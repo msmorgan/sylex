@@ -1,6 +1,9 @@
 // The Oracle English grammar data file. It names Categories, features,
 // Schemas and core closed-class lexemes only: every other word, and every
 // Subcategorization Frame, comes from the lexical environment it is bound to.
+// Citations: `CGEL 15§3.6:1335` is The Cambridge Grammar of the English
+// Language, Ch. 15 §3.6, p. 1335; `OSG` is `docs/oracle-style-guide.md`;
+// `ADR` is `docs/decisions/english.md`.
 root Document
 
 // A keyword mention may omit parameters; a Keyword Line supplies them.
@@ -9,7 +12,7 @@ feature KeywordForm = Bare | Parametric
 // catalog parameter frame; `SetOff` kinds follow an em dash. A set-off
 // cost ends in a period of its own, and an associated instruction may
 // follow it on the line; a set-off ability runs to the end of the
-// line (style guide §3 "Periods", §14 "Keyword abilities").
+// line (OSG §3, Periods; §14, Keyword abilities).
 feature FinalParameter = Cost | SetOffCost | SetOffAbility
 feature Number = Singular | Plural
 // The Number of a noun's *of* oblique, or of a determinative's
@@ -17,8 +20,7 @@ feature Number = Singular | Plural
 feature ObliqueNumber = Singular | Plural
 // An adjective's inflectional grade, or the comparison a non-scalar
 // comparative governor marks: equality with *as* (*same*), or
-// inequality with *than* (*different*, *other*; CGEL, Ch. 13 §1.1,
-// p. 1100).
+// inequality with *than* (*different*, *other*; CGEL 13§1.1:1100).
 feature Grade = Plain | Comparative | Superlative | Equative | NonScalarInequality
 // Internal numeral–noun agreement survives external group respecification.
 feature QuantityNumber = Singular | Plural
@@ -27,17 +29,17 @@ feature QuantityNumber = Singular | Plural
 feature ConjunctNumber = Singular | Plural
 // The Number of the first conjunct of an *and*-coordination of Noun
 // Phrases, which an existential *be* before it may agree with by
-// proximity (CGEL, Ch. 4 §3.2.2, p. 242, n. 21).
+// proximity (CGEL 4§3.2.2:242 n. 21).
 feature FirstConjunctNumber = Singular | Plural
 // Oracle text has no first person.
 feature Person = Second | Third
 feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
 // A to-infinitival Clause is marked by its subordinator; a relative
-// clause by *that* or a relative phrase. `To` has one source, the
-// ToInfinitival Production, and is the whole class: only a clause
-// whose VP carries the subordinator *to* (CGEL, Ch. 2 §14, pp. 64–65)
-// is a ToInf Complement (InfinitivalComplement), takes a phrasal
-// adverb before it (ModifiedInfinitival), or follows *whether*
+// clause by *that* or a relative phrase. `To` is the whole class of
+// clauses whose VP carries the subordinator *to* (CGEL 2§14:64–65), made
+// only by the ToInfinitival Production; only those are a ToInf
+// Complement (InfinitivalComplement), take a phrasal adverb before
+// them (ModifiedInfinitival), or follow *whether*
 // (ClosedInfinitivalInterrogative).
 feature ClauseMarking = Unmarked | To | Relative
 feature Voice = Active | Passive
@@ -48,19 +50,18 @@ feature AdjectivalPassive = Lexical
 // leaves it unvalued.
 feature VerbKind = Auxiliary
 // An auxiliary's form is Affirmative or Negative (*can*, *can't*); a
-// premodifier prefixed by *non-* is Negative
-// (`docs/oracle-style-guide.md` §7, Negation with non-), and any other
-// premodifier leaves it unvalued. An asyndetic chain of premodifiers
-// holds only Negative ones (§6, Determiners and modifier order).
+// premodifier prefixed by *non-* is Negative (OSG §7, Negation with
+// non-), and any other premodifier leaves it unvalued. An asyndetic
+// chain of premodifiers holds only Negative ones (§6, Determiners and
+// modifier order).
 feature Polarity = Affirmative | Negative
 // The Slot Kind of a Preposition Phrase's Complement. `MeasureNP` has
 // one preposition holder, *of* (*your choice of 5/1 or 1/5*), and
 // `QuotedAbility` one, *with* (*a token with "This token can't
-// block."*): each is a Complement that is no ordinary Noun Phrase.
-// A bare slash measure occurs only where a head selects one (project
-// term Measure Noun Phrase; *get* selects it as its Object by frame),
-// and a quoted ability is the granted ability of [CR#113.1a],
-// which only a Nominal-hosted *with* takes, beside *has* and *gain*.
+// block."*): each is a Complement that is no ordinary Noun Phrase. A
+// bare slash measure occurs only where a head selects one; a quoted
+// ability is the granted ability of [CR#113.1a], which only a
+// Nominal-hosted *with* takes.
 feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
@@ -70,24 +71,21 @@ feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
     | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
-// `Quantity` has one holder, *number*: the number-transparent
-// quantificational noun (*any number of target creatures*; CGEL,
-// Ch. 5 §3.3, pp. 349–351) that TransparentQuantity, TargetedQuantity
-// and FreeChoiceQuantity read; no other Oracle noun takes its
-// Number from its *of* oblique.
-// `Serial` has one holder, *time*, and that is the whole class: a
-// bounding frequency Noun Phrase has *times* as its head (*three
-// times*; CGEL, Ch. 8 §9, p. 715), and so does a cardinal multiplier
-// (*three times X*; Ch. 5 §12, p. 434).
+// `Quantity` has one holder, *number*: the number-transparent noun
+// (*any number of target creatures*; CGEL 5§3.3:349–351) that
+// TransparentQuantity, TargetedQuantity and FreeChoiceQuantity read.
+// `Serial` has one holder, *time*, the head of a bounding frequency
+// Noun Phrase (*three times*; CGEL 8§9:715) and of a cardinal
+// multiplier (*three times X*; 5§12:434).
 feature NounDistribution = Ordinary | Quantity | DirectMeasure | HeadOnly | Serial | FixedFrame
 // A fused-head quantity (*choose one*, *one or more*) is a Quantity.
-// `Manner` has one holder, *way*, the only Oracle noun that is a
-// Manner Adjunct without a governing preposition (*do it this way*;
-// CGEL, Ch. 8 §2.1, p. 671); MannerAdjunct reads it.
+// `Manner` has one holder, *way*, the one noun that is a Manner Adjunct
+// without a preposition (*do it this way*; CGEL 8§2.1:671); MannerAdjunct
+// reads it.
 feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity
 // A noun whose values are cited names, the variable of a specifying
-// copular clause (*the new creature type can't be Wall*; CGEL, Ch. 4
-// §5.5, pp. 266-269): *type*. Carried by the Noun Phrase it heads.
+// copular clause (*the new creature type can't be Wall*; CGEL
+// 4§5.5:266-269): *type*. Carried by the Noun Phrase it heads.
 feature Variable = Cited
 // The NounKind of a head's *of* oblique.
 feature ObliqueNounKind = Ordinary | Temporal | Manner | Numeric | Quantity
@@ -102,81 +100,65 @@ feature ObliqueDistribution =
 feature AdjectivePosition = Attributive | Predicative
 feature Sign = Negative | Zero | Positive
 // `Existential` has one holder, dummy *there*, the subject of an
-// existential clause (CGEL, Ch. 16 §6.2, p. 1394); the Existential
-// Production reads it, and the Pronoun Production excludes it.
+// existential clause (CGEL 16§6.2:1394); the Existential Production
+// reads it, and the Pronoun Production excludes it.
 feature PronounKind = Personal | Existential | Relative
-// `FreeChoice` has one holder, *any*, and that is the whole class, as
-// `Serial` is *time*. Determined and DeterminedModifiedQuantity
-// exclude it, two admission gates (`docs/decisions/english.md`
-// §6): Determined's routes *any* to FreeChoiceDetermined,
-// TransparentQuantity and TemporalQuantity, which carry number
-// transparency (CGEL, Ch. 5 §3.3, pp. 349–351: never *any number of
-// target creatures becomes*); and with
-// DeterminedModifiedQuantity's, neither Production builds a second
-// tree of an analysis FreeChoiceDetermined or AgreeingModifiedQuantity
-// builds (`docs/decisions/english.md` §8).
+// `FreeChoice` has one holder, *any*, which Determined and
+// DeterminedModifiedQuantity exclude (two admission gates, ADR §6): it
+// goes to FreeChoiceDetermined, TransparentQuantity and
+// TemporalQuantity, which carry number transparency (CGEL 5§3.3:349–351;
+// never *any number of target creatures becomes*), so no second tree
+// (ADR §8).
 // `IndefiniteArticle` (*a*) and `SingularOrQuantified` (*another*) each
-// have one holder, and each is the whole of its class. *A* alone
-// selects a singular head (CGEL, Ch. 5 §3.4, p. 353, set (a) [67]);
-// *another* is the one word that also selects a quantified plural
-// (*another three bodies*; set (c) [69–70]), where *a* does so only
-// with *further* or *additional*, read by DeterminedModifiedQuantity.
-// The two also part in temporal location: *another day*, never *a
-// day* (Ch. 8 §6.3, p. 698), an admission gate on TemporalLocation
-// (`docs/decisions/english.md` §6).
+// have one holder. *A* alone selects a singular head (CGEL 5§3.4:353
+// [67]); *another* also a quantified plural (*another three bodies*;
+// [69–70]), as *a* does only with *further* or *additional*
+// (DeterminedModifiedQuantity). They also part in temporal location:
+// *another day*, never *a day* (8§6.3:698), an admission gate on
+// TemporalLocation (ADR §6).
 // `Targeting` has one holder, the Targeting Marker *target* (project
-// term, `docs/contexts/oracle-english/CONTEXT.md`): a determinative
-// that only determines a nominal, so it is kept apart from
-// `Dependent`, which FusedDegreeDeterminer and DegreePartitive
-// require, and it never fuses or partitions (not *choose target*,
-// *target of those*). TargetedNounPhrase and BareTargetingMarker
-// carry it.
+// term, `docs/contexts/oracle-english/CONTEXT.md`): it only determines
+// a nominal, so it is not `Dependent` (which FusedDegreeDeterminer and
+// DegreePartitive require) and never fuses or partitions (not *choose
+// target*); TargetedNounPhrase and BareTargetingMarker carry it.
 feature DeterminativeDistribution =
     | Dependent | Independent | Numerical | IndefiniteArticle | Distributive | Deictic
     | SingularOrQuantified | FreeChoice | Multiplier | Targeting
 // Whether a determiner is a cardinal numeral or a coordination with one
-// (*ten*, *ten or more*; CGEL, Ch. 15 §3.3(d), p. 1330). Every
-// determinative values it, so a Production that needs a numerically
-// quantified Noun Phrase `Carry`s it (a postpositive sum adjective,
-// CGEL, Ch. 5 §14.2(b), pp. 445-446).
+// (*ten*, *ten or more*; CGEL 15§3.3(d):1330). Every determinative
+// values it, so a Production that needs a numerically quantified Noun
+// Phrase `Carry`s it (a postpositive sum adjective, CGEL
+// 5§14.2(b):445-446).
 feature Cardinality = Cardinal | NonCardinal
 feature Case = Plain | Nominative | Accusative | Genitive
 feature Countability = Count | Mass
 // `Linking` is the position of a connective that marks a Linked
-// Coordination, initial in its Linked Conjunct (CGEL, Ch. 15 §2.10,
-// pp. 1319–1320).
+// Coordination, initial in its Linked Conjunct (CGEL 15§2.10:1319–1320).
 // `Multiplying` is the position of a multiplier of a quantity (*twice
-// the damage*), which is also a frequency adverb at the end of a Verb
-// Phrase (*draw a card twice*): it modifies a Noun Phrase or a
-// measure only, never a Preposition Phrase or a temporal Noun Phrase,
-// where it would build a second tree for the frequency adverb's
-// Adjunct (`docs/decisions/english.md` §8).
+// the damage*), also a frequency adverb at the end of a Verb Phrase
+// (*draw a card twice*): it modifies a Noun Phrase or a measure only,
+// never a Preposition Phrase or a temporal Noun Phrase, where it would
+// build a second tree for the frequency adverb's Adjunct (ADR §8).
 feature AdjunctPosition = Front | Central | End | Phrasal | Multiplying | Bounding | Linking
 // A Clause whose front position holds a dependent set off by a comma
-// (*If you do, ...*, *Once each turn, ...*). Front dependents that
-// share one comma are siblings in one Production (*Then if ...*,
-// *Once during each of your turns, ...*), so a front Adverb Phrase
-// without a comma never also precedes such a Clause: one tree per
-// analysis (`docs/decisions/english.md` §8). A Clause coordination
-// takes it from its first conjunct, where its front position is:
-// front dependents sharing one comma are siblings whether they scope
-// over the first conjunct or the whole (*Once each turn, C1, and
-// C2*), never split between the two.
+// (*If you do, ...*, *Once each turn, ...*). Front dependents sharing
+// one comma are siblings in one Production (*Then if ...*), so a front
+// Adverb Phrase without a comma never also precedes such a Clause
+// (ADR §8). A Clause coordination takes it from its first conjunct,
+// never split between the first conjunct and the whole (*Once each
+// turn, C1, and C2*).
 feature FrontPosition = Occupied
 // A Verb Phrase that begins with a central Adjunct (*also gains
-// trample*). A bare imperative has no Subject, so its front and
-// central positions coincide: an adverb before it is its Clause's
-// front Adjunct (*Also draw a card*, *Then [draw a card and discard
-// a card]*), as a chain of bare imperatives is coordinated Clauses,
-// and never also a central Adjunct of its Verb Phrase: one tree per
-// analysis (`docs/decisions/english.md` §8).
+// trample*). A bare imperative has no Subject, so an adverb before it
+// is its Clause's front Adjunct (*Also draw a card*), never also a
+// central Adjunct of its Verb Phrase (ADR §8).
 feature CentralPosition = Occupied
 // A fused-head adjective that names a Quality with no noun of its own
 // (*protection from multicolored*), as the lexicon declares it.
 feature QualityHead = Fused
 // A Conjunct of a Word-Part Coordination: a Compound Noun's first
 // base alone, sharing the head word of the last Conjunct, the
-// `Whole` Compound Noun (CGEL, Ch. 15 §3.1(g), p. 1325).
+// `Whole` Compound Noun (CGEL 15§3.1(g):1325).
 feature CompoundPart = Base | Whole
 feature Inflection =
     | Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis
@@ -203,7 +185,7 @@ category KeywordList
 category Quality
 // A name has the Number of what it names, from the lexicon: singular
 // unless it names a collection (*When The Notary Hobbits enter*;
-// CGEL, Ch. 5 §20.2.1, p. 517). It is never another card's name,
+// CGEL 5§20.2.1:517). It is never another card's name,
 // which `Lex(Catalog)` does not admit, so never *Exile target ...*
 // with *Exile* a card's name and *target* its verb.
 category Name [Number]
@@ -230,23 +212,21 @@ category ChoiceQuantity [Number]
 category Sentence
 category Sentences
 // A Clause's Inflection is its finite verb's: an independent clause
-// excludes the irrealis *were* (CGEL, Ch. 3 §1.5, pp. 85–88). Its
+// excludes the irrealis *were* (CGEL 3§1.5:85–88). Its
 // Number and Person are its Subject's, which a Subject remnant after
 // it recovers (SubjectRemnant).
 category Clause [Number, Person, VerbForm, ClauseMarking, Inflection, FrontPosition] { gap }
 // A subject relative agrees with its antecedent in number; an
 // adverbial relative modifies a temporal nominal.
 category RelativeClause [Number, NounKind, ClauseMarking]
-// A finite clause whose Subject is its Gap (CGEL, Ch. 12 §3.3(a), p. 1044).
+// A finite clause whose Subject is its Gap (CGEL 12§3.3(a):1044).
 category SubjectGapClause : Clause [Number, Person, VerbForm, Inflection] { gap }
 // A finite clause with an extracted Adjunct.
 category AdjunctGapClause : Clause [VerbForm] { gap }
 // A finite clause that opens with its Subject, as a bare relative's
-// does: no preposed adjunct comes before it (CGEL, Ch. 12 §3.5.5,
-// p. 1055). An admission gate (`docs/decisions/english.md` §6): "Bare
-// relatives always have the subject in initial position", so the
-// Category restates the Clause Productions that open with the Subject
-// and omits those that front an adjunct.
+// does: no preposed adjunct comes before it (CGEL 12§3.5.5:1055). An
+// admission gate (ADR §6): the Category restates the Clause Productions
+// that open with the Subject and omits those that front an adjunct.
 category SubjectInitialClause : Clause [VerbForm, Inflection] { gap }
 // A coordination of bare adverbial relatives' Clauses.
 category SubjectInitialCoordination : Clause [VerbForm, Inflection] { gap }
@@ -258,13 +238,13 @@ category VerbPhrase [
 // The Linked Conjunct of a Linked Coordination: a Clause or Verb
 // Phrase marked by its initial linking connective, its Adjunct
 // (*Draw a card, [then discard a card]*; *Each player discards a
-// card, [then draws a card]*; CGEL, Ch. 15 §2.10, pp. 1319–1320).
+// card, [then draws a card]*; CGEL 15§2.10:1319–1320).
 category LinkedClause : Clause [VerbForm, ClauseMarking, Inflection, FrontPosition] { gap }
 category LinkedVerbPhrase : VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
 ] { gap }
-// Existential *there* and the predicate it is subject of (CGEL, Ch. 16
-// §6.1, p. 1391).
+// Existential *there* and the predicate it is subject of (CGEL
+// 16§6.1:1391).
 category DummyPronoun : NounPhrase [Number, Person]
 category ExistentialPredicate : VerbPhrase [Number, Person, VerbForm, Inflection, ComplementKind]
 category FusedNounPhrase : NounPhrase [
@@ -278,7 +258,7 @@ category SymbolHead : NounPhrase [Number, Person, Case, Determination, NounKind,
 // and a relative clause may postmodify (*each of those cards that has
 // suspend*). A fused partitive carries its determinative's
 // distribution: *each of X* has the same distributive head as *each
-// X* (CGEL, Ch. 5 §9.1, p. 411).
+// X* (CGEL 5§9.1:411).
 category PartitiveHead : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
 ] { gap }
@@ -297,7 +277,7 @@ category FixedFrameNounPhrase : NounPhrase [
 ]
 // A Noun Phrase's DeterminativeDistribution is its determiner's: an
 // *and*-coordination of distributive ones is singular (*each dog and
-// each cat has*; CGEL, Ch. 5 §18.4, p. 508).
+// each cat has*; CGEL 5§18.4:508).
 // A noun's Amount Complement is a Nominal dependent, so a slash
 // Measure is shared only by coordinated Nominals (*base power and
 // toughness 4/4*): a Noun Phrase never passes up a Measure Gap.
@@ -307,8 +287,8 @@ category NounPhrase [
     Variable, Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution,
 ] { gap, closed_gaps: [Measure] }
-// A temporal Noun Phrase Adjunct: of location (*this turn*; CGEL, Ch. 8
-// §6.3, p. 698) or of frequency (*three times*; Ch. 8 §9, pp. 713–716).
+// A temporal Noun Phrase Adjunct: of location (*this turn*; CGEL
+// 8§6.3:698) or of frequency (*three times*; 8§9:713–716).
 category TemporalNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability,
 ]
@@ -326,14 +306,11 @@ category ModifiedQuantifiedNominal : Nominal [
     QuantityNumber, NounKind, Determination, NounDistribution,
 ]
 // A temporal nominal bounded by a relative clause (*next time you cast a
-// spell*). An admission gate (`docs/decisions/english.md` §6),
-// a formation rule: a Noun Phrase is a temporal Adjunct only
-// in restricted forms (CGEL, Ch. 8 §6.3, p. 698), and a temporal
-// nominal in one takes a *when*-less adverbial relative clause, then at
-// most a temporal bound, and no other postmodifier (*the next time
-// [event] this turn*, `docs/oracle-style-guide.md` §11, Continuous and
-// bounded durations). RelativeTime and RelativeTimePostmodifier
-// restate NominalPostmodifier and TemporalPostmodifier for that reason.
+// spell*). An admission gate (ADR §6): it takes a *when*-less adverbial
+// relative clause, then at most a temporal bound (*the next time
+// [event] this turn*; CGEL 8§6.3:698), and no other postmodifier.
+// RelativeTime and RelativeTimePostmodifier restate NominalPostmodifier
+// and TemporalPostmodifier.
 category RelativeTemporalNominal : Nominal [
     Number, Countability, NounKind, Determination, NounDistribution,
 ]
@@ -363,20 +340,16 @@ category PrepositionalNominal : Nominal [Number, Countability, NounDistribution]
 category TargetedOblique : PrepositionPhrase [Number, NounKind]
 category TargetedNounPhrase : NounPhrase [Number, NounKind, Countability]
 category BareNominalComplement : Nominal
-// A genitive's possessor: a Noun Phrase that ends in its head. An
-// admission gate (`docs/decisions/english.md` §6), a
-// register formation rule: English has the phrasal genitive (*the King
-// of England's daughter*; CGEL, Ch. 5 §16.6, p. 479), but Oracle never
-// postmodifies a possessor, and fronts the player noun instead "to
-// avoid a dangling possessive" (`docs/oracle-style-guide.md` §6,
-// Controller and owner). Its Productions restate the Noun Phrase ones
-// over BareNominal, which takes no postmodifier.
+// A genitive's possessor: a Noun Phrase that ends in its head, never
+// postmodified (OSG §6, Controller and owner). An admission gate (ADR
+// §6): its Productions restate the Noun Phrase ones over BareNominal,
+// which takes no postmodifier.
 category Possessor : NounPhrase [Number, Person, Case]
 // A single genitive over coordinated nominals (*target artifact or
-// creature's owner*; CGEL, Ch. 15 §3.4, p. 1331).
+// creature's owner*; CGEL 15§3.4:1331).
 category PossessorNominals : Nominal [Number, Countability, NounKind]
 // A direct multiple genitive over nominals (*that creature's or
-// spell's controller*; CGEL, Ch. 15 §3.4, p. 1331), and each genitive.
+// spell's controller*; CGEL 15§3.4:1331), and each genitive.
 category GenitiveNominal : Nominal [Number, Countability, NounKind]
 category GenitiveNominals : Nominal [Number, Countability, NounKind]
 category NumericalDeterminer : DeterminerPhrase [Number, Countability]
@@ -388,7 +361,7 @@ category PositionPhrase : AdjectivePhrase
 category FusableDeterminer : DeterminerPhrase [Number, Countability, NounKind]
 category FusedQuantity : DeterminerPhrase [Number, Countability]
 // A determinative's Complement has a Number of its own (*all but
-// one*; CGEL, Ch. 5 §7.3, p. 375).
+// one*; CGEL 5§7.3:375).
 category DeterminerPhrase [
     Number, Countability, DeterminativeDistribution, Cardinality, NounKind, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution,
@@ -415,67 +388,58 @@ category AdverbPhrase [AdjunctPosition]
 // The predicative Complement function; its head bears it too.
 category Predicative { function }
 // A depictive Adjunct of unlike categories coordinated (*onto the
-// battlefield tapped and attacking*; CGEL, Ch. 15 §3.2, pp. 1326–1329), and each of
-// its conjuncts, by the kind of phrase that fills it.
+// battlefield tapped and attacking*; CGEL 15§3.2:1326–1329), and each
+// of its conjuncts, by the kind of phrase that fills it.
 category Depictive : Predicative [ComplementKind] { function }
 category DepictiveCoordination : Predicative [ComplementKind] { function }
 // A predicate Adjunct of unlike categories coordinated (*only during
 // your turn and only once each turn*), and each of its conjuncts.
 category PredicateAdjunct [ComplementKind] { function }
-// A clause fragment of Predicate Adjuncts that *but* or *and* adds to
-// a whole Clause, and the fragment focused by *only* or *not* that
-// qualifies it (*but only during their turn before the end step*;
-// CGEL, Ch. 15 §4.5, pp. 1347–1348).
 // Complement Clusters, sequences of a verb's Complements, each with
 // an optional Adjunct after them, coordinated after the shared verb
 // (*put [one of them into your hand] and [the rest into your
-// graveyard]*; *has [lifelink if you control a Cleric], [deathtouch
-// if you control a Rogue], and [flying if you control a Wizard]*):
-// right nonce-constituent coordination (CGEL, Ch. 15 §4.3,
-// pp. 1341–1343), whose coordination bears no function (p. 1343).
+// graveyard]*): right nonce-constituent coordination (CGEL
+// 15§4.3:1341–1343), whose coordination bears no function (1343).
 category ComplementCluster
 category ClusterCoordination : ComplementCluster
 // A keyword's parameters without the keyword: a later Cluster's
 // remnant, the keyword elided as the initial Cluster's Object head
-// (*gain protection from white if ..., [from blue] if ...*; CGEL,
-// Ch. 15 §4.3, p. 1343, note 65: *We'll be in Paris for a week and
-// Bonn for three days*, *in* elided).
+// (*gain protection from white if ..., [from blue] if ...*; CGEL
+// 15§4.3:1343 n. 65).
 category ParameterRemnant
 // Clusters of Adjuncts alone after a head with no Complement, two
-// Preposition Phrases each (*enters [with a +1/+1
-// counter on it for each other red creature you control] and [a +1/+1
-// counter on it for each other green creature you control]*; CGEL,
-// Ch. 15 §4.3, p. 1343, note 65: a PP+PP-coordination).
+// Preposition Phrases each (*enters [with a +1/+1 counter on it for
+// each other red creature you control] and [a +1/+1 counter on it for
+// each other green creature you control]*; CGEL 15§4.3:1343 n. 65).
 category AdjunctCluster
 category AdjunctClusterCoordination : AdjunctCluster
 // A Preposition Phrase's Complement without the preposition: a later
 // Adjunct Cluster's remnant, the preposition elided as the initial
 // Cluster's (*[a +1/+1 counter on it] for each ...*, *with* elided).
 category PrepositionRemnant
-// A copular Verb Phrase's Predicative Complement without the verb: a
-// medial conjunct of a Verb Phrase coordination, the verb elided and
-// recovered from the initial conjunct (*is enchanted, [equipped], and
-// has a counter on it*; CGEL, Ch. 15 §3.6, pp. 1335–1336, [31ii]: *He
-// was middle-aged, of sallow complexion and had penetrating blue
-// eyes*).
+// A copular Verb Phrase's Predicative Complement without the verb, a
+// medial conjunct of a Verb Phrase coordination (*is enchanted,
+// [equipped], and has a counter on it*; CGEL 15§3.6:1335–1336 [31ii]).
 category PredicativeRemnant
-// A finite Verb Phrase whose Subject is elided: a medial conjunct of
-// a Clause coordination, its Subject the initial Clause's (*you gain
-// 4 life, [draw four cards], and he deals 4 damage*; CGEL, Ch. 15
-// §3.6, pp. 1335–1336, [31iii]: *He reads widely, has a questioning
-// mind and he's very mature for his years*).
+// A finite Verb Phrase whose Subject is elided, a medial conjunct of a
+// Clause coordination (*you gain 4 life, [draw four cards], and he
+// deals 4 damage*; CGEL 15§3.6:1335–1336 [31iii]); its Subject is the
+// initial Clause's.
 category SubjectRemnant [Number, Person, VerbForm]
 // An idiomatic coordinate (*and [so on for double strike, ...]*),
 // standing for further conjuncts of its coordination's kind
 // (`idiomatic_coordinates`).
 category IdiomaticCoordinate
+// A clause fragment of Predicate Adjuncts that *but* or *and* adds to
+// a whole Clause, and the fragment focused by *only* or *not* that
+// qualifies it (*but only during their turn before the end step*;
+// CGEL 15§4.5:1347–1348).
 category ClauseFragment
 category QualifyingFragment
 // Coordinates joined by *but* that contrast as positive and negative,
 // *not* modifying the second (*life equal to the damage dealt, but
 // not more life than ...*; *from your graveyard, but not from
-// anywhere else*; CGEL, Ch. 15 §2.6, p. 1313, [60iia]: *They had
-// invited [Jill but not her husband]*), and each coordinate.
+// anywhere else*; CGEL 15§2.6:1313 [60iia]), and each coordinate.
 category ContrastConjunct : NounPhrase [Polarity] { function }
 category ContrastCoordination : NounPhrase [Polarity] { function }
 category ContrastPrepositionConjunct : PrepositionPhrase [
@@ -494,23 +458,19 @@ category Attributes [ComplementKind] { function }
 // toughness 5/5 and vigilance*), and each of its conjuncts.
 category ObjectConjunct : NounPhrase [ComplementKind] { function }
 category ObjectCoordination : NounPhrase [ComplementKind] { function }
-// Postmodifiers of unlike categories coordinated (*the player with the
-// most life or tied for most life*), and each of them.
 // An Amount and a Noun Phrase coordinated (*equal to [2] or [the
 // greatest power among Dinosaurs you control]*), where a head selects
-// both (CGEL, Ch. 15 §3.1, p. 1323, rule [1]), and each of its
-// conjuncts.
+// both (CGEL 15§3.1:1323 rule [1]), and each of its conjuncts.
 category AmountOrNounConjunct : NounPhrase [ComplementKind] { function }
 category AmountOrNounPhrase : NounPhrase [ComplementKind] { function }
+// Postmodifiers of unlike categories coordinated (*the player with the
+// most life or tied for most life*), and each of them.
 category PostmodifierConjunct : Postmodifier [ComplementKind] { function }
 category PostmodifierCoordination : Postmodifier [ComplementKind] { function }
 category Attribute : Attributes [ComplementKind, Polarity] { function }
-// An asyndetic chain of premodifiers. An admission gate
-// (`docs/decisions/english.md` §6), a register formation
-// rule: Oracle sets off with commas only independent *non-*
-// premodifiers of one head (`docs/oracle-style-guide.md` §6,
-// Determiners and modifier order), so the chain never holds an
-// uncoordinated attribute that is not `Polarity: Negative`.
+// An asyndetic chain of premodifiers. An admission gate (ADR §6): it
+// never holds an uncoordinated attribute that is not `Polarity:
+// Negative` (OSG §6, Determiners and modifier order).
 category AttributeChain : Attributes [ComplementKind] { function }
 category AdjunctCoordination : PredicateAdjunct [ComplementKind] { function }
 // An adverbial Complement: an Adverb Phrase or a Noun Phrase of
@@ -519,22 +479,21 @@ category Adverbial { function }
 // The Adjunct function before a selected Complement or shifted Object.
 category Interleaved { function }
 // The Adjunct function before only the Internalised Complement of a
-// passive, a non-core Complement (CGEL, Ch. 4 §3.2.1, p. 241).
+// passive, a non-core Complement (CGEL 4§3.2.1:241).
 category InternalisedInterleaved { function }
 // A relative clause before the Complement its noun selects, which is
-// postposed past it: post-head order in a Nominal is labile (CGEL,
-// Ch. 5 §15, p. 454 [12]–[13]: *the rumour [which was published in
-// 'The Times'] [that income tax would be cut]*; *Equip abilities
-// [you activate] [of other Equipment]*).
+// postposed past it, post-head order in a Nominal being labile (*Equip
+// abilities [you activate] [of other Equipment]*; CGEL 5§15:454
+// [12]–[13]).
 category InterleavedModifier [Number, NounKind] { function }
 // The Modifier function of an Object, postposed after the selected
-// Complements that follow it (CGEL, Ch. 12 §4, p. 1066), with the
+// Complements that follow it (CGEL 12§4:1066), with the
 // Case its Object agrees in.
 category PostposedModifier [Case] { function }
 // The Modifier function after a nominal head: a relative clause or a
 // participial clause.
 category Postmodifier [Number, NounKind] { function }
-// A relative phrase with genitive *whose* (CGEL, Ch. 12 §3.2.5, p. 1043).
+// A relative phrase with genitive *whose* (CGEL 12§3.2.5:1043).
 category RelativeNounPhrase : NounPhrase [Number]
 // A preposition and its relative pronoun, fronted (*for which*).
 category RelativePrepositionPhrase : PrepositionPhrase
@@ -571,17 +530,17 @@ category AuxiliaryComplement : VerbPhrase [VerbForm, Voice, VerbKind] {
 }
 category Gerund : VerbPhrase [Number, Person, VerbForm, Voice] { gap }
 // A gerund-participial Clause with its Subject, which Oracle uses as
-// a Subject only (CGEL, Ch. 14 §2.1, p. 1188).
+// a Subject only (CGEL 14§2.1:1188).
 category GerundClause : Clause
 category QuotedAbility
-// A word cited rather than used: a metalinguistic Noun Phrase (CGEL,
-// Ch. 5 §8.2, p. 401), as *left or right* in *choose left or right*
+// A word cited rather than used: a metalinguistic Noun Phrase (CGEL
+// 5§8.2:401), as *left or right* in *choose left or right*
 // and *Wall* in *other than Wall*. It fills only a slot a head's
 // frame selects, never an ordinary Noun Phrase's.
 category Mention
 category MentionModifier
 category QuotedCost
-// An interrogative content clause (CGEL, Ch. 11 §5.1, pp. 972–973).
+// An interrogative content clause (CGEL 11§5.1:972–973).
 category InterrogativeClause : Clause
 // An interrogative phrase with *which* (*which creatures*).
 category InterrogativePhrase : NounPhrase [Number, Person]
@@ -593,7 +552,7 @@ word Than = "prep:than"
 word From = "prep:from"
 word For = "prep:for"
 // The locative prepositions of *be* and temporal *after*: an
-// existential's extension (CGEL, Ch. 16 §6.2.1, p. 1394).
+// existential's extension (CGEL 16§6.2.1:1394).
 word In = "prep:in"
 word On = "prep:on"
 word Among = "prep:among"
@@ -625,7 +584,7 @@ word All = "det:all.count"
 word Whichever = "det:whichever"
 word Which = "det:which"
 word Whether = "sub:whether"
-// Interrogative *how* (CGEL, Ch. 10 §7, p. 902).
+// Interrogative *how* (CGEL 10§7:902).
 word How = "adv:how"
 word Target = "det:target"
 word Most = "det:most"
@@ -638,35 +597,30 @@ class Coordinator = ["coord:and", "coord:or", "coord:and/or", "coord:nor"]
 class Disjunctive = ["coord:or", "coord:and/or", "coord:nor"]
 class Alternative = ["coord:or", "coord:nor"]
 // The coordinators that attach a new element to a whole Clause
-// (CGEL, Ch. 15 §4.5, p. 1347: "*But* is the most common coordinator
-// in this construction; *and* is also possible, but *or* is not").
+// (CGEL 15§4.5:1347): *but* or *and*, never *or*.
 class AddingCoordinator = ["coord:and", "coord:but"]
-// The focusing adverbs of a qualifying added element (CGEL, Ch. 15
-// §4.5, p. 1347: "*only* is not omissible, though *not* could take
-// its place").
+// The focusing adverbs of a qualifying added element (CGEL 15§4.5:1347).
 class FocusingAdverb = ["adv:only", "adv:not"]
 // *Be* and its contracted and negative forms.
 class BeVerb = ["verb:be", "verb:'re", "verb:aren't"]
 // Perfect *have* and its contracted and negative forms.
 class HaveVerb = ["verb:have", "verb:'ve", "verb:haven't"]
 // Auxiliaries stranded before the ellipsis site of their Complement
-// (CGEL, Ch. 17 §7.1, pp. 1519–1523), by the form of the verb that
-// heads the omitted Complement: a modal's is plain (its
-// `Catenative(BareInf)` frame), perfect *have*'s a past participle
-// (Perfect) and *be*'s a gerund-participle or a past participle
-// (Progressive, Passive). *Do* has its intransitive pro-form frame;
-// a reduced clitic never stands in this stressed position (Ch. 18
-// §6.1, p. 1614).
+// (CGEL 17§7.1:1519–1523), by the form of the omitted Complement's
+// verb: a modal's is plain, perfect *have*'s a past participle
+// (Perfect), *be*'s a gerund-participle or past participle
+// (Progressive, Passive). *Do* has its intransitive pro-form frame; a
+// reduced clitic never stands in this stressed position (18§6.1:1614).
 class StrandableModal = ["verb:can", "verb:can't", "verb:may", "verb:must", "verb:will"]
 class StrandableHave = ["verb:have", "verb:haven't"]
 class StrandableBe = ["verb:be", "verb:aren't"]
 // Comparative determinatives: they select a *than* Complement (*more
-// than one*; CGEL, Ch. 13 §2.1, p. 1104), and a measure phrase
+// than one*; CGEL 13§2.1:1104), and a measure phrase
 // modifies them (*{1} less*).
 class ComparativeQuantifier = ["det:more.count", "det:more.mass", "det:less", "det:fewer"]
 // Determinatives that head a partitive with an *of* oblique in fused
 // determiner-head function (*some of them*, *each of those
-// creatures*; CGEL, Ch. 5 §9.3, pp. 408–410). *Any* and a quantity
+// creatures*; CGEL 5§9.3:408–410). *Any* and a quantity
 // (*one of them*, *that many of those tokens*) have Productions of
 // their own.
 class PartitiveQuantifier = [
@@ -676,48 +630,42 @@ class PartitiveQuantifier = [
 ]
 // The universal quantifiers that float as a quantificational
 // Adjunct after a plural Subject or an auxiliary (*the girls each
-// enjoyed it*, *we both enjoyed it*, *you will each qualify*; CGEL,
-// Ch. 5 §9.3, p. 413; §10.1.1, p. 428). *All* floats after a
-// personal pronoun only, in FloatedAll.
+// enjoyed it*, *we both enjoyed it*, *you will each qualify*; CGEL
+// 5§9.3:413; §10.1.1:428). *All* floats after a personal pronoun only,
+// in FloatedAll.
 class FloatingQuantifier = ["det:each", "det:both"]
 class SuperlativeQuantifier = ["det:most", "det:least", "det:fewest"]
 // The superlative determinative that is no degree word, so that it
 // fuses with its head with the article unexpressed (*tied for
-// fewest*; CGEL, Ch. 13 §6.3.4, pp. 1168-1169). *Most* and *least*
-// also modify an adjective (*most common*), and fused so they would
-// leave it a depictive Adjunct of the clause.
+// fewest*; CGEL 13§6.3.4:1168-1169). *Most* and *least* also modify an
+// adjective (*most common*); fused, they would leave it a depictive
+// Adjunct of the clause.
 class CountSuperlativeQuantifier = ["det:fewest"]
-// Determinatives that stand alone as a fused determiner-head (CGEL,
-// Ch. 5 §9.1, p. 410): *both*, *none*, and *another* opposed to *one*
-// (*replacing all instances of one color word with another*; p. 391).
-// *Each* fuses with the head in an implicit partitive, its set
-// recovered from an antecedent (*one or more creatures enter, each
-// enters with ...*; Ch. 5 §9.3, p. 413), as *both* and *either* do;
-// in Oracle only as a Subject (NonNumericComplement,
+// Determinatives that stand alone as a fused determiner-head (CGEL
+// 5§9.1:410): *both*, *none*, and *another* opposed to *one*
+// (*replacing all instances of one color word with another*; 391).
+// *Each* fuses in an implicit partitive, its set recovered from an
+// antecedent (*one or more creatures enter, each enters with ...*;
+// 5§9.3:413); in Oracle only as a Subject (NonNumericComplement,
 // NominalPredicative).
 class FusedQuantifier = [
     "det:another", "det:both", "det:each", "det:more.count", "det:everything", "det:this",
     "det:none",
 ]
 // *Either* and *neither* choose from a set in an implicit partitive
-// (*If a player does either*; p. 413, [11ii]: *there wasn't time to
-// watch either (of them)*). Unlike fused *each*, whose set is the
-// antecedent's members acting severally, the Noun Phrase they make is
-// an ordinary singular one, so it is a Complement as well as a Subject.
+// (*If a player does either*; CGEL 5§9.3:413 [11ii]). Unlike fused
+// *each*, the Noun Phrase they make is an ordinary singular one, so it
+// is a Complement as well as a Subject.
 class FusedChoice = ["det:either", "det:neither"]
-// Subordinator *that* and the relative pronouns (CGEL, Ch. 12 §3.5).
+// Subordinator *that* and the relative pronouns (CGEL 12§3.5).
 class RelativeMarker = ["sub:that", "pronoun:which", "pronoun:who"]
+class CopularVerb { typed }
 // `FusedHeadAdjective` has one member, *other*, the one Oracle adjective
 // that heads a Noun Phrase with ordinary determination (*the other*,
-// *each other*; CGEL, Ch. 5 §9.1, p. 410, modifier-head).
-// `DefiniteFusedHeadAdjective` has *same*, whose anaphoric fused NP
-// takes the definite article (Ch. 5 §9.3, p. 416; Ch. 17, p. 1545).
-// `RangeMarker`
-// has one member, `LEVEL`, the marker of a level symbol [CR#711.2a], and
-// `Pawprint` one, `{P}` [CR#107.18]; each is a CR-enumerated symbol read
-// by its header and mode Productions (RangeHeader, SinglePawprint).
-class CopularVerb { typed }
+// *each other*; CGEL 5§9.1:410).
 class FusedHeadAdjective { typed }
+// `DefiniteFusedHeadAdjective` has *same*, whose anaphoric fused Noun
+// Phrase takes the definite article (CGEL 5§9.3:416; 17:1545).
 class DefiniteFusedHeadAdjective { typed }
 class SumAdjective { typed }
 class PhrasalAdverb { typed }
@@ -736,7 +684,10 @@ class AbilityWord { typed }
 class AnchorWord { typed }
 class BracedSymbol { typed }
 class Variable { typed }
+// `RangeMarker` has one member, `LEVEL`, the marker of a level symbol
+// [CR#711.2a]; RangeHeader and OpenRangeHeader read it.
 class RangeMarker { typed }
+// `Pawprint` has one member, `{P}` [CR#107.18]; SinglePawprint reads it.
 class Pawprint { typed }
 class SharedHeadCompound { typed }
 
@@ -751,8 +702,7 @@ slot Measure = Measure
 // nominative.
 slot NP = ComplementNounPhrase where slot.Case != Nominative
 // A *with* or *without* phrase with an Absolute Clause is an Adjunct
-// or a Modifier, never a selected Complement (CGEL, Ch. 14 §10(a),
-// p. 1267).
+// or a Modifier, never a selected Complement (CGEL 14§10(a):1267).
 slot PP = PrepositionPhrase where slot.ComplementKind != AbsoluteClause
 slot Pred = Predicative
 slot AdjP = AdjectivePhrase
@@ -767,9 +717,8 @@ slot Amount = Amount
 slot AmountOrNP = AmountOrNounPhrase
 // A final Keyword Parameter Cost lowers to two productions: this
 // mana-only slot after a space, or Bound em dash + NonManaCost +
-// Suffix period. Each projects its own FinalParameter (Cost or
-// SetOffCost); punctuation comes from that production, not a Reading
-// (style guide §3 "Em dashes", "Periods"). This slot stays mana-only
+// Suffix period, each projecting its own FinalParameter (Cost or
+// SetOffCost; OSG §3, Em dashes, Periods). This slot stays mana-only
 // for DashCost (*Suspend 4—{1}{U}*), non-final keyword costs, and
 // keyword actions (*waterbend {3}*).
 slot Cost = SymbolCosts
@@ -788,8 +737,7 @@ slot Mention = Mention
 
 // A distributive adjunct, whose Complement has a Distributive
 // determinative (*for each …*), anchors to the outermost eligible clause,
-// as a comma-set Supplement does (`docs/decisions/english.md` §5,
-// AttachmentClass).
+// as a comma-set Supplement does (ADR §5, AttachmentClass).
 high_attachment PrepositionPhrase where $.DeterminativeDistribution = Distributive
 
 TextMode: Document -> Mode
@@ -810,34 +758,31 @@ CardTypeModifier: TypeModifier -> Class(CardType) where head.Number = Singular
 SupertypeModifier: TypeModifier -> Class(Supertype)
 NegativeTypeModifier: TypeModifier -> prefix:Lex(Affix) TypeModifier
 IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal where head.Number = Singular
-// An em-dash ability runs to the end of its keyword line, so a
-// keyword with one never premodifies a nominal in a sentence (style
-// guide §14 "Keyword abilities"). A keyword that ends in its Cost
-// premodifies only as a Keyword Mention, without that Cost (*a
-// disturb cost*, *the flashback cost*).
+// An em-dash ability runs to the end of its keyword line, so a keyword
+// with one never premodifies a nominal in a sentence (OSG §14, Keyword
+// abilities). A keyword that ends in its Cost premodifies only as a
+// Keyword Mention, without that Cost (*a disturb cost*).
 KeywordPremodifier: BareNominal -> modifier:KeywordPhrase BareNominal
     where modifier.FinalParameter != SetOffAbility | Cost
-// Quotation marks around a term that mentions literal wording: a
-// keyword or cited-word premodifier (*all "bands with other"
-// abilities*, *a "left" pile*), a cited word on its own (*choose
-// "left" or "right."*), and the singular nominal that names one term
-// (*the "legend rule"*, [CR#704.5j]), written without a period of its
-// own (style guide §3, Quotation marks and apostrophes; CGEL, Ch. 20
-// §6, pp. 1753–1755). A quoted plural is a granted ability's (*have
-// "bands with other legendary creatures."*), never a term's.
+// Quotation marks around a term that mentions literal wording (Mention):
+// a keyword or cited-word premodifier (*all "bands with other"
+// abilities*, *a "left" pile*), a cited word alone (*choose "left" or
+// "right."*), or a singular nominal naming one term (*the "legend
+// rule"*, [CR#704.5j]), with no period of its own (OSG §3, Quotation
+// marks and apostrophes; CGEL 20§6:1753–1755). A quoted plural is a
+// granted ability's (*have "bands with other legendary creatures."*),
+// never a term's.
 QuotedKeywordPremodifier: BareNominal -> modifier:"KeywordPhrase" BareNominal
     where modifier.FinalParameter != SetOffAbility | Cost
 QuotedMentionPremodifier: BareNominal -> modifier:"Mention" BareNominal
 QuotedMention: Mention -> "Mention"
 QuotedNominal: BareNominal -> "BareNominal" where head.Number = Singular
-// A quoted imperative names the cost it states (*cost an additional
-// "Sacrifice a land" to activate*; [CR#118.8]): the clause is
-// mentioned, not used, as the quoted term of QuotedNominal is (CGEL,
-// Ch. 5 §8.2, p. 401; Ch. 20 §6, p. 1753), and has no period of its
-// own (style guide §3, Quotation marks and apostrophes). It is a
-// singular count noun that a modifier premodifies, never a Conjunct
-// of its own: any other quoted clause is a granted ability's
-// (QuotedAbility).
+// A quoted imperative naming the cost it states (*cost an additional
+// "Sacrifice a land" to activate*; [CR#118.8]), mentioned as
+// QuotedNominal's term is (CGEL 5§8.2:401; 20§6:1753), with no period
+// of its own (OSG §3, Quotation marks and apostrophes). A singular
+// count noun that a modifier premodifies, never a Conjunct of its own:
+// any other quoted clause is a granted ability's (QuotedAbility).
 QuotedCost: QuotedCost -> "Clause" where head.VerbForm := Plain
 QuotedCostPremodifier: BareNominal -> modifier:AdjectivePhrase QuotedCost
     where modifier.ComplementKind = Intransitive,
@@ -857,7 +802,7 @@ SymbolNominal: BareNominal -> Symbols
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
 // An Arabic numeral is a singular count noun under a determiner (*a
-// natural 20*; CGEL, Ch. 5 §7.1, p. 386).
+// natural 20*; CGEL 5§7.1:386).
 ArabicNumeralName: NumeralName -> Numeral(Arabic(false))
 // A numeral named as a noun or a comparative adjective with that
 // numeral its understood standard, as ComparativeBoundedAmount is
@@ -893,9 +838,8 @@ NumericNounPhrase: NounPhrase -> Amount
           $.Person = Third
 // Fused *each*, an implicit partitive, is a Subject only (*each
 // enters with ...*): a Complement is the explicit partitive *each of
-// them* (`docs/oracle-style-guide.md` §6, Target: "Put a +1/+1
-// counter on each of up to two target creatures"), so an *of* phrase
-// after a fused *each* is always its partitive oblique.
+// them* (OSG §6, Target), so an *of* phrase after a fused *each* is
+// always its partitive oblique.
 NonNumericComplement: ComplementNounPhrase -> NounPhrase { transparent: [head] }
     where head.NounKind != Numeric,
           head.Case != Nominative | Genitive,
@@ -908,9 +852,8 @@ NumeralNominalPhrase: FusedNounPhrase -> ChoiceQuantity
 CardinalChoice: ChoiceQuantity -> Numeral(Cardinal)
 // Plural demonstrative *those* as a fused determiner-head,
 // interpreted anaphorically or with a relative clause that sets its
-// set (*except those that share a creature type with ...*; CGEL,
-// Ch. 5 §9.2, p. 414, [14i]: *Those who break the rules*; "*Those* is
-// used in the same way" as fused-head *these*).
+// set (*except those that share a creature type with ...*; CGEL
+// 5§9.2:414 [14i]).
 FusedDemonstrative: FusedNounPhrase -> Word(Those)
     where $.NounKind = Ordinary,
           $.Determination = Overt,
@@ -944,11 +887,10 @@ ChapterModalHeader: Document -> chapters:Chapters '—':Free ModalHeader
 CompleteKeywordPhrase: KeywordPhrase -> KeywordParameters
 CompleteKeywordItem: KeywordLineItem -> KeywordParameters
 BareKeywordMention: KeywordPhrase -> Class(ParameterizedKeyword)
-// A granted ability quoted whole (*has "{T}: Add {G}."*; [CR#113.1a]):
-// the text of an Ability set in quotation marks, with its final
-// period inside the closing mark (style guide §3, Periods; Quotation
-// marks and apostrophes; §12, Granting and removing abilities; CGEL,
-// Ch. 20 §6, pp. 1753–1755).
+// A granted ability quoted whole (*has "{T}: Add {G}."*; [CR#113.1a]),
+// its final period inside the closing mark (OSG §3, Periods; Quotation
+// marks and apostrophes; §12, Granting and removing abilities; CGEL
+// 20§6:1753–1755).
 QuotedAbility: QuotedAbility -> "Ability"
 TextAbility: Document -> Ability
 TextTypeLine: Document -> TypeLine
@@ -993,20 +935,18 @@ ActivatedAbility: Ability -> cost:ActivationCost ':' effect:Effect
 LabelledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability
 // An ability headed by an Anchor Word, on its own paragraph after the
 // ability that offers the choice [CR#607.2m]: *• Khans — ...*. The
-// bullet belongs to this construction: each such ability is "marked
-// with an anchor word and preceded by a bullet point" [CR#614.12c].
-// It is an ability, never a mode: no instruction to choose a number
-// of options precedes it [CR#700.2] (style guide "Anchor words": "The
-// bulleted abilities are not modes").
+// bullet belongs to the construction [CR#614.12c]. An ability, never a
+// mode: no instruction to choose a number of options precedes it
+// [CR#700.2]; OSG, Anchor words.
 AnchoredAbility: Ability -> '•':Free label:Class(AnchorWord) '—':Free Ability
 FlavorLabelledAbility: Ability -> label:Lex(FlavorWord) Ability
 NominalMode: Mode -> '•':Free Nominal '.'
 NounPhraseMode: Mode -> '•':Free NounPhrase '.'
 // A keyword whose em-dash cost ends in its own period, then that
-// keyword's associated instruction (style guide §3 "Periods": *Equip—
-// Sacrifice another nonland permanent. Activate only once each turn.*).
-// No other keyword form is followed by a sentence on its line (§8
-// "Keyword abilities on a shared line").
+// keyword's associated instruction (*Equip— Sacrifice another nonland
+// permanent. Activate only once each turn.*; OSG §3, Periods). No other
+// keyword form is followed by a sentence on its line (OSG §8, Keyword
+// abilities on a shared line).
 KeywordFollowedBySentences: Ability -> first:KeywordLineItem rest:Sentences
     where first.FinalParameter := SetOffCost
 NamePremodifier: BareNominal -> modifier:Name BareNominal
@@ -1029,13 +969,11 @@ SingularNominalQuality: Quality -> Nominal
           head.Countability := Count,
           head.NounDistribution != HeadOnly
 NominalPhraseQuality: Quality -> NounPhrase
-// An adjective is a Quality only as a fused head, and only one the
-// lexicon declares a Quality head (*protection from multicolored*,
-// *protection from snow* [CR#205.4a]; CGEL, Ch. 5 §9.3, p. 417). A colour word is not: its
-// conversion to a noun is the Quality (*protection from red*; Ch. 19
-// §3.3, p. 1642), so the fused-head adjective of the same word would
-// be a second tree for it (`docs/decisions/english.md`
-// §8).
+// An adjective is a Quality only as a fused head the lexicon declares a
+// Quality head (*protection from multicolored*, *protection from snow*
+// [CR#205.4a]; CGEL 5§9.3:417). A color word is not: its noun
+// conversion is the Quality (*protection from red*; CGEL 19§3.3:1642),
+// so its fused-head adjective would be a second tree (ADR §8).
 AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
 NamedParameter: Name -> Lex(Catalog)
 NameAsComplement: NameComplement -> Name { cost: 0 }
@@ -1054,12 +992,10 @@ ChapterAbility: Ability -> chapters:Chapters '—':Free Ability
 // An imperative or declarative Clause, with any preposed adjunct
 // (*When this creature enters, choose one —*).
 ChoiceHeader: ModalHeader -> Clause '—':Free where head.Inflection != Irrealis
-// A reflexive trigger [CR#603.12] begins a new sentence after the
-// instruction it depends on, and a modal header can be one (*You may pay
-// {E}{E}. When you do, choose one —*; `docs/oracle-style-guide.md`
-// §8, Delayed and reflexive triggers; §10, Modal choices). Right
-// recursion gives a sentence sequence one grouping, as
-// SentenceSequence does.
+// A modal header that is a reflexive trigger [CR#603.12], a new sentence
+// after the instruction it depends on (*You may pay {E}{E}. When you do,
+// choose one —*; OSG §8, Delayed and reflexive triggers; §10, Modal
+// choices). Right recursion gives one grouping, as SentenceSequence does.
 SentencePrefixedModalHeader: ModalHeader -> first:Sentence ModalHeader
 
 // Sentences: a bare imperative or a declarative clause.
@@ -1072,24 +1008,19 @@ Imperative: Clause -> VerbPhrase { uncoordinated: [head] }
 Declarative: Sentence -> clause:Clause '.'
     where clause.ClauseMarking = Unmarked,
           clause.Inflection != Irrealis
-// A Subject remnant (SubjectRemnant) is a finite Verb Phrase, which
-// a medial conjunct of a Clause coordination may be.
 SubjectRemnant: SubjectRemnant -> VerbPhrase
     where head.VerbForm = Finite,
           head.CentralPosition != Occupied
-// Restated as RelativeSubjectPredicate (a SubjectInitialClause, for
-// bare relatives); a change to one must be made to the other.
+// Twin: RelativeSubjectPredicate.
 SubjectPredicate: Clause -> subject:NounPhrase Free(VerbPhrase) { transparent: [head] }
     where subject.Number = head.Number,
           subject.Person = head.Person,
           head.VerbForm = Finite,
           subject.Case != Accusative | Genitive,
           $.ClauseMarking = Unmarked
-// A specifying copular clause names the value of the variable its
-// Subject's head noun denotes: *type* has cited names as values (*the
-// new creature type can't be Wall*; CGEL, Ch. 4 §5.5, pp. 266-269),
-// so only a Subject headed by such a noun takes a subtype name as
-// the value, never a Noun Phrase after any copular verb.
+// A specifying copular clause (*the new creature type can't be Wall*;
+// CGEL 4§5.5:266–269): only a Subject headed by a Variable noun takes
+// a subtype name as its value, never a Noun Phrase after any copular verb.
 SpecifyingClause: Clause -> subject:NounPhrase Class(BeVerb) value:Class(Subtype)
     where subject.Variable := Cited,
           value.Number = Singular,
@@ -1110,8 +1041,7 @@ SpecifyingModalClause: Clause ->
           $.ClauseMarking = Unmarked
 // A bound auxiliary clitic (*'s*, *'re*, *'ve*, *'m*) has a
 // nominative pronoun host (*it's*, *you're*, *they've*).
-// Restated as RelativeCliticSubjectPredicate; a change to one must be
-// made to the other.
+// Twin: RelativeCliticSubjectPredicate.
 CliticSubjectPredicate: Clause -> subject:NounPhrase Attached(VerbPhrase, Suffix) {
     transparent: [head],
 }
@@ -1122,7 +1052,7 @@ CliticSubjectPredicate: Clause -> subject:NounPhrase Attached(VerbPhrase, Suffix
           $.ClauseMarking = Unmarked
 
 // A gerund-participial Clause as Subject (*turning a face-down permanent
-// face up causes ...*; CGEL, Ch. 14 §7.1(c), p. 1254).
+// face up causes ...*; CGEL 14§7.1(c):1254).
 GerundSubject: Clause -> subject:Gerund VerbPhrase { transparent: [head] }
     where head.VerbForm = Finite,
           head.Number = Singular,
@@ -1130,7 +1060,7 @@ GerundSubject: Clause -> subject:Gerund VerbPhrase { transparent: [head] }
           $.ClauseMarking = Unmarked
 
 // A gerund-participial clause with its Subject (*a creature you
-// control attacking causes ...*; CGEL, Ch. 14 §2.1, p. 1188).
+// control attacking causes ...*; CGEL 14§2.1:1188).
 SubjectGerund: GerundClause -> subject:NounPhrase VerbPhrase { cost: 2 }
     where head.VerbForm = GerundParticiple,
           subject.Case != Nominative | Genitive
@@ -1141,13 +1071,10 @@ GerundClauseSubject: Clause -> subject:GerundClause VerbPhrase { transparent: [h
           $.ClauseMarking = Unmarked
 
 // An existential clause: dummy *there*, the copula agreeing with the
-// displaced subject, and an optional locative or temporal extension,
-// a Complement of *be* as in its non-existential counterpart (CGEL,
-// Ch. 16 §6.2.1, p. 1394: *There's one copy on the table*, *One copy
-// is on the table*). A Preposition Phrase it could head right after the
-// displaced subject is that Complement, never an Adjunct nor the
-// displaced subject's postmodifier, so a PP Adjunct follows only a
-// complemented predicate.
+// displaced subject, and an optional locative or temporal extension, a
+// Complement of *be* (*There's one copy on the table*; CGEL
+// 16§6.2.1:1394). A Preposition Phrase right after the displaced subject
+// is that Complement, never an Adjunct nor the subject's postmodifier.
 Existential: Clause -> subject:DummyPronoun ExistentialPredicate
     where subject.Number = head.Number,
           subject.Person = head.Person,
@@ -1170,8 +1097,8 @@ LocatedExistentialBe: ExistentialPredicate ->
           $.ComplementKind = PP
 // Before an *and*-coordination of Noun Phrases, existential *be* may
 // agree by proximity with a singular first conjunct (*There was a
-// bottle of wine and several glasses on the table*; CGEL, Ch. 4
-// §3.2.2, p. 242, n. 21), as well as with the plural coordination.
+// bottle of wine and several glasses on the table*; CGEL
+// 4§3.2.2:242 n. 21), as well as with the plural coordination.
 LocatedProximateExistentialBe: ExistentialPredicate ->
     Class(BeVerb) displaced_subject:NounPhrase
     complement:Selected(PrepositionPhrase, In, On, Among, Under, Outside, After) {
@@ -1189,18 +1116,16 @@ FrontAdverb: AdverbPhrase -> Class(FrontAdverb) where $.AdjunctPosition = Front
 LinkingAdverb: AdverbPhrase -> Class(LinkingAdverb) where $.AdjunctPosition = Linking
 // An idiomatic coordinate, alone or with a *for*-phrase naming what
 // the further conjuncts are for, as *do the same* takes one (*and so
-// on for double strike, deathtouch, ..., and partner*; CGEL, Ch. 17
-// §7.7.3(e), p. 1540).
+// on for double strike, deathtouch, ..., and partner*; CGEL
+// 17§7.7.3(e):1540).
 IdiomaticCoordinate: IdiomaticCoordinate -> Class(CoordinateAdverb)
 IdiomaticCoordinateFor: IdiomaticCoordinate ->
     Class(CoordinateAdverb) adjunct:Selected(PrepositionPhrase, For)
-// A Linked Conjunct: its linking connective is its Adjunct, never a
-// Coordinator, whether it is the sole link (*Draw a card, then
-// discard a card*) or follows one (*and then discard a card*, a front
-// Adjunct). It may scope over a coordination by a Coordinator (*then
-// [shuffle and put that card on top]*; CGEL, Ch. 15 §2.10, pp.
-// 1319–1320; `docs/oracle-style-guide.md` §3, Commas and the serial
-// comma; §10, Sequence).
+// A Linked Conjunct's linking connective is its Adjunct, never a
+// Coordinator, whether sole (*Draw a card, then discard a card*) or
+// following one (*and then discard a card*). It may scope over a
+// coordination (*then [shuffle and put that card on top]*; OSG §3,
+// Commas and the serial comma; §10, Sequence).
 LinkedClause: LinkedClause -> adjunct:AdverbPhrase Clause { transparent: [head] }
     where adjunct.AdjunctPosition = Linking
 LinkedVerbPhrase: LinkedVerbPhrase -> adjunct:AdverbPhrase VerbPhrase { transparent: [head] }
@@ -1211,11 +1136,10 @@ FrontAdverbial: Clause -> adjunct:AdverbPhrase ',' Clause { cost: 2, transparent
           $.FrontPosition = Occupied
 // A comma-set passive participial Supplement (*there is an additional
 // combat phase after this phase, followed by an additional main
-// phase*; CGEL, Ch. 14 §9.1, p. 1265; Ch. 15 §5.1, p. 1350). It
-// supplements one conjunct, never a whole coordination (*X is …,
-// rounded down, and Y is …, rounded up*). Like the engine's comma-set
-// post-adjuncts, it is outside any relative clause (CGEL, Ch. 12 §4,
-// p. 1058), so its head Clause passes up no Gap.
+// phase*; CGEL 14§9.1:1265; 15§5.1:1350). It supplements one conjunct,
+// never a whole coordination (*X is …, rounded down, and Y is …,
+// rounded up*), and is outside any relative clause (CGEL 12§4:1058), so
+// its head Clause passes up no Gap.
 ParticipialSupplement: Clause -> Clause ',' supplement:VerbPhrase {
     cost: 3,
     heavy: [supplement],
@@ -1225,37 +1149,28 @@ ParticipialSupplement: Clause -> Clause ',' supplement:VerbPhrase {
           supplement.Voice = Passive
 // A gerund-participial Supplement likewise, its missing Subject
 // controlled by the anchor clause's (*Restart the game, leaving in
-// exile all non-Aura permanent cards exiled with Karn*; CGEL, Ch. 14
-// §9, pp. 1265–1266).
+// exile all non-Aura permanent cards exiled with Karn*; CGEL
+// 14§9:1265–1266).
 GerundParticipialSupplement: Clause -> Clause ',' supplement:VerbPhrase {
     cost: 3,
     heavy: [supplement],
     uncoordinated: [head],
 }
     where supplement.VerbForm = GerundParticiple
-// A trailing NP Supplement is outside the integrated Clause: its
-// anchor remains an Object or another constituent, rather than
-// becoming a larger NP with the description (CGEL, Ch. 15 §§5.1,
-// 5.2(b), pp. 1350–1351, 1357–1358). Oracle uses this for a named
-// token's description (OSG §12, Tokens). The Supplement is a full
-// Noun Phrase, retaining its own postmodifiers.
+// A trailing NP Supplement is outside the integrated Clause: its anchor
+// stays an Object or other constituent, not part of a larger NP (CGEL
+// 15§§5.1, 5.2(b):1350–1351, 1357–1358). Oracle uses it for a named
+// token's description (OSG §12, Tokens); a full Noun Phrase, with its
+// own postmodifiers.
 NounPhraseSupplement: Clause -> Clause ',' supplement:NounPhrase
-// End-attachment coordination by addition of a new element, in its
-// qualifying use: *but* or *and* adds to the whole main Clause before
-// it a clause fragment that weakens it, focused by *only* or *not*,
-// which is not omissible there (*Any player may activate this
-// ability but only during their turn*; *Only your opponents may
-// activate this ability and only as a sorcery*; CGEL, Ch. 15 §4.5,
-// pp. 1346–1347, [33iii]: *I'll drive you there, but only if you pay
-// for the petrol*; *but not if you criticise my driving*). The
-// fragment is of Adjuncts the Clause's predicate could take
-// (p. 1347). As a main Clause's, it ends its Sentence; Oracle sets it
-// off with no comma. It is a new element: a Clause ending in a
-// Predicate Adjunct of a kind the fragment could coordinate with has
-// the fragment as that Adjunct's coordinate, a basic coordination
-// (§4.5, p. 1346, [29]; *Activate [only as a sorcery and only once
-// each turn]*; `docs/oracle-style-guide.md` §8, Activation
-// instructions).
+// Addition of a new element, qualifying use: *but* or *and* adds to the
+// whole main Clause a fragment focused by *only* or *not* (*Any player
+// may activate this ability but only during their turn*; CGEL
+// 15§4.5:1346–1347 [33iii]); it ends its Sentence, with no comma. Where
+// the Clause ends in a Predicate Adjunct the fragment could coordinate
+// with, it is that Adjunct's coordinate instead (*Activate [only as a
+// sorcery and only once each turn]*; 15§4.5:1346 [29]; OSG §8,
+// Activation instructions).
 AddedElement: Sentence ->
     clause:Clause coordinator:Class(AddingCoordinator) fragment:QualifyingFragment '.' {
     cost: 2,
@@ -1266,12 +1181,10 @@ AddedElement: Sentence ->
     where clause.ClauseMarking = Unmarked,
           clause.Inflection != Irrealis
 // A non-initial coordinate may open, after its coordinator, with a
-// fronted Adjunct delimited on both sides (*except it's legendary
-// ... and, if it's a creature, it enters with ...*): heavy
-// punctuation marks the Adjunct's left boundary after the
-// coordinator, where light punctuation leaves it unmarked (CGEL,
-// Ch. 20 §3.2.5, p. 1745, note 13; *But if that's not convenient,
-// ...*).
+// fronted Adjunct delimited on both sides (*except it's legendary ...
+// and, if it's a creature, it enters with ...*): heavy punctuation
+// marks the Adjunct's left boundary after the coordinator (CGEL
+// 20§3.2.5:1745 n. 13).
 DelimitedFrontConjunct: Clause -> first:Clause coordinator:Class(Coordinator) ',' last:Clause {
     cost: 2,
 }
@@ -1285,12 +1198,10 @@ QualifyingFragment: QualifyingFragment -> modifier:Class(FocusingAdverb) ClauseF
 AdjunctFragment: ClauseFragment -> PredicateAdjunct { cost: 0 }
 ExtendedFragment: ClauseFragment -> ClauseFragment adjunct:PredicateAdjunct
 // A temporal Noun Phrase after a final Adverb Phrase is a second
-// Adjunct of the Verb Phrase (TemporalAdjunct: *[[activate only
-// once] each turn]*), never also the adverb's interval
-// (FrequencyInterval), which it is where no Verb Phrase follows
-// (*Once each turn, ...*): the two sites differ in no meaning (CGEL,
-// Ch. 8 §9, p. 715: *each year is probably a separate adjunct rather
-// than a postmodifier*).
+// Adjunct of the Verb Phrase (TemporalAdjunct: *[[activate only once]
+// each turn]*), never also the adverb's interval (FrequencyInterval),
+// which it is where no Verb Phrase follows (*Once each turn, ...*): the
+// two sites differ in no meaning (CGEL 8§9:715).
 EndAdverbial: VerbPhrase -> VerbPhrase adjunct:AdverbPhrase {
     unadjoined: [adjunct -> [TemporalNounPhrase]],
     transparent: [head],
@@ -1303,16 +1214,13 @@ CentralAdverbial: VerbPhrase -> adjunct:AdverbPhrase VerbPhrase { transparent: [
 // Auxiliaries take a verb phrase complement through which a Gap passes.
 AuxiliaryParticiple: AuxiliaryComplement -> VerbPhrase { transparent: [head] }
 // A finite auxiliary stranded before the ellipsis site of its
-// Complement heads its Verb Phrase alone (CGEL, Ch. 17 §7.1,
-// p. 1519: *If you can't, ...*, *each opponent who can't*). Only a
-// coordinator, punctuation or the head it is a dependent of follows
-// the site: a dependent right after it would be the Complement, and
-// Oracle retains no dependent in the reduced Verb Phrase (p. 1520).
-// Nor does a head or coordinator whose lexical head is spelled like
-// a verb in the omitted Complement's form: it would be that
-// Complement (*less than this creature's power can't [block it]*,
-// *cards that weren't [cast this way]*), while *each opponent who
-// can't [discards a card]* keeps its ellipsis.
+// Complement heads its Verb Phrase alone (*If you can't, ...*, *each
+// opponent who can't*; CGEL 17§7.1:1519). Only a coordinator,
+// punctuation or the head it depends on follows the site: a dependent
+// right after it would be the Complement (p. 1520). Never a head or
+// coordinator spelled like a verb in the omitted Complement's form: it
+// would be that Complement (*less than this creature's power can't
+// [block it]*, *cards that weren't [cast this way]*).
 StrandedModal: VerbPhrase -> Class(StrandableModal) { elliptical: [Plain] }
     where head.VerbForm = Finite,
           $.Voice = Active
@@ -1358,8 +1266,8 @@ InfinitivalComplement: ToInf -> Clause { transparent: [head] } where head.Clause
 BareInfinitival: BareInf -> VerbPhrase { transparent: [head] } where head.VerbForm = Plain
 GerundParticipial: Gerund -> VerbPhrase { transparent: [head] }
     where head.VerbForm = GerundParticiple
-// A hollow *to*-infinitival (*this spell costs {1} to cast*; CGEL,
-// Ch. 14 §6.3(c), p. 1250).
+// A hollow *to*-infinitival (*this spell costs {1} to cast*; CGEL
+// 14§6.3(c):1250).
 HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
     where head.VerbForm = Plain,
           head.Gap = NP
@@ -1374,17 +1282,15 @@ PostCopularAdverbial: VerbPhrase ->
     where adjunct.AdjunctPosition = Central
 
 MeasurePremodifier: BareNominal -> modifier:Measure BareNominal
-// *its {1}{G} kicker*.
 // *five {P} worth of modes*.
 PawprintPremodifier: BareNominal -> modifier:Pawprints BareNominal
+// *its {1}{G} kicker*.
 SymbolPremodifier: BareNominal -> modifier:Symbols BareNominal
 // A slash measure is a noun only under a determiner (*an additional
-// +2/+2*, *a 3/3*); bare, it is a selected Measure Noun Phrase.
-// It is a fused first base (*a 3/3* [creature]), and so never a
-// non-final Conjunct of a Nominal Coordination: before a coordinated
-// Compound Noun it is a Word-Part Coordination's base (*a +2/+0,
-// +1/+1, or +0/+2 counter*), one tree per analysis
-// (`docs/decisions/english.md` §8).
+// +2/+2*, *a 3/3*); bare, it is a MeasureNounPhrase. Never a non-final
+// Conjunct of a Nominal Coordination: before a coordinated Compound
+// Noun it is a Word-Part Coordination's base (*a +2/+0, +1/+1, or +0/+2
+// counter*), one tree per analysis (ADR §8).
 MeasureNominal: BareNominal -> Measure
     where $.CompoundPart = Base,
           $.Determination = Overt,
@@ -1393,15 +1299,10 @@ MeasureNominal: BareNominal -> Measure
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
 MeasureNounPhrase: MeasureNounPhrase -> Measure
-// A Word-Part Coordination of Compound Nouns: the first bases of the
-// earlier ones are coordinated with the last whole, which supplies
-// their shared head word (CGEL, Ch. 15 §3.1(g), p. 1325: *Sydney- or
-// Melbourne-based companies*). A counter's first base is its name
-// [CR#122.1]: a keyword for a keyword counter, a slash measure for a
-// +X/+Y counter [CR#122.1a,122.1b] (`docs/oracle-style-guide.md`
-// §12, Counters: "A keyword counter takes the lowercased keyword as
-// its modifier"). `SharedHeadCompound` holds the Compound Nouns whose
-// first base names their kind: the counters.
+// A Word-Part Coordination of Compound Nouns (CompoundCoordination). A
+// counter's first base is its name [CR#122.1]: a keyword for a keyword
+// counter, a slash measure for a +X/+Y counter [CR#122.1a,122.1b] (OSG
+// §12, Counters). `SharedHeadCompound` holds the counters.
 WordPartCoordination: BareNominal -> CompoundCoordination
 KeywordBase: CompoundConjunct -> modifier:KeywordPhrase
     where $.CompoundPart = Base,
@@ -1429,10 +1330,8 @@ InterleavedPreposition: Interleaved -> PrepositionPhrase { cost: 0 }
 InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
 // A manner Noun Phrase, as MannerAdjunct, before the Internalised
 // Complement (*weren't chosen this way by any player*), never before a
-// core Complement: Oracle sets *this way* right after the verb it
-// restricts (`docs/oracle-style-guide.md` §5, This way, that much, and
-// linked events: *cards exiled this way*), never between an Object
-// and a goal.
+// core Complement: Oracle sets *this way* right after its verb (OSG §5,
+// This way, that much, and linked events).
 InterleavedManner: InternalisedInterleaved -> NounPhrase { cost: 0 } where head.NounKind := Manner
 // An end adverb before a later selected Complement (*divided evenly
 // among*, *dealt to you so far this turn by artifacts*), or a
@@ -1471,21 +1370,18 @@ DepictiveAdjunct: PredicateAdjunct -> filler:AdjectivePhrase
           filler.ComplementKind != Amount,
           filler.AdjectivePosition != Attributive,
           $.ComplementKind = AdjP
-// A temporal Noun Phrase Adjunct as an unlike conjunct (*flip a coin
-// [that many times] or [until you lose a flip]*; CGEL, Ch. 15 §3.2,
-// pp. 1326–1329).
-// A trailing Preposition Phrase Adjunct of a coordination of
-// clauses, which scopes over every conjunct, beside the site in its
-// last one (*[put a counter on target creature, and that creature
-// gains flying] until end of turn*; CGEL, Ch. 15 §1.3.4,
-// pp. 1285–1286). A chain of bare imperatives shares one here too
-// (*[untap target creature and gain control of it] until end of
-// turn*), never as its Verb Phrase coordination's: the Imperative
-// heads no coordination, nor one a post-verbal Adjunct follows
-// (`docs/decisions/english.md` §8).
+// A trailing Preposition Phrase Adjunct of a coordination of clauses,
+// scoping over every conjunct (*[put a counter on target creature, and
+// that creature gains flying] until end of turn*; CGEL
+// 15§1.3.4:1285–1286). A chain of bare imperatives shares one too
+// (*[untap target creature and gain control of it] until end of turn*),
+// never as its Verb Phrase coordination's: the Imperative heads no
+// coordination, nor one a post-verbal Adjunct follows (ADR §8).
 CoordinatedClauseAdjunct: Clause -> Clause adjunct:Hosted(PrepositionPhrase, Predicate) {
     coordinated: [head],
 }
+// A temporal Noun Phrase Adjunct as an unlike conjunct (*flip a coin
+// [that many times] or [until you lose a flip]*; CGEL 15§3.2:1326–1329).
 TemporalNounAdjunct: PredicateAdjunct -> filler:TemporalNounPhrase where $.ComplementKind = NP
 AdverbialAdjunct: PredicateAdjunct -> filler:AdverbPhrase
     where filler.AdjunctPosition = End,
@@ -1507,12 +1403,9 @@ MultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb) where $.AdjunctPosit
 BoundingAdverb: AdverbPhrase -> Class(BoundingAdverb) where $.AdjunctPosition = Bounding
 DegreeDeterminer: DeterminerPhrase -> modifier:Word(That) Class(DegreeQuantifier)
     where $.ComplementKind = Intransitive
-// Scalar equality: *as much / as many* (CGEL, Ch. 13 §§4.1.2,
-// 4.3, pp. 1126, 1130). The secondary term may be implicit (§1.2,
-// p. 1102). DegreePartitive supplies its partitive oblique; the
-// existing NP multipliers can modify the resulting phrase (§4.4.1,
-// p. 1131; Ch. 5 §12(c), p. 434). Degree *as* modifies the
-// determinative, never an arbitrary Noun Phrase.
+// Scalar equality: *as much / as many* (CGEL 13§§4.1.2, 4.3:1126, 1130).
+// DegreePartitive supplies its partitive oblique. Degree *as* modifies
+// the determinative, never an arbitrary Noun Phrase.
 EquativeDeterminer: DeterminerPhrase -> modifier:Word(DegreeAs) Class(DegreeQuantifier)
     where $.ComplementKind = Intransitive
 // A modified degree determinative as a fused head (*that many*, *the
@@ -1528,8 +1421,6 @@ FusedDegreeDeterminer: FusedNounPhrase -> DeterminerPhrase { heavy: [head], unco
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-// A coordination of fusable determinatives as a fused head (*choose
-// one or more*, *if X is 5 or more*).
 // A spelled cardinal is a quantity (*one or more*); an Arabic numeral
 // or variable names a number, so it is Numeric (*X is 5 or more*).
 FusableCardinal: FusableDeterminer -> ChoiceQuantity
@@ -1541,6 +1432,8 @@ FusableAmount: FusableDeterminer -> Amount
           $.NounKind = Numeric
 FusableQuantifier: FusableDeterminer -> Class(FusedQuantifier)
 FusableChoice: FusableDeterminer -> Class(FusedChoice)
+// A coordination of fusable determinatives as a fused head (*choose
+// one or more*, *if X is 5 or more*).
 FusedQuantityCoordination: FusedNounPhrase -> FusedQuantity
     where $.NounKind = Quantity,
           $.Determination = Bare,
@@ -1550,8 +1443,8 @@ FusedQuantityCoordination: FusedNounPhrase -> FusedQuantity
 // target*, *twice X life*); a bounding one, its quantity (*at least
 // one creature*).
 // A focusing modifier precedes a determined NP (*exactly those
-// colors*; CGEL, Ch. 6 §7.3.1, p. 587). With numerical determination
-// the existing AdverbModifiedDeterminerPhrase hosts it instead.
+// colors*; CGEL 6§7.3.1:587). With numerical determination
+// AdverbModifiedDeterminerPhrase hosts it instead.
 BoundingNounPhrase: NounPhrase -> modifier:AdverbPhrase determiner:DeterminerPhrase Nominal
     where modifier.AdjunctPosition = Bounding,
           determiner.DeterminativeDistribution != Numerical | Independent | FreeChoice,
@@ -1568,17 +1461,15 @@ AdverbMultipliedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Multiplying
 // *Both* floats after a plural Object, ahead of the Complement that
 // follows it (*put two cards from your hand both on top of your
-// library*; CGEL, Ch. 5 §9.2(c), p. 413 and §10.1.1, pp. 427–428,
-// which describe it after a Subject or auxiliary and, after a
-// pronoun Object, as part of the pronoun: *invited us both*). A
-// Subject keeps FloatedEach.
+// library*; CGEL 5§9.2(c):413, 5§10.1.1:427–428). A Subject keeps
+// FloatedEach.
 FloatedObjectBoth: ComplementNounPhrase -> NounPhrase adjunct:Word(Both) { uncoordinated: [head] }
     where head.Number = Plural,
           head.NounKind != Numeric,
           head.Case != Nominative | Genitive
 // *All* after an accusative personal pronoun forms a compound
-// pronoun (*remove them all*; CGEL, Ch. 5 §10.1.1, pp. 427–428:
-// *They've invited us all*, never *the girls all*).
+// pronoun (*remove them all*; CGEL 5§10.1.1:427–428), never after a
+// full Noun Phrase.
 FloatedObjectAll: ComplementNounPhrase -> NounPhrase adjunct:Word(All) { uncoordinated: [head] }
     where head.Number = Plural,
           head.Case = Accusative
@@ -1601,10 +1492,8 @@ PredeterminerCount: NounPhrase -> determiner:Class(Predeterminer) NounPhrase
           determiner.Number = head.Number,
           determiner.Countability = head.Countability
 // *All* before a fused cardinal, the head of its Noun Phrase unexpressed
-// (*if you've done all four*; CGEL, Ch. 5 §12, p. 434: before a cardinal
-// *all* is the determiner and the numeral an internal modifier, which
-// fuses with the omitted head, §9.3(a), pp. 415-416): it counts the
-// members of a set, as *all of them* does.
+// (*if you've done all four*; CGEL 5§12:434, 5§9.3(a):415-416): it
+// counts the members of a set, as *all of them* does.
 AllFusedCardinal: NounPhrase -> determiner:Word(All) ChoiceQuantity
     where head.Number = Plural,
           $.Number = Plural,
@@ -1622,7 +1511,7 @@ SingularQuantifier: DeterminerPhrase -> Word(Any) modifier:Numeral(Cardinal)
 // an article or genitive (*the turn*), and without postmodifiers;
 // serial *time* with any determinative (*any time*, *an additional
 // time*, *three times*); or a temporal nominal bounded by a relative
-// clause (*the next time you cast a spell*; CGEL, Ch. 8 §6.3, p. 698).
+// clause (*the next time you cast a spell*; CGEL 8§6.3:698).
 TemporalLocation: TemporalNounPhrase -> determiner:DeterminerPhrase BareNominal
     where head.NounKind = Temporal,
           head.NounDistribution != Serial,
@@ -1641,10 +1530,9 @@ SerialTemporal: TemporalNounPhrase -> determiner:DeterminerPhrase BareNominal
           $.Person = Third
 // A comparative quantity of serial *times* with its *than* Complement
 // after the head, as in ComparativeCountDetermined, is a frequency
-// Adjunct (CGEL, Ch. 13 §2.1, p. 1104; Ch. 8 §9, p. 715), with or
-// without a determinative modifying the comparative (*Activate no
-// more times each turn than the number of snow Swamps you control*;
-// Ch. 13 §4.4, p. 1126).
+// Adjunct (CGEL 8§9:715), with or without a determinative modifying
+// the comparative (*Activate no more times each turn than the number
+// of snow Swamps you control*).
 ComparativeFrequency: TemporalNounPhrase ->
     determiner:Class(ComparativeQuantifier) Nominal complement:Selected(PrepositionPhrase, Than)
     where head.NounDistribution = Serial,
@@ -1665,9 +1553,8 @@ ModifiedComparativeFrequency: TemporalNounPhrase ->
           $.Case = Plain,
           $.Person = Third
 // An equative quantity of serial *times* with its *as* Complement
-// after the head, as the comparative's *than* one is (*as many times
-// as you choose*; CGEL, Ch. 13 §1.3, pp. 1103–1104 and §2, p. 1106),
-// a frequency Adjunct (Ch. 8 §9, p. 715).
+// after the head, as ComparativeFrequency's *than* one is (*as many
+// times as you choose*; CGEL 13§1.3:1103–1104, 13§2:1106).
 EquativeFrequency: TemporalNounPhrase ->
     modifier:Word(DegreeAs) determiner:Class(DegreeQuantifier) Nominal
     complement:Selected(PrepositionPhrase, As)
@@ -1681,7 +1568,7 @@ EquativeFrequency: TemporalNounPhrase ->
           $.Person = Third
 // A maximum quantity of serial *times* (*pay {G} up to three times*),
 // the Preposition Phrase in Determiner function, as in
-// MaximumDetermination (CGEL, Ch. 5 §7.1, p. 357; Ch. 8 §9, p. 715).
+// MaximumDetermination (CGEL 5§7.1:357).
 MaximumSerialTemporal: TemporalNounPhrase -> determiner:Selected(PrepositionPhrase, Up) BareNominal
     where head.NounDistribution = Serial,
           determiner.Determination = Bare,
@@ -1705,10 +1592,9 @@ RelativeTime: RelativeTemporalNominal -> Nominal modifier:RelativeClause
 RelativeTimePostmodifier: RelativeTemporalNominal ->
     RelativeTemporalNominal modifier:TemporalNounPhrase { cost: 2 }
 // A preposed frequency adverb and its interval, set off by a comma
-// (*Twice this turn, ...*; CGEL, Ch. 8 §9, p. 715), as the fronted
-// *Once each turn, ...* is (FrequencyInterval). *Twice* is no Front
-// adverb, which would admit *Twice that many counters are put ...*
-// without the comma.
+// (*Twice this turn, ...*), as the fronted *Once each turn, ...* is
+// (FrequencyInterval). *Twice* is no Front adverb, which would admit
+// *Twice that many counters are put ...* without the comma.
 PreposedFrequency: Clause -> adverb:AdverbPhrase adjunct:TemporalNounPhrase ',' Clause {
     transparent: [head],
 }
@@ -1719,16 +1605,12 @@ PreposedTemporalAdjunct: Clause -> adjunct:TemporalNounPhrase ',' Clause { trans
     where $.FrontPosition = Occupied
 // A preposed Preposition Phrase and temporal Noun Phrase set off by
 // one comma (*For one spell this turn, ...*). The Preposition Phrase
-// has a Noun Phrase Complement: a Clause Complement runs to the comma
-// and keeps the temporal inside it (*When you next cast a spell this
-// turn, ...*; oracle-style-guide checklist item 4; [CR#603.1]). A
-// temporal that can belong inside the Preposition Phrase, as a
-// trigger's or header's bound (*At the beginning of each combat this
-// turn, ...*; oracle-style-guide §8, Triggered abilities;
-// [CR#603.1,603.7]) or a relative clause's (*For each creature that
-// entered this turn, ...*), ranks first there: the second of two
-// preposed dependents violates an Attachment Class
-// (`docs/decisions/english.md` §5).
+// has a Noun Phrase Complement: a Clause Complement keeps the temporal
+// inside it (*When you next cast a spell this turn, ...*; OSG checklist
+// 4; [CR#603.1]). A temporal that can belong inside the Preposition
+// Phrase (*At the beginning of each combat this turn, ...*; OSG §8,
+// Triggered abilities; [CR#603.1,603.7]) ranks first there: the second
+// of two preposed dependents violates an Attachment Class (ADR §5).
 PreposedPrepositionAndTemporal: Clause ->
     adjunct:Hosted(PrepositionPhrase, Predicate) adjunct:TemporalNounPhrase ',' Clause {
     cost: 2,
@@ -1738,15 +1620,12 @@ PreposedPrepositionAndTemporal: Clause ->
           $.FrontPosition = Occupied
 // Two preposed Preposition Phrases set off by one comma, a delayed
 // trigger's timing and its duration (*At the beginning of each of
-// your upkeeps for the rest of the game, ...*; oracle-style-guide §8,
-// Delayed and reflexive triggers, and §11, Continuous and bounded
-// durations; [CR#603.7]). Both have a Noun Phrase Complement: a
-// Clause Complement keeps what follows it inside it (*If tapped for
-// mana, ...*; *As many times as you choose, ...*). A phrase that can
-// belong inside the first ranks first there, as in the fixed phrase
-// *at the beginning of combat on your turn* (oracle-style-guide §11,
-// Turn-structure names): the second of two preposed dependents
-// violates an Attachment Class (`docs/decisions/english.md` §5).
+// your upkeeps for the rest of the game, ...*; OSG §8, Delayed and
+// reflexive triggers; [CR#603.7]). Both have a Noun Phrase Complement
+// (a Clause Complement keeps what follows it inside it). A phrase that
+// can belong inside the first ranks first there (*at the beginning of
+// combat on your turn*; OSG §11, Turn-structure names): the second of
+// two preposed dependents violates an Attachment Class (ADR §5).
 PreposedPrepositionPair: Clause ->
     adjunct:Hosted(PrepositionPhrase, Predicate) adjunct:Hosted(PrepositionPhrase, Predicate) ','
     Clause { cost: 2, transparent: [head] }
@@ -1800,7 +1679,7 @@ DistributiveQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNomina
           $.Determination = Overt
 // A singular determinative over a quantified plural, which *a* selects
 // only with *further* or *additional* (*an additional two creatures*;
-// CGEL, Ch. 5 §3.4, p. 353, [69–70]). A determiner agreeing with its
+// CGEL 5§3.4:353 [69–70]). A determiner agreeing with its
 // quantity is AgreeingModifiedQuantity's.
 DeterminedModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQuantifiedNominal
     where determiner.DeterminativeDistribution != Dependent | FreeChoice | Distributive,
@@ -1830,7 +1709,7 @@ DistributiveModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase Modified
           $.Person = Third,
           $.Determination = Overt
 // A maximum quantity: a Preposition Phrase in Determiner function (*up
-// to two target creatures*; CGEL, Ch. 5 §7.1, p. 357), or the fused
+// to two target creatures*; CGEL 5§7.1:357), or the fused
 // head of its Noun Phrase (*choose up to one*). Its Complement is a
 // bare quantity, never a determined Noun Phrase.
 MaximumDetermination: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) Nominal
@@ -1856,7 +1735,7 @@ FusedMaximum: NounPhrase -> Selected(PrepositionPhrase, Up)
           $.Case = Plain,
           $.Person = Third
 // A comparative determinative fused head modified by a measure phrase
-// (*costs {1} less to cast*; CGEL, Ch. 13 §4.4, pp. 1125–1126).
+// (*costs {1} less to cast*; CGEL 13§4.4:1125–1126).
 MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Class(ComparativeQuantifier)
     where modifier.Case := Plain,
           modifier.Countability != Count,
@@ -1866,7 +1745,7 @@ MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Class(ComparativeQuan
           $.Case = Plain,
           $.Person = Third
 // Partitive Noun Phrases: a determinative fused head and its *of*
-// oblique, its sibling (CGEL, Ch. 5 §9.3, pp. 408–410). The Noun
+// oblique, its sibling (CGEL 5§9.3:408–410). The Noun
 // Phrase takes its Number from the oblique, a distributive head's
 // singular from the head, and *any* may be singular with a plural
 // oblique (*if any of those cards shares a card type*).
@@ -1887,8 +1766,8 @@ DistributivePartitive: PartitiveHead ->
           $.Person = Third
 // Distributive *each* with a plural oblique takes plural agreement
 // by synesis (*Each of X target creatures you control connive*;
-// CGEL, Ch. 5 §18.2, p. 504); its Number is the oblique's, not the
-// singular quantifier's.
+// CGEL 5§18.2:504); its Number is the oblique's, not the singular
+// quantifier's.
 SynesisDistributivePartitive: PartitiveHead ->
     quantifier:Word(Each) complement:Selected(PrepositionPhrase, Of) { cost: 3 }
     where complement.Number = Plural,
@@ -1925,21 +1804,13 @@ QuantityPartitive: PartitiveHead -> DeterminerPhrase complement:Selected(Preposi
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// A determinative with its own Complement heads a partitive: an
-// exceptive one (*all but one of them*, *all but 1 of that damage*;
-// CGEL, Ch. 5 §7.3, p. 375) or a comparative one with a bare standard
-// (*more than one of the same mana symbol*; Ch. 5 §11(d), p. 432), a
-// count one over a count oblique, a non-count one over a non-count
-// oblique. The Noun Phrase has the determiner's Number: the
-// exceptive's own, the comparative's standard's.
 // A quantity with *each* as its oblique, the implicit partitive's set
-// recovered from the context (*create one of each*; CGEL, Ch. 5 §9.3,
-// p. 413): fused *each* is no Complement elsewhere (NonNumericComplement),
-// and a Preposition Phrase would let *of* take it before a second
-// *of* Phrase (*the beginning of each of your main phases*). It is a
-// fused Noun Phrase at once, so that no Preposition Phrase after it
-// modifies it (*one of each of those kinds of counters* is the
-// partitive of a partitive).
+// recovered from the context (*create one of each*; CGEL 5§9.3:413).
+// Fused *each* is no Complement elsewhere (NonNumericComplement), and a
+// Preposition Phrase would let *of* take it before a second *of* Phrase
+// (*the beginning of each of your main phases*). A fused Noun Phrase at
+// once, so no Preposition Phrase after it modifies it (*one of each of
+// those kinds of counters* is the partitive of a partitive).
 QuantityPartitiveOfEach: FusedNounPhrase -> DeterminerPhrase preposition:Word(Of) oblique:Word(Each) {
     unshared: [DeterminativeDistribution],
 }
@@ -1949,6 +1820,12 @@ QuantityPartitiveOfEach: FusedNounPhrase -> DeterminerPhrase preposition:Word(Of
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
+// A determinative with its own Complement heads a partitive: an
+// exceptive one (*all but one of them*; CGEL 5§7.3:375) or a
+// comparative one with a bare standard (*more than one of the same
+// mana symbol*; CGEL 5§11(d):432), count over a count oblique, non-count
+// over a non-count one. The Noun Phrase has the determiner's Number: the
+// exceptive's own, the comparative's standard's.
 ComplementedPartitive: PartitiveHead -> DeterminerPhrase complement:Selected(PrepositionPhrase, Of)
     where head.ComplementKind = PP,
           head.Countability := Count,
@@ -1982,20 +1859,18 @@ PostpositiveAdjective: Nominal -> Nominal modifier:AdjectivePhrase { heavy: [mod
     where modifier.ComplementKind = PP,
           modifier.Voice != Passive
 // An AdjP with its own post-head dependent follows the nominal
-// (CGEL, Ch. 5 §14.2, p. 445): *creatures able to block it*.
+// (CGEL 5§14.2:445): *creatures able to block it*.
 PostpositiveInfinitivalAdjective: Nominal -> Nominal modifier:AdjectivePhrase { heavy: [modifier] }
     where modifier.ComplementKind = ToInf,
           modifier.AdjectivePosition != Attributive,
           modifier.Voice != Passive
 // A number or a comparative adjective with that number its
-// understood standard (*power 3 or greater*, *X is 2 or less*,
-// *five or greater*). Its `Amount` ComplementKind keeps it out of
-// every depictive (AdjectivalDepictive, DepictiveAdjunct,
-// DepictiveAdjective): a number is no depictive (*\*She left 10*), and
-// a coordination fills only a function its conjuncts could each fill
-// (CGEL, Ch. 15 §3.1, pp. 1323–1324, rule [1]), so never *[with
-// power] [10 or greater]*. A comparative alone may be one (*She left
-// richer than she arrived*).
+// understood standard (*power 3 or greater*, *X is 2 or less*). Its
+// `Amount` ComplementKind keeps it out of every depictive
+// (AdjectivalDepictive, DepictiveAdjunct, DepictiveAdjective): a number
+// is no depictive, and a coordination fills only a function its
+// conjuncts could each fill (CGEL 15§3.1:1323–1324 [1]), so never
+// *[with power] [10 or greater]*.
 ComparativeBoundedAlternative: AdjectivePhrase ->
     first:DeterminerPhrase coordinator:Word(Or) last:AdjectivePhrase
     where first.DeterminativeDistribution = Numerical,
@@ -2005,8 +1880,6 @@ ComparativeBoundedAlternative: AdjectivePhrase ->
           $.ComplementKind = Amount,
           last.Grade = Comparative,
           last.ComplementKind = Intransitive
-// A postpositive comparative quantity (*for each card fewer than
-// three in their hand*).
 // The same alternative as the value of a noun that takes an Amount
 // (*power 3 or less*, *mana value X or greater*): the noun's frame,
 // not a postmodifier, licenses it.
@@ -2017,9 +1890,8 @@ ComparativeBoundedAmount: Amount -> first:Amount coordinator:Word(Or) last:Adjec
           $.ComplementKind = Amount
 // A scalar comparative bound on a number as an Amount: the endpoint
 // of a scalar change, like the number it bounds (*reduce it to less
-// than 1* beside *reduce it to 1*, *reduced to 0 or less*; CGEL, Ch. 8
-// §5.2, pp. 691–692; the comparative and its *than* Complement, Ch. 13
-// §2.1, p. 1104).
+// than 1* beside *reduce it to 1*, *reduced to 0 or less*; CGEL
+// 8§5.2:691–692).
 ComparativeAmount: Amount ->
     quantifier:Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
     where quantifier.Countability = Mass,
@@ -2027,9 +1899,9 @@ ComparativeAmount: Amount ->
           $.ComplementKind = PP
 // An adjective that follows a specific sum qualifies a numerically
 // quantified Noun Phrase (*ten or more creature cards total*, *fifty
-// dollars net*; CGEL, Ch. 5 §14.2(b), pp. 445-446), never a bare or
-// definite one: the determiner `Carry`s `Cardinal`, as an unvalued one
-// would pass a `Require`.
+// dollars net*; CGEL 5§14.2(b):445-446), never a bare or definite one.
+// The determiner `Carry`s `Cardinal`, since an unvalued one would pass
+// a `Require`.
 SumQualifiedNounPhrase: NounPhrase ->
     determiner:DeterminerPhrase Nominal modifier:Class(SumAdjective)
     where determiner.Cardinality := Cardinal,
@@ -2040,6 +1912,8 @@ SumQualifiedNounPhrase: NounPhrase ->
           determiner.ComplementKind != PP,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
+// A postpositive comparative quantity (*for each card fewer than
+// three in their hand*).
 PostpositiveComparative: Nominal -> Nominal modifier:DeterminerPhrase { cost: 2, heavy: [modifier] }
     where head.Number = Singular,
           modifier.ComplementKind = PP,
@@ -2049,11 +1923,9 @@ PostpositiveLocativeAdjective: LocativeHead -> LocativeHead modifier:AdjectivePh
     heavy: [modifier],
 }
 // A comparative adjective modified by a measure phrase (*2 greater*;
-// CGEL, Ch. 13 §4.4, pp. 1125–1126). The head `Carry`s `Comparative`:
-// a coordination, whose Grade is unshared, would pass a `Require`,
-// and *both* is no measure of *red and white* (*the plural meaning of
-// both excludes it from such modifying constructions*; CGEL, Ch. 5
-// §7.3, p. 377).
+// CGEL 13§4.4:1125–1126). The head `Carry`s `Comparative`, since a
+// coordination, whose Grade is unshared, would pass a `Require`: *both*
+// is no measure of *red and white* (CGEL 5§7.3:377).
 MeasuredComparative: AdjectivePhrase -> modifier:NounPhrase AdjectivePhrase
     where head.Grade := Comparative,
           head.ComplementKind = Intransitive,
@@ -2069,8 +1941,8 @@ MeasuredStandardComparative: AdjectivePhrase -> modifier:NounPhrase AdjectivePhr
           modifier.NounKind := Numeric,
           modifier.Case := Plain
 // A superlative quantifier under the definite article (*the most
-// creatures*, *the least life*; CGEL, Ch. 5 §6.1, p. 393), with a
-// plural count or a mass head.
+// creatures*, *the least life*; CGEL 5§6.1:393), with a plural count
+// or a mass head.
 SuperlativeCountDeterminer: DeterminerPhrase -> marker:Word(The) Class(SuperlativeQuantifier)
     where $.Number = Plural,
           $.Countability = Count,
@@ -2080,8 +1952,8 @@ SuperlativeMassDeterminer: DeterminerPhrase -> marker:Word(The) Class(Superlativ
           $.Countability = Mass,
           $.ComplementKind = Intransitive
 // A comparative determinative with its *than* Complement after the
-// head (*more lands than you*, *less life than an opponent*; CGEL,
-// Ch. 13 §2.1, p. 1104), of a plural count or a mass head.
+// head (*more lands than you*, *less life than an opponent*; CGEL
+// 13§2.1:1104), of a plural count or a mass head.
 ComparativeCountDetermined: NounPhrase ->
     determiner:Class(ComparativeQuantifier) Nominal complement:Selected(PrepositionPhrase, Than)
     where head.Number = Plural,
@@ -2101,14 +1973,12 @@ ComparativeMassDetermined: NounPhrase ->
           $.Case = Plain,
           $.Person = Third
 // A comparative determinative and its *than* Complement, siblings in
-// a Determinative Phrase (*more than one*, *fewer than six*; CGEL,
-// Ch. 13 §2.1, p. 1104). Its standard is a bare quantity, and the
-// phrase has the standard's Number (*more than one creature*, *more
-// than two lands*; Ch. 5 §11(d), p. 432), so the comparative is
-// `quantifier`, not `head`, which would give it the comparative's own
-// Number. A determined standard follows the head instead (*more lands
-// than you*); a bounding frequency is a degree Adjunct's
-// (ComparativeAdverb).
+// a Determinative Phrase (*more than one*, *fewer than six*; CGEL
+// 13§2.1:1104). A bare quantity standard gives the phrase its Number
+// (*more than two lands*; CGEL 5§11(d):432), so the comparative is
+// `quantifier`, not `head`. A determined standard follows the head
+// (ComparativeCountDetermined); a bounding frequency is
+// ComparativeAdverb's.
 ComparativeDeterminer: DeterminerPhrase ->
     quantifier:Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
     where complement.Determination = Bare,
@@ -2121,7 +1991,7 @@ ComparativeDeterminer: DeterminerPhrase ->
           $.ObliqueKind = complement.ComplementKind,
           $.ObliqueDetermination = complement.Determination
 // The same with a determinative modifying the comparative (*no more
-// than one*, *many more than two*; CGEL, Ch. 13 §4.4, p. 1126).
+// than one*, *many more than two*; CGEL 13§4.4:1126).
 ModifiedComparativeDeterminer: DeterminerPhrase ->
     modifier:Lex(Determinative) quantifier:Class(ComparativeQuantifier)
     complement:Selected(PrepositionPhrase, Than)
@@ -2136,8 +2006,7 @@ ModifiedComparativeDeterminer: DeterminerPhrase ->
           $.ObliqueDetermination = complement.Determination
 // The same without the *than* Complement, the standard being the
 // nominal it determines (*no more scream counters*, *no fewer
-// cards*; CGEL, Ch. 13 §4.4, p. 1126), as a measure phrase does in
-// MeasuredComparativeDeterminer.
+// cards*), as a measure phrase does in MeasuredComparativeDeterminer.
 DegreeModifiedComparativeDeterminer: DeterminerPhrase ->
     modifier:Word(No) quantifier:Class(ComparativeQuantifier)
     where $.Number = quantifier.Number,
@@ -2185,14 +2054,13 @@ NounPhraseArithmetic: NounPhrase -> NounPhrase modifier:Selected(PrepositionPhra
           head.Case := Plain
 // A frequency Noun Phrase admits the same arithmetic as an object
 // Noun Phrase, adding or taking away a number of occurrences (*that
-// many times plus an additional time*; CGEL, Ch. 7 §5.1(a), p. 635;
-// Ch. 8 §9, pp. 713–716).
+// many times plus an additional time*; CGEL 7§5.1(a):635; 8§9:713–716).
 TemporalArithmetic: TemporalNounPhrase ->
     TemporalNounPhrase modifier:Selected(PrepositionPhrase, Plus, Minus)
     where modifier.NounKind = Temporal
 // The same on a frequency adverb (*copy that spell once plus an
 // additional time for each opponent*), which counts occasions as a
-// frequency Noun Phrase does (CGEL, Ch. 8 §9, p. 715).
+// frequency Noun Phrase does (TemporalArithmetic).
 FrequencyAdverbArithmetic: AdverbPhrase ->
     AdverbPhrase modifier:Selected(PrepositionPhrase, Plus, Minus)
     where head.AdjunctPosition = End,
@@ -2212,12 +2080,11 @@ MultiplierPredetermination: NounPhrase -> determiner:DeterminerPhrase NounPhrase
 AdverbAdverbial: Adverbial -> AdverbPhrase where head.AdjunctPosition = End
 FrequencyAdverbial: Adverbial -> TemporalNounPhrase
 // A comparative determinative and its *than* Complement, siblings in
-// a degree Adjunct (*choose the same mode more than once*; CGEL, Ch.
-// 13 §4.4), with or without a determinative modifying the
-// comparative (*activate no more than twice*). Its standard is a
-// bounding frequency (*once*, *twice*), which counts occasions (CGEL,
-// Ch. 8 §9, p. 715), so *more* is count *many*'s comparative (Ch. 13
-// §4.1, p. 1123).
+// a degree Adjunct (*choose the same mode more than once*; CGEL
+// 13§4.4), with or without a determinative modifying the comparative
+// (*activate no more than twice*). Its standard is a bounding
+// frequency, which counts occasions (ComparativeFrequency), so *more*
+// is count *many*'s comparative (CGEL 13§4.1:1123).
 ComparativeAdverb: AdverbPhrase ->
     Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
     where complement.ComplementKind = AdvP,
@@ -2231,7 +2098,7 @@ ModifiedComparativeAdverb: AdverbPhrase ->
           $.AdjunctPosition = End
 // A comparative adjective premodifier with its *than* Complement after
 // the head, an indirect Complement (*greater power than this
-// creature*; CGEL, Ch. 13 §2.1, p. 1104; Ch. 5 §16.1, p. 445).
+// creature*; CGEL 5§16.1:445).
 ComparativeIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, Than)
     where modifier.Grade = Comparative,
@@ -2239,9 +2106,7 @@ ComparativeIndirectComplement: Nominal ->
           modifier.Determination = $.Determination
 // A non-scalar comparative governor of inequality takes its *than*
 // Complement after the head too, in the Type I attributive
-// construction (*a different sort of experience than live music*,
-// *some other means of restricting imports than tariffs*; CGEL, Ch.
-// 13 §5.4, pp. 1143–1145).
+// construction (CGEL 13§5.4:1143–1145).
 NonScalarIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, Than)
     where modifier.Grade := NonScalarInequality,
@@ -2253,8 +2118,8 @@ EquativeIndirectComplement: Nominal ->
           complement.ComplementKind = NP,
           modifier.Determination = $.Determination
 // An analytic superlative (*your most recent turn*, *most recently
-// cast*; CGEL, Ch. 13 §4.3, p. 1122): a plain adjective heads a
-// superlative phrase.
+// cast*; CGEL 13§4.3:1122): a plain adjective heads a superlative
+// phrase.
 DegreeModifiedAdjective: AdjectivePhrase -> modifier:Word(Most) AdjectivePhrase {
     unshared: [Grade],
 }
@@ -2263,18 +2128,13 @@ DegreeModifiedAdjective: AdjectivePhrase -> modifier:Word(Most) AdjectivePhrase 
           $.Grade = Superlative
 DegreeModifiedAdverb: AdverbPhrase -> modifier:Word(Most) AdverbPhrase
     where head.AdjunctPosition = Central
-// A comparative determinative and its *than* Complement as a fused
-// head (*by more than {5}*, *more than two*), with a bare standard;
-// scalar *less than* is the adjective's. The Noun Phrase has its
-// standard's Number, not the quantifier's (*more* is plural).
 // *All* with an exception Preposition Phrase as a fused determiner-head
 // whose standard is a determined Noun Phrase (*ignore all but the
-// highest roll*; CGEL, Ch. 5 §11(f), p. 433): a definite one, since a
-// quantity there determines with *all but* (*all but one +1/+1
-// counter*, *[all but one] of them*). It counts the members of
-// a set (*All but a few helicopters*), so count *all*: the Noun
-// Phrase has its plural, not the exception's Number. A bare quantity
-// in the exception is ComparativeFusedHead's (*all but one*).
+// highest roll*; CGEL 5§11(f):433): a definite one, since a quantity
+// there determines with *all but* (*all but one +1/+1 counter*). It
+// counts the members of a set, so count *all*: the Noun Phrase has its
+// plural, not the exception's Number. A bare quantity in the exception
+// is ComparativeFusedHead's (*all but one*).
 ExceptiveFusedHead: NounPhrase -> quantifier:DeterminerPhrase
     where quantifier.ComplementKind = PP,
           quantifier.ObliqueKind = NP,
@@ -2287,6 +2147,10 @@ ExceptiveFusedHead: NounPhrase -> quantifier:DeterminerPhrase
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
+// A comparative determinative and its *than* Complement as a fused
+// head (*by more than {5}*, *more than two*), with a bare standard;
+// scalar *less than* is the adjective's. The Noun Phrase has its
+// standard's Number, not the quantifier's (*more* is plural).
 ComparativeFusedHead: NounPhrase -> quantifier:DeterminerPhrase
     where quantifier.ComplementKind = PP,
           quantifier.ObliqueKind != AdvP | FiniteClause,
@@ -2300,11 +2164,11 @@ ComparativeFusedHead: NounPhrase -> quantifier:DeterminerPhrase
           $.Person = Third
 // A comparative determinative fused head whose standard a dependent
 // determinative determines (*can't be more than the total number of
-// ...*; CGEL, Ch. 13 §4.5(a), p. 1132): *more* is the head and its
-// *than* phrase its Complement. A quantified standard is not one: *more
-// than two* determines *lands* and *more than one* heads a partitive
-// (Ch. 5 §11(d), p. 432). Predicative *less than* is the adjective's
-// (Ch. 13 §4.1.1, p. 1126).
+// ...*; CGEL 13§4.5(a):1132): *more* is the head, its *than* phrase
+// the Complement. Never a quantified standard: *more than two*
+// determines *lands*, *more than one* heads a partitive (CGEL
+// 5§11(d):432). Predicative *less than* is the adjective's (CGEL
+// 13§4.1.1:1126).
 ComparativeDeterminedStandard: NounPhrase ->
     quantifier:Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
     where complement.ComplementKind = NP,
@@ -2328,8 +2192,8 @@ FractionPartitive: PartitiveHead ->
 // A measure phrase on a comparative determinative with its *than*
 // Complement (*at least 7 life more than your starting life total*;
 // *at least four more creatures than you*). The measure phrase is
-// quantified by a numeral (CGEL, Ch. 6 §3.2, pp. 549–550): in *target
-// creature with power less than this creature's power*, *power* has a
+// quantified by a numeral (CGEL 6§3.2:549–550): in *target creature
+// with power less than this creature's power*, *power* has a
 // postpositive comparative.
 MeasuredComparativeStandard: NounPhrase ->
     modifier:NounPhrase Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
@@ -2362,24 +2226,22 @@ MeasuredComparativeDeterminer: DeterminerPhrase ->
           $.DeterminativeDistribution = Numerical,
           $.ComplementKind = Intransitive
 // Floated *each* before a predicative adjective (*are each equal to
-// ...*, *power and toughness each equal to ...*; CGEL, Ch. 5 §10.1.1,
-// p. 428).
+// ...*, *power and toughness each equal to ...*; CGEL 5§10.1.1:428).
 FloatedEachAdjective: AdjectivePhrase -> adjunct:Word(Each) AdjectivePhrase
     where head.ComplementKind = PP
 // Floated *each* before a Preposition Phrase postmodifying a plural
 // nominal, which it quantifies distributively (*creature cards each
-// with mana value 3 or less*), as before a postpositive adjective
-// above (CGEL, Ch. 5 §9.3, p. 413; §10.1.1, p. 428).
+// with mana value 3 or less*), as FloatedEachAdjective does before an
+// adjective (CGEL 5§9.3:413, 5§10.1.1:428).
 FloatedEachPostmodifier: Nominal ->
     Nominal adjunct:Word(Each) modifier:Hosted(PrepositionPhrase, Nominal) { heavy: [modifier] }
     where head.Number = Plural
-// A serial coordination whose initial conjuncts are nominals under
-// one determiner and whose last is a Noun Phrase with its own
-// (*their hand, graveyard, and all permanents they own*): a
-// coordination at unlike levels (CGEL, Ch. 15 §3.6, pp. 1335–1336;
-// the shared determiner, §2.1(c), p. 1291). The shared nominals are
-// singular and count, so none is a Noun Phrase alone and no serial
-// Noun Phrase coordination brackets the same words.
+// A serial coordination of nominals under one determiner whose last
+// conjunct is a Noun Phrase with its own (*their hand, graveyard, and
+// all permanents they own*): a coordination at unlike levels (CGEL
+// 15§3.6:1335–1336, 15§2.1(c):1291). The shared nominals are singular
+// and count, so none is a Noun Phrase alone and no serial Noun Phrase
+// coordination brackets the same words.
 SharedDeterminerCoordination: NounPhrase ->
     determiner:DeterminerPhrase SharedNominals ',' coordinator:Word(And) last:NounPhrase
     where last.Determination = Overt,
@@ -2397,20 +2259,19 @@ SharedNominalPair: SharedNominals -> first:Nominal ',' last:Nominal
 SharedNominalSequence: SharedNominals -> first:Nominal ',' rest:SharedNominals
     where first.Number = Singular,
           first.Countability = Count
-// It quantifies the members of a coordination of Noun Phrases the
-// same way, each conjunct its own (*up to one target instant card
-// and/or up to one target sorcery card from your graveyard each with
-// mana value X or less*); an uncoordinated plural one has the nominal
-// site above, and a singular coordination none, never *a creature or
-// a land each with flying*.
+// FloatedEachPostmodifier over a coordination of Noun Phrases, each
+// conjunct its own (*up to one target instant card and/or up to one
+// target sorcery card from your graveyard each with mana value X or
+// less*); a singular coordination has none, never *a creature or a
+// land each with flying*.
 FloatedEachCoordinationPostmodifier: NounPhrase ->
     NounPhrase adjunct:Word(Each) modifier:Hosted(PrepositionPhrase, Nominal) {
     heavy: [modifier],
     coordinated: [head],
 }
     where head.Number != Singular
-// A floating quantifier after an auxiliary (*any number of target players may
-// each search ...*; CGEL, Ch. 5 §10.1.1, p. 428).
+// A floating quantifier after an auxiliary (*any number of target
+// players may each search ...*; CGEL 5§10.1.1:428).
 AuxiliaryFloatedEach: VerbPhrase -> adjunct:Class(FloatingQuantifier) VerbPhrase {
     cost: 2,
     transparent: [head],
@@ -2445,8 +2306,8 @@ IndexedNounPhrase: NounPhrase -> IndexedNominal
           $.Case = Plain,
           $.Person = Third
 // The count-noun pro-form *one* (*this one*, *a different one of
-// those creatures*, *the first one they draw*; CGEL, Ch. 5 §7.1,
-// pp. 386–388; Ch. 17 §5.1, p. 1511).
+// those creatures*, *the first one they draw*; CGEL 5§7.1:386–388;
+// 17§5.1:1511).
 CardinalNominal: BareNominal -> Numeral(Cardinal)
     where $.Determination = Overt,
           $.Number = Singular,
@@ -2471,7 +2332,7 @@ FusedAdjectiveHead: NounPhrase -> determiner:DeterminerPhrase Class(FusedHeadAdj
           determiner.Countability = $.Countability,
           $.NounKind = Ordinary
 // Abstract anaphoric NP *the same*, including *do the same for ...*
-// (CGEL, Ch. 17, p. 1545). Its head remains an adjective.
+// (CGEL 17:1545). Its head remains an adjective.
 DefiniteFusedAdjectiveHead: NounPhrase -> determiner:Word(The) Class(DefiniteFusedHeadAdjective)
     where $.Case = Plain,
           $.Person = Third,
@@ -2489,10 +2350,8 @@ KeywordInstruction: Sentence -> KeywordLineItem '.' where head.KeywordForm = Par
 // A floating quantifier quantifies a plural Subject (*they each*,
 // *this creature and target creature both*), or a second-person one:
 // *you* is singular in Oracle, but its verb forms are those of plural
-// *you* (CGEL, Ch. 5 §10.1.1, p. 428 [7ii]: *You each qualify for a
-// prize*; *You each lose life*).
-// Restated as RelativeFloatedEach; a change to one must be made to the
-// other.
+// *you* (*You each lose life*; CGEL 5§10.1.1:428 [7ii]).
+// Twin: RelativeFloatedEach.
 FloatedEach: Clause -> subject:NounPhrase adjunct:Class(FloatingQuantifier) VerbPhrase {
     transparent: [head],
 }
@@ -2503,9 +2362,8 @@ FloatedEach: Clause -> subject:NounPhrase adjunct:Class(FloatingQuantifier) Verb
           head.VerbForm = Finite,
           $.ClauseMarking = Unmarked
 // Floated *all* after a personal pronoun Subject (*they all share a
-// color*; CGEL, Ch. 5 §10.1.1, p. 428).
-// Restated as RelativeFloatedAll; a change to one must be made to the
-// other.
+// color*; CGEL 5§10.1.1:428).
+// Twin: RelativeFloatedAll.
 FloatedAll: Clause -> subject:NounPhrase adjunct:Word(All) VerbPhrase { transparent: [head] }
     where subject.Number = Plural,
           subject.Case = Nominative,
@@ -2546,16 +2404,16 @@ FusedLocative: LocativeHead -> Word(Anywhere)
           $.Case = Plain,
           $.Person = Third
 // A cited noun, alone or prefixed by *non-* (*choose land or
-// nonland*; CGEL, Ch. 5 §8.2, p. 401): bare and singular, whatever its
+// nonland*; CGEL 5§8.2:401): bare and singular, whatever its
 // countability, since it names the word, not what the word denotes.
 WordMention: Mention -> FreeLex(Noun) where head.Inflection = Singular
 NegativeMention: Mention -> prefix:Lex(Affix) Mention { light: [head], uncoordinated: [head] }
-// A cited noun premodified by an attributive adjective or by a
-// cited word with *non-* is a composite nominal (*choose white
-// Citizen*, *non-Aura enchantment*; CGEL, Ch. 5 §14.4, pp. 448-450).
-// Only those modify: a cited noun before a cited noun (*choose
-// target creature*) is an ordinary Noun Phrase. The head is one word,
-// so that a longer term is left-branching, one tree.
+// A cited noun premodified by an attributive adjective or a cited
+// *non-* word is a composite nominal (*choose white Citizen*,
+// *non-Aura enchantment*; CGEL 5§14.4:448-450). Never a cited noun
+// before a cited noun (*choose target creature*), an ordinary Noun
+// Phrase. The head is one word, so a longer term is left-branching,
+// one tree.
 CompoundMention: Mention -> modifier:MentionModifier Mention {
     light: [head],
     uncoordinated: [head],
@@ -2568,9 +2426,8 @@ NegativeMentionModifier: MentionModifier -> prefix:Lex(Affix) Mention {
     uncoordinated: [head],
 }
 // A count noun prefixed by *non-* heads a nominal, naming what is not
-// of its kind (*four or more nonlands*; CGEL, Ch. 19 §5.5.1, p. 1689:
-// *non-member*, *non-resident*): one noun, never a compound under the
-// prefix.
+// of its kind (*four or more nonlands*; CGEL 19§5.5.1:1689): one noun,
+// never a compound under the prefix.
 PrefixedNoun: BareNominal -> prefix:Lex(Affix) BareNominal { light: [head] }
     where head.Countability := Count
 AttributiveNoun: NounPremodifier -> FreeLex(Noun)
@@ -2578,10 +2435,9 @@ AttributiveNoun: NounPremodifier -> FreeLex(Noun)
           head.NounDistribution != HeadOnly
 PrefixedNounPremodifier: NounPremodifier -> prefix:Lex(Affix) NounPremodifier
     where $.Polarity = Negative
-// An attributive participle expands only by an adverb before it (*a
-// poorly drafted report*, *each differently named dungeon*; CGEL, Ch.
-// 14 §1.1, p. 1175, [9]): a manner adverb, which a clause has in end
-// position.
+// An attributive participle expands only by an adverb before it (*each
+// differently named dungeon*; CGEL 14§1.1:1175 [9]): a manner adverb,
+// which a clause has in end position.
 AdverbModifiedParticiple: Participle -> modifier:AdverbPhrase Participle { cost: 0 }
     where modifier.AdjunctPosition = End
 // A participle premodifier prefixed by *non-* (*nonattacking*).
@@ -2606,12 +2462,11 @@ AdjectivalAttribute: Attribute -> filler:AdjectivePhrase
           $.ComplementKind = AdjP,
           $.Polarity = filler.Polarity
 // Oracle sets off with commas only independent negative modifiers of
-// one head (`docs/oracle-style-guide.md` §6, Determiners and modifier
-// order): each premodifier of an asyndetic chain is a *non-* one,
-// `Polarity: Negative`, which the chain requires it to carry. A
-// comma before a bare premodifier is a serial coordination's (§3,
-// Commas and the serial comma): *a Swamp, Mountain, black permanent,
-// or red permanent*, *a Bat, Bird, Mouse, or Rabbit card*.
+// one head (OSG §6, Determiners and modifier order): each premodifier
+// of an asyndetic chain is a *non-* one (`Polarity: Negative`). A comma
+// before a bare premodifier is a serial coordination's (OSG §3, Commas
+// and the serial comma): *a Swamp, Mountain, black permanent, or red
+// permanent*.
 AsyndeticAttributes: Attributes -> first:Attribute ',' rest:AttributeChain
     where first.Polarity := Negative
 AttributeSequence: AttributeChain -> first:Attribute ',' rest:AttributeChain
@@ -2625,31 +2480,30 @@ BarePrepositionalNominal: BareNominalComplement -> PrepositionalNominal
     where head.Number = Singular,
           head.Countability = Count
 // A superlative confers definiteness on its nominal, so the article
-// may go unexpressed without a change of meaning (CGEL, Ch. 13
-// §6.3.4, pp. 1168–1169), here in a bare nominal Complement: *tied
-// for lowest life total*.
+// may go unexpressed without a change of meaning (CGEL
+// 13§6.3.4:1168–1169), here in a bare nominal Complement: *tied for
+// lowest life total*.
 SuperlativeBareNominal: BareNominalComplement -> modifier:AdjectivePhrase BareNominal
     where modifier.Grade = Superlative,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative,
           head.Number = Singular,
           head.Countability = Count
-// A superlative also fuses with the head it would modify (CGEL, Ch. 5
-// §9.3(b), p. 416), its article unexpressed as above: *tied for
-// greatest*, *tied for most common*.
 // A superlative determinative fuses the same way, its article
 // unexpressed: *tied for fewest*.
 SuperlativeQuantifierFusedHead: BareNominalComplement -> Class(CountSuperlativeQuantifier)
+// A superlative also fuses with the head it would modify (CGEL
+// 5§9.3(b):416), its article unexpressed as above: *tied for greatest*,
+// *tied for most common*.
 SuperlativeFusedHead: BareNominalComplement -> modifier:AdjectivePhrase
     where modifier.Grade := Superlative,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative
 // Noun phrases.
-// A singular count noun stands bare in a fixed frame only when the
-// noun is one that frame admits; the nouns that do "are severely
-// restricted" (CGEL, Ch. 5 §8.5(b), pp. 409–410), so the frame, not
-// the noun, licenses the missing determiner: *from outside the game*,
-// never *if it's [outside the game]* with the noun.
+// A singular count noun bare in a fixed frame (FixedFrameNounPhrase):
+// the frame, not the noun, licenses the missing determiner (*from
+// outside the game*, never *if it's [outside the game]*; CGEL
+// 5§8.5(b):409–410).
 FixedFrameBareNoun: FixedFrameNounPhrase -> Nominal
     where head.NounDistribution = FixedFrame,
           head.Number = Singular,
@@ -2657,13 +2511,11 @@ FixedFrameBareNoun: FixedFrameNounPhrase -> Nominal
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-// A bare Noun Phrase is no coordination of Nominals: with no
-// determiner or dependent to share, the coordination is of the bare
-// Noun Phrases (*creatures and lands*, *choose [black] or [red]*), the
-// same analysis one level up; a Nominal coordination is for what
-// something outside it shares (*all [creatures and lands]*,
-// *[creatures and lands] you control*; CGEL, Ch. 15 §2.1, p. 1291;
-// `docs/decisions/english.md` §8). BarePlural too.
+// A bare Noun Phrase is never a coordination of Nominals: with nothing
+// to share, the coordination is of the bare Noun Phrases (*creatures
+// and lands*); a Nominal coordination is for what something outside it
+// shares (*all [creatures and lands]*; CGEL 15§2.1:1291; ADR §8).
+// BarePlural too.
 BareMass: NounPhrase -> Nominal { transparent: [head], uncoordinated: [head] }
     where $.Determination = Bare,
           $.Case = Plain,
@@ -2694,14 +2546,9 @@ Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [he
           determiner.Number = head.Number
 // A distributive determiner over an *and*-coordination of singular
 // nominals makes a singular Noun Phrase (*each creature and
-// planeswalker you control gets ...*; CGEL, Ch. 5 §18.4, p. 508).
-// The nominal child is named `nominal`, not `head`, to keep it out of
-// implicit head agreement: the Noun Phrase takes Number from its
-// distributive determiner (singular), while the *and*-coordination
-// it determines is plural, and Countability, Determination and
-// NounKind are set here, not copied from the coordination. It
-// forgoes the head lexeme in Readings and the head line (CGEL, Ch. 5
-// §18.4, p. 508).
+// planeswalker you control gets ...*; CGEL 5§18.4:508). `nominal`, not
+// `head`: Number comes from the determiner, though the coordination is
+// plural.
 DistributiveCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase nominal:Nominal {
     transparent: [nominal],
 }
@@ -2718,13 +2565,10 @@ DistributiveCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase no
           $.Person = Third
 // A singular determiner over an *and*-coordination of singular
 // nominals makes a singular Noun Phrase of joint reference: one
-// entity that each conjunct describes (*our chef and chauffeur has*;
-// *a red, white and blue flag*; *is also a Cleric, Rogue, Warrior,
-// and Wizard*; CGEL, Ch. 5 §18.4, pp. 507–508, [26]–[27]). As in
-// DistributiveCoordinationDetermined, the nominal child is
-// `nominal`, not `head`: the Noun Phrase is singular while the
-// coordination it determines is plural. A distributive determiner
-// is that Production's.
+// entity that each conjunct describes (*is also a Cleric, Rogue,
+// Warrior, and Wizard*; CGEL 5§18.4:507–508 [26]–[27]). `nominal`, not
+// `head`: Number is Singular though the coordination is plural. A
+// distributive determiner is DistributiveCoordinationDetermined's.
 JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase nominal:Nominal {
     transparent: [nominal],
 }
@@ -2742,14 +2586,11 @@ JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase nominal:N
           $.Case = Plain,
           $.Person = Third
 // A comparative or exceptive quantity determines a count head that
-// agrees with its Complement (*more than one creature*, *all but one
-// +1/+1 counter*), or a mass head of the determinative's Countability
-// (*less than three mana*, *all but 1 life*). A singular noun both
-// count and mass carries no Countability of its own, so it is not a
-// mass head here. In a determiner the standard is a bare quantity
-// (*than* + numeral): a determined standard comes after the head
-// instead (CGEL, Ch. 5 §11(d), p. 432), so *more than the total*
-// determines nothing.
+// agrees with its Complement (*more than one creature*), or a mass head
+// of the determinative's Countability (*less than three mana*). A noun
+// both count and mass is not a mass head here. The standard is a bare
+// quantity: a determined standard follows the head (CGEL 5§11(d):432),
+// so *more than the total* determines nothing.
 ComparativeQuantityCountDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal
     where determiner.ComplementKind = PP,
           determiner.ObliqueDetermination = Bare,
@@ -2789,11 +2630,9 @@ FreeChoiceQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal
           $.Person = Third,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
-// The nominal child is named `quantity`, not `head`, to keep it out of
-// implicit head agreement: Number and NounKind come from the
-// quantity's oblique (`ObliqueNumber`, `ObliqueNounKind`), not from
-// the quantificational noun itself (CGEL, Ch. 5 §3.3, pp. 349-351). It
-// forgoes the head lexeme in Readings and the head line.
+// `quantity`, not `head`: Number and NounKind come from the oblique
+// (`ObliqueNumber`, `ObliqueNounKind`), not the quantificational noun
+// (CGEL 5§3.3:349–351).
 TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase quantity:Nominal
     where determiner.DeterminativeDistribution = FreeChoice,
           quantity.NounDistribution = Quantity,
@@ -2804,10 +2643,8 @@ TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase quantity:Nominal
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// A Number-transparent quantificational noun gives the Targeting
-// Marker alone in its oblique the oblique's plural (*any number of
-// target creatures*; CGEL, Ch. 5 §3.3, pp. 349–351): the quantity,
-// not the Marker, counts the targets, as an outer determiner does.
+// A Number-transparent quantity over a TargetedOblique (*any number of
+// target creatures*): the quantity, not the Marker, counts the targets.
 TargetedQuantity: BareNominal -> FreeLex(Noun) complement:TargetedOblique
     where head.NounDistribution = Quantity,
           $.ComplementKind = PP,
@@ -2824,10 +2661,8 @@ TargetedNounPhrase: TargetedNounPhrase -> determiner:DeterminerPhrase Nominal
           head.Determination = Overt,
           determiner.Countability = head.Countability
 // A free-choice quantity of serial *times* is a frequency Adjunct
-// (*pay {1}{G} any number of times*). As TransparentQuantity, the
-// nominal child is `quantity`, not `head`: Number comes from the
-// oblique, and NounKind is `Temporal` from the oblique, so the
-// head lexeme and the head line are forgone.
+// (*pay {1}{G} any number of times*). `quantity`, not `head`: Number
+// comes from the oblique, NounKind is `Temporal`.
 TemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase quantity:Nominal
     where determiner.DeterminativeDistribution = FreeChoice,
           quantity.ComplementKind = PP,
@@ -2839,7 +2674,7 @@ TemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase quantity:Nom
           $.Case = Plain,
           $.Person = Third
 // Bounding frequency also uses a quantified *number of times*,
-// including its postmodifiers (CGEL, Ch. 8 §9, p. 715 n. 19).
+// including its postmodifiers (CGEL 8§9:715 n. 19).
 DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase quantity:Nominal
     where determiner.DeterminativeDistribution != FreeChoice,
           quantity.NounDistribution = Quantity,
@@ -2852,13 +2687,10 @@ DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase qu
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// Ordinary bare plurals have plural count heads, not just the plural
-// Number of a coordination of singular count nominals. A shared
-// determiner belongs outside that coordination and cannot be left
-// behind when its tail becomes a Supplement (CGEL, Ch. 5 §8.5,
-// pp. 409–410; Ch. 15 §3.1, p. 1323; OSG §7, Plurals and agreement).
-// Mass-noun coordinations remain bare; exceptional bare singular
-// expressions are separately licensed, not ordinary bare plurals.
+// A bare plural has a plural count head, never just the plural Number
+// of a coordination of singular count nominals, whose shared determiner
+// belongs outside it (CGEL 5§8.5:409–410; 15§3.1:1323; OSG §7, Plurals
+// and agreement). Mass-noun coordinations remain bare.
 BarePlural: NounPhrase -> Nominal { uncoordinated: [head] }
     where $.Determination = Bare,
           $.Case = Plain,
@@ -2889,12 +2721,10 @@ GenitivePossessor: NounPhrase -> possessor:Possessor marker:Word(Genitive)
           possessor.Case := Plain,
           $.Number = possessor.Number,
           $.Person = possessor.Person
-// A genitive in a fused subject-determiner-head is a whole Noun
-// Phrase whose head is understood from an antecedent (*power less
-// than Mirko's*; CGEL, Ch. 5 §16.3, pp. 467–468). Where a nominal
-// right after it can be its head, that Reading ranks first (CGEL,
-// Ch. 17 §6.1, pp. 1516–1517): *during [its controller's next untap
-// step]*.
+// A genitive with its head understood from an antecedent (*power less
+// than Mirko's*; CGEL 5§16.3:467–468). Where a following nominal can be
+// its head, that Reading ranks first (17§6.1:1516–1517): *during [its
+// controller's next untap step]*.
 FusedSubjectDeterminerHead: NounPhrase -> possessor:Possessor marker:Word(Genitive)
     where $.NounKind = Ordinary,
           $.Determination = Overt,
@@ -2921,12 +2751,10 @@ Unmodified: Nominal -> BareNominal { transparent: [head] }
     where $.ConjunctNumber = $.Number,
           !(head.ComplementKind = Amount & head.ObliqueKind = PP)
 // The Targeting Marker is a determiner on its own (*target creature*),
-// singular as the lexicon gives it; after an adjective (*other target
-// creatures*, *second target*); or the last word of a determiner with
-// an outer one, which marks it and gives it its Number (*two target
-// creatures*, *each other target creature*, *up to one target
-// artifact or creature you control*). The nominal it determines takes
-// every modifier below it (CGEL, Ch. 5, pp. 330–332).
+// after an adjective (*other target creatures*), or the last word of a
+// determiner with an outer one (*two target creatures*; see
+// TargetingMarker). The nominal it determines takes every modifier
+// below it (CGEL 5:330–332).
 BareTargetingMarker: TargetingMarker -> DeterminerPhrase
     where head.DeterminativeDistribution := Targeting
 ModifiedTargetingMarker: DeterminerPhrase -> modifier:AdjectivePhrase TargetingMarker
@@ -2950,10 +2778,9 @@ Premodifier: BareNominal -> modifier:AdjectivePhrase BareNominal { transparent: 
           modifier.AdjectivePosition != Predicative
 // An attributive adjective before an *and*-coordination of singular
 // nominals may modify the whole coordination (*long [poems and
-// essays]*; CGEL, Ch. 15 §1.3.4, pp. 1285–1286, [32b]), as well as its
-// first conjunct: *[total [power and toughness 5 or less]]*. A
-// nominal's Complement is inside its premodifiers, so a shared Amount
-// is too.
+// essays]*; CGEL 15§1.3.4:1285–1286 [32b]), as well as its first
+// conjunct: *[total [power and toughness 5 or less]]*. A shared Amount
+// is inside the premodifiers too.
 CoordinationPremodifier: Nominal -> modifier:AdjectivePhrase Nominal
     where modifier.ComplementKind = Intransitive,
           modifier.Determination = $.Determination,
@@ -2995,7 +2822,7 @@ PluralPossessor: Possessor -> BareNominal
 ProperPossessor: Possessor -> Name where $.Case = Plain, $.Person = Third
 // A postmodifier agrees with each conjunct of an *and*-coordinated
 // nominal: under distributive *each* it is singular (*each creature and
-// planeswalker that is tapped*; CGEL, Ch. 5 §18.4, p. 508).
+// planeswalker that is tapped*; CGEL 5§18.4:508).
 NominalPostmodifier: Nominal -> Nominal modifier:Postmodifier
     where head.ConjunctNumber = modifier.Number,
           head.NounKind = modifier.NounKind
@@ -3014,8 +2841,8 @@ FusedPostmodifier: FusedNounPhrase -> FusedNounPhrase modifier:RelativeClause
     where modifier.ClauseMarking = Relative,
           head.Number = modifier.Number
 // A subjectless participial clause can modify a partitive fused head
-// too (*one of them chosen at random*; CGEL, Ch. 5 §9.1, p. 411;
-// Ch. 14 §9, pp. 1264–1265; OSG §5, This way).
+// too (*one of them chosen at random*; CGEL 5§9.1:411; 14§9:1264–1265;
+// OSG §5, This way).
 FusedParticipialPostmodifier: FusedNounPhrase -> FusedNounPhrase modifier:VerbPhrase {
     heavy: [modifier],
 }
@@ -3048,10 +2875,8 @@ AdjectivalConjunct: PostmodifierConjunct -> filler:AdjectivePhrase { heavy: [fil
     where filler.Voice != Passive,
           $.ComplementKind = AdjP
 // A past-participial conjunct is a lexical passive participle clause
-// (CGEL, Ch. 14 §9, p. 1264), as the single participial postmodifier
-// is, never one headed by an auxiliary (*been* + participle): in a
-// passive the auxiliary takes the participle (Ch. 16 §10.1.1,
-// p. 1427).
+// (CGEL 14§9:1264), as the single participial postmodifier is, never
+// one headed by an auxiliary (*been* + participle; 16§10.1.1:1427).
 PastParticipialConjunct: PostmodifierConjunct -> filler:VerbPhrase { heavy: [filler] }
     where filler.VerbForm = PastParticiple,
           filler.Voice = Passive,
@@ -3063,12 +2888,9 @@ GerundParticipialConjunct: PostmodifierConjunct -> filler:VerbPhrase { heavy: [f
 CoordinatedPostmodifier: Nominal -> Nominal modifier:PostmodifierCoordination
 RelativePostmodifier: Postmodifier -> RelativeClause
 // A participial clause with dependents (*each creature tapped this
-// way*, *a card exiled with ...*). A single postpositive participle
-// ranks behind it (CGEL, Ch. 5 §14.2, p. 445), and is never one whose
-// Adjectival Passive is a declared Adjective: bare *tapped* is that
-// Adjective. A past-participial postmodifier is a bare passive, with
-// neither *be* nor *get*, so the auxiliary *been* never heads one
-// (CGEL, Ch. 14 §9, pp. 1264–1265; Ch. 16 §10.1.1, pp. 1429–1430).
+// way*, *a card exiled with ...*); a single postpositive participle
+// ranks behind it (CGEL 5§14.2:445). A bare passive, never headed by the
+// auxiliary *been* (14§9:1264–1265; 16§10.1.1:1429–1430).
 ParticipialPostmodifier: Postmodifier -> VerbPhrase { heavy: [head] }
     where head.VerbForm = PastParticiple,
           head.Voice = Passive,
@@ -3078,7 +2900,7 @@ GerundParticipialPostmodifier: Postmodifier -> VerbPhrase { heavy: [head] }
 // A single participle postmodifies the bare nominal, outside its
 // premodifiers and inside any relative clause (*creatures entering*,
 // *a creature dying*). A past participle here is a bare passive too,
-// never the auxiliary *been* (CGEL, Ch. 14 §9, pp. 1264–1265).
+// never the auxiliary *been* (CGEL 14§9:1264–1265).
 SingleParticipialPostmodifier: Nominal -> BareNominal modifier:VerbPhrase {
     cost: 3,
     light: [modifier],
@@ -3094,7 +2916,7 @@ SingleGerundParticipialPostmodifier: Nominal -> BareNominal modifier:VerbPhrase 
 }
     where $.ConjunctNumber = $.Number,
           modifier.VerbForm = GerundParticiple
-// Relative clauses (CGEL, Ch. 12 §3). A bare relative is a finite
+// Relative clauses (CGEL 12§3). A bare relative is a finite
 // clause with an object Gap; *that* or a relative pronoun may also
 // introduce a subject Gap, which agrees with the antecedent.
 BareRelative: RelativeClause -> clause:SubjectInitialClause
@@ -3103,27 +2925,20 @@ BareRelative: RelativeClause -> clause:SubjectInitialClause
           clause.VerbForm = Finite
 // A bare relative whose Gap is a subjective predicative (*the
 // permanent it becomes*, *a color the other isn't*, *the number of
-// colors that spell is*; CGEL, Ch. 12 §3.3(c), p. 1045; §3.5.4(g),
-// p. 1054), of an ordinary head.
+// colors that spell is*; CGEL 12§3.3(c):1045; 12§3.5.4(g):1054), of an
+// ordinary head.
 BarePredicativeRelative: RelativeClause -> clause:SubjectInitialClause { cost: 3 }
     where $.ClauseMarking = Unmarked,
           $.NounKind = Ordinary,
           clause.Gap = Pred,
           clause.VerbForm = Finite
-// A bare relative's Clause is a Subject and its Predicate, as a
-// declarative's that can pass up a Gap (*SubjectPredicate*,
-// *CliticSubjectPredicate*, *FloatedEach*, *FloatedAll*), never one
-// with a preposed adjunct: "Bare relatives always have the subject in
-// initial position" (CGEL, Ch. 12 §3.5.5, p. 1055).
-// Each of the four Productions below restates its Clause twin and
-// differs from it only in having no `$.ClauseMarking` equation, so a
-// change to a twin must be made to its restatement, and conversely:
-// RelativeSubjectPredicate / SubjectPredicate, RelativeCliticSubjectPredicate
-// / CliticSubjectPredicate, RelativeFloatedEach / FloatedEach,
-// RelativeFloatedAll / FloatedAll. (SubjectInitialCoordination
-// coordinates SubjectInitialClauses: two bare relatives under one
-// head, as in Serum Powder's *Any time you could mulligan and this
-// card is in your hand*.)
+// A bare relative's Clause opens with its Subject, never a preposed
+// adjunct (CGEL 12§3.5.5:1055). Each of the four Productions below
+// restates its Clause twin minus the `$.ClauseMarking` equation, and a
+// change to one must be made to the other: RelativeSubjectPredicate /
+// SubjectPredicate, RelativeCliticSubjectPredicate /
+// CliticSubjectPredicate, RelativeFloatedEach / FloatedEach,
+// RelativeFloatedAll / FloatedAll.
 RelativeSubjectPredicate: SubjectInitialClause -> subject:NounPhrase Free(VerbPhrase) {
     transparent: [head],
 }
@@ -3169,7 +2984,7 @@ SubjectGap: SubjectGapClause -> VerbPhrase
           head.Inflection != Irrealis,
           $.Gap = NP
 // The plural Requirement already keeps out the irrealis *were*, which
-// is third person singular only (CGEL, Ch. 3 §1.5, pp. 85–88), so this
+// is third person singular only (CGEL 3§1.5:85–88), so this
 // needs no Exclude of SubjectGap's.
 FloatedEachSubjectGap: SubjectGapClause -> adjunct:Class(FloatingQuantifier) VerbPhrase
     where head.VerbForm = Finite,
@@ -3193,14 +3008,14 @@ GenitivePredicativeRelative: RelativeClause -> marker:RelativeNounPhrase clause:
           clause.Gap = Pred,
           clause.VerbForm = Finite
 // A relative phrase may be a Preposition Phrase fronted with its
-// relative pronoun (*for which*; CGEL, Ch. 12 §3.2.1, p. 1040).
+// relative pronoun (*for which*; CGEL 12§3.2.1:1040).
 PrepositionRelativePhrase: RelativePrepositionPhrase -> Lex(Preposition) complement:Lex(Pronoun)
     where complement.PronounKind = Relative,
           complement.Case != Nominative | Genitive
 PrepositionalRelative: RelativeClause -> marker:RelativePrepositionPhrase clause:AdjunctGapClause
     where $.ClauseMarking = Relative,
           clause.Gap = Adjunct
-// A fused relative is a Noun Phrase (CGEL, Ch. 12 §6, p. 1068).
+// A fused relative is a Noun Phrase (CGEL 12§6:1068).
 FusedSubjectRelative: NounPhrase -> Word(Whichever) clause:SubjectGapClause
     where clause.Gap = NP,
           $.NounKind = Ordinary,
@@ -3215,10 +3030,9 @@ FusedRelative: NounPhrase -> Word(Whichever) clause:Clause
           $.Case = Plain,
           $.Person = Third
 // An adverbial relative: its Gap is a temporal Adjunct (*the next time
-// you cast a spell*; CGEL, Ch. 12 §3.3(e), p. 1045).
-// It is bare, so its Clause too opens with its Subject: *the first
-// time [each turn, those coins come up heads]* is no adverbial
-// relative.
+// you cast a spell*; CGEL 12§3.3(e):1045). It is bare, so its Clause
+// opens with its Subject: *the first time [each turn, those coins come
+// up heads]* is no adverbial relative.
 AdverbialRelative: RelativeClause -> clause:SubjectInitialClause
     where $.ClauseMarking = Unmarked,
           clause.Gap = Adjunct,
@@ -3227,17 +3041,14 @@ CoordinatedAdverbialRelative: RelativeClause -> clause:SubjectInitialCoordinatio
     where $.ClauseMarking = Unmarked,
           clause.Gap = Adjunct,
           $.NounKind = Temporal
-// Restates AdjunctGap over SubjectInitialClause; a change to one must
-// be made to the other.
+// Twin: AdjunctGap, over SubjectInitialClause.
 RelativeAdjunctGap: SubjectInitialClause -> SubjectInitialClause where $.Gap = Adjunct
-// Restated as RelativeAdjunctGap; a change to one must be made to the
-// other.
+// Twin: RelativeAdjunctGap.
 AdjunctGap: AdjunctGapClause -> Clause where head.VerbForm = Finite, $.Gap = Adjunct
 // A marked relative clause postposed past a predicate adjunct, at the
 // end of the clause containing its Antecedent, the Object that fills
 // the head's Gap (*Choose a card at random that was exiled with ...*;
-// CGEL, Ch. 12 §4, p. 1066). It ranks behind the relative clause in
-// place.
+// CGEL 12§4:1066). It ranks behind the relative clause in place.
 PostposedRelative: VerbPhrase ->
     VerbPhrase object:ComplementNounPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
     modifier:RelativeClause { cost: 5 }
@@ -3255,8 +3066,8 @@ PostposedBareRelative: VerbPhrase ->
           object.Number = modifier.Number
 // Postposing separates an Object from its participial postmodifier
 // by a manner PP (*a card at random exiled with ...*; OSG §10,
-// Ordinary choices; CGEL, Ch. 14 §9, pp. 1264–1265; Ch. 16 §4,
-// pp. 1382–1384). The modifier is a bare passive, not an auxiliary.
+// Ordinary choices; CGEL 14§9:1264–1265; 16§4:1382–1384). The modifier
+// is a bare passive, not an auxiliary.
 PostposedParticipialModifier: VerbPhrase ->
     VerbPhrase object:ComplementNounPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
     modifier:VerbPhrase { cost: 2, heavy: [modifier] }
@@ -3265,74 +3076,63 @@ PostposedParticipialModifier: VerbPhrase ->
           modifier.VerbForm = PastParticiple,
           modifier.Voice = Passive,
           modifier.VerbKind != Auxiliary
-// A postpositive equative Adjective Phrase with its own Complement,
-// the amount of the Object, postposed out of it past the verb's
-// selected Complements (*deals damage to any target equal to …*,
-// *put a number of counters on it equal to …*; CGEL, Ch. 5 §14.2,
-// p. 445; Ch. 12 §4, p. 1066). Oracle gives an Object's amount with
-// *equal to* in place or postposed (`docs/oracle-style-guide.md`
-// §12, "Damage"). Its Object is in plain case, as a
-// Nominal is: a personal pronoun takes no such Modifier. It ranks
-// behind the Adjective Phrase in place.
+// A postpositive equative Adjective Phrase postposed out of its Object
+// past the verb's selected Complements (*deals damage to any target
+// equal to …*; CGEL 5§14.2:445; 12§4:1066; OSG §12, Damage). Its Object
+// is in plain case, as a Nominal is: a personal pronoun takes no such
+// Modifier. It ranks behind the Adjective Phrase in place.
 PostposedAdjective: PostposedModifier -> AdjectivePhrase { cost: 5, heavy: [head] }
     where head.ComplementKind = PP,
           head.Grade := Equative,
           head.Voice != Passive,
           $.Case = Plain
 
-// Clause Complements of a Preposition (CGEL, Ch. 7 §1, pp. 599–600):
-// a finite Clause (*when this creature enters*), or a reducible
-// verbless Clause without its Subject (*if able*; Ch. 14 §10(b), p. 1267).
-// A sole connective links instructions and main clauses, never
-// subordinate ones (CGEL, Ch. 15 §2.10, p. 1320; `docs/oracle-style-
-// guide.md` §10, Sequence: "`Then` orders instructions"): *until
-// [they exile a nonland card], then you may cast it*, never *until
-// [they exile a nonland card, then you may cast it]*.
+// Clause Complements of a Preposition (CGEL 7§1:599–600): a finite
+// Clause (*when this creature enters*), or a reducible verbless Clause
+// without its Subject (*if able*; CGEL 14§10(b):1267). A sole connective
+// links instructions and main clauses, never subordinate ones (CGEL
+// 15§2.10:1320; OSG §10, Sequence): never *until [they exile a nonland
+// card, then you may cast it]*.
 FiniteComplementClause: FiniteClause -> Clause { unlinked: [head] } where head.VerbForm = Finite
 // Expandable declarative content clauses permit *that*; their lexical
 // governors select this Category instead of the non-expandable one
-// (CGEL, Ch. 11 §4.8, p. 971; OSG §12, Copies).
+// (CGEL 11§4.8:971; OSG §12, Copies).
 UnmarkedExpandableClause: ExpandableClause -> FiniteClause
 MarkedExpandableClause: ExpandableClause -> marker:Word(ContentMarker) FiniteClause
-// A Clause, or a coordination of Clauses, set off by a dash, giving
-// the content of the Object before it, as a content-specifying
-// Supplement does (*Kate's proposal – to dismiss the manager –*;
-// CGEL, Ch. 14 §9, p. 1266; Ch. 15 §5.1, pp. 1350–1351), where a
-// head's frame selects one: the options of a villainous choice
-// [CR#701.55a], each capitalized after the dash
-// (`docs/oracle-style-guide.md` §14, Keyword actions in sentences).
-// The sentence end absorbs its closing dash, so nothing but the
-// period follows it (CGEL, Ch. 20 §5, p. 1751).
+// A Clause, or a coordination of Clauses, set off by a dash as the
+// content of the Object before it (CGEL 14§9:1266; 15§5.1:1350–1351),
+// where a head's frame selects one: the options of a villainous choice
+// [CR#701.55a], each capitalized after the dash (OSG §14, Keyword
+// actions in sentences). The sentence end absorbs the closing dash
+// (CGEL 20§5:1751).
 SetOffComplementClause: SetOffClause -> '—':Free Clause { unclosed }
     where head.ClauseMarking = Unmarked,
           head.Inflection != Irrealis
 VerblessComplementClause: VerblessClause -> Predicative
 // A passive participle with a Preposition Phrase Adjunct is verbal
-// (*if tapped for mana*), where the bare participle is the Adjectival
-// Passive that AdjectivalPredicative reads (*if tapped*, *if
-// sacrificed*): each string has one tree. A verbless clause takes no
-// such Adjunct of its own, for *unless you control another Ally* in
-// *attacks each combat if able unless ...* belongs to the clause
-// outside *if able* (CGEL, Ch. 14 §10(b), p. 1267; the verb's Adjunct,
-// Ch. 8 §20.1, pp. 779-781).
+// (*if tapped for mana*); the bare participle is the Adjectival Passive
+// AdjectivalPredicative reads (*if tapped*): each string has one tree.
+// A verbless clause takes no such Adjunct of its own: *unless you
+// control another Ally* in *attacks each combat if able unless ...*
+// belongs to the clause outside *if able* (CGEL 14§10(b):1267; 8§20.1:779–781).
 ParticipialVerblessClause: VerblessClause -> VerbPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
     where head.VerbForm = PastParticiple,
           head.Voice = Passive,
           head.VerbKind != Auxiliary
 // The Absolute Clause Complement of *with* and *without*: a Subject
-// and a past-participial predicate (*with your hand revealed*; CGEL,
-// Ch. 14 §8.3, p. 1262, and §10(a), p. 1267). Its Subject is never
-// nominative (*with them tapped*).
+// and a past-participial predicate (*with your hand revealed*; CGEL
+// 14§8.3:1262; 14§10(a):1267). Its Subject is never nominative (*with
+// them tapped*).
 PastParticipialAbsolute: AbsoluteClause -> subject:ComplementNounPhrase VerbPhrase
     where head.VerbForm = PastParticiple,
           head.Voice = Passive,
           head.VerbKind != Auxiliary
 
-// Content clauses: declarative (*choose that ...*; CGEL, Ch. 11 §3.1,
-// p. 951), closed interrogative (*whether ...*), or open interrogative
-// with an interrogative phrase as Subject (*which creatures attack*)
-// or filling a Gap (*which number you chose*) or with an interrogative
-// adverb (*how each player votes*; Ch. 11 §5.1, pp. 972–973).
+// Content clauses: declarative (*choose that ...*; CGEL 11§3.1:951),
+// closed interrogative (*whether ...*), or open interrogative with an
+// interrogative phrase as Subject (*which creatures attack*) or filling
+// a Gap (*which number you chose*) or with an interrogative adverb
+// (*how each player votes*; CGEL 11§5.1:972–973).
 DeclarativeContentClause: InterrogativeClause -> marker:Word(ContentMarker) clause:Clause
     where clause.VerbForm = Finite
 ClosedInterrogative: InterrogativeClause -> marker:Word(Whether) clause:Clause
@@ -3358,15 +3158,12 @@ GapInterrogative: InterrogativeClause -> marker:InterrogativePhrase clause:Claus
 AdverbialInterrogative: InterrogativeClause -> marker:Word(How) clause:AdjunctGapClause
     where clause.Gap = Adjunct
 
-// Fused distributive *each* is an implicit partitive (CGEL, Ch. 5
-// §9.3, p. 413) that quantifies the members of a set (Ch. 5 §5,
-// p. 358): it is never a predicative Complement, and *are each equal
-// to 2* has floated *each* (Ch. 5 §10.1.1, p. 428), never *are
-// [each]*. A bare non-count Noun Phrase is a Predicative (*That's
-// utter nonsense*, p. 536), but not one headed by a noun whose
-// modifying uses are an adjective's: a bare colour word after a
-// copula is the adjective (*His tie is brown*; Ch. 19 §3.3, p. 1642),
-// which also specifies (Ch. 4 §5.5.1, p. 267, [48ii]).
+// A Noun Phrase Predicative, never a fused distributive one
+// (FusedQuantifier): *are each equal to 2* has floated *each*
+// (FloatingQuantifier), never *are [each]*. A bare non-count Noun
+// Phrase is one (CGEL p. 536), but not when headed by a noun whose
+// modifying uses are an adjective's: a bare color word after a copula
+// is the adjective (CGEL 19§3.3:1642; 4§5.5.1:267 [48ii]).
 NominalPredicative: Predicative -> NounPhrase
     where head.Case != Genitive,
           !(head.DeterminativeDistribution = Distributive & head.NounKind = Quantity),
@@ -3376,7 +3173,7 @@ PrepositionalPredicative: Predicative -> Hosted(PrepositionPhrase, Nominal)
 AdjectivalPredicative: Predicative -> AdjectivePhrase where head.AdjectivePosition != Attributive
 
 // Central Preposition Phrase adjuncts in a bare infinitival (*may
-// instead draw a card*; CGEL, Ch. 8 §20.1, pp. 779–781). Imperative
+// instead draw a card*; CGEL 8§20.1:779–781). Imperative
 // front position is supplied by the Clause adjunct schema.
 adjunct PrepositionPhrase { host: BareInf, side: Before, host_kind: Predicate }
     where adjunct.ComplementKind = Intransitive
@@ -3402,22 +3199,18 @@ parameters KeywordParameters {
     remnant: ParameterRemnant,
 }
 parameters BoundKeyword { head: Keyword, binding: Suffix }
-// The Internalised Complement is *by* plus a Noun Phrase, the
-// active's Subject (CGEL, Ch. 16 §10.1.1, p. 1428). An amount, a
-// fused-head quantity or a symbol after *by* is also an extent, which
-// *reduce* and *increase* select (*reduced by {2}*, *increased by
-// two*; Ch. 8 §5.2, p. 692): both Readings are well-formed, and
-// semantics rejects the agent one by type (`docs/decisions/english.md`
-// §4). A *by* gerund is a means Adjunct (p. 1428).
-// Voice is a verb's: another head's phrase takes its Voice from the
-// head (a declared Adjectival Passive). A passive is headed by a past
-// participle. An auxiliary verb derives no
-// prepositional passive and no Adjectival Passive, nor does a verb
-// whose Adjectival Passive is a declared Adjective (*tapped*), which
-// stands in its place; an Adjectival Passive is predicative. A heavy
-// Object postposed past a predicative Complement or an Adjunct is
-// determined, as every Object Oracle postposes is (*chooses from among
-// them [an artifact, a creature, …]*; CGEL, Ch. 16 §4, pp. 1382–1384).
+// Voice is a verb's: another head's phrase takes it from the head (a
+// declared Adjectival Passive). The `passive` Complement is *by* plus a
+// Noun Phrase, the active's Subject (CGEL 16§10.1.1:1428). A passive is
+// headed by a past participle, and an auxiliary derives no prepositional
+// passive. An amount after *by* is also an extent (*reduced by {2}*;
+// CGEL 8§5.2:692): both Readings stand, and semantics rejects the agent
+// one by type (ADR §4). An Adjectival Passive is predicative, and an
+// auxiliary or a verb whose Adjectival Passive is a declared Adjective
+// (*tapped*) has none. A heavy Object postposed past a predicative
+// Complement or an Adjunct is determined, as every Object Oracle
+// postposes is (*chooses from among them [an artifact, a creature, …]*;
+// CGEL 16§4:1382–1384).
 valence VerbPhrase {
     head: Verb,
     active: [$.Voice = Active],
@@ -3452,17 +3245,14 @@ valence VerbPhrase {
     remnants: [Pred -> PredicativeRemnant],
 }
 // A non-verbal phrase names its first Complement's Slot Kind, or
-// `Intransitive` without one.
-// A Preposition Phrase with a Noun Phrase Complement also stands
-// without its preposition, as a later Adjunct Cluster's remnant.
-// A Gap inside a preposition's Complement never passes up: only a
-// stranded preposition's own Gap does. English extracts from there
-// (*the card you put it on top of*), but no card reads that way, and
-// an extraction from a determined Noun Phrase in a preposition's
-// Complement makes spurious Right Node Raising (*less than [void
-// counters on it] or equal to the number of [void counters on it]*,
-// Sphere of Annihilation). An admission gate
-// (`docs/decisions/english.md` §6).
+// `Intransitive` without one. A Preposition Phrase with a Noun Phrase
+// Complement also stands without its preposition, as a later Adjunct
+// Cluster's remnant. A Gap inside a preposition's Complement never
+// passes up, only a stranded preposition's own does: an admission gate
+// (ADR §6) against the spurious Right Node Raising that an extraction
+// from a determined Noun Phrase there makes (*less than [void counters
+// on it] or equal to the number of [void counters on it]*, Sphere of
+// Annihilation).
 valence PrepositionPhrase {
     head: Preposition,
     complement_kind: ComplementKind,
@@ -3480,9 +3270,9 @@ valence BareNominal {
     interleaved: InterleavedModifier,
     agree: [ObliqueNumber -> Number, ObliqueKind -> ComplementKind, ObliqueNounKind -> NounKind],
 }
-// A bare noun in a fossilised Preposition Phrase keeps the Complement
-// it selects (*until end of turn*, *on top of*, *in excess of*; CGEL,
-// Ch. 7 §3.1, pp. 618–620): a relational noun without it is no bare
+// A bare noun in a fossilized Preposition Phrase keeps the Complement
+// it selects (*until end of turn*, *on top of*, *in excess of*; CGEL
+// 7§3.1:618–620): a relational noun without it is no bare
 // count nominal (*the amount of [excess] damage dealt*).
 valence PrepositionalNominal { head: Noun, obligatory }
 valence AdjectivePhrase { head: Adjective, complement_kind: ComplementKind }
@@ -3495,28 +3285,25 @@ valence DeterminerPhrase {
     ],
 }
 // A carrier noun distributes over a coordination of noun premodifiers
-// (`docs/oracle-style-guide.md` §7, Card types are common nouns and
-// attributive modifiers), and a later conjunct may carry its own
-// negative premodifier (§7, Negation with non-): *artifact or non-Aura
-// enchantment card* is an artifact card or a non-Aura enchantment
-// card. A preposed dependent at the start of the first conjunct
-// scopes over the whole coordination instead (*non-Lesson [instant and
-// sorcery] card*; `docs/decisions/english.md` §8).
+// (OSG §7, Card types are common nouns and attributive modifiers), and
+// a later conjunct may carry its own negative premodifier (OSG §7,
+// Negation with non-): *artifact or non-Aura enchantment card*. A
+// preposed dependent at the start of the first conjunct scopes over the
+// whole coordination (*non-Lesson [instant and sorcery] card*; ADR §8).
 adjunct NounPremodifier { host: NounPremodifierConjunct, side: Before, host_kind: Nominal }
     where modifier.Polarity := Negative
 // An attributive adjective can modify a noun premodifier within a
 // conjunct under a shared carrier noun (*Knight, Aura, Equipment, or
-// [legendary artifact] card*; `docs/oracle-style-guide.md` §7, Card
-// types are common nouns and attributive modifiers; Supertypes are
-// lowercase modifiers). As with AdjectivalAttribute, it is an
-// attributive adjective without a post-head Complement.
+// [legendary artifact] card*; OSG §7, Card types are common nouns and
+// attributive modifiers; Supertypes are lowercase modifiers), without
+// a post-head Complement, as AdjectivalAttribute.
 adjunct AdjectivePhrase { host: NounPremodifierConjunct, side: Before, host_kind: Nominal }
     where modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative
 // A complement costs nothing. A Preposition Phrase Adjunct costs the
 // same whether it postmodifies a Nominal or modifies a Predicate: the
 // Ranking Key's Right Association, not a Production Cost, prefers one
-// host to another (`docs/decisions/english.md` §5).
+// host to another (ADR §5).
 adjunct PrepositionPhrase { host: QuantifiedNominal, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: LocativeHead, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: PartitiveHead, side: After, host_kind: Nominal }
@@ -3528,31 +3315,26 @@ adjunct PrepositionPhrase { host: ExistentialPredicate, side: After, host_kind: 
 adjunct PrepositionPhrase { host: Clause, side: Before, host_kind: Predicate, delimiter: ',' }
     where $.FrontPosition = Occupied
 // A front Adverb Phrase without a comma (*Then draw a card*, *Then
-// that player shuffles*): connective *then* is an ordering connective
-// (CGEL, Ch. 8 §19, p. 778 [9ii]; `docs/oracle-style-guide.md`
-// checklist 10 and §10, Sequence). Before a front dependent set off
-// by a comma it shares that comma, in FrontAdverbial
-// (*Once each turn, ...*) or PreposedAdverbAndPreposition (*Then if
-// ...*), never also here (FrontPosition).
+// that player shuffles*; CGEL 8§19:778 [9ii]; OSG checklist 10, §10
+// Sequence). Before a front dependent set off by a comma it shares that
+// comma, in FrontAdverbial (*Once each turn, ...*) or
+// PreposedAdverbAndPreposition (*Then if ...*), never also here
+// (FrontPosition).
 adjunct AdverbPhrase { host: Clause, side: Before, host_kind: Predicate, cost: 2 }
     where adjunct.AdjunctPosition = Front,
           head.FrontPosition != Occupied
-// An intransitive Preposition Phrase preposed without a comma, before
-// an imperative or before a declarative's Subject (*The next time you
-// would draw a card this turn, instead put ...*; *If this spell was
-// kicked, instead that creature gets ...*), where Oracle moves
-// *instead* from the end of a long or coordinated replacement
-// (`docs/oracle-style-guide.md` §13, Would and instead). Like a
-// comma-fronted dependent it attaches outermost, outside a comma-set
-// post-dependent (`docs/decisions/english.md` §8).
+// An intransitive Preposition Phrase preposed without a comma (*If this
+// spell was kicked, instead that creature gets ...*), where Oracle
+// moves *instead* from the end of a long replacement (OSG §13, Would
+// and instead). It attaches outermost, outside a comma-set
+// post-dependent (ADR §8).
 adjunct PrepositionPhrase { host: Clause, side: Before, host_kind: Predicate }
     where adjunct.ComplementKind = Intransitive
 // A comma-set post-adjunct (*, except it has flying*, *, unless ...*)
 // or Supplement (*, where X is its power*) is anchored to a finite
 // Clause, never to a Verb Phrase, a *to*-infinitival or a relative's
-// Clause, whose Gap it closes (CGEL, Ch. 15 §5.1, p. 1351; Ch. 12 §4,
-// p. 1058; `docs/oracle-style-guide.md` §3, Commas and the serial
-// comma; §12, Copies).
+// Clause, whose Gap it closes (CGEL 15§5.1:1351; 12§4:1058; OSG §3,
+// Commas and the serial comma; §12, Copies).
 adjunct PrepositionPhrase { host: Clause, side: After, host_kind: Predicate, delimiter: ',' }
     where head.ClauseMarking = Unmarked
 adjunct PrepositionPhrase {
@@ -3566,9 +3348,8 @@ adjunct PrepositionPhrase {
 // A comma-set Supplement to a Verb Phrase conjunct before the next
 // (*Each player searches their library for up to X basic land cards,
 // where X is …, puts them onto the battlefield tapped, then
-// shuffles*): under a shared Subject no Clause ends after that
-// conjunct to anchor it, and after the last conjunct the Supplement
-// is the Clause's (CGEL, Ch. 15 §5.1, p. 1351).
+// shuffles*): under a shared Subject no Clause ends there to anchor it
+// (CGEL 15§5.1:1351), and after the last conjunct it is the Clause's.
 adjunct PrepositionPhrase {
     host: VerbPhrase,
     side: After,
@@ -3578,10 +3359,9 @@ adjunct PrepositionPhrase {
     nonfinal,
 }
 // A comma-set Supplement to a keyword line's item or an indexed
-// instruction. A Supplement anchors to a Clause or line (Oracle
-// English glossary, "Host Category"), never to a Keyword Phrase in a
-// sentence, which takes only its catalog-declared parameters
-// (english.md §2).
+// instruction, never to a Keyword Phrase in a sentence, which takes only
+// its catalog-declared parameters (ADR §2; Oracle English glossary,
+// "Host Category").
 adjunct PrepositionPhrase {
     host: KeywordLineItem,
     side: After,
@@ -3611,10 +3391,10 @@ adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
 // that selects them sees a value (*it has attacked or blocked* is no
 // passive perfect).
 // A coordination begins where its first conjunct does
-// (CentralPosition). A medial conjunct may be a Predicative
-// remnant, its copula elided: never the initial or last one, so a
-// coordination of Predicatives under one copula keeps its one tree
-// (*is a creature, an artifact, and an enchantment*).
+// (CentralPosition). A medial conjunct may be a PredicativeRemnant,
+// never the initial or last, so a coordination of Predicatives under
+// one copula keeps its one tree (*is a creature, an artifact, and an
+// enchantment*).
 coordination VerbPhrase {
     coordinators: Coordinator,
     unshared: [Inflection, AdjectivalPassive, CentralPosition],
@@ -3650,14 +3430,12 @@ coordination VerbPhrase {
     unshared: [Inflection, AdjectivalPassive, CentralPosition],
 }
     where $.CentralPosition = first.CentralPosition
-// A Linked Coordination of Verb Phrases sharing a Subject or modal
-// (*Each player discards a card, then draws a card*; *may search
-// ..., put ..., then shuffle*), set off by the comma before its
-// connective (`docs/oracle-style-guide.md` §3, Commas and the serial
-// comma: "before `then` within a sequence"), which older Oracle text
-// omits in a binary one (*puts that land onto the battlefield then
-// sacrifices a land*). Its Conjuncts may each begin with the
-// connective (*loses ..., then discards ..., then sacrifices ...*).
+// A Linked Coordination (LinkedVerbPhrase) of Verb Phrases sharing a
+// Subject or modal (*may search ..., put ..., then shuffle*), set off by
+// the comma before its connective (OSG §3, Commas and the serial
+// comma), which older Oracle text omits in a binary one (*puts that
+// land onto the battlefield then sacrifices a land*). Its Conjuncts may
+// each begin with the connective (*loses ..., then discards ...*).
 coordination VerbPhrase {
     link: LinkedVerbPhrase,
     unshared: [Inflection, AdjectivalPassive, CentralPosition],
@@ -3671,12 +3449,9 @@ coordination QuotedAbility { coordinators: Coordinator }
 coordination Mention { coordinators: Coordinator }
 // *named Crown of Empires and Scepter of Empires*.
 coordination NameComplement { coordinators: Coordinator }
-// A medial conjunct may be a Subject remnant, its Subject the
-// initial Clause's, with whose Number and Person it agrees (*you gain
-// 4 life, draw four cards, and he deals 4 damage*, never *you gain 4
-// life, draws four cards, ...*): never the initial or last conjunct,
-// as a coordination at the level of the final conjunct (CGEL,
-// Ch. 15 §3.6, pp. 1335–1336, [31iii]).
+// A medial conjunct may be a SubjectRemnant, never the initial or last,
+// and agrees in Number and Person with the initial Clause's Subject
+// (never *you gain 4 life, draws four cards, ...*).
 coordination Clause {
     coordinators: Coordinator,
     unshared: [Inflection, FrontPosition],
@@ -3685,14 +3460,12 @@ coordination Clause {
     recovered: [Number, Person],
 }
     where $.FrontPosition = first.FrontPosition
-// Clauses of mixed moods (CGEL, Ch. 15 §3.5, pp. 1332–1333): an
-// imperative and then a declarative (*tap that creature and it
-// doesn't untap ...*), with either mood between in a serial one (*gain
-// control of that permanent, it loses all abilities, and it can't
-// attack or block*). After an initial declarative, a subjectless
-// conjunct is a Verb Phrase with its Subject ellipted, no imperative
-// (*you gain 4 life, draw four cards, ..., and he deals ...*;
-// coordination at unlike levels, §3.6, pp. 1335–1336, [31iii]).
+// Clauses of mixed moods (CGEL 15§3.5:1332–1333): an imperative and
+// then a declarative (*tap that creature and it doesn't untap ...*),
+// with either mood between in a serial one (*gain control of that
+// permanent, it loses all abilities, and it can't attack or block*).
+// After an initial declarative, a subjectless conjunct is a
+// SubjectRemnant, no imperative.
 coordination Clause {
     coordinators: Coordinator,
     unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
@@ -3718,11 +3491,11 @@ coordination Clause {
           first.VerbForm = Finite,
           last.VerbForm = Plain,
           $.VerbForm = Plain
-// The comma between coordinated main clauses may be omitted (CGEL,
-// Ch. 20 §3.2.1, p. 1739), as older Oracle text omits it before an
-// imperative that opens with a fronted dependent, which no Verb
-// Phrase coordinate could hold (*that creature can't be regenerated
-// this turn and if it would die this turn, exile it instead*).
+// The comma between coordinated main clauses may be omitted (CGEL
+// 20§3.2.1:1739), as older Oracle text omits it before an imperative
+// that opens with a fronted dependent, which no Verb Phrase coordinate
+// could hold (*that creature can't be regenerated this turn and if it
+// would die this turn, exile it instead*).
 coordination Clause {
     coordinators: Coordinator,
     unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
@@ -3735,7 +3508,7 @@ coordination Clause {
           $.VerbForm = Plain
 // *But* coordinates clauses of like or mixed moods as the Coordinator
 // does, a binary coordination (*Discard it, but you may put it on top
-// of your library*; CGEL, Ch. 15 §3.5, pp. 1332–1333).
+// of your library*; CGEL 15§3.5:1332–1333).
 coordination Clause {
     coordinators: But,
     unshared: [Number, Person, Inflection, FrontPosition],
@@ -3765,13 +3538,11 @@ coordination Clause {
           first.VerbForm = Finite,
           last.VerbForm = Plain,
           $.VerbForm = Plain
-// Linked Coordinations of Clauses, imperative or declarative, of
-// like or mixed moods as the Coordinator's are (*Draw a card, then
-// discard a card*; *Tap it, then you may sacrifice an artifact*;
-// *Search ..., put it into your hand, then shuffle*), set off by the
-// comma before the connective (`docs/oracle-style-guide.md` §3,
-// Commas and the serial comma; §10, Sequence), which older Oracle
-// text omits in a binary one. A stranded auxiliary never precedes a
+// Linked Coordinations (LinkedClause) of Clauses of like or mixed moods
+// as the Coordinator's are (*Tap it, then you may sacrifice an
+// artifact*), set off by the comma before the connective (OSG §3,
+// Commas and the serial comma; §10, Sequence), which older Oracle text
+// omits in a binary one. A stranded auxiliary never precedes a
 // comma-less link whose verb could be its Complement (*You may then
 // have ...*; StrandedModal).
 coordination Clause {
@@ -3807,16 +3578,14 @@ coordination Clause {
           $.VerbForm = Plain
 // Conjuncts may differ in Case (*them and all other creatures*); the
 // coordination takes its last conjunct's.
-// Every conjunct but the last shares its Determination, and the
-// coordination is determined only when the last is too: *all
-// artifacts and enchantments* has no predeterminer over coordinated
-// bare Noun Phrases. Its Countability is its last conjunct's.
+// The coordination is determined only when its last conjunct is, as
+// *all artifacts and enchantments* has no predeterminer, and has the
+// last conjunct's Countability.
 // After a determined Noun Phrase, a bare mass one is no conjunct: the
 // determiner scopes over the coordinated nominal (*its power and
-// toughness*, *that's red or green*).
-// An *and*-coordination of Noun Phrases or nominals is plural; an
-// *or*-coordination has its conjuncts' Number (CGEL, Ch. 5 §18.4,
-// pp. 507–509).
+// toughness*).
+// An *and*-coordination is plural; an *or*-coordination has its
+// conjuncts' Number (CGEL 5§18.4:507–509).
 coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, DeterminativeDistribution, FirstConjunctNumber],
@@ -3839,7 +3608,7 @@ coordination NounPhrase {
           $.Person = Third,
           first.DeterminativeDistribution := Distributive,
           last.DeterminativeDistribution := Distributive
-// *And/or* means "and or or" (CGEL, Ch. 15 §3.3(a), p. 1329): plural
+// *And/or* means "and or or" (CGEL 15§3.3(a):1329): plural
 // with a plural last conjunct, of either Number with a singular one
 // (*you and/or at least one permanent you control becomes*).
 coordination NounPhrase {
@@ -3859,16 +3628,14 @@ coordination NounPhrase {
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           last.Number = Singular
-// A Numeric Noun Phrase is no first conjunct: a conjunct must fill
-// the coordination's function alone (CGEL, Ch. 15 §3.1, p. 1323,
-// rule [1]), and a number fills no Noun Phrase Complement slot, so
-// never *is dealt [3] or [more damage]*. Numbers alone are an Amount
-// coordination (*2 or 3*). An admission gate
-// (`docs/decisions/english.md` §6).
-// Commas may set off the final coordinate of Right Node Raising, so
-// that the shared constituent is read as the Complement of each
-// coordinate (*some amount of, or all of, the mana*, Illusionary
-// Mask; CGEL, Ch. 20 §3.2.5, p. 1746, [26iii]).
+// A Numeric Noun Phrase is no first conjunct, since a number fills no
+// Noun Phrase Complement slot (CGEL 15§3.1:1323 rule [1]): never *is
+// dealt [3] or [more damage]*; numbers alone are an Amount
+// coordination (*2 or 3*). An admission gate (ADR §6).
+// Commas may set off the final coordinate of Right Node Raising, the
+// shared constituent being the Complement of each coordinate (*some
+// amount of, or all of, the mana*, Illusionary Mask; CGEL
+// 20§3.2.5:1746 [26iii]).
 coordination NounPhrase {
     coordinators: Alternative,
     raising_delimiter: ',',
@@ -3905,23 +3672,22 @@ coordination PossessorNominals {
     conjunct: BareNominal,
 }
 // Relative clauses coordinate, each with its relative word (*tokens
-// that are copies of it and that are tapped and attacking*; CGEL, Ch.
-// 15 §2.1, p. 1292).
+// that are copies of it and that are tapped and attacking*; CGEL
+// 15§2.1:1292).
 coordination RelativeClause { coordinators: Coordinator } where last.ClauseMarking = Relative
 coordination RelativeClause { coordinators: But }
 // Bare adverbial relatives coordinate under one temporal head (*any
-// time [you could mulligan and this card is in your hand]*; CGEL, Ch.
-// 15 §2.1, p. 1292), each conjunct bearing the head's Adjunct Gap. The
+// time [you could mulligan and this card is in your hand]*; CGEL
+// 15§2.1:1292), each conjunct bearing the head's Adjunct Gap. The
 // coordination is its own Category, so that RelativeAdjunctGap states
-// the Gap once per conjunct and never again over their coordination
-// (`docs/decisions/english.md` §8).
+// the Gap once per conjunct, never again over it (ADR §8).
 coordination SubjectInitialCoordination {
     coordinators: Coordinator,
     unshared: [Inflection],
     conjunct: SubjectInitialClause,
 }
 // Interrogative clauses coordinate (*which creatures block and how
-// those creatures block*; CGEL, Ch. 5 §18.4, p. 508).
+// those creatures block*; CGEL 5§18.4:508).
 coordination InterrogativeClause { coordinators: Coordinator }
 coordination NounPremodifier {
     coordinators: Coordinator,
@@ -3980,17 +3746,16 @@ coordination ObjectCoordination {
           !(first.ComplementKind = MeasureNP & last.ComplementKind = NP),
           !(first.ComplementKind = QuotedAbility & last.ComplementKind = MeasureNP),
           !(first.ComplementKind = MeasureNP & last.ComplementKind = QuotedAbility)
-// A comma may set off a binary coordination's second Cluster, which is
-// likelier before long and complex coordinates (*deals half X damage,
-// rounded down, to any target, and half X damage, rounded up, to
-// you*; CGEL, Ch. 20 §3.2.1, pp. 1739–1740;
-// `docs/oracle-style-guide.md` §3, Commas and the serial comma).
+// A comma may set off a binary coordination's second Cluster, likelier
+// before long and complex coordinates (*deals half X damage, rounded
+// down, to any target, and half X damage, rounded up, to you*; CGEL
+// 20§3.2.1:1739–1740; OSG §3, Commas and the serial comma).
 coordination ClusterCoordination {
     coordinators: Coordinator,
     delimiter: ',',
     conjunct: ComplementCluster,
 }
-// Adjunct Clusters are parallel (CGEL, Ch. 15 §4.3, p. 1341): every
+// Adjunct Clusters are parallel (CGEL 15§4.3:1341): every
 // Cluster has the initial one's prepositions, the first overt or
 // elided.
 coordination AdjunctClusterCoordination {
@@ -4038,15 +3803,14 @@ coordination MeasureNounPhrase { coordinators: Coordinator }
 coordination Amount { coordinators: Coordinator, proximate: [QuantityNumber, Sign] }
 coordination SymbolCosts { coordinators: Coordinator }
 // A coordination of quantifiers determines as its last one does (*one
-// or more cards*, *one or more of them*; CGEL, Ch. 15 §3.3, p. 1330).
+// or more cards*, *one or more of them*; CGEL 15§3.3:1330).
 coordination DeterminerPhrase {
     coordinators: Coordinator,
     proximate: [Number, Countability, DeterminativeDistribution, NounKind],
     resolve: [Cardinality -> Cardinal],
 }
 // Numbers alone are an Amount coordination (*X is 2 or 3*), never also
-// a fused quantity over them (`docs/decisions/english.md`
-// §8).
+// a fused quantity over them (ADR §8).
 coordination FusedQuantity {
     coordinators: Disjunctive,
     proximate: [Number, Countability, NounKind],
@@ -4058,6 +3822,6 @@ correlative Both = And
 correlative Either = Or
 correlative Neither = Nor
 
-// *And so on* ends a coordination of any Category (CGEL, Ch. 17
-// §7.7.3(e), p. 1540).
+// *And so on* ends a coordination of any Category (CGEL
+// 17§7.7.3(e):1540).
 idiomatic_coordinate And = IdiomaticCoordinate
