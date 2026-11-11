@@ -1,6 +1,7 @@
 //! The shortened spelling each card's own text uses for it [CR#201.5c],
 //! computed from the Oracle corpus as the card names load.
 
+use std::borrow::Cow;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
@@ -48,7 +49,7 @@ impl AttestedShortenings {
                     if let Some(candidate) = short_name(unit.display_name(), &supertypes, &types) {
                         faces.push((
                             unit.display_name().to_owned(),
-                            candidate.to_owned(),
+                            candidate.into_owned(),
                             // A vanilla legendary has no Oracle text.
                             unit.oracle_text().unwrap_or("").to_owned(),
                         ));
@@ -107,7 +108,7 @@ fn parse_type_line(
 }
 
 // Shortened self-reference has the full name's referent [CR#201.5c]. The
-// truncation patterns propose candidates; the unit's Oracle text must attest
+// rule's patterns propose a candidate; the unit's Oracle text must attest
 // the candidate outside an occurrence of any complete card title.
 // The full and shortened names are the Full and Shortened forms of one Lexeme.
 fn attested_short_name<'a>(
@@ -184,25 +185,42 @@ fn title_index(titles: &BTreeSet<String>) -> TitleIndex<'_> {
     index
 }
 
-/// The Shortened Name [CR#201.5c] the rule gives a face: a legendary
-/// permanent's name cut at the comma prefix; none for names starting "The ";
-/// a trailing Roman numeral dropped; else the text before the earliest
-/// " and the ", " the " or " of "; else the first word. None for any other
-/// face, and when the cut is the full name. Whether the face's own text uses
-/// the result is a separate check ([`AttestedShortenings`]).
+/// The Shortened Name [CR#201.5c] the rule gives a face: for a legendary
+/// permanent whose name before any comma has at least three words and starts
+/// with a listed title, that title and the last of those words; else its name
+/// cut at the comma prefix; none for names starting "The "; a trailing Roman
+/// numeral dropped; else the text before the earliest " and the ", " the " or
+/// " of "; else the first word. None for any other face, and when the cut is
+/// the full name. Whether the face's own text uses the result is a separate
+/// check ([`AttestedShortenings`]).
 #[must_use]
 pub fn short_name<'a>(
     name: &'a str,
     supertypes: &[Supertype],
     types: &[TypeDef],
-) -> Option<&'a str> {
+) -> Option<Cow<'a, str>> {
     (supertypes.contains(&Supertype::Legendary)
         && types.iter().any(|card_type| card_type.permanent_type))
     .then(|| rule(name))
     .flatten()
 }
 
-fn rule(name: &str) -> Option<&str> {
+// The titles Oracle text keeps when it shortens a name to its title and last
+// word, as Captain James T. Kirk's text says "Captain Kirk". They are listed
+// because a face's Shortened Name is computed from its name alone, without
+// the corpus, and nothing in a name's words shows which one is a title.
+const SURNAME_TITLES: [&str; 5] = ["Captain", "Commander", "Dr.", "Ensign", "Lieutenant"];
+
+fn rule(name: &str) -> Option<Cow<'_, str>> {
+    let base = name
+        .split_once(',')
+        .map_or(name, |(prefix, _)| prefix.trim());
+    let words = base.split(' ').collect::<Vec<_>>();
+    if let [title, _, .., surname] = words.as_slice()
+        && SURNAME_TITLES.contains(title)
+    {
+        return Some(Cow::Owned(format!("{title} {surname}")));
+    }
     let candidate = if let Some((prefix, _)) = name.split_once(',') {
         prefix.trim()
     } else if name.starts_with("The ") {
@@ -220,14 +238,14 @@ fn rule(name: &str) -> Option<&str> {
     } else {
         name.split(' ').next().unwrap_or(name)
     };
-    (candidate != name && !candidate.is_empty()).then_some(candidate)
+    (candidate != name && !candidate.is_empty()).then_some(Cow::Borrowed(candidate))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn legendary_short_name(name: &str) -> &str {
+    fn legendary_short_name(name: &str) -> Cow<'_, str> {
         short_name(name, &[Supertype::Legendary], &[Type::Creature.def()]).unwrap()
     }
 
@@ -246,7 +264,7 @@ mod tests {
             ("Progenitus", None),
         ] {
             assert_eq!(
-                short_name(name, &[Supertype::Legendary], &[Type::Creature.def()]),
+                short_name(name, &[Supertype::Legendary], &[Type::Creature.def()]).as_deref(),
                 expected,
                 "{name}"
             );
@@ -254,18 +272,40 @@ mod tests {
         let creature = [Type::Creature.def()];
         let legendary = [Supertype::Legendary];
         assert_eq!(
-            short_name("Nissa Revane", &legendary, &creature),
+            short_name("Nissa Revane", &legendary, &creature).as_deref(),
             Some("Nissa")
         );
-        assert_eq!(short_name("Nissa Revane", &[], &creature), None);
+        assert_eq!(short_name("Nissa Revane", &[], &creature).as_deref(), None);
         assert_eq!(
-            short_name("Nissa Revane", &legendary, &[Type::Sorcery.def()]),
+            short_name("Nissa Revane", &legendary, &[Type::Sorcery.def()]).as_deref(),
             None
         );
         let (supertypes, types) =
             parse_type_line("Golem", "Legendary Artifact Creature — Golem").unwrap();
-        assert_eq!(short_name("Golem Man", &supertypes, &types), Some("Golem"));
+        assert_eq!(
+            short_name("Golem Man", &supertypes, &types).as_deref(),
+            Some("Golem")
+        );
         assert!(parse_type_line("Bad", "Legendary Elf — X").is_err());
+    }
+
+    #[test]
+    fn a_listed_title_with_at_least_three_name_words_shortens_to_title_and_surname() {
+        for (name, expected) in [
+            ("Captain James T. Kirk", "Captain Kirk"),
+            // A quoted nickname is one more word between title and surname.
+            ("Dr. Leonard \"Bones\" McCoy", "Dr. McCoy"),
+            // The words counted are the name's before its comma.
+            ("Ensign Harry Kim, Operations", "Ensign Kim"),
+            // Under three words, a listed title keeps the first-word cut.
+            ("Captain Sisay", "Captain"),
+            ("Captain Kirk, Boldly Going", "Captain Kirk"),
+            // An unlisted title keeps today's cuts.
+            ("General Leo Cristophe", "General"),
+            ("General Kudro of Drannith", "General Kudro"),
+        ] {
+            assert_eq!(legendary_short_name(name), expected, "{name}");
+        }
     }
 
     #[test]
@@ -282,6 +322,9 @@ mod tests {
             ("The Balrog, Durin's Bane", Some("The Balrog")),
             ("Tor Wauki the Younger", Some("Tor Wauki")),
             ("King Darien XLVIII", Some("King Darien")),
+            ("Captain James T. Kirk", Some("Captain Kirk")),
+            ("Dr. Leonard \"Bones\" McCoy", Some("Dr. McCoy")),
+            ("Ensign Harry Kim, Operations", Some("Ensign Kim")),
         ]);
         let mut titles = BTreeSet::new();
         let mut observed = BTreeMap::new();
@@ -303,7 +346,7 @@ mod tests {
         for (name, text) in observed {
             let short = expected[name.as_str()];
             assert_eq!(
-                attested_short_name(&name, legendary_short_name(&name), &text, &titles),
+                attested_short_name(&name, &legendary_short_name(&name), &text, &titles),
                 short,
                 "{name}"
             );
@@ -320,7 +363,7 @@ mod tests {
             assert_eq!(
                 attested_short_name(
                     "Dina, Soul Steeper",
-                    legendary_short_name("Dina, Soul Steeper"),
+                    &legendary_short_name("Dina, Soul Steeper"),
                     text,
                     &titles
                 ),
@@ -331,7 +374,7 @@ mod tests {
         assert_eq!(
             attested_short_name(
                 "Nissa Revane",
-                legendary_short_name("Nissa Revane"),
+                &legendary_short_name("Nissa Revane"),
                 "Nissa's Chosen",
                 &titles
             ),
