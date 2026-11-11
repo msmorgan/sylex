@@ -9,7 +9,7 @@ What an unusual card does is never recorded here; it goes in
 - [Architecture](architecture.md): the layers of the system and how they connect.
 - [Semantics](semantics.md): reference resolution, Definitions, Templates and the action-clause spine.
 - [Syl](syl.md): the `.syl` data language.
-- [Spelling](spelling.md): the spelling grammar: Constructions, substitution and one-sided adjunction, its three extensions and the round trip between Readings and resolved terms.
+- [Spelling](spelling.md): the spelling grammar: Constructions, substitution and its two closed rules, its three extensions and the round trip between Readings and resolved terms.
 - [Core](core.md): the compiled core that the engine executes.
 - [Engine](engine.md): the engine's laws.
 - [English](english.md): the English grammar and parser: crate split, Catalog constraint, admission, ranking and the round-trip contract.

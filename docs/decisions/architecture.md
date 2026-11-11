@@ -127,16 +127,20 @@ there, in place.
 ## Spelling is a construction grammar
 
 Each Construction — a Primitive, Template or Definition with its printed
-wording — pairs a fragment of English structure with the call it spells, the
-wording's Holes linked to the call's parameters. Constructions combine by
-substitution and by adjunction on one side of a host, never by wrapping, with
-three closed extensions: optional and list Holes, a Tail printed away from its
+wording — pairs one fixed fragment of English structure with the call it
+spells, the fragment's Holes linked to the call's parameters. Constructions
+combine by substitution only, never by adjunction. Two closed rules cover two
+places where English and the term part: a passive prints the complement its
+Action's frame promotes as its context's subject, and a trigger clause fronted in the
+first sentence of an effect of several sentences governs them all. Three closed
+extensions cover more: optional and list Holes, a Tail printed away from its
 Hole, and Factoring of what a coordination's arms share
-([Spelling](spelling.md) §2–3). A derivation builds both sides at once, so the
+([Spelling](spelling.md) §2–3). What these do not yet cover is open
+([Spelling](spelling.md) §10). A derivation builds both sides at once, so the
 same grammar recovers a resolved term from a Reading and spells a resolved term
-as English, and the resolved term is that derivation: nothing records it beside
-the term ([Spelling](spelling.md) §4). It is not a bijection: several terms may
-word identically, and one sentence has several grammatical Readings, which the
+as English, and the resolved term is that derivation: nothing records it beside the term
+([Spelling](spelling.md) §4). It is not a bijection: several terms may word
+identically, and one sentence has several grammatical Readings, which the
 parser keeps rather than choosing ([English](english.md) §4). Meaning
 resolves the ambiguity, never rank or rule order: recovery expands each
 candidate and reads its discourse, and a candidate the checker or discourse

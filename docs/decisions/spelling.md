@@ -8,18 +8,19 @@ Its data is the `spelling` field of each `.syl` declaration ([`.syl`](syl.md) §
 Construction, Hole, Tail and Factoring are the
 [glossary's](../contexts/oracle-english/CONTEXT.md).
 
-The grammar is a synchronous grammar of substitution and one-sided adjunction (§2), with three
-closed extensions (§3). It has no wrapping adjunction. The resolved term is its derivation (§4),
-and it changes nothing in the English grammar, in the shape of the resolved term or in what
-expansion means (§5).
+The grammar is a synchronous grammar of substitution, with two closed rules (§2) and three
+closed extensions (§3). It has no adjunction. The resolved term is its derivation (§4), and it
+changes nothing in the English grammar, in the shape of the resolved term or in what expansion
+means (§5).
 
 ## 1. Constructions
 
 A Construction is one declaration's wording paired with the call it spells. Every declaration
 that carries a `spelling` is one: a Template, a Definition, and a Primitive too, since a
-primitive is where a constructor's spelling attaches ([`.syl`](syl.md) §1). The wording is a
-fragment of English structure with Holes, one for each parameter the wording prints. The call
-is one node of the resolved term, with those parameters as its arguments.
+primitive is where a constructor's spelling attaches ([`.syl`](syl.md) §1). The wording is one
+fixed fragment of English structure, a tree whose frontier carries Holes, one for each parameter
+the wording prints. The call is one node of the resolved term, with those parameters as its
+arguments.
 
 A Construction pairs wording with the call, not with the call's body. The resolved term keeps
 the call, and what the call expands to is expansion's business (§5). Why: a body may use a
@@ -34,12 +35,14 @@ them. What the English layer derives from that structure is never written into a
 none of it is an operation of this grammar:
 
 - **Inflection and agreement.** A verb whose agreement depends on a Hole is written
-  uninflected: one wording is "gets" in Giant Growth and "get" in Glorious Anthem.
+  uninflected: the one verb-phrase wording of a power/toughness change is "gets +3/+3" in
+  Giant Growth and "get +1/+1" in Glorious Anthem, once the subject is taken out of it (§2).
 - **Case.** `controllerOf`, "$subject's controller", over `it` is "its controller".
-- **Voice and verb form.** An Action's wording is its verb's one Subcategorization Frame. The
-  context that embeds the Action selects the form the frame takes, and its Subject selects the
-  voice ([Semantics](semantics.md) §4.2): under `any` or `by(np)` the wording is the frame's
-  passive, with the patient's Hole as the clause's subject.
+- **Voice and verb form.** An Action's wording selects one of its verb's Subcategorization
+  Frames. The context that embeds the Action selects the form that frame takes, and its Subject
+  selects the voice ([Semantics](semantics.md) §4.2): under `any` or `by(np)` the wording is
+  the frame's passive, with the complement the passive promotes as the clause's subject (§2,
+  passive subject promotion).
 - **Gaps.** `which` fills a Hole and prints no word. The Reading has a Gap there, as in
   Alabaster Leech's "White spells you cast", whose lookback is
   `did(actor(you), cast(which), thisObject)`.
@@ -49,64 +52,161 @@ frame from the frame's one declaration ([English](english.md) §3). A wording fo
 number or Gap would multiply as frames times forms, and the copies would drift apart
 ([Architecture](architecture.md), design principle 4).
 
-## 2. The two operations
+## 2. Substitution and its two closed rules
 
-**Substitution** fills a Hole with the wording of the argument's own Construction. It serves
-every case where a phrase stands whole where its parent's wording leaves room for it: "draw
-$amount cards", "target $subject", "$cost: $action". A wording whose fixed words stand on
-both sides of its Holes is still substitution: "more $p than $subject" is one fragment with
-two Holes, and nothing is inserted into another Construction's phrase.
+**Substitution** is the grammar's one operation. It fills a Hole with the wording of the
+argument's own Construction, whose fragment stands where the Hole stood: "draw $amount cards",
+"target $subject", "$cost: $action". A wording whose fixed words stand on both sides of its
+Holes is still substitution: "more $p than $subject" is one fragment with two Holes. Nothing is
+inserted into a phrase another Construction spelled, and nothing is attached at its edge, except
+by the extensions of §3 and the two rules below.
 
-**One-sided adjunction** attaches a Construction's wording to the left or the right of a
-phrase that another Construction spelled, at a node on that phrase's edge, which need not be
-its root. The phrase is the adjunct's host. Substitution cannot do this, because it only fills
-room a wording left; it cannot put words inside or beside a phrase that is already complete.
-Three things Oracle text does routinely need it:
+Why substitution only:
 
-- **An auxiliary or negation inside its Action's clause.** Abrupt Decay's "This spell can't be
-  countered" is `cant(any, counter(thisSpell))`. The patient is an argument of `counter`
-  ([Semantics](semantics.md) §4.4), yet it is printed before "can't be", and "countered" after.
-  The words `cant` contributes attach inside the clause `counter` spells.
-- **Modifiers on both sides of a noun from one list.** In "other nonland permanents you
-  control" (Abdel Adrian, Gorion's Ward), "nonland" stands before the head noun and "you
-  control" after it, and the term holds them as elements of one `and([…])`. Each modifier
-  attaches on its own side of the nominal.
-- **A trigger condition over an effect of several sentences.** Boommobile prints "When this
-  Vehicle enters, add four mana of any one color. Spend this mana only to activate abilities."
-  In the Reading, "When this Vehicle enters," belongs to the first sentence. In the term,
-  `when(event, action)` takes the whole effect, both sentences, as its `action`. The trigger
-  condition attaches at the left edge of its host, inside the host's first sentence.
+- **Each Construction is one fixed tree.** Recovery matches a Construction against one forest
+  node and the nodes of its Holes. It never asks, at each node on the edge of a phrase, whether
+  some other Construction attached words there.
+- **A sentence has fewer derivations.** Outside the extensions, the two rules and the nodes the
+  English layer derives (the "be" of a passive, an inflection), every node of a Reading belongs
+  to the fragment of exactly one Construction. So two derivations of one Reading differ in which
+  Constructions they use, never in where they attached the same ones.
+- **The term is the derivation with nothing beside it** (§4). Under substitution each call
+  spells one subtree of the Reading, so where a call stands in the term is where its wording
+  stands in the Reading.
+- **`.syl` sorts line up with English constituents.** A Hole is one constituent, so a
+  parameter's sort is the sort of one phrase of the Reading. That is what lets the sort of a slot
+  decide a word's coercion ([`.syl`](syl.md) §3): "creature" is a noun phrase's head at one sort
+  and a modifier at another, and the slot it fills says which.
 
-Why one-sided: in each case the adjunct's words are a single run that lies wholly to one side
-of the node it attaches to. A grammar built from such attachments builds only trees a
-context-free grammar builds, so every Reading the English parser already produces is one the
-spelling grammar can describe, and the parser does not change (§5).
+Substitution is in no lower complexity class than one-sided adjunction, which is context-free
+and cubic too (§8). What it buys is the shape of what recovery searches and of what the term
+records.
 
-**There is no wrapping adjunction**, the operation of a full tree-adjoining grammar in which an
-adjunct contributes words on both sides of its host at once. Why: nothing in in-scope Oracle
-text needs it. The constructions that would are cross-serial pairings, and no in-scope card
-prints "respectively" or "the former … the latter". What looks discontinuous in card text is
-either fixed words around Holes, which is substitution, or one phrase printed away from the
-unit it measures, which is a Tail (§3.2). Wrapping would buy capacity no card uses, at the price
-of a larger class of derivations for recovery to search, and it still would not provide
-Factoring (§3.3).
+Where English attaches a word inside or beside a phrase, the term has the structure English
+has, or a Template holds the word in its one fixed fragment:
+
+- **An auxiliary or negation** stands between a Subject and an Action that its context takes
+  apart ([Semantics](semantics.md) §4.1): "$subj can't $action", with the Action's verb phrase
+  in one Hole. Only the passive needs more (passive subject promotion, below).
+- **A central adverb** ("also", "still", "no longer") attaches to the verb phrase below the
+  subject (`CentralAdverbial`, `crates/english/grammar/english.fug`): *Efflorescence* prints
+  "that creature also gains trample and indestructible". Its Construction takes the verb
+  phrase, with no subject, as its Hole, and the Construction that supplies the subject takes the
+  result. A declaration that takes its subject together with its verb phrase leaves no such
+  Hole; the continuous-effect declarations under `plugins/` (`getsPt`, `abilityGrant`, `gain`,
+  `get` and others) do, and the `syl-continuous-effect-subject` ticket takes the subject out.
+- **A floated "each"** is a sibling of the subject and the verb phrase in one flat clause
+  (`FloatedEach`): *Abandon Reason* prints "Up to two target creatures each get +1/+0 and gain
+  first strike until end of turn". Its Construction is that clause, "$subject each $action",
+  with the subject and the subjectless verb phrase as two Holes. Only after an auxiliary
+  (`AuxiliaryFloatedEach`) does "each" stand over a verb phrase of its own.
+- **Modifiers on both sides of a noun** come from two lists. A description is a nominal: a head
+  with the premodifiers printed before it and the postmodifiers printed after it,
+  `nominal(pre = [], head, post = [])`, each list in its own list Hole (§3.1) on its own side of
+  the head's Hole. In "other nonland permanents you control" (*Abdel Adrian, Gorion's Ward*),
+  "other" and "nonland" are premodifiers and "you control" a postmodifier. The `nominal`
+  declaration is not yet built: the descriptions under `plugins/` are one flat `and([…])` of
+  predicates, the head among its modifiers, which has no wording under substitution, and the
+  `syl-nominal-descriptions` ticket restructures them.
+- **A word printed in several places is a Template per placement.** "Also" stands between a
+  subject and its verb ("it also deals 4 damage", *Goblin Barrage*), after a copula or passive
+  auxiliary ("Burakos is also a Cleric, Rogue, Warrior, and Wizard", *Burakos, Party Leader*;
+  "that creature is also goaded", *Hot Pursuit*), after a modal ("may also copy that spell",
+  *Parnesse, the Subtle Brush*), at the front of a clause with no subject after a comma ("also
+  create X 4/4 white Angel creature tokens", *Finale of Glory*), and at the front of a sentence
+  (*Beast Mode*). "Still" stands after a copula too ("a 3/3 creature that's still a land",
+  *Animate Land*). "Instead" has at least five placements: at the end of the verb phrase it marks
+  (706 cards, and about 50 more where another Construction's trailing adjunct follows, which is
+  plain substitution: Accumulate Wisdom's "Put each of those cards into your hand instead if there
+  are three or more Lesson cards in your graveyard" has a Reading [[Put … instead] if …],
+  `instead`'s fragment inside the conditional's), before its clause after a fronted dependent and
+  its comma (*Notion Thief*'s "instead that player skips that draw"; 146), after a modal
+  (*Archmage Ascension*'s "you may instead search your library"; 10), between a subject and its
+  finite verb ("that player instead puts that land onto the battlefield", *Land Equilibrium*;
+  *False Dawn*), and inside a passive verb phrase ("can't be prevented or dealt instead to another
+  permanent or player", *Lava Burst*, *Whippoorwill*).
+
+Two mismatches between English and the term are not covered by substitution or the extensions
+of §3. Each gets one closed rule.
+
+**Passive subject promotion.** The contexts whose first parameter is a Subject take a Subject
+and an Action apart: a trigger (`does`), a replacement (`would`), a lookback (`did`), the
+deontic rules (`cant`, `must`, `can`, `gatedBy`) and the negative declarative (`doesnt`)
+([Semantics](semantics.md) §4.1). An imperative, a cost and a Handoff have no Subject. Under the
+Subject `any` or `by(np)`, the context's Subject position prints the complement of the Action's
+frame that the English passive promotes, and the Action's verb phrase is that frame's passive
+(§1), with the `np` of `by(np)` as its agent phrase. The English layer derives three such
+passives: of a monotransitive frame, whose Object is promoted ("This spell can't be
+countered"); of a ditransitive one, whose indirect Object is promoted ("equipped creature would
+be dealt damage", the frame `deal` declares for it); and the prepositional passive of a
+prepositional frame, whose preposition's object is promoted and the preposition stranded ("each
+card looked at"). Which parameter of the Action fills that complement is its frame's. Abrupt
+Decay's
+"This spell can't be countered" is `cant(any, counter(thisSpell))`. The patient is an argument
+of `counter` ([Semantics](semantics.md) §4.4), yet it is printed before "can't be", where
+`cant`'s wording has its Subject, and "countered" in the verb-phrase Hole. No card under
+`plugins/` writes `doesnt` with `any` or `by(np)`. Where one verb has two frames with two
+promoted complements, as `deal` has, one term has two passives, and which one a card prints is
+open (§10).
+
+The rule applies only where the Subject is `any` or `by(np)`. `becomeBlocked` ("becomes
+blocked") and `resolve` ("resolves") are subjectless Actions read like `die`: what becomes
+blocked or resolves is the context's Subject, active, as in `does(actor(thisCreature),
+becomeBlocked)`, so the rule has nothing to promote. That form is not yet built: the
+`syl-shared-phrase-written-once` ticket builds it, and the corpus writes
+`does(any, becomeBlocked(x))` (afflict, rampage, bushido) and `does(any, resolve(thisSpell))`
+(buyback, haunt, rebound) today. "Becomes blocked by $blocker" (73 cards) is no passive of
+`block`: the passive of `block`'s frame is "is blocked by"
+(*General Jarkeld*'s "all creatures that the other is blocked by"), so "becomes blocked by" is
+a Template whose one fragment prints it over `by(B)` and `block`.
+
+Why: voice is already the Subject's choice ([Semantics](semantics.md) §4.2), so the rule links
+two Holes the term already holds in one fixed way, and it adds no place for words: the
+promoted phrase takes the subject position the context's own wording has.
+
+**A fronted trigger clause over several sentences.** A triggered ability is written
+"[When/Whenever/At] [trigger condition or event], [effect]" [CR#603.1], and one with an
+intervening "if" clause "When/Whenever/At [trigger event], if [condition], [effect]" [CR#603.4].
+Its effect may be several sentences. Boommobile prints "When this Vehicle enters, add four mana of
+any one color. Spend this mana only to activate abilities." In the Reading, "When this Vehicle
+enters," is a front dependent of the first sentence's clause. In the term, `when(event, action)`
+takes the whole effect, both sentences, as its `action`. With an intervening "if", the Reading
+stacks both clauses as front dependents of the first sentence: Eon Frolicker's "When this
+creature enters, if you cast it, target opponent takes an extra turn after this one. Until your
+next turn, you and planeswalkers you control gain protection from that player." has "When this
+creature enters," over "if you cast it, target opponent takes …", and the second sentence
+outside both. The trigger rule: the fronted clauses of a
+trigger's Construction, its trigger clause and any intervening "if" clause, may govern an effect
+of several sentences, and they are printed at the front of the first of them. It holds for the
+fronted clauses of a triggered ability, a delayed trigger ("At the beginning of the next end step,
+…") and a reflexive one ("When you do, …"). A delayed trigger clause printed after its effect is
+ordinary substitution within its one sentence: Aetherling's "Return it to the battlefield under
+its owner's control at the beginning of the next end step." Why: the term cannot follow English
+here, because the whole effect belongs to the one ability, and writing only the first sentence
+under the trigger would leave the rest outside it. Nor does the English grammar change for the
+layer above it (§5, §9).
+
+The same mismatch appears in other contexts, which the trigger rule does not cover: a
+postposed delayed trigger clause that governs a later sentence, a fronted replacement clause
+over several sentences, and a sentence printed after a run of several sentences. They are one
+open question (§10). So substitution, the extensions of §3 and these two rules are the
+operations this design states; what they do not cover is listed in §10, and a wording that needs
+something else is a defect in this design, reported and settled here.
 
 ## 3. The three extensions
 
-Substitution and one-sided adjunction leave three things Oracle text prints unexpressed. Each
-gets one closed extension. They are the whole list of this grammar's operations: a wording
-that needs something else is a defect in this design, reported and settled here, never patched
-in one declaration. Inflection, voice and Gaps are not on the list because they are not this
-grammar's (§1).
+Substitution and its two closed rules leave three things Oracle text prints unexpressed. Each
+gets one closed extension. Substitution, these three and the two rules of §2 are the operations
+this design states, and §10 lists what they do not yet cover. A wording that needs something
+else is a defect in this design, reported and settled here, never patched in one declaration.
+Inflection, voice and Gaps are not on the list because they are not this grammar's (§1).
 
 ### 3.1 Optional and list Holes
 
 **An optional part** is printed only when the parameters that govern it are supplied, and
 omitted when they are absent (§7). It may carry fixed words beside its Hole: Elvish Piper's "put
 a creature card from your hand onto the battlefield" prints "from $from", and a card that names
-no origin prints nothing there. Giant Growth's "Target creature gets +3/+3 until end of turn"
-and Glorious Anthem's "Creatures you control get +1/+1" are one Construction whose duration is
-present in the first and absent in the second.
+no origin prints nothing there.
 
 **A list Hole** prints each element of a `List` argument and states how the elements join:
 coordinated, with the commas and the coordinator English uses (Angelic Skirmisher's "first
@@ -115,24 +215,26 @@ no wording: its Hole stands in an optional part, and the part is omitted.
 
 Why: without them a declaration needs a wording for every combination of its optional
 parameters, and `when` alone has four optional parameters and a list. Wordings that differ only
-in such a part become families of near-duplicate Templates, and about five in six of the
+in such a part become families of near-duplicate Templates, and 128 of the 167
 `TODO(spelling)` markers in `plugins/builtin/` stand for want of exactly this.
 
 **Printed order governs the order of a list's elements**, in every list, the conjuncts of
-`and([…])` included. The elements are written in the order the text prints them, the head among
-its modifiers: "nonland permanent you control" lists the negated land type, then permanent,
-then the control test. Which side of the head a modifier stands on comes from the modifier's
-own Construction, and the list's order says the rest. Why: order among modifiers is wording.
-Favorable Winds prints "Creatures you control with flying" and Blight Pile "creatures with
-defender you control", so a list in any other order would lose which was printed. It is also
-what read order requires ([`.syl`](syl.md) §5), and a list with one admissible order gives
-recovery one term for a noun phrase where an unordered list would give it every permutation.
+`and([…])` included. The elements are written in the order the text prints them. A nominal's
+modifiers stand in two lists (§2; the `nominal` declaration is not yet built), so which side of
+the head a modifier stands on is which list holds it, and each list's order says the rest:
+"other nonland permanents you control" has "other" then "nonland" in `pre`, and "you control" in
+`post`. Why: order among modifiers is wording. Favorable Winds prints "Creatures you control
+with flying" and Blight Pile "creatures with defender you control", so a list in any other
+order would lose which was printed. It is also what read order requires ([`.syl`](syl.md) §5),
+and a list with one admissible order gives recovery one term for a noun phrase where an
+unordered list would give it every permutation.
 
 ### 3.2 Tails
 
-A Tail is part of a Construction's wording that is printed away from the rest: it attaches as
-a one-sided adjunct at the edge of a phrase that encloses the Construction's Hole, and the
-wording names the Category of that phrase. Quantity adjuncts are the case. In Kabira Outrider's
+A Tail is part of a Construction's wording that is printed away from the rest: at the edge of
+a phrase that encloses the Construction's Hole, and the wording names the Category of that
+phrase. It is the one place a Construction prints words outside its own fragment. Quantity
+adjuncts are the case. In Kabira Outrider's
 "target creature gets +1/+1 until end of turn for each creature in your party", what is
 scaled is "+1/+1", and one `forEach` holds it and the predicate. The "+1/+1" is printed where
 the verb's object stands, and "for each $p" is printed at the end of the verb phrase, past the
@@ -142,16 +244,17 @@ what measures it.
 
 Three properties make the extension closed:
 
-- **On the English side a Tail is ordinary one-sided adjunction.** The Reading has "for each …"
-  as an adjunct of the verb phrase, which is where the English grammar already puts it. Only
-  the link is longer: the adjunct's meaning belongs to a call several arguments down from the
-  call that spells the phrase.
+- **On the English side a Tail is an ordinary dependent.** The Reading has "for each …" as an
+  Adjunct of the verb phrase, which is where the English grammar already puts it. What the Tail
+  adds is the link: the Adjunct's meaning belongs to a call several arguments down from the
+  call that spells the phrase, and it prints only at the edge of a phrase of the Category it
+  names.
 - **A Tail states where it stands among its phrase's other adjuncts**: inside them, next to
   what the host itself prints, or outside them. Aurochs prints "gets +1/+0 until end of turn
   for each other attacking Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your
   hand until end of turn". Both Tails attach to one verb phrase, so the Category alone does not
   tell them apart, and the two placements are two Templates (§4). The notation writes the
-  inside placement `<inner Category: …>` (§7); which Templates need it is the
+  inside placement `<~inner Category: …>` (§7); which Templates need it is the
   `syl-tail-placement` ticket's to find.
 - **A Tail is read where it is printed.** Gaze of Adamaro "deals damage to target player equal
   to the number of cards in that player's hand": the amount is the declaration's first
@@ -190,15 +293,16 @@ the one `forEach` serve them all.
 ### 3.3 Shared material at a coordination
 
 English prints once what coordinated clauses share. Howling Golem's "Whenever this creature
-attacks or blocks" has one subject for two events. Chub Toad's "Whenever this creature blocks
-or becomes blocked" has one subject that stands in two roles, the performer of one event and
-the patient of the other ([Semantics](semantics.md) §4.2). Predator's Strike's "Target creature
-gets +3/+3 and gains trample until end of turn" has one subject and one duration over two
-actions. The English grammar reads each as a coordination whose conjuncts share a dependent
-([English](english.md) §3).
+attacks or blocks" has one subject for two events, and so does Chub Toad's "Whenever this creature
+blocks or becomes blocked". Aether Tunnel's "Enchanted creature gets +1/+0 and can't be blocked"
+has one subject that stands in two roles, the subject of an active verb phrase in one arm and the
+patient a passive promotes in the other ([Semantics](semantics.md) §4.2). Predator's Strike's
+"Target creature gets +3/+3 and gains trample until end of turn" has one subject and one duration
+over two actions. The English grammar reads each as a coordination whose conjuncts share a
+dependent ([English](english.md) §3).
 
-Substitution and adjunction, with or without wrapping, link one place in the wording to one
-place in the term. Neither relates a phrase printed once to several arms.
+Substitution links one place in the wording to one place in the term, and so would
+adjunction of any kind. None of them relates a phrase printed once to several arms.
 
 **A shared phrase is written once in the term**, as any value the text prints once is
 ([`.syl`](syl.md) §2). It is never copied into each arm, and no arm re-mentions it with an
@@ -210,26 +314,38 @@ the one creature that "it" names. An unprinted anaphor is a word in the term tha
 not have, and spelling would have to know to print nothing for it. The term writes the phrase
 once in one of two ways:
 
-- **Where the phrase has the same role in every arm, the term coordinates where English
-  does.** The coordinated Actions stand under one Subject: one Handoff over the Actions of
-  Predator's Strike, and one `does` over an `or` of the Actions of "attacks or blocks". A list
-  Hole spells the coordination (§3.1), and no extension is involved. "Attacks or blocks" is
-  one trigger condition, met when a game event matches either event [CR#603.2], and an `or` of
-  event-capable Actions under one Subject is how the term says so when the events share their
-  Subject. Several trigger conditions of one ability, each with its own trigger word, are
-  instead the disjunction at `TriggerCondition` [CR#603.1b].
+- **Where the phrase has the same role in every arm, the term coordinates where English does.**
+  The coordinated phrases stand under one subject: Predator's Strike's two continuous-effect verb
+  phrases under the one Construction that supplies their subject (not yet built, §2), and one
+  `does` over an `or` of the Actions of "attacks or blocks" and of Chub Toad's "blocks or becomes
+  blocked", `does(actor(thisCreature), or([block, becomeBlocked]))` (not yet built: no `or` stands
+  at `Action` under `plugins/builtin/`, `semantics.md` §4.6 refuses one at the event gate,
+  `becomeBlocked` still takes its subject, and the `syl-shared-phrase-written-once` ticket settles
+  both). The subject of Predator's Strike is no Handoff's, since a Handoff makes its subject the
+  Actor and a creature that gets +3/+3 performs nothing. A list Hole spells the coordination
+  (§3.1), and no extension is involved. "Attacks or blocks" is one trigger condition, met when a
+  game event matches either event [CR#603.2], and an `or` of event-capable Actions under one
+  Subject is how the term says so when the events share their Subject. Several trigger conditions
+  of one ability, each with its own trigger word, are instead the disjunction at
+  `TriggerCondition` [CR#603.1b].
 - **Where the roles differ, the coordination binds the phrase once.** Its Construction takes
   the shared phrase as a parameter, and each arm holds a placeholder word where the phrase
   belongs, as a lookback holds `which` (§1). The parameter is the binding, read once
-  ([`.syl`](syl.md) §4). Chub Toad's "blocks or becomes blocked" is this case, with the
-  performer of one event and the patient of the other; so are Aether Tunnel's "gets +1/+0 and
-  can't be blocked" and Cephalid Illusionist's "dealt to and dealt by target creature you
-  control".
+  ([`.syl`](syl.md) §4). Aether Tunnel's "gets +1/+0 and can't be blocked" is this case, and
+  so is Cephalid Illusionist's "dealt to and dealt by target creature you control". Dream
+  Fighter's "blocks or becomes blocked by a creature" is an open question of the
+  `syl-shared-phrase-written-once` ticket.
 
-**Factoring** is the third extension, and it serves the second way only: the coordination's
-Construction prints the shared phrase once, where the first arm's placeholder stands, and the
-placeholders of the other arms print nothing. Recovery reads the one printed phrase as the
-parameter.
+**Factoring** is the third extension, and it serves the second way only. In the Reading the shared
+phrase is a sibling of the coordination, in no arm, and every arm lacks it. A shared subject
+stands above a coordination of subjectless verb phrases: Aether Tunnel's "Enchanted creature gets
++1/+0 and can't be blocked" is `SubjectPredicate` over `Coordination:VerbPhrase`. A shared
+complement follows a coordination of verb phrases that each have a gap for it: Cephalid
+Illusionist's "dealt to and dealt by target creature you control" is
+`Coordination:VerbPhrase/shared`, whose head is the coordination of "dealt to" and "dealt by" and
+whose shared dependent is the noun phrase. The coordination's Construction prints the shared
+phrase once, in that sibling position, and every arm's placeholder prints nothing, standing where
+the arm lacks the phrase. Recovery reads the one printed phrase as the parameter.
 
 Where the text repeats the phrase, the term does too. Ancient Craving prints "You draw three
 cards and you lose 3 life" and Ambition's Cost "You draw three cards and lose 3 life", and
@@ -241,11 +357,15 @@ The resolved term stays a plain tree of calls, and that tree is the derivation: 
 Construction, and where it stands says what it was combined with. Nothing records a derivation
 beside the term.
 
-That holds under adjunction because an adjunct is always in one of two places in the term.
-Either it is a call that takes its host as an argument, as `cant` takes its Action and `when`
-its effect, or it is an argument, at some depth, of the call that spells its host, as a
-conjunct of `and([…])` is and as the `forEach` inside a verb's amount is. No adjunct needs a
-node the term would not otherwise have.
+Substitution makes that hold directly: each call's wording is one fixed fragment, so, outside the
+extensions, the two rules and the nodes the English layer derives, each call spells one subtree of
+the Reading (§2). The extensions and closed rules keep it, because each relates parts of the
+Reading to calls the term already has. A Tail is an argument, at some depth, of the call that
+spells its phrase, as the `forEach` inside a verb's amount is. Factoring prints a parameter of the
+coordination's own call (§3.3). Passive subject promotion links the complement the passive of an
+Action's frame promotes to the Subject position of the context that takes the Action, and the
+trigger rule links a fronted trigger clause to its whole effect; in both, the context is a call
+that takes the Action as an argument. None needs a node the term would not otherwise have.
 
 So wording is carried by exactly two things: **which Template a card calls, and the printed
 order of a list's elements** (§3.1). Two wordings with one meaning are two Templates with one
@@ -280,12 +400,14 @@ Construction's wording is matched against forest nodes. The grammar still names 
 and carries no meaning ([English](english.md) §1–2).
 
 **The shape of the resolved term.** A term is a tree of calls with named and positional
-arguments, lists and records. Adjunction, Tails and Factoring are relations between that tree
-and a Reading. None of them adds a kind of node, and `.syl` gains no syntax outside the
+arguments, lists and records. The two closed rules, Tails and Factoring are relations between
+that tree and a Reading. None of them adds a kind of node, and `.syl` gains no syntax outside the
 `spelling` string. Only a declaration carries a `spelling`, so every part of a card's `text`
 that prints words is a call. A record written in place has no wording of its own: where its
 fields are printed, a Template takes them as parameters and spells them: `creatureToken` is
-the Template for Archfiend's Vessel's "a 5/5 black Demon creature token with flying".
+the Template for Archfiend's Vessel's "a 5/5 black Demon creature token with flying". Whether a
+created token's description becomes a nominal (§2) instead is the open question of the
+`syl-token-records-to-templates` ticket.
 
 **What expansion means.** Expansion substitutes a Template's parameters and wraps a
 Definition's ([`.syl`](syl.md) §4), and a Template still adds no meaning
@@ -312,6 +434,10 @@ keeps it:
 - A list is spelled in its written order, which is the printed order.
 - A Tail has one position and one placement for a given Template, so two printed positions are
   two Templates.
+- An Action prints its frame's passive exactly when the Subject is `any` or `by(np)` (§2). A
+  fronted trigger clause over several sentences is printed at the front of the first, and a
+  trigger clause printed after its effect is a different Template. So neither rule leaves a choice
+  open.
 - A shared phrase is written once and printed once, and a phrase the text repeats is written
   again, so the two forms are two terms (§3.3).
 
@@ -329,17 +455,17 @@ representation yet.
 ## 7. The `spelling` notation
 
 A `spelling` is fixed words with four kinds of markup, each with one job. `$` marks a Hole,
-`~` ties a Hole to letters, parentheses mark an optional part, and angle brackets a list's
-join or a Tail.
+`~` ties a Hole to letters, parentheses mark an optional part, angle brackets a list's join,
+and `<~ … >` a Tail.
 
 ```
 spelling := part*
 part     := text | hole | optional | tail
 hole     := [affix "~"] "$" name ["~" affix]   -- a parameter's argument
           | "$" name "<" join ">"              -- a List parameter
-join     := "" | "," | "and" | "or" | "and/or" | "then" | "$" name
+join     := "" | "," | "and" | "or" | "and/or" | "then"
 optional := "(" part+ ")"
-tail     := "<" ["inner"] Category ":" part+ ">"
+tail     := "<~" ["inner"] Category ":" part+ ">"
 affix    := letter+
 text     := any characters except "$", "~", "(", ")", "<" and ">"
 ```
@@ -355,34 +481,59 @@ Man, and "$n~th" is "third" in Bookwurm's "third from the top". A Hole that abut
 digit with no tie fails to load, so a missing space is never read as a tie, and the affix is a
 bound form the lexicon declares.
 
-**A list Hole is `$name<join>`.** A `List` parameter must state its join and no other
-parameter may, so a list is visible at its Hole. The joins are a closed set: `<>` juxtaposes
-the elements; `<,>` separates them with commas and no coordinator; `<and>`, `<or>`, `<and/or>`
-and `<then>` coordinate them; and `<$name>` coordinates them with the coordinator a parameter
-of the declaration supplies. The commas of a coordination of three or more are the English
-layer's and are never written. One element prints alone, with no join. An element whose own
-wording prints nothing in place, having only a Tail, takes no part in the join. A `<` directly
-after a Hole's name always opens a join, so a Tail that follows a Hole stands after a space.
+**A list Hole is `$name<join>`.** A `List` parameter must state its join and no other parameter
+may, so a list is visible at its Hole. The joins are a closed set: `<>` juxtaposes the elements;
+`<,>` separates them with commas and no coordinator; `<and>`, `<or>`, `<and/or>` and `<then>`
+coordinate them. No parameter chooses a join: a coordinator is printed by the Template that names
+it, as the Templates `and`, `or` and `andOr` print "and", "or" and "and/or" over the three `coord`
+primitives (at `NounPhrase`, `Predicate` and `Location`), which have no `spelling`. Under
+`plugins/`, no `coord` has a `spelling`, and the Templates `and`, `or` and `andOr` have none yet
+either; the `syl-spelling-optional-segments` ticket writes them. The commas of a coordination of
+three or more are the English layer's and are never written. One element prints alone, with no
+join. An element whose own wording prints nothing in place, having only a Tail, takes no part in
+the join. A `<` directly after a Hole's name is only ever a join, and `<~` only ever opens a Tail,
+so a Tail may follow a Hole with or without a space. A `~` anywhere else, outside `<~`, is a tie.
 
 **An optional part is `( … )`.** A parameter is omissible when it has a declared default, or
 its sort is `Option(T)` or a list; its absent value is the default, else `none`, else the
 empty list. An optional part is governed by every parameter with a Hole directly in it, and
 each of those must be omissible. It is printed when every governor differs from its absent
 value and omitted when none does: "put $subject (from $from) onto the battlefield
-($riders<>)", "$subject gets $powerValue/$toughnessValue ($duration)". A term in which only
+($riders<>)". A term in which only
 some governors are supplied has no wording by that declaration. An optional part may hold
 another, which can print only when the outer one does. All the Holes of one parameter stand in
 one optional part, or all stand outside every one. An empty list is never printed by its Hole;
 it is spelled only as the absent value of an optional part.
 
-**A Tail is `<Category: …>` or `<inner Category: …>`** (§3.2): "$per <VerbPhrase: for each
-$p>". Its host is the smallest phrase of the named Category that contains the Hole the
-declaration's call fills; for a declaration that prints nothing in place, it is the smallest
-such phrase that ends where that Hole stands. Unmarked, the Tail is adjoined to the largest
-phrase of that Category with the same head, so it prints after the host's other adjuncts.
-Marked `inner`, it is adjoined to the host directly, and prints before them. Tails that land
-at one edge print in the order of their Holes, and an argument printed at two Holes prints its
-Tail once. A Tail stands last among the parts beside it and holds no Tail.
+**A Tail is `<~Category: …>` or `<~inner Category: …>`** (§3.2): "$per <~VerbPhrase: for each $p>".
+Its host is the nearest phrase of the named Category above the Hole the declaration's call fills
+that the English grammar lets carry the Tail's words as a trailing dependent. For ", except …"
+that is a finite Clause and never a relative's Clause, whose Gap the grammar keeps it from
+closing: in Shredder, Shadow Master the nearest Clause above the copy is the relative "that's a
+copy of Shredder", and the host is the next one up, "create a token … attacking that player". In
+Aurochs and Ral's Staticaster the host of "for each …" is the verb phrase "gets +1/+0". Where the
+declaration prints nothing in place, its Hole has no node in the Reading, and how its host is
+found is open (§10). Unmarked, a trailing Tail stands inside the fronted dependents of that
+Category and outside the host's other trailing dependents with the same head: it attaches to the
+largest phrase of that Category with the same head that begins with no fronted dependent. That is
+the tree the forest builds, where a comma-set post-dependent stands inside a fronted one
+(`CompiledGrammar::normal_form`, "fronted dependent outermost",
+`crates/syntax/src/normal_form.rs`). Shredder, Shadow Master prints "Whenever Shredder attacks a
+player, for each other opponent, create a token that's a copy of Shredder tapped and attacking
+that player, except it isn't legendary": the copy's ", except it isn't legendary" is a
+post-dependent of the clause "create … attacking that player", inside both "Whenever …," and "for
+each other opponent,". Marked `inner`, the Tail prints at the edge of the host itself, before the
+host's other trailing dependents. Tails that land at one edge print in the order of their Holes,
+and an argument printed at two Holes prints its Tail once. A Tail stands last among the parts
+beside it and holds no Tail.
+
+**The notation does not yet express the two closed rules of §2.** Nothing marks a context's
+Subject Hole and Action Hole as the pair passive subject promotion links, which Action's
+parameter fills the promoted position, or a trigger's effect Hole as one that may hold several
+sentences. Until it does, a promoted Subject and the effect Hole of `when`, `whenever`, `at`
+and the delayed and reflexive triggers stand outside the check that a variant is English
+(below): that check substitutes a phrase for each Hole where the Hole stands, and under either
+rule the printed phrase stands elsewhere (§10).
 
 **No escape exists, because none is needed.** None of `$`, `~`, `(`, `)`, `<` and `>` occurs
 in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `<` and `>` occur in no
@@ -401,11 +552,13 @@ are never markup.
   Tail.
 - **A variant is not English.** Every variant, which is each consistent choice of optional
   parts with each list Hole at one, two and three elements, must parse under the English
-  grammar at a Category its result sort is spelled as, each Hole standing for a phrase of any
+  grammar: its in-place part at a Category its result sort is spelled as, and each Tail as a
+  trailing dependent of a host of its named Category, each Hole standing for a phrase of any
   Category that its own sort's Constructions spell, with the features agreement will fix left
   unmarked. A sort is not one Category: a `Predicate` is a noun in "creature", an adjective in
   "tapped", a preposition phrase in "with flying" and a relative clause in "you control". A
-  `spelling` that parses in several ways is several Constructions.
+  `spelling` whose in-place part parses in several ways names no one fragment, and which of them
+  spelling prints is open (§10).
 - **Its skeleton is ambiguous.** Replace each Hole by its parameter's sort, counting two sorts
   as one when a coercion or `Option` takes one to the other, each optional part by an optional,
   and each list Hole by one or more of its sort with its join between. The result is a regular
@@ -444,46 +597,180 @@ wordings). The `syl-spelling-conventions` ticket migrates them.
 What the grammar can describe is known only in part, and what recovery costs is not known at
 all, because no spelling crate exists. This section separates the two.
 
-- **One-sided adjunction keeps the English side context-free.** Tree insertion grammar, the
-  monolingual formalism of substitution with left and right adjunction and no wrapping, is
-  shown by Schabes and Waters (1995) to generate context-free languages and to parse strings in
-  cubic time. That is a result about parsing strings with one grammar. It bears on spelling in
-  one way only: the English half of every Construction describes trees of a kind the
-  context-free English grammar already builds. It says nothing about relating a forest to
-  terms.
-- **The extensions are outside that result.** An optional part or a list Hole abbreviates a
-  finite or regular family of wordings. A Tail links an adjunct to a call some arguments below
-  its host, and Factoring relates one phrase to several arms. Neither belongs to tree insertion
-  grammar or to any synchronous form of it, and no published bound is claimed for them here.
+- **Substitution keeps the English side context-free.** Each Construction's English half is a
+  tree of a kind the context-free English grammar already builds, and substitution builds only
+  such trees. Tree insertion grammar, substitution with left and right adjunction and no
+  wrapping, is shown by Schabes and Waters (1995) to generate context-free languages and to
+  parse strings in cubic time, so substitution is in no lower complexity class than one-sided
+  adjunction. These are results about parsing strings with one grammar, and they say nothing
+  about relating a forest to terms.
+- **The extensions and closed rules are outside those results.** An optional part or a list
+  Hole abbreviates a finite or regular family of wordings. A Tail links an Adjunct to a call
+  some arguments below its phrase, Factoring relates one phrase to several arms, and the two
+  rules of §2 link a Hole's phrase to a position in another Construction's fragment. None
+  belongs to a published synchronous formalism, and no bound is claimed for them here.
 - **Recovery's cost is a design expectation.** Recovery never parses text, so its work is
   matching Constructions against the nodes of a forest the parser has already built. The
   expectation is that each match is local: a Construction looks at one node and its Holes'
-  nodes, a Tail at one enclosing phrase, Factoring at one coordination. Whether that keeps
-  recovery proportional to the forest is for the spelling crate to measure on the corpus, and
-  a Construction that makes recovery enumerate trees instead of reading the forest is a defect
-  ([English](english.md) §4).
+  nodes, a Tail at one enclosing phrase, Factoring at one coordination, passive subject
+  promotion at one context and its Action, the trigger rule at the first sentence of one
+  ability's effect. Whether that keeps recovery proportional to the forest is for the spelling
+  crate to measure on the corpus, and a Construction that makes recovery enumerate trees instead
+  of reading the forest is a defect ([English](english.md) §4).
 
 ## 9. Rejected alternatives
 
-- **Substitution alone**, a synchronous tree-substitution grammar. It cannot put an auxiliary
-  inside its Action's clause, split one list's modifiers around a head, or put a trigger
-  condition inside the first sentence of an effect it governs (§2), and it needs a Template per
-  verb for every detached quantity (§3.2).
-- **Wrapping adjunction**, a full or regular-form synchronous tree-adjoining grammar. Nothing
-  in-scope needs the added capacity, and it lacks Factoring like every other variant (§2).
+- **General one-sided adjunction**, a synchronous tree insertion grammar, in which any
+  Construction may attach its wording to the left or right of a node on the edge of a phrase
+  another Construction spelled. Recovery would then ask at each node on a phrase's edge whether
+  something attached there, and the same words attached at different nodes of one edge would be
+  different derivations of one sentence. Where an adjunct attaches is not in the term, so either
+  the term records it beside its calls or two derivations share one term. A phrase that another
+  Construction adjoined into is no longer the phrase of one argument, so a slot's sort no longer
+  names one constituent. What it served is covered without it: the passive under a context by
+  passive subject promotion, a fronted trigger over several sentences by the trigger rule,
+  modifiers on both sides of a noun by a nominal's two lists, and an adverb by substitution over
+  a subjectless verb phrase or a Template per placement (§2).
+- **Wrapping adjunction**, a full or regular-form synchronous tree-adjoining grammar, in which an
+  adjunct contributes words on both sides of its host at once. Nothing in-scope needs it. The
+  constructions that would are cross-serial pairings, and no in-scope card prints
+  "respectively" or "the former … the latter". What looks discontinuous in card text is either
+  fixed words around Holes, which is substitution, or one phrase printed away from the unit it
+  measures, which is a Tail (§3.2). It would add every cost of one-sided adjunction and more,
+  and it still would not provide Factoring (§3.3).
+- **Substitution with no extensions or closed rules**, a plain synchronous tree-substitution
+  grammar. It cannot print a passive under its context or a trigger at the front of the first
+  of several sentences (§2), it needs a wording per combination of optional parameters (§3.1)
+  and a Template per verb for every detached quantity (§3.2), and it cannot print a shared
+  phrase once (§3.3).
 - **Copying a shared phrase into each arm**, or re-mentioning it there with an anaphor the card
   does not print. The first duplicates targets and Referents, and the second puts a word in the
   term that the text does not have (§3.3).
-- **Fixing the term instead of the grammar.** Surface faithfulness ([Semantics](semantics.md)
-  §1, item 1) argues for moving each mismatch into the term: an optional `per` parameter on
-  each of about thirty verbs in place of a Tail, explicit premodifier and postmodifier slots in
-  place of adjunction on a nominal, and a trigger attached at the level of the Ability in the
-  English grammar. That comes near substitution with optional parts and lists. It is rejected
-  because scaling an amount from outside its Action needs a primitive that reaches into the
-  Action to change its amount, which is a second place for one value; because it changes the
-  English grammar for the sake of the layer above it; and because it still leaves passives
-  under auxiliaries and shared-material coordination unsolved.
+- **Fixing every mismatch in the term.** Surface faithfulness ([Semantics](semantics.md) §1,
+  item 1) moves into the term each mismatch the term can follow: a nominal's premodifier and
+  postmodifier lists, and a verb phrase without its subject (§2). Three mismatches stay with
+  the grammar: a detached quantity, the passive and the fronted trigger. An optional `per`
+  parameter on each of about thirty verbs, in place of a Tail, is rejected because scaling an
+  amount from outside its Action needs a primitive that reaches into the Action to change its
+  amount, which is a second place for one value. The passive stays a closed rule, because voice
+  is the English layer's to derive from the frame (§1). A trigger attached at the level of the
+  Ability in the English grammar, in place of the trigger rule, is rejected because it changes
+  the English grammar for the sake of the layer above it.
 
 ## 10. Open
 
 The notation of §7 has no form yet for the placeholder a coordination's arms hold (§3.3).
+
+**A dependent of one sentence that the term relates to a run of sentences.** English attaches
+a clause or a word to one sentence where the term relates it to several. The trigger rule of §2
+covers one case, the fronted trigger clause (Boommobile). These are not covered:
+
+- **A postposed delayed trigger clause over a later sentence.** Goblin Kites prints "Flip a coin
+  at the beginning of the next end step. If you lose the flip, sacrifice that creature." The
+  coin is flipped when the delayed trigger resolves, so the second sentence belongs to its
+  effect. 371 lines print a delayed trigger clause after its effect, 30 of them with a further
+  sentence after it; which of those the clause governs is a question for each card.
+- **A fronted replacement clause over several sentences.** Eruth, Tormented Prophet prints "If
+  you would draw a card, exile the top two cards of your library instead. You may play those
+  cards this turn." The replaced event never happens, and a modified event occurs instead
+  [CR#614.6]. The second sentence reads the cards the first exiled, so the term relates the
+  replacement to both sentences, while "instead" and the "If" clause are printed in the
+  first. Enduring Renewal and Chains of Mephistopheles have the same shape. 47 lines print a
+  fronted "If … would …" sentence with "instead" followed by another sentence.
+- **A sentence after a run.** A triggered ability is written with its instructions, if any, after
+  its effect [CR#603.1]; those that limit its targets or say it can't be countered are not part of
+  the effect [CR#603.1a]. Academy Wall prints "Whenever you cast an instant or sorcery spell, you
+  may draw a card. If you do, discard a card. This ability triggers only once each turn." An
+  activated ability may carry a restriction on its use [CR#602.5b], printed after its effect:
+  Aggravated Assault prints "{3}{R}{R}: Untap all creatures you control. After this main phase,
+  there is an additional combat phase followed by an additional main phase. Activate only as a
+  sorcery." 207 cards print such a sentence after an effect of two or more sentences. A
+  Construction whose own wording is two sentences can be followed by another sentence too: Advice
+  from the Fae prints "If you control more creatures than each other player, put two of those
+  cards into your hand. Otherwise, put one of them into your hand. Then put the rest on the bottom
+  of your library in any order." 173 cards print "If you do", "Otherwise" or a like two-sentence
+  wording followed by another sentence. A rounding instruction is such a sentence too: Saw in
+  Half prints "Destroy target creature. If that creature dies this way, its controller creates two
+  tokens that are copies of that creature, except their power is half that creature's power and
+  their toughness is half that creature's toughness. Round up each time.", a sentence after a run
+  of two that the term relates to the halved values inside the second. Hydroid Krasis prints
+  "When you cast this spell, you gain half X life and draw half X cards. Round down each time."
+  after a one-sentence effect. 6 lines print "Round up each time." or "Round down each time.",
+  1 of them after an effect of two or more sentences.
+- **Other fronted dependents followed by more sentences**: "As long as …," on 16 lines, "Until
+  end of turn," on 33 and "If <condition>," on 524. These count every line where such a sentence
+  has a successor; which of them the dependent governs is a question for each card, and the term
+  may follow English where a branch's output reaches later text ([Semantics](semantics.md)
+  §2.2).
+
+The English grammar builds a sentence sequence by right recursion (`SentenceSequence`), so a run
+of sentences that another sentence follows, or that a dependent inside its first sentence
+governs, is no node of the Reading, and no Hole stands for it. Two answers are candidates:
+
+- **(a) A run of consecutive sentences is something a Hole can fill.** A text has no syntactic
+  structure above the sentence, and the grammar's right recursion is one grouping chosen for
+  the forest, so spelling reads a sentence sequence as flat. One rule, "a dependent printed in a
+  run's first sentence may govern the run", replaces the trigger rule. It applies only to a
+  Hole whose sort can be a run of sentences, an effect or a replacement's Action, so a trailing
+  adjunct of the first sentence such as "until end of turn" is never read as governing the run.
+  Boommobile: `when`'s effect Hole holds the run of two sentences, and "When this Vehicle
+  enters," governs it, as now. Eruth: two Constructions each print a dependent in the run's
+  first sentence. `replace` prints its would-clause "If you would draw a card," at the front of
+  its replacement Hole, which holds `instead` over the run; `instead` prints its word after the
+  first sentence's verb phrase, over its Action Hole, which holds the run. "Instead" is
+  postposed, as is Goblin Kites' delayed clause, which is why the rule says "dependent" and not
+  "fronted clause". In Abundance, `instead`'s Action is a `may`, and its word stands inside the
+  `may`'s verb phrase, a Template per placement (§2). Academy Wall: `may`'s
+  two sentences are one run in `when`'s effect Hole, and "This ability triggers only once each
+  turn." follows it as `when`'s own wording, which is plain substitution. Advice from the Fae:
+  the `doIf` with "Otherwise" is a run of two that is one element of the sequence, and "Then
+  put the rest …" the next element. The cost is that recovery matches Holes against runs, spans
+  of sibling sentences, and not only against nodes; an ability of n sentences has about n²/2
+  runs.
+- **(b) A closed rule per context.** The trigger rule stays, and each other context gets its
+  own: a replacement rule (Eruth, Enduring Renewal), which must also place "instead" in the
+  first sentence; a rule for a postposed delayed trigger (Goblin Kites); a rule for a sentence
+  after a run, which Academy Wall needs together with the trigger rule and Aggravated Assault
+  alone; and a rule for `sequentially`, since Advice from the Fae has no fronted dependent at
+  all. That is at least four more rules, and each new context with an argument of several
+  sentences is one more.
+
+Recommendation: (a). It states one rule where (b) states five, it is the reading the English
+grammar already implies by grouping a sequence one fixed way, and Boommobile's term and wording
+are the same under it.
+
+**A Tail whose declaration prints nothing in place.** Its Hole has no node in the Reading, so
+"the nearest phrase above the Hole" names nothing, and a rule by position, such as the smallest
+phrase that ends where the Hole stands, does not fit a Reading, which is a tree. How such
+a Tail's host is found is not settled.
+
+**A list element that prints only a Tail.** Such an element takes no part in its list's join
+(§7), so `[A, B, T]`, `[A, T, B]` and `[T, A, B]` print one Reading, and recovery cannot recover
+where in the list `T` stands, against printed order (§3.1) and the round trip (§6). A load rule
+that fixes its position, such as "an element that prints only a Tail stands last", would settle
+it; none is stated.
+
+**A wording with several Readings.** Spelling a resolved term yields a Reading, and a
+Construction is one fragment (§1), but a `spelling`'s fixed words can parse in several ways, and
+the notation cannot say which. "Exile all cards from target player's graveyard." gets two
+Readings: "from target player's graveyard" postmodifies "cards" in one and is an adjunct of the
+verb phrase in the other. Hot Pursuit's "that creature is also goaded." gets two: "is also
+goaded" is a copula with "also" and the adjective "goaded" (`PostCopularAdverbial`) in one, and
+a passive "is" over "also goaded" (`CentralAdverbial` over the passive participle) in the other.
+Which Reading `spell` yields for such a wording is not settled.
+
+**The notation for the two closed rules.** §7 has no mark for a context's Subject and Action
+Holes, for which of the Action's parameters passive subject promotion moves, or for a
+trigger's effect Hole. Until it has, a promoted Subject and a trigger's effect Hole stand outside
+the check that a variant is English.
+
+**Which passive a term prints.** English has two passives of `deal`. Panther Habit prints "If
+equipped creature would be dealt damage", the passive of the ditransitive frame `deal` declares
+for it, with the recipient promoted: 158 lines print "is", "was" or "be dealt damage", and 2
+"would be dealt damage". Angel of Suffering prints "If damage would be dealt to you", the
+passive of the frame with a *to* phrase, with the damage promoted: 40 lines. The parser derives
+both. One term, `dealDamage` under `any` with an amount and a recipient, stands for both, and
+passive subject promotion (§2) promotes one complement per frame, so nothing in `.syl` says
+which passive a card prints. Two answers are candidates: a Template per promoted complement,
+each fixing its frame, or promotion that names the promoted parameter, written at the
+context's Subject.
