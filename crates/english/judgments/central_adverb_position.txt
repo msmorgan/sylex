@@ -9,5 +9,8 @@
 +Clause <card=Dark Dabbling> also regenerate each other creature you control => AdverbPhrase "also" as Adjunct of regenerate; NounPhrase "each other creature you control" as Object of regenerate
 + <card=Deadly Complication> • Put a +1/+1 counter on target suspected creature you control. You may have it become no longer suspected. => AdverbPhrase "no longer" as Adjunct of become; AdjectivePhrase "suspected" as PredicativeComplement of become
 + Target snow land is no longer snow. => AdverbPhrase "no longer" as Adjunct of be; readings 1
+# After *be*, a central adverb precedes its locative Complement as it does a predicative one (CGEL, Ch. 3 §2.1.5, p. 102; Ch. 4 §5.2, p. 257)
++ <card=Commander Spock> If that card is still on top of your library, draw a card. => AdverbPhrase "still" as Adjunct of be; PrepositionPhrase "on top of your library" as Complement of be
++ <card=Auratouched Mage> If this creature is still on the battlefield, put that Aura card onto the battlefield attached to it. => AdverbPhrase "still" as Adjunct of be; PrepositionPhrase "on the battlefield" as Complement of be; !PrepositionPhrase "on the battlefield" as PredicativeComplement of be
 # A central adverb is not a Subject remnant's own: *then* in *then draws …* is the Linked Adjunct of its Conjunct, never part of a finite Verb Phrase that recovers its Subject (Sycorax Commander)
 + <card=Sycorax Commander> Sanctified Rules of Combat — When this creature enters, each opponent faces a villainous choice — That opponent discards all the cards in their hand, then draws that many cards minus one, or this creature deals damage to that player equal to the number of cards in their hand. => !SubjectRemnant "then draws that many cards minus one"

@@ -185,9 +185,6 @@ impl Builder {
         lexeme
             .forms
             .retain(|slot| slot.features.person != Some(Person::First));
-        if entry.frames.contains(&FrameSpec::Copular) {
-            lexeme.properties.classes.insert("CopularVerb".into());
-        }
         if let Some(binding) = entry.binding {
             lexeme.binding = binding;
             lexeme.capitalization = sylex_lexicon::Capitalization::Exact;

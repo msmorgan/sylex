@@ -801,7 +801,7 @@ Construction is one fragment (§1), but a `spelling`'s fixed words can parse in 
 the notation cannot say which. "Exile all cards from target player's graveyard." gets two
 Readings: "from target player's graveyard" postmodifies "cards" in one and is an adjunct of the
 verb phrase in the other. Hot Pursuit's "that creature is also goaded." gets two: "is also
-goaded" is a copula with "also" and the adjective "goaded" (`PostCopularAdverbial`) in one, and
+goaded" is a copula with the central adjunct "also" and the adjective "goaded" in one, and
 a passive "is" over "also goaded" (`CentralAdverbial` over the passive participle) in the other.
 Which Reading `spell` yields for such a wording is not settled.
 

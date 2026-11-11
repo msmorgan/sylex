@@ -103,6 +103,30 @@ Why: a selected and an unselected attachment to the same head are one
 analysis, so keeping both is a second tree (§8), while attachments to
 different heads are different analyses that only meaning can choose between.
 
+**A central Adjunct after *be* or a copula.** An adverb in central position
+follows an auxiliary and precedes its Complement (*He is always miserable*),
+while the same order after a lexical verb is ungrammatical (∗*He looks always
+miserable*; CGEL, Ch. 3 §2.1.5, p. 102, [35]); in a clause an auxiliary heads,
+central position is more often just after the verb (CGEL, Ch. 6 §7.1,
+p. 575). The verb Valence schema derives a phrase with a central Adjunct
+between the verb and its first Complement from each frame of *be* and from
+every Copular frame, never from a catenative frame. *Still* thus precedes
+*be*'s locative Complement (*is still on top of your library*, Commander
+Spock) as it does its predicative one (*is still a land*), and a lexical
+copula's predicative takes one too (*have it become no longer suspected*,
+Deadly Complication). A locative Complement is not a predicative one (CGEL,
+Ch. 4 §5.2, p. 257), so *is still on the battlefield* has the single analysis
+that *is on the battlefield* has: *be* with its locative Complement. Every
+other auxiliary takes a Verb Phrase Complement, and the central adverb belongs
+to that phrase (*can still block*, *is still blocking*). Why: the adverb is
+the clause's, so the Complement keeps the analysis it has without the adverb.
+Deriving the phrase from the frames makes their preference of a locative
+Complement over a predicative one (§8) apply to it, so *remain*, whose
+locative frame takes none, has no *remains still on the battlefield*.
+Limiting it to *be* and the Copular frames keeps the order off other lexical
+verbs and off lexical *have*, which the lexicon lists among the auxiliaries:
+in *has only one target* (Meddle), *only* stays the Noun Phrase's.
+
 **No policing.** No feature or equation exists only to refuse a form no card
 prints. A negative Judgment pins a formation rule that generation needs, such as
 agreement, Case or verb form, on a real or cited construction, never an

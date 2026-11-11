@@ -412,6 +412,10 @@ category Adverbial { function }
 category Interleaved { function }
 // The Adjunct function before a passive's Internalised Complement only.
 category InternalisedInterleaved { function }
+// The Adjunct function in central position between *be* or a copula and
+// its Complement (*is still on top of your library*, *become no longer
+// suspected*; ADR §3).
+category CentralAdjunct { function }
 // A relative clause before the Complement its noun selects (*Equip
 // abilities [you activate] [of other Equipment]*; CGEL 5§15:454).
 category InterleavedModifier [Number, NounKind] { function }
@@ -563,7 +567,6 @@ class FusedQuantifier = [
 // singular Noun Phrase, so a Complement as well as a Subject.
 class FusedChoice = ["det:either", "det:neither"]
 class RelativeMarker = ["sub:that", "pronoun:which", "pronoun:who"]
-class CopularVerb { typed }
 // Only *other*, which heads a Noun Phrase with ordinary determination (*the
 // other*; CGEL 5§9.1:410).
 class FusedHeadAdjective { typed }
@@ -1125,10 +1128,9 @@ HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
 // first spell that mana from a Treasure was spent to cast*).
 GappedPurpose: VerbPhrase -> VerbPhrase adjunct:ToInf { transparent: [adjunct] }
     where adjunct.Gap = NP
-// *Is no longer snow*, *become no longer suspected*.
-PostCopularAdverbial: VerbPhrase ->
-    Class(CopularVerb) adjunct:AdverbPhrase predicative_complement:Predicative
-    where adjunct.AdjunctPosition = Central
+// *Is still on top of your library*, *is no longer snow*, *become no longer
+// suspected*.
+CentralAdverbAdjunct: CentralAdjunct -> AdverbPhrase { cost: 0 } where head.AdjunctPosition = Central
 
 MeasurePremodifier: BareNominal -> modifier:Measure BareNominal
 // *five {P} worth of modes*.
@@ -2899,6 +2901,9 @@ valence VerbPhrase {
     ],
     interleaved: Interleaved,
     interleaved_internalised: InternalisedInterleaved,
+    central: CentralAdjunct,
+    central_heads: BeVerb,
+    central_families: [Copular],
     heavy_shift,
     shifted_object: [object.Determination := Overt],
     postposed: PostposedModifier,
