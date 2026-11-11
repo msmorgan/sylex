@@ -18,6 +18,7 @@ use std::io::BufRead;
 
 use sylex_lexicon::LexemeId;
 use sylex_upstream::oracle_text::strip_reminder_text;
+use sylex_vocabulary::card_name_id;
 use sylex_upstream::scryfall::OracleCardReader;
 
 /// One Card Face record of the supported corpus.
@@ -185,12 +186,6 @@ pub enum CorpusError {
     Read(String),
 }
 
-/// The lexeme id of a card name, as `sylex_vocabulary` declares it.
-#[must_use]
-pub fn card_name_lexeme(name: &str) -> LexemeId {
-    LexemeId::new(&format!("name:{name}"))
-}
-
 /// The rules-text units of a face: its paragraph lines after balanced
 /// reminder text is removed (a keyword line's semicolon separators becoming
 /// commas with it), trimmed, without empty lines. A line break
@@ -251,8 +246,8 @@ impl Corpus {
                 // and two faces that shorten to one spelling (*Ral*) name one
                 // object, not two.
                 let scope = BTreeSet::from([
-                    card_name_lexeme(unit.display_name()),
-                    card_name_lexeme(&card.name),
+                    card_name_id(unit.display_name()),
+                    card_name_id(&card.name),
                 ]);
                 let face = Face {
                     identity: unit.identity().to_string(),
@@ -415,13 +410,13 @@ mod tests {
         // Both faces shorten to *Ral*; each face's text names only itself.
         let input = r#"{"object":"card","id":"p","oracle_id":"o","name":"Ral, Monsoon Mage // Ral, Leyline Prodigy","layout":"transform","legalities":{"vintage":"legal"},"card_faces":[{"name":"Ral, Monsoon Mage","type_line":"Creature — Human Wizard","oracle_text":"Transform Ral."},{"name":"Ral, Leyline Prodigy","type_line":"Legendary Planeswalker — Ral","oracle_text":"Ral deals 2 damage to any target."}]}"#;
         let corpus = Corpus::read(std::io::Cursor::new(input), |_| true).unwrap();
-        let card = card_name_lexeme("Ral, Monsoon Mage // Ral, Leyline Prodigy");
+        let card = card_name_id("Ral, Monsoon Mage // Ral, Leyline Prodigy");
         let scopes: Vec<_> = corpus.faces.iter().map(|f| f.scope.clone()).collect();
         assert_eq!(
             scopes,
             [
-                BTreeSet::from([card_name_lexeme("Ral, Monsoon Mage"), card]),
-                BTreeSet::from([card_name_lexeme("Ral, Leyline Prodigy"), card]),
+                BTreeSet::from([card_name_id("Ral, Monsoon Mage"), card]),
+                BTreeSet::from([card_name_id("Ral, Leyline Prodigy"), card]),
             ]
         );
     }

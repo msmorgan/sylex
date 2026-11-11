@@ -6,7 +6,7 @@
 
 use std::collections::BTreeSet;
 
-use sylex_english::corpus::card_name_lexeme;
+use sylex_vocabulary::card_name_id;
 use sylex_lexicon::Lexicon;
 use sylex_vocabulary::LexicalEnvironment;
 
@@ -63,7 +63,7 @@ fn named_readings(lexicon: &Lexicon, env: &LexicalEnvironment) -> Vec<(&'static 
     UNITS
         .iter()
         .map(|(card, text)| {
-            let scope = BTreeSet::from([card_name_lexeme(card)]);
+            let scope = BTreeSet::from([card_name_id(card)]);
             let parse = grammar.parse_analyzed(&lexicon.analyze_source_scoped(text, None, &scope));
             let readings: Vec<_> = parse.readings().collect();
             assert!(!readings.is_empty(), "{card}: no Reading");

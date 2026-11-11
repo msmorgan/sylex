@@ -34,6 +34,7 @@ use crate::build::card_scoped;
 use crate::build::exact;
 use crate::build::source;
 pub use crate::data_text::read_data_file;
+pub use crate::names::card_name_id;
 pub use crate::names::shortened_name;
 use crate::schema::AbilityWord;
 use crate::schema::AdjectiveDecl;

@@ -70,7 +70,7 @@ fn a_distributive_adjunct_attaches_to_the_outermost_predicate() {
 fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let own = sylex_english::corpus::card_name_lexeme("Nicol Bolas, the Deceiver");
+    let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Deceiver");
     let scope = std::collections::BTreeSet::from([own]);
     let text = "Nicol Bolas deals 7 damage to each opponent.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
@@ -91,13 +91,13 @@ fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
 fn after_named_a_face_s_own_name_ranks_before_another_card_s_spelled_alike() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let own = sylex_english::corpus::card_name_lexeme("Nicol Bolas, the Deceiver");
+    let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Deceiver");
     let scope = std::collections::BTreeSet::from([own]);
     let text = "Search your library for a card named Nicol Bolas.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 2);
-    let other = sylex_english::corpus::card_name_lexeme("Nicol Bolas");
+    let other = sylex_vocabulary::card_name_id("Nicol Bolas");
     assert!(
         names(&grammar, &env, &ranked[0].1)
             .iter()

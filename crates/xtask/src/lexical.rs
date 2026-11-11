@@ -14,7 +14,7 @@ use anyhow::Result;
 use anyhow::ensure;
 use rayon::prelude::*;
 use serde::Serialize;
-use sylex_english::corpus::card_name_lexeme;
+use sylex_vocabulary::card_name_id;
 use sylex_lexicon::AnalyzedText;
 use sylex_lexicon::Category;
 use sylex_lexicon::LexemeId;
@@ -348,8 +348,8 @@ fn analyze_face(face: &SelectedFace, lexicon: &Lexicon) -> Result<Option<(FaceRe
     };
     // A face's text names its own face and card [CR#201.5c].
     let scope = BTreeSet::from([
-        card_name_lexeme(&face.name),
-        card_name_lexeme(&face.group_name),
+        card_name_id(&face.name),
+        card_name_id(&face.group_name),
     ]);
     let analyzed = lexicon.analyze_source_scoped(raw, None, &scope);
     let mut inventory = Inventory::default();

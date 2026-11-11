@@ -14,7 +14,7 @@ use sylex_syntax::Gap;
 use sylex_syntax::Parse;
 use sylex_syntax::Reading;
 
-use crate::corpus::card_name_lexeme;
+use sylex_vocabulary::card_name_id;
 
 /// More Readings than this and an entry is not evaluated tree by tree.
 pub const READING_LIMIT: u128 = 4096;
@@ -345,7 +345,7 @@ fn parse_assertion(text: &str) -> Result<Assertion, String> {
 /// The card names an entry puts in scope.
 #[must_use]
 pub fn scope(entry: &Judgment) -> BTreeSet<LexemeId> {
-    entry.card.iter().map(|c| card_name_lexeme(c)).collect()
+    entry.card.iter().map(|c| card_name_id(c)).collect()
 }
 
 /// Round-trip law 2 for one Reading of `parse`: admitted, realized, and
