@@ -71,6 +71,9 @@ pub enum SlotFill {
     /// kind (*do the same for [Vampire]*, a cited word, never *for flying*).
     PP(Vec<LexemeId>, #[serde(default)] Option<SlotKind>),
     Pred,
+    /// A name, the predicative complement of *name* (*cards named
+    /// Relentless Rats*).
+    Name,
     AdjP,
     /// An adverbial: an Adverb Phrase or a Noun Phrase of frequency, as
     /// *twice* or *three times* in *more than twice*.
@@ -169,6 +172,7 @@ impl SlotFill {
             Self::NP => SlotKind::NP,
             Self::PP(..) => SlotKind::PP,
             Self::Pred => SlotKind::Pred,
+            Self::Name => SlotKind::Name,
             Self::AdjP => SlotKind::AdjP,
             Self::AdvP => SlotKind::AdvP,
             Self::LocativeNP => SlotKind::LocativeNP,
@@ -275,7 +279,7 @@ impl Frame {
                 shape[..],
                 [
                     (Object, SlotFill::NP),
-                    (PredicativeComplement, SlotFill::Pred)
+                    (PredicativeComplement, SlotFill::Pred | SlotFill::Name)
                 ]
             ),
             FrameFamily::ComplexCatenative => matches!(

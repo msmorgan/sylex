@@ -2,6 +2,8 @@
 //! of, or all of, the mana*, Illusionary Mask), and a Preposition Phrase that
 //! passes up no Gap from inside its Complement (`closed_complement`).
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -77,7 +79,11 @@ fn count(coordination: &str, preposition: &str, text: &str) -> usize {
     let grammar = grammar(&lexicon, coordination, preposition).unwrap();
     let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
+        assert_eq!(
+            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{text}"
+        );
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     found.len()

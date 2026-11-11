@@ -180,13 +180,6 @@ pub struct ProductionDecl {
     /// ends in one is followed by nothing but a period.
     #[serde(default)]
     pub unclosed: bool,
-    /// Lexical children that cost one more where analysis did not admit
-    /// their leaf through the scope of the face whose text is parsed (one of
-    /// the face's own names, or a card-scoped spelling such as its Shortened
-    /// Name [CR#201.5c]): another card's full name. A Production Cost
-    /// preference, never an admission condition.
-    #[serde(default)]
-    pub scoped: Vec<Ident>,
     /// Children that are not themselves a coordination, where a coordination
     /// one level up is the same analysis (a chain of bare imperatives).
     #[serde(default)]
@@ -228,9 +221,13 @@ pub enum SymbolDecl {
     Free(Ident, Ident),
     /// A numeral in a specific notation.
     Numeral(Ident, sylex_lexicon::Numeral),
-    /// Any word of a lexical Category.
+    /// Any word of a lexical Category, except another card's name.
     Lex(Ident, sylex_lexicon::Category),
     FreeLex(Ident, sylex_lexicon::Category),
+    /// Another card's name: a card name [CR#201.1] in the text of a face
+    /// that is not that card's [CR#201.5]. No other symbol admits one, so a
+    /// position opts in to another card's name by naming this symbol.
+    OtherCardName(Ident),
     /// The Closed Word of that grammar name.
     Word(Ident, Ident),
     /// Any member of the Lexical Class of that grammar name.

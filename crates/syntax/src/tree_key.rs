@@ -5,9 +5,6 @@
 //! exists to check it, and is compiled only for tests (the `tree-ranking-key`
 //! feature, which the test targets of this workspace enable).
 
-use std::collections::BTreeSet;
-
-use sylex_lexicon::LexemeId;
 use sylex_lexicon::Lexicon;
 
 use crate::compile::CompiledGrammar;
@@ -23,8 +20,6 @@ use crate::step::Symbol;
 /// and Constituents.
 struct KeyContext<'r> {
     lexicon: &'r Lexicon,
-    /// The card-name Lexemes the Reading's text is in the scope of.
-    scope: &'r BTreeSet<LexemeId>,
     text: &'r str,
     constituents: &'r [Constituent],
 }
@@ -52,8 +47,7 @@ impl KeyContext<'_> {
 impl CompiledGrammar {
     /// A Reading's Ranking Key, computed from the tree: the sum of its
     /// Productions' keys and of the Right Association words each of its
-    /// children adds, counted on the Reading's realized text. `scope` is the
-    /// card-name scope its text was analyzed in.
+    /// children adds, counted on the Reading's realized text.
     ///
     /// # Errors
     /// The Reading cannot be realized with this lexicon.
@@ -61,12 +55,10 @@ impl CompiledGrammar {
         &self,
         reading: &Reading,
         lexicon: &Lexicon,
-        scope: &BTreeSet<LexemeId>,
     ) -> Result<RankingKey, AdmissionError> {
         let (text, constituents) = self.constituents(reading, lexicon)?;
         let context = KeyContext {
             lexicon,
-            scope,
             text: &text,
             constituents: &constituents,
         };
@@ -105,11 +97,6 @@ impl CompiledGrammar {
             .filter(|(_, symbol)| !matches!(symbol, Symbol::Punct(..)))
             .map(|(i, _)| i)
             .collect();
-        for (child, &at) in node.children.iter().zip(&positions) {
-            if let Reading::Leaf(leaf) = child {
-                key = key + self.leaf_key(production, at, self.scoped(leaf, context.scope));
-            }
-        }
         let first = names
             .iter()
             .position(|name| name.as_str() == "first")

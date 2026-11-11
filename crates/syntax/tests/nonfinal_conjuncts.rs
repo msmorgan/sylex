@@ -4,6 +4,8 @@
 //! them …*). After the last conjunct the Supplement is the Clause's, so each
 //! string keeps one Supplement site (CGEL, Ch. 15 §5.1, p. 1351).
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -87,7 +89,11 @@ fn reading(text: &str) -> Reading {
     let mut readings = parse.readings().collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
     let reading = readings.remove(0);
-    assert_eq!(grammar.admit(&reading, &lexicon), Ok(()), "{text}");
+    assert_eq!(
+        grammar.admit(&reading, &lexicon, &BTreeSet::new()),
+        Ok(()),
+        "{text}"
+    );
     assert_eq!(grammar.realize(&reading, &lexicon).unwrap(), text);
     reading
 }

@@ -112,9 +112,19 @@ impl Prediction {
                 category: facts.category,
                 features: [None; MAX_FEATURES],
                 forms: 0,
+                other_card_name: false,
             };
             let mut mask = vec![0; words];
             prediction.add_tests(grammar, &leaf, Some(facts), &mut mask);
+            // A card name is the face's own or another card's by the face's
+            // scope, so it predicts the terminals of both.
+            if grammar.card_names.contains(&id) {
+                let other = LeafFacts {
+                    other_card_name: true,
+                    ..leaf
+                };
+                prediction.add_tests(grammar, &other, Some(facts), &mut mask);
+            }
             prediction.lexemes.insert(id, mask);
         }
         prediction

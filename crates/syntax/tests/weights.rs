@@ -2,6 +2,8 @@
 //! (more than one), as a single postpositive participle differs from a
 //! participial clause.
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -52,7 +54,11 @@ fn a_light_child_is_one_leaf_and_a_heavy_child_more() {
         let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
         assert_eq!(found.len(), readings, "{text}: {found:#?}");
         for reading in &found {
-            assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
+            assert_eq!(
+                grammar.admit(reading, &lexicon, &BTreeSet::new()),
+                Ok(()),
+                "{text}"
+            );
         }
     }
 }

@@ -161,6 +161,9 @@ pub(crate) enum Test {
     FreeFrame(usize),
     /// A preposition that declares this complement frame.
     PrepositionFrame(usize),
+    /// Another card's name (`LeafFacts::other_card_name`), which no other
+    /// test admits.
+    OtherCardName,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -274,9 +277,6 @@ pub(crate) struct Production {
     /// Children that may not be, nor be headed by, a Linked Coordination
     /// (`Summary::link`).
     pub unlinked: Vec<usize>,
-    /// Lexical children that cost one more where their leaf was not admitted
-    /// through the face's scope (`ProductionDecl::scoped`).
-    pub scoped: Vec<usize>,
     /// It is a coordination delimited before its coordinator.
     pub delimits: bool,
     /// It is a serial tail of a coordination (*…, [B, and C]*): its `first`
@@ -533,7 +533,6 @@ pub(crate) fn resolve(
         uncoordinated: Vec::new(),
         unlinked: Vec::new(),
         coordinated: Vec::new(),
-        scoped: Vec::new(),
         delimits: false,
         tail: false,
         chained: None,
@@ -895,6 +894,10 @@ pub(crate) struct LeafFacts {
     /// The word forms of every Word spelled like it, ignoring case, as a
     /// mask (`form_bit`).
     pub forms: u16,
+    /// It is another card's name: a card name [CR#201.1] the scope of the
+    /// face whose text is parsed does not hold [CR#201.5]. Only
+    /// [`Test::OtherCardName`] admits it, and that admits nothing else.
+    pub other_card_name: bool,
 }
 
 pub(crate) enum ChildView<'a> {
@@ -2146,7 +2149,12 @@ impl CompiledGrammar {
         leaf: &LeafFacts,
         facts: Option<&LexemeFacts>,
     ) -> bool {
+        // Another card's name fills only a position that opts in to it.
+        if leaf.other_card_name != (*test == Test::OtherCardName) {
+            return false;
+        }
         match test {
+            Test::OtherCardName => true,
             Test::Lexical(category) => leaf.category == *category,
             Test::FreeLexical(category) => {
                 leaf.category == *category
@@ -2181,8 +2189,13 @@ impl CompiledGrammar {
         }
     }
 
-    /// Projects a lexical alternative into the leaf a Production sees.
-    pub(crate) fn leaf_facts(&self, reading: &LexicalReading) -> Option<LeafFacts> {
+    /// Projects a lexical alternative into the leaf a Production sees, in
+    /// the text of a face whose own card names are `scope`.
+    pub(crate) fn leaf_facts(
+        &self,
+        reading: &LexicalReading,
+        scope: &std::collections::BTreeSet<LexemeId>,
+    ) -> Option<LeafFacts> {
         match reading {
             LexicalReading::Word(value) => {
                 let facts = self.lexemes.get(&value.lexeme)?;
@@ -2235,6 +2248,8 @@ impl CompiledGrammar {
                         .get(value)
                         .copied()
                         .unwrap_or_else(|| form_bit(value.form)),
+                    other_card_name: self.card_names.contains(&value.lexeme)
+                        && !scope.contains(&value.lexeme),
                 })
             }
             LexicalReading::Numeral {
@@ -2271,6 +2286,7 @@ impl CompiledGrammar {
                     features
                 },
                 forms: 0,
+                other_card_name: false,
             }),
             LexicalReading::FlavorWord { .. } => Some(LeafFacts {
                 binding: sylex_lexicon::Binding::Free,
@@ -2280,6 +2296,7 @@ impl CompiledGrammar {
                 category: LexicalCategory::FlavorWord,
                 features: [None; MAX_FEATURES],
                 forms: 0,
+                other_card_name: false,
             }),
         }
     }

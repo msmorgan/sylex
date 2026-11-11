@@ -43,9 +43,6 @@ pub(crate) struct Leaf {
     pub end: usize,
     pub reading: LexicalReading,
     pub facts: LeafFacts,
-    /// It was admitted through the scope of the face whose text is parsed:
-    /// one of the face's own names, or a card-scoped spelling.
-    pub scoped: bool,
 }
 
 /// A child of a partial Production in a Packed Forest: a completed
@@ -156,6 +153,8 @@ pub struct Parse<'g> {
     pub forest: PackedForest,
     /// Words no declared lexeme spells, as char ranges.
     pub vocabulary_gaps: Vec<Range<usize>>,
+    /// The card names the text was analyzed in the scope of.
+    pub(crate) scope: std::collections::BTreeSet<sylex_lexicon::LexemeId>,
 }
 
 impl<'g> Parse<'g> {
@@ -451,14 +450,13 @@ impl CompiledGrammar {
             }) {
                 continue;
             }
-            if let Some(facts) = self.leaf_facts(&found.reading) {
+            if let Some(facts) = self.leaf_facts(&found.reading, &analyzed.scope) {
                 by_start[found.start].push(forest.leaves.len());
                 forest.leaves.push(Leaf {
                     start: found.start,
                     end: found.end,
                     reading: found.reading.clone(),
                     facts,
-                    scoped: self.scoped(&found.reading, &analyzed.scope),
                 });
             }
         }
@@ -775,6 +773,7 @@ impl CompiledGrammar {
             tokens: logical,
             forest,
             vocabulary_gaps: analyzed.unknown_words(),
+            scope: analyzed.scope.clone(),
         }
     }
 }

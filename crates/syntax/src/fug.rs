@@ -45,7 +45,7 @@
 //! `[role:]"Category"` (set in quotation marks), `'c'` (punctuation),
 //! `'c':Binding` (a mark), or `[role:]Kind(args)` for the other
 //! [`SymbolDecl`] kinds (`Class(X)`, `Word(X)`, `Lex(Noun)`, `Free(X)`,
-//! `FreeLex(Noun)`, `Numeral(Cardinal)`, `Numeral(Arabic(false))`,
+//! `FreeLex(Noun)`, `OtherCardName()`, `Numeral(Cardinal)`, `Numeral(Arabic(false))`,
 //! `Hosted(X, Nominal)`, `Attached(X, Suffix)`, `Selected(X, Of, ...)`). An
 //! equation is `path = Value` (require), `path = path` (agree),
 //! `path := Value` (carry), `path != A | B` (exclude each), or

@@ -3,6 +3,8 @@
 //! Adjuncts set off by one comma both bear `adjunct`, and a requirement on
 //! `adjunct` holds of both.
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -49,7 +51,11 @@ fn count(equations: &str, text: &str) -> usize {
     let grammar = grammar(&lexicon, equations).unwrap();
     let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
+        assert_eq!(
+            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{text}"
+        );
     }
     found.len()
 }

@@ -287,12 +287,14 @@ impl Parse<'_> {
             })
     }
 
-    /// Admission of `reading` as the Category this Parse was made for.
+    /// Admission of `reading` as the Category this Parse was made for, in the
+    /// card-name scope its text was analyzed in.
     ///
     /// # Errors
     /// As [`crate::CompiledGrammar::admit`].
     pub fn admit(&self, reading: &Reading, lexicon: &Lexicon) -> Result<(), AdmissionError> {
-        self.grammar.admit_as(reading, lexicon, self.root)
+        self.grammar
+            .admit_as(reading, lexicon, self.root, &self.scope)
     }
 
     /// The Category this Parse was made for.

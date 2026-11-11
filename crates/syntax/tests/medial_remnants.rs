@@ -2,6 +2,8 @@
 //! an element at the beginning of each medial conjunct elided and recovered
 //! from the initial one (CGEL, Ch. 15 §3.6, pp. 1335–1336, [31]).
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -61,7 +63,11 @@ fn count(text: &str) -> usize {
     .unwrap();
     let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
+        assert_eq!(
+            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{text}"
+        );
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     found.len()

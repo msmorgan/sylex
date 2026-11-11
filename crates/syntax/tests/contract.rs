@@ -109,7 +109,11 @@ fn checked(
         assert_eq!(parse.verify_realization(lexicon), Ok(()), "{text}");
     }
     for reading in &readings {
-        assert_eq!(grammar.admit(reading, lexicon), Ok(()), "{reading:#?}");
+        assert_eq!(
+            grammar.admit(reading, lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{reading:#?}"
+        );
         let surface = grammar.realize(reading, lexicon).unwrap();
         assert_eq!(surface, text);
         assert!(
@@ -321,7 +325,7 @@ fn multiword_lexeme_is_atomic_and_needs_its_separator() {
         .collect::<Vec<_>>();
     assert_eq!(decomposed.len(), 1);
     assert!(matches!(
-        grammar.admit(&decomposed[0], &lexicon),
+        grammar.admit(&decomposed[0], &lexicon, &BTreeSet::new()),
         Err(AdmissionError::Rejected { production, .. }) if production == "lexical atomicity"
     ));
     // Neither lexical nor constructional realization inserts two spaces.
@@ -396,7 +400,7 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
     let apart = bind(source, &separate, NO_FRAMES).unwrap();
     let rejected = |reading: &Reading, grammar: &CompiledGrammar, lexicon: &Lexicon| {
         matches!(
-            grammar.admit(reading, lexicon),
+            grammar.admit(reading, lexicon, &BTreeSet::new()),
             Err(AdmissionError::Rejected { production, .. }) if production == "lexical atomicity"
         )
     };
@@ -410,7 +414,10 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
         .partition(|r| r.node().is_some_and(|n| n.production.as_str() == "Split"));
     assert_eq!(straddling.len(), 1);
     assert_ne!(rebuilt, []);
-    assert_eq!(grammar.admit(&straddling[0], &lexicon), Ok(()));
+    assert_eq!(
+        grammar.admit(&straddling[0], &lexicon, &BTreeSet::new()),
+        Ok(())
+    );
     for reading in &rebuilt {
         assert!(rejected(reading, &grammar, &lexicon), "{reading:#?}");
     }
@@ -687,11 +694,15 @@ fn agreement_keeps_joint_alternatives_correlated() {
     let sg3 = (Number::Singular, Person::Third);
     let pl3 = (Number::Plural, Person::Third);
     let it_sees = built(bundle(sg3.0, sg3.1), "pr:it", finite(sg3.0, sg3.1));
-    assert_eq!(grammar.admit(&it_sees, &lexicon), Ok(()));
+    assert_eq!(grammar.admit(&it_sees, &lexicon, &BTreeSet::new()), Ok(()));
     let crossed = built(bundle(sg3.0, sg3.1), "pr:x", finite(sg3.0, sg3.1));
-    assert!(grammar.admit(&crossed, &lexicon).is_err());
+    assert!(grammar.admit(&crossed, &lexicon, &BTreeSet::new()).is_err());
     let disagreeing = built(bundle(sg3.0, sg3.1), "pr:it", finite(pl3.0, pl3.1));
-    assert!(grammar.admit(&disagreeing, &lexicon).is_err());
+    assert!(
+        grammar
+            .admit(&disagreeing, &lexicon, &BTreeSet::new())
+            .is_err()
+    );
 }
 
 /// Imperatives whose objects take gapped relative clauses.
@@ -1069,7 +1080,7 @@ fn assert_family(
     let mut groups: BTreeMap<String, BTreeSet<Reading>> = BTreeMap::new();
     for built in family {
         assert_eq!(
-            grammar.admit_category(&built, lexicon, category),
+            grammar.admit_category(&built, lexicon, category, &BTreeSet::new()),
             Ok(()),
             "{built:#?}"
         );
@@ -1271,7 +1282,7 @@ fn numeral_sign_survives_phrase_projection_and_controls_admission() {
             )],
         );
         if value < 0 {
-            assert!(grammar.admit(&reading, &lexicon).is_err());
+            assert!(grammar.admit(&reading, &lexicon, &BTreeSet::new()).is_err());
             assert!(readings(&grammar, &lexicon, &value.to_string()).is_empty());
         } else {
             let surface = grammar.realize(&reading, &lexicon).unwrap();

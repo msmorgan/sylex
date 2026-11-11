@@ -5,8 +5,6 @@
 //! then has the Attachment Class the tree computes: the forest's Ranking Key
 //! equals the tree's (`docs/decisions/english.md` §5).
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -66,10 +64,7 @@ fn a_last_conjunct_ending_in_a_dependent_has_the_same_forest_and_tree_key() {
     // The first conjunct ends in its head and the last in a dependent: the
     // dependent belongs to the whole coordination, so the Class is counted.
     assert_eq!(key.attachment_class, 1);
-    assert_eq!(
-        grammar.ranking_key(reading, &lexicon, &BTreeSet::new()),
-        Ok(*key)
-    );
+    assert_eq!(grammar.ranking_key(reading, &lexicon), Ok(*key));
 }
 
 #[test]
@@ -81,8 +76,5 @@ fn a_last_conjunct_ending_in_its_head_has_the_same_forest_and_tree_key() {
     assert_eq!(ranked.len(), 1, "{ranked:#?}");
     let (key, reading) = &ranked[0];
     assert_eq!(key.attachment_class, 0);
-    assert_eq!(
-        grammar.ranking_key(reading, &lexicon, &BTreeSet::new()),
-        Ok(*key)
-    );
+    assert_eq!(grammar.ranking_key(reading, &lexicon), Ok(*key));
 }

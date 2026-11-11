@@ -5,6 +5,8 @@
 //! connective as a front Adjunct, and a child declared `unlinked` (a
 //! subordinate clause) is never one.
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -75,7 +77,11 @@ fn readings(text: &str) -> Vec<Reading> {
     let readings = parse.readings().collect::<Vec<_>>();
     assert_eq!(parse.verify_realization(&lexicon), Ok(()), "{text}");
     for reading in &readings {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
+        assert_eq!(
+            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{text}"
+        );
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     readings

@@ -4,6 +4,8 @@
 //! Internalised Complement (CGEL,
 //! Ch. 8 §5.2, p. 692; Ch. 16 §10.1.1, p. 1428).
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -109,7 +111,7 @@ fn families(internalised: &str, text: &str) -> Vec<Option<FrameFamily>> {
     let grammar = grammar(&lexicon, internalised).unwrap();
     let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()));
+        assert_eq!(grammar.admit(reading, &lexicon, &BTreeSet::new()), Ok(()));
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     let mut families: Vec<_> = readings.iter().map(family).collect();

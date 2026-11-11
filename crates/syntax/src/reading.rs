@@ -75,9 +75,7 @@ pub struct RankingKey {
     /// Right Association: the words between unselected dependents and the
     /// heads of their hosts, reversed for a dependent that attaches high.
     pub right_association_words: i64,
-    /// The summed Production Cost, with one more for each `scoped` lexical
-    /// child admitted outside the parsed face's scope
-    /// ([`crate::grammar::ProductionDecl::scoped`]).
+    /// The summed Production Cost.
     pub production_cost: u64,
 }
 
@@ -235,8 +233,7 @@ impl Parse<'_> {
             };
             let here = match child {
                 ChildRef::Node(n) => self.tier_node(n, memo),
-                ChildRef::Leaf(l) => Some((self.leaf_key(item, l), 1)),
-                ChildRef::Punct => Some((RankingKey::default(), 1)),
+                ChildRef::Leaf(_) | ChildRef::Punct => Some((RankingKey::default(), 1)),
             };
             for (anchors, before) in befores {
                 let edge = self.edge_key(item, anchors, previous, child);
@@ -251,13 +248,6 @@ impl Parse<'_> {
             memo.items.insert(item, tiers.clone());
         }
         tiers
-    }
-
-    /// The key leaf `leaf` adds as the child that `item` took last.
-    fn leaf_key(&self, item: usize, leaf: usize) -> RankingKey {
-        let it = &self.forest.items[item];
-        self.grammar
-            .leaf_key(it.production, it.dot - 1, self.forest.leaves[leaf].scoped)
     }
 
     /// The Ranking Key a child adds where an item takes it after `previous`,
@@ -518,7 +508,7 @@ impl<'a, 'g> Enumeration<'a, 'g> {
                 ChildRef::Node(n) => Some(self.node_stream(n, memo)),
                 ChildRef::Leaf(l) => {
                     let tree = self.tree(TreeEntry::Leaf(l));
-                    Some(self.singleton(self.parse.leaf_key(item, l), Value::Tree(tree)))
+                    Some(self.singleton(RankingKey::default(), Value::Tree(tree)))
                 }
                 ChildRef::Punct => None,
             };
@@ -967,29 +957,6 @@ impl CompiledGrammar {
         }
     }
 
-    /// The key a leaf adds as the child at right-hand-side position `at`:
-    /// one more Production Cost where the Production declares it `scoped`
-    /// and the leaf was not admitted through the face's scope, so that
-    /// another card's full name ranks after the face's own name spelled
-    /// alike.
-    pub(crate) fn leaf_key(&self, production: usize, at: usize, scoped: bool) -> RankingKey {
-        RankingKey {
-            production_cost: u64::from(
-                self.productions[production].scoped.contains(&at) && !scoped,
-            ),
-            ..RankingKey::default()
-        }
-    }
-
-    /// Whether a leaf was admitted through the scope of the face whose text
-    /// is parsed: one of the face's own names (`scope`), or a card-scoped
-    /// spelling, which analysis admits only within its card's scope.
-    pub(crate) fn scoped(&self, leaf: &LexicalReading, scope: &BTreeSet<LexemeId>) -> bool {
-        matches!(leaf, LexicalReading::Word(value)
-            if scope.contains(&value.lexeme)
-                || self.card_scoped.contains(&(value.lexeme, value.variant)))
-    }
-
     pub(crate) fn feature_map(&self, category: usize, summary: &Summary) -> BTreeMap<Ident, Ident> {
         self.category_features[category]
             .iter()
@@ -1002,12 +969,18 @@ impl CompiledGrammar {
     }
 
     /// Admission without parsing: whether `reading` is a Reading of the root
-    /// Category that this grammar and lexicon accept.
+    /// Category that this grammar and lexicon accept in the text of a face
+    /// whose own card names are `scope`.
     ///
     /// # Errors
     /// The first violation found.
-    pub fn admit(&self, reading: &Reading, lexicon: &Lexicon) -> Result<(), AdmissionError> {
-        self.admit_as(reading, lexicon, self.root)
+    pub fn admit(
+        &self,
+        reading: &Reading,
+        lexicon: &Lexicon,
+        scope: &BTreeSet<LexemeId>,
+    ) -> Result<(), AdmissionError> {
+        self.admit_as(reading, lexicon, self.root, scope)
     }
 
     /// Admission without parsing as the named Category instead of the root.
@@ -1020,11 +993,12 @@ impl CompiledGrammar {
         reading: &Reading,
         lexicon: &Lexicon,
         category: &str,
+        scope: &BTreeSet<LexemeId>,
     ) -> Result<(), AdmissionError> {
         let root = self
             .category_id(category)
             .ok_or_else(|| AdmissionError::Root(category.to_owned()))?;
-        self.admit_as(reading, lexicon, root)
+        self.admit_as(reading, lexicon, root, scope)
     }
 
     /// Admission as Category `root`.
@@ -1033,8 +1007,9 @@ impl CompiledGrammar {
         reading: &Reading,
         lexicon: &Lexicon,
         root: usize,
+        scope: &BTreeSet<LexemeId>,
     ) -> Result<(), AdmissionError> {
-        let (category, summary) = self.summarize(reading, lexicon)?;
+        let (category, summary) = self.summarize(reading, lexicon, scope)?;
         if category != root || summary.gap != Gap::None {
             return Err(AdmissionError::Root(self.categories[category].to_string()));
         }
@@ -1140,6 +1115,7 @@ impl CompiledGrammar {
         &self,
         reading: &Reading,
         lexicon: &Lexicon,
+        scope: &BTreeSet<LexemeId>,
     ) -> Result<(usize, Summary), AdmissionError> {
         let Reading::Node(node) = reading else {
             return Err(AdmissionError::Leaf);
@@ -1163,7 +1139,7 @@ impl CompiledGrammar {
                         return Err(reject("expected a lexical leaf"));
                     };
                     lexicon.realize(value).map_err(|_| AdmissionError::Leaf)?;
-                    let facts = self.leaf_facts(value).ok_or(AdmissionError::Leaf)?;
+                    let facts = self.leaf_facts(value, scope).ok_or(AdmissionError::Leaf)?;
                     if !self.leaf_matches(test, &facts) {
                         return Err(reject("leaf does not satisfy its symbol"));
                     }
@@ -1173,7 +1149,7 @@ impl CompiledGrammar {
                     let Some(child) = children.next() else {
                         return Err(reject("missing child"));
                     };
-                    let (child_category, summary) = self.summarize(child, lexicon)?;
+                    let (child_category, summary) = self.summarize(child, lexicon, scope)?;
                     if child_category != *category {
                         return Err(reject("child has the wrong category"));
                     }

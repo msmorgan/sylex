@@ -7,6 +7,8 @@
 //! the one before it (*the card and mana*), and so, with a resolved feature,
 //! of every conjunct before it.
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -77,7 +79,11 @@ fn readings(coordination: &str, text: &str) -> Vec<Reading> {
     let grammar = grammar(&lexicon, coordination).unwrap();
     let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()), "{text}");
+        assert_eq!(
+            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{text}"
+        );
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     readings

@@ -5,6 +5,8 @@
 //! does a head spelled like a verb in the omitted Complement's form, which
 //! would be that Complement.
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -79,7 +81,11 @@ fn grammar(lexicon: &Lexicon, elliptical: &str) -> CompiledGrammar {
 fn count(grammar: &CompiledGrammar, lexicon: &Lexicon, text: &str) -> usize {
     let found = grammar.parse(lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
-        assert_eq!(grammar.admit(reading, lexicon), Ok(()), "{text}");
+        assert_eq!(
+            grammar.admit(reading, lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{text}"
+        );
     }
     found.len()
 }

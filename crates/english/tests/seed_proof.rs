@@ -4,6 +4,8 @@
 
 mod seed;
 
+use std::collections::BTreeSet;
+
 use dpsi::Ident;
 use sylex_lexicon::Lexicon;
 use sylex_syntax::CompiledGrammar;
@@ -50,7 +52,10 @@ impl Seed {
         );
         let readings = parse.readings().collect::<Vec<_>>();
         for reading in &readings {
-            assert_eq!(self.grammar.admit(reading, &self.lexicon), Ok(()));
+            assert_eq!(
+                self.grammar.admit(reading, &self.lexicon, &BTreeSet::new()),
+                Ok(())
+            );
             assert_eq!(self.grammar.realize(reading, &self.lexicon).unwrap(), text);
         }
         readings
@@ -107,7 +112,11 @@ impl Seed {
     /// a Reading of the parse of its realization.
     fn reparses(&self, reading: &Reading) {
         let rebuilt: Reading = ron::from_str(&ron::to_string(reading).unwrap()).unwrap();
-        assert_eq!(self.grammar.admit(&rebuilt, &self.lexicon), Ok(()));
+        assert_eq!(
+            self.grammar
+                .admit(&rebuilt, &self.lexicon, &BTreeSet::new()),
+            Ok(())
+        );
         let surface = self.surface(&rebuilt);
         assert!(self.readings(&surface).contains(&rebuilt), "{surface}");
     }
@@ -215,12 +224,7 @@ fn ranking_key_ranks_a_higher_component_over_any_amount_of_a_lower_one() {
             .len()
     );
     for (key, reading) in &ranked {
-        assert_eq!(
-            *key,
-            s.grammar
-                .ranking_key(reading, &s.lexicon, &std::collections::BTreeSet::new())
-                .unwrap()
-        );
+        assert_eq!(*key, s.grammar.ranking_key(reading, &s.lexicon).unwrap());
         assert_eq!(key.attachment_class, 0);
     }
     assert!(ranked.windows(2).all(|w| w[0] < w[1]));
@@ -430,7 +434,8 @@ fn role(symbol: &SymbolDecl) -> Option<&Ident> {
         | SymbolDecl::Class(role, _)
         | SymbolDecl::Hosted(role, ..)
         | SymbolDecl::Selected(role, ..)
-        | SymbolDecl::Quoted(role, _) => Some(role),
+        | SymbolDecl::Quoted(role, _)
+        | SymbolDecl::OtherCardName(role) => Some(role),
         SymbolDecl::Punct(_) | SymbolDecl::Mark(..) => None,
     }
 }
@@ -547,7 +552,9 @@ fn normal_form_identifies_clause_and_verb_phrase_coordination_of_imperatives() {
     });
     let excluded = replace(&clauses, coordination, &excluded);
     assert!(
-        s.grammar.admit(&excluded, &s.lexicon).is_err(),
+        s.grammar
+            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .is_err(),
         "a chain of bare imperatives is coordinated imperative Clauses"
     );
     assert_eq!(
@@ -591,7 +598,9 @@ fn normal_form_identifies_bare_noun_phrase_and_nominal_coordination() {
     let excluded = replace(phrases, coordination, &excluded);
     assert_eq!(s.surface(&excluded), s.surface(phrases));
     assert!(
-        s.grammar.admit(&excluded, &s.lexicon).is_err(),
+        s.grammar
+            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .is_err(),
         "a bare Noun Phrase's Nominal is no coordination"
     );
     assert_eq!(
@@ -665,7 +674,11 @@ fn normal_form_identifies_same_head_complement_priority() {
         })],
         ..sentence.clone()
     });
-    assert!(s.grammar.admit(&excluded, &s.lexicon).is_err());
+    assert!(
+        s.grammar
+            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .is_err()
+    );
     assert_eq!(
         s.grammar.normal_form(&excluded),
         s.grammar.normal_form(&complement)
@@ -696,7 +709,9 @@ fn normal_form_identifies_groupings_of_one_coordinator() {
     });
     let nested = replace(&serial, top, &nested);
     assert!(
-        s.grammar.admit(&nested, &s.lexicon).is_err(),
+        s.grammar
+            .admit(&nested, &s.lexicon, &BTreeSet::new())
+            .is_err(),
         "one tree per chain"
     );
     let normal = s.grammar.normal_form(&serial);
@@ -765,7 +780,9 @@ fn adjuncts_attach_below_a_non_modal_auxiliary() {
     let excluded = replace(verbal, auxiliary, &excluded);
     assert_eq!(s.surface(&excluded), s.surface(verbal));
     assert!(
-        s.grammar.admit(&excluded, &s.lexicon).is_err(),
+        s.grammar
+            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .is_err(),
         "an uncoordinated auxiliary Verb Phrase hosts no post-verbal Adjunct"
     );
     assert_eq!(
@@ -844,7 +861,11 @@ fn normal_form_identifies_a_fronted_dependent_outermost() {
     });
     let excluded = replace(canonical, front, &excluded);
     assert_eq!(s.surface(&excluded), s.surface(canonical));
-    assert!(s.grammar.admit(&excluded, &s.lexicon).is_err());
+    assert!(
+        s.grammar
+            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .is_err()
+    );
     assert_eq!(
         s.grammar.normal_form(&excluded),
         s.grammar.normal_form(canonical)

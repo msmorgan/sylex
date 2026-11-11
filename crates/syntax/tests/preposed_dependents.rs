@@ -80,10 +80,7 @@ fn a_dependent_the_one_before_it_can_hold_ranks_first_inside_it() {
     let (stacked, reading) = &ranked[1];
     assert!(uses(reading, "PreposedPair"));
     assert_eq!(stacked.attachment_class, 1);
-    assert_eq!(
-        grammar.ranking_key(reading, &lexicon, &BTreeSet::new()),
-        Ok(*stacked)
-    );
+    assert_eq!(grammar.ranking_key(reading, &lexicon), Ok(*stacked));
     assert_eq!(parse.admit(reading, &lexicon), Ok(()));
 }
 
@@ -99,5 +96,5 @@ fn a_stacked_dependent_with_no_other_site_is_the_reading() {
         .collect::<Vec<_>>();
     assert_eq!(found.len(), 1, "{found:#?}");
     assert!(uses(&found[0], "PreposedPair"));
-    assert_eq!(grammar.admit(&found[0], &lexicon), Ok(()));
+    assert_eq!(grammar.admit(&found[0], &lexicon, &BTreeSet::new()), Ok(()));
 }

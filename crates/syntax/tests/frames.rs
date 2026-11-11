@@ -1,6 +1,8 @@
 //! Subcategorization Frames drive phrases uniformly for every head
 //! category, not only verbs and prepositions.
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -98,7 +100,7 @@ fn readings(text: &str) -> Vec<Reading> {
     .unwrap();
     let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()));
+        assert_eq!(grammar.admit(reading, &lexicon, &BTreeSet::new()), Ok(()));
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     readings

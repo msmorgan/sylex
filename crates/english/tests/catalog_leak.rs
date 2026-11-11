@@ -115,7 +115,8 @@ fn leaks(grammar: &Grammar, catalog: &BTreeSet<String>) -> BTreeSet<String> {
                 }
                 SymbolDecl::FreeLex(child, _)
                 | SymbolDecl::Numeral(child, _)
-                | SymbolDecl::Lex(child, _) => names.push(child),
+                | SymbolDecl::Lex(child, _)
+                | SymbolDecl::OtherCardName(child) => names.push(child),
                 SymbolDecl::Punct(_) | SymbolDecl::Mark(..) => {}
             }
         }

@@ -108,9 +108,10 @@ pub struct CompiledGrammar {
     /// case, as a mask (`step::form_bit`), where they are more than the
     /// value's own form (`LeafFacts::forms`).
     pub(crate) homograph_forms: BTreeMap<sylex_lexicon::LexicalValue, u16>,
-    /// The card-scoped spellings of the lexicon, as (Lexeme, spelling
-    /// variant), which analysis admits only within their card's scope.
-    pub(crate) card_scoped: BTreeSet<(LexemeId, usize)>,
+    /// The card names of the lexicon [CR#201.1]: a leaf of one the face's
+    /// scope does not hold is another card's name
+    /// (`LeafFacts::other_card_name`).
+    pub(crate) card_names: BTreeSet<LexemeId>,
     pub(crate) frames: Vec<Frame>,
     /// Each frame's shape for Complement Clusters, as the index of the first
     /// frame with the same: the relation of each Frame Slot, and what fills
@@ -280,7 +281,6 @@ struct Draft {
     unshared: Vec<usize>,
     /// Children that are not, nor are headed by, a Linked Coordination.
     unlinked: Vec<usize>,
-    scoped: Vec<usize>,
     /// A binary coordination with a delimiter before its coordinator.
     delimits: bool,
     /// A serial tail of a coordination, whose `first` conjunct follows another.
@@ -386,7 +386,6 @@ impl Draft {
             unlinked: Vec::new(),
             coordinated: Vec::new(),
             unshared: Vec::new(),
-            scoped: Vec::new(),
             delimits: false,
             tail: false,
             chained: None,
@@ -809,10 +808,11 @@ impl<'a> Binder<'a> {
                 root,
                 lexemes,
                 homograph_forms: homograph_forms(lexicon),
-                card_scoped: lexicon
+                card_names: lexicon
+                    .lexemes()
                     .values()
-                    .filter(|value| lexicon.is_card_scoped(value))
-                    .map(|value| (value.lexeme, value.variant))
+                    .filter(|lexeme| lexeme.card_name)
+                    .map(|lexeme| lexeme.id)
                     .collect(),
                 frames,
                 cluster_shapes: Vec::new(),
@@ -1186,18 +1186,6 @@ impl<'a> Binder<'a> {
                 .ok_or_else(|| context(invalid(format!("unknown coordinated child `{name}`"))))?;
             draft.coordinated.push(child);
         }
-        for name in &declaration.scoped {
-            let child = draft
-                .children
-                .iter()
-                .position(|c| c.name == *name && matches!(c.symbol, Symbol::Leaf(_)))
-                .ok_or_else(|| {
-                    context(invalid(format!(
-                        "scoped child `{name}` is not a lexical child"
-                    )))
-                })?;
-            draft.scoped.push(child);
-        }
         draft.unclosed = declaration.unclosed;
         if let Some(forms) = &declaration.elliptical {
             if forms.is_empty() {
@@ -1334,6 +1322,7 @@ impl<'a> Binder<'a> {
             SymbolDecl::Lex(name, category) => {
                 (name.as_str(), Symbol::Leaf(Test::Lexical(*category)))
             }
+            SymbolDecl::OtherCardName(name) => (name.as_str(), Symbol::Leaf(Test::OtherCardName)),
             SymbolDecl::Word(name, word) => {
                 (name.as_str(), Symbol::Leaf(Test::Word(self.word(word)?)))
             }
@@ -1766,7 +1755,6 @@ impl<'a> Binder<'a> {
         production.uncoordinated = draft.uncoordinated;
         production.unlinked = draft.unlinked;
         production.coordinated = draft.coordinated;
-        production.scoped = draft.scoped;
         production.delimits = draft.delimits;
         production.tail = draft.tail;
         production.chained = draft.chained;
@@ -4365,9 +4353,6 @@ fn complement_clusters(draft: &Draft, categories: &ClusterCategories) -> Vec<Dra
     whole
         .weights
         .extend(draft.weights.iter().filter(|(i, _)| *i == 0).copied());
-    whole
-        .scoped
-        .extend(draft.scoped.iter().filter(|i| **i == 0));
     whole.frame = Some(frame);
     whole.clusters = Some((at, frame));
     out.push(whole);
@@ -4416,7 +4401,6 @@ fn adjunct_clusters(draft: &Draft, frame: usize, categories: &ClusterCategories)
         list.extend(original.iter().copied());
     }
     whole.weights.extend(draft.weights.iter().copied());
-    whole.scoped.extend(draft.scoped.iter().copied());
     whole.frame = Some(frame);
     whole.clusters = Some((at, frame));
     out.push(whole);

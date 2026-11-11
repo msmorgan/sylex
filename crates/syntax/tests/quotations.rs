@@ -5,6 +5,8 @@
 //! Periods): the punctuation is derived on realization, never stored, so
 //! both round-trip laws hold.
 
+use std::collections::BTreeSet;
+
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -64,7 +66,11 @@ fn quotations_round_trip_with_derived_punctuation() {
         let readings = parse.readings().collect::<Vec<_>>();
         assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
         assert_eq!(parse.verify_realization(&lexicon), Ok(()), "{text}");
-        assert_eq!(grammar.admit(&readings[0], &lexicon), Ok(()), "{text}");
+        assert_eq!(
+            grammar.admit(&readings[0], &lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{text}"
+        );
         assert_eq!(grammar.realize(&readings[0], &lexicon).unwrap(), text);
         assert!(parse.contains(&readings[0]), "{text}");
     }

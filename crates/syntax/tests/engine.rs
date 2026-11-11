@@ -89,7 +89,11 @@ fn readings(grammar: &CompiledGrammar, lexicon: &Lexicon, text: &str) -> Vec<Rea
         "every derivation of {text:?} is a distinct Reading"
     );
     for reading in &readings {
-        assert_eq!(grammar.admit(reading, lexicon), Ok(()), "{reading:#?}");
+        assert_eq!(
+            grammar.admit(reading, lexicon, &BTreeSet::new()),
+            Ok(()),
+            "{reading:#?}"
+        );
         assert_eq!(grammar.realize(reading, lexicon).unwrap(), text);
     }
     readings
@@ -157,12 +161,8 @@ fn cheaper_attachment_ranks_first() {
         "nominal attachment first"
     );
     assert!(
-        grammar
-            .ranking_key(&readings[0], &lexicon, &BTreeSet::new())
-            .unwrap()
-            < grammar
-                .ranking_key(&readings[1], &lexicon, &BTreeSet::new())
-                .unwrap()
+        grammar.ranking_key(&readings[0], &lexicon).unwrap()
+            < grammar.ranking_key(&readings[1], &lexicon).unwrap()
     );
 }
 
@@ -215,7 +215,7 @@ fn feature_exclusion_is_shared_by_parsing_and_admission() {
         .collect::<Vec<_>>()
         .pop()
         .unwrap();
-    assert!(grammar.admit(&finite, &lexicon).is_err());
+    assert!(grammar.admit(&finite, &lexicon, &BTreeSet::new()).is_err());
 }
 
 #[test]
@@ -257,7 +257,11 @@ fn hand_built_readings_reparse() {
         // parse, then check law 2: it is admitted and is a Reading of the
         // parse of its realization.
         let rebuilt: Reading = ron::from_str(&ron::to_string(&built).unwrap()).unwrap();
-        assert_eq!(grammar.admit(&rebuilt, &lexicon), Ok(()), "tree {index}");
+        assert_eq!(
+            grammar.admit(&rebuilt, &lexicon, &BTreeSet::new()),
+            Ok(()),
+            "tree {index}"
+        );
         let surface = grammar.realize(&rebuilt, &lexicon).unwrap();
         assert!(readings(&grammar, &lexicon, &surface).contains(&rebuilt));
     }
@@ -279,10 +283,10 @@ fn admission_rejects_broken_readings() {
     )
     .unwrap();
     assert_ne!(plural, reading, "the edit changed the noun");
-    assert!(grammar.admit(&plural, &lexicon).is_err());
+    assert!(grammar.admit(&plural, &lexicon, &BTreeSet::new()).is_err());
     let unknown: Reading =
         ron::from_str(&text.replace("\"Transitive\"", "\"Ditransitive\"")).unwrap();
-    assert!(grammar.admit(&unknown, &lexicon).is_err());
+    assert!(grammar.admit(&unknown, &lexicon, &BTreeSet::new()).is_err());
 }
 
 #[test]
@@ -362,12 +366,7 @@ fn best_ranked_orders_by_key_then_reading() {
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), parse.readings().collect::<Vec<_>>().len());
     for (key, reading) in &ranked {
-        assert_eq!(
-            *key,
-            grammar
-                .ranking_key(reading, &lexicon, &BTreeSet::new())
-                .unwrap()
-        );
+        assert_eq!(*key, grammar.ranking_key(reading, &lexicon).unwrap());
     }
     assert!(
         ranked.windows(2).all(|w| w[0] < w[1]),
@@ -408,7 +407,7 @@ fn best_readings_do_not_enumerate_every_attachment() {
     let best = parse.best_readings(2).collect::<Vec<_>>();
     assert_eq!(best.len(), 2);
     for reading in &best {
-        assert_eq!(grammar.admit(reading, &lexicon), Ok(()));
+        assert_eq!(grammar.admit(reading, &lexicon, &BTreeSet::new()), Ok(()));
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     println!("{:?}", parse.forest.metrics());
@@ -511,10 +510,14 @@ fn a_phrase_parses_and_admits_as_its_own_category() {
     assert_eq!(readings.len(), 1);
     assert_eq!(parse.admit(&readings[0], &lexicon), Ok(()));
     assert_eq!(
-        grammar.admit_category(&readings[0], &lexicon, "NounPhrase"),
+        grammar.admit_category(&readings[0], &lexicon, "NounPhrase", &BTreeSet::new()),
         Ok(())
     );
-    assert!(grammar.admit(&readings[0], &lexicon).is_err());
+    assert!(
+        grammar
+            .admit(&readings[0], &lexicon, &BTreeSet::new())
+            .is_err()
+    );
     assert_eq!(parse.verify_realization(&lexicon), Ok(()));
     assert!(grammar.parse_category(&analyzed, "Nonesuch").is_none());
 }
