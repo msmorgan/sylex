@@ -1,0 +1,8 @@
+# The Characteristic Edits an effect states the entering permanent "is" or "has" ("that creature is
+# a black Zombie in addition to its other colors and types"): they apply simultaneously with its
+# entering, not after it as "becomes" does [CR#611.2e].
+# [CR#611.2e]
+# TODO(spelling): The edits are printed as a following sentence about the permanent ("It's …",
+# "That creature is …").
+primitive withCharacteristicEdits(
+  edits: List(CharacteristicEdit)): MoveRider = WithCharacteristicEdits
