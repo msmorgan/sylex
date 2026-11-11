@@ -50,4 +50,4 @@ it), 4 "any creature card in a graveyard" and 1 "any land card in a graveyard".
 `plugins/canon/cards/{Clone,Quicksilver Gargantuan,Sculpting Steel}.syl`,
 `plugins/builtin/templates/ability/mayHaveEnter.syl`,
 `plugins/builtin/primitives/zone/asCopyOf.syl`, `plugins/builtin/templates/determiner/a.syl`,
-`plugins/builtin/primitives/predicate/in_.syl`, `plugins/builtin/templates/predicate/isPermanent.syl`.
+`plugins/builtin/primitives/predicate/in.syl`, `plugins/builtin/templates/predicate/isPermanent.syl`.

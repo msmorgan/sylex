@@ -8,7 +8,7 @@ needs: [syl-printed-it-self-references, syl-argument-naming, syl-condition-first
 
 `plugins/builtin/templates/noun/` holds 21 `this<Head>` Templates (`thisCreature`, `thisAura`,
 `thisSpell`, `thisPermanent`, …), each `headed(<head>, this)` for one head noun over the `this`
-primitive (`plugins/builtin/primitives/pronoun/this_.syl`). Three have no caller (`thisClass`,
+primitive (`plugins/builtin/primitives/pronoun/this.syl`). Three have no caller (`thisClass`,
 `thisEmblem`, `thisSpacecraft`), and a head with no Template can't be written at all. Callers also
 mix `thisSpell`, `thisPermanent` and bare `this` for the same printed words.
 
@@ -30,7 +30,7 @@ bare (`creature`, `aura`), so that ticket lands first.
 `syl-self-name-references` rewrites the canon `this` sites that print the card's name first,
 and leaves the "this spell" sites (*Abolish*'s `altCost(this, …)`, *Embercleave*'s
 `costShift(this, …)`, *Conqueror's Pledge*'s `keywordCostPaid(kicker, this)`) to this ticket.
-`syl-underscore-file-names` renames `this_.syl`, which this ticket rewrites, and lands first.
+`syl-underscore-file-names` renames that file to `this.syl`, which this ticket rewrites, and lands first.
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
@@ -61,5 +61,5 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 ## Pointers
 
-`plugins/builtin/templates/noun/this*.syl`, `plugins/builtin/primitives/pronoun/this_.syl`,
+`plugins/builtin/templates/noun/this*.syl`, `plugins/builtin/primitives/pronoun/this.syl`,
 `docs/decisions/syl.md` §3.
