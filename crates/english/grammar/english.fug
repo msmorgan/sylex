@@ -198,8 +198,8 @@ category VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
 ] { gap }
 // A Linked Conjunct: a Clause or Verb Phrase opened by its linking
-// connective (*Each player discards a card, [then draws a card]*; CGEL
-// 15§2.10:1319–1320).
+// connective (*Each player discards a card, [then draws a card]*), as *so*
+// and *yet* are a coordination's sole linking item (CGEL 15§2.10:1320).
 category LinkedClause : Clause [VerbForm, ClauseMarking, Inflection, FrontPosition] { gap }
 category LinkedVerbPhrase : VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
@@ -541,14 +541,14 @@ class StrandableBe = ["verb:be", "verb:aren't"]
 // a measure phrase modifies them.
 class ComparativeQuantifier = ["det:more.count", "det:more.mass", "det:less", "det:fewer"]
 // They head a partitive with an *of* oblique (*each of those creatures*;
-// CGEL 5§9.3:408–410). *Any* and a quantity have Productions of their own.
+// CGEL 5§9.1:411). *Any* and a quantity have Productions of their own.
 class PartitiveQuantifier = [
     "det:all.count", "det:all.mass", "det:another", "det:both", "det:each", "det:either",
     "det:fewer", "det:less", "det:many", "det:more.count", "det:more.mass", "det:most", "det:much",
     "det:neither", "det:none", "det:some",
 ]
 // They float as an Adjunct after a plural Subject or an auxiliary (CGEL
-// 5§9.3:413). *All* floats after a personal pronoun only (FloatedAll).
+// 5§9.2:413). *All* floats after a personal pronoun only (FloatedAll).
 class FloatingQuantifier = ["det:each", "det:both"]
 class SuperlativeQuantifier = ["det:most", "det:least", "det:fewest"]
 // The superlative that fuses with its head (*tied for fewest*). Never
@@ -563,7 +563,7 @@ class FusedQuantifier = [
     "det:none",
 ]
 // They choose from a set in an implicit partitive (*If a player does
-// either*; CGEL 5§9.3:413). Unlike fused *each*, they make an ordinary
+// either*; CGEL 5§9.2:413). Unlike fused *each*, they make an ordinary
 // singular Noun Phrase, so a Complement as well as a Subject.
 class FusedChoice = ["det:either", "det:neither"]
 class RelativeMarker = ["sub:that", "pronoun:which", "pronoun:who"]
@@ -1527,7 +1527,7 @@ DistributiveModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase Modified
           $.Person = Third,
           $.Determination = Overt
 // A Preposition Phrase in Determiner function (*up to two target
-// creatures*; CGEL 5§7.1:357). Its Complement is a bare quantity, never a
+// creatures*; CGEL 5§4:357). Its Complement is a bare quantity, never a
 // determined Noun Phrase.
 MaximumDetermination: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) Nominal
     where determiner.Determination = Bare,
@@ -1560,7 +1560,7 @@ MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Class(ComparativeQuan
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-// A determinative fused head and its *of* oblique (CGEL 5§9.3:408–410).
+// A determinative fused head and its *of* oblique (CGEL 5§9.1:411).
 // Number is the oblique's, a distributive head's singular its own, and
 // *any*'s open (*if any of those cards shares a card type*).
 Partitive: PartitiveHead -> Class(PartitiveQuantifier) complement:Selected(PrepositionPhrase, Of) { transparent: [complement] }
@@ -1697,8 +1697,9 @@ ComparativeAmount: Amount ->
           complement.NounKind = Numeric,
           $.ComplementKind = PP
 // A sum adjective after a numerically quantified Noun Phrase (*ten or more
-// creature cards total*; CGEL 5§14.2(b):445-446), never a bare or definite
-// one. `Carry`, since an unvalued determiner would pass a `Require`.
+// creature cards total*), as *net* and *gross* follow specific sums (*fifty
+// dollars net*; CGEL 5§14.2:445–446), never a bare or definite one.
+// `Carry`, since an unvalued determiner would pass a `Require`.
 SumQualifiedNounPhrase: NounPhrase ->
     determiner:DeterminerPhrase Nominal modifier:Class(SumAdjective)
     where determiner.Cardinality := Cardinal,
@@ -1867,7 +1868,7 @@ ModifiedComparativeAdverb: AdverbPhrase ->
     where complement.ComplementKind = AdvP,
           head.Countability = Count,
           $.AdjunctPosition = End
-// *Greater power than this creature* (CGEL 5§16.1:445).
+// *Greater power than this creature* (CGEL 5§14.1:443).
 ComparativeIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, Than)
     where modifier.Grade = Comparative,
