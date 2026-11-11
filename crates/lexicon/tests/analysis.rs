@@ -1194,6 +1194,7 @@ fn serialized_surface_scope_filters_matching_and_keeps_realization() {
         Category::Catalog,
     );
     card.capitalization = Capitalization::Exact;
+    card.card_name = true;
     card.forms[0].surfaces = Some(vec!["Chandra, Pyromaster".into(), "Chandra".into()]);
     card.card_scoped_surfaces.insert("Chandra".into());
     let decoded: Lexeme = ron::from_str(&ron::to_string(&card).unwrap()).unwrap();
@@ -1234,6 +1235,24 @@ fn serialized_surface_scope_filters_matching_and_keeps_realization() {
     }
     card.card_scoped_surfaces
         .insert("undeclared spelling".into());
+    assert!(Lexicon::new([card]).is_err());
+}
+
+#[test]
+fn only_a_card_name_is_scoped_to_its_own_card() {
+    // Chandra, Pyromaster's own text shortens its name to *Chandra*
+    // [CR#201.5c]: that scope is its own card's only when it is a card name.
+    let mut card = invariant(
+        "card:Chandra, Pyromaster",
+        "Chandra, Pyromaster",
+        Category::Catalog,
+    );
+    card.forms[0].surfaces = Some(vec!["Chandra, Pyromaster".into(), "Chandra".into()]);
+    card.card_scoped_surfaces.insert("Chandra".into());
+    assert!(Lexicon::new([card.clone()]).is_err());
+    card.card_name = true;
+    assert!(Lexicon::new([card.clone()]).is_ok());
+    card.card_scope = BTreeSet::from([LexemeId::new("name:Chandra, Torch of Defiance")]);
     assert!(Lexicon::new([card]).is_err());
 }
 

@@ -108,6 +108,11 @@ pub struct Lexeme {
     /// Lexeme's own card, as for a Shortened Name [CR#201.5c].
     #[serde(default)]
     pub card_scope: BTreeSet<crate::LexemeId>,
+    /// The Lexeme is a card name [CR#201.1]: a face's lexical scope holds it
+    /// when the face is that card or one of its faces, and it is another
+    /// card's name everywhere else.
+    #[serde(default)]
+    pub card_name: bool,
     /// Per-spelling pronunciation overrides, before positional capitalization.
     #[serde(default)]
     pub onsets: BTreeMap<String, crate::Onset>,
@@ -139,6 +144,7 @@ impl Lexeme {
             binding: Binding::Free,
             card_scoped_surfaces: BTreeSet::new(),
             card_scope: BTreeSet::new(),
+            card_name: false,
             onsets: BTreeMap::new(),
             article_onsets: BTreeMap::new(),
             surface_structure: if matches!(

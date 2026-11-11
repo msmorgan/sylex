@@ -694,12 +694,21 @@ impl Lexicon {
 }
 
 /// Why a Lexeme's card scope is malformed: a card-scoped spelling it does not
-/// declare, or cards that admit no card-scoped spelling.
+/// declare, cards that admit no card-scoped spelling, or a scope of its own
+/// card on a Lexeme that is no card name.
 fn card_scope_defect(lexeme: &Lexeme, realized: &BTreeSet<String>) -> Option<&'static str> {
     if !lexeme.card_scoped_surfaces.is_subset(realized) {
         Some("card scope has no declared spelling")
     } else if !lexeme.card_scope.is_empty() && lexeme.card_scoped_surfaces.is_empty() {
         Some("card scope has no card-scoped spelling")
+    } else if lexeme.card_scope.is_empty()
+        && !lexeme.card_scoped_surfaces.is_empty()
+        && !lexeme.card_name
+    {
+        // An empty card scope means the Lexeme's own card.
+        Some("card-scoped spelling with no card scope on a Lexeme that is no card name")
+    } else if lexeme.card_name && !lexeme.card_scope.is_empty() {
+        Some("a card name is scoped to its own card, never to others")
     } else {
         None
     }

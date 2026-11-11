@@ -68,7 +68,8 @@ pub fn card_name_id(name: &str) -> LexemeId {
 }
 
 /// One Lexeme per card name, each with its Shortened Name in its own card's
-/// scope only.
+/// scope only. The full name is spelled everywhere: on its own card's faces
+/// it is that card's own name, and elsewhere another card's [CR#201.5].
 pub(crate) fn card_names(
     text: &str,
     attested: &AttestedShortenings,
@@ -85,6 +86,7 @@ pub(crate) fn card_names(
                 Category::Catalog,
                 source(SourceKind::Catalog, CARD_NAMES, name),
             );
+            lexeme.card_name = true;
             if let Some(short) = shortened_name(name, attested.get(name), vocabulary) {
                 lexeme.forms[0].surfaces = Some(vec![name.to_owned(), short.clone()]);
                 lexeme.card_scoped_surfaces = [short].into();
