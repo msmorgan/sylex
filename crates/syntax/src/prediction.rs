@@ -38,7 +38,7 @@ impl Prediction {
                     symbol => {
                         let terminal = match symbol {
                             Symbol::Leaf(test) => Terminal::Leaf(test.clone()),
-                            Symbol::Punct(c, _) => Terminal::Punct(*c),
+                            Symbol::Punct(c, ..) => Terminal::Punct(*c),
                             Symbol::Cat { .. } => unreachable!(),
                         };
                         let id = terminals

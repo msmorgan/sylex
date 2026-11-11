@@ -710,9 +710,11 @@ GroupedNumericAmount: Amount -> Numeral(Arabic(true)) where $.QuantityNumber = h
 // cards*).
 AdverbModifiedAmount: Amount -> modifier:AdverbPhrase Amount
     where modifier.AdjunctPosition != Central | End | Linking
+// A sign is spoken, *plus* or *minus* (*a +1/+1 counter*), so its mark is
+// a word to Adjacency Agreement; a range's dash (`RangeHeader`) is not.
 UnsignedMeasureAmount: SignedAmount -> Amount where head.Sign != Negative
-PositiveMeasureAmount: SignedAmount -> '+':Prefix Amount
-NegativeMeasureAmount: SignedAmount -> '-':Prefix Amount
+PositiveMeasureAmount: SignedAmount -> '+':Prefix:Consonant Amount
+NegativeMeasureAmount: SignedAmount -> '-':Prefix:Consonant Amount
 
 BoundKeywordItem: KeywordParameters -> BoundKeyword
 // A comparative bound on a number is no Noun Phrase: predicated, it
@@ -795,12 +797,12 @@ SymbolSequence: Symbols -> first:Class(BracedSymbol) rest:Attached(Symbols, Suff
 SymbolCost: Cost -> SymbolCosts
 SingleSymbolCost: SymbolCosts -> Symbols
 CostSequence: SymbolCosts -> first:Symbols ',' rest:SymbolCosts
-NegativeLoyaltySymbolCost: ActivationCost -> '−':Prefix amount:Amount
-PositiveLoyaltySymbolCost: ActivationCost -> '+':Prefix amount:Amount
+NegativeLoyaltySymbolCost: ActivationCost -> '−':Prefix:Consonant amount:Amount
+PositiveLoyaltySymbolCost: ActivationCost -> '+':Prefix:Consonant amount:Amount
 ZeroLoyaltySymbolCost: ActivationCost -> amount:Amount
 LoyaltySymbol: LoyaltySymbol -> '[':Prefix amount:Amount ']'
-UnicodeNegativeLoyaltySymbol: LoyaltySymbol -> '[':Prefix '−':Bound amount:Amount ']'
-PositiveLoyaltySymbol: LoyaltySymbol -> '[':Prefix '+':Bound amount:Amount ']'
+UnicodeNegativeLoyaltySymbol: LoyaltySymbol -> '[':Prefix '−':Bound:Consonant amount:Amount ']'
+PositiveLoyaltySymbol: LoyaltySymbol -> '[':Prefix '+':Bound:Consonant amount:Amount ']'
 LoyaltyCost: ActivationCost -> LoyaltySymbol
 LoyaltyNominal: BareNominal -> LoyaltySymbol
     where $.Determination = Overt,
@@ -827,7 +829,7 @@ KeywordFollowedBySentences: Ability -> first:KeywordLineItem rest:Sentences
     where first.FinalParameter := SetOffCost
 NamePremodifier: BareNominal -> modifier:Name BareNominal
 ModeBullet: Mode -> '•':Free Ability
-PlusCostedMode: Mode -> '+':Free cost:Cost '—':Free ModeEffect
+PlusCostedMode: Mode -> '+':Free:Consonant cost:Cost '—':Free ModeEffect
 LabelledCostedMode: Mode -> '•':Free label:Lex(FlavorWord) cost:Cost '—':Free ModeEffect
 PawprintMode: Mode -> quantity:Pawprints '—':Free ModeEffect
 SinglePawprint: Pawprints -> Class(Pawprint)
@@ -854,7 +856,7 @@ OtherCardNameComplement: NameComplement -> OtherCardName()
 SlashMeasure: Measure -> first:SignedAmount '/':Bound second:SignedAmount
 MeasureHeader: Header -> Measure
 RangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '-':Bound upper:Amount
-OpenRangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '+'
+OpenRangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '+':Suffix:Consonant
 SingleChapter: Chapters -> Numeral(Roman)
 ChapterSequence: Chapters -> first:Numeral(Roman) ',' rest:Chapters
 ChapterAbility: Ability -> chapters:Chapters '—':Free Ability
@@ -2073,7 +2075,7 @@ DefiniteFusedAdjectiveHead: NounPhrase -> determiner:Word(The) Class(DefiniteFus
           $.Countability = Count,
           $.NounKind = Ordinary
 SingleRowHeader: RowHeader -> Amount
-OpenRowHeader: RowHeader -> Amount '+'
+OpenRowHeader: RowHeader -> Amount '+':Suffix:Consonant
 UnicodeRangeRowHeader: RowHeader -> lower:Amount '—':Bound upper:Amount
 TableRow: Ability -> header:RowHeader '|':Free Ability
 SequentialVerbalCosts: NonManaCost -> first:VerbPhrase ',' rest:Cost where first.VerbForm = Plain

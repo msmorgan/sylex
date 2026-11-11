@@ -26,6 +26,8 @@
 *NounPhrase an creature
 # from: Kiora Bests the Sea God
 *NounPhrase a 8/8 blue Kraken creature token
+# from: Illusionary Mask; a sign is spoken *plus* or *minus*
+*NounPhrase an +8/+8 creature
 # from: Abigale, Poet Laureate; a sign is spoken *plus* or *minus*
 *NounPhrase an +1/+1 counter
 # from: Baleful Ammit

@@ -1457,7 +1457,7 @@ impl CompiledGrammar {
                 located(me, (first, first));
                 let mut children = node.children.iter();
                 for symbol in &self.productions[index].rhs {
-                    if let Symbol::Punct(QUOTATION_MARK, binding) = symbol {
+                    if let Symbol::Punct(QUOTATION_MARK, binding, _) = symbol {
                         if glues_after(*binding) {
                             out.push((
                                 quotation_mark(*depth).to_string(),
@@ -1480,7 +1480,7 @@ impl CompiledGrammar {
                                 AtomKind::Close,
                             ));
                         }
-                    } else if let Symbol::Punct(c, binding) = symbol {
+                    } else if let Symbol::Punct(c, binding, _) = symbol {
                         // Nor is a period after a word that ends in terminal
                         // punctuation (`CompiledGrammar::run`).
                         let absorbed = *c == '.'

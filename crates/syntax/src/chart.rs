@@ -697,7 +697,7 @@ impl CompiledGrammar {
                             }
                         }
                     }
-                    Symbol::Punct(c, binding) => {
+                    Symbol::Punct(c, binding, _) => {
                         let mut at = if c.is_whitespace() { position } else { skip(position) };
                         let mut end = at + 1;
                         let found = if *c == QUOTATION_MARK {

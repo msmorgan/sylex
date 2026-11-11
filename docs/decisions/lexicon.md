@@ -61,16 +61,20 @@ any other Category takes no prefix and agrees with neither, and the genitive's
 by the host before it: the bare genitive after any Plural noun form ending in
 *s*, regular or irregular, and after the singular of a noun spelled alike in
 both numbers with final *s*, and the *'s* genitive after any other form, a
-singular ending in *s* whose plural differs and a name ending in *s* included
-(*players'*, *elves'*, *Thalakos'* singular or plural, *player's*, *Spawn's*,
-*Swarm of Rats's*; CGEL, Ch. 18 §4.2 [35], p. 1596, where *species* takes the
-bare genitive "in the singular as well as the plural", and the bare genitive of
-a name is only a variant, [35ii], which Oracle does not write). The host's
-realized forms decide it: no word lists the hosts. The grammar checks the
-agreement between each word and the next, whatever Constituents they end and
-begin. Why: a free choice of spelling lets the parser accept *a artifact* and
-*players's*, and leaves realization nothing to derive the spelling from but the
-source text.
+singular noun ending in *s* whose plural differs and a name the text treats as
+singular ending in *s* included (*players'*, *elves'*, *Thalakos'* singular or
+plural, *player's*, *Spawn's*, *Swarm of Rats's*; CGEL, Ch. 18 §4.2: [35i], p.
+1595, and p. 1596, where the bare genitive is obligatory with plural nouns
+ending in *s* and *species* takes it "in the singular as well as the plural";
+for a singular proper name ending in *s* the bare genitive is only a variant,
+[35ii], p. 1595, and Oracle writes *'s*). The host's realized forms decide it:
+no word lists the hosts. The grammar checks the agreement between each word and
+the next, whatever Constituents they end and begin; a mark is a word there only
+where its Production declares it spoken, with its Onset, as a sign is (*plus*,
+*minus*: *a +8/+8 creature*), since one character is a sign in one construction
+and a range's dash in another. Why: a free choice of spelling lets the parser
+accept *a artifact* and *players's*, and leaves realization nothing to derive
+the spelling from but the source text.
 
 **A word in two Parts of Speech is two Lexemes**, related by Conversion, never
 one Lexeme with a fused-head use standing in for the other: *red* is a noun in

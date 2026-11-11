@@ -252,6 +252,11 @@ pub enum SymbolDecl {
     Punct(char),
     /// Structural punctuation with explicit attachment to adjacent atoms.
     Mark(char, sylex_lexicon::Binding),
+    /// A mark spoken as a word with this Onset, a sign (*plus*, *minus*):
+    /// Adjacency Agreement reads it as it reads a word (*a +1/+1 counter*).
+    /// Which marks are spoken is the Production's to say, since one
+    /// character is a sign in one construction and a range dash in another.
+    SpokenMark(char, sylex_lexicon::Binding, sylex_lexicon::Onset),
 }
 
 /// A feature equation over `$.Feature` (the mother) or `child.Feature` paths.

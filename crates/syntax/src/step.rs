@@ -179,7 +179,10 @@ pub(crate) enum Symbol {
         host: Option<HostKind>,
     },
     Leaf(Test),
-    Punct(char, sylex_lexicon::Binding),
+    /// A mark, with the Onset of the word it is spoken as, if it is one: a
+    /// sign is spoken *plus* or *minus* (*a +1/+1 counter*), and takes part
+    /// in Adjacency Agreement as a word does. Any other mark is no word.
+    Punct(char, sylex_lexicon::Binding, Option<sylex_lexicon::Onset>),
 }
 
 /// The Complements a Production's phrase omits at its right edge.
@@ -1037,7 +1040,7 @@ impl Production {
             ChildView::Node(summary) => (summary.first_glues, summary.last_glues),
             ChildView::Leaf(leaf, _) => (glues_before(leaf.binding), glues_after(leaf.binding)),
             ChildView::Punct => match self.rhs[position] {
-                Symbol::Punct(_, binding) => (glues_before(binding), glues_after(binding)),
+                Symbol::Punct(_, binding, _) => (glues_before(binding), glues_after(binding)),
                 _ => (false, false),
             },
         };
@@ -1691,7 +1694,7 @@ impl Production {
         self.coordinator.is_none()
             && self.head == Some(self.rhs.len() - 1)
             && ((self.rhs.len() > 2
-                && matches!(self.rhs[self.rhs.len() - 2], Symbol::Punct(',', _)))
+                && matches!(self.rhs[self.rhs.len() - 2], Symbol::Punct(',', ..)))
                 || self
                     .host_check
                     .is_some_and(|(host, adjunct, _)| adjunct < host))
@@ -1722,7 +1725,7 @@ impl Production {
     /// Whether the Production hosts a comma-set post-dependent: its head
     /// comes first, followed by a comma.
     pub(crate) fn hosts_comma_set_dependent(&self) -> bool {
-        self.head == Some(0) && self.rhs.len() > 2 && matches!(self.rhs[1], Symbol::Punct(',', _))
+        self.head == Some(0) && self.rhs.len() > 2 && matches!(self.rhs[1], Symbol::Punct(',', ..))
     }
 
     /// Whether child `position` is set off before the head by a comma: a
@@ -1732,7 +1735,7 @@ impl Production {
             position < head
                 && self.rhs[position + 1..head]
                     .iter()
-                    .any(|symbol| matches!(symbol, Symbol::Punct(',', _)))
+                    .any(|symbol| matches!(symbol, Symbol::Punct(',', ..)))
         })
     }
 
@@ -1820,7 +1823,7 @@ impl Production {
         {
             return None;
         }
-        if state.unclosed && !matches!(self.rhs[position], Symbol::Punct('.', _)) {
+        if state.unclosed && !matches!(self.rhs[position], Symbol::Punct('.', ..)) {
             return None;
         }
         next.unclosed = matches!(child, ChildView::Node(summary) if summary.unclosed);
@@ -1831,7 +1834,7 @@ impl Production {
         // it unpunctuated (CGEL, Ch. 20 §3.2.5, p. 1745 [25]).
         if state.open_comma
             && !first
-            && !matches!(self.rhs[position], Symbol::Punct(_, binding) if !crate::reading::glues_after(binding))
+            && !matches!(self.rhs[position], Symbol::Punct(_, binding, _) if !crate::reading::glues_after(binding))
         {
             return None;
         }
@@ -1839,24 +1842,18 @@ impl Production {
         next.first_glues.get_or_insert(first);
         next.last_glues = last;
         // Adjacency Agreement holds between each word and the next, whatever
-        // Constituents they end and begin. A spoken mark (*a +8/+8
-        // creature*) is a word; an empty child and any other mark have none.
+        // Constituents they end and begin. A mark its Production declares
+        // spoken (*a +8/+8 creature*) is a word; an empty child and any other
+        // mark have none.
         let (first_edge, last_edge) = match child {
             ChildView::Node(summary) => (summary.first_edge, summary.last_edge),
             ChildView::Leaf(_, edges) => (Some(edges.left), Some(edges.right)),
             ChildView::Punct => {
-                let Symbol::Punct(mark, _) = self.rhs[position] else {
+                let Symbol::Punct(_, _, spoken) = self.rhs[position] else {
                     unreachable!("a punctuation child stands at a punctuation symbol");
                 };
-                sylex_lexicon::mark_onset(mark)
-                    .map(|onset| {
-                        sylex_lexicon::Edges::new(
-                            &sylex_lexicon::FeatureBundle::default(),
-                            Some(onset),
-                            None,
-                            sylex_lexicon::GenitiveAlternant::ApostropheS,
-                        )
-                    })
+                spoken
+                    .map(|onset| sylex_lexicon::Edges::plain(Some(onset)))
                     .map_or((None, None), |edges| (Some(edges.left), Some(edges.right)))
             }
         };

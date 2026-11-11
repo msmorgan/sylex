@@ -80,10 +80,9 @@ pub(crate) fn default_onset(surface: &str) -> Option<Onset> {
     }
 }
 
-/// The Onset of a mark spoken as a word: a sign, *plus* or *minus* (*a
-/// +8/+8 creature*). Any other mark is not spoken and has none.
-#[must_use]
-pub fn mark_onset(mark: char) -> Option<Onset> {
+/// The Onset of a sign that begins a spelling, *plus* or *minus* (*a +1/+1
+/// counter*).
+fn mark_onset(mark: char) -> Option<Onset> {
     matches!(mark, '+' | '-').then_some(Onset::Consonant)
 }
 

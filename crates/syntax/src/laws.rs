@@ -160,7 +160,7 @@ impl Parse<'_> {
                 }
                 ChildRef::Punct => {
                     let state = &self.forest.items[item];
-                    let crate::step::Symbol::Punct(_, binding) =
+                    let crate::step::Symbol::Punct(_, binding, _) =
                         &self.grammar.productions[state.production].rhs[state.dot - 1]
                     else {
                         unreachable!()
@@ -175,7 +175,8 @@ impl Parse<'_> {
             let at = self.forest.items[previous].end;
             let symbol = &self.grammar.productions[self.forest.items[item].production].rhs
                 [self.forest.items[item].dot - 1];
-            let space = if matches!(symbol, crate::step::Symbol::Punct(c, _) if c.is_whitespace()) {
+            let space = if matches!(symbol, crate::step::Symbol::Punct(c, ..) if c.is_whitespace())
+            {
                 Some(false)
             } else {
                 self.space_after(at)

@@ -310,13 +310,21 @@ impl Edges {
             crate::LexicalReading::Numeral { value, .. } => crate::numeral_onset(*value),
             crate::LexicalReading::FlavorWord { .. } => None,
         };
-        Some(Self::new(
+        Some(Self::plain(onset))
+    }
+
+    /// The edges of a word with this Onset and no Feature Bundle: a numeral,
+    /// a Flavor Word or a spoken mark. It hosts no prefix and takes the *'s*
+    /// genitive.
+    #[must_use]
+    pub fn plain(onset: Option<Onset>) -> Self {
+        Self::new(
             &FeatureBundle::default(),
             AgreementProperties {
                 onset,
                 prefix_hyphenation: None,
                 genitive_host: GenitiveAlternant::ApostropheS,
             },
-        ))
+        )
     }
 }

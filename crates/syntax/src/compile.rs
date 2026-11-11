@@ -1116,7 +1116,7 @@ impl<'a> Binder<'a> {
             if quoted {
                 draft.child(
                     "",
-                    Symbol::Punct(QUOTATION_MARK, Binding::Prefix),
+                    Symbol::Punct(QUOTATION_MARK, Binding::Prefix, None),
                     GapRule::Closed,
                 );
             }
@@ -1134,7 +1134,7 @@ impl<'a> Binder<'a> {
             if quoted {
                 draft.child(
                     "",
-                    Symbol::Punct(QUOTATION_MARK, Binding::Suffix),
+                    Symbol::Punct(QUOTATION_MARK, Binding::Suffix, None),
                     GapRule::Closed,
                 );
             }
@@ -1372,15 +1372,18 @@ impl<'a> Binder<'a> {
                         .ok_or_else(|| invalid(format!("unknown class `{class}`")))?,
                 )),
             ),
-            SymbolDecl::Mark(c, _) | SymbolDecl::Punct(c)
+            SymbolDecl::Mark(c, _) | SymbolDecl::SpokenMark(c, ..) | SymbolDecl::Punct(c)
                 if crate::chart::is_quotation_mark(*c) =>
             {
                 return Err(invalid(format!(
                     "quotation mark `{c}`: a quoted child is declared with `Quoted`"
                 )));
             }
-            SymbolDecl::Mark(c, binding) => ("", Symbol::Punct(*c, *binding)),
-            SymbolDecl::Punct(c) => ("", Symbol::Punct(*c, Binding::Suffix)),
+            SymbolDecl::Mark(c, binding) => ("", Symbol::Punct(*c, *binding, None)),
+            SymbolDecl::SpokenMark(c, binding, onset) => {
+                ("", Symbol::Punct(*c, *binding, Some(*onset)))
+            }
+            SymbolDecl::Punct(c) => ("", Symbol::Punct(*c, Binding::Suffix, None)),
         })
     }
 
@@ -2024,13 +2027,21 @@ impl<'a> Binder<'a> {
                         if delimiter.is_some() { GapRule::Closed } else { GapRule::Transparent };
                     let h = draft.child("head", host_symbol, host_gap);
                     if let Some(c) = delimiter {
-                        draft.child("", Symbol::Punct(*c, Binding::Suffix), GapRule::Closed);
+                        draft.child(
+                            "",
+                            Symbol::Punct(*c, Binding::Suffix, None),
+                            GapRule::Closed,
+                        );
                     }
                     (h, draft.child(function, adjunct_symbol, GapRule::Closed))
                 } else {
                     let a = draft.child(function, adjunct_symbol, GapRule::Closed);
                     if let Some(c) = delimiter {
-                        draft.child("", Symbol::Punct(*c, Binding::Suffix), GapRule::Closed);
+                        draft.child(
+                            "",
+                            Symbol::Punct(*c, Binding::Suffix, None),
+                            GapRule::Closed,
+                        );
                     }
                     (draft.child("head", host_symbol, GapRule::Transparent), a)
                 };
@@ -2362,7 +2373,7 @@ impl<'a> Binder<'a> {
                                 },
                             )
                         }
-                        ParameterPart::Mark(c, binding) => ("", Symbol::Punct(*c, *binding)),
+                        ParameterPart::Mark(c, binding) => ("", Symbol::Punct(*c, *binding, None)),
                     };
                     draft.child(name, symbol, GapRule::Closed);
                 }
@@ -2423,15 +2434,27 @@ impl<'a> Binder<'a> {
         };
         let mut serial = draft.clone();
         serial.id = Ident::new(&format!("{}/serial", draft.id));
-        serial.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+        serial.child(
+            "",
+            Symbol::Punct(',', Binding::Suffix, None),
+            GapRule::Closed,
+        );
         serial.child("rest", tail_symbol.clone(), GapRule::Closed);
         let mut more = Draft::new(format!("{}/serial-more", draft.id), tail, 0);
         push_marked(&mut more);
-        more.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+        more.child(
+            "",
+            Symbol::Punct(',', Binding::Suffix, None),
+            GapRule::Closed,
+        );
         more.child("rest", tail_symbol, GapRule::Closed);
         let mut end = Draft::new(format!("{}/serial-end", draft.id), tail, 0);
         push_marked(&mut end);
-        end.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+        end.child(
+            "",
+            Symbol::Punct(',', Binding::Suffix, None),
+            GapRule::Closed,
+        );
         end.child(
             "coordinator",
             Symbol::Leaf(coordinator.clone()),
@@ -3245,7 +3268,11 @@ impl<'a> Binder<'a> {
             );
             let h = raising.child("head", head, GapRule::Require(gap));
             if let Some((_, mark)) = delimited {
-                raising.child("", Symbol::Punct(mark, Binding::Suffix), GapRule::Closed);
+                raising.child(
+                    "",
+                    Symbol::Punct(mark, Binding::Suffix, None),
+                    GapRule::Closed,
+                );
             }
             let shared_child = raising.child(
                 "shared",
@@ -3418,7 +3445,11 @@ impl<'a> Binder<'a> {
                 serial.child("correlative", Symbol::Leaf(marker.clone()), GapRule::Closed);
             }
             let a = serial.child("first", conjoin.conjunct(), GapRule::Shared);
-            serial.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+            serial.child(
+                "",
+                Symbol::Punct(',', Binding::Suffix, None),
+                GapRule::Closed,
+            );
             let t = serial.child("rest", conjoin.tail(), GapRule::Shared);
             serial.coordinator = Some(t);
             serial.paired_coordinator = paired;
@@ -3483,7 +3514,11 @@ impl<'a> Binder<'a> {
             };
             let mut more = Draft::new(shape("serial-more"), conjoin.tail_id, 0);
             let a = first(&mut more);
-            more.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+            more.child(
+                "",
+                Symbol::Punct(',', Binding::Suffix, None),
+                GapRule::Closed,
+            );
             let t = more.child("rest", conjoin.tail(), GapRule::Shared);
             more.coordinator = Some(t);
             more.distinct_coordinator = vec![a];
@@ -3493,7 +3528,11 @@ impl<'a> Binder<'a> {
             drafts.push(more);
             let mut end = Draft::new(shape("serial-end"), conjoin.tail_id, 0);
             let a = first(&mut end);
-            end.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+            end.child(
+                "",
+                Symbol::Punct(',', Binding::Suffix, None),
+                GapRule::Closed,
+            );
             let mut words = Vec::new();
             for (_, paired) in &self.grammar.correlatives {
                 words.push(self.word(paired)?);
@@ -3596,7 +3635,11 @@ impl Binder<'_> {
             let mut draft = Draft::new(id(shape), conjoin.lhs, cost);
             let a = draft.child("first", conjoin.conjunct(), GapRule::Shared);
             if let Some(mark) = mark {
-                draft.child("", Symbol::Punct(mark, Binding::Suffix), GapRule::Closed);
+                draft.child(
+                    "",
+                    Symbol::Punct(mark, Binding::Suffix, None),
+                    GapRule::Closed,
+                );
                 draft.delimits = true;
             }
             let b = draft.child("last", marked.clone(), GapRule::Shared);
@@ -3613,7 +3656,11 @@ impl Binder<'_> {
         // Serial: X , X , Y — the whole, and its tail of one or more links.
         let mut serial = Draft::new(id("serial"), conjoin.lhs, cost);
         let a = serial.child("first", conjoin.conjunct(), GapRule::Shared);
-        serial.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+        serial.child(
+            "",
+            Symbol::Punct(',', Binding::Suffix, None),
+            GapRule::Closed,
+        );
         let t = serial.child("rest", conjoin.tail(), GapRule::Shared);
         serial.coordinator = Some(t);
         serial.link = Some(identity);
@@ -3623,7 +3670,11 @@ impl Binder<'_> {
         drafts.push(serial);
         let mut more = Draft::new(id("serial-more"), conjoin.tail_id, 0);
         let a = more.child("first", conjoin.conjunct(), GapRule::Shared);
-        more.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+        more.child(
+            "",
+            Symbol::Punct(',', Binding::Suffix, None),
+            GapRule::Closed,
+        );
         let t = more.child("rest", conjoin.tail(), GapRule::Shared);
         more.coordinator = Some(t);
         more.link = Some(identity);
@@ -3633,7 +3684,11 @@ impl Binder<'_> {
         drafts.push(more);
         let mut end = Draft::new(id("serial-end"), conjoin.tail_id, 0);
         let a = end.child("first", conjoin.conjunct(), GapRule::Shared);
-        end.child("", Symbol::Punct(',', Binding::Suffix), GapRule::Closed);
+        end.child(
+            "",
+            Symbol::Punct(',', Binding::Suffix, None),
+            GapRule::Closed,
+        );
         let b = end.child("last", marked, GapRule::Shared);
         end.coordinator = Some(b);
         end.link = Some(identity);
@@ -3854,7 +3909,11 @@ impl Conjoin {
         // A link and a further tail: into `TAIL++` and `TAIL+`.
         for (lhs, shape) in [(two, "++"), (one, "+")] {
             let mut link = Draft::new(format!("Coordination:{name}/polysyndetic{shape}"), lhs, 0);
-            link.child("", Symbol::Punct(mark, Binding::Suffix), GapRule::Closed);
+            link.child(
+                "",
+                Symbol::Punct(mark, Binding::Suffix, None),
+                GapRule::Closed,
+            );
             let c = link.child(
                 "coordinator",
                 Symbol::Leaf(coordinator.clone()),
@@ -3871,7 +3930,11 @@ impl Conjoin {
         }
         // The last link: into `TAIL+`.
         let mut end = Draft::new(format!("Coordination:{name}/polysyndetic-end"), one, 0);
-        end.child("", Symbol::Punct(mark, Binding::Suffix), GapRule::Closed);
+        end.child(
+            "",
+            Symbol::Punct(mark, Binding::Suffix, None),
+            GapRule::Closed,
+        );
         let c = end.child(
             "coordinator",
             Symbol::Leaf(coordinator.clone()),
@@ -3932,7 +3995,11 @@ impl Conjoin {
         }
         let a = draft.child("first", self.conjunct(), GapRule::Shared);
         if let Some(mark) = delimiter {
-            draft.child("", Symbol::Punct(mark, Binding::Suffix), GapRule::Closed);
+            draft.child(
+                "",
+                Symbol::Punct(mark, Binding::Suffix, None),
+                GapRule::Closed,
+            );
             draft.delimits = true;
         }
         let c = draft.child("coordinator", Symbol::Leaf(coordinator), GapRule::Closed);
@@ -4037,7 +4104,11 @@ impl Conjoin {
             let mut draft = Draft::new(id, lhs, cost);
             let a = draft.child("first", self.conjunct(), GapRule::Shared);
             if let Some(mark) = mark {
-                draft.child("", Symbol::Punct(mark, Binding::Suffix), GapRule::Closed);
+                draft.child(
+                    "",
+                    Symbol::Punct(mark, Binding::Suffix, None),
+                    GapRule::Closed,
+                );
                 draft.delimits = !tail;
             }
             let c = draft.child(
