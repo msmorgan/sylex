@@ -34,10 +34,11 @@ state a rule of English:
   `AdjunctPosition` comment says `Multiplying` is a multiplier that never goes with a temporal
   Noun Phrase; no card with a fronted *Twice this turn,* is known.
 
-## Open questions
+## Design
 
-- For a Production with one supporting card: name the card in its comment and keep it, or
-  handle the card another way (an Editorial Correction, a general rule, or none)?
+- A Production that serves one card stays. It is generalized where a general rule covers its
+  card without adding spurious Readings, and otherwise its comment names the card and, for a
+  gate, the measured effect.
 
 ## Done when
 
