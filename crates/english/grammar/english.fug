@@ -2805,14 +2805,18 @@ SetOffComplementClause: SetOffClause -> '—':Free Clause { unclosed }
     where head.ClauseMarking = Unmarked,
           head.Inflection != Irrealis
 VerblessComplementClause: VerblessClause -> Predicative
-// A passive participle with a Preposition Phrase Adjunct is verbal (*if
-// tapped for mana*), a bare one the Adjectival Passive (*if tapped*): one
-// tree each. A verbless clause has no Adjunct of its own: in *attacks each
-// combat if able unless ...*, *unless* belongs to the outer clause.
-ParticipialVerblessClause: VerblessClause -> VerbPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
+// A passive participle with a dependent of its own is verbal (*if tapped
+// for mana*, Reality Twist, Naked Singularity), a bare one the Adjectival
+// Passive (*if tapped*): one tree each. A coordination of participles and
+// a participle under a central adverb are the Adjective Phrase's alone (*if
+// tapped or blocked*, *if not tapped*). A verbless clause has no Adjunct of
+// its own: in *attacks each combat if able unless ...*, *unless* belongs to
+// the outer clause.
+ParticipialVerblessClause: VerblessClause -> VerbPhrase { heavy: [head], uncoordinated: [head] }
     where head.VerbForm = PastParticiple,
           head.Voice = Passive,
-          head.VerbKind != Auxiliary
+          head.VerbKind != Auxiliary,
+          head.CentralPosition != Occupied
 // *With your hand revealed*: a Subject, never nominative, and a
 // past-participial predicate (CGEL 14§8.3:1262).
 PastParticipialAbsolute: AbsoluteClause -> subject:ComplementNounPhrase VerbPhrase
