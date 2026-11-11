@@ -26,6 +26,15 @@ pub struct Grammar {
     pub typed_classes: Vec<Ident>,
     /// The Category that fills each kind of Frame Slot.
     pub slot_categories: BTreeMap<SlotKind, Ident>,
+    /// Unlike slots (`slot Name = Category { unlike: [kind, ...] }`), each
+    /// its name and its kinds: where a head's frames select two or more of
+    /// the kinds in one position, the engine derives a Frame Slot there
+    /// filled by the Category, a coordination whose `unlike` feature's
+    /// values on its conjuncts are each the name of a kind the head selects
+    /// (CGEL, Ch. 15 §3.1, p. 1323, rule [1]). Slot `i` is
+    /// `SlotKind::Unlike(i)` in `slot_categories`, and its name is the value
+    /// a `complement_kind` feature takes for it.
+    pub unlike_slots: Vec<(Ident, Vec<SlotKind>)>,
     /// Equations on every Frame Slot child of that kind in a derived valence
     /// phrase, over the child `slot`: what fills the slot as a Complement
     /// (a Noun Phrase Complement is never nominative).

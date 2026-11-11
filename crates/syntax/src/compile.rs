@@ -16,10 +16,13 @@ use crate::chart::QUOTATION_MARK;
 use crate::frames::Frame;
 use crate::frames::FrameCatalog;
 use crate::frames::FrameFamily;
+use crate::frames::FrameSlot;
+use crate::frames::Hosts;
 use crate::frames::PrepositionFrame;
 use crate::frames::SlotFill;
 use crate::frames::SlotKind;
 use crate::frames::SlotRelation;
+use crate::frames::UnlikeFill;
 use crate::grammar::ClustersDecl;
 use crate::grammar::Equation;
 use crate::grammar::Grammar;
@@ -33,6 +36,7 @@ use crate::step::GapRule;
 use crate::step::Production;
 use crate::step::Symbol;
 use crate::step::Test;
+use crate::step::Unlike;
 use crate::step::Weight;
 
 /// Feature names that would police attachment rather than describe grammar.
@@ -288,8 +292,13 @@ struct Draft {
     delimits: bool,
     /// A serial tail of a coordination, whose `first` conjunct follows another.
     tail: bool,
-    /// Conjuncts that must differ in a feature: (first, last, feature).
-    unlike: Option<(usize, usize, usize)>,
+    /// Conjuncts that must not all share a feature value
+    /// (`Production::unlike`).
+    unlike: Option<Unlike>,
+    /// Derived unlike Frame Slot children, each with the mask of the values
+    /// of its coordination's unlike feature that the head selects
+    /// (`Production::unlike_slots`).
+    unlike_slots: Vec<(usize, u64)>,
     /// A polysyndetic tail that must repeat the coordinator.
     chained: Option<usize>,
     gap_preposition: Option<LexemeId>,
@@ -422,6 +431,7 @@ impl Draft {
             fills_preposition: None,
             foreign_coordinators: Vec::new(),
             unlike: None,
+            unlike_slots: Vec::new(),
             internalised: None,
             omits_complement: false,
             elliptical: None,
@@ -638,6 +648,10 @@ impl<'a> Binder<'a> {
             facts.optional_complement =
                 list.is_empty() || list.iter().any(|f| f.family == FrameFamily::Intransitive);
             facts.active_only = !list.is_empty() && list.iter().all(|f| f.active_only);
+            for frame in unlike_frames(&grammar.unlike_slots, list) {
+                let index = intern(&mut frames, &frame);
+                facts.frames.insert(index);
+            }
         }
         for (id, list) in &catalog.prepositions {
             let facts = lexemes
@@ -650,32 +664,9 @@ impl<'a> Binder<'a> {
                 let index = intern(&mut preposition_frames, frame);
                 facts.preposition_frames.insert(index);
             }
-            // A preposition that selects both an Amount and a Noun Phrase
-            // selects their unlike coordination, where the grammar names a
-            // Category for it (CGEL, Ch. 15 §3.1, p. 1323, rule [1]).
-            if grammar.slot_categories.contains_key(&SlotKind::AmountOrNP) {
-                let selected = |fill: SlotFill, relation: SlotRelation| {
-                    list.iter()
-                        .find(|f| f.complement == fill && f.relation == relation)
-                };
-                for relation in [
-                    SlotRelation::Complement,
-                    SlotRelation::PredicativeComplement,
-                ] {
-                    if let (Some(np), Some(amount)) = (
-                        selected(SlotFill::NP, relation),
-                        selected(SlotFill::Amount, relation),
-                    ) {
-                        let derived = PrepositionFrame {
-                            relation,
-                            complement: SlotFill::AmountOrNP,
-                            hosts: np.hosts.meet(amount.hosts),
-                            named_only: false,
-                        };
-                        let index = intern(&mut preposition_frames, &derived);
-                        facts.preposition_frames.insert(index);
-                    }
-                }
+            for frame in unlike_preposition_frames(&grammar.unlike_slots, list) {
+                let index = intern(&mut preposition_frames, &frame);
+                facts.preposition_frames.insert(index);
             }
         }
         let mut referenced = Vec::new();
@@ -947,6 +938,67 @@ impl<'a> Binder<'a> {
         Test::Words(set)
     }
 
+    /// The name of a Slot Kind, which a `complement_kind` feature takes as
+    /// its value: an unlike slot's declared name, or the kind's own.
+    fn kind_name(&self, kind: SlotKind) -> String {
+        match kind {
+            SlotKind::Unlike(slot) => self.grammar.unlike_slots[usize::from(slot)].0.to_string(),
+            kind => format!("{kind:?}"),
+        }
+    }
+
+    /// Restricts child `child`, a derived unlike Frame Slot, to coordinations
+    /// whose conjuncts' values of the coordination's `unlike` feature are
+    /// each the name of a kind the head selects there.
+    fn unlike_slot(&self, draft: &mut Draft, child: usize, fill: &SlotFill) -> Result<(), LoadError> {
+        let SlotFill::Unlike(unlike) = fill else {
+            return Ok(());
+        };
+        let mask = self.unlike_mask(unlike.slot, &unlike.kinds)?;
+        draft.unlike_slots.push((child, mask));
+        Ok(())
+    }
+
+    /// The mask of the values of unlike slot `slot`'s coordination's
+    /// `unlike` feature that name `kinds`. Every coordination schema of the
+    /// slot's Category that declares `unlike` must declare the same feature.
+    fn unlike_mask(&self, slot: u8, kinds: &[SlotKind]) -> Result<u64, LoadError> {
+        let slot_name = &self.grammar.unlike_slots[usize::from(slot)].0;
+        let name = &self.out.categories[self.slot_category(SlotKind::Unlike(slot))?];
+        let features: BTreeSet<&Ident> = self
+            .grammar
+            .schemas
+            .iter()
+            .filter_map(|schema| match schema {
+                SchemaDecl::Coordination {
+                    category: c,
+                    unlike: Some(feature),
+                    ..
+                } if c == name => Some(feature),
+                _ => None,
+            })
+            .collect();
+        let feature = match features.into_iter().collect::<Vec<_>>()[..] {
+            [feature] => self.feature(feature)?,
+            [] => {
+                return Err(invalid(format!(
+                    "unlike slot `{slot_name}`: no coordination of `{name}` declares `unlike`"
+                )));
+            }
+            _ => {
+                return Err(invalid(format!(
+                    "unlike slot `{slot_name}`: the coordinations of `{name}` declare different `unlike` features"
+                )));
+            }
+        };
+        let mut mask = 0u64;
+        for kind in kinds {
+            let value = self.value(feature, &format!("{kind:?}"))?;
+            mask |= 1u64 << value;
+        }
+        Ok(mask)
+    }
+
     fn slot_category(&self, kind: SlotKind) -> Result<usize, LoadError> {
         let name = self
             .grammar
@@ -957,6 +1009,10 @@ impl<'a> Binder<'a> {
     }
 
     fn finish(mut self) -> Result<CompiledGrammar, LoadError> {
+        for (slot, (_, kinds)) in self.grammar.unlike_slots.iter().enumerate() {
+            let slot = u8::try_from(slot).expect("at most 256 unlike slots");
+            self.unlike_mask(slot, kinds)?;
+        }
         for declaration in &self.grammar.productions {
             let draft = self.authored(declaration)?;
             self.add(draft)?;
@@ -1830,6 +1886,7 @@ impl<'a> Binder<'a> {
             .foreign_coordinators
             .clone_from(&draft.foreign_coordinators);
         production.unlike = draft.unlike;
+        production.unlike_slots.clone_from(&draft.unlike_slots);
         production.omission = if let Some(forms) = draft.elliptical {
             crate::step::Omission::Ellipsis(forms)
         } else if draft.omits_complement {
@@ -2639,7 +2696,7 @@ impl<'a> Binder<'a> {
                 heavy_shift,
             )?;
             if let (Some(f), Some(first)) = (complement_kind, slots.first()) {
-                let kind = self.value(f, &format!("{:?}", first.kind()))?;
+                let kind = self.value(f, &self.kind_name(first.kind()))?;
                 for draft in &mut family {
                     draft.equations.push((Path::Mother(f), Target::Value(kind)));
                 }
@@ -2777,8 +2834,8 @@ impl<'a> Binder<'a> {
             let frame = &self.out.preposition_frames[index];
             let mut draft = Draft::new(
                 format!(
-                    "Valence:{phrase}/{:?}@{:?}{}{}",
-                    frame.complement,
+                    "Valence:{phrase}/{}@{:?}{}{}",
+                    complement_label(&frame.complement),
                     frame.hosts,
                     if frame.relation == SlotRelation::Complement { "" } else { "/predicative" },
                     if frame.named_only { "/named" } else { "" }
@@ -2792,7 +2849,7 @@ impl<'a> Binder<'a> {
                 GapRule::Closed,
             );
             if let Some(f) = complement_kind {
-                let kind = self.value(f, &format!("{:?}", frame.complement.kind()))?;
+                let kind = self.value(f, &self.kind_name(frame.complement.kind()))?;
                 draft.equations.push((Path::Mother(f), Target::Value(kind)));
             }
             if frame.complement != SlotFill::Intransitive {
@@ -2802,14 +2859,15 @@ impl<'a> Binder<'a> {
                     if closed_complement { GapRule::Closed } else { GapRule::Transparent },
                 );
                 self.slot_equations(&mut draft, child, frame.complement.kind())?;
+                self.unlike_slot(&mut draft, child, &frame.complement)?;
             }
             drafts.push(draft);
             if gap_capable && matches!(frame.complement, SlotFill::NP | SlotFill::Amount) {
                 let amount = frame.complement == SlotFill::Amount;
                 let mut stranded = Draft::new(
                     format!(
-                        "Valence:{phrase}/{:?}@{:?}{}{}/gap0",
-                        frame.complement,
+                        "Valence:{phrase}/{}@{:?}{}{}/gap0",
+                        complement_label(&frame.complement),
                         frame.hosts,
                         if frame.relation == SlotRelation::Complement {
                             ""
@@ -2829,7 +2887,7 @@ impl<'a> Binder<'a> {
                 stranded.introduces = if amount { Gap::Amount } else { Gap::NP };
                 // It names the Slot Kind of the Complement it strands.
                 if let Some(f) = complement_kind {
-                    let kind = self.value(f, &format!("{:?}", frame.complement.kind()))?;
+                    let kind = self.value(f, &self.kind_name(frame.complement.kind()))?;
                     stranded
                         .equations
                         .push((Path::Mother(f), Target::Value(kind)));
@@ -2982,6 +3040,7 @@ impl<'a> Binder<'a> {
                     GapRule::Transparent,
                 );
                 self.slot_equations(&mut draft, child, fill.kind())?;
+                self.unlike_slot(&mut draft, child, fill)?;
                 if **fill == SlotFill::Pred {
                     draft.predicative = Some(child);
                 }
@@ -3591,7 +3650,7 @@ impl<'a> Binder<'a> {
                 }
             }
             serial.distinct_coordinator = vec![a];
-            serial.unlike = conjoin.unlike.map(|f| (a, t, f));
+            serial.unlike = conjoin.unlike.map(|feature| Unlike::new(a, t, feature, true));
             conjoin.close(self, &mut serial, &[a, t], Edge::Whole { last: false })?;
             for &feature in &conjoin.recovered {
                 serial.equations.push((
@@ -3652,7 +3711,7 @@ impl<'a> Binder<'a> {
             more.coordinator = Some(t);
             more.distinct_coordinator = vec![a];
             conjoin.close(self, &mut more, &[a, t], Edge::Tail { last: false })?;
-            conjoin.carry_unlike(&mut more, a, t);
+            conjoin.carry_unlike(&mut more, a, t, true);
             recover(&mut more, middle.map(|_| a), Some(t));
             drafts.push(more);
             let mut end = Draft::new(shape("serial-end"), conjoin.tail_id, 0);
@@ -3672,7 +3731,7 @@ impl<'a> Binder<'a> {
             end.coordinator = Some(c);
             end.distinct_coordinator = vec![a, b];
             conjoin.close(self, &mut end, &[a, b], Edge::Tail { last: true })?;
-            conjoin.carry_unlike(&mut end, a, b);
+            conjoin.carry_unlike(&mut end, a, b, false);
             recover(&mut end, middle.map(|_| a), None);
             drafts.push(end);
         }
@@ -3775,7 +3834,7 @@ impl Binder<'_> {
             draft.coordinator = Some(b);
             draft.link = Some(identity);
             draft.distinct_coordinator = vec![a, b];
-            draft.unlike = conjoin.unlike.map(|f| (a, b, f));
+            draft.unlike = conjoin.unlike.map(|feature| Unlike::new(a, b, feature, false));
             conjoin.close(self, &mut draft, &[a, b], Edge::Whole { last: true })?;
             drafts.push(draft);
         }
@@ -3794,7 +3853,7 @@ impl Binder<'_> {
         serial.coordinator = Some(t);
         serial.link = Some(identity);
         serial.distinct_coordinator = vec![a];
-        serial.unlike = conjoin.unlike.map(|f| (a, t, f));
+        serial.unlike = conjoin.unlike.map(|feature| Unlike::new(a, t, feature, true));
         conjoin.close(self, &mut serial, &[a, t], Edge::Whole { last: false })?;
         drafts.push(serial);
         let mut more = Draft::new(id("serial-more"), conjoin.tail_id, 0);
@@ -3809,7 +3868,7 @@ impl Binder<'_> {
         more.link = Some(identity);
         more.distinct_coordinator = vec![a];
         conjoin.close(self, &mut more, &[a, t], Edge::Tail { last: false })?;
-        conjoin.carry_unlike(&mut more, a, t);
+        conjoin.carry_unlike(&mut more, a, t, true);
         drafts.push(more);
         let mut end = Draft::new(id("serial-end"), conjoin.tail_id, 0);
         let a = end.child("first", conjoin.conjunct(), GapRule::Shared);
@@ -3823,7 +3882,7 @@ impl Binder<'_> {
         end.link = Some(identity);
         end.distinct_coordinator = vec![a, b];
         conjoin.close(self, &mut end, &[a, b], Edge::Tail { last: true })?;
-        conjoin.carry_unlike(&mut end, a, b);
+        conjoin.carry_unlike(&mut end, a, b, false);
         drafts.push(end);
         Ok(drafts)
     }
@@ -3890,6 +3949,16 @@ impl Conjoin {
             .as_deref()
             .map_or(Ok(lhs), |c| binder.category(c))?;
         let unlike = unlike.as_deref().map(|f| binder.feature(f)).transpose()?;
+        // A Summary gathers the unlike feature's values as a 64-bit mask,
+        // whose last bit marks a conjunct with no value
+        // (`step::UNVALUED_CONJUNCT`).
+        if let Some(f) = unlike
+            && binder.out.values[f].len() > 63
+        {
+            return Err(invalid(format!(
+                "coordination of `{category}`: its unlike feature has more than 63 values"
+            )));
+        }
         let features = |names: &[Ident]| {
             names
                 .iter()
@@ -4032,7 +4101,7 @@ impl Conjoin {
         whole.coordinator = Some(t);
         whole.distinct_coordinator = vec![a];
         // Unlike conjuncts are not all alike, as in the serial.
-        whole.unlike = self.unlike.map(|f| (a, t, f));
+        whole.unlike = self.unlike.map(|feature| Unlike::new(a, t, feature, true));
         self.close(binder, &mut whole, &[a, t], Edge::Whole { last: false })?;
         drafts.push(whole);
         // A link and a further tail: into `TAIL++` and `TAIL+`.
@@ -4054,7 +4123,7 @@ impl Conjoin {
             link.chained = Some(r);
             link.distinct_coordinator = vec![b];
             self.close(binder, &mut link, &[b, r], Edge::Tail { last: false })?;
-            self.carry_unlike(&mut link, b, r);
+            self.carry_unlike(&mut link, b, r, true);
             drafts.push(link);
         }
         // The last link: into `TAIL+`.
@@ -4073,24 +4142,19 @@ impl Conjoin {
         end.coordinator = Some(c);
         end.distinct_coordinator = vec![b];
         self.close(binder, &mut end, &[b], Edge::Tail { last: true })?;
-        self.carry_unlike(&mut end, b, b);
+        self.carry_unlike(&mut end, b, b, false);
         drafts.push(end);
         Ok(drafts)
     }
 
-    /// A serial tail of unlike conjuncts carries its last conjunct's value of
-    /// the unlike feature, which the whole compares with the first's, and
-    /// records whether its own conjuncts, from `first` to `last` (a conjunct
-    /// or a further tail), already differ (`Summary::unlike_mixed`).
-    fn carry_unlike(&self, draft: &mut Draft, first: usize, last: usize) {
-        if let Some(f) = self.unlike {
-            if first != last {
-                draft.unlike = Some((first, last, f));
-            }
-            draft
-                .equations
-                .push((Path::Mother(f), Target::Path(Path::Child(last, f))));
-        }
+    /// A serial tail of unlike conjuncts gathers the unlike feature's values
+    /// of its conjuncts, from `first` to `last` (a conjunct, or a further
+    /// tail when `rest`), for the whole to compare
+    /// (`Summary::unlike_values`).
+    fn carry_unlike(&self, draft: &mut Draft, first: usize, last: usize, rest: bool) {
+        draft.unlike = self
+            .unlike
+            .map(|feature| Unlike::new(first, last, feature, rest));
     }
 
     /// A binary coordination, after a correlative marker or with a
@@ -4135,7 +4199,7 @@ impl Conjoin {
         let b = draft.child("last", self.conjunct(), GapRule::Shared);
         draft.coordinator = Some(c);
         draft.distinct_coordinator = vec![a, b];
-        draft.unlike = self.unlike.map(|f| (a, b, f));
+        draft.unlike = self.unlike.map(|feature| Unlike::new(a, b, feature, false));
         self.close(binder, &mut draft, &[a, b], Edge::Whole { last: true })?;
         Ok(draft)
     }
@@ -4787,6 +4851,7 @@ pub(crate) fn frame_name(phrase: &str, frame: &Frame) -> String {
                     .join("|"),
                 complement.map_or_else(String::new, |kind| format!(":{kind:?}"))
             ),
+            SlotFill::Unlike(unlike) => unlike_label(unlike),
             fill => format!("{:?}", fill.kind()),
         })
         .collect();
@@ -4796,6 +4861,123 @@ pub(crate) fn frame_name(phrase: &str, frame: &Frame) -> String {
     };
     let voice = if frame.active_only { "[ActiveOnly]" } else { "" };
     format!("Valence:{phrase}/{family}({}){voice}", slots.join(","))
+}
+
+/// The frames a head's declared `frames` derive for the grammar's unlike
+/// slots: where frames of one family differ only in one slot, whose fills
+/// are two or more of an unlike slot's kinds, a frame with that slot's
+/// unlike coordination of those kinds there (CGEL, Ch. 15 §3.1, p. 1323,
+/// rule [1]). It is active-only if any of them is.
+fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Frame> {
+    let mut derived = Vec::new();
+    for (index, (name, kinds)) in slots.iter().enumerate() {
+        let slot = u8::try_from(index).expect("at most 256 unlike slots");
+        // (family, varied position, every other slot, its relation) -> the
+        // kinds selected there, and whether any such frame is active-only.
+        let mut groups: BTreeMap<_, (BTreeSet<SlotKind>, bool)> = BTreeMap::new();
+        for frame in frames {
+            for (at, varied) in frame.slots.iter().enumerate() {
+                let kind = varied.fill.kind();
+                if !kinds.contains(&kind) {
+                    continue;
+                }
+                let mut rest = frame.slots.clone();
+                rest.remove(at);
+                let group = groups
+                    .entry((frame.family, at, rest, varied.relation))
+                    .or_default();
+                group.0.insert(kind);
+                group.1 |= frame.active_only;
+            }
+        }
+        for ((family, at, rest, relation), (selected, active_only)) in groups {
+            if selected.len() < 2 {
+                continue;
+            }
+            let mut slots = rest;
+            slots.insert(
+                at,
+                FrameSlot {
+                    relation,
+                    fill: SlotFill::Unlike(unlike_fill(slot, name, kinds, &selected)),
+                },
+            );
+            derived.push(Frame {
+                family,
+                slots,
+                active_only,
+            });
+        }
+    }
+    derived
+}
+
+/// The frames a preposition's declared frames derive for the grammar's
+/// unlike slots, as [`unlike_frames`] derives a head's: one per relation
+/// whose frames select two or more of an unlike slot's kinds, admitting the
+/// Host Categories they all admit. A frame only a slot naming its kind
+/// selects (`named_only`) takes no part.
+fn unlike_preposition_frames(
+    slots: &[(Ident, Vec<SlotKind>)],
+    frames: &[PrepositionFrame],
+) -> Vec<PrepositionFrame> {
+    let mut derived = Vec::new();
+    for (index, (name, kinds)) in slots.iter().enumerate() {
+        let slot = u8::try_from(index).expect("at most 256 unlike slots");
+        let mut groups: BTreeMap<SlotRelation, (BTreeSet<SlotKind>, Option<Hosts>)> =
+            BTreeMap::new();
+        for frame in frames {
+            let kind = frame.complement.kind();
+            if frame.named_only || !kinds.contains(&kind) {
+                continue;
+            }
+            let group = groups.entry(frame.relation).or_default();
+            group.0.insert(kind);
+            group.1 = Some(group.1.map_or(frame.hosts, |hosts| hosts.meet(frame.hosts)));
+        }
+        for (relation, (selected, hosts)) in groups {
+            let (true, Some(hosts)) = (selected.len() >= 2, hosts) else {
+                continue;
+            };
+            derived.push(PrepositionFrame {
+                relation,
+                complement: SlotFill::Unlike(unlike_fill(slot, name, kinds, &selected)),
+                hosts,
+                named_only: false,
+            });
+        }
+    }
+    derived
+}
+
+/// The Fill of unlike slot `slot` restricted to `selected`, its kinds in the
+/// slot's declared order.
+fn unlike_fill(
+    slot: u8,
+    name: &Ident,
+    kinds: &[SlotKind],
+    selected: &BTreeSet<SlotKind>,
+) -> UnlikeFill {
+    UnlikeFill {
+        slot,
+        name: *name,
+        kinds: kinds.iter().filter(|k| selected.contains(k)).copied().collect(),
+    }
+}
+
+/// A derived unlike Fill as a Production id shows it: the slot's name and
+/// the kinds selected (`UnlikeObject[NP|KeywordPhrase]`).
+fn unlike_label(unlike: &UnlikeFill) -> String {
+    let kinds: Vec<String> = unlike.kinds.iter().map(|kind| format!("{kind:?}")).collect();
+    format!("{}[{}]", unlike.name, kinds.join("|"))
+}
+
+/// A preposition frame's Complement as its Production id shows it.
+fn complement_label(fill: &SlotFill) -> String {
+    match fill {
+        SlotFill::Unlike(unlike) => unlike_label(unlike),
+        fill => format!("{fill:?}"),
+    }
 }
 
 /// What a Frame Slot selects, as same-head complement priority sees it.

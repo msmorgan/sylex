@@ -20,6 +20,7 @@
 //! class Coordinator = ["coord:and", "coord:or"]
 //! class CardType { typed }                    // membership from the lexical environment
 //! slot NP = ComplementNounPhrase where slot.Case != Nominative
+//! slot AmountOrNP = AmountOrNounPhrase { unlike: [NP, Amount] }  // derived where a head selects two
 //! high_attachment PrepositionPhrase where $.DeterminativeDistribution = Distributive
 //! correlative Both = And
 //! idiomatic_coordinate And = IdiomaticCoordinate
@@ -1129,6 +1130,29 @@ impl Builder {
                 }
                 grammar.typed_classes.push(name);
                 false
+            }
+            Some("slot") if item.props.is_some() => {
+                let shape = "an unlike slot is `slot Name = Category { unlike: [Kind, ...] }`";
+                let mut props = item.props.take().into_iter().flatten().collect::<Vec<_>>();
+                let (Some((key, Some(kinds), _)), true) = (props.pop(), props.is_empty()) else {
+                    return fail(at, shape);
+                };
+                if key != "unlike" {
+                    return fail(at, shape);
+                }
+                let kinds: Vec<SlotKind> = read(kinds)?;
+                if kinds.len() < 2 {
+                    return fail(at, "an unlike slot names two or more kinds");
+                }
+                let category = item.value()?.ident()?;
+                let duplicate = grammar.unlike_slots.iter().any(|(n, _)| *n == name);
+                let index = u8::try_from(grammar.unlike_slots.len())
+                    .map_err(|_| LoadError::Format("more than 256 unlike slots".into()))?;
+                grammar.unlike_slots.push((name, kinds));
+                grammar
+                    .slot_categories
+                    .insert(SlotKind::Unlike(index), category);
+                duplicate
             }
             Some("slot") => {
                 let slot: SlotKind = read(item.ident(&item.name.clone()))?;

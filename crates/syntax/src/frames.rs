@@ -119,12 +119,25 @@ pub enum SlotFill {
     Cost,
     /// No Complement: an intransitive preposition, as *out* in *phase out*.
     Intransitive,
-    /// An unlike coordination of an Amount and a Noun Phrase (*equal to [2]
-    /// or [the greatest power among ...]*). It is never declared: a
-    /// preposition that selects both an Amount and a Noun Phrase selects it,
-    /// since each conjunct fills the position alone (CGEL, Ch. 15 §3.1,
-    /// p. 1323, rule [1]).
-    AmountOrNP,
+    /// An unlike coordination of the kinds of an unlike slot the grammar
+    /// declares (`Grammar::unlike_slots`), restricted to those the head
+    /// selects in this position (*has flying and "{T}: Add {G}."*,
+    /// *equal to [2] or [the greatest power among ...]*). It is never
+    /// declared: a head whose frames select two or more of the slot's kinds
+    /// in one position selects it there, since each conjunct fills the
+    /// position alone (CGEL, Ch. 15 §3.1, p. 1323, rule [1]).
+    #[serde(skip)]
+    Unlike(UnlikeFill),
+}
+
+/// The Fill of a derived unlike Frame Slot: the grammar's unlike slot, by
+/// its index in `Grammar::unlike_slots` and its name, and the kinds the
+/// head selects of it, in the slot's order.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub struct UnlikeFill {
+    pub slot: u8,
+    pub name: Ident,
+    pub kinds: Vec<SlotKind>,
 }
 
 /// A [`SlotFill`] without its markers: the key a grammar maps to a Category.
@@ -163,7 +176,10 @@ pub enum SlotKind {
     Amount,
     Cost,
     Intransitive,
-    AmountOrNP,
+    /// A derived unlike Frame Slot ([`SlotFill::Unlike`]): the grammar's
+    /// unlike slot of this index, never a declared kind.
+    #[serde(skip)]
+    Unlike(u8),
 }
 
 impl SlotFill {
@@ -197,7 +213,7 @@ impl SlotFill {
             Self::Amount => SlotKind::Amount,
             Self::Cost => SlotKind::Cost,
             Self::Intransitive => SlotKind::Intransitive,
-            Self::AmountOrNP => SlotKind::AmountOrNP,
+            Self::Unlike(fill) => SlotKind::Unlike(fill.slot),
         }
     }
 }

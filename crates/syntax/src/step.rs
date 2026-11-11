@@ -209,6 +209,32 @@ pub(crate) fn form_bit(form: WordForm) -> u16 {
     1 << form as u16
 }
 
+/// The bit of `Summary::unlike_values` marking a conjunct with no value of
+/// the unlike feature, whose own values take the bits below it.
+pub(crate) const UNVALUED_CONJUNCT: u64 = 1 << 63;
+
+/// The conjuncts of an unlike coordination: its `first` child and its
+/// `last`, a conjunct or, when `rest`, a serial tail whose Summary gathers
+/// its own conjuncts' values; `feature` is the unlike feature.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Unlike {
+    pub first: usize,
+    pub last: usize,
+    pub feature: usize,
+    pub rest: bool,
+}
+
+impl Unlike {
+    pub(crate) fn new(first: usize, last: usize, feature: usize, rest: bool) -> Self {
+        Self {
+            first,
+            last,
+            feature,
+            rest,
+        }
+    }
+}
+
 /// A compiled Production.
 #[derive(Debug, Clone)]
 #[expect(
@@ -302,11 +328,13 @@ pub(crate) struct Production {
     /// Coordinators a plain serial coordination's tail may not end with.
     pub foreign_coordinators: Vec<LexemeId>,
     /// The conjuncts of an unlike coordination, which may not all share a
-    /// feature value: (first, last, feature), the last a conjunct or a serial
-    /// tail. A serial tail records whether its own conjuncts already differ
-    /// (`Summary::unlike_mixed`); the whole requires that the first differ
-    /// from the last or that the tail be mixed.
-    pub unlike: Option<(usize, usize, usize)>,
+    /// feature value. Its Summary gathers their values
+    /// (`Summary::unlike_values`); the whole requires two or more.
+    pub unlike: Option<Unlike>,
+    /// Derived unlike Frame Slot children: (child, mask of values). The
+    /// coordination filling the slot has no conjunct whose value of its
+    /// `unlike` feature is outside the mask (`Grammar::unlike_slots`).
+    pub unlike_slots: Vec<(usize, u64)>,
     /// An auxiliary Verb Phrase's Complement: the child of an uncoordinated
     /// Production after its head, last, and of a function Category aliasing
     /// the Production's own Category, the participial Verb Phrase Complement
@@ -550,6 +578,7 @@ pub(crate) fn resolve(
         fills_preposition: None,
         foreign_coordinators: Vec::new(),
         unlike: None,
+        unlike_slots: Vec::new(),
         auxiliary: None,
         omission: Omission::None,
         unclosed: false,
@@ -610,8 +639,7 @@ pub(crate) fn resolve(
             conjunct_hosts: u8::MAX,
             plain_hosts: u8::MAX,
             conjoined_host: false,
-            unlike_value: None,
-            unlike_mixed: false,
+            unlike_values: 0,
             nonlast: [FeatureValue::UNSET; MAX_RESOLUTIONS],
             last: [FeatureValue::UNSET; MAX_RESOLUTIONS],
             joint_hits: 0,
@@ -719,9 +747,10 @@ pub(crate) struct Summary {
     pub other_preposition: Option<LexemeId>,
     /// A serial tail's last conjunct's value of each resolved feature.
     pub last_resolved: [FeatureValue; MAX_RESOLUTIONS],
-    /// A serial tail of an unlike coordination whose conjuncts do not all
-    /// share the unlike feature's value (`Production::unlike`).
-    pub unlike_mixed: bool,
+    /// An unlike coordination's or serial tail's conjuncts' values of the
+    /// unlike feature, as a mask (`Production::unlike`); 0 for any other
+    /// phrase.
+    pub unlike_values: u64,
     /// Complements that would extend this phrase's selected frame, as an
     /// index into [`CompiledGrammar::extension_sets`].
     pub extensions: u16,
@@ -989,10 +1018,8 @@ pub(crate) struct State {
     /// A conjunct admits a Predicate host only as a conjunct
     /// (`frames::conjoined_hosts`).
     conjoined_host: bool,
-    /// The first conjunct's value of an `unlike` feature.
-    unlike_value: Option<u16>,
-    /// The conjuncts so far do not all share the `unlike` feature's value.
-    unlike_mixed: bool,
+    /// The `unlike` feature's values of the conjuncts so far, as a mask.
+    unlike_values: u64,
     /// The value of each resolved feature on the conjuncts but the last, and
     /// on the last.
     nonlast: [FeatureValue; MAX_RESOLUTIONS],
@@ -1571,11 +1598,10 @@ impl Production {
         }
     }
 
-    /// Records the first unlike conjunct's value and whether the last (or
-    /// the serial tail's conjuncts) differ from it; `None` if the whole
-    /// coordination's conjuncts are all of one kind (or a compared one has
-    /// no value): unlike conjuncts need only not all be alike (CGEL, Ch. 15
-    /// §3.1, p. 1323 [1]; §3.2, p. 1326).
+    /// Gathers the unlike feature's values of the conjuncts, a serial tail's
+    /// from its Summary; `None` if the whole coordination's valued conjuncts
+    /// are all of one kind: unlike conjuncts need only not all be alike
+    /// (CGEL, Ch. 15 §3.1, p. 1323 [1]; §3.2, p. 1326).
     fn unlike_conjuncts(
         &self,
         next: &mut State,
@@ -1583,20 +1609,38 @@ impl Production {
         child: &ChildView<'_>,
         lookup: &dyn Fn(usize) -> Option<u16>,
     ) -> Option<()> {
-        if let Some((first, last, feature)) = self.unlike {
-            let value = lookup(feature);
-            if position == first {
-                next.unlike_value = value;
-            } else if position == last {
-                let differ = matches!(child, ChildView::Node(summary) if summary.unlike_mixed)
-                    || value.is_some() && next.unlike_value.is_some() && value != next.unlike_value;
-                if !self.tail && !differ {
-                    return None;
-                }
-                next.unlike_mixed = differ;
+        let Some(unlike) = self.unlike else {
+            return Some(());
+        };
+        if position != unlike.first && position != unlike.last {
+            return Some(());
+        }
+        next.unlike_values |= match child {
+            ChildView::Node(summary) if unlike.rest && position == unlike.last => {
+                summary.unlike_values
             }
+            // A conjunct with no value is of no kind a derived unlike slot
+            // selects (`unlike_slot_admits`), and differs from none.
+            _ => lookup(unlike.feature).map_or(UNVALUED_CONJUNCT, |value| 1u64 << value),
+        };
+        if position == unlike.last
+            && !self.tail
+            && (next.unlike_values & !UNVALUED_CONJUNCT).count_ones() < 2
+        {
+            return None;
         }
         Some(())
+    }
+
+    /// Whether child `position`, a derived unlike Frame Slot, admits the
+    /// coordination: none of its conjuncts' values of the unlike feature is
+    /// outside the slot's mask, and every conjunct has one
+    /// (`Production::unlike_slots`; the mask never holds
+    /// [`UNVALUED_CONJUNCT`]).
+    fn unlike_slot_admits(&self, position: usize, summary: &Summary) -> bool {
+        self.unlike_slots.iter().all(|&(at, mask)| {
+            at != position || (summary.unlike_values != 0 && summary.unlike_values & !mask == 0)
+        })
     }
 
     /// Records the joint-exclusion conditions child `position` meets, or
@@ -1916,6 +1960,7 @@ impl Production {
         match child {
             ChildView::Node(summary) => {
                 if !self.slot_admits(grammar, position, summary)
+                    || !self.unlike_slot_admits(position, summary)
                     || (summary.nonfinal && !self.nonfinal_conjuncts.contains(&position))
                 {
                     return None;
@@ -2106,7 +2151,7 @@ impl Production {
                 state.other_preposition
             },
             last_resolved,
-            unlike_mixed: self.tail && state.unlike_mixed,
+            unlike_values: if self.unlike.is_some() { state.unlike_values } else { 0 },
             extensions: state.extensions,
             coordinator: self.link.or(state.coordinator),
             coordinated: self.link.is_some()

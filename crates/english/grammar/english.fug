@@ -619,7 +619,13 @@ slot MeasureNP = MeasureNounPhrase
 slot KeywordPhrase = KeywordPhrase
 slot Nominal = BareNominalComplement
 slot Amount = Amount
-slot AmountOrNP = AmountOrNounPhrase
+// Unlike slots. Where a head's frames select two or more of a slot's kinds
+// in one position, that position also takes the slot's coordination,
+// restricted to conjuncts of the kinds the head selects there: each conjunct
+// fills the position alone (CGEL, Ch. 15 §3.1, p. 1323, rule [1]). A
+// preposition's derived frame admits the Host Categories all of its frames
+// do. *Equal to [2] or [the greatest power among ...]*.
+slot AmountOrNP = AmountOrNounPhrase { unlike: [NP, Amount] }
 // Mana-only. A final Keyword Parameter Cost is this slot after a space, or
 // an em dash, a NonManaCost and a period, each with its own FinalParameter;
 // the punctuation is the production's, not a Reading (OSG §3, Em dashes).

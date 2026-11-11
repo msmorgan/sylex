@@ -34,6 +34,8 @@ fn lexicon() -> Lexicon {
         Lexeme::invariant("p:on", "on", Category::Preposition, core()),
         Lexeme::invariant("p:with", "with", Category::Preposition, core()),
         Lexeme::invariant("p:in", "in", Category::Preposition, core()),
+        Lexeme::invariant("c:and", "and", Category::Coordinator, core()),
+        Lexeme::invariant("c:or", "or", Category::Coordinator, core()),
     ];
     for noun in ["man", "hill", "telescope", "card"] {
         lexemes.push(Lexeme::noun(
@@ -343,6 +345,31 @@ fn load_errors() {
         1,
     );
     assert!(load_error(&agreeing).contains("values differ"));
+    // An unlike slot's Category is coordinated over one unlike feature.
+    let unlike = |coordinations: &str| {
+        format!(
+            "{GRAMMAR}
+    word And = \"c:and\"
+    word Or = \"c:or\"
+    feature Kind = NP | Amount
+    feature Other = NP | Amount
+    category Pair [Kind, Other]
+    slot Pairs = Pair {{ unlike: [NP, Amount] }}
+    Single: Pair -> NounPhrase where $.Kind = NP, $.Other = NP
+{coordinations}"
+        )
+    };
+    assert!(
+        load_error(&unlike(
+            "    coordination Pair { coordinators: And, unshared: [Kind], unlike: Kind }
+    coordination Pair { coordinators: Or, unshared: [Other], unlike: Other }"
+        ))
+        .contains("different `unlike` features")
+    );
+    assert!(
+        load_error(&unlike("    coordination Pair { coordinators: And }"))
+            .contains("declares `unlike`")
+    );
     // The CR-catalog ban: a keyword action is catalog vocabulary.
     assert!(
         load_error(&swap("word This = \"d:this\"", "word This = \"v:destroy\""))
