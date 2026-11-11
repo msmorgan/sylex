@@ -83,37 +83,6 @@ fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
     );
 }
 
-/// After *named*, the face's own Shortened Name and another card's full name
-/// spelled alike are both Readings, and the face's own ranks first, in the
-/// forest and on the tree alike. A minimal repro on Nicol Bolas, the
-/// Deceiver: no card prints *named* before its own Shortened Name.
-#[test]
-fn after_named_a_face_s_own_name_ranks_before_another_card_s_spelled_alike() {
-    let env = LexicalEnvironment::load().unwrap();
-    let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Deceiver");
-    let scope = std::collections::BTreeSet::from([own]);
-    let text = "Search your library for a card named Nicol Bolas.";
-    let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
-    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
-    assert_eq!(ranked.len(), 2);
-    let other = sylex_vocabulary::card_name_id("Nicol Bolas");
-    assert!(
-        names(&grammar, &env, &ranked[0].1)
-            .iter()
-            .all(|h| *h == own)
-    );
-    assert!(
-        names(&grammar, &env, &ranked[1].1)
-            .iter()
-            .all(|h| *h == other)
-    );
-    assert!(ranked[0].0 < ranked[1].0);
-    for (key, reading) in &ranked {
-        assert_eq!(grammar.ranking_key(reading, &env.lexicon), Ok(*key));
-    }
-}
-
 /// The card names that head a Reading's Constituents.
 fn names(
     grammar: &sylex_syntax::CompiledGrammar,

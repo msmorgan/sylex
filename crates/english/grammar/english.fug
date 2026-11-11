@@ -850,10 +850,7 @@ NominalPhraseQuality: Quality -> NounPhrase
 AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
 NamedParameter: Name -> Lex(Catalog)
 NameAsComplement: NameComplement -> Name { cost: 0 }
-// Costs more than a Name, so the face's own Shortened Name [CR#201.5c]
-// ranks first where the two are spelled alike (*Nicol Bolas* on Nicol
-// Bolas, the Ravager). Both stay Readings.
-OtherCardNameComplement: NameComplement -> OtherCardName() { cost: 2 }
+OtherCardNameComplement: NameComplement -> OtherCardName()
 SlashMeasure: Measure -> first:SignedAmount '/':Bound second:SignedAmount
 MeasureHeader: Header -> Measure
 RangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '-':Bound upper:Amount

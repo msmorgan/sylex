@@ -155,8 +155,7 @@ selected, as *do the same for* selects *for* with a cited word
 (`PPWith(["for"], Mention)`): a name after *among* under any other head (*divide
 it among Black Lotus*) is refused. Any other position, a Subject, Object,
 possessor or premodifier among them, refuses another card's name with no clause
-of its own. There, where the face's own Shortened Name is spelled alike, both
-are Readings and the face's own ranks first. A name a card gives an object, or
+of its own. A name a card gives an object, or
 a vote option, spelled like another card's name is listed as that card's
 Introduced Name or vote option (*create a Tarmogoyf token*, *votes for Redhorn
 Pass or Mines of Moria*). Why: a card's text mentions another card by name only
