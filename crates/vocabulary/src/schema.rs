@@ -77,6 +77,9 @@ pub enum FillSpec {
     /// word: `PPWith(["for"], Mention)`).
     PPWith(Vec<String>, Box<FillSpec>),
     Pred,
+    /// A name as the predicative complement of *name*, where another
+    /// card's name stands (*cards named Relentless Rats*).
+    Name,
     AdjP,
     /// An Adverb Phrase or a Noun Phrase of frequency (*than twice*).
     AdvP,
@@ -143,8 +146,9 @@ pub enum FrameSpec {
     Prepositional(Vec<String>),
     Copular,
     Catenative(Catenation),
-    /// An object and a predicative complement: *turn it face up*.
-    ComplexTransitive,
+    /// An object and a predicative complement of the given kind: `Pred` in
+    /// *turn it face up*, `Name` in *cards named Relentless Rats*.
+    ComplexTransitive(FillSpec),
     /// An object and a non-finite complement: *cause you to sacrifice*.
     ComplexCatenative(Catenation),
     /// A content clause: *decide whether to flip again*.

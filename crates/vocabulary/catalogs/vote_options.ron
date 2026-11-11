@@ -5,7 +5,8 @@
 // gets more votes*, *for each numbers vote*. A mentioned word is a name, not a use of the word
 // (CGEL, Ch. 5 §8.2, p. 401), so each option is a Name in scope only on the cards that print it.
 // Options that are objects or players (*votes for a player*) are ordinary Noun Phrases and are not
-// listed, nor is an option that is a card name, in scope everywhere (*Mines of Moria*).
+// listed. An option spelled like a card's name is listed too (*Mines of Moria*): another card's
+// name stands only after *named* or *Partner with* (`docs/decisions/lexicon.md` §6).
 [
     (name: "aid", cards: ["Elrond of the White Council"]),
     (name: "bribery", cards: ["Tivit, Seller of Secrets"]),
@@ -29,6 +30,7 @@
     (name: "homage", cards: ["Coercive Portal"]),
     (name: "innocent", cards: ["Trial of a Time Lord"]),
     (name: "knowledge", cards: ["Plea for Power"]),
+    (name: "Mines of Moria", cards: ["Travel Through Caradhras"]),
     (name: "money", cards: ["Expropriate"]),
     (name: "numbers", cards: ["Lieutenants of the Guard"]),
     (name: "past", cards: ["Fateful Tempest"]),

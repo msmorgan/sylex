@@ -98,7 +98,7 @@ fn an_identity_is_declared_once() {
 }
 
 #[test]
-fn a_card_scope_names_cards_and_an_introduced_name_is_none() {
+fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
     let card_names = "Dark Depths\nMarit Lage's Slumber\nCitadel Siege\n";
     let mut sources = Sources::load().unwrap();
     sources
@@ -132,24 +132,22 @@ fn a_card_scope_names_cards_and_an_introduced_name_is_none() {
         .to_string();
     assert!(error.contains("which is not a card name"), "{error}");
 
-    let error = sources
+    // A scoped name may be spelled like a card's name (Disa the Restless's
+    // *create a Tarmogoyf token*): another card's name stands only after
+    // *named* or *Partner with*, so the two never compete elsewhere.
+    let env = sources
         .environment(&format!("{card_names}Marit Lage\n"), &none)
-        .unwrap_err()
-        .to_string();
-    assert!(error.contains("is a card name"), "{error}");
-
-    // A vote option or a cited name is no card name either.
+        .unwrap();
+    let lexeme = |id: &str| &env.lexicon.lexemes()[&sylex_lexicon::LexemeId::new(id)];
+    assert!(lexeme("name:Marit Lage").card_name);
+    assert!(!lexeme("introduced_name:Marit Lage").card_name);
     for push in [
         |sources: &mut Sources| sources.vote_options.push(scoped("Dark Depths")),
         |sources: &mut Sources| sources.cited_names.push(scoped("Dark Depths")),
     ] {
-        let mut stray = sources.clone();
-        push(&mut stray);
-        let error = stray
-            .environment(card_names, &none)
-            .unwrap_err()
-            .to_string();
-        assert!(error.contains("is a card name"), "{error}");
+        let mut spelled_alike = sources.clone();
+        push(&mut spelled_alike);
+        spelled_alike.environment(card_names, &none).unwrap();
     }
 }
 

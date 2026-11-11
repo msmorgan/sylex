@@ -1,9 +1,10 @@
-// Introduced Names: names a card's own text gives an object that are not card names. Most name a
+// Introduced Names: names a card's own text gives an object that is not a card. Most name a
 // token the card creates [CR#111.4] (*create Angelo, a legendary 1/1 green and white Dog creature
 // token*, *a colorless artifact token named Lotus*); a few name a permanent or a copy the card
 // changes (*She's a land named Moon*). Each lists the cards whose text uses it, which are the only
-// cards on which it is in scope. A name that is also a card name is that card's name, in scope
-// everywhere, and is not listed here; neither is a predefined token's name (`tokens.ron`).
+// cards on which it is in scope. A name spelled like a card's name is listed too (*create a
+// Tarmogoyf token*): another card's name stands only after *named* or *Partner with*
+// (`docs/decisions/lexicon.md` §6). A predefined token's name (`tokens.ron`) is not listed.
 [
     (name: "Angelo", cards: ["Rinoa Heartilly"]),
     (name: "Ashaya, the Awoken World", cards: ["Nissa, Sage Animist"]),
@@ -45,6 +46,7 @@
     (name: "Fenric", cards: ["The Curse of Fenric"]),
     (name: "First Mate Ragavan", cards: ["Baral and Kari Zev"]),
     (name: "Galactus", cards: ["The Coming of Galactus"]),
+    (name: "Gingerbrute", cards: ["Ginger, Queen of Sweets"]),
     (name: "Guenhwyvar", cards: ["Drizzt Do'Urden"]),
     (name: "Hornet", cards: ["Hornet Cannon"]),
     (name: "Humble Merchant", cards: ["Honest Work"]),
@@ -72,6 +74,7 @@
     (name: "Moon", cards: ["Princess Yue"]),
     (name: "Mowu", cards: ["Jiang Yanggu", "Jiang Yanggu, Never Alone"]),
     (name: "Munitions", cards: ["Weapons Manufacturing"]),
+    (name: "Mutavault", cards: ["Mutable Explorer"]),
     (name: "Nalaar Aetherjet", cards: ["Pia Nalaar, Chief Mechanic"]),
     (name: "Phobos", cards: ["The Spear of Leonidas"]),
     (name: "Plaguebearer of Nurgle", cards: ["Great Unclean One", "Nurgle's Rot"]),
@@ -87,12 +90,14 @@
     (name: "Settlement", cards: ["Preston Garvey, Minuteman"]),
     (name: "Smaug", cards: ["There and Back Again"]),
     (name: "Smoke Blessing", cards: ["Smoke Spirits' Aid"]),
+    (name: "Spellgorger Weird", cards: ["Ral and the Implicit Maze"]),
     (name: "Stangg Twin", cards: ["Stangg", "Stangg, Echo Warrior"]),
     (name: "Stone Boulder", cards: ["Stone-Giant of High Pass"]),
     (name: "Stoneforged Blade", cards: ["Nahiri, the Lithomancer"]),
     (name: "Sturdy Shield", cards: ["Origin of Captain America", "U.S.Agent, John Walker"]),
     (name: "Sword", cards: ["Blacksmith's Talent"]),
     (name: "Tamiyo's Notebook", cards: ["Tamiyo, Compleated Sage"]),
+    (name: "Tarmogoyf", cards: ["Disa the Restless", "Tarmogoyf Nest"]),
     (name: "The Blackjack", cards: ["Setzer, Wandering Gambler"]),
     (name: "The Hollow Sentinel", cards: ["Venser, Corpse Puppet"]),
     (name: "The Tiger God", cards: ["White Tiger, Ava Ayala"]),

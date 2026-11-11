@@ -514,6 +514,7 @@ impl Resolver<'_> {
                 Some(self.fill(complement, owner)?.kind()),
             ),
             FillSpec::Pred => SlotFill::Pred,
+            FillSpec::Name => SlotFill::Name,
             FillSpec::AdjP => SlotFill::AdjP,
             FillSpec::AdvP => SlotFill::AdvP,
             FillSpec::LocativeNP => SlotFill::LocativeNP,
@@ -582,11 +583,11 @@ impl Resolver<'_> {
                 FrameFamily::Catenative,
                 vec![slot(Complement, catenation(*kind))],
             ),
-            FrameSpec::ComplexTransitive => (
+            FrameSpec::ComplexTransitive(fill) => (
                 FrameFamily::ComplexTransitive,
                 vec![
                     slot(Object, SlotFill::NP),
-                    slot(PredicativeComplement, SlotFill::Pred),
+                    slot(PredicativeComplement, self.fill(fill, owner)?),
                 ],
             ),
             FrameSpec::ComplexCatenative(kind) => (

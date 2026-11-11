@@ -69,7 +69,7 @@
     (lemma: "distribute", frames: [Monotransitive, TransitiveWithPP(["among"])]),
     (lemma: "divide", frames: [Monotransitive, TransitiveWithPP(["among", "into"])]),
     // *Draft this card face up.*
-    (lemma: "draft", frames: [Monotransitive, ComplexTransitive]),
+    (lemma: "draft", frames: [Monotransitive, ComplexTransitive(Pred)]),
     (lemma: "draw", preterite: "drew", past_participle: "drawn", frames: [Monotransitive]),
     (lemma: "end", frames: [Intransitive, Monotransitive]),
     (lemma: "ensue", frames: [Intransitive]),
@@ -110,8 +110,10 @@
     // The source `from` PP is an adjunct, as with *put*.
     (lemma: "move", frames: [Monotransitive, Prepositional(["to"]), TransitiveWithPP(["onto"])]),
     (lemma: "mulligan", frames: [Intransitive]),
-    // Only the passive is printed: *cards named CARDNAME*.
-    (lemma: "name", frames: [ComplexTransitive]),
+    // Only the passive is printed: *cards named CARDNAME*. Its predicative
+    // complement is a name, where another card's name stands
+    // (`docs/decisions/lexicon.md` §6).
+    (lemma: "name", frames: [ComplexTransitive(Name)]),
     (lemma: "note", frames: [Monotransitive, ContentClause]),
     (lemma: "offer", frames: [Ditransitive]),
     (lemma: "own", frames: [Monotransitive]),
@@ -167,7 +169,7 @@
     (lemma: "target", frames: [Monotransitive]),
     (lemma: "top", past: "topped", gerund: "topping", frames: [Monotransitive]),
     // *turn it face up*
-    (lemma: "turn", frames: [ComplexTransitive]),
+    (lemma: "turn", frames: [ComplexTransitive(Pred)]),
     (lemma: "trigger", frames: [Intransitive, Monotransitive]),
     (lemma: "unlock", frames: [Monotransitive]),
     // *cast using teamwork* [CR#702.194b]

@@ -278,7 +278,7 @@ impl Sources {
                 "plural name `{missing}` names no card"
             )));
         }
-        self.check_card_scopes(&lexemes, &card_names)?;
+        Self::check_card_scopes(&lexemes, &card_names)?;
         lexemes.extend(card_names);
         Ok(LexicalEnvironment {
             lexicon: Lexicon::new(lexemes)?,
@@ -638,39 +638,14 @@ impl Sources {
         }
     }
 
-    /// Every card a card scope names is a card, and no Introduced Name is one.
-    fn check_card_scopes(
-        &self,
-        lexemes: &[Lexeme],
-        card_names: &[Lexeme],
-    ) -> Result<(), SourceError> {
+    /// Every card a card scope names is a card.
+    fn check_card_scopes(lexemes: &[Lexeme], card_names: &[Lexeme]) -> Result<(), SourceError> {
         let cards: std::collections::BTreeSet<_> = card_names.iter().map(|card| card.id).collect();
         for lexeme in lexemes {
             if let Some(card) = lexeme.card_scope.iter().find(|card| !cards.contains(*card)) {
                 return Err(SourceError::Invalid(format!(
                     "`{}` is scoped to `{card}`, which is not a card name",
                     lexeme.id
-                )));
-            }
-        }
-        let scoped = self
-            .introduced_names
-            .iter()
-            .map(|introduced| ("introduced name", &introduced.name))
-            .chain(
-                self.vote_options
-                    .iter()
-                    .map(|option| ("vote option", &option.name)),
-            )
-            .chain(
-                self.cited_names
-                    .iter()
-                    .map(|cited| ("cited name", &cited.name)),
-            );
-        for (kind, name) in scoped {
-            if cards.contains(&names::card_name_id(name)) {
-                return Err(SourceError::Invalid(format!(
-                    "{kind} `{name}` is a card name, already in scope everywhere"
                 )));
             }
         }

@@ -89,7 +89,8 @@ fn a_shortened_name_is_in_scope_only_on_its_own_card() {
     };
     assert!(names(&[dina].into()).contains(&dina));
     assert!(!names(&BTreeSet::new()).contains(&dina));
-    // Full names are in scope everywhere.
+    // The full name is spelled everywhere: off its own card the grammar
+    // reads it as another card's name, only after *named* or *Partner with*.
     let full = environment.lexicon.analyze("Dina, Soul Steeper");
     assert!(full.matches.iter().any(|found| matches!(
         &found.reading,
