@@ -1849,7 +1849,14 @@ impl Production {
                     unreachable!("a punctuation child stands at a punctuation symbol");
                 };
                 sylex_lexicon::mark_onset(mark)
-                    .map(|onset| sylex_lexicon::Edges::plain(Some(onset)))
+                    .map(|onset| {
+                        sylex_lexicon::Edges::new(
+                            &sylex_lexicon::FeatureBundle::default(),
+                            Some(onset),
+                            None,
+                            sylex_lexicon::GenitiveAlternant::ApostropheS,
+                        )
+                    })
                     .map_or((None, None), |edges| (Some(edges.left), Some(edges.right)))
             }
         };
@@ -2231,10 +2238,9 @@ impl CompiledGrammar {
     pub(crate) fn leaf_edges(&self, reading: &LexicalReading) -> Option<sylex_lexicon::Edges> {
         match reading {
             LexicalReading::Word(value) => self.edges.get(value).copied(),
-            LexicalReading::Numeral { value, .. } => Some(sylex_lexicon::Edges::plain(
-                sylex_lexicon::numeral_onset(*value),
-            )),
-            LexicalReading::FlavorWord { .. } => Some(sylex_lexicon::Edges::plain(None)),
+            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
+                sylex_lexicon::Edges::non_word(reading)
+            }
         }
     }
 

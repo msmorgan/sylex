@@ -286,18 +286,14 @@ impl Lexicon {
                     initial: initial_surface(&surface) == surface,
                     interior: true,
                 };
-                let edges = crate::Edges {
-                    left: crate::LeftEdge {
+                let edges = crate::Edges::new(
+                    &declaration.features,
+                    crate::AgreementProperties {
                         onset: features.onset,
                         prefix_hyphenation,
-                        genitive: declaration.features.genitive,
-                    },
-                    right: crate::RightEdge {
                         genitive_host: genitive_host(declaration.form, &surface, &plurals),
-                        following_onset: declaration.features.following_onset,
-                        hyphenation: declaration.features.hyphenation,
                     },
-                };
+                );
                 let initial = initial_surface(&surface);
                 let capitalized =
                     lexeme.capitalization == Capitalization::Initial && initial != surface;
@@ -417,7 +413,8 @@ impl Lexicon {
                 .copied()
                 .ok_or(LexicalError::UnlicensedValue),
             LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
-                Ok(crate::Edges::plain(self.surface_features(reading)?.onset))
+                self.realize(reading)?;
+                crate::Edges::non_word(reading).ok_or(LexicalError::UnlicensedValue)
             }
         }
     }
@@ -739,41 +736,12 @@ fn card_scope_defect(lexeme: &Lexeme) -> Option<&'static str> {
     }
 }
 
-/// Why a Lexeme's Adjacency Agreement paradigm is incomplete: a dimension
-/// some form carries must be carried by every form, with every value, since
-/// the context may fix any of them.
+/// Why a Lexeme's Adjacency Agreement paradigm is incomplete
+/// ([`crate::FeatureBundle::complete_agreement`]).
 fn agreement_defect(lexeme: &Lexeme) -> Option<&'static str> {
-    fn complete<T: PartialEq + Copy>(
-        lexeme: &Lexeme,
-        dimension: impl Fn(&crate::FeatureBundle) -> Option<T>,
-        domain: &[T],
-    ) -> bool {
-        let values: Vec<Option<T>> = lexeme
-            .forms
-            .iter()
-            .map(|slot| dimension(&slot.features))
-            .collect();
-        values.iter().all(Option::is_none)
-            || values.iter().all(Option::is_some)
-                && domain.iter().all(|value| values.contains(&Some(*value)))
-    }
-    let complete = complete(
-        lexeme,
-        |features| features.following_onset,
-        &[crate::Onset::Consonant, crate::Onset::Vowel],
-    ) && complete(
-        lexeme,
-        |features| features.hyphenation,
-        &[crate::Hyphenation::Solid, crate::Hyphenation::Hyphenated],
-    ) && complete(
-        lexeme,
-        |features| features.genitive,
-        &[
-            crate::GenitiveAlternant::ApostropheS,
-            crate::GenitiveAlternant::Bare,
-        ],
-    );
-    (!complete).then_some("an agreement dimension lacks a form for some value")
+    let bundles: Vec<_> = lexeme.forms.iter().map(|slot| &slot.features).collect();
+    (!crate::FeatureBundle::complete_agreement(&bundles))
+        .then_some("an agreement dimension lacks a form for some value")
 }
 
 /// The spelling of one declared slot: its override, or the default rule.

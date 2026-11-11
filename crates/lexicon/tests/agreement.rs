@@ -295,3 +295,51 @@ fn only_a_prefix_host_has_a_prefix_hyphenation() {
     land.properties.prefix_hyphenation = Some(Hyphenation::Solid);
     assert!(Lexicon::new([land]).is_err());
 }
+
+/// Each dimension belongs to one Category's invariant form, and an agreement
+/// dimension's paradigm has a form for each of its values.
+#[test]
+fn a_dimension_stands_only_on_its_owner_with_every_value() {
+    let onset = |onset| FeatureBundle {
+        following_onset: Some(onset),
+        ..FeatureBundle::default()
+    };
+    let article = |category| {
+        allomorphs(
+            "a",
+            category,
+            [(onset(Onset::Consonant), "a"), (onset(Onset::Vowel), "an")],
+        )
+    };
+    assert!(Lexicon::new([article(Category::Determinative)]).is_ok());
+    assert!(Lexicon::new([article(Category::Adverb)]).is_err());
+    // *a* without *an*: the context could fix a value it has no form for.
+    let only_a = allomorphs(
+        "a",
+        Category::Determinative,
+        [(onset(Onset::Consonant), "a")],
+    );
+    assert!(Lexicon::new([only_a]).is_err());
+    let genitive = |alternant| FeatureBundle {
+        genitive: Some(alternant),
+        ..FeatureBundle::default()
+    };
+    let only_bare = allomorphs(
+        "genitive",
+        Category::Clitic,
+        [(genitive(GenitiveAlternant::Bare), "'")],
+    );
+    assert!(Lexicon::new([only_bare]).is_err());
+    let named = allomorphs(
+        "Thalakos",
+        Category::Noun,
+        [(
+            FeatureBundle {
+                name: Some(NameForm::Full),
+                ..FeatureBundle::default()
+            },
+            "Thalakos",
+        )],
+    );
+    assert!(Lexicon::new([named]).is_err());
+}
