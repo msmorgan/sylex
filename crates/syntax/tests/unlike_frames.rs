@@ -150,7 +150,18 @@ fn a_conjunct_of_a_kind_the_head_does_not_select_is_no_object() {
 }
 
 #[test]
+fn a_serial_coordination_with_a_medial_conjunct_the_head_does_not_select_is_no_object() {
+    // From Timber Paladin's *has base power and toughness 10/10, vigilance,
+    // and trample*, with a medial conjunct of a kind the head does not
+    // select.
+    assert_eq!(readings("Lose abilities, banding, and banding.").len(), 1);
+    assert_no_reading("Lose abilities, 2, and banding.");
+    assert_no_reading("Lose banding, 2, and abilities.");
+}
+
+#[test]
 fn a_head_selecting_one_kind_takes_no_unlike_coordination() {
+    // As *destroy* in *destroy target creature* takes no keyword beside it.
     assert_no_reading("Destroy abilities and banding.");
     assert_no_reading("Destroy banding and abilities.");
     assert_eq!(object_fill(&readings("Destroy abilities.")[0]), SlotFill::NP);

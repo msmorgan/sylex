@@ -32,10 +32,13 @@
         (complement: FiniteClause, hosts: Predicate),
     ]),
     // *the greatest power among creatures you control*
-    // *from among flying, first strike, and lifelink*
+    // *from among flying, first strike, and lifelink*; a slash measure names
+    // a +X/+Y counter's kind as a keyword names a keyword counter's
+    // [CR#122.1a,122.1b] (*from among flying, ..., and +1/+1*).
     (lemma: "among", frames: [
         (complement: NP, hosts: Nominal),
         (complement: KeywordPhrase, hosts: Nominal),
+        (complement: MeasureNP, hosts: Nominal),
         // A name cited as a name, where another card's name stands, only as
         // *from*'s Complement, wherever that attaches (*choose a card name
         // ... from among Disenchant, ..., and Black Lotus*).

@@ -43,19 +43,22 @@ feature VerbKind = Auxiliary
 // *non-*, otherwise unvalued.
 feature Polarity = Affirmative | Negative
 // A Preposition Phrase's Complement's Slot Kind. `MeasureNP`: only *of*
-// (*your choice of 5/1 or 1/5*). `QuotedAbility`: only Nominal-hosted
+// (*your choice of 5/1 or 1/5*) and *among* (*from among flying, ..., and
+// +1/+1*). `QuotedAbility`: only Nominal-hosted
 // *with* (*a token with "This token can't block."*; [CR#113.1a]). `Name`:
 // only *among* (*from among Disenchant, ..., and Black Lotus*).
 feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
-    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | Name
+    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | UnlikeObject
+    | Name
 // The Slot Kind of a determinative's Preposition Phrase's Complement: the
 // values of ComplementKind, which it agrees with.
 feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
-    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | Name
+    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | UnlikeObject
+    | Name
 // `Quantity`: only *number*, the number-transparent noun (*any number
 // of target creatures*; CGEL 5§3.3:349–351). `Serial`: only *time*, a
 // frequency or multiplier head (*three times*; CGEL 8§9:715).
@@ -388,8 +391,9 @@ category ContrastPrepositionCoordination : PrepositionPhrase [
 // Unlike premodifiers coordinated, with a coordinator or asyndetically
 // (*noncreature, nonland card*), and each premodifier.
 category Attributes [ComplementKind] { function }
-// Unlike categories coordinated as an Object (*has base power and toughness
-// 5/5 and vigilance*), and each conjunct.
+// Unlike categories coordinated as an Object or a preposition's Complement
+// where the head selects each of them there (*has base power and toughness
+// 5/5 and vigilance*; slot `UnlikeObject`), and each conjunct.
 category ObjectConjunct : NounPhrase [ComplementKind] { function }
 category ObjectCoordination : NounPhrase [ComplementKind] { function }
 // An Amount and a Noun Phrase coordinated where a head selects both (*equal
@@ -624,8 +628,10 @@ slot Amount = Amount
 // restricted to conjuncts of the kinds the head selects there: each conjunct
 // fills the position alone (CGEL, Ch. 15 §3.1, p. 1323, rule [1]). A
 // preposition's derived frame admits the Host Categories all of its frames
-// do. *Equal to [2] or [the greatest power among ...]*.
+// do. *Equal to [2] or [the greatest power among ...]*; *has [flying] and
+// ["{T}: Add {G}."]*, never *destroy [target creature] and [flying]*.
 slot AmountOrNP = AmountOrNounPhrase { unlike: [NP, Amount] }
+slot UnlikeObject = ObjectCoordination { unlike: [NP, KeywordPhrase, QuotedAbility, MeasureNP] }
 // Mana-only. A final Keyword Parameter Cost is this slot after a space, or
 // an em dash, a NonManaCost and a period, each with its own FinalParameter;
 // the punctuation is the production's, not a Reading (OSG §3, Em dashes).
@@ -2573,7 +2579,8 @@ PrepositionalConjunct: PostmodifierConjunct -> filler:Hosted(PrepositionPhrase, 
     where $.ComplementKind = PP
 NominalObjectConjunct: ObjectConjunct -> filler:ComplementNounPhrase where $.ComplementKind = NP
 KeywordObjectConjunct: ObjectConjunct -> filler:KeywordPhrase where $.ComplementKind = KeywordPhrase
-// A slash measure names a +X/+Y counter's kind beside keywords
+// A slash measure is a conjunct only where the head selects a measure, as
+// *among* does a +X/+Y counter's kind beside keyword counters' kinds
 // [CR#122.1a,122.1b] (*a kind of counter ... from among flying, first
 // strike, ..., and +1/+1*).
 MeasureObjectConjunct: ObjectConjunct -> filler:MeasureNounPhrase where $.ComplementKind = MeasureNP
@@ -2581,7 +2588,6 @@ MeasureObjectConjunct: ObjectConjunct -> filler:MeasureNounPhrase where $.Comple
 QuotedObjectConjunct: ObjectConjunct -> filler:QuotedAbility where $.ComplementKind = QuotedAbility
 AmountConjunct: AmountOrNounConjunct -> filler:Amount where $.ComplementKind = Amount
 NounPhraseConjunct: AmountOrNounConjunct -> filler:ComplementNounPhrase where $.ComplementKind = NP
-CoordinatedObject: ComplementNounPhrase -> filler:ObjectCoordination
 AffirmativeConjunct: ContrastConjunct -> filler:ComplementNounPhrase where $.Polarity = Affirmative
 NegatedConjunct: ContrastConjunct -> modifier:Word(Not) filler:ComplementNounPhrase
     where $.Polarity = Negative
@@ -3368,9 +3374,8 @@ coordination PostmodifierCoordination {
     conjunct: PostmodifierConjunct,
     unlike: ComplementKind,
 }
-// A slash measure names a counter kind only beside keyword phrases naming
-// keyword counters' kinds [CR#122.1a,122.1b], never beside a Noun Phrase or
-// a quoted ability, where it is no Object.
+// Its conjuncts' kinds are those the selecting head takes (slot
+// `UnlikeObject`).
 coordination ObjectCoordination {
     coordinators: And,
     unshared: [ComplementKind],
@@ -3378,10 +3383,6 @@ coordination ObjectCoordination {
     conjunct: ObjectConjunct,
     unlike: ComplementKind,
 }
-    where !(first.ComplementKind = NP & last.ComplementKind = MeasureNP),
-          !(first.ComplementKind = MeasureNP & last.ComplementKind = NP),
-          !(first.ComplementKind = QuotedAbility & last.ComplementKind = MeasureNP),
-          !(first.ComplementKind = MeasureNP & last.ComplementKind = QuotedAbility)
 // A comma may set off a binary coordination's second Cluster (*deals half X
 // damage, rounded down, to any target, and half X damage, rounded up, to
 // you*).
