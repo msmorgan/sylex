@@ -7,3 +7,6 @@
 +Nominal same name as that land => NounPhrase "that land"; readings 1
 + Discard two nonland cards with the same name: Draw four cards.
 + <card=Chrome Replicator> When this creature enters, if you control two or more nonland, nontoken permanents with the same name as one another, create a 4/4 colorless Construct artifact creature token. => Nominal "same name as one another"; NounPhrase "one another"
+# The as-standard is the Complement of *same*, never of a plain adjective's Nominal.
++ <card=Cornered Market> Players can't play nonbasic lands with the same name as a nontoken permanent. => !PrepositionPhrase "as a nontoken permanent" as Complement of land
++ <card=Key to the Side-Door> {1}, {T}, Discard a legendary card with the same name as a legendary permanent you control: Draw two cards. => !PrepositionPhrase "as a legendary permanent you control" as Complement of card; !PrepositionPhrase "as a legendary permanent" as Complement of card

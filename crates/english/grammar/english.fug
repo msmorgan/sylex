@@ -730,7 +730,7 @@ ArabicNumeralName: NumeralName -> Numeral(Arabic(false))
 // you roll a 4 or higher*), as ComparativeBoundedAmount.
 ComparativeBoundedNumeralName: NumeralName ->
     first:Numeral(Arabic(false)) coordinator:Word(Or) last:AdjectivePhrase
-    where last.Grade = Comparative,
+    where last.Grade := Comparative,
           last.ComplementKind = Intransitive
 NumeralNominal: BareNominal -> NumeralName
     where $.Determination = Overt,
@@ -1708,13 +1708,13 @@ ComparativeBoundedAlternative: AdjectivePhrase ->
           $.AdjectivePosition = last.AdjectivePosition,
           $.Voice = last.Voice,
           $.ComplementKind = Amount,
-          last.Grade = Comparative,
+          last.Grade := Comparative,
           last.ComplementKind = Intransitive
 // The same as the value of a noun whose frame takes an Amount (*mana value
 // X or greater*).
 ComparativeBoundedAmount: Amount -> first:Amount coordinator:Word(Or) last:AdjectivePhrase
     where $.QuantityNumber = first.QuantityNumber,
-          last.Grade = Comparative,
+          last.Grade := Comparative,
           last.ComplementKind = Intransitive,
           $.ComplementKind = Amount
 // A comparative bound as the endpoint of a scalar change (*reduce it to
@@ -1755,7 +1755,7 @@ MeasuredComparative: AdjectivePhrase -> modifier:NounPhrase AdjectivePhrase
 // The same with a *than* Complement and a numeric measure (*at least 10
 // greater than your starting life total*).
 MeasuredStandardComparative: AdjectivePhrase -> modifier:NounPhrase AdjectivePhrase
-    where head.Grade = Comparative,
+    where head.Grade := Comparative,
           head.ComplementKind = PP,
           modifier.NounKind := Numeric,
           modifier.Case := Plain
@@ -1897,7 +1897,7 @@ ModifiedComparativeAdverb: AdverbPhrase ->
 // *Greater power than this creature* (CGEL 5§14.1:443).
 ComparativeIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, Than)
-    where modifier.Grade = Comparative,
+    where modifier.Grade := Comparative,
           modifier.AdjectivePosition != Predicative,
           modifier.Determination = $.Determination
 // The same for a non-scalar governor of inequality (CGEL 13§5.4:1143–1145).
@@ -1908,7 +1908,7 @@ NonScalarIndirectComplement: Nominal ->
           modifier.Determination = $.Determination
 EquativeIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, As)
-    where modifier.Grade = Equative,
+    where modifier.Grade := Equative,
           complement.ComplementKind = NP,
           modifier.Determination = $.Determination
 // *Your most recent turn*: a plain adjective heads a superlative phrase.
@@ -1916,7 +1916,7 @@ DegreeModifiedAdjective: AdjectivePhrase -> modifier:Word(Most) AdjectivePhrase 
     unshared: [Grade],
 }
     where $.AdjectivePosition = Attributive,
-          head.Grade = Plain,
+          head.Grade := Plain,
           $.Grade = Superlative
 DegreeModifiedAdverb: AdverbPhrase -> modifier:Word(Most) AdverbPhrase
     where head.AdjunctPosition = Central
@@ -2238,7 +2238,7 @@ BarePrepositionalNominal: BareNominalComplement -> PrepositionalNominal
 // A superlative lets the article go unexpressed in a bare nominal
 // Complement (*tied for lowest life total*; CGEL 13§6.3.4:1168–1169).
 SuperlativeBareNominal: BareNominalComplement -> modifier:AdjectivePhrase BareNominal
-    where modifier.Grade = Superlative,
+    where modifier.Grade := Superlative,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative,
           head.Number = Singular,
@@ -3366,7 +3366,19 @@ coordination CompoundCoordination {
     where first.CompoundPart = Base,
           last.CompoundPart = Whole
 coordination Participle { coordinators: Coordinator, unshared: [Inflection, Polarity] }
+// This coordination leaves Grade unvalued, so a gate that needs a Grade
+// writes `:=` (*red or green* is no comparative). A coordination whose last
+// coordinate is comparative is the next schema's alone: one tree per
+// analysis.
 coordination AdjectivePhrase { coordinators: Coordinator, unshared: [Grade, Polarity] }
+    where last.Grade != Comparative
+// Oracle prints a comparative coordinated with a non-comparative before a
+// *than* Complement only the last coordinate licenses (*equal or lesser mana
+// value than that spell*, Saruman of Many Colors), which CGEL marks ?
+// (CGEL 15§4.4:1343 n. 66).
+coordination AdjectivePhrase { coordinators: Coordinator, unshared: [Grade, Polarity] }
+    where last.Grade := Comparative,
+          $.Grade = Comparative
 coordination PrepositionPhrase {
     coordinators: Coordinator,
     unshared: [DeterminativeDistribution],
