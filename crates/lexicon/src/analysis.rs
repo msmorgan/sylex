@@ -229,6 +229,12 @@ impl Lexicon {
             }
             let mut slots = BTreeSet::new();
             let mut realized_surfaces = BTreeSet::new();
+            let plurals: BTreeSet<String> = lexeme
+                .forms
+                .iter()
+                .filter(|slot| slot.form == WordForm::Plural)
+                .map(|slot| spelling(&lexeme, slot))
+                .collect();
             for declaration in &lexeme.forms {
                 if !slots.insert((declaration.form, &declaration.features)) {
                     return Err(error("duplicate inflection slot"));
@@ -240,9 +246,7 @@ impl Lexicon {
                 if let Some(reason) = missing_explicit_spelling(declaration) {
                     return Err(error(reason));
                 }
-                let surface = declaration.surface.clone().unwrap_or_else(|| {
-                    morphology::default_surface(&lexeme, declaration.form, &declaration.features)
-                });
+                let surface = spelling(&lexeme, declaration);
                 if surface.trim() != surface || surface.is_empty() {
                     return Err(error("empty or padded spelling"));
                 }
@@ -272,7 +276,7 @@ impl Lexicon {
                         genitive: declaration.features.genitive,
                     },
                     right: crate::RightEdge {
-                        genitive_host: genitive_host(declaration.form, &surface),
+                        genitive_host: genitive_host(declaration.form, &surface, &plurals),
                         following_onset: declaration.features.following_onset,
                         hyphenation: declaration.features.hyphenation,
                     },
@@ -755,13 +759,31 @@ fn agreement_defect(lexeme: &Lexeme) -> Option<&'static str> {
     (!complete).then_some("an agreement dimension lacks a form for some value")
 }
 
-/// The genitive alternant a host form takes: the bare genitive after a Plural
-/// noun form ending in *s*, regular or irregular, a base plural included
-/// (*players'*, *elves'*, *Thalakos'*); else the *'s* genitive, after a
-/// singular ending in *s* too (*Rats's*), and after a Plural not ending in *s*
-/// (*Spawn's*). CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596.
-fn genitive_host(form: WordForm, surface: &str) -> crate::GenitiveAlternant {
-    if form == WordForm::Plural && surface.ends_with('s') {
+/// The spelling of one declared slot: its override, or the default rule.
+fn spelling(lexeme: &Lexeme, slot: &crate::FormDeclaration) -> String {
+    slot.surface
+        .clone()
+        .unwrap_or_else(|| morphology::default_surface(lexeme, slot.form, &slot.features))
+}
+
+/// The genitive alternant a host form takes, given its Lexeme's Plural
+/// spellings: the bare genitive after a form ending in *s* that is a Plural,
+/// regular or irregular (*players'*, *elves'*), or that is spelled like its
+/// Plural (*Thalakos'* singular and plural alike); else the *'s* genitive,
+/// after a singular noun ending in *s* whose Plural differs (*Octopus's*),
+/// after a name the text treats as singular ending in *s* (*Swarm of
+/// Rats's*), and after a form not ending in *s* (*Spawn's*). CGEL, Ch. 18
+/// §4.2, p. 1596: the bare genitive is obligatory with plural nouns ending in
+/// *s*, and "[n]ouns like *species* which have identical singular and plural
+/// forms with final *s* take a bare genitive in the singular as well as the
+/// plural"; with a singular proper name it is only a variant of *'s* ([35ii],
+/// p. 1595), and Oracle writes *'s*.
+fn genitive_host(
+    form: WordForm,
+    surface: &str,
+    plurals: &BTreeSet<String>,
+) -> crate::GenitiveAlternant {
+    if surface.ends_with('s') && (form == WordForm::Plural || plurals.contains(surface)) {
         crate::GenitiveAlternant::Bare
     } else {
         crate::GenitiveAlternant::ApostropheS

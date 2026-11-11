@@ -11,6 +11,7 @@ use sylex_lexicon::Lexeme;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::LexicalValue;
 use sylex_lexicon::Lexicon;
+use sylex_lexicon::NameForm;
 use sylex_lexicon::Onset;
 use sylex_lexicon::Source;
 use sylex_lexicon::SourceKind;
@@ -101,12 +102,21 @@ fn lexicon() -> Lexicon {
     for slot in &mut spawn.forms {
         slot.surface = Some("Spawn".into());
     }
-    // A base plural ending in *s* (*Thalakos*), and an irregular plural
-    // (*Elves*).
+    // A noun spelled alike in both numbers with final *s* (*Thalakos*), an
+    // irregular plural (*Elves*), and a singular ending in *s* whose plural
+    // differs (*Octopus*, *Octopuses*).
     let mut thalakos = count_noun("Thalakos");
     for slot in &mut thalakos.forms {
         slot.surface = Some("Thalakos".into());
     }
+    let octopus = count_noun("Octopus");
+    // A card name ending in *s* (*Swarm of Rats's*).
+    let rats = Lexeme::card_name(
+        "Swarm of Rats",
+        "Swarm of Rats",
+        None,
+        source("Swarm of Rats"),
+    );
     let mut elf = count_noun("Elf");
     for slot in &mut elf.forms {
         if slot.form == WordForm::Plural {
@@ -115,6 +125,8 @@ fn lexicon() -> Lexicon {
     }
     Lexicon::new([
         thalakos,
+        octopus,
+        rats,
         elf,
         article,
         non,
@@ -221,13 +233,27 @@ fn each_allomorph_realizes_one_spelling_its_neighbor_selects() {
     assert!(agree(&lexicon, &player, &suffixed) && agree(&lexicon, &players, &bare));
     assert!(agree(&lexicon, &spawn, &suffixed) && !agree(&lexicon, &spawn, &bare));
     assert!(!agree(&lexicon, &player, &bare) && !agree(&lexicon, &players, &suffixed));
-    // Every Plural ending in *s* takes the bare genitive, a base plural and
-    // an irregular one included (CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596); the
-    // singular of a base plural takes *'s*.
+    // Every Plural ending in *s* takes the bare genitive, an irregular one
+    // included, and so does the singular of a noun spelled alike in both
+    // numbers with final *s* (CGEL, Ch. 18 §4.2 [35i], p. 1596).
     let thalakos = noun("Thalakos", WordForm::Plural);
     let elves = noun("Elf", WordForm::Plural);
     let one_thalakos = noun("Thalakos", WordForm::Singular);
     assert!(agree(&lexicon, &thalakos, &bare) && !agree(&lexicon, &thalakos, &suffixed));
-    assert!(agree(&lexicon, &one_thalakos, &suffixed));
+    assert!(agree(&lexicon, &one_thalakos, &bare) && !agree(&lexicon, &one_thalakos, &suffixed));
     assert!(agree(&lexicon, &elves, &bare) && !agree(&lexicon, &elves, &suffixed));
+    // A singular ending in *s* whose plural differs takes *'s*, and so does a
+    // name ending in *s*, where CGEL's bare genitive is only a variant [35ii]
+    // and Oracle writes *'s* (*Swarm of Rats's*).
+    let octopus = noun("Octopus", WordForm::Singular);
+    let rats = value(
+        "Swarm of Rats",
+        WordForm::Invariant,
+        FeatureBundle {
+            name: Some(NameForm::Full),
+            ..FeatureBundle::default()
+        },
+    );
+    assert!(agree(&lexicon, &octopus, &suffixed) && !agree(&lexicon, &octopus, &bare));
+    assert!(agree(&lexicon, &rats, &suffixed) && !agree(&lexicon, &rats, &bare));
 }

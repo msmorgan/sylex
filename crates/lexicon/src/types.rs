@@ -76,13 +76,15 @@ pub enum Hyphenation {
     Hyphenated,
 }
 
-/// The two alternants of the genitive suffix (CGEL, Ch. 18 §4.2 [35i],
+/// The two alternants of the genitive suffix (CGEL, Ch. 18 §4.2 [35],
 /// pp. 1595–1596): the bare genitive, an apostrophe alone, which every Plural
-/// noun form ending in *s* takes, regular or irregular, a base plural included
-/// (*players'*, *elves'*, *Thalakos'*), and the default *'s* genitive after any
-/// other form (*player's*, *Spawn's*). A singular ending in *s* takes *'s*
-/// (*Rats's*): CGEL's [35ii] makes the bare genitive only a variant there, and
-/// Oracle writes *'s*.
+/// noun form ending in *s* takes, regular or irregular (*players'*, *elves'*),
+/// and so does the singular of a noun spelled alike in both numbers with final
+/// *s* (*Thalakos'*, singular or plural); and the default *'s* genitive after
+/// any other form (*player's*, *Spawn's*), a singular ending in *s* whose
+/// plural differs and a name ending in *s* included (*Swarm of Rats's*): CGEL's
+/// [35ii] makes the bare genitive of a name only a variant, and Oracle writes
+/// *'s*.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum GenitiveAlternant {
     ApostropheS,
@@ -196,9 +198,8 @@ pub struct LeftEdge {
 /// word.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct RightEdge {
-    /// The genitive alternant a genitive suffix after it takes: the bare
-    /// genitive after a Plural noun form ending in *s* (CGEL, Ch. 18 §4.2
-    /// [35i], pp. 1595–1596), else the *'s* genitive.
+    /// The genitive alternant a genitive suffix after it takes
+    /// ([`GenitiveAlternant`]).
     pub genitive_host: GenitiveAlternant,
     /// Its [`FeatureBundle::following_onset`].
     pub following_onset: Option<Onset>,

@@ -163,8 +163,10 @@ a feature of its Feature Bundle that the context fixes: the indefinite
 article's by the Onset of the word after it (*a creature*, *an artifact*),
 *non*'s by how the host after it takes a prefix (*nonland*, *non-Vampire*), and
 the genitive's by the host before it: an apostrophe alone after a Plural noun
-form ending in *s* (*players'*, *Thalakos'*), and *'s* after any other form
-(*player's*, *Rats's*, *Spawn's*; CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596). No
+form ending in *s* and after the singular of a noun spelled alike in both
+numbers with final *s* (*players'*, *Thalakos'*), and *'s* after any other
+form, a name the text treats as singular ending in *s* included (*player's*,
+*Swarm of Rats's*, *Spawn's*; CGEL, Ch. 18 §4.2: [35], p. 1595, and p. 1596). No
 form is a free choice, and each has one spelling.
 _Avoid_: Spelling Variant
 

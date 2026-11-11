@@ -1,4 +1,4 @@
-# The host selects the genitive's form: the bare genitive, an apostrophe alone, after any Plural noun form ending in *s*, regular or irregular, and the *'s* genitive after any other form, a singular ending in *s* included (CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596)
+# The host selects the genitive's form: the bare genitive, an apostrophe alone, after any Plural noun form ending in *s*, regular or irregular, and after the singular of a noun spelled alike in both numbers with final *s*, and the *'s* genitive after any other form, a singular noun ending in *s* whose plural differs and a name the text treats as singular ending in *s* included (CGEL, Ch. 18 §4.2: [35], p. 1595, and p. 1596)
 # from: Sorcerous Sight
 +NounPhrase target opponent's hand
 *NounPhrase target opponent' hand

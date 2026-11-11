@@ -58,11 +58,14 @@ artifact*, *an 8/8*, *a +1/+1 counter*), *non*'s by how the host after it takes
 a prefix, hyphenated before a subtype or *outlaw* and solid before any other
 word (*non-Vampire*, *nonland*), and the genitive's by the host before it: the
 bare genitive after any Plural noun form ending in *s*, regular or irregular,
-a base plural included, and the *'s* genitive after any other form, a singular
-ending in *s* included (*players'*, *elves'*, *Thalakos'*, *player's*,
-*Spawn's*, *Rats's*; CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596, where the bare
-genitive of such a singular is only a variant, [35ii], and Oracle writes
-*'s*). The grammar checks the agreement between each word and the
+and after the singular of a noun spelled alike in both numbers with final *s*,
+and the *'s* genitive after any other form, a singular ending in *s* whose
+plural differs and a name ending in *s* included (*players'*, *elves'*,
+*Thalakos'* singular or plural, *player's*, *Spawn's*, *Swarm of Rats's*; CGEL,
+Ch. 18 §4.2 [35], p. 1596, where *species* takes the bare genitive "in the
+singular as well as the plural", and the bare genitive of a name is only a
+variant, [35ii], which Oracle does not write). The host's realized forms decide
+it: no word lists the hosts. The grammar checks the agreement between each word and the
 next, whatever Constituents they end and begin. Why: a free choice of spelling
 lets the parser accept *a artifact* and *players's*, and leaves realization
 nothing to derive the spelling from but the source text.
