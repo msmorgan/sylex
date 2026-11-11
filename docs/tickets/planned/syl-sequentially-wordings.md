@@ -34,16 +34,16 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 
 - The steps' meaning is one: the instructions are followed in the order written [CR#608.2c].
   `sequentially` stays the one expansion, and each printed wording is its own Template over it,
-  never one Template with a join or coordinator parameter that carries only wording
-  (`spelling.md`, on the resolved term as the derivation). "And" and "then" between steps are two Templates, `$steps<and>` and
-  `$steps<then>`.
+  never one Template with a parameter that carries only wording (`spelling.md`, on the resolved
+  term as the derivation); a join is fixed in the wording, never chosen by a parameter. "And"
+  and "then" between steps are two Templates, `$steps<and>` and `$steps<then>`.
 - A verb-phrase coordination under one subject is one `instruct` over one Template of the steps,
   as `spelling.md` writes a shared subject (shared material at a coordination).
 
 ## Open questions
 
 - **The comma and the sentence break.** ", and", ", then" and ". " are not joins: `spelling.md`'s
-  notation has a closed set (`""`, `","`, `"and"`, `"or"`, `"and/or"`, `"then"`, `"$name"`), and a
+  notation has a closed set (nothing, `","`, `"and"`, `"or"`, `"and/or"`, `"then"`), and a
   Reading stores no punctuation, which realization derives. Yet the grammar builds the
   delimited and undelimited coordinations as different trees, and a wording's fixed text may
   already hold a comma (`when`'s "When $event, if $condition, $action", `syl.md` §5). Options:

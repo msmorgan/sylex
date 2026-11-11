@@ -20,8 +20,9 @@ Written against the spine (`cleanup-step6-spine`).
 ## Design
 
 - The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `~` ties, `$xs<join>`
-  lists, `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails) with its load
-  rules; where this ticket's text differs, §7 governs.
+  lists (a join is nothing, `,`, `and`, `or`, `and/or` or `then`, never chosen by a parameter),
+  `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails) with its load rules;
+  where this ticket's text differs, §7 governs.
 
 ## Done when
 
@@ -34,6 +35,16 @@ Written against the spine (`cleanup-step6-spine`).
   are written like any other, no mark is invented for those Holes, and the landing lists these
   declarations as standing outside the check that a variant is English until `spelling.md`
   gives the mark.
+- The parser refuses a join chosen by a parameter (`$xs<$name>`), with a negative test.
+- No `coord` primitive has a `spelling` (`plugins/builtin/primitives/{noun,predicate,zone}/coord.syl`
+  have none today; each takes its `coordinator` as an argument), and the coordinator word is the
+  Template's: the `and`, `or` and `andOr` Templates at `NounPhrase`, `Predicate` and `Location`,
+  unspelled today, are spelled `$xs<and>`, `$xs<or>` and `$xs<and/or>` over their list, and the
+  `or` at `TriggerCondition` `$conditions<or>`, replacing its `TODO(spelling)`. `isOutlaw`
+  ("outlaw") keeps its own wording over an unspelled `coord(andOr, …)` in its body. The
+  `Predicate` `coord` and its Templates are what `syl-nominal-descriptions` replaces in
+  descriptions; whatever coordination at `Nominal` and `PreModifier` it adds follows the same
+  rule.
 - The near-duplicate Template families that differed only by such a segment are each one
   Template; the landing lists the merges.
 - Declaration order stays the printed order (`syl.md` §5).

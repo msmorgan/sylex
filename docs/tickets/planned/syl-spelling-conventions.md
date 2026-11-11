@@ -18,9 +18,9 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 ## Design
 
 The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `~` ties, `$xs<join>`
-lists, `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails); where this
-ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every `<name>` Hole to
-`$name`.
+lists (a fixed join, never one chosen by a parameter), `( … )` optional parts, `<~Category: …>` and
+`<~inner Category: …>` Tails); where this ticket's text differs, §7 governs. This ticket's corpus
+rewrite migrates every `<name>` Hole to `$name`.
 
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
