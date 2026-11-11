@@ -1071,7 +1071,7 @@ AddedElement: Sentence ->
 DelimitedFrontConjunct: Clause -> first:Clause coordinator:Class(Coordinator) ',' last:Clause {
     cost: 2,
 }
-    where last.FrontPosition = Occupied,
+    where last.FrontPosition := Occupied,
           $.VerbForm = first.VerbForm,
           $.VerbForm = last.VerbForm,
           $.ClauseMarking = first.ClauseMarking,

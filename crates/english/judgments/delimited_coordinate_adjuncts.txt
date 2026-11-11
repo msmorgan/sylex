@@ -4,3 +4,6 @@
 + <card=Moritte of the Frost> You may have Moritte enter as a copy of a permanent you control, except it's legendary and snow in addition to its other types and, if it's a creature, it enters with two additional +1/+1 counters on it and has changeling. => Clause "it's legendary and snow in addition to its other types and, if it's a creature, it enters with two additional +1/+1 counters on it and has changeling"; Clause "if it's a creature, it enters with two additional +1/+1 counters on it and has changeling"
 # from: Moritte of the Frost
 + It's legendary and, if it's a creature, it has changeling. => Clause "if it's a creature, it has changeling"
+# The comma after the coordinator needs the fronted Adjunct it delimits.
+# from: Moritte of the Frost
+* It's legendary and, it has changeling.
