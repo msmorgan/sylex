@@ -472,6 +472,8 @@ category QuotedAbility
 category Mention
 category MentionModifier
 category QuotedCost
+// A quoted cost and its premodifiers, kept out of Nominal coordination.
+category QuotedCostNominal : Nominal [Number, Countability, NounKind, NounDistribution]
 category InterrogativeClause : Clause
 category InterrogativePhrase : NounPhrase [Number, Person]
 
@@ -688,18 +690,30 @@ QuotedMentionPremodifier: BareNominal -> modifier:"Mention" BareNominal
 QuotedMention: Mention -> "Mention"
 QuotedNominal: BareNominal -> "BareNominal" where head.Number = Singular
 // A quoted imperative naming a cost (*cost an additional "Sacrifice a land"
-// to activate*; [CR#118.8]): a singular count noun, never a Conjunct of its
-// own. Any other quoted clause is a QuotedAbility.
+// to activate*, Brutal Suppression, Drought; [CR#118.8]): a singular count
+// noun under a determiner. Any other quoted clause is a QuotedAbility.
 QuotedCost: QuotedCost -> "Clause" where head.VerbForm := Plain
-QuotedCostPremodifier: BareNominal -> modifier:AdjectivePhrase QuotedCost
-    where modifier.ComplementKind = Intransitive,
-          modifier.AdjectivePosition != Predicative,
-          modifier.Determination = $.Determination,
-          $.Determination = Overt,
-          $.Number = Singular,
+QuotedCostHead: QuotedCostNominal -> QuotedCost
+    where $.Number = Singular,
           $.Countability = Count,
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
+QuotedCostPremodifier: QuotedCostNominal -> modifier:AdjectivePhrase QuotedCostNominal
+    where modifier.ComplementKind = Intransitive,
+          modifier.AdjectivePosition != Predicative
+// Twin: Determined. A QuotedCostNominal is no Nominal Conjunct, so a quoted
+// ability is never a quoted cost conjoined in a Nominal (*a ... token with
+// flying and "Whenever Redwing attacks, surveil 1."*, Falcon, Winged
+// Wonder).
+DeterminedQuotedCost: NounPhrase -> determiner:DeterminerPhrase QuotedCostNominal
+    where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
+          $.Determination = Overt,
+          $.Case = Plain,
+          $.Person = Third,
+          determiner.DeterminativeDistribution != Independent | FreeChoice,
+          determiner.ComplementKind != PP,
+          determiner.Countability = head.Countability,
+          determiner.Number = head.Number
 
 TextSymbols: Document -> Symbols
 // A symbol sequence as a noun under a determiner (*each {B} in a cost*,
