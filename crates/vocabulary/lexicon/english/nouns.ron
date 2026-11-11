@@ -53,6 +53,8 @@
     "deck",
     (lemma: "devotion", countability: [Mass], frames: [Complement(PP(["to"]))]),
     (lemma: "die", plural: "dice"),
+    // The event of facing one [CR#700.17]: *Whenever you face a dilemma*.
+    "dilemma",
     (lemma: "difference", frames: [Complement(PP(["between"]))]),
     "direction",
     (lemma: "door", frames: [Complement(PP(["of"]))]),

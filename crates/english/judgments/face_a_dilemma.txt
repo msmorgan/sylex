@@ -1,0 +1,4 @@
+# Facing a dilemma [CR#700.17] as a trigger event, a this-turn lookback and the object of a counted relative clause
++ <card=Seven of Nine> Whenever you face a dilemma, draw a card. => VerbPhrase "face a dilemma"
++ <card=The Caretaker> At the beginning of each end step, if you faced a dilemma this turn, target opponent exiles cards from the top of their library until they exile a nonland card. => VerbPhrase "faced a dilemma"
++ <card=Captain Benjamin Sisko> At the beginning of your end step, create a 1/1 red Officer creature token for each dilemma you've faced this turn. => RelativeClause "you've faced" gap "dilemma" || RelativeClause "you've faced this turn" gap "dilemma"
