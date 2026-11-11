@@ -66,11 +66,11 @@ const KEYWORD_ABILITY_EXCLUSIONS: [(&str, Excluded); 3] = [
 const KEYWORD_ABILITIES_IN_SUBRULES: [(&str, &str); 2] =
     [("[CR#720.3a]", "To Solve"), ("[CR#702.145e]", "Nightbound")];
 
-/// Scryfall's inventory lists words that are not ability words of
-/// Vintage-playable cards.
 /// Rulebreaker is printed only on cards that are not Vintage-legal.
 const ABILITY_WORD_EXCLUSIONS: [(&str, Excluded); 1] = [("rulebreaker", NoVintageCard)];
 
+/// Scryfall's inventory lists words that are not ability words of
+/// Vintage-playable cards.
 const SCRYFALL_ABILITY_WORD_EXCLUSIONS: [(&str, Excluded); 9] = [
     ("actualize", NoVintageCard),
     ("covercast", NoVintageCard),
