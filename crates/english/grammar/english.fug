@@ -211,6 +211,7 @@ category LinkedVerbPhrase : VerbPhrase [
 // Existential *there*, and the predicate it is subject of.
 category DummyPronoun : NounPhrase [Number, Person]
 category ExistentialPredicate : VerbPhrase [Number, Person, VerbForm, Inflection, ComplementKind]
+category DisplacedSubject : NounPhrase [Number, Case] { gap }
 category FusedNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
 ] { gap }
@@ -966,32 +967,30 @@ Existential: Clause -> subject:DummyPronoun ExistentialPredicate
           head.VerbForm = Finite,
           $.ClauseMarking = Unmarked
 ExistentialThere: DummyPronoun -> Lex(Pronoun) where head.PronounKind = Existential
-ExistentialBe: ExistentialPredicate -> Class(BeVerb) displaced_subject:NounPhrase {
+ExistentialBe: ExistentialPredicate -> Class(BeVerb) displaced_subject:DisplacedSubject {
     unextended: [displaced_subject],
 }
     where $.Number = displaced_subject.Number,
           displaced_subject.Case != Accusative,
           $.ComplementKind = NP
+// The prepositions are *be*'s prepositional frame's.
 LocatedExistentialBe: ExistentialPredicate ->
-    Class(BeVerb) displaced_subject:NounPhrase
+    Class(BeVerb) displaced_subject:DisplacedSubject
     complement:Selected(PrepositionPhrase, In, On, Among, Under, Outside, After) {
     unextended: [displaced_subject],
 }
     where $.Number = displaced_subject.Number,
           displaced_subject.Case != Accusative,
           $.ComplementKind = PP
-// Existential *be* may agree by proximity with a singular first conjunct of
-// an *and*-coordination (CGEL 4§3.2.2:242 n. 21).
-LocatedProximateExistentialBe: ExistentialPredicate ->
-    Class(BeVerb) displaced_subject:NounPhrase
-    complement:Selected(PrepositionPhrase, In, On, Among, Under, Outside, After) {
-    unextended: [displaced_subject],
-}
+// Existential *be* agrees with its displaced subject as a whole, or by
+// proximity with a singular first conjunct of an *and*-coordination (*If
+// there is an instant card and a sorcery card in your graveyard*, Flow
+// State; CGEL 4§3.2.2:242 n. 21).
+WholeDisplacedSubject: DisplacedSubject -> NounPhrase { transparent: [head] }
+ProximateDisplacedSubject: DisplacedSubject -> NounPhrase { transparent: [head], unshared: [Number] }
     where $.Number = Singular,
-          displaced_subject.Number = Plural,
-          displaced_subject.FirstConjunctNumber := Singular,
-          displaced_subject.Case != Accusative,
-          $.ComplementKind = PP
+          head.Number = Plural,
+          head.FirstConjunctNumber := Singular
 
 EndAdverb: AdverbPhrase -> Class(EndAdverb) where $.AdjunctPosition = End
 CentralAdverb: AdverbPhrase -> Class(CentralAdverb) where $.AdjunctPosition = Central

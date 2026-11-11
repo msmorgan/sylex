@@ -167,13 +167,15 @@
                 (form: Present, number: Plural, surface: "are"),
                 (form: Preterite, person: Third, number: Singular, surface: "was"),
             ],
-            // A predicative or a locative Complement (CGEL Ch. 4 §5.2, p. 257).
-            frames: [Copular, Prepositional(["in", "on", "under", "outside", "among"])]),
+            // A predicative Complement (CGEL Ch. 4 §5.2, p. 257), or a locative
+            // or temporal one (Ch. 16 §6.2.1(b), p. 1394: *One concert is on
+            // Sunday*).
+            frames: [Copular, Prepositional(["in", "on", "under", "outside", "among", "after"])]),
         (lemma: "aren't", form_of: Some("be"), third_singular: "isn't", preterite: "weren't", irrealis: "weren't",
             forms: [
                 (form: Preterite, person: Third, number: Singular, surface: "wasn't"),
             ],
-            finite_only: true, negative: true, frames: [Copular, Prepositional(["in", "on", "under", "outside", "among"])]),
+            finite_only: true, negative: true, frames: [Copular, Prepositional(["in", "on", "under", "outside", "among", "after"])]),
         (lemma: "can", third_singular: "can", preterite: "could", finite_only: true, frames: [Catenative(BareInf)]),
         (lemma: "can't", form_of: Some("can"), third_singular: "can't", preterite: "couldn't", finite_only: true, negative: true,
             frames: [Catenative(BareInf)]),
@@ -201,7 +203,7 @@
                 (form: Present, person: Second, surface: "'re"),
                 (form: Present, person: Third, number: Plural, surface: "'re"),
             ],
-            frames: [Copular, Prepositional(["in", "on", "under", "outside", "among"])]),
+            frames: [Copular, Prepositional(["in", "on", "under", "outside", "among", "after"])]),
         (lemma: "may", third_singular: "may", preterite: "might", finite_only: true, frames: [Catenative(BareInf)]),
         (lemma: "must", third_singular: "must", finite_only: true, frames: [Catenative(BareInf)]),
         (lemma: "will", third_singular: "will", preterite: "would", finite_only: true, frames: [Catenative(BareInf)]),
