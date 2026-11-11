@@ -8,8 +8,8 @@ needs: [cleanup-step6-surface, syl-nominal-descriptions]
 
 Fourteen canon cards write a created token's characteristics as a record literal in a token slot
 (`written({characteristics = {…}})`, or the `token` argument of `createTappedAttacking`). A
-record written in place has no wording (`docs/decisions/spelling.md` §5), so none of these tokens
-round-trips. Each prints its characteristics:
+record written in place has no wording (`docs/decisions/spelling.md`, on records), so none of
+these tokens round-trips. Each prints its characteristics:
 
 | Card | Oracle |
 |---|---|
@@ -34,8 +34,8 @@ spell the first ten in part and none of the last four: no slot takes a name, a s
 what a nominal can: a premodifier printed inside the token's description ("create a tapped 2/2
 …"; `createTappedToken` is spelled "create <count> tapped <token>", which prints "tapped" before
 the article), and "colorless" printed against no color word printed, which both write as an
-omitted `colors` (*Chrome Replicator* against *Volrath's Laboratory*; `spelling.md` §7 lists a
-word for an absent value as a known limit). The scan of every `{characteristics = …}` record is
+omitted `colors` (*Chrome Replicator* against *Volrath's Laboratory*; a word printed for an
+absent value has no notation in `spelling.md`). The scan of every `{characteristics = …}` record is
 in `docs/evidence/syl-token-records-to-templates/`.
 
 ## Open questions
@@ -46,11 +46,11 @@ in `docs/evidence/syl-token-records-to-templates/`.
     from `syl-nominal-descriptions`'s sorts, and lowered to the token's characteristics. "A tapped
     2/2 black Zombie creature token" and "colorless" are premodifiers like any other.
   - (b) Fixed-slot Templates, one per token shape, with a new Template for each shape no slot
-    covers (named legendary, `Amount`-sized artifact, chosen qualities), as `spelling.md` §5 names
-    `creatureToken` the Template for *Archfiend's Vessel*'s token.
+    covers (named legendary, `Amount`-sized artifact, chosen qualities), as `spelling.md` today gives
+    `creatureToken` for *Archfiend's Vessel*'s token.
 
   Recommendation: (a). It writes every printed token in the table with no new shape, and (b)
-  adds a Template for every shape the corpus has not met yet. Under (a), `spelling.md` §5's
+  adds a Template for every shape the corpus has not met yet. Under (a), `spelling.md`'s
   `creatureToken` example is rewritten.
 - **A named token** ("create Marit Lage, a legendary 20/20 … token"; *Tuktuk the Explorer*; *There
   and Back Again*'s "Create Smaug, a legendary 6/6 red Dragon creature token …"; *Bonny Pall,
@@ -61,7 +61,7 @@ in `docs/evidence/syl-token-records-to-templates/`.
   inside the object noun phrase, and a wording "$name, $spec" at the object's Hole would print it
   before anything else the clause prints after its object. Options: a Template taking the name and
   the description, with the description a Tail on the clause (`<Clause: , $spec>`, `spelling.md`
-  §3.2); or a `token` Definition in the card's plugin. Recommendation: the Template with the Tail,
+  on Tails); or a `token` Definition in the card's plugin. Recommendation: the Template with the Tail,
   since `token` Definitions are the tokens the rules define (`plugins/builtin/definitions/token/`)
   and a Template adds no meaning. The name sets the token's name in place of its subtypes plus
   "Token" [CR#111.4].
@@ -83,7 +83,7 @@ in `docs/evidence/syl-token-records-to-templates/`.
 
 ## Done when
 
-- The open questions are answered, and `spelling.md` §5 gives an example that exists.
+- The open questions are answered, and `spelling.md`'s token example is one that exists.
 - *There and Back Again* and *Bonny Pall, Clearcutter* are in `plugins/canon/cards/`, their named
   tokens written as printed, each checked against its Oracle text.
 - No raw `{characteristics = …}` record remains in a token slot under `plugins/`; the fourteen
@@ -101,7 +101,7 @@ in `docs/evidence/syl-token-records-to-templates/`.
 
 ## Pointers
 
-`docs/decisions/spelling.md` §4, §5, §7; `plugins/builtin/templates/noun/{creatureToken,
+`docs/decisions/spelling.md` (the resolved term as the derivation, records, the notation); `plugins/builtin/templates/noun/{creatureToken,
 creatureTokenOf,artifactCreatureToken}.syl`; `plugins/builtin/primitives/noun/written.syl`;
 `plugins/builtin/templates/action/{createTappedToken,createTappedAttacking}.syl`;
 `docs/evidence/syl-token-records-to-templates/`.

@@ -20,7 +20,7 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 - A power/toughness change is one value of its own sort, built from its two deltas by one
   primitive, and `get`, `getsPt` and what they expand to take it whole
-  (`docs/decisions/spelling.md` §3.2).
+  (`docs/decisions/spelling.md`, on Tails and "for each").
 - `forEach` is declared at that sort: it takes a change and a Predicate and scales the whole
   change.
 - A bare "+N/+N" is two printed values and is written as two. `getsBoth` is deleted at `Action`
@@ -69,7 +69,7 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 ## Pointers
 
-`docs/decisions/spelling.md` §3.2; `plugins/builtin/templates/action/{get,getsBoth}.syl`,
+`docs/decisions/spelling.md` (Tails and "for each"); `plugins/builtin/templates/action/{get,getsBoth}.syl`,
 `plugins/builtin/templates/ability/{getsPt,getsBoth,getsBase}.syl`,
 `plugins/builtin/templates/amount/forEach.syl`; glossary **Delta**
 (`docs/contexts/game-model/CONTEXT.md`), **Measure Noun Phrase**

@@ -41,39 +41,29 @@ About 390 canon call sites in all. `gain` and `get` also carry their duration in
 
 With the subject inside each verb's call, a subject printed once over two verbs cannot be
 written once. *Predator's Strike* prints "Target creature gets +3/+3 and gains trample until end
-of turn", and `spelling.md` §3.3 already prescribes its term: "one Handoff over the Actions",
-with one subject and one duration. Written with `get` and `gain`, it copies `target(…)` into
-each call, which introduces two targets, or re-mentions it with an `it` the card does not print.
-A floated "each" is the same: *Abandon Reason* prints "Up to two target creatures each get +1/+0
-and gain first strike until end of turn", and the English grammar's `FloatedEach` is a Clause
-production whose subject, floating quantifier and verb phrase are siblings
-(`crates/english/grammar/english.fug`), so a Template for it needs the verb phrase to
-stand alone.
+of turn": one subject and one duration over two verbs, which the term writes once, with the
+coordinated phrases under the one subject (`spelling.md`, shared material at a coordination).
+Written with `get` and `gain`, it copies `target(…)` into each call, which introduces two
+targets, or re-mentions it with an `it` the card does not print. A floated "each" is the same:
+*Abandon Reason* prints "Up to two target creatures each get +1/+0 and gain first strike until
+end of turn", and the English grammar's `FloatedEach` is a Clause production whose subject,
+floating quantifier and verb phrase are siblings (`crates/english/grammar/english.fug`), so a
+Template for it needs the verb phrase to stand alone.
 
-A central adverb attaches below the subject too: `CentralAdverbial` is
-`VerbPhrase -> adjunct:AdverbPhrase VerbPhrase` (`crates/english/grammar/english.fug`), inside the verb phrase
-that `SubjectPredicate` joins to its subject. *Efflorescence* prints "that creature
-also gains trample and indestructible", and *Beast Mode* a sentence-initial "Also put a +1/+1
-counter on that creature". No Vintage-legal card prints "also can't", "still can't" or "also
-must", so the deontics, which already take their Subject apart, are not involved.
+A central adverb needs it too. `CentralAdverbial` is `VerbPhrase -> adjunct:AdverbPhrase
+VerbPhrase`, inside the verb phrase that `SubjectPredicate` joins to its subject
+(`crates/english/grammar/english.fug`). Spelling is substitution, with no adjunction that could
+place "also" inside a clause a subject-bundled declaration spells, so "also", "still" and "no
+longer" on a continuous effect are Templates over the subjectless phrase. *Efflorescence* prints
+"that creature also gains trample and indestructible" (`syl-focus-also`). No Vintage-legal card
+prints "also can't", "still can't" or "also must", so the deontics, which already take their
+Subject apart, are not involved.
 
 What it does not buy. Where the shared subject has different roles in the arms, as in *Aether
-Tunnel*'s "gets +1/+0 and can't be blocked", the coordination still binds it once by Factoring
-(`spelling.md` §3.3).
+Tunnel*'s "gets +1/+0 and can't be blocked", the coordination still binds it once by Factoring.
 
 ## Open questions
 
-- **Whether "also", "still" and "no longer" need the subjectless phrase.** This turns on whether
-  spelling keeps general one-sided adjunction (`spelling.md` §2), which is not settled.
-  - If it keeps it, "also" attaches inside the clause its argument spells, as `cant` places
-    "can't", and the subject may stay bundled; this ticket only simplifies `syl-focus-also`.
-  - If spelling drops it, keeping substitution, optional and list Holes, Tails, Factoring and its
-    closed bridges, then a central adverb is a Construction over the verb phrase alone, which
-    exists only once this ticket takes the subject out: "also", "still" and "no longer" on a
-    continuous effect require it.
-
-  Recommendation: none until the formalism is ruled; the ticket is needed by its other uses in
-  either branch.
 - **Where the duration stands.** One duration may cover two verbs under one subject (*Predator's
   Strike*, *Abandon Reason*), two clauses with two subjects (*Moku, Meandering Drummer*: "Moku
   gets +2/+1 and creatures you control gain haste until end of turn"), or be printed before the
@@ -110,7 +100,7 @@ Tunnel*'s "gets +1/+0 and can't be blocked", the coordination still binds it onc
 
 - The open questions are answered and written in `docs/decisions/semantics.md` §4.7 and the
   glossary.
-- `spelling.md` §3.3 names the declaration that gives *Predator's Strike*'s phrases their one
+- `spelling.md`'s account of shared material at a coordination names the declaration that gives *Predator's Strike*'s phrases their one
   subject, where it now says "one Handoff": a Handoff makes its subject the Actor, and a creature
   that gets +3/+3 performs nothing.
 - No declaration in the table takes the subject of its continuous effect, and every call in
@@ -123,13 +113,12 @@ Tunnel*'s "gets +1/+0 and can't be blocked", the coordination still binds it onc
 
 - Writing *Predator's Strike*, *Aether Tunnel* and the other coordinations that share a phrase:
   `syl-shared-phrase-written-once`, which writes them against this ticket's declarations.
-- "Also": `syl-focus-also`, which depends on this ticket in one branch of the first open
-  question.
+- "Also": `syl-focus-also`, which writes it over this ticket's subjectless phrase.
 - The referent "each" introduces: `syl-each-plural-referent`.
 
 ## Pointers
 
-- `docs/decisions/spelling.md` §2, §3.3; `docs/decisions/semantics.md` §4.1, §4.7;
+- `docs/decisions/spelling.md` (substitution, shared material at a coordination); `docs/decisions/semantics.md` §4.1, §4.7;
   glossary **Handoff**, **Subject**, **Static Spec** (`docs/contexts/game-model/CONTEXT.md`)
 - `plugins/builtin/templates/action/{gain,get,getsBoth,establishFor,become}.syl`,
   `plugins/builtin/templates/ability/{getsPt,abilityGrant,getsBase}.syl`,

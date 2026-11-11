@@ -35,16 +35,16 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 - The steps' meaning is one: the instructions are followed in the order written [CR#608.2c].
   `sequentially` stays the one expansion, and each printed wording is its own Template over it,
   never one Template with a join or coordinator parameter that carries only wording
-  (`spelling.md` §4). "And" and "then" between steps are two Templates, `$steps<and>` and
+  (`spelling.md`, on the resolved term as the derivation). "And" and "then" between steps are two Templates, `$steps<and>` and
   `$steps<then>`.
 - A verb-phrase coordination under one subject is one `instruct` over one Template of the steps,
-  as `spelling.md` §3.3 prescribes for a shared subject.
+  as `spelling.md` writes a shared subject (shared material at a coordination).
 
 ## Open questions
 
-- **The comma and the sentence break.** ", and", ", then" and ". " are not joins: `spelling.md`
-  §7's set is closed (`""`, `","`, `"and"`, `"or"`, `"and/or"`, `"then"`, `"$name"`), and §6 says
-  punctuation is not spelling's concern, a Reading storing none. Yet the grammar builds the
+- **The comma and the sentence break.** ", and", ", then" and ". " are not joins: `spelling.md`'s
+  notation has a closed set (`""`, `","`, `"and"`, `"or"`, `"and/or"`, `"then"`, `"$name"`), and a
+  Reading stores no punctuation, which realization derives. Yet the grammar builds the
   delimited and undelimited coordinations as different trees, and a wording's fixed text may
   already hold a comma (`when`'s "When $event, if $condition, $action", `syl.md` §5). Options:
   the English layer derives the comma or period from structure, and one Template serves both;
@@ -53,7 +53,7 @@ of the sequences and lands first, so the steps this ticket spells are the printe
   elements with the `<>` join, each period coming from its sentence. Recommendation: parse the
   lines of *Cloudshift*, *Agate-Blade Assassin*, *Duneblast* and *Juxtapose* first and record
   their Readings; where the comma or period separates two Readings, fixed Templates, and
-  `spelling.md` §6 states the case.
+  `spelling.md` states the case where it says what punctuation a wording holds.
 - **Names** for the Templates. Recommendation: named for their wording, chosen with the answer
   above; the glossary's **Linked Coordination** names the ", then" form.
 
@@ -77,7 +77,8 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 
 ## Pointers
 
-- `docs/decisions/spelling.md` §3.3, §4, §6, §7; `docs/decisions/syl.md` §5
+- `docs/decisions/spelling.md` (shared material at a coordination, the resolved term as the derivation, the round
+  trip, the notation); `docs/decisions/syl.md` §5
 - `plugins/builtin/primitives/action/sequentially.syl`;
   `plugins/canon/cards/{Duneblast,Cloudshift,Agate-Blade Assassin,Bonus Round,Juxtapose}.syl`
 - `crates/english/grammar/english.fug` (`SentenceSequence`, `LinkedClause`, `LinkedVerbPhrase`),

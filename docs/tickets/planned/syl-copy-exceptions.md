@@ -27,6 +27,12 @@ exceptions)` (TokenSpec), `asCopyOf(source, exceptions)` (MoveRider), `copyChang
   toughness is half that creature's toughness") and *Donal, Herald of Wings* ("except the copy is
   a 1/1 Spirit in addition to its other types") use the unspelled `characteristicEdits`.
 
+## Design
+
+- The exceptions print at the end of the clause that makes the copy, after whatever else that
+  clause prints, so the copy's declaration prints them as a Tail on that clause
+  (`<Clause: , except …>`, `spelling.md` on Tails), and they stay an argument of the copy.
+
 ## Open questions
 
 - **What the exception is.** Options: (a) one optional clause of the copy, the coordination of
@@ -37,20 +43,10 @@ exceptions)` (TokenSpec), `asCopyOf(source, exceptions)` (MoveRider), `copyChang
   values [CR#707.9b], never to a continuous effect. Recommendation: (b), which keeps each
   exception a value of the closed `CopyExcept` sort that lowering already reads, and prints the
   subjects and the "and" the cards print.
-- **Where it attaches.** It prints at the end of the clause that makes the copy, after whatever
-  else that clause prints. Whether spelling keeps general one-sided adjunction is not settled:
-  - With it, a call that takes the copying clause as its host and adjoins ", except …" at the
-    clause's right edge, or a Tail.
-  - Without it, a Tail on the copy's declaration (`<Clause: , except …>`, `spelling.md` §3.2),
-    the clause being away from the copied object's Hole.
-
-  Recommendation: the Tail, which serves in both branches and keeps the exceptions an argument of
-  the copy.
 
 ## Done when
 
-- The open questions are answered and written in `docs/decisions/spelling.md` §3.2 or the
-  declarations' doc comments.
+- The open question is answered and written in the declarations' doc comments.
 - Every copy in `plugins/` writes its exceptions as printed: one "except", the printed subjects,
   and the printed coordinator, checked against Oracle text; `characteristicEdits` is called only
   where no spelled exception says it, and each such site keeps a `TODO(spelling)` naming the

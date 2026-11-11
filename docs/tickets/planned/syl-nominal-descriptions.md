@@ -102,15 +102,15 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
     with lesser mana value than the creature that died".
 
   Options: a Template at `Nominal` per construction whose wording has fixed words and Holes on
-  both sides of the head Hole ("the $ordinal $head $relative"), which is substitution
-  (`spelling.md` §2's "more $p than $subject"); or a premodifier and a postmodifier that the
-  checker pairs. Recommendation: the Templates, one per construction, each with its card as
+  both sides of the head Hole ("the $ordinal $head $relative"), which is substitution, as any
+  wording with fixed words on both sides of its Holes is; or a premodifier and a postmodifier that
+  the checker pairs. Recommendation: the Templates, one per construction, each with its card as
   caller.
 - **Two well-sorted trees for one nominal.** "Artifact or enchantment you control" is
   `nominal(or([artifact, enchantment]), post = [youControl])` or
   `or([artifact, nominal(enchantment, post = [youControl])])`, and nothing in the ADRs picks
-  between well-sorted candidates (`spelling.md` §5). Recommendation: the owner rules which
-  attachment canon writes, and `spelling.md` §5 says how recovery picks.
+  between well-sorted candidates (`spelling.md`, on what spelling leaves to meaning). Recommendation:
+  the owner rules which attachment canon writes, and `spelling.md` says how recovery picks.
 - **Consumers that are not descriptions.** Eight classes of declaration take a `Predicate` for a
   phrase that is no description:
   1. spend purposes: `toCast`, `toTurnFaceUp`, `toActivate` (`syl-tocast-noun-phrase`);
@@ -180,10 +180,9 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 
 - The open questions are answered, and each answer is written where it governs: `spelling.md`,
   `syl.md`, `semantics.md` §2.4 and §4.5, and the declarations' doc comments.
-- `spelling.md` says a nominal's modifiers are substitution into its two lists: §2 drops
-  modifiers on both sides of a noun from its uses of one-sided adjunction, §3.1 and §7 stop
-  describing a description as one `Predicate` list, and §9 drops "explicit premodifier and
-  postmodifier slots" from the rejected alternatives. `syl.md` §2 and §3 list the coercions that
+- `spelling.md` describes a description as a nominal whose modifiers are substitution into its two
+  lists: nothing in it describes a description as one `Predicate` list, and explicit premodifier
+  and postmodifier slots are not among its rejected alternatives. `syl.md` §2 and §3 list the coercions that
   exist and give examples that do, and `syl.md` §5's "basic land" example is a nominal.
 - `semantics.md` states [CR#109.2]: a type word at `Nominal` means a permanent of that type on the
   battlefield, and at `PreModifier` the type alone.
@@ -221,14 +220,15 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   `syl-become-replaces-types`.
 - Repeated determiners over one shared nominal: *Balthor the Defiled*'s "Each player returns all
   black and all red creature cards from their graveyard to the battlefield". It is a coordination
-  of two determined phrases that print their shared head once, which `spelling.md` §3.3 governs:
+  of two determined phrases that print their shared head once, which `spelling.md`'s shared material at a coordination governs:
   `syl-shared-phrase-written-once` lists it among the coordinations that take a shared phrase.
 - Location postmodifiers ("in your graveyard", "exiled with …") beyond the retype:
   `syl-zone-words`.
 
 ## Pointers
 
-- `docs/decisions/spelling.md` §2, §3.1, §4, §5, §7, §9; `docs/decisions/syl.md` §2, §3, §5;
+- `docs/decisions/spelling.md` (substitution, optional and list Holes, the resolved term as the
+  derivation, the notation, rejected alternatives); `docs/decisions/syl.md` §2, §3, §5;
   `docs/decisions/semantics.md` §2.4, §4.5
 - `plugins/builtin/coercions/`, `plugins/builtin/primitives/noun/`,
   `plugins/builtin/primitives/nounWord/`, `plugins/builtin/primitives/predicate/`,

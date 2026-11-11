@@ -41,40 +41,33 @@ No use among the 58 was found to change what the effect does: each sentence mean
 "also". No existing declaration spells "also" (`isAlso`'s wording is "in addition to its other
 types").
 
-## Open questions
+Written against the surface (`cleanup-step6-surface`), which includes
+`syl-continuous-effect-subject`; that ticket's subjectless phrase is what "also" wraps on a
+continuous effect, and the gate already orders the two, so this ticket names no edge of its own.
 
-- Where does printed "also" live: a Template per verb that carries it (`alsoGain`, `alsoGet`,
-  `alsoDeal`, …), a modifier on the grant or action, or something the English layer supplies?
-  - The English layer cannot supply it. A Reading holds the word "also" (`english.md` §7's round
-    trip renders it from the Reading), and what the English layer derives instead of spelling is
-    the closed list in `spelling.md` §1: inflection and agreement, case, voice, Gaps.
-  - A Template per verb multiplies with the verbs that take it (gain, get, have, lose, deal,
-    discard, create, put, regenerate, copy, attack, block, cost: 13 in the corpus) and is the
-    shape `spelling.md` §1 avoids for voice and number.
-  - A modifier that is an argument of `gain` would be a flag stored beside the term, which
-    `spelling.md` §4 rules out.
-  - The grammar attaches a central "also" to the verb phrase below the subject
-    (`CentralAdverbial: VerbPhrase -> adjunct:AdverbPhrase VerbPhrase`, `crates/english/grammar/english.fug`).
-    Whether spelling keeps general one-sided adjunction (`spelling.md` §2) is not settled, and
-    the recommendation depends on it:
-    - With adjunction: one Template per host sort, `also(x)`, whose body is `$x` and whose
-      wording adjoins "also" inside the clause its argument spells, as `cant` adjoins "can't"; it
-      adds no meaning.
-    - Without it: `also` is a Template over the subjectless verb phrase that
-      `syl-continuous-effect-subject` introduces for continuous effects, and over the Action a
-      Handoff or an imperative takes for deeds (*Liliana's Triumph*, *Beast Mode*'s
-      sentence-initial "Also put …"); the subject is supplied outside it.
+## Design
 
-    In both, the sorts it wraps come from the classes above (Action for the grants and second
-    effects, the continuous effect for *Jetmir*, the event in *Okk*'s condition), and the "is
-    also a" type line is its own Template beside the "in addition to its other types" forms.
-    Recommendation: settle the formalism first; this ticket follows `syl-continuous-effect-subject`
-    either way, which the surface gate it needs already ensures.
+- The English grammar attaches a central "also" to the verb phrase below the subject
+  (`CentralAdverbial: VerbPhrase -> adjunct:AdverbPhrase VerbPhrase`,
+  `crates/english/grammar/english.fug`), and spelling is substitution, so "also" is a Template
+  over a subjectless phrase, with the subject supplied outside it. It adds no meaning: its body
+  is its argument.
+- Its hosts: the subjectless continuous-effect phrase of `syl-continuous-effect-subject`
+  (*Efflorescence*, *Jetmir*, *Goatnap*); the Action a Handoff, an imperative or an event takes
+  for a deed (*Liliana's Triumph*'s "each opponent also discards a card", *Goblin Barrage*, *Okk*'s
+  "unless a creature with greater power also attacks"); and the sentence-initial "Also" before an
+  imperative (*Beast Mode*'s "Also put a +1/+1 counter on that creature if …"), its own Template
+  for its own placement. One Template per sort it wraps, added as a card needs it.
+- Not a Template per verb (`alsoGain`, `alsoGet`, …), which multiplies with the 13 verbs the
+  corpus puts "also" before; not a modifier argument of each verb, which would be a flag stored
+  beside the term; and not the English layer's, since a Reading holds the word "also" and the
+  English layer derives only inflection and agreement, case, voice and Gaps.
+- The "is also a" type line and "is also goaded" are their own Templates beside the "in addition
+  to its other types" forms.
 
 ## Done when
 
-- The Open question is settled in `docs/decisions/spelling.md`, and the declarations it calls
-  for exist.
+- The Templates above exist, each with a canon caller.
 - *Efflorescence* writes "also" in its canon file, and every canon card that prints "also" in
   rules text writes it; the scan's canon section lists each.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -86,6 +79,7 @@ Writing the 57 non-canon cards. The `become` forms of "in addition to its other 
 
 ## Pointers
 
-`docs/decisions/spelling.md` §1–4; `docs/decisions/english.md` §3, §7;
+`docs/decisions/spelling.md` (Constructions, substitution, the resolved term as the derivation);
+`docs/decisions/english.md` §3, §7;
 `plugins/canon/cards/Efflorescence.syl`; `plugins/builtin/templates/ability/isAlso.syl`;
 `plugins/builtin/templates/action/become.syl`; `docs/evidence/syl-focus-also/`.

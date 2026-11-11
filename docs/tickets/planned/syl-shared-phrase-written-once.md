@@ -7,7 +7,7 @@ needs: [cleanup-step6-surface]
 ## Why
 
 A phrase that coordinated clauses share is printed once, and the term writes it once
-(`docs/decisions/spelling.md` §3.3). The corpus writes it three other ways. *Arrest* copies it:
+(`docs/decisions/spelling.md`, on shared material at a coordination). The corpus writes it three other ways. *Arrest* copies it:
 `cant(actor(enchanted(creature)), attack)` and `cant(actor(enchanted(creature)), block)` for
 "can't attack or block". *Aether Tunnel* re-mentions it with an anaphor the card does not
 print: `cant(any, block(it))` for "gets +1/+0 and can't be blocked". *Aim High* takes it as
@@ -16,12 +16,12 @@ print: `cant(any, block(it))` for "gets +1/+0 and can't be blocked". *Aim High* 
 introduces it again, so *Predator's Strike* would get two targets and *Powerstone Minefield* a
 creature per arm; neither card can be written correctly today.
 
-`docs/decisions/semantics.md` contradicts `spelling.md` §3.3 twice. §4.6 writes "attacks or
+`docs/decisions/semantics.md` contradicts `spelling.md`'s shared material at a coordination twice. §4.6 writes "attacks or
 blocks" as `or([does(actor(x), attack), does(actor(x), block)])`, each arm a whole event with its
 own subject, and says "An `or` over Actions would be a compound action, which the gate refuses";
-§3.3 writes it as one `does` over an `or` of the Actions. And §4.2 makes "becomes blocked" its own
+`spelling.md` writes it as one `does` over an `or` of the Actions. And §4.2 makes "becomes blocked" its own
 event head, `becomeBlocked` (the Blocked status beginning, once per combat, even with no blocker
-[CR#509.1h,509.3c]), not the agentless passive of `block`, while §3.3 gives *Chub Toad*'s "blocks
+[CR#509.1h,509.3c]), not the agentless passive of `block`, while `spelling.md` gives *Chub Toad*'s "blocks
 or becomes blocked" as one subject standing as the performer of one event and the patient of the
 other.
 
@@ -50,8 +50,8 @@ other.
   stands: `becomeBlocked` is its own event head whose one argument is its patient
   (`does(any, becomeBlocked(x))`), so "blocks or becomes blocked" is still a coordination whose
   shared subject has different roles, the performer of `block` and the patient of
-  `becomeBlocked`, and `spelling.md` §3.3 names `becomeBlocked` where it now says the patient of
-  the other event; (b) "becomes blocked" is the agentless passive of `block`, which would trigger
+  `becomeBlocked`, and `spelling.md` names `becomeBlocked` as the event whose patient the shared
+  subject is; (b) "becomes blocked" is the agentless passive of `block`, which would trigger
   once per blocker, against [CR#509.3c] ("generally triggers only once each combat for that
   creature, even if it's blocked by multiple creatures"). Recommendation: (a).
 
@@ -72,11 +72,11 @@ other.
 
 ## Done when
 
-- `docs/decisions/semantics.md` agrees with `spelling.md` §3.3: §4.6 writes "attacks or blocks"
+- `docs/decisions/semantics.md` agrees with `spelling.md` on shared material at a coordination: §4.6 writes "attacks or blocks"
   as one `does` over an `or` of Actions, no longer says the gate refuses an `or` over Actions, and
   states that the event gate admits such an `or` when every arm is an event-capable head (a
   Deed's Action or a keyword-action Definition matched by its Deed) and refuses it otherwise; §4.2
-  and §3.3 say the same of "becomes blocked", by the answer above. `cargo xtask dsl check`
+  and `spelling.md` say the same of "becomes blocked", by the answer above. `cargo xtask dsl check`
   enforces the gate's rule, with a negative test for an `or` holding a control-flow arm.
 - Every coordination in `plugins/` that copies a shared phrase into its arms, or re-mentions it
   with an unprinted anaphor, is rewritten one of the two ways; the landing lists each with the
@@ -97,7 +97,7 @@ other.
 
 ## Pointers
 
-`docs/decisions/spelling.md` §3.3; `docs/decisions/semantics.md` §4.1, §4.2, §4.6;
+`docs/decisions/spelling.md` (shared material at a coordination); `docs/decisions/semantics.md` §4.1, §4.2, §4.6;
 `plugins/builtin/primitives/event/or.syl`, `plugins/builtin/templates/action/establishFor.syl`,
 `plugins/builtin/definitions/keyword_ability/bushido.syl`;
 `plugins/canon/cards/{Aim High,Aether Tunnel,Arrest,Chub Toad}.syl`.

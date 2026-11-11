@@ -18,7 +18,7 @@ Each of these terms writes words its card does not print, or cannot print what i
 - *Juxtapose* prints "You and target player exchange control of the creature you each control
   with the greatest mana value." and writes `controlledBy(target(isPlayer))` twice in its first
   exchange. A copy of a phrase that introduces a Referent introduces it again
-  (`docs/decisions/spelling.md` §3.3), so the term has two targets where the card has one.
+  (`docs/decisions/spelling.md`, on shared material at a coordination), so the term has two targets where the card has one.
 - `isAnyTarget` (`plugins/builtin/templates/predicate/isAnyTarget.syl`) has no spelling, and its
   callers wrap it in a determiner: 35 calls in 32 canon files write `target(isAnyTarget)`, which
   `target`'s wording "target $p" would print as "target …", where the cards print "any target"
@@ -59,4 +59,4 @@ Each of these terms writes words its card does not print, or cannot print what i
 `plugins/canon/cards/{Answered Prayers,Helm of Possession,Juxtapose,Harsh Sustenance,Fall of the
 Titans,Screaming Nemesis}.syl`; `plugins/builtin/templates/predicate/{isAnyTarget,isAnyOtherTarget}.syl`,
 `plugins/builtin/templates/determiner/{target,targets}.syl`,
-`plugins/builtin/primitives/timing/forAsLongAs.syl`; `docs/decisions/spelling.md` §3.3.
+`plugins/builtin/primitives/timing/forAsLongAs.syl`; `docs/decisions/spelling.md` (shared material at a coordination).

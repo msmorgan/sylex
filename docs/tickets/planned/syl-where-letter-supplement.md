@@ -27,16 +27,15 @@ a shared subject, or to a keyword line's item (the comma-set Supplement adjuncts
 Neither form has a wording that prints ", where", and `syl-sequentially-wordings` would otherwise
 spell a `define` step as a sequenced instruction.
 
+## Design
+
+- One Template per host sort (Action, StaticSpec, and the keyword-line item where a keyword
+  prints "X, where X is …"), each taking its host and its letter definitions, worded
+  "$host, where $definitions<and>", added as a card needs it. The supplement stands at its host's
+  right edge, so the host is a Hole and the wording is substitution.
+
 ## Open questions
 
-- **The declaration's shape.** Options: one Template per host sort (Action, StaticSpec, and the
-  keyword-line item where a keyword prints "X, where X is …") that takes the host and its letter
-  definitions, worded "$host, where $definitions<and>"; one declaration generic over its host's
-  sort, which `syl.md` has no form for; or the definitions as an optional parameter of each host
-  declaration. Recommendation: one Template per host sort, added as a card needs it. Whether
-  spelling keeps general one-sided adjunction does not change this: the supplement stands at its
-  host's right edge, so the host is a Hole and the wording is substitution, and a host printed
-  away from the supplement's anchor would be a Tail.
 - **A supplement on a non-final conjunct** ("searches their library for up to X basic land cards,
   where X is …, puts them onto the battlefield tapped, then shuffles"): the supplement's host is
   that conjunct's verb phrase. Recommendation: the Template at Action takes the conjunct as its
@@ -45,8 +44,7 @@ spell a `define` step as a sequenced instruction.
 
 ## Done when
 
-- The open questions are answered and written in `docs/decisions/spelling.md` or the declarations'
-  doc comments.
+- The open questions are answered and written in the declarations' doc comments.
 - No `define` or `letterDefinition` in `plugins/` stands as a sibling step or conjunct of what it
   supplements; every site is rewritten by a script, with the script and an old-to-new table in
   `docs/evidence/`, each checked against Oracle text, and the script checks that each letter has
@@ -64,4 +62,4 @@ spell a `define` step as a sequenced instruction.
 `plugins/builtin/primitives/static/letterDefinition.syl`,
 `plugins/canon/cards/{Celebrate the Harvest,Death's Shadow,Phyrexian Ingester}.syl`;
 `crates/english/grammar/english.fug` (the comma-set Supplement adjuncts); `docs/decisions/spelling.md`
-§2, §3.2.
+(substitution, Tails).
