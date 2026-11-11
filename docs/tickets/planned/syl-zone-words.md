@@ -1,5 +1,5 @@
 ---
-needs: [syl-single-face-card-call, cleanup-step6-spine, syl-argument-naming, syl-spelling-optional-segments, syl-nominal-descriptions]
+needs: [syl-single-face-card-call, cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions]
 ---
 
 # Zone words mean what they say, and prepositions stay out of `Location`
@@ -29,10 +29,10 @@ in the composition the declarations imply, not in a string anything prints:
   of your library".
 - *Future Sight* and *Courser of Kruphix* `play(…, from = onTop)`: "from on top of its owner's
   library", where Oracle prints "from the top of your library".
-- *Chronostutter* and *Approach of the Second Sun* `putInto(target(isCreature), fromTop(2,
-  library))`: "into second from the top of its owner's library", where Oracle prints "into its
-  owner's library second from the top", the Position Phrase after the zone (`PositionDepictive`,
-  `crates/english/grammar/english.fug` line 1417).
+- *Chronostutter* `putInto(target(isCreature), fromTop(2, library))`: "into second from the top
+  of its owner's library", where Oracle prints "into its owner's library second from the top",
+  the Position Phrase after the zone (`PositionDepictive`, `crates/english/grammar/english.fug`); *Approach of the Second Sun*'s `putInto(this, fromTop(7, library))` likewise, for
+  "into its owner's library seventh from the top".
 
 One collision is spelled today: `cardIn(exiledWith(…))` (*Cold Storage*, *Oblivion Ring*) composes
 "card in exiled with this artifact".

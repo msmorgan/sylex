@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-argument-naming, syl-spelling-optional-segments]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments]
 ---
 
 # Descriptions are nominals: a head with its pre- and postmodifiers
@@ -38,7 +38,7 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   elements stand in printed order. `headed` is taken by an existing primitive ("$subject as a
   $head"), so the constructor is `nominal`.
 - `pre` is declared before the required `head` because it is printed first, and arguments are
-  written in declaration order (`syl-argument-naming`).
+  written in declaration order (`syl.md` §2).
 - A copula's complement is a `Predicative`: what `is(subject, …)` takes ("If it's a land",
   "is tapped", "is in your graveyard").
 - A type word coerces to two things, and the sort of the slot it stands in decides which: at
@@ -76,10 +76,36 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   Recommendation: both, with the refusal a checker rule and a negative test.
 - **Stacked premodifiers inside a premodifier coordination.** "Artifact or non-Aura enchantment
   card", "Knight, Aura, Equipment, or legendary artifact card": one arm of an `or` at `pre` is
-  itself several premodifiers (`crates/english/grammar/english.fug`, lines 347–351). Whether a
+  itself several premodifiers (`NounPremodifierConjunct`, `crates/english/grammar/english.fug`). Whether a
   `PreModifier` coordination's arm may be a list of premodifiers, and by what constructor.
   Recommendation: yes, through one constructor at `PreModifier` that takes a list printed with no
   join, refused with one element.
+- **A group property printed as a postmodifier.** *Eerie Ultimatum* prints "Return any number of
+  permanent cards with different names from your graveyard to the battlefield", and writes
+  `withDifferentNames(counted(anyNumber, and([isPermanentCard, in(yourGraveyard)])))`: the
+  wrapper stands outside the determiner, so it prints "with different names" after "from your
+  graveyard". `withDifferentNames` and `withTheSameName` (7 files call them) are
+  `NounPhrase -> NounPhrase` over `agree`, an Agreement that holds of the group, not of each member
+  (glossary **Agreement**), so a `PostModifier` in the member list would test each card alone.
+  Options: a `PostModifier` whose meaning the determiner lifts to the group it forms; or a
+  Template at `NounPhrase` taking the determiner's quantity and the nominal, with the group words
+  printed between the nominal's postmodifiers. Recommendation: the second, which keeps the
+  Agreement on the group and the words in printed order.
+- **One operator printed on both sides of the head.** `nominal(pre, head, post)` gives each
+  modifier one side. Two constructions put one operator's words on both:
+  - an ordinal over a head and its relative: *Highspire Bell-Ringer*'s "The second spell you cast
+    each turn costs {1} less to cast", which ranks the spells cast each turn, and is written today
+    with the ordinal inside the lookback (`did(…, ordinal = {ordinal = nth(2), per = turn})`);
+  - a comparative premodifier with its "than" complement after the head
+    (`ComparativeIndirectComplement`, `crates/english/grammar/english.fug`): *Conformer Shuriken*'s granted
+    "If that creature has greater power than this creature", *Death's Oasis*'s "a creature card
+    with lesser mana value than the creature that died".
+
+  Options: a Template at `Nominal` per construction whose wording has fixed words and Holes on
+  both sides of the head Hole ("the $ordinal $head $relative"), which is substitution
+  (`spelling.md` §2's "more $p than $subject"); or a premodifier and a postmodifier that the
+  checker pairs. Recommendation: the Templates, one per construction, each with its card as
+  caller.
 - **Two well-sorted trees for one nominal.** "Artifact or enchantment you control" is
   `nominal(or([artifact, enchantment]), post = [youControl])` or
   `or([artifact, nominal(enchantment, post = [youControl])])`, and nothing in the ADRs picks
@@ -193,6 +219,10 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   encore's "that opponent": `syl-opponent-noun-and-predicate`.
 - Created tokens and characteristic-setting complements: `syl-token-records-to-templates`,
   `syl-become-replaces-types`.
+- Repeated determiners over one shared nominal: *Balthor the Defiled*'s "Each player returns all
+  black and all red creature cards from their graveyard to the battlefield". It is a coordination
+  of two determined phrases that print their shared head once, which `spelling.md` §3.3 governs:
+  `syl-shared-phrase-written-once` lists it among the coordinations that take a shared phrase.
 - Location postmodifiers ("in your graveyard", "exiled with …") beyond the retype:
   `syl-zone-words`.
 

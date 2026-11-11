@@ -70,7 +70,7 @@ three parts, where the card prints one subject and no "it".
 ## Not in scope
 
 - Records in a token slot: `syl-token-records-to-templates`.
-- Copy exceptions ("except it has haste"), the `CopyExcept` declarations.
+- Copy exceptions ("except it has haste"): `syl-copy-exceptions`.
 
 ## Pointers
 

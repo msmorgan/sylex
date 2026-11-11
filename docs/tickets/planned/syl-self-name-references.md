@@ -44,6 +44,13 @@ which this ticket's check can call, and lands first.
 - Whether a granted ability that names its grantor by name [CR#201.5a] (*Grothama,
   All-Devouring*'s "fight Grothama, All-Devouring"; *Gutter Grime*'s token) gets the same
   name-versus-head split beside `theGrantor`.
+- Whether a named token's ability that names the token uses these forms: *There and Back Again*'s
+  Smaug ("When Smaug dies, …") and *Bonny Pall, Clearcutter*'s Beau ("Beau's power and toughness
+  are each equal to …") name the token, which means that object [CR#201.5], while the forms here
+  name the enclosing face, the card that creates the token. `syl-token-records-to-templates`
+  writes those tokens and waits on this answer. Recommendation: the forms name the object whose
+  characteristics hold the ability, a token's name being the one its creating effect sets
+  [CR#111.4], so one pair of forms serves faces and named tokens.
 
 ## Done when
 

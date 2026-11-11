@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-argument-naming, syl-spelling-optional-segments]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-where-letter-supplement]
 ---
 
 # Each printed sequence of instructions is a Template over `sequentially`
@@ -11,8 +11,8 @@ is called 296 times (218 in 200 canon files, 78 in `plugins/builtin/`). It stand
 printed constructions, which the English grammar reads as different trees:
 
 - Separate sentences: *Duneblast*'s "Choose up to one creature. Destroy the rest."
-  (`SentenceSequence`, `crates/english/grammar/english.fug` line 1013).
-- ", then", a Linked Coordination (`LinkedClause`, `LinkedVerbPhrase`, lines 1196–1198):
+  (`SentenceSequence`, `crates/english/grammar/english.fug`).
+- ", then", a Linked Coordination (`LinkedClause`, `LinkedVerbPhrase`):
   *Cloudshift*'s "Exile target creature you control, then return that card to the battlefield
   under your control." A "then" with no comma (*Land Equilibrium*, "puts that land onto the
   battlefield then sacrifices a land") and a sentence opening "Then" (*Juxtapose*'s ". Then
@@ -25,6 +25,10 @@ printed constructions, which the English grammar reads as different trees:
   the printed subject is written twice.
 
 No program spells terms yet, so `cargo xtask dsl check` cannot see that none of these round-trips.
+
+A `define(x, …)` step (19 canon files, as *Celebrate the Harvest*'s second step) is no step: it is
+the ", where X is …" supplement of the step before it. `syl-where-letter-supplement` takes it out
+of the sequences and lands first, so the steps this ticket spells are the printed instructions.
 
 ## Design
 

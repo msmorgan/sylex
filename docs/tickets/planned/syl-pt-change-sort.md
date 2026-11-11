@@ -31,6 +31,16 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 - The sort's name and its word. The glossary has **Delta** for one number's change and nothing
   for the pair. Recommendation: sort `PtChange`, glossary entry "Power/Toughness Change", built
   by `pt(power, toughness)`, matching the `Pt` already in `getsPt` and `definesPt`.
+- **Coordinated and multiplied changes.** The English grammar coordinates measures
+  (`coordination MeasureNounPhrase`, `crates/english/grammar/english.fug`) and
+  multiplies one (`AdverbMultipliedMeasure`, "gets twice -X/-X"), and cards print
+  both: "gets +1/-1 or -1/+1 until end of turn" (*Pemmin's Aura*, *Shorecrasher Elemental*,
+  *Brightling*, *Endling*), "gets +2/-2 or -2/+2" (*Shaper Parasite*, *Multiform Wonder*), and
+  *Nuclear Fallout*'s "Each creature gets twice -X/-X until end of turn". Options: the sort admits
+  an `or` of changes and a multiplier, each its own declaration at the sort; or these cards are
+  written with a choice of two `get`s and a scaled amount in each delta, which writes the printed
+  "or" and "twice" as something else. Recommendation: the first, each declaration with one of
+  these cards as its caller.
 - Whether "has base power and toughness 3/3" (`getsBase`, two `set` deltas) takes the same
   sort. It prints no sign and is not a change the text scales. Recommendation: leave `getsBase`
   with its two amounts, and decide separately whether `set` stays a `Delta`.
@@ -52,6 +62,9 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 ## Not in scope
 
+- A counter kind printed as a power/toughness pair ("enters with a +2/+0, +1/+1, or +0/+2 counter
+  on it", *Frankenstein's Monster*): a Word-Part Coordination of counter names
+  (`docs/contexts/oracle-english/CONTEXT.md`), not this sort.
 - Where the "for each" Tail stands relative to a duration: `syl-tail-placement`.
 
 ## Pointers

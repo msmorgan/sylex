@@ -8,9 +8,9 @@ needs: [cleanup-step6-surface]
 
 *Efflorescence* prints "Infusion — If you gained life this turn, that creature also gains trample
 and indestructible until end of turn." Its canon file writes
-`gain(that(creature), [trample, indestructible], untilEndOfTurn)`, and no declaration spells
-"also", so the Reading's "also" matches no Construction and the card does not round-trip. It is
-the only canon card that prints "also" in rules text today.
+`gain(that(creature), [trample, indestructible], duration = untilEndOfTurn)`, and no declaration
+spells "also", so the Reading's "also" matches no Construction and the card does not
+round-trip. It is the only canon card that prints "also" in rules text today.
 
 A scan of Vintage-legal Oracle rules text with reminder text removed (script and output in
 `docs/evidence/syl-focus-also/`) finds "also" on 58 cards:
@@ -53,12 +53,23 @@ types").
     shape `spelling.md` §1 avoids for voice and number.
   - A modifier that is an argument of `gain` would be a flag stored beside the term, which
     `spelling.md` §4 rules out.
-  - Recommendation: one Template per host sort, `also(x)`, whose body is `$x` and whose wording
-    adjoins "also" inside the clause its argument spells, as `cant` adjoins "can't" (one-sided
-    adjunction, `spelling.md` §2); it adds no meaning. The sorts it wraps come from the classes
-    above (Action for the grants and second effects, the continuous effect for *Jetmir*, the
-    event in *Okk*'s condition), and the "is also a" type line is its own Template beside the
-    "in addition to its other types" forms.
+  - The grammar attaches a central "also" to the verb phrase below the subject
+    (`CentralAdverbial: VerbPhrase -> adjunct:AdverbPhrase VerbPhrase`, `crates/english/grammar/english.fug`).
+    Whether spelling keeps general one-sided adjunction (`spelling.md` §2) is not settled, and
+    the recommendation depends on it:
+    - With adjunction: one Template per host sort, `also(x)`, whose body is `$x` and whose
+      wording adjoins "also" inside the clause its argument spells, as `cant` adjoins "can't"; it
+      adds no meaning.
+    - Without it: `also` is a Template over the subjectless verb phrase that
+      `syl-continuous-effect-subject` introduces for continuous effects, and over the Action a
+      Handoff or an imperative takes for deeds (*Liliana's Triumph*, *Beast Mode*'s
+      sentence-initial "Also put …"); the subject is supplied outside it.
+
+    In both, the sorts it wraps come from the classes above (Action for the grants and second
+    effects, the continuous effect for *Jetmir*, the event in *Okk*'s condition), and the "is
+    also a" type line is its own Template beside the "in addition to its other types" forms.
+    Recommendation: settle the formalism first; this ticket follows `syl-continuous-effect-subject`
+    either way, which the surface gate it needs already ensures.
 
 ## Done when
 
