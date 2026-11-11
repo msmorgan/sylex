@@ -182,9 +182,24 @@ pub struct Legalities {
 pub struct RelatedCard {
     #[serde(rename = "id")]
     pub printing_id: String,
-    pub component: String,
+    pub component: RelatedComponent,
     pub name: String,
     pub type_line: String,
+}
+
+/// How a related card relates to the card that lists it: Scryfall's
+/// `all_parts[].component`. A component outside this list is refused.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum RelatedComponent {
+    /// A token the card makes.
+    Token,
+    /// A card of the meld pair, the listing card among them.
+    MeldPart,
+    /// The meld result its meld pair melds into.
+    MeldResult,
+    /// A card related in any other way.
+    ComboPiece,
 }
 
 /// Whether a source record denotes printed Card Face characteristics or the
@@ -773,8 +788,18 @@ mod tests {
         let unit = card.oracle_units().next().unwrap();
         assert_eq!(unit.identity().to_string(), "oracle-meld#card");
         assert_eq!(unit.related_cards().len(), 1);
-        assert_eq!(unit.related_cards()[0].component, "meld_part");
+        assert_eq!(
+            unit.related_cards()[0].component,
+            RelatedComponent::MeldPart
+        );
         assert_eq!(unit.related_cards()[0].name, "Other Half");
+    }
+
+    #[test]
+    fn an_unknown_related_card_component_is_refused() {
+        let part = r#"{"object":"related_card","id":"p","component":"meld_partner","name":"Other Half","type_line":"Creature — Angel"}"#;
+        let error = serde_json::from_str::<RelatedCard>(part).unwrap_err();
+        assert!(error.to_string().contains("meld_partner"), "{error}");
     }
 
     #[test]
