@@ -8,9 +8,11 @@ needs: [syl-result-reads, syl-one-declaration-per-keyword, syl-ability-words-onc
 
 `plugins/builtin/` carries declarations no card or rule needs: about 78 primitives with no user
 and 63 used once (re-count when claimed), six `gift…` Templates (`giftACard`, `giftAFood`,
-`giftATappedFish`, `giftATreasure`, `giftAnExtraTurn`, `giftAnOctopus`), and `manifestPlacement`
+`giftATappedFish`, `giftATreasure`, `giftAnExtraTurn`, `giftAnOctopus`), `manifestPlacement`
 (`definitions/keyword_action/manifestPlacement.syl`), a placement-only fragment of manifest kept
-for a bench that no longer exists.
+for a bench that no longer exists, and `cardOnTheStack`
+(`templates/predicate/cardOnTheStack.syl`), which nothing calls and whose "card on the stack" no
+in-scope card prints.
 
 Other tickets decide the fate of declarations this sweep would otherwise delete or fold, so they
 land first: `syl-result-reads` (the coin and die reads with no user),
@@ -38,6 +40,7 @@ declarations.
 - Each declaration used once, and each of the six `gift…` Templates, is handled as settled; the
   landing lists each.
 - `manifestPlacement` is gone, and nothing names it.
+- `cardOnTheStack` is gone, and nothing names it.
 - Declaration order stays the printed order (`syl.md` §5).
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -46,4 +49,5 @@ declarations.
 
 `plugins/builtin/`, `plugins/builtin/templates/ability/gift*.syl`,
 `plugins/builtin/definitions/keyword_ability/gift.syl`,
-`plugins/builtin/definitions/keyword_action/manifestPlacement.syl`.
+`plugins/builtin/definitions/keyword_action/manifestPlacement.syl`,
+`plugins/builtin/templates/predicate/cardOnTheStack.syl`.
