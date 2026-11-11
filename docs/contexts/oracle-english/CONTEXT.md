@@ -269,8 +269,8 @@ only where it holds one of its cards.
 
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5], and
-the name of a meld result in the text of either card of its meld pair
-[CR#712.4a]. The grammar reads it as any other Proper Name.
+the name of a meld result in the text of either card of its meld pair, each of
+which carries half of the result's face [CR#712.4]. The grammar reads it as any other Proper Name.
 
 **Another Card's Name**:
 A card's full name in the text of any face but its own. Only a position that

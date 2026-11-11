@@ -45,7 +45,7 @@
 * <card=Garth One-Eye> Choose Black Lotus.
 * <card=Garth One-Eye> Create a copy of Black Lotus.
 * <card=Garth One-Eye> Choose a card name among Disenchant and Black Lotus.
-# a meld result's name is an own name on both cards of its meld pair [CR#712.4a], the Complement of *into*; on any other card it is another card's name, which *into* does not admit
+# a meld result's name is an own name on both cards of its meld pair [CR#712.4], the Complement of *into*; on any other card it is another card's name, which *into* does not admit
 + <card=Gisela, the Broken Blade> At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares. => NounPhrase "Brisela, Voice of Nightmares" as Complement of into
 + <card=Graf Rats> At the beginning of combat on your turn, if you both own and control this creature and a creature named Midnight Scavengers, exile them, then meld them into Chittering Host. => NounPhrase "Chittering Host" as Complement of into
 + <card=Hanweir Battlements> {3}{R}{R}, {T}: If you both own and control this land and a creature named Hanweir Garrison, exile them, then meld them into Hanweir, the Writhing Township. => NounPhrase "Hanweir, the Writhing Township" as Complement of into

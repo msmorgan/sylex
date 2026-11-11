@@ -13,15 +13,17 @@ ticket.
 
 ## Design
 
-- The meld result's name is in scope as an own name on both cards of its meld pair
-  [CR#712.4a]: on the card that prints the meld ability (Gisela, the Broken Blade; Graf Rats;
-  Hanweir Battlements; Mishra, Claimed by Gix; Titania, Voice of Gaea; Urza, Lord Protector;
-  Vanille, Cheerful l'Cie) and on its partner, which never names it.
+- The meld result's name is in scope as an own name on both cards of its meld pair, each of
+  which carries half of the result's face on its back [CR#712.4]: on the card that prints the
+  meld ability [CR#712.4a] (Gisela, the Broken Blade; Graf Rats; Hanweir Battlements; Mishra,
+  Claimed by Gix; Titania, Voice of Gaea; Urza, Lord Protector; Vanille, Cheerful l'Cie) and on
+  its partner, which never names it.
 - The pairing comes from the card data, which records each meld part's result for both parts
   alike: Scryfall's `all_parts` entry with component `meld_result`, as mtgjson's
   `Gisela, the Broken Blade // Brisela, Voice of Nightmares` (layout `meld`, side `a`) does.
 - The name reads through the face's scope (`corpus::own_names`) like any own name, with no
-  construct, gate or list of its own. A judgment's `<card=NAME>` takes the same own names.
+  construct, gate or list of its own. A judgment's `<card=NAME>` takes the scope the census gives
+  the face so named (`judgment::CardScopes`).
 
 ## Done when
 
