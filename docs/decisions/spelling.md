@@ -86,13 +86,14 @@ records.
 sentence sequence. A text has no syntactic structure above the sentence: the English grammar
 builds a sequence by right recursion (`SentenceSequence`, `crates/english/grammar/english.fug`),
 which is one grouping chosen for the forest, so spelling reads a sentence sequence as flat, and a
-run fills a Hole whether or not it is a node of the Reading. A Hole of sort `Action` holds a run,
-and so does a Hole whose argument's own phrase is a run, as `replaceEvent`'s `replacement` Hole
-holds `instead` over one (below). A Construction's fixed words may follow such a Hole as a
-sentence of their own, which is plain substitution. Aggravated Assault prints "{3}{R}{R}: Untap
-all creatures you control. After this main phase, there is an additional combat phase followed
-by an additional main phase. Activate only as a sorcery." `activatedOnlyDuring`'s wording "$cost:
-$action. Activate only $timing." holds the run of the first two sentences in its `action` Hole,
+run fills a Hole whether or not it is a node of the Reading. A run fills only a Hole its wording
+marks for one, `$action*` (§7); an unmarked Hole holds one phrase, whatever its sort. `when`'s
+effect Hole is marked, and so is `replaceEvent`'s `replacement` Hole, which holds `instead` over a
+run (below). A Construction's fixed words may follow a marked Hole as a sentence of their own,
+which is plain substitution. Aggravated Assault prints "{3}{R}{R}: Untap all creatures you
+control. After this main phase, there is an additional combat phase followed by an additional
+main phase. Activate only as a sorcery." `activatedOnlyDuring`'s wording "$cost: $action*.
+Activate only $timing." holds the run of the first two sentences in its `action` Hole,
 a run the Reading has no node for: its `SentenceSequence` nodes span all three sentences and the
 last two. Academy Wall's "Whenever you cast an instant or sorcery spell, you may draw a card. If
 you do, discard a card. This ability triggers only once each turn." is the same shape, with the
@@ -184,8 +185,8 @@ promoted phrase takes the subject position the context's own wording has.
 Construction whose wording prints the dependent takes the run in its Hole, and the dependent
 stands where that wording places it in the run's first sentence, before the sentence's clause or
 after its verb phrase. The run's other sentences follow the first as they are printed. The rule
-applies only to a Hole that holds a run (above), so a dependent whose Construction has no such
-Hole never governs one: "until end of turn" is a `Duration` argument of its effect's own call,
+applies only to a Hole marked to hold a run (above), so a dependent whose Construction has no
+such Hole never governs one: "until end of turn" is a `Duration` argument of its effect's own call,
 and it stays an adjunct of its one sentence.
 
 - **A fronted trigger clause.** A triggered ability is written "[When/Whenever/At] [trigger
@@ -519,20 +520,23 @@ representation yet.
 
 ## 7. The `spelling` notation
 
-A `spelling` is fixed words with four kinds of markup, each with one job. `$` marks a Hole,
-`~` ties a Hole to letters, parentheses mark an optional part, angle brackets a list's join,
-and `<~ … >` a Tail.
+A `spelling` is fixed words with markup, each mark with one job. `$` marks a Hole, `@` the
+printed form of its head word, `*` a Hole a run of sentences may fill, `~` ties a Hole to
+letters, parentheses mark an optional part, angle brackets a list's join, and `<~ … >` a Tail.
 
 ```
 spelling := part*
 part     := text | hole | optional | tail
-hole     := [affix "~"] "$" name ["~" affix]   -- a parameter's argument
-          | "$" name "<" join ">"              -- a List parameter
-join     := "" | "," | "and" | "or" | "and/or" | "then"
+hole     := [affix "~"] "$" name [mark] ["~" affix]   -- a parameter's argument
+          | "$" name "<" join ">"                     -- a List parameter
+mark     := "@" form | "*"
+form     := "Cardinal" | "Arabic" | "Ordinal" | "Roman" | "Counting"
+          | "Present" | "Preterite" | "PastParticiple" | "GerundParticiple"
+join     := "" | "," | "." | "and" | "or" | "and/or" | "then"
 optional := "(" part+ ")"
 tail     := "<~" ["inner"] Category ":" part+ ">"
 affix    := letter+
-text     := any characters except "$", "~", "(", ")", "<" and ">"
+text     := any characters except "$", "~", "@", "*", "(", ")", "<" and ">"
 ```
 
 **A Hole is `$name`**, the sigil that reads the same parameter in `body`
@@ -540,24 +544,74 @@ text     := any characters except "$", "~", "(", ")", "<" and ">"
 written again, and recovery requires the same term at each (§4).
 
 **A tie, `~`, joins a Hole and the letters beside it into one word**: "non~$p",
-"$quality~walk", "$n~th". The word is formed by the lexicon's morphology, never by putting
-the characters side by side: "non~$p" is "nonland" in Abrupt Decay and "non-Aura" in Absorbing
-Man, and "$n~th" is "third" in Bookwurm's "third from the top". A Hole that abuts a letter or
-digit with no tie fails to load, so a missing space is never read as a tie, and the affix is a
-bound form the lexicon declares.
+"$quality~walk". The word is formed by the lexicon's morphology, never by putting the characters
+side by side: "non~$p" is "nonland" in Abrupt Decay and "non-Aura" in Absorbing Man. A Hole that
+abuts a letter or digit with no tie fails to load, so a missing space is never read as a tie, and
+the affix is a bound form the lexicon declares. An ordinal is no tie: "third" is a numeral of the
+lexicon's, written `$n@Ordinal` (below).
+
+**A printed form is `$name@Form`.** It states the form of a Hole's head word where neither
+agreement nor a governing word fixes it (§1). The forms are the lexicon's (`Numeral` and
+`WordForm`, `crates/lexicon/src/types.rs`), and `@` has no other meaning:
+
+- **A numeral's notation**: `Cardinal` ("three"), `Arabic` ("3"), `Ordinal` ("third") and `Roman`
+  (a Saga's chapters), and `Counting` (below). The English grammar admits more than one at one
+  place, "Draw two cards." and "Draw 2 cards." alike, so the notation is wording, and the slot
+  states it: *Approach of the Second Sun* prints one value both ways, "put Approach of the
+  Second Sun into its owner's library seventh from the top and you gain 7 life", which is
+  `fromTop`'s "$n@Ordinal from the top of $loc" and `gainLife`'s "gain $amount@Arabic life".
+- **A verb form on an `Action` Hole that nothing governs**: `Present`, `Preterite`,
+  `PastParticiple` and `GerundParticiple`. After "can't" or "would" the verb is governed and
+  nothing is written; in a clause whose Subject and Action are two Holes, nothing governs it, so
+  `does` and `did` differ in their spelling, the first `@Present` ("this creature enters") and
+  the second `@Preterite` ("you attacked this turn"), both in *Mardu Hordechief*'s "When this
+  creature enters, if you attacked this turn, create a 1/1 white Warrior creature token."
+
+A label is refused where the position admits only one form. A wording at a numeric sort that
+leaves its numeric Hole unlabeled, as `lit`'s "$value" and `plus`'s "$left plus $right" do,
+prints it in the notation of the Hole its own call fills: `plus(thatMuch, 1)` is "that many plus
+one +1/+1 counters" under `putCounters` in *Hardened Scales* and "that much damage plus 1" under
+`dealDamage` in *Sulfuric Vapors*.
+
+**`Counting` is `Cardinal`, except that the integer 1 prints as the article or as no word in
+three places.** Oracle counts objects that way, and it is the one alternation chosen by a value
+that the notation states (below). The three places:
+
+- 1 as the whole determiner prints the indefinite article, with a singular noun: "Draw a card."
+  (*Opt*) beside "Draw two cards." (*Divination*).
+- 1 as the whole determiner before "target" prints no word: "Destroy target creature."
+  (*Murder*) beside "Destroy two target nonblack creatures." (*Wicked Pact*).
+- 1 after another determiner prints no word: "the top card of your library" (*Courser of
+  Kruphix*) beside "the top three cards of your library" (*Sensei's Divining Top*).
+
+Elsewhere 1 is "one": in "up to one target creature" (*Witch of the Moors*) the determiner is
+"up to one", not 1. The grammar parses "Draw one card." and "Destroy one target creature." too,
+so the exceptions are wording, not agreement. A numeral "one" printed where `Counting` would
+print the article, as in *Melira, the Living Cure*'s "you get one poison counter" and *Noxious
+Vapors*'s "chooses one card of each color", is the parameterless Template `one` at `Amount`,
+whose spelling is "one".
 
 **A list Hole is `$name<join>`.** A `List` parameter must state its join and no other parameter
 may, so a list is visible at its Hole. The joins are a closed set: `<>` juxtaposes the elements;
-`<,>` separates them with commas and no coordinator; `<and>`, `<or>`, `<and/or>` and `<then>`
-coordinate them. No parameter chooses a join: a coordinator is printed by the Template that names
-it, as the Templates `and`, `or` and `andOr` print "and", "or" and "and/or" over the three `coord`
-primitives (at `NounPhrase`, `Predicate` and `Location`), which have no `spelling`. Under
+`<,>` separates them with commas and no coordinator; `<.>` prints each element as a run of
+sentences (`*`, below) after the one before, so such a list needs no `*`; `<and>`, `<or>`,
+`<and/or>` and `<then>` coordinate them. No parameter chooses a join: a coordinator is printed by
+the Template that names it, as the Templates `and`, `or` and `andOr` print "and", "or" and
+"and/or" over the three `coord` primitives (at `NounPhrase`, `Predicate` and `Location`), which
+have no `spelling`. Under
 `plugins/`, no `coord` has a `spelling`, and the Templates `and`, `or` and `andOr` have none yet
 either; the `syl-spelling-optional-segments` ticket writes them. The commas of a coordination of
 three or more are the English layer's and are never written. One element prints alone, with no
 join. An element whose own wording prints nothing in place, having only a Tail, takes no part in
 the join. A `<` directly after a Hole's name is only ever a join, and `<~` only ever opens a Tail,
 so a Tail may follow a Hole with or without a space. A `~` anywhere else, outside `<~`, is a tie.
+
+**A Hole a run of sentences may fill is `$name*`** (§2, the run rule). An unmarked Hole holds one
+phrase. `when`'s `action` Hole is `$action*`, and holds Boommobile's two sentences. The parts of
+a wording that stand in a `*` Hole's own sentence are the dependents the run rule prints in the
+run's first sentence: `when`'s "When $event," before it, `instead`'s "instead" after its verb
+phrase. A sentence of the wording after the Hole's, as `activatedOnlyDuring`'s "Activate only
+$timing.", follows the run's last.
 
 **An optional part is `( … )`.** A parameter is omissible when it has a declared default, or
 its sort is `Option(T)` or a list; its absent value is the default, else `none`, else the
@@ -592,21 +646,20 @@ host's other trailing dependents. Tails that land at one edge print in the order
 and an argument printed at two Holes prints its Tail once. A Tail stands last among the parts
 beside it and holds no Tail.
 
-**The notation does not yet express the two closed rules of §2.** Nothing marks a context's
-Subject Hole and Action Hole as the pair passive subject promotion links, which Action's
-parameter fills the promoted position, a Hole as one that may hold a run of sentences, or the
-dependent a Construction prints in that run's first sentence. Until it does, a promoted Subject
-and a Hole that holds a run stand outside the check that a variant is English (below): that
-check substitutes one phrase for each Hole where the Hole stands, and under either rule the
-printed material stands elsewhere (§10).
+**The notation does not yet express passive subject promotion (§2).** Nothing marks a
+context's Subject Hole and Action Hole as the pair the rule links, or which Action's parameter
+fills the promoted position. Until it does, a promoted Subject stands outside the check that a
+variant is English (below), and so do the sentences of a run after its first: that check
+substitutes one phrase for each Hole where the Hole stands, and under passive subject promotion
+and in a run's later sentences the printed material stands elsewhere (§10).
 
-**No escape exists, because none is needed.** None of `$`, `~`, `(`, `)`, `<` and `>` occurs
-in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `<` and `>` occur in no
-in-scope card's text at all, and every parenthesis is removed with reminder text: a
+**No escape exists, because none is needed.** None of `$`, `~`, `@`, `*`, `(`, `)`, `<` and `>`
+occurs in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `@`, `*`, `<` and `>`
+occur in no in-scope card's text at all, and every parenthesis is removed with reminder text: a
 parenthetical is reminder text even where it reminds the player of something other than a
 keyword's rule, as on Mistform Ultimus, and one inside an ability-word label has no rules
 meaning. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
-are never markup.
+are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is no mark.
 
 **A `spelling` is refused at load** when it breaks a rule above, and also when:
 
@@ -640,9 +693,10 @@ Why the skeleton rule: it is the round trip of §6 as one check, in place of a r
 construct. It is a check on the `spelling` alone. Two sorts whose wordings overlap can still
 give recovery two candidates, and meaning chooses between those (§5).
 
-**What the notation does not say is a Template, or a change to the declaration.** It has no
-part chosen by an enum value and no omission governed by a value that is not absent. A wording
-that differs that way is a different wording, and gets its own Template (§4). Three more
+**What the notation does not say is a Template, or a change to the declaration.** Apart from
+`Counting`'s 1 (above), it has no part chosen by a value and no omission governed by a value
+that is not absent. A wording that differs that way is a different wording, and gets its own
+Template (§4), as *Melira, the Living Cure*'s "one" is `one`. Three more
 things are known limits:
 
 - **Coordinating whichever optional pieces are present.** Akul the Unrepentant prints "Activate
@@ -654,8 +708,10 @@ things are known limits:
 - **A Tail between two of its host's adjuncts.** Only the two placements exist.
 
 The declarations under `plugins/` still write a Hole `<name>`: 776 Holes on 593 `spelling`
-lines, five of which need a tie (`landwalk`, `typecycling`, `non` and the two "$n~th from …"
-wordings). The `syl-spelling-conventions` ticket migrates them.
+lines, three of which need a tie (`landwalk`, `typecycling` and `non`) and two an ordinal
+(`fromTop` and `fromBottom`, "$n@Ordinal from …"). No declaration writes a form label, a `*` or
+a `<.>` join yet. The `syl-spelling-conventions` ticket migrates the Holes, and
+`syl-spelling-forms-and-runs` writes the labels, marks and joins.
 
 ## 8. Capacity and cost
 
@@ -749,11 +805,9 @@ goaded" is a copula with "also" and the adjective "goaded" (`PostCopularAdverbia
 a passive "is" over "also goaded" (`CentralAdverbial` over the passive participle) in the other.
 Which Reading `spell` yields for such a wording is not settled.
 
-**The notation for the two closed rules.** §7 has no mark for a context's Subject and Action
-Holes, for which of the Action's parameters passive subject promotion moves, for a Hole that
-may hold a run of sentences, or for the dependent a Construction prints in the run's first
-sentence. Until it has, a promoted Subject and a Hole that holds a run stand outside the check
-that a variant is English.
+**The notation for passive subject promotion.** §7 has no mark for a context's Subject and
+Action Holes, or for which of the Action's parameters passive subject promotion moves. Until it
+has, a promoted Subject stands outside the check that a variant is English.
 
 **Which passive a term prints.** English has two passives of `deal`. Panther Habit prints "If
 equipped creature would be dealt damage", the passive of the ditransitive frame `deal` declares
