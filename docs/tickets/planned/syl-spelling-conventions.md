@@ -25,11 +25,11 @@ ticket's corpus rewrite migrates every `<name>` Hole to `$name`.
   agreement is solved when the clause is rendered. Three cases:
   - The performer is outside the declaration (`actor`): the spelling is the bare verb phrase.
     `die` is `"die"`, `sacrifice` is `"sacrifice $subject"`, `win` is `"win the game"`.
-  - The grammatical Subject is a parameter: the hole stays and the verb is still uninflected.
-    `becomeBlocked(subject)` is `"$subject become blocked"`, likewise `becomeBlocking`,
-    `stopBlocking` and `phaseOutUntil`. These keep `subject` because their Subject is the
-    patient, not the performer (`does(any, becomeBlocked(this))`, `semantics.md` §4.2), so passive
-    subject promotion never applies to them (`spelling.md`, its closed rules).
+  - The grammatical Subject is a parameter: the hole stays and the verb is still uninflected,
+    as `phaseOutUntil`'s `"$subject phase out until $event"` while it keeps its parameter (the
+    open question below). `becomeBlocked` and `resolve` are not this case:
+    `syl-shared-phrase-written-once` makes them subjectless, read like `die` (`"become blocked"`,
+    `"resolve"`), their subject the context's.
   - The Subject is fixed inside the declaration and no hole decides agreement: the verb is
     written as printed. `controllerSacrifices` stays `"$subject's controller sacrifices it"`.
 - A spelling that parses in several ways is several Constructions (`spelling.md`, the notation's
@@ -38,6 +38,15 @@ ticket's corpus rewrite migrates every `<name>` Hole to `$name`.
 - A spelling's Holes stand in its declaration's parameter order, which is printed order, as
   arguments are written in declaration order (`syl.md` §2, §5); a spelling whose Hole order
   differs is `syl-printed-read-order`'s to reorder, not this ticket's.
+
+## Open questions
+
+- **`becomeBlocking`, `stopBlocking` and `phaseOutUntil`** ("$subject becomes blocking $blocked",
+  "$subject stops blocking $blocked", "$subject phases out until $event") take their subject as a
+  parameter, as `becomeBlocked` did, and nothing in `plugins/` calls them. Each prints its own
+  subject in the active: the creature that begins or stops blocking, the permanent that phases
+  out. Whether they become subjectless like `becomeBlocked`. Recommendation: yes, each when a
+  card first calls it, so its subject is the context's.
 
 ## Done when
 
