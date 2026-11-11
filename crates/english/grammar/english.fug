@@ -286,8 +286,10 @@ category PrepositionalNominal : Nominal [Number, Countability, NounDistribution]
 category TargetedOblique : PrepositionPhrase [Number, NounKind]
 category TargetedNounPhrase : NounPhrase [Number, NounKind, Countability]
 category BareNominalComplement : Nominal
-// A genitive's possessor, never postmodified. An admission gate (ADR §6):
-// it restates the Noun Phrase Productions over BareNominal.
+// A genitive's possessor, never postmodified: Oracle fronts the player noun
+// "to avoid a dangling possessive" (OSG §6, Controller and owner). An
+// admission gate (ADR §6): it restates the Noun Phrase Productions over
+// BareNominal.
 category Possessor : NounPhrase [Number, Person, Case]
 // One genitive over coordinated nominals (*target artifact or creature's
 // owner*).
