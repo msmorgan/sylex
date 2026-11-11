@@ -27,7 +27,8 @@ Front matter carries `needs: [...]`: the slugs of tickets that must reach `done/
   it in `specs: [...]` front matter.
 - **Open questions**: optional; one bullet per design decision that still needs the owner.
   Planned work waiting on one stays in `planned/`; `maybe/` never holds planned work.
-- **Done when**: checkable acceptance criteria, including which tests or gates must pass.
+- **Done when**: checkable acceptance criteria, including which tests or gates must pass. Each
+  states what must be true; a case that may need an owner ruling is still done only once handled.
 - **Not in scope**: only what a reader would likely confuse for part of the ticket.
 - **Pointers**: the files or documents to read.
 

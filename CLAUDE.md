@@ -66,6 +66,9 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 - Ticket form: `docs/tickets/README.md`.
 - A ticket with Open questions starts with research: answer each question with evidence and a
   recommendation, and present them to the owner before implementing.
+- Work inside a ticket's Done-when that waits only on an owner ruling stays in that ticket: ask,
+  and once the owner rules, implement it there. A follow-up ticket is for work outside the
+  Done-when or too large to ride along.
 
 ## CR citations
 
