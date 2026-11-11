@@ -13,16 +13,15 @@
 //! convention its printed card keeps, the census reads the corrected text and
 //! the grammar is not relaxed for the slip.
 
-use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::io::BufRead;
-use std::sync::OnceLock;
 
 use sylex_lexicon::CardScope;
 use sylex_lexicon::LexemeId;
 use sylex_upstream::oracle_text::strip_reminder_text;
 use sylex_upstream::scryfall::OracleCardReader;
 use sylex_upstream::scryfall::OracleUnit;
+use sylex_upstream::scryfall::RelatedComponent;
 use sylex_vocabulary::card_name_id;
 
 /// One Card Face record of the supported corpus.
@@ -190,9 +189,9 @@ pub enum CorpusError {
 }
 
 /// The card names a face's text uses as its own: the face's name and its
-/// card's [CR#201.5c], and on a card of a meld pair the name of the meld
-/// result the pair melds into [CR#712.4a], which the data records as the
-/// card's `meld_result` part.
+/// card's [CR#201.5c], and on a meld card the name of its meld result, whose
+/// face is half on that card's back [CR#712.4], which the data records as
+/// the card's `meld_result` part.
 ///
 /// The faces of a double-faced card are named apart
 /// [CR#712.8d,712.8e,712.8f], and two faces that shorten to one spelling
@@ -206,44 +205,12 @@ fn own_name_ids<'u>(unit: &'u OracleUnit<'_>) -> impl Iterator<Item = LexemeId> 
     let melded = unit
         .related_cards()
         .iter()
-        .filter(|part| part.component == "meld_result")
+        .filter(|part| part.component == RelatedComponent::MeldResult)
         .map(|part| part.name.as_str());
     [unit.display_name(), unit.group_name()]
         .into_iter()
         .chain(melded)
         .map(card_name_id)
-}
-
-/// The [`own_names`] of every supported face of the pinned snapshot at
-/// `data/scryfall/oracle-cards.jsonl`, by face name. A name more than one
-/// face has (a prepared spell's) has the names of all of them.
-///
-/// # Panics
-/// On a missing or unreadable snapshot.
-#[must_use]
-pub fn own_names_by_face() -> &'static BTreeMap<String, CardScope> {
-    static INDEX: OnceLock<BTreeMap<String, CardScope>> = OnceLock::new();
-    INDEX.get_or_init(|| {
-        let reader = sylex_upstream::scryfall::oracle_cards()
-            .unwrap_or_else(|e| panic!("reading the Oracle Cards snapshot: {e}"));
-        let mut index = BTreeMap::<String, BTreeSet<LexemeId>>::new();
-        for card in reader {
-            let card = card.unwrap_or_else(|e| panic!("reading the Oracle Cards snapshot: {e}"));
-            if !card.supported() {
-                continue;
-            }
-            for unit in card.oracle_units() {
-                index
-                    .entry(unit.display_name().to_owned())
-                    .or_default()
-                    .extend(own_name_ids(&unit));
-            }
-        }
-        index
-            .into_iter()
-            .map(|(face, names)| (face, CardScope::own_names(names)))
-            .collect()
-    })
 }
 
 /// The rules-text units of a face: its paragraph lines after balanced

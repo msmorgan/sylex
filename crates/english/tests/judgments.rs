@@ -9,19 +9,23 @@ mod seed;
 use std::sync::OnceLock;
 
 use sylex_english::COMPLETED_STRATUM;
+use sylex_english::corpus::Corpus;
 use sylex_english::corpus::UnitKind;
+use sylex_english::judgment::CardScopes;
 use sylex_english::judgment::Judge;
 use sylex_english::judgment::Outcome;
 use sylex_english::profile::Profiler;
 use sylex_syntax::CompiledGrammar;
 use sylex_vocabulary::LexicalEnvironment;
 
-fn environment() -> &'static (LexicalEnvironment, CompiledGrammar) {
-    static ENVIRONMENT: OnceLock<(LexicalEnvironment, CompiledGrammar)> = OnceLock::new();
+fn environment() -> &'static (LexicalEnvironment, CompiledGrammar, CardScopes) {
+    static ENVIRONMENT: OnceLock<(LexicalEnvironment, CompiledGrammar, CardScopes)> =
+        OnceLock::new();
     ENVIRONMENT.get_or_init(|| {
         let env = LexicalEnvironment::load().unwrap();
         let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-        (env, grammar)
+        let corpus = Corpus::load(|_| true).unwrap();
+        (env, grammar, CardScopes::new(&corpus.faces))
     })
 }
 
@@ -37,6 +41,7 @@ fn the_seed_judgments_hold() {
     let judge = Judge {
         grammar: &grammar,
         lexicon: &lexicon,
+        scopes: &CardScopes::default(),
     };
     let (_, entries) = files()
         .into_iter()
@@ -59,10 +64,11 @@ fn judgments_at_or_below_the_completed_stratum_hold() {
 
 #[test]
 fn catalog_determinative_judgments_hold() {
-    let (env, grammar) = environment();
+    let (env, grammar, scopes) = environment();
     let judge = Judge {
         grammar,
         lexicon: &env.lexicon,
+        scopes,
     };
     let (_, entries) = files()
         .into_iter()
@@ -81,7 +87,7 @@ fn catalog_determinative_judgments_hold() {
 
 fn check_judgments(completed: Option<u8>) {
     let files = files();
-    let (env, grammar) = environment();
+    let (env, grammar, scopes) = environment();
     let deferred: std::collections::BTreeSet<&str> = sylex_english::census::deferrals()
         .into_iter()
         .map(|(_, text)| text)
@@ -103,16 +109,20 @@ fn check_judgments(completed: Option<u8>) {
                     let judge = Judge {
                         grammar,
                         lexicon: &env.lexicon,
+                        scopes,
                     };
                     let mut enforced = 0;
                     let mut pending = 0;
                     let mut failures = Vec::new();
                     for entry in entries {
-                        let analyzed = env.lexicon.analyze_source_scoped(
-                            &entry.text,
-                            None,
-                            &sylex_english::judgment::scope(entry),
-                        );
+                        let scope = match scopes.scope(entry) {
+                            Ok(scope) => scope,
+                            Err(why) => {
+                                failures.push(why);
+                                continue;
+                            }
+                        };
+                        let analyzed = env.lexicon.analyze_source_scoped(&entry.text, None, &scope);
                         let stratum = profiler.profile(UnitKind::Line, &analyzed).stratum;
                         if completed.is_none_or(|done| stratum > done)
                             || deferred.contains(entry.text.as_str())
@@ -159,6 +169,7 @@ fn false_judgments_fail() {
     let judge = Judge {
         grammar: &grammar,
         lexicon: &lexicon,
+        scopes: &CardScopes::default(),
     };
     let false_entries = r##"
 + Destroy target creature. => NounPhrase "target creature" as Subject of destroy
@@ -189,7 +200,7 @@ fn false_judgments_fail() {
 
 #[test]
 fn every_word_a_judgment_names_is_declared() {
-    let (env, _) = environment();
+    let (env, _, _) = environment();
     let lexemes = env.lexicon.lexemes();
     // A card name is no lemma: *Greater Good* does not declare *greater*.
     let declared = |name: &str| {
@@ -223,10 +234,11 @@ fn every_word_a_judgment_names_is_declared() {
 
 #[test]
 fn stratum_zero_spines_hold_over_seed_payloads() {
-    let (env, grammar) = environment();
+    let (env, grammar, scopes) = environment();
     let judge = Judge {
         grammar,
         lexicon: &env.lexicon,
+        scopes,
     };
     let (_, entries) = files()
         .into_iter()

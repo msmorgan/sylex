@@ -34,6 +34,7 @@ use crate::corpus::Corpus;
 use crate::corpus::UnitKind;
 use crate::corpus::split_lines;
 use crate::judgment;
+use crate::judgment::CardScopes;
 use crate::judgment::Judge;
 use crate::judgment::Judgment;
 use crate::judgment::Located;
@@ -178,6 +179,7 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
         })
         .collect();
     let grammar = grammar.as_ref().ok();
+    let scopes = CardScopes::new(&corpus.faces);
     let profiler = Profiler::new(env);
     let units = corpus
         .units
@@ -209,7 +211,7 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
                 Some((grammar, frame)) => {
                     let judge = |text: &str, analyzed: &AnalyzedText| {
                         let entries = entries(text);
-                        judge_unit(grammar, frame, env, analyzed, &entries)
+                        judge_unit(grammar, frame, env, &scopes, analyzed, &entries)
                     };
                     match cleave {
                         None => judge(&unit.text, &analyzed),
@@ -261,6 +263,7 @@ fn judge_unit(
     grammar: &CompiledGrammar,
     frame: &SegmentFrame,
     env: &LexicalEnvironment,
+    scopes: &CardScopes,
     analyzed: &sylex_lexicon::AnalyzedText,
     entries: &[&Judgment],
 ) -> (Verdict, u128, Option<Segmentation>, u128) {
@@ -274,13 +277,14 @@ fn judge_unit(
     }
     let segments = Some(crate::segments::segments(&parse, frame));
     let cheapest_tier = parse.cheapest_tier().map_or(0, |(_, tied)| tied);
-    let (verdict, derivations) = judge_parse(grammar, env, &parse, derivations, entries);
+    let (verdict, derivations) = judge_parse(grammar, env, scopes, &parse, derivations, entries);
     (verdict, derivations, segments, cheapest_tier)
 }
 
 fn judge_parse(
     grammar: &CompiledGrammar,
     env: &LexicalEnvironment,
+    scopes: &CardScopes,
     parse: &sylex_syntax::Parse<'_>,
     derivations: u128,
     entries: &[&Judgment],
@@ -295,6 +299,7 @@ fn judge_parse(
         let judge = Judge {
             grammar,
             lexicon: &env.lexicon,
+            scopes,
         };
         let limit = usize::try_from(judgment::READING_LIMIT).unwrap_or(usize::MAX);
         let endorsed = parse.best_readings(limit).any(|reading| {

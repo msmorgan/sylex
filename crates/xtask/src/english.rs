@@ -143,6 +143,7 @@ struct ParseArgs {
 fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
     use sylex_english::corpus::UnitKind;
     use sylex_english::judgment;
+    use sylex_english::judgment::CardScopes;
     use sylex_english::judgment::Judge;
     use sylex_english::profile::Profiler;
 
@@ -166,17 +167,25 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
     let grammar = sylex_english::bind(&env.lexicon, &env.frames)?;
     let frame = sylex_english::segments::segment_frame(&grammar)?;
+    let corpus = Corpus::load(|_| true).context("loading the supported corpus")?;
+    let scopes = CardScopes::new(&corpus.faces);
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
+        scopes: &scopes,
     };
     let profiler = Profiler::new(&env);
     for (entry, evaluate) in entries {
         writeln!(output, "{}: {:?}", entry.location, entry.text)?;
         let text = sylex_upstream::oracle_text::strip_reminder_text(&entry.text);
-        let analyzed = env
-            .lexicon
-            .analyze_source_scoped(&text, None, &judgment::scope(&entry));
+        let scope = match scopes.scope(&entry) {
+            Ok(scope) => scope,
+            Err(why) => {
+                writeln!(output, "Unparsed: {why}")?;
+                continue;
+            }
+        };
+        let analyzed = env.lexicon.analyze_source_scoped(&text, None, &scope);
         let kind = if entry.category.as_deref() == Some("TypeLine") {
             UnitKind::TypeLine
         } else {
@@ -195,15 +204,14 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
                 .join(", ")
         )?;
         if evaluate {
-            writeln!(output, "Outcome: {}", judge.evaluate(&entry))?;
+            writeln!(output, "Outcome: {}", judge.evaluate_scoped(&entry, &scope))?;
         }
-        let Some(parse) = judge.parse(&entry) else {
-            writeln!(
-                output,
-                "Unknown Category: {}",
-                entry.category.as_deref().unwrap_or_default()
-            )?;
-            continue;
+        let parse = match judge.parse_scoped(&entry, &scope) {
+            Ok(parse) => parse,
+            Err(why) => {
+                writeln!(output, "Unparsed: {why}")?;
+                continue;
+            }
         };
         writeln!(output, "Vocabulary gaps: {:?}", parse.vocabulary_gaps)?;
         let derivations = parse.derivation_count();
@@ -365,17 +373,21 @@ mod tests {
     }
 
     #[test]
-    fn parse_reports_gaps_and_unknown_categories_without_aborting_other_inputs() {
+    fn parse_reports_gaps_unknown_categories_and_unknown_cards_without_aborting_other_inputs() {
         let output = dump(&[
             "parse",
             "--limit",
             "0",
             "+ Destroy target zzzunknownword.",
             "+MissingCategory target creature",
+            "+ <card=Lightning Blot> Draw a card.",
             "*PrepositionPhrase target creature",
         ]);
         assert!(output.contains("Outcome: vocabulary gaps"));
-        assert!(output.contains("Unknown Category: MissingCategory"));
+        assert!(output.contains("Unparsed: the grammar has no Category `MissingCategory`"));
+        assert!(output.contains(
+            "Unparsed: input 3:1: `<card=Lightning Blot>` names no face of the supported corpus"
+        ));
         assert!(output.contains("Outcome: holds"));
         assert!(!output.contains("Reading 1 (ranking key"));
     }

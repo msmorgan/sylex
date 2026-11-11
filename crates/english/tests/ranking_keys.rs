@@ -1,6 +1,8 @@
 //! The Ranking Key extracted from the Packed Forest equals the key computed
 //! from each Reading's tree, over the judgment set.
 
+use sylex_english::corpus::Corpus;
+use sylex_english::judgment::CardScopes;
 use sylex_english::judgment::Judge;
 use sylex_vocabulary::LexicalEnvironment;
 
@@ -8,9 +10,12 @@ use sylex_vocabulary::LexicalEnvironment;
 fn forest_keys_equal_tree_keys_over_the_judgment_set() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
+    let corpus = Corpus::load(|_| true).unwrap();
+    let scopes = CardScopes::new(&corpus.faces);
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
+        scopes: &scopes,
     };
     let files = sylex_english::judgment::load_dir(&sylex_english::judgments_dir()).unwrap();
     let mut checked = 0;
@@ -20,9 +25,9 @@ fn forest_keys_equal_tree_keys_over_the_judgment_set() {
             continue;
         }
         for entry in entries.iter().filter(|e| e.grammatical) {
-            let Some(parse) = judge.parse(entry) else {
-                continue;
-            };
+            let parse = judge
+                .parse(entry)
+                .unwrap_or_else(|why| panic!("{}: {why}", entry.location));
             if parse.derivation_count() > sylex_english::judgment::READING_LIMIT {
                 continue;
             }
@@ -48,6 +53,7 @@ fn a_distributive_adjunct_attaches_to_the_outermost_predicate() {
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
+        scopes: &CardScopes::default(),
     };
     let entry = &sylex_english::judgment::parse_file(
         "test",
