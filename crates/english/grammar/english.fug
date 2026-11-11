@@ -44,11 +44,12 @@ feature VerbKind = Auxiliary
 feature Polarity = Affirmative | Negative
 // A Preposition Phrase's Complement's Slot Kind. `MeasureNP`: only *of*
 // (*your choice of 5/1 or 1/5*). `QuotedAbility`: only Nominal-hosted
-// *with* (*a token with "This token can't block."*; [CR#113.1a]).
+// *with* (*a token with "This token can't block."*; [CR#113.1a]). `Name`:
+// only *among* (*from among Disenchant, ..., and Black Lotus*).
 feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
-    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP
+    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | Name
 // The Slot Kind of a determinative's Preposition Phrase's Complement.
 feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
@@ -150,9 +151,11 @@ category Quality
 // A name's Number is the lexicon's (*When The Notary Hobbits enter*). Never
 // another card's name, which `Lex(Catalog)` does not admit.
 category Name [Number]
-// A name cited as a name: after *named* and as the parameter of *Partner
-// with* [CR#702.124j]. Only these admit another card's name, through
-// `OtherCardName()` (`docs/decisions/lexicon.md` §6).
+// A name cited as a name: after *named*, as the parameter of *Partner
+// with* [CR#702.124j], and as the complement of *among* after *from*,
+// wherever that attaches, as in a choice (*choose a card name ... from among
+// Disenchant, ..., and Black Lotus*). Only these admit another card's name,
+// through `OtherCardName()` (`docs/decisions/lexicon.md` §6).
 category NameComplement
 category Condition
 category Measure
@@ -3084,7 +3087,8 @@ coordination KeywordPhrase { coordinators: Coordinator, unshared: [KeywordForm, 
 coordination QuotedAbility { coordinators: Coordinator }
 // *left or right*; *artifact, creature, or land*.
 coordination Mention { coordinators: Coordinator }
-// *named Crown of Empires and Scepter of Empires*.
+// *named Crown of Empires and Scepter of Empires*; *from among Disenchant,
+// Braingeyser, ..., and Black Lotus*.
 coordination NameComplement { coordinators: Coordinator }
 // Only a medial conjunct may be a SubjectRemnant, agreeing with the initial
 // Clause's Subject (never *you gain 4 life, draws four cards, ...*); a

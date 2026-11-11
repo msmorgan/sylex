@@ -5,9 +5,6 @@
 
 # english-v4-stratum-7-discourse-and-long-tail
 
-# english-card-name-choice-list
-Garth One-Eye | {T}: Choose a card name that hasn't been chosen from among Disenchant, Braingeyser, Terror, Shivan Dragon, Regrowth, and Black Lotus. Create a copy of the card with the chosen name. You may cast the copy.
-
 # english-meld-result-names
 Gisela, the Broken Blade | At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares.
 Graf Rats | At the beginning of combat on your turn, if you both own and control this creature and a creature named Midnight Scavengers, exile them, then meld them into Chittering Host.

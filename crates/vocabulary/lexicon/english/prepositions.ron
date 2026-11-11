@@ -33,7 +33,14 @@
     ]),
     // *the greatest power among creatures you control*
     // *from among flying, first strike, and lifelink*
-    (lemma: "among", frames: [(complement: NP, hosts: Nominal), (complement: KeywordPhrase, hosts: Nominal)]),
+    (lemma: "among", frames: [
+        (complement: NP, hosts: Nominal),
+        (complement: KeywordPhrase, hosts: Nominal),
+        // A name cited as a name, where another card's name stands, only as
+        // *from*'s Complement, wherever that attaches (*choose a card name
+        // ... from among Disenchant, ..., and Black Lotus*).
+        (complement: Name, hosts: ComplementOnly, named_only: true),
+    ]),
     // *Activate only as a sorcery*; *as it enters*; *as part of casting a spell*
     (lemma: "as", frames: [
         (complement: NP, hosts: Predicate, relation: PredicativeComplement),
@@ -114,11 +121,13 @@
     ]),
     // *cast spells ... from the top of your library*; *a card you own from
     // outside the game*, a noun bare in this fixed frame (`nouns.ron`);
-    // *from among them*
+    // *from among them*; *from among Disenchant, ..., and Black Lotus*, a
+    // name cited as a name
     (lemma: "from", frames: [
         (complement: NP, hosts: NominalAndPredicate),
         (complement: FixedFrameNP, hosts: NominalAndPredicate),
         (complement: PP(["among"]), hosts: NominalAndPredicate),
+        (complement: PPWith(["among"], Name), hosts: NominalAndPredicate),
     ]),
     // *If you do, ...*; *attacks each combat if able*
     (lemma: "if", frames: [

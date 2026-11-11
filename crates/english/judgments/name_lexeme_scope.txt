@@ -1,4 +1,4 @@
-# A card's own name, full or Shortened, is in scope only on that card's own text [CR#201.5c]; another card's name stands only after *named* or *Partner with* [CR#702.124j]; subtype nouns on type lines; full card names with "and" as one name
+# A card's own name, full or Shortened, is in scope only on that card's own text [CR#201.5c]; another card's name stands only after *named*, *Partner with* [CR#702.124j] or *from among*; subtype nouns on type lines; full card names with "and" as one name
 * Chandra deals 2 damage to any target.
 * Jace draws two cards.
 * Ajani deals 2 damage to any target.
@@ -39,3 +39,9 @@
 + <card=Kaust, Eyes of the Glade> {T}: Turn target face-down attacking creature you control face up. => !Name "Turn"
 # after *named*, another card's name is a Name Complement, alone or coordinated
 + <card=Dragonstorm Forecaster> {2}, {T}: Search your library for a card named Dragonstorm Globe or Boulderborn Dragon, reveal it, put it into your hand, then shuffle. => NameComplement "Dragonstorm Globe or Boulderborn Dragon" as PredicativeComplement of name
+# after *from among*, each option of a choice is a card's name cited as a name, a Name Complement, coordinated as after *named*
++ <card=Garth One-Eye> {T}: Choose a card name that hasn't been chosen from among Disenchant, Braingeyser, Terror, Shivan Dragon, Regrowth, and Black Lotus. Create a copy of the card with the chosen name. You may cast the copy. => PrepositionPhrase "among Disenchant, Braingeyser, Terror, Shivan Dragon, Regrowth, and Black Lotus" as Complement of from; NameComplement "Disenchant, Braingeyser, Terror, Shivan Dragon, Regrowth, and Black Lotus" as Complement of among; NameComplement "Shivan Dragon"; NameComplement "Black Lotus"
+# off those positions, the same names stay unread on Garth One-Eye's text: an Object, a Complement of *of*, and *among* outside *from*
+* <card=Garth One-Eye> Choose Black Lotus.
+* <card=Garth One-Eye> Create a copy of Black Lotus.
+* <card=Garth One-Eye> Choose a card name among Disenchant and Black Lotus.
