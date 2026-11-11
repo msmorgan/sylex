@@ -7,6 +7,7 @@ card singleFaced({
         delayWithin(
           does(actor(a(isPlayer)), cast(a(and([isInstantOrSorcery, isSpell])))),
           untilEndOfTurn,
-          sequentially([
+          sequentially(
+            steps = [
               instruct(that(player), copyOnStack(it)),
               instruct(that(player), may(chooseNewTargets(that(copy))))])))]})

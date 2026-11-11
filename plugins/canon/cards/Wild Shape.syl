@@ -24,7 +24,7 @@ card singleFaced({
                         text = [hexproof],
                         power = 1,
                         toughness = 3}})),
-                untilEndOfTurn)),
+                duration = untilEndOfTurn)),
             mode(
               none,
               none,
@@ -38,7 +38,7 @@ card singleFaced({
                         text = [reach],
                         power = 1,
                         toughness = 5}})),
-                untilEndOfTurn)),
+                duration = untilEndOfTurn)),
             mode(
               none,
               none,
@@ -52,4 +52,4 @@ card singleFaced({
                         text = [trample],
                         power = 3,
                         toughness = 3}})),
-                untilEndOfTurn))]))]})
+                duration = untilEndOfTurn))]))]})

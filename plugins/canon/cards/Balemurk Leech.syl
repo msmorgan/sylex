@@ -9,6 +9,6 @@ card singleFaced({
           and([
               whenever(does(actor(a(and([isEnchantment, youControl]))), enter)),
               whenever(does(actor(you), fullyUnlock(a(hasSubtype(room)))))]),
-          action = instruct(eachOpponent, loseLife(1))))],
+          instruct(eachOpponent, loseLife(1))))],
     power = 2,
     toughness = 2})

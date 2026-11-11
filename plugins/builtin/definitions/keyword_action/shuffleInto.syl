@@ -7,5 +7,5 @@ action shuffleInto(subject: NounPhrase) {
       {lemma = "shuffle", frames = [Intransitive, Monotransitive, TransitiveWithPP(["into"])]}]},
   deed = "shuffle",
   body = sequentially(
-    [move($subject, anywhere, zone(library, none), []), actionShuffle(zone(library, none))])
+    steps = [move($subject, anywhere, zone(library, none), []), actionShuffle(zone(library, none))])
 }

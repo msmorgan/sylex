@@ -16,5 +16,5 @@ card singleFaced({
                 instead(
                   doIfDone(
                     removeCounters(exactly(1), printedKind(p1p1Counter), thisCreature),
-                    untap(thisCreature))),
-                duringPart(untapStep, you)))]))]})
+                    ifDid = untap(thisCreature))),
+                timing = duringPart(untapStep, whose = you)))]))]})

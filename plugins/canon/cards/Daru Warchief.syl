@@ -6,7 +6,8 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(and([hasSubtype(soldier), isSpell, did(actor(you), cast(which), thisObject)])),
+          allOf(
+            and([hasSubtype(soldier), isSpell, did(actor(you), cast(which), within = thisObject)])),
           less(1))),
       static(getsPt(allOf(and([hasSubtype(soldier), isCreature, youControl])), up(1), up(2)))],
     power = 1,

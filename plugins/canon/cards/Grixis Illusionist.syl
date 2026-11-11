@@ -10,7 +10,7 @@ card singleFaced({
           qualityChange(
             target(and([isLand, youControl])),
             sets,
-            chosenQuality(ofYourChoice(subtype(land), basicTypesOnly))),
+            chosenQuality(ofYourChoice(subtype(land), domain = basicTypesOnly))),
           untilEndOfTurn))],
     power = 1,
     toughness = 1})

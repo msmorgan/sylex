@@ -10,7 +10,7 @@ card singleFaced({
           allOf(
             and([
                 isSpell,
-                did(actor(yourOpponents), cast(which), thisObject),
+                did(actor(yourOpponents), cast(which), within = thisObject),
                 targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
           more(2))),
       static(
@@ -18,7 +18,7 @@ card singleFaced({
           allOf(
             and([
                 abilityHead(anyActivated),
-                did(actor(yourOpponents), activate(which), thisObject),
+                did(actor(yourOpponents), activate(which), within = thisObject),
                 targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
           more(2)))],
     power = 2,

@@ -7,5 +7,5 @@ template at(
   if: Option(Condition) = none): Ability {
   # TODO(spelling): Include or omit the clauses supplied by limit and if.
   spelling = "At <point>, <action>",
-  body = triggered(at($point), $if, $action, $limit)
+  body = triggered(at($point), intervening = $if, $action, limit = $limit)
 }

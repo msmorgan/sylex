@@ -10,12 +10,13 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        sequentially([
-            gainControl(target(and([isCreature, anOpponentControls])), untilEndOfTurn),
+        sequentially(
+          steps = [
+            gainControl(target(and([isCreature, anOpponentControls])), duration = untilEndOfTurn),
             untap(it),
-            gain(it, [lifelink, haste], untilEndOfTurn)])),
+            gain(it, [lifelink, haste], duration = untilEndOfTurn)])),
       whenever(
-        does(actor(anOpponent), gainControlOf(a(isPermanent), you)),
+        does(actor(anOpponent), gainControlOf(a(isPermanent), from = you)),
         create(1, defined(treasureToken)))],
     power = 3,
     toughness = 3})

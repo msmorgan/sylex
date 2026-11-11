@@ -5,8 +5,9 @@ card singleFaced({
     text = [
       static(
         if(
-          and([
+          and(
+            conjuncts = [
               exists(and([isLand, hasSubtype(plains), anOpponentControls])),
               exists(and([isLand, hasSubtype(swamp), youControl]))]),
           can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
-      spell(get(allOf(isCreature), down(2), down(2), untilEndOfTurn))]})
+      spell(get(allOf(isCreature), down(2), down(2), duration = untilEndOfTurn))]})

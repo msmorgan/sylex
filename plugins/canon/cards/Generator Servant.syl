@@ -5,13 +5,13 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       activated(
-        compound([tapSymbol, perform(sacrifice(thisCreature))]),
+        compound(costs = [tapSymbol, perform(sacrifice(thisCreature))]),
         addMana(
           symbols([colorlessPip, colorlessPip]),
-          [
+          riders = [
             whenSpentOn(
               affectsIt,
               a(and([isCreature, isSpell])),
-              gain(becomes(that(spell)), [haste], untilEndOfTurn))]))],
+              gain(becomes(that(spell)), [haste], duration = untilEndOfTurn))]))],
     power = 2,
     toughness = 1})

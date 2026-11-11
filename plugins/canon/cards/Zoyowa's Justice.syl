@@ -4,7 +4,8 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             instruct(
               ownerOf(target(and([or([isArtifact, isCreature]), hasManaValue(atLeast, 1)]))),
               shuffleInto(it)),

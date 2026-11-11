@@ -4,6 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(a(quality(subtype(creature)))),
             draw(forEach(1, and([isPermanent, youControl, ofChosen(subtype(creature))])))]))]})

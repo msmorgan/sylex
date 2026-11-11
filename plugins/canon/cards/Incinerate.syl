@@ -4,10 +4,12 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
-            instruct(this, dealDamage(3, target(isAnyTarget))),
+        sequentially(
+          steps = [
+            instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))),
             establishThroughout(
               cant(
                 any,
-                regeneration(a(and([isCreature, was(dealDamage(recipient = which), thisWay)])))),
+                regeneration(
+                  a(and([isCreature, was(dealDamage(recipient = which), within = thisWay)])))),
               thisTurn)]))]})

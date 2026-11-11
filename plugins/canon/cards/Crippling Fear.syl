@@ -4,10 +4,11 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(a(quality(subtype(creature)))),
             get(
               allOf(and([isCreature, not(ofChosen(subtype(creature)))])),
               down(3),
               down(3),
-              untilEndOfTurn)]))]})
+              duration = untilEndOfTurn)]))]})

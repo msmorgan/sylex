@@ -14,7 +14,7 @@ card singleFaced({
                 and([isCreature, in(yourGraveyard), hasKeyword(thatKeyword)])),
               untilEndOfTurn),
             exists(and([isCreature, in(yourGraveyard), hasKeyword(thatKeyword)])))),
-        [
+        keywords = [
           theKeyword(flying),
           theKeyword(firstStrike),
           theKeyword(doubleStrike),

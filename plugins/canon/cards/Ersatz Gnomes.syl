@@ -5,6 +5,8 @@ card singleFaced({
     subtypes = [gnome],
     text = [
       activated(tapSymbol, becomeColor(target(isSpell), colors([]))),
-      activated(tapSymbol, becomeColor(target(isPermanent), colors([]), untilEndOfTurn))],
+      activated(
+        tapSymbol,
+        becomeColor(target(isPermanent), colors([]), duration = untilEndOfTurn))],
     power = 1,
     toughness = 1})

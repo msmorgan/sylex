@@ -6,10 +6,10 @@ card singleFaced({
       static(entersWithCounters(thisLand, 10, iceCounter)),
       activated(mana([generic(3)]), removeCounters(exactly(1), printedKind(iceCounter), thisLand)),
       when(
-        stateHolds(not(is(thisLand, hasCounter(iceCounter)))),
+        stateHolds(not(is(thisLand, hasCounter(kind = iceCounter)))),
         doIfDone(
           sacrifice(thisLand),
-          create(
+          ifDid = create(
             1,
             written({
                 characteristics = {

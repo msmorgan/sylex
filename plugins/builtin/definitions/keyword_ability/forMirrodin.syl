@@ -6,7 +6,8 @@ ability forMirrodin {
   body = [
     when(
       does(actor(thisEquipment), enter),
-      sequentially([
+      sequentially(
+        steps = [
           create(1, written(creatureToken(2, 2, [red], [rebel]))),
           attachTo(thisEquipment, thatToken)]))]
 }

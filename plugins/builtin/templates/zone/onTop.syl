@@ -1,5 +1,5 @@
 # "on top of its owner's library"
 template onTop: Location {
   spelling = "on top of its owner's library",
-  body = fromEnd(top, loc = zone(library, none))
+  body = fromEnd(top, zone(library, none))
 }

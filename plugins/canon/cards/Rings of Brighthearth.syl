@@ -5,8 +5,8 @@ card singleFaced({
     text = [
       whenever(
         does(actor(you), activate(a(abilityHead(anyActivated)))),
-        if = not(is(that(ability), isManaAbility)),
-        action = may(
+        may(
           pay(mana([generic(2)]), once),
-          sequentially(
-            [copyOnStack(that(ability)), may(chooseNewTargets(that(copied(ability))))])))]})
+          ifDid = sequentially(
+            steps = [copyOnStack(that(ability)), may(chooseNewTargets(that(copied(ability))))])),
+        if = not(is(that(ability), isManaAbility)))]})

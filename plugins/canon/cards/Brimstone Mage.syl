@@ -1,5 +1,4 @@
-card leveler(
-  inner = {
+card leveler({
     name = "Brimstone Mage",
     cost = [generic(2), pip(red)],
     types = [creature],
@@ -7,14 +6,20 @@ card leveler(
     text = [levelUp(mana([generic(3), pip(red)]))],
     power = 2,
     toughness = 2},
-  bands = [
+  [
     {
       range = between(1, 2),
       power = 2,
       toughness = 3,
-      text = [activated(tapSymbol, instruct(thisCreature, dealDamage(1, target(isAnyTarget))))]},
+      text = [
+        activated(
+          tapSymbol,
+          instruct(thisCreature, dealDamage(amount = 1, recipient = target(isAnyTarget))))]},
     {
       range = plus(3),
       power = 2,
       toughness = 4,
-      text = [activated(tapSymbol, instruct(thisCreature, dealDamage(3, target(isAnyTarget))))]}])
+      text = [
+        activated(
+          tapSymbol,
+          instruct(thisCreature, dealDamage(amount = 3, recipient = target(isAnyTarget))))]}])

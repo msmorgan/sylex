@@ -2,4 +2,6 @@ card singleFaced({
     name = "Last Chance",
     cost = [pip(red), pip(red)],
     types = [sorcery],
-    text = [spell(sequentially([extraTurn(1), atNext(beginningOfThatTurns(endStep), loseGame)]))]})
+    text = [
+      spell(
+        sequentially(steps = [extraTurn(1), atNext(beginningOfThatTurns(endStep), loseGame)]))]})

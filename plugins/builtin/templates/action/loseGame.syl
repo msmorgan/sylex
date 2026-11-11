@@ -3,5 +3,5 @@
 # [CR#704.5a]
 template loseGame(cause: Option(StateBasedCause) = none): Action {
   # TODO(spelling): Include or omit the clauses supplied by cause.
-  body = conclude(loseGame, $cause)
+  body = conclude(loseGame, cause = $cause)
 }

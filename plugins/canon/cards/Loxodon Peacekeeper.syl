@@ -9,14 +9,16 @@ card singleFaced({
     text = [
       at(
         beginningOfYour(upkeep),
-        sequentially([
+        sequentially(
+          steps = [
             gainControl(
               thisCreature,
               controller = the(and([isPlayer, superlative(min, playerStat(lifeTotal), isPlayer)]))),
             doIf(
               thereAre(
                 counted(orMore(2), and([isPlayer, tiedFor(min, playerStat(lifeTotal), isPlayer)]))),
-              sequentially([
+              sequentially(
+                steps = [
                   choose(someOf(exactly(1), themPlayers)),
                   gainControl(thisCreature, controller = that(player))]))]))],
     power = 4,

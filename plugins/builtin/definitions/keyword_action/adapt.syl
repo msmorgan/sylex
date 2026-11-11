@@ -4,6 +4,6 @@ action adapt(amount: Amount) {
   lexical = {verbs = [{lemma = "adapt", frames = [Amount, Intransitive]}]},
   spelling = "adapt <amount>",
   body = doIf(
-    not(is(thisPermanent, hasCounter(p1p1Counter))),
+    not(is(thisPermanent, hasCounter(kind = p1p1Counter))),
     putCounters($amount, printedKind(p1p1Counter), thisPermanent))
 }

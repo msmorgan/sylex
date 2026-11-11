@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       triggered(
         and([when(does(actor(thisCreature), die)), when(does(actor(you), discard(thisCard)))]),
-        action = create(1, defined(foodToken)))],
+        create(1, defined(foodToken)))],
     power = 3,
     toughness = 3})

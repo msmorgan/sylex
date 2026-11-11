@@ -2,5 +2,6 @@
 # [CR#305.1]
 template playableFrom(zone: Location, timing: Timing): Conferral {
   spelling = "You may play this card from <zone> <timing>",
-  body = property(can(actor(you), procedure(play, this, itsOwnCost, from = $zone), $timing))
+  body = property(
+    can(actor(you), procedure(play, this, itsOwnCost, from = $zone), timing = $timing))
 }

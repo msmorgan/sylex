@@ -1,5 +1,4 @@
-card flip(
-  normal = {
+card flip({
     name = "Kitsune Mystic",
     cost = [generic(3), pip(white)],
     types = [creature],
@@ -7,11 +6,11 @@ card flip(
     text = [
       at(
         beginningOfEach(endStep),
-        if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))),
-        action = flip(thisCreature))],
+        flip(thisCreature),
+        if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))))],
     power = 2,
     toughness = 3},
-  alternative = {
+  {
     name = "Autumn-Tail, Kitsune Sage",
     supertypes = [legendary],
     types = [creature],

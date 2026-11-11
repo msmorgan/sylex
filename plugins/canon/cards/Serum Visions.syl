@@ -2,4 +2,4 @@ card singleFaced({
     name = "Serum Visions",
     cost = [pip(blue)],
     types = [sorcery],
-    text = [spell(sequentially([draw(1), scry(2)]))]})
+    text = [spell(sequentially(steps = [draw(1), scry(2)]))]})

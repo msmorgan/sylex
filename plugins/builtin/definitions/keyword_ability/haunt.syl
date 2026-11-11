@@ -8,10 +8,10 @@ ability haunt {
     ifPermanentType(
       when(
         does(actor(thisPermanent), die),
-        sequentially([exile(it), relate(it, haunting, target(isCreature))])),
+        sequentially(steps = [exile(it), relate(it, haunting, target(isCreature))])),
       when(
         causes(
           byEvent(does(any, resolve(thisSpell))),
-          does(any, putInto(thisSpell, graveyard, stack))),
-        sequentially([exile(it), relate(it, haunting, target(isCreature))])))]
+          does(any, putInto(thisSpell, graveyard, from = stack))),
+        sequentially(steps = [exile(it), relate(it, haunting, target(isCreature))])))]
 }

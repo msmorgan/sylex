@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(1), pip(white)],
     types = [creature],
     subtypes = [human],
-    text = [activatedOnlyDuring(tapSymbol, gainLife(1), beforePart(declareAttackers, you))],
+    text = [activatedOnlyDuring(tapSymbol, gainLife(1), beforePart(declareAttackers, whose = you))],
     power = 1,
     toughness = 1})

@@ -4,9 +4,10 @@ card singleFaced({
     text = [
       static(entersTapped(thisLand)),
       activated(
-        compound([mana([generic(1)]), tapSymbol]),
-        sequentially([
-            search(yourLibrary, a(and([isLand, hasSupertype(basic)]))),
+        compound(costs = [mana([generic(1)]), tapSymbol]),
+        sequentially(
+          steps = [
+            search(yourLibrary, for = a(and([isLand, hasSupertype(basic)]))),
             putOntoBattlefieldTapped(that(card)),
             shuffle,
             atNext(beginningOfNext(cleanup), returnToHand(thisLand))]))]})

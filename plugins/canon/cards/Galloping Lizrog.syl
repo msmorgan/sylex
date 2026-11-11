@@ -12,6 +12,6 @@ card singleFaced({
             anyNumber,
             printedKind(p1p1Counter),
             among(allOf(and([isCreature, youControl])))),
-          putCounters(times(2, thatMuch), printedKind(p1p1Counter), thisCreature)))],
+          ifDid = putCounters(times(2, thatMuch), printedKind(p1p1Counter), thisCreature)))],
     power = 3,
     toughness = 3})

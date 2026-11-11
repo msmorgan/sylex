@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [human, wizard],
     text = [
       activated(
-        compound([mana([pip(blue)]), perform(sacrifice(thisCreature))]),
+        compound(costs = [mana([pip(blue)]), perform(sacrifice(thisCreature))]),
         untap(allOf(and([isCreature, ofYourChoice(subtype(creature))]))))],
     power = 1,
     toughness = 3})

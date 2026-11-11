@@ -5,9 +5,9 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       activated(
-        compound([mana([pip(white)]), tapSymbol]),
+        compound(costs = [mana([pip(white)]), tapSymbol]),
         doIfDone(
           removeCounters(exactly(1), printedKind(m1m1Counter), target(isCreature)),
-          gainLife(2)))],
+          ifDid = gainLife(2)))],
     power = 3,
     toughness = 5})

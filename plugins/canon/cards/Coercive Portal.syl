@@ -6,10 +6,13 @@ card singleFaced({
       willOfTheCouncil(
         at(
           beginningOfYour(upkeep),
-          sequentially([
+          sequentially(
+            steps = [
               instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["carnage", "homage"]))),
               doIf(
                 getsMoreVotes("carnage"),
                 sequentially(
-                  [sacrifice(thisArtifact), destroy(allOf(and([isPermanent, non(isLand)])))])),
+                  steps = [
+                    sacrifice(thisArtifact),
+                    destroy(allOf(and([isPermanent, non(isLand)])))])),
               doIf(getsMoreVotesOrTied("homage"), draw(1))])))]})

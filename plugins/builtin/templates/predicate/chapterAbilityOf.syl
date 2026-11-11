@@ -2,5 +2,5 @@
 # [CR#714.2,714.2a]
 template chapterAbilityOf(saga: NounPhrase): Predicate {
   spelling = "a chapter ability of <saga>",
-  body = and([abilityOf($saga), compare(atLeast, 1, [chapter])])
+  body = and([abilityOf($saga), compare(atLeast, 1, axes = [chapter])])
 }

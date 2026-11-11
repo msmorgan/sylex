@@ -2,5 +2,5 @@
 # [CR#603.12]
 template triggerThisWay(body: Action, event: GameEvent, triggerBody: Action): Action {
   spelling = "<body>. When <event> this way, <triggerBody>.",
-  body = triggerReflexively($body, $triggerBody, $event)
+  body = triggerReflexively($body, $triggerBody, event = $event)
 }

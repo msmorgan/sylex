@@ -9,7 +9,7 @@ card singleFaced({
         does(actor(thisCreature), die),
         doForEachKind(
           counterKind,
-          it,
+          domain = it,
           counterKind,
           putCounters(statOf(boundCounter, it), thatKind, target(and([isCreature, youControl])))))],
     power = 0,

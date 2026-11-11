@@ -10,11 +10,12 @@ ability rebound {
       replace(
         causedBy(
           byEvent(does(any, resolve(thisSpell))),
-          would(any, putInto(thisSpell, graveyard, stack))),
+          would(any, putInto(thisSpell, graveyard, from = stack))),
         doIf(
-          is(thisSpell, did(any, cast(which, yourHand), thisObject)),
+          is(thisSpell, did(any, cast(which, from = yourHand), within = thisObject)),
           instead(
-            sequentially([
+            sequentially(
+              steps = [
                 exile(thisSpell),
                 atNext(
                   beginningOf(upkeep, you, nextTime),

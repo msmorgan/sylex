@@ -5,7 +5,8 @@ card singleFaced({
     subtypes = [beast],
     text = [
       activated(
-        compound([mana([generic(2), pip(green)]), tapSymbol, perform(sacrifice(thisCreature))]),
+        compound(
+          costs = [mana([generic(2), pip(green)]), tapSymbol, perform(sacrifice(thisCreature))]),
         destroy(allOf(and([isEnchantment, ofYourChoice(color)]))))],
     power = 2,
     toughness = 3})

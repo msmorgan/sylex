@@ -6,7 +6,8 @@ card singleFaced({
         replace(
           would(actor(thisLand), enter),
           instead(
-            sequentially([
+            sequentially(
+              steps = [
                 sacrifice(
                   each(
                     and(
@@ -14,6 +15,6 @@ card singleFaced({
                 putOntoBattlefield(thisLand)])))),
       at(
         beginningOfYour(upkeep),
-        if = compareAmt(countOf(and([isLand, youControl])), atMost, 3),
-        action = gainLife(1)),
+        gainLife(1),
+        if = compareAmt(countOf(and([isLand, youControl])), atMost, 3)),
       activated(tapSymbol, addMana(symbols([colorlessPip])))]})

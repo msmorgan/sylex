@@ -4,6 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             destroy(target(or([isArtifact, isEnchantment]))),
-            instruct(this, dealDamage(2, controllerOf(that(permanent))))]))]})
+            instruct(this, dealDamage(amount = 2, recipient = controllerOf(that(permanent))))]))]})

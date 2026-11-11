@@ -10,4 +10,4 @@ card singleFaced({
             allOf(and([isCreature, shares(cardName, share, that(creature)), isOther]))),
           down(3),
           down(3),
-          untilEndOfTurn))]})
+          duration = untilEndOfTurn))]})

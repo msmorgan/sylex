@@ -4,8 +4,9 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             sacrifice(counted(anyNumber, isLand)),
-            search(yourLibrary, counted(upToOf(groupSize), isLand)),
+            search(yourLibrary, for = counted(upToOf(groupSize), isLand)),
             putOntoBattlefieldTapped(them),
             shuffle]))]})

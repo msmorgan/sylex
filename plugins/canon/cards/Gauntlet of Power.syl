@@ -6,5 +6,5 @@ card singleFaced({
       static(entersChoosing(thisArtifact, color)),
       static(getsPt(allOf(and([isCreature, ofChosen(color)])), up(1), up(1))),
       whenever(
-        does(any, tapForMana(a(and([isLand, hasSupertype(basic)])), ofColor(thatColor))),
+        does(any, tapForMana(a(and([isLand, hasSupertype(basic)])), type = ofColor(thatColor))),
         instruct(controllerOf(that(land)), addMana(counted(1, ofTheChosenColor))))]})

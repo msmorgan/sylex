@@ -7,8 +7,6 @@ card singleFaced({
     text = [
       fear,
       whenever(does(actor(a(isCreature)), dealDamage(recipient = you)), destroy(it)),
-      when(
-        does(any, putInto(this, graveyard, from = anywhere)),
-        instruct(ownerOf(it), shuffleInto(it)))],
+      when(does(any, putInto(this, graveyard)), instruct(ownerOf(it), shuffleInto(it)))],
     power = 6,
     toughness = 6})

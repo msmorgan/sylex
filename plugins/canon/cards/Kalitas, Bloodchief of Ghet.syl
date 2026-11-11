@@ -11,8 +11,9 @@ card singleFaced({
     text = [
       lifelink,
       activated(
-        compound([mana([pip(black), pip(black), pip(black)]), tapSymbol]),
-        sequentially([
+        compound(costs = [mana([pip(black), pip(black), pip(black)]), tapSymbol]),
+        sequentially(
+          steps = [
             destroy(target(isCreature)),
             doIf(
               did(actor(that(creature)), die, thisWay),

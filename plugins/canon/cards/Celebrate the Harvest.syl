@@ -4,8 +4,11 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
-            search(yourLibrary, counted(upToOf(letter(x)), and([isLand, hasSupertype(basic)]))),
+        sequentially(
+          steps = [
+            search(
+              yourLibrary,
+              for = counted(upToOf(letter(x)), and([isLand, hasSupertype(basic)]))),
             define(x, distinctCount(value(power), allOf(and([isCreature, youControl])))),
             putOntoBattlefieldTapped(those(card)),
             shuffle]))]})

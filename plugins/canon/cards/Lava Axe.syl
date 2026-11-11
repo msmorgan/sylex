@@ -2,4 +2,8 @@ card singleFaced({
     name = "Lava Axe",
     cost = [generic(4), pip(red)],
     types = [sorcery],
-    text = [spell(instruct(this, dealDamage(5, target(or([isPlaneswalker, isPlayer])))))]})
+    text = [
+      spell(
+        instruct(
+          this,
+          dealDamage(amount = 5, recipient = target(or([isPlaneswalker, isPlayer])))))]})

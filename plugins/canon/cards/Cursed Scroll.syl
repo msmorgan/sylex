@@ -6,10 +6,11 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([mana([generic(3)]), tapSymbol]),
-        sequentially([
+        compound(costs = [mana([generic(3)]), tapSymbol]),
+        sequentially(
+          steps = [
             choose(a(quality(cardName))),
             reveal(aAtRandom(cardIn(yourHand))),
             doIf(
               is(that(card), named(chosenName)),
-              instruct(thisArtifact, dealDamage(2, target(isAnyTarget))))]))]})
+              instruct(thisArtifact, dealDamage(amount = 2, recipient = target(isAnyTarget))))]))]})

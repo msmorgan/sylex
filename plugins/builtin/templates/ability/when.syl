@@ -10,5 +10,5 @@ template when(
   limit: Option(UsageLimit) = none,
   if: Option(Condition) = none): Ability {
   # TODO(spelling): Include or omit the clauses supplied by limit and if.
-  body = triggered(when($event), $if, $action, $limit)
+  body = triggered(when($event), intervening = $if, $action, limit = $limit)
 }

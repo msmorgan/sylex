@@ -7,7 +7,7 @@ ability flying {
     static(
       cant(
         any,
-        block(thisCreature),
+        block(attacker = thisCreature),
         except = byObjects(
           bare(
             and([

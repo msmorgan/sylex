@@ -1,4 +1,4 @@
 template orMore(n: Nat): Quantity {
   spelling = "<n> or more",
-  body = range($n)
+  body = range(low = $n)
 }

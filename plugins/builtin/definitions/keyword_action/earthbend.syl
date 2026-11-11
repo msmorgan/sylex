@@ -4,11 +4,12 @@
 action earthbend(amount: Amount) {
   lexical = {verbs = [{lemma = "earthbend", past = "earthbent", frames = [Amount, Intransitive]}]},
   spelling = "earthbend <amount>",
-  body = sequentially([
+  body = sequentially(
+    steps = [
       establish(
         characteristicChange(
           target(and([isLand, actorControls])),
-          [
+          edits = [
             typeLine(adds, {types = [creature]}),
             stat(power, set(0)),
             stat(toughness, set(0)),
@@ -16,5 +17,5 @@ action earthbend(amount: Amount) {
       putCounters($amount, printedKind(p1p1Counter), that(land)),
       delay(
         or([does(actor(that(land)), die), does(any, move(that(land), battlefield, exileZone, []))]),
-        returnToBattlefield(that(land), [entersAs(tapped), under(actor)]))])
+        returnToBattlefield(that(land), riders = [entersAs(tapped), under(actor)]))])
 }

@@ -12,6 +12,6 @@ ability offspring(cost: Cost) {
         1,
         copyOf(
           thisPermanent,
-          [characteristicEdits([stat(power, set(1)), stat(toughness, set(1))])])),
+          exceptions = [characteristicEdits([stat(power, set(1)), stat(toughness, set(1))])])),
       if = keywordCostPaid(offspring, thisPermanent))]
 }

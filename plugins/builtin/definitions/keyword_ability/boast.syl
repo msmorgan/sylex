@@ -10,5 +10,5 @@ ability boast(ability: Ability) {
     qualified(
       $ability,
       limit = oncePerTurn,
-      guard = is(thisCreature, did(actor(which), attack, within(soFarThisTurn))))]
+      guard = is(thisCreature, did(actor(which), attack, within = within(soFarThisTurn))))]
 }

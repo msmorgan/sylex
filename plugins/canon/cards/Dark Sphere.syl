@@ -4,7 +4,7 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound(costs = [tapSymbol, perform(sacrifice(thisArtifact))]),
         establishThroughout(
           replace(
             would(actor(aYourChoice(isSource)), dealDamage(recipient = you)),

@@ -10,6 +10,8 @@ card singleFaced({
             actor(you),
             pay(anyCost, once, whose = allOf(and([isPermanent, youControl])), keyword = echo)),
           instead(may(pay(mana([generic(0)]), once))))),
-      activated(mana([pip(red)]), gain(thisCreature, [protection(hasColor(red))], untilEndOfTurn))],
+      activated(
+        mana([pip(red)]),
+        gain(thisCreature, [protection(hasColor(red))], duration = untilEndOfTurn))],
     power = 2,
     toughness = 1})

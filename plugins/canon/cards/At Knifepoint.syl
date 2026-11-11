@@ -16,7 +16,11 @@ card singleFaced({
                 text = [
                   activatedOnlyDuring(
                     tapSymbol,
-                    get(target(and([isCreature, youControl])), up(1), up(0), untilEndOfTurn),
+                    get(
+                      target(and([isCreature, youControl])),
+                      up(1),
+                      up(0),
+                      duration = untilEndOfTurn),
                     asSorcery)],
                 power = 1,
                 toughness = 1}})),

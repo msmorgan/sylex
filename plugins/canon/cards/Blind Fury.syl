@@ -4,10 +4,14 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             establishThroughout(abilityLoss(allOf(isCreature), [written(trample)]), untilEndOfTurn),
             establishThroughout(
               replace(
                 would(actor(a(isCreature)), dealDamage(recipient = a(isCreature), kind = combat)),
-                instead(instruct(it, dealDamage(times(2, thatMuch), that(creature))))),
+                instead(
+                  instruct(
+                    it,
+                    dealDamage(amount = times(2, thatMuch), recipient = that(creature))))),
               thisTurn)]))]})

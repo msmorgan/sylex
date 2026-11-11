@@ -14,9 +14,11 @@ card singleFaced({
                     did(
                       actor(thisCreature),
                       dealDamage(recipient = which),
-                      within(soFarThisTurn))]))),
+                      within = within(soFarThisTurn))]))),
             die),
           instead(exile(it)))),
-      activated(tapSymbol, instruct(thisCreature, dealDamage(1, target(isAnyTarget))))],
+      activated(
+        tapSymbol,
+        instruct(thisCreature, dealDamage(amount = 1, recipient = target(isAnyTarget))))],
     power = 1,
     toughness = 2})

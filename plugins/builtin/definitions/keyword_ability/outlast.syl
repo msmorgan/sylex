@@ -5,7 +5,7 @@ ability outlast(cost: Cost) {
   spelling = "outlast <cost>",
   body = [
     activatedOnlyDuring(
-      compound([$cost, tapSymbol]),
+      compound(costs = [$cost, tapSymbol]),
       putCounters(1, printedKind(p1p1Counter), thisCreature),
       asSorcery)]
 }

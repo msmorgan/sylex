@@ -8,4 +8,6 @@ card singleFaced({
         exile(target(and([non(isLand), isPermanent, isOther])))),
       when(
         does(actor(thisEnchantment), leave),
-        returnToBattlefield(the(cardIn(exiledWith(thisEnchantment))), [under(ownerOf(it))]))]})
+        returnToBattlefield(
+          the(cardIn(exiledWith(thisEnchantment))),
+          riders = [under(ownerOf(it))]))]})

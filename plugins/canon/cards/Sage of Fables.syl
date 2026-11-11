@@ -10,7 +10,8 @@ card singleFaced({
           1,
           p1p1Counter)),
       activated(
-        compound([
+        compound(
+          costs = [
             mana([generic(2)]),
             perform(
               removeCounters(

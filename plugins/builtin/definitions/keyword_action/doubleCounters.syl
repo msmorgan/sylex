@@ -6,7 +6,7 @@ action doubleCounters(on: NounPhrase) {
   spelling = "double the number of each kind of counter on <on>",
   body = doForEachKind(
     counterKind,
-    $on,
+    domain = $on,
     counterKind,
     putCounters(statOf(boundCounter, $on), thatKind, $on))
 }

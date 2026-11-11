@@ -10,6 +10,6 @@ ability landwalk(quality: Predicate) {
   body = [
     static(
       onlyWhile(
-        cant(any, block(thisCreature)),
+        cant(any, block(attacker = thisCreature)),
         exists(and([isLand, $quality, controlledBy(defendingPlayer)]))))]
 }

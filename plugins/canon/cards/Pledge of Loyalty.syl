@@ -9,5 +9,5 @@ card singleFaced({
         conjunction([
             abilityGrant(
               enchanted(creature),
-              [protection(eachKind(color, allOf(and([isPermanent, youControl]))))]),
+              [protection(eachKind(color, domain = allOf(and([isPermanent, youControl]))))]),
             doesnt(actor(thisEffect), remove(thisAura))]))]})

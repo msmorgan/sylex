@@ -5,10 +5,12 @@ card singleFaced({
     subtypes = [goblin, archer],
     text = [
       reach,
-      when(does(actor(thisCreature), enter), instruct(it, dealDamage(2, target(isAnyTarget)))),
+      when(
+        does(actor(thisCreature), enter),
+        instruct(it, dealDamage(amount = 2, recipient = target(isAnyTarget)))),
       channel(
         activated(
-          compound([mana([generic(1), pip(red)]), perform(discard(this))]),
-          instruct(it, dealDamage(2, target(isAnyTarget)))))],
+          compound(costs = [mana([generic(1), pip(red)]), perform(discard(this))]),
+          instruct(it, dealDamage(amount = 2, recipient = target(isAnyTarget)))))],
     power = 2,
     toughness = 3})

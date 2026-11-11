@@ -4,7 +4,8 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
-            instruct(this, dealDamage(letter(x), target(isAnyTarget))),
+        sequentially(
+          steps = [
+            instruct(this, dealDamage(amount = letter(x), recipient = target(isAnyTarget))),
             gainLife(letter(x)),
             define(x, countOf(and([isCreature, youControl])))]))]})

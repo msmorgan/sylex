@@ -4,7 +4,8 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             destroy(target(isCreature)),
             doIf(
               did(actor(that(creature)), die, thisWay),
@@ -14,7 +15,7 @@ card singleFaced({
                   2,
                   copyOf(
                     that(creature),
-                    [
+                    exceptions = [
                       characteristicEdits([
                           stat(power, set(half(up, powerOf(that(creature))))),
                           stat(toughness, set(half(up, toughnessOf(that(creature)))))])]))))]))]})

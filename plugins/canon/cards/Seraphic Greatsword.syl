@@ -8,7 +8,7 @@ card singleFaced({
       whenever(
         does(
           actor(equipped(creature)),
-          attack(a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
+          attack(defender = a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
         createTappedAttacking(
           1,
           {
@@ -19,5 +19,5 @@ card singleFaced({
               text = [flying],
               power = 4,
               toughness = 4}},
-          that(player))),
+          defender = that(player))),
       equip(mana([generic(4)]))]})

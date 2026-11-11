@@ -9,11 +9,13 @@ card singleFaced({
         beginningOfYour(upkeep),
         doIfDone(
           exile(a(and([isCreature, in(yourGraveyard)]))),
-          putCounters(1, printedKind(p1p1Counter), thisCreature),
-          sacrifice(thisCreature))),
+          ifDid = putCounters(1, printedKind(p1p1Counter), thisCreature),
+          ifNot = sacrifice(thisCreature))),
       activated(
         compound(
-          [mana([pip(black), pip(green)]), perform(discard(a(and([isCreature, in(yourHand)]))))]),
+          costs = [
+            mana([pip(black), pip(green)]),
+            perform(discard(a(and([isCreature, in(yourHand)]))))]),
         putCounters(1, printedKind(p1p1Counter), thisCreature))],
     power = 4,
     toughness = 4})

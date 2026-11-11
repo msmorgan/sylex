@@ -9,12 +9,12 @@ ability embalm(cost: Cost) {
   spelling = "embalm <cost>",
   body = [
     activatedOnlyDuring(
-      compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
+      compound(costs = [$cost, perform(exileFrom(thisCard, yourGraveyard))]),
       create(
         1,
         copyOf(
           this,
-          [
+          exceptions = [
             characteristicEdits([
                 colors(sets, colors([white])),
                 manaCost(none),

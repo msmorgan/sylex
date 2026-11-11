@@ -7,7 +7,7 @@ ability intimidate {
     static(
       cant(
         any,
-        block(thisCreature),
+        block(attacker = thisCreature),
         except = byObjects(
           bare(and([isCreature, andOr([isArtifact, shares(color, share, thisCreature)])])))))]
 }

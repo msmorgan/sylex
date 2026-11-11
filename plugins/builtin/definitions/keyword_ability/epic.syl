@@ -10,7 +10,8 @@ ability epic {
       delayWithin(
         reached(beginningOfYour(upkeep)),
         restOfGame,
-        sequentially([
+        sequentially(
+          steps = [
             copy(
               fromStack,
               thisSpell,

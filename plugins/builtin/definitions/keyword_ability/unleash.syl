@@ -9,5 +9,7 @@ ability unleash {
         would(actor(thisPermanent), enter),
         alongside(may(putCounters(1, printedKind(p1p1Counter), thisPermanent))))),
     static(
-      onlyWhile(cant(actor(thisPermanent), block), is(thisPermanent, hasCounter(p1p1Counter))))]
+      onlyWhile(
+        cant(actor(thisPermanent), block),
+        is(thisPermanent, hasCounter(kind = p1p1Counter))))]
 }

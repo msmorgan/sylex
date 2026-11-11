@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       whenever(
         does(actor(a(isPlayer)), cast(a(isSpell))),
-        if = noColoredManaSpentToCast(it),
-        action = counter(that(spell)))]})
+        counter(that(spell)),
+        if = noColoredManaSpentToCast(it))]})

@@ -7,7 +7,8 @@ card singleFaced({
       councilsDilemma(
         when(
           does(actor(thisCreature), enter),
-          sequentially([
+          sequentially(
+            steps = [
               instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["strength", "numbers"]))),
               putCounters(votesFor("strength"), printedKind(p1p1Counter), thisCreature),
               create(votesFor("numbers"), written(creatureToken(1, 1, [white], [soldier])))])))],

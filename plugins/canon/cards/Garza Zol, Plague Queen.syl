@@ -16,7 +16,7 @@ card singleFaced({
                   did(
                     actor(thisCreature),
                     dealDamage(recipient = which),
-                    within(soFarThisTurn))]))),
+                    within = within(soFarThisTurn))]))),
           die),
         putCounters(1, printedKind(p1p1Counter), thisCreature)),
       whenever(

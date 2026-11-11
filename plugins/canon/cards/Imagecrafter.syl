@@ -6,7 +6,8 @@ card singleFaced({
     text = [
       activated(
         tapSymbol,
-        sequentially([
+        sequentially(
+          steps = [
             choose(a(qualityFrom(subtype(creature), typeOtherThan(wall)))),
             establishThroughout(
               qualityChange(target(isCreature), sets, chosenQuality(ofChosen(subtype(creature)))),

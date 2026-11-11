@@ -9,6 +9,6 @@ card singleFaced({
       static(
         asLongAs(
           is(topSlice(1), hasSubtype(goblin)),
-          abilityGrantFrom(thisCreature, topSlice(1), [anyActivated])))],
+          abilityGrantFrom(thisCreature, topSlice(1), classes = [anyActivated])))],
     power = 2,
     toughness = 2})

@@ -1,10 +1,9 @@
-card split(
-  left = {
+card split({
     name = "Wax",
     cost = [pip(green)],
     types = [instant],
-    text = [spell(get(target(isCreature), up(2), up(2), untilEndOfTurn))]},
-  right = {
+    text = [spell(get(target(isCreature), up(2), up(2), duration = untilEndOfTurn))]},
+  {
     name = "Wane",
     cost = [pip(white)],
     types = [instant],

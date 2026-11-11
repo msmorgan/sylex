@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [plant, mutant],
     text = [
       whenever(
-        timed(does(actor(a(isLand)), enter), duringPart(turn, you)),
-        action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
+        timed(does(actor(a(isLand)), enter), duringPart(turn, whose = you)),
+        putCounters(1, printedKind(p1p1Counter), thisCreature))],
     power = 3,
     toughness = 3})

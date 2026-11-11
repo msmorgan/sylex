@@ -1,5 +1,4 @@
-card adventurer(
-  normal = {
+card adventurer({
     name = "Brazen Borrower",
     cost = [generic(1), pip(blue), pip(blue)],
     types = [creature],
@@ -10,10 +9,10 @@ card adventurer(
       static(
         cant(
           actor(thisCreature),
-          block(allOf(and([isCreature, not(hasKeyword(theKeyword(flying)))])))))],
+          block(attacker = allOf(and([isCreature, not(hasKeyword(theKeyword(flying)))])))))],
     power = 3,
     toughness = 1},
-  adventure = {
+  {
     name = "Petty Theft",
     cost = [generic(1), pip(blue)],
     types = [instant],

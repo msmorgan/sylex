@@ -5,4 +5,5 @@ card singleFaced({
     text = [
       at(
         beginningOfYour(upkeep),
-        sequentially([gainLife(letter(x)), define(x, minus(countOf(cardIn(yourHand)), 4))]))]})
+        sequentially(
+          steps = [gainLife(letter(x)), define(x, minus(countOf(cardIn(yourHand)), 4))]))]})

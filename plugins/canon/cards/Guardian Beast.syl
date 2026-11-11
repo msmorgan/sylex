@@ -14,7 +14,7 @@ card singleFaced({
                   cant(any, attachTo(a(hasSubtype(aura)), them)),
                   abilityGrant(them, [indestructible]),
                   cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
-                bare(and([non(isCreature), isArtifact, youControl])))),
+                subject = bare(and([non(isCreature), isArtifact, youControl])))),
             doesnt(
               actor(thisEffect),
               remove(bare(and([hasSubtype(aura), attachedTo(those(artifact))]))))]))],

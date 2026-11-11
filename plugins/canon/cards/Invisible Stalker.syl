@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(1), pip(blue)],
     types = [creature],
     subtypes = [human, rogue],
-    text = [hexproof, static(cant(any, block(thisCreature)))],
+    text = [hexproof, static(cant(any, block(attacker = thisCreature)))],
     power = 1,
     toughness = 1})

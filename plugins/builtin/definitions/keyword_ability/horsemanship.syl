@@ -7,5 +7,5 @@ ability horsemanship {
     static(
       cant(
         by(allOf(and([isCreature, not(hasKeyword(theKeyword(horsemanship)))]))),
-        block(thisCreature)))]
+        block(attacker = thisCreature)))]
 }

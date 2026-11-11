@@ -9,8 +9,9 @@ card singleFaced({
         instruct(
           eachOpponent,
           may(
-            sequentially([
-                search(libraryOf(they), a(and([isLand, hasSupertype(basic)]))),
+            sequentially(
+              steps = [
+                search(libraryOf(they), for = a(and([isLand, hasSupertype(basic)]))),
                 putOntoBattlefieldTapped(it),
                 shuffle]))))],
     power = 3,

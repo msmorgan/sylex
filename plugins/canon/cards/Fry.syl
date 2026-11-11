@@ -8,6 +8,6 @@ card singleFaced({
         instruct(
           this,
           dealDamage(
-            5,
-            target(
+            amount = 5,
+            recipient = target(
               and([or([isCreature, isPlaneswalker]), or([hasColor(white), hasColor(blue)])])))))]})

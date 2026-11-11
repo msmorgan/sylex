@@ -8,6 +8,6 @@ card singleFaced({
         tapSymbol,
         addMana(
           counted(1, ofAnyColor(sameColor)),
-          spendOnlyToCastAnd(
+          riders = spendOnlyToCastAnd(
             and([isCreature, isSpell, ofChosen(subtype(creature))]),
             establish(cant(any, counter(that(spell)))))))]})

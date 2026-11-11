@@ -5,12 +5,14 @@ action explore {
   spelling = "explore",
   body = instruct(
     controllerOf(actor),
-    sequentially([
+    sequentially(
+      steps = [
         reveal(slice(top, 1, libraryOf(actor))),
         doIf(
           is(that(card), isLand),
           putInto(that(card), zone(hand, ownerOf(that(card)))),
-          sequentially([
+          otherwise = sequentially(
+            steps = [
               putCounters(1, printedKind(p1p1Counter), actor),
               may(putInto(that(card), graveyard))]))]))
 }

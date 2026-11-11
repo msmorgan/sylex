@@ -4,5 +4,5 @@
 # [CR#613.1f]
 template grants(keyword: Ability): Conferral {
   spelling = "<keyword>",
-  body = property(characteristicChange(this, [addedAbilities([$keyword])]))
+  body = property(characteristicChange(this, edits = [addedAbilities([$keyword])]))
 }

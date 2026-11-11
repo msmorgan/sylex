@@ -6,7 +6,11 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), attack),
-        get(target(and([isCreature, opponentsControl])), down(1), down(1), untilEndOfTurn)),
+        get(
+          target(and([isCreature, opponentsControl])),
+          down(1),
+          down(1),
+          duration = untilEndOfTurn)),
       encore(mana([generic(3), pip(black)]))],
     power = 3,
     toughness = 4})

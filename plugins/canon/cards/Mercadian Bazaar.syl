@@ -6,5 +6,7 @@ card singleFaced({
       activated(tapSymbol, putCounters(1, printedKind(storageCounter), thisLand)),
       activated(
         compound(
-          [tapSymbol, perform(removeCounters(anyNumber, printedKind(storageCounter), thisLand))]),
+          costs = [
+            tapSymbol,
+            perform(removeCounters(anyNumber, printedKind(storageCounter), thisLand))]),
         addMana(counted(removedThisWay, symbols([pip(red)]))))]})

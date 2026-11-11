@@ -8,6 +8,6 @@ card singleFaced({
         tapSymbol,
         addMana(
           or([symbols([pip(blue)]), symbols([colorlessPip, pip(blue)])]),
-          [spendOnly([toPay(ofKeyword(cumulativeUpkeep))])]))],
+          riders = [spendOnly([toPay(ofKeyword(cumulativeUpkeep))])]))],
     power = 2,
     toughness = 2})

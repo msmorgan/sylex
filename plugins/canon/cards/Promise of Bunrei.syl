@@ -7,4 +7,4 @@ card singleFaced({
         does(actor(a(and([isCreature, youControl]))), die),
         doIfDone(
           sacrifice(thisEnchantment),
-          create(4, written(creatureToken(1, 1, [], [spirit])))))]})
+          ifDid = create(4, written(creatureToken(1, 1, [], [spirit])))))]})

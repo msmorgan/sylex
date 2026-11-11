@@ -6,5 +6,6 @@ card singleFaced({
       when(does(actor(thisLand), enter), putCounters(1, printedKind(energy), you)),
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
-        compound([tapSymbol, perform(removeCounters(exactly(1), printedKind(energy), you))]),
+        compound(
+          costs = [tapSymbol, perform(removeCounters(exactly(1), printedKind(energy), you))]),
         addMana(counted(1, ofAnyColor(sameColor))))]})

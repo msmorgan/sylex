@@ -12,6 +12,6 @@ ability reconfigure(cost: Cost) {
     activated(
       $cost,
       unattach(thisPermanent),
-      asSorcery,
-      guard = is(thisPermanent, attachment(attachment, a(isCreature))))]
+      timing = asSorcery,
+      guard = is(thisPermanent, attachment(attachment, counterpart = a(isCreature))))]
 }

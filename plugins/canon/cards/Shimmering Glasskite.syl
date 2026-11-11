@@ -9,7 +9,7 @@ card singleFaced({
         nthOccurrence(
           nth(1),
           does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
-          turn),
+          per = turn),
         counter(that(stackObject)))],
     power = 2,
     toughness = 3})

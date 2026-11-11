@@ -3,7 +3,8 @@
 action bolster(amount: Amount) {
   lexical = {verbs = [{lemma = "bolster", frames = [Amount]}]},
   spelling = "bolster <amount>",
-  body = sequentially([
+  body = sequentially(
+    steps = [
       choose(
         a(
           and([

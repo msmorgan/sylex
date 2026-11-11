@@ -5,7 +5,9 @@ card singleFaced({
     subtypes = [saga],
     text = [
       when(
-        chapterMark([1]),
-        instruct(this, dealDamage(6, target(and([isCreature, anOpponentControls]))))),
-      when(chapterMark([2]), destroy(target(and([isArtifact, anOpponentControls])))),
-      when(chapterMark([3, 4]), addMana(symbols([pip(red)])))]})
+        chapterMark(chapters = [1]),
+        instruct(
+          this,
+          dealDamage(amount = 6, recipient = target(and([isCreature, anOpponentControls]))))),
+      when(chapterMark(chapters = [2]), destroy(target(and([isArtifact, anOpponentControls])))),
+      when(chapterMark(chapters = [3, 4]), addMana(symbols([pip(red)])))]})

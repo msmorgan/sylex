@@ -14,6 +14,9 @@ card singleFaced({
               does(
                 actor(you),
                 attack(
-                  eitherOf(enchanted(opponent), a(and([isPlaneswalker, controlledBy(they)])))))),
-            when(does(actor(they), attack(youOr(a(and([isPlaneswalker, youControl]))))))]),
-        action = sacrifice(thisAura))]})
+                  defender = eitherOf(
+                    enchanted(opponent),
+                    a(and([isPlaneswalker, controlledBy(they)])))))),
+            when(
+              does(actor(they), attack(defender = youOr(a(and([isPlaneswalker, youControl]))))))]),
+        sacrifice(thisAura))]})

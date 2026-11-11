@@ -4,8 +4,11 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(target(isAnyTarget)),
             scry(3),
             reveal(topSlice(1)),
-            instruct(this, dealDamage(statOf(stat(manaValue), that(card)), thatJoin))]))]})
+            instruct(
+              this,
+              dealDamage(amount = statOf(stat(manaValue), that(card)), recipient = thatJoin))]))]})

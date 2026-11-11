@@ -6,5 +6,5 @@ action fateseal(amount: Amount) {
   body = lookAndSortSlice(
     slice(top, $amount, libraryOf(a(isOpponentOf(actor)))),
     onBottom,
-    [inOrder(anyOrder)])
+    spillRiders = [inOrder(anyOrder)])
 }

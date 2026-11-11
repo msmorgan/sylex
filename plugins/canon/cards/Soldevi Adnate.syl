@@ -6,7 +6,9 @@ card singleFaced({
     text = [
       activated(
         compound(
-          [tapSymbol, perform(sacrifice(a(and([isCreature, or([hasColor(black), isArtifact])]))))]),
+          costs = [
+            tapSymbol,
+            perform(sacrifice(a(and([isCreature, or([hasColor(black), isArtifact])]))))]),
         addMana(
           counted(
             statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),

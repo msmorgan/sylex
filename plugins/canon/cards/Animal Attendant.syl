@@ -8,7 +8,7 @@ card singleFaced({
         tapSymbol,
         addMana(
           counted(1, ofAnyColor(sameColor)),
-          [
+          riders = [
             whenSpentOn(
               affectsIt,
               a(and([non(hasSubtype(human)), isCreature, isSpell])),

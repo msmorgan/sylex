@@ -8,7 +8,9 @@ card singleFaced({
       ward(mana([generic(2)])),
       static(
         replace(
-          would(any, createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), you)),
+          would(
+            any,
+            createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), under = you)),
           instead(create(times(2, groupSize), asThose))))],
     power = 2,
     toughness = 2})

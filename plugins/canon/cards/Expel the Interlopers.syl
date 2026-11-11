@@ -4,6 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(a(qualityFrom(number, number(fromTo(0, 10))))),
             destroy(allOf(and([isCreature, hasPower(atLeast, chosenNumber)])))]))]})

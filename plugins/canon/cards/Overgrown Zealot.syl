@@ -7,6 +7,8 @@ card singleFaced({
       activated(tapSymbol, addMana(counted(1, ofAnyColor(sameColor)))),
       activated(
         tapSymbol,
-        addMana(counted(2, ofAnyColor(sameColor)), [spendOnly([toTurnFaceUp(isPermanent)])]))],
+        addMana(
+          counted(2, ofAnyColor(sameColor)),
+          riders = [spendOnly([toTurnFaceUp(isPermanent)])]))],
     power = 0,
     toughness = 4})

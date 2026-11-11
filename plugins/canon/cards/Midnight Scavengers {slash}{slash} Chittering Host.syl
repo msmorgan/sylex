@@ -1,5 +1,4 @@
-card transforming(
-  front = {
+card transforming({
     name = "Midnight Scavengers",
     cost = [generic(4), pip(black)],
     types = [creature],
@@ -10,10 +9,10 @@ card transforming(
         may(
           returnToHand(
             target(and([isCreature, in(yourGraveyard), hasManaValue(atMost, 3)])),
-            yourGraveyard)))],
+            from = yourGraveyard)))],
     power = 3,
     toughness = 3},
-  back = {
+  {
     name = "Chittering Host",
     types = [creature],
     subtypes = [eldrazi, horror],
@@ -25,6 +24,6 @@ card transforming(
         establishFor(
           allOf(and([isCreature, youControl, isOther])),
           [getsPt(them, up(1), up(0)), abilityGrant(them, [menace])],
-          untilEndOfTurn))],
+          duration = untilEndOfTurn))],
     power = 5,
     toughness = 6})

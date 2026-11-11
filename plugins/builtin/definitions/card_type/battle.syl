@@ -13,11 +13,13 @@ card_type battle {
   confers = [
     castableFrom(yourHand, asSorcery),
     ability(static(entersWithCounters(this, statOf(stat(defense), this), defenseCounter))),
-    property(can(any, attack(this))),
-    damageResult(loseCounters(printedKind(defenseCounter), thatMuch, this)),
+    property(can(any, attack(defender = this))),
+    damageResult(loseCounters(printedKind(defenseCounter), thatMuch, agent = this)),
     stateBased(
       and(
-        [not(is(this, hasSubtype(siege))), compareAmt(countersOn(defenseCounter, this), equal, 0)]),
+        conjuncts = [
+          not(is(this, hasSubtype(siege))),
+          compareAmt(countersOn(defenseCounter, this), equal, 0)]),
       putInto(this, graveyard)),
     property(
       onlyUnless(

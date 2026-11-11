@@ -10,6 +10,8 @@ card singleFaced({
           would(actor(you), loseGame),
           instead(
             sequentially(
-              [exile(thisCreature), setLife(statOf(playerStat(startingLifeTotal), you))]))))],
+              steps = [
+                exile(thisCreature),
+                setLife(statOf(playerStat(startingLifeTotal), you))]))))],
     power = 5,
     toughness = 5})

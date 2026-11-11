@@ -8,7 +8,7 @@ card singleFaced({
       lifelink,
       at(
         beginningOfEach(combat),
-        if = compareAmt(lifeTotalOf(you), greater, lifeTotalOf(anOpponent)),
-        action = gain(thisCreature, [doubleStrike], untilEndOfTurn))],
+        gain(thisCreature, [doubleStrike], duration = untilEndOfTurn),
+        if = compareAmt(lifeTotalOf(you), greater, lifeTotalOf(anOpponent)))],
     power = 5,
     toughness = 5})

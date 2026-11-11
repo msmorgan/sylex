@@ -15,7 +15,8 @@ ability foretell(cost: Cost) {
   body = [
     static(
       specialAction(
-        duringPart(turn, you),
+        duringPart(turn, whose = you),
         mana([generic(2)]),
-        sequentially([exileFaceDownFrom(thisCard, yourHand), gainDesignation(it, foretold)])))]
+        sequentially(
+          steps = [exileFaceDownFrom(thisCard, yourHand), gainDesignation(it, foretold)])))]
 }

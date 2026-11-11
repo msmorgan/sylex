@@ -123,6 +123,21 @@ pub enum RefusalKind {
     DuplicateArgument { word: String, argument: String },
     #[error("missing argument `{argument}` to `{word}`")]
     MissingArgument { word: String, argument: String },
+    #[error("required argument `{argument}` to `{word}` is passed by name; pass it positionally")]
+    NamedRequired { word: String, argument: String },
+    #[error("defaulted argument `{argument}` to `{word}` is passed positionally; pass it by name")]
+    PositionalDefaulted { word: String, argument: String },
+    #[error("argument `{argument}` to `{word}` is its declared default; omit it")]
+    RedundantDefault { word: String, argument: String },
+    #[error(
+        "argument `{argument}` to `{word}` is written after `{after}`, which is declared after \
+         it; write arguments in declaration order"
+    )]
+    OutOfOrder {
+        word: String,
+        argument: String,
+        after: String,
+    },
     #[error("string at {0}")]
     StringAt(String),
     #[error("integer at {0}")]

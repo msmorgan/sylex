@@ -15,8 +15,12 @@ card singleFaced({
                   subtypes = [assemblyWorker],
                   power = 2,
                   toughness = 2}},
-              land)),
+              retained = land)),
           untilEndOfTurn)),
       activated(
         tapSymbol,
-        get(target(and([isCreature, hasSubtype(assemblyWorker)])), up(1), up(1), untilEndOfTurn))]})
+        get(
+          target(and([isCreature, hasSubtype(assemblyWorker)])),
+          up(1),
+          up(1),
+          duration = untilEndOfTurn))]})

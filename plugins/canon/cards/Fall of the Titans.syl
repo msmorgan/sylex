@@ -4,4 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       surge(mana([variable, pip(red)])),
-      spell(instruct(this, dealDamage(letter(x), eachOf(targets(upTo(2), isAnyTarget)))))]})
+      spell(
+        instruct(
+          this,
+          dealDamage(amount = letter(x), recipient = eachOf(targets(upTo(2), isAnyTarget)))))]})

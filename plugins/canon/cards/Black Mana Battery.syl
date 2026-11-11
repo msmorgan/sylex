@@ -4,12 +4,14 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([mana([generic(2)]), tapSymbol]),
+        compound(costs = [mana([generic(2)]), tapSymbol]),
         putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
-        compound([
+        compound(
+          costs = [
             tapSymbol,
             perform(removeCounters(anyNumber, printedKind(chargeCounter), thisArtifact))]),
-        sequentially([
+        sequentially(
+          steps = [
             addMana(symbols([pip(black)])),
             addMana(counted(removedThisWay, symbols([pip(black)])))]))]})

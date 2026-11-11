@@ -7,4 +7,4 @@ card singleFaced({
         and([
             when(does(actor(this), enter)),
             whenever(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, 5)])))))]),
-        action = draw(1))]})
+        draw(1))]})

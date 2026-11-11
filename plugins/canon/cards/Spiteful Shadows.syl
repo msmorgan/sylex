@@ -7,4 +7,4 @@ card singleFaced({
       enchant(isCreature),
       whenever(
         does(any, dealDamage(recipient = enchanted(creature))),
-        instruct(it, dealDamage(thatMuch, controllerOf(it))))]})
+        instruct(it, dealDamage(amount = thatMuch, recipient = controllerOf(it))))]})

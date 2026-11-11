@@ -8,6 +8,6 @@ card singleFaced({
       static(
         asLongAs(
           is(topSlice(1), or([isArtifact, isCreature])),
-          abilityGrantFrom(thisCreature, topSlice(1), [anyActivated])))],
+          abilityGrantFrom(thisCreature, topSlice(1), classes = [anyActivated])))],
     power = 1,
     toughness = 3})

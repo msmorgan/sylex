@@ -12,11 +12,11 @@ ability jumpStart {
         actor(you),
         cast(
           this,
-          yourGraveyard,
+          from = yourGraveyard,
           resulting = isInstantOrSorcery,
           addedCost = plusAdditional(perform(discard(a(isCard))))))),
     static(
       replace(
-        would(actor(thisSpell), leave(stack)),
+        would(actor(thisSpell), leave(from = stack)),
         doIf(choiceWasTaken(byKeyword(jumpStart), thisSpell), instead(exile(thisSpell)))))]
 }

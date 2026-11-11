@@ -4,6 +4,6 @@ card singleFaced({
     text = [
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activatedOnlyIf(
-        compound([mana([generic(3)]), tapSymbol]),
+        compound(costs = [mana([generic(3)]), tapSymbol]),
         draw(1),
         exists(and([isCreature, youControl, hasPower(atLeast, 4)])))]})

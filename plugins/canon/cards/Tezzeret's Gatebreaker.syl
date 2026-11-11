@@ -5,13 +5,18 @@ card singleFaced({
     text = [
       when(
         does(actor(thisArtifact), enter),
-        sequentially([
+        sequentially(
+          steps = [
             lookAt(topSlice(5)),
             may(
-              sequentially([
+              sequentially(
+                steps = [
                   reveal(fromAmong(exactly(1), or([hasColor(blue), isArtifact]), them)),
                   putInto(that(card), hand)])),
             putInto(theRest, onBottom, riders = [inOrder(randomOrder)])])),
       activated(
-        compound([mana([generic(5), pip(blue)]), tapSymbol, perform(sacrifice(thisArtifact))]),
-        establishThroughout(cant(any, block(allOf(and([isCreature, youControl])))), thisTurn))]})
+        compound(
+          costs = [mana([generic(5), pip(blue)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+        establishThroughout(
+          cant(any, block(attacker = allOf(and([isCreature, youControl])))),
+          thisTurn))]})

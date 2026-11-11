@@ -3,4 +3,8 @@ card singleFaced({
     name = "Radiant Flames",
     cost = [generic(2), pip(red)],
     types = [sorcery],
-    text = [spell(instruct(this, dealDamage(colorsSpentToCast(this), each(isCreature))))]})
+    text = [
+      spell(
+        instruct(
+          this,
+          dealDamage(amount = colorsSpentToCast(this), recipient = each(isCreature))))]})

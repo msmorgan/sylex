@@ -7,8 +7,9 @@ card singleFaced({
       static(
         altCost(
           payingInstead(
-            compound([
-                perform(payLife(6)),
+            compound(
+              costs = [
+                perform(payLife(amount = 6)),
                 perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))])),
           this)),
       flying,

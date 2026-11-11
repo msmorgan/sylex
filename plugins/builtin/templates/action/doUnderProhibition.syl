@@ -6,5 +6,6 @@
 # [CR#608.2c,701.19c]
 template doUnderProhibition(action: Action, forbidden: Action): Action {
   spelling = "<action>. <forbidden> can't happen",
-  body = sequentially([$action, establish(cant(any, $forbidden), modifiesPrecedingAction)])
+  body = sequentially(
+    steps = [$action, establish(cant(any, $forbidden), duration = modifiesPrecedingAction)])
 }

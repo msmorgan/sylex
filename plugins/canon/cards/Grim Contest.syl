@@ -8,9 +8,12 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(
               both(
                 target(and([isCreature, youControl])),
                 target(and([isCreature, anOpponentControls])))),
-            instruct(eachOf(those(creature)), dealDamage(toughnessOf(it), theOther))]))]})
+            instruct(
+              eachOf(those(creature)),
+              dealDamage(amount = toughnessOf(it), recipient = theOther))]))]})

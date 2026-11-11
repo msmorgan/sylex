@@ -7,6 +7,6 @@ card singleFaced({
       static(
         replace(
           would(actor(a(and([isInstantOrSorcery, hasColor(red), youControl]))), dealDamage),
-          instead(instruct(it, dealDamage(times(2, thatMuch))))))],
+          instead(instruct(it, dealDamage(amount = times(2, thatMuch))))))],
     power = 4,
     toughness = 3})

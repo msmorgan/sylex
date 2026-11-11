@@ -28,12 +28,17 @@ Written against the spine (`cleanup-step6-spine`).
   declaration order, even when an optional parameter is declared before it.
 - A defaulted argument is passed by name.
 - A named argument whose written value equals the parameter's declared default is refused.
+- Arguments are written in declaration order, a named one in its declared place among the
+  positional ones; a declaration's parameter order is never changed to suit the rule.
 
 ## Done when
 
 - `cargo xtask dsl check` binds positional arguments only to required parameters, refuses a named
   required argument, a positional defaulted one, and a named argument equal to its declared
   default; each refusal has a negative test.
+- `cargo xtask dsl check` refuses a call whose arguments are written out of the declaration's
+  parameter order, naming the call, the argument and the parameter it was written after, with a
+  negative test; a named argument may stand before a positional one in its declared place.
 - The redundant-default refusal looks through coercion bodies (`syl-implicit-coercions`), so
   `n = 0` is refused where the declared default is `lit(0)`, with a negative test.
 - Every call in `plugins/` follows the rule, with no named argument equal to its default.

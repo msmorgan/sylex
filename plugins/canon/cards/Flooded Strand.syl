@@ -3,8 +3,11 @@ card singleFaced({
     types = [land],
     text = [
       activated(
-        compound([tapSymbol, perform(payLife(1)), perform(sacrifice(thisLand))]),
-        sequentially([
-            search(yourLibrary, a(and([isCard, or([hasSubtype(plains), hasSubtype(island)])]))),
+        compound(costs = [tapSymbol, perform(payLife(amount = 1)), perform(sacrifice(thisLand))]),
+        sequentially(
+          steps = [
+            search(
+              yourLibrary,
+              for = a(and([isCard, or([hasSubtype(plains), hasSubtype(island)])]))),
             putOntoBattlefield(it),
             shuffle]))]})

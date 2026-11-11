@@ -5,4 +5,6 @@ card singleFaced({
     text = [
       whenever(
         does(any, dealDamage(recipient = a(isCreature))),
-        instruct(thisEnchantment, dealDamage(thatMuch, controllerOf(that(creature)))))]})
+        instruct(
+          thisEnchantment,
+          dealDamage(amount = thatMuch, recipient = controllerOf(that(creature)))))]})

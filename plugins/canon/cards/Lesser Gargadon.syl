@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         or([does(actor(thisCreature), attack), does(actor(thisCreature), block)]),
-        action = sacrifice(a(isLand)))],
+        sacrifice(a(isLand)))],
     power = 6,
     toughness = 4})

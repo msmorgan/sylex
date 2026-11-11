@@ -12,7 +12,7 @@ card singleFaced({
         putCounters(1, printedKind(p1p1Counter), thisCreature)),
       when(
         does(actor(thisCreature), enter),
-        if = keywordCostPaid(kicker, thisCreature),
-        action = instruct(target(isOpponent), discard(countedAtRandom(exactly(2), isCard))))],
+        instruct(target(isOpponent), discard(countedAtRandom(exactly(2), isCard))),
+        if = keywordCostPaid(kicker, thisCreature))],
     power = 2,
     toughness = 1})

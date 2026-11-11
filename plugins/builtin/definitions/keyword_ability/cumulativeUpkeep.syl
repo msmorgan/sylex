@@ -8,7 +8,8 @@ ability cumulativeUpkeep(cost: Cost) {
   body = [
     at(
       beginningOfYour(upkeep),
-      sequentially([
+      sequentially(
+        steps = [
           putCounters(1, printedKind(ageCounter), thisPermanent),
           doUnlessKeywordCost(
             sacrifice(thisPermanent),

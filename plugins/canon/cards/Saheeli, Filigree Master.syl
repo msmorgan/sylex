@@ -7,10 +7,14 @@ card singleFaced({
     text = [
       activated(
         loyaltySymbol(up(1)),
-        sequentially([scry(1), may(tap(a(and([isArtifact, isUntapped, youControl]))), draw(1))])),
+        sequentially(
+          steps = [
+            scry(1),
+            may(tap(a(and([isArtifact, isUntapped, youControl]))), ifDid = draw(1))])),
       activated(
         loyaltySymbol(down(2)),
-        sequentially([
+        sequentially(
+          steps = [
             create(
               2,
               written({
@@ -20,13 +24,14 @@ card singleFaced({
                     text = [flying],
                     power = 1,
                     toughness = 1}})),
-            gain(them, [haste], untilEndOfTurn)])),
+            gain(them, [haste], duration = untilEndOfTurn)])),
       activated(
         loyaltySymbol(down(4)),
         getEmblem([
             static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(1), up(1))),
             static(
               costShift(
-                allOf(and([isArtifact, isSpell, did(actor(you), cast(which), thisObject)])),
+                allOf(
+                  and([isArtifact, isSpell, did(actor(you), cast(which), within = thisObject)])),
                 less(1)))]))],
     loyalty = 3})

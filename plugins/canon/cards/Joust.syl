@@ -9,12 +9,13 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(
               both(
                 target(and([isCreature, youControl])),
                 target(and([isCreature, youDontControl])))),
             doOnlyIf(
-              get(the(and([isCreature, youControl])), up(2), up(1), untilEndOfTurn),
+              get(the(and([isCreature, youControl])), up(2), up(1), duration = untilEndOfTurn),
               is(it, hasSubtype(knight))),
             fightEachOther(those(creature))]))]})

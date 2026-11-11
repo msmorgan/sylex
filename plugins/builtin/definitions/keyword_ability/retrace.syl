@@ -10,6 +10,6 @@ ability retrace {
         actor(you),
         cast(
           this,
-          yourGraveyard,
+          from = yourGraveyard,
           addedCost = plusAdditional(perform(discard(a(and([isCard, isLand]))))))))]
 }

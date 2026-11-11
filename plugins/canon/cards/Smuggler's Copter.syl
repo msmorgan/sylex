@@ -7,7 +7,7 @@ card singleFaced({
       flying,
       whenever(
         or([does(actor(thisVehicle), attack), does(actor(thisVehicle), block)]),
-        action = may(draw(1), discard(a(cardIn(yourHand))))),
+        may(draw(1), ifDid = discard(a(cardIn(yourHand))))),
       crew(1)],
     power = 3,
     toughness = 3})

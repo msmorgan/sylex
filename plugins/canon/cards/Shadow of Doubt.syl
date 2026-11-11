@@ -4,6 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             establishThroughout(cant(actor(bare(isPlayer)), search(libraries)), thisTurn),
             draw(1)]))]})

@@ -5,7 +5,8 @@ card singleFaced({
     text = [
       when(
         does(actor(a(and([isCreature, youControl]))), enter),
-        sequentially([
+        sequentially(
+          steps = [
             gainLife(1),
             doIf(
               not(is(thisEnchantment, isCreature)),
@@ -18,4 +19,4 @@ card singleFaced({
                     text = [flying],
                     power = 3,
                     toughness = 3}},
-                untilEndOfTurn))]))]})
+                duration = untilEndOfTurn))]))]})

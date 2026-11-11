@@ -3,5 +3,5 @@
 # [CR#500.9]
 template additionalStep(part: TurnPart, anchor: Option(TurnPart), count: Amount): Action {
   # TODO(spelling): Include or omit the clauses supplied by anchor.
-  body = addTurnPart($part, $count, $anchor)
+  body = addTurnPart($part, $count, anchor = $anchor)
 }

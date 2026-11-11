@@ -76,8 +76,16 @@ location is not stated by the declaration, and it can disagree with what the dec
   any declaration that would make one mistakable.
 - **Reads are marked.** `$name` reads a parameter; a bare word never does. Why: what a word refers
   to can be read from its spelling, and a parameter can never shadow a word.
-- **Argument order carries no meaning.** Named arguments may stand anywhere, so a call can follow
-  printed order.
+- **A call has one spelling.** A required argument is positional and binds the next required
+  parameter not yet bound, in declaration order, even past an optional parameter declared before
+  it. A defaulted argument is passed by name, and never with the value its parameter declares as
+  its default (looking through a coercion, so `n = 0` is that default when it is `lit(0)`).
+  Arguments are written in declaration order, which is printed order (§5), a named argument in
+  its declared place among the positional ones: `fromEnd(bottom, ordinal = nth($n), $loc)`.
+  `cargo xtask dsl check` refuses a required argument passed by name, a defaulted one passed
+  positionally, a named argument equal to its default, and arguments out of declaration order.
+  Why: a reader can tell which parameter each argument fills, and two spellings never mean the
+  same.
 - **Notation.** `=` binds and `:` means "has sort". A capitalized word is a sort in a signature
   (`other: NounPhrase`, `Option(List(Cost))`) or a constructor in a primitive's constructor
   clause, and nothing else; `sylex_syl`'s parser refuses one anywhere else. The rule does not

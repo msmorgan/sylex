@@ -3,4 +3,6 @@ card singleFaced({
     cost = [generic(1), pip(black)],
     types = [enchantment],
     text = [
-      at(beginningOfYour(upkeep), destroy(target(and([isCreature, hasCounter(m1m1Counter)]))))]})
+      at(
+        beginningOfYour(upkeep),
+        destroy(target(and([isCreature, hasCounter(kind = m1m1Counter)]))))]})

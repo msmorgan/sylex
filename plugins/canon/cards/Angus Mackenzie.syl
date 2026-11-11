@@ -6,8 +6,8 @@ card singleFaced({
     subtypes = [human, cleric],
     text = [
       activatedOnlyDuring(
-        compound([mana([pip(green), pip(white), pip(blue)]), tapSymbol]),
-        preventAll(any, thisTurn, combat),
+        compound(costs = [mana([pip(green), pip(white), pip(blue)]), tapSymbol]),
+        preventAll(any, thisTurn, kind = combat),
         beforePart(combatDamage))],
     power = 2,
     toughness = 2})

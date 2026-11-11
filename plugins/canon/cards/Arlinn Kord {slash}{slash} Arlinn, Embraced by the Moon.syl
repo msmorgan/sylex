@@ -1,5 +1,4 @@
-card transforming(
-  front = {
+card transforming({
     name = "Arlinn Kord",
     cost = [generic(2), pip(red), pip(green)],
     supertypes = [legendary],
@@ -11,14 +10,15 @@ card transforming(
         establishFor(
           targets(upTo(1), isCreature),
           [getsPt(it, up(2), up(2)), abilityGrant(it, [vigilance, haste])],
-          untilEndOfTurn)),
+          duration = untilEndOfTurn)),
       activated(
         loyaltySymbol(up(0)),
-        sequentially([
+        sequentially(
+          steps = [
             create(1, written(creatureToken(2, 2, [green], [wolf]))),
             transform(thisPlaneswalker)]))],
     loyalty = 3},
-  back = {
+  {
     name = "Arlinn, Embraced by the Moon",
     supertypes = [legendary],
     types = [planeswalker],
@@ -29,11 +29,13 @@ card transforming(
         establishFor(
           allOf(and([isCreature, youControl])),
           [getsPt(them, up(1), up(1)), abilityGrant(them, [trample])],
-          untilEndOfTurn)),
+          duration = untilEndOfTurn)),
       activated(
         loyaltySymbol(down(1)),
         sequentially(
-          [instruct(this, dealDamage(3, target(isAnyTarget))), transform(thisPlaneswalker)])),
+          steps = [
+            instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))),
+            transform(thisPlaneswalker)])),
       activated(
         loyaltySymbol(down(6)),
         getEmblem([

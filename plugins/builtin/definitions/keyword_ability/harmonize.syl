@@ -12,9 +12,10 @@ ability harmonize(cost: Cost) {
         actor(you),
         cast(
           this,
-          yourGraveyard,
+          from = yourGraveyard,
           altCost = payingInstead(
-            compound([
+            compound(
+              costs = [
                 $cost,
                 perform(
                   tap(counted(upTo(1), and([isUntapped, and([isCreature, youControl])]))))]))))),
@@ -26,6 +27,6 @@ ability harmonize(cost: Cost) {
           generic(down(powerOf(the(and([was(tap(which)), isCreature])))), none)))),
     static(
       replace(
-        would(actor(thisSpell), leave(stack)),
+        would(actor(thisSpell), leave(from = stack)),
         doIf(keywordCostPaid(harmonize, thisSpell), instead(exile(thisSpell)))))]
 }

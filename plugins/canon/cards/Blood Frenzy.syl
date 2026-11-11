@@ -4,11 +4,12 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             get(
               target(and([isCreature, or([isAttacking, isBlocking])])),
               up(4),
               up(0),
-              untilEndOfTurn),
+              duration = untilEndOfTurn),
             atNext(beginningOfNext(endStep), destroy(that(creature)))]),
         timing = beforePart(combatDamage))]})

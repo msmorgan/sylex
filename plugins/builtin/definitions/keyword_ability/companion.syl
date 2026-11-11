@@ -10,7 +10,7 @@ ability companion(condition: DeckCondition) {
   body = [
     static(
       specialAction(
-        and([asSorcery, whileTrue(is(thisCard, outsideTheGame))]),
+        and(conjuncts = [asSorcery, whileTrue(is(thisCard, outsideTheGame))]),
         mana([generic(3)]),
         limited(putInto(thisCard, handOf(you)), oncePerGame)))]
 }

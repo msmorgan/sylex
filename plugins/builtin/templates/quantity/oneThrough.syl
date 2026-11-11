@@ -1,4 +1,4 @@
 template oneThrough(n: Nat): Quantity {
   spelling = "one to <n>",
-  body = range(1, $n)
+  body = range(low = 1, high = $n)
 }

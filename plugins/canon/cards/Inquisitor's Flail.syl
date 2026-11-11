@@ -7,11 +7,14 @@ card singleFaced({
       static(
         replace(
           would(actor(equipped(creature)), dealDamage(kind = combat)),
-          instead(instruct(it, dealDamage(times(2, thatMuch)))))),
+          instead(instruct(it, dealDamage(amount = times(2, thatMuch)))))),
       static(
         replace(
           would(
             actor(a(and([isCreature, isOther]))),
             dealDamage(recipient = equipped(creature), kind = combat)),
-          instead(instruct(it, dealDamage(times(2, thatMuch), equipped(creature)))))),
+          instead(
+            instruct(
+              it,
+              dealDamage(amount = times(2, thatMuch), recipient = equipped(creature)))))),
       equip(mana([generic(2)]))]})

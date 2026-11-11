@@ -1,5 +1,4 @@
-card transforming(
-  front = {
+card transforming({
     name = "Neglected Heirloom",
     cost = [generic(1)],
     types = [artifact],
@@ -8,7 +7,7 @@ card transforming(
       static(getsPt(equipped(creature), up(1), up(1))),
       when(does(any, turnOver(equipped(creature))), transform(thisEquipment)),
       equip(mana([generic(1)]))]},
-  back = {
+  {
     name = "Ashmouth Blade",
     types = [artifact],
     subtypes = [equipment],

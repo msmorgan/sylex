@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(counted(orMore(1), and([isArtifact, youControl]))), enter),
-        instruct(thisCreature, dealDamage(groupSize, eachOpponent)))],
+        instruct(thisCreature, dealDamage(amount = groupSize, recipient = eachOpponent)))],
     power = 3,
     toughness = 1})

@@ -11,4 +11,4 @@ card singleFaced({
                 hasSubtype(zombie),
                 isCreature,
                 isSpell,
-                did(actor(you), cast(which), thisObject)]))))]})
+                did(actor(you), cast(which), within = thisObject)]))))]})

@@ -3,4 +3,9 @@ card singleFaced({
     cost = [generic(2), pip(black), pip(green)],
     types = [sorcery],
     text = [
-      spell(get(allOf(and([isCreature, not(hasCounter)])), down(2), down(2), untilEndOfTurn))]})
+      spell(
+        get(
+          allOf(and([isCreature, not(hasCounter)])),
+          down(2),
+          down(2),
+          duration = untilEndOfTurn))]})

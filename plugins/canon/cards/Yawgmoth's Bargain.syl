@@ -2,4 +2,4 @@ card singleFaced({
     name = "Yawgmoth's Bargain",
     cost = [generic(4), pip(black), pip(black)],
     types = [enchantment],
-    text = [static(partSkip(you, drawStep)), activated(perform(payLife(1)), draw(1))]})
+    text = [static(partSkip(you, drawStep)), activated(perform(payLife(amount = 1)), draw(1))]})

@@ -6,6 +6,6 @@ card singleFaced({
       vanishing(3),
       triggered(
         and([when(does(actor(thisEnchantment), enter)), at(beginningOfYour(firstMain))]),
-        action = exileUntil(
+        exileUntil(
           target(and([isCreature, anOpponentControls])),
           does(actor(thisEnchantment), leave)))]})

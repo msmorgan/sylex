@@ -7,15 +7,18 @@ ability ninjutsu(cost: Cost) {
   spelling = "ninjutsu <cost>",
   body = [
     activated(
-      compound([
+      compound(
+        costs = [
           $cost,
           perform(reveal(this)),
           perform(returnToHand(a(and([isCreature, isAttacking, isUnblocked, youControl]))))]),
       putOntoBattlefieldTappedAttacking(
         this,
-        yourHand,
-        the(
+        from = yourHand,
+        defender = the(
           and([
               or([isPlayer, isPlaneswalker, isBattle]),
-              inCombat(attackedBy, the(and([was(returnToHand(which)), isCreature])))]))))]
+              inCombat(
+                attackedBy,
+                counterpart = the(and([was(returnToHand(which)), isCreature])))]))))]
 }

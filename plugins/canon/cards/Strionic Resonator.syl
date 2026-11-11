@@ -4,7 +4,8 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([mana([generic(2)]), tapSymbol]),
-        sequentially([
+        compound(costs = [mana([generic(2)]), tapSymbol]),
+        sequentially(
+          steps = [
             copyOnStack(target(and([abilityHead(anyTriggered), youControl]))),
             may(chooseNewTargets(that(copied(ability))))]))]})

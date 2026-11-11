@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       at(
         beginningOfPossessed(eachOpponent, upkeep),
-        if = compareAmt(countOf(cardIn(handOf(that(player)))), atMost, 1),
-        action = instruct(they, loseLife(3)))]})
+        instruct(they, loseLife(3)),
+        if = compareAmt(countOf(cardIn(handOf(that(player)))), atMost, 1))]})

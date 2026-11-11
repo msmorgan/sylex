@@ -5,5 +5,8 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(and([abilityHead(keyword(cycling)), did(actor(you), activate(which), thisObject)])),
+          allOf(
+            and([
+                abilityHead(keyword(cycling)),
+                did(actor(you), activate(which), within = thisObject)])),
           less(2)))]})

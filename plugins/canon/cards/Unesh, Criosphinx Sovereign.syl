@@ -8,13 +8,15 @@ card singleFaced({
       flying,
       static(
         costShift(
-          allOf(and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), thisObject)])),
+          allOf(
+            and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), within = thisObject)])),
           less(2))),
       whenever(
         does(
           actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))),
           enter),
-        sequentially([
+        sequentially(
+          steps = [
             reveal(topSlice(4)),
             instruct(anOpponent, separateIntoPiles(them, 2)),
             putInto(onePile, hand),

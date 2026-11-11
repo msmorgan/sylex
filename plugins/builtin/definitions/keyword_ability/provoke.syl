@@ -11,7 +11,7 @@ ability provoke {
         establishThroughout(
           must(
             actor(target(and([isCreature, controlledBy(defendingPlayer)]))),
-            block(thisCreature)),
+            block(attacker = thisCreature)),
           untilEndOfCombat),
-        untap(that(creature))))]
+        ifDid = untap(that(creature))))]
 }

@@ -1,5 +1,4 @@
-card transforming(
-  front = {
+card transforming({
     name = "Afflicted Deserter",
     cost = [generic(3), pip(red)],
     types = [creature],
@@ -7,28 +6,31 @@ card transforming(
     text = [
       at(
         beginningOfEach(upkeep),
-        if = not(did(any, cast(a(isSpell)), within(lastTurn))),
-        action = transform(thisCreature))],
+        transform(thisCreature),
+        if = not(did(any, cast(a(isSpell)), within(lastTurn))))],
     power = 3,
     toughness = 2},
-  back = {
+  {
     name = "Werewolf Ransacker",
     types = [creature],
     subtypes = [werewolf],
     text = [
       whenever(
         does(any, transform(thisCreature, into = named(printedName("Werewolf Ransacker")))),
-        sequentially([
+        sequentially(
+          steps = [
             may(destroy(target(isArtifact))),
             doIf(
               did(actor(that(artifact)), putInto(actor, graveyard), thisWay),
-              instruct(thisCreature, dealDamage(3, controllerOf(that(artifact)))))])),
+              instruct(
+                thisCreature,
+                dealDamage(amount = 3, recipient = controllerOf(that(artifact)))))])),
       at(
         beginningOfEach(upkeep),
+        transform(thisCreature),
         if = compareAmt(
           aggregateOver(max, isPlayer, eventCount(cast(a(isSpell)), actor(they), lastTurn)),
           atLeast,
-          2),
-        action = transform(thisCreature))],
+          2))],
     power = 5,
     toughness = 4})

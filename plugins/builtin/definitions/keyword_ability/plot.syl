@@ -15,5 +15,5 @@ ability plot(cost: Cost) {
       specialAction(
         asSorcery,
         $cost,
-        sequentially([exileFrom(thisCard, yourHand), gainDesignation(it, plotted)])))]
+        sequentially(steps = [exileFrom(thisCard, yourHand), gainDesignation(it, plotted)])))]
 }

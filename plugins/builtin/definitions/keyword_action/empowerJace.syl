@@ -11,7 +11,8 @@ action empowerJace(amount: Amount) {
         gerund = "empowering Jace",
         frames = [Amount]}]},
   spelling = "empower Jace <amount>",
-  body = sequentially([
+  body = sequentially(
+    steps = [
       doIf(
         not(exists(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
         create(1, defined(jaceToken))),

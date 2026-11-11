@@ -4,7 +4,8 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             doIf(compareAmt(lifeTotalOf(you), less, lifeTotalOf(anOpponent)), gainLife(6)),
             doIf(
               compareAmt(

@@ -12,7 +12,7 @@ card_type planeswalker {
   confers = [
     castableFrom(yourHand, asSorcery),
     ability(static(entersWithCounters(this, statOf(stat(loyalty), this), loyaltyCounter))),
-    property(can(any, attack(this))),
-    damageResult(loseCounters(printedKind(loyaltyCounter), thatMuch, this)),
+    property(can(any, attack(defender = this))),
+    damageResult(loseCounters(printedKind(loyaltyCounter), thatMuch, agent = this)),
     stateBased(compareAmt(countersOn(loyaltyCounter, this), equal, 0), putInto(this, graveyard))]
 }

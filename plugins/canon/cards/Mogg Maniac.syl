@@ -6,6 +6,8 @@ card singleFaced({
     text = [
       whenever(
         does(any, dealDamage(recipient = thisCreature)),
-        instruct(it, dealDamage(thatMuch, target(or([isPlaneswalker, isOpponent])))))],
+        instruct(
+          it,
+          dealDamage(amount = thatMuch, recipient = target(or([isPlaneswalker, isOpponent])))))],
     power = 1,
     toughness = 1})

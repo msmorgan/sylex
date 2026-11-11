@@ -7,4 +7,5 @@ card singleFaced({
       static(
         replace(
           would(actor(a(isSource)), dealDamage(recipient = a(and([isCreature, youControl])))),
-          instead(instruct(it, dealDamage(minus(thatMuch, 1), that(creature))))))]})
+          instead(
+            instruct(it, dealDamage(amount = minus(thatMuch, 1), recipient = that(creature))))))]})

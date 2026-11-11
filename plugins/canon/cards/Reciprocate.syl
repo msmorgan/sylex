@@ -8,4 +8,7 @@ card singleFaced({
           target(
             and([
                 isCreature,
-                did(actor(which), dealDamage(recipient = you), within(soFarThisTurn))]))))]})
+                did(
+                  actor(which),
+                  dealDamage(recipient = you),
+                  within = within(soFarThisTurn))]))))]})

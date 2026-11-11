@@ -9,9 +9,13 @@ ability flashback(cost: Cost) {
     static(
       can(
         actor(you),
-        cast(this, yourGraveyard, resulting = isInstantOrSorcery, altCost = payingInstead($cost)))),
+        cast(
+          this,
+          from = yourGraveyard,
+          resulting = isInstantOrSorcery,
+          altCost = payingInstead($cost)))),
     static(
       replace(
-        would(actor(thisSpell), leave(stack)),
+        would(actor(thisSpell), leave(from = stack)),
         doIf(keywordCostPaid(flashback, thisSpell), instead(exile(thisSpell)))))]
 }

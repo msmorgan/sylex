@@ -10,4 +10,4 @@ card singleFaced({
               action = untap(allOf(and([isCreature, controlledBy(target(isPlayer))])))},
             {
               cost = mana([generic(1)]),
-              action = gain(target(isCreature), [doubleStrike], untilEndOfTurn)}]))]})
+              action = gain(target(isCreature), [doubleStrike], duration = untilEndOfTurn)}]))]})

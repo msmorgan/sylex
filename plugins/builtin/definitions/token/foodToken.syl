@@ -8,6 +8,6 @@ token foodToken {
       subtypes = [food],
       text = [
         activated(
-          compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisToken))]),
+          compound(costs = [mana([generic(2)]), tapSymbol, perform(sacrifice(thisToken))]),
           gainLife(3))]}}
 }

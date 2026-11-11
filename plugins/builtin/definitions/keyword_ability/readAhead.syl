@@ -10,6 +10,8 @@ ability readAhead {
         cant(
           actor(allOf(chapterAbilityOf(thisSaga))),
           trigger,
-          unless = is(that(ability), compare(equal, countersOn(loreCounter, thisSaga), [chapter]))),
+          unless = is(
+            that(ability),
+            compare(equal, countersOn(loreCounter, thisSaga), axes = [chapter]))),
         did(actor(thisSaga), enter, within(soFarThisTurn))))]
 }

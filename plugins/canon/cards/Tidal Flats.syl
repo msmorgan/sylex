@@ -13,7 +13,9 @@ card singleFaced({
               instruct(
                 you,
                 gain(
-                  allOf(and([isCreature, youControl, inCombat(blockerOf, that(creature))])),
+                  allOf(
+                    and(
+                      [isCreature, youControl, inCombat(blockerOf, counterpart = that(creature))])),
                   [firstStrike],
-                  untilEndOfTurn)),
+                  duration = untilEndOfTurn)),
               mana([generic(1)])))))]})

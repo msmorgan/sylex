@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(counted(orMore(1), cardIn(yourGraveyard))), leave(from = yourGraveyard)),
-        instruct(this, dealDamage(1, eachOpponent)))],
+        instruct(this, dealDamage(amount = 1, recipient = eachOpponent)))],
     power = 4,
     toughness = 3})

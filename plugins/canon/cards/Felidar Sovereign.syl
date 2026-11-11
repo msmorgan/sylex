@@ -6,9 +6,6 @@ card singleFaced({
     text = [
       vigilance,
       lifelink,
-      at(
-        beginningOfYour(upkeep),
-        if = compareAmt(lifeTotalOf(you), atLeast, 40),
-        action = winGame)],
+      at(beginningOfYour(upkeep), winGame, if = compareAmt(lifeTotalOf(you), atLeast, 40))],
     power = 4,
     toughness = 6})

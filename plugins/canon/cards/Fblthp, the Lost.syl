@@ -10,9 +10,10 @@ card singleFaced({
         replace(
           draw(1),
           doIf(
-            or([
+            or(
+              disjuncts = [
                 did(actor(it), enter(from = yourLibrary), triggering),
-                is(it, did(any, cast(which, from = yourLibrary), thisObject))]),
+                is(it, did(any, cast(which, from = yourLibrary), within = thisObject))]),
             instead(draw(2))))),
       when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
     power = 1,

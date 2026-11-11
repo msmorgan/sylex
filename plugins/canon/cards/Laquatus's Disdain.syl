@@ -4,6 +4,8 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
-            counter(target(and([isSpell, did(any, cast(which, from = graveyard), thisObject)]))),
+        sequentially(
+          steps = [
+            counter(
+              target(and([isSpell, did(any, cast(which, from = graveyard), within = thisObject)]))),
             draw(1)]))]})

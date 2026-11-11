@@ -3,7 +3,7 @@ card singleFaced({
     cost = [pip(blue)],
     types = [sorcery],
     text = [
-      spell(instruct(this, dealDamage(1, target(isAnyTarget)))),
+      spell(instruct(this, dealDamage(amount = 1, recipient = target(isAnyTarget)))),
       when(
         causes(
           bySource(a(and([or([isSpell, abilityHead(anyOnStack)]), anOpponentControls]))),

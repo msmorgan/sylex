@@ -4,6 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             exile(topSlice(1)),
-            doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), repeat(again)))]))]})
+            doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), ifDid = repeat(again)))]))]})

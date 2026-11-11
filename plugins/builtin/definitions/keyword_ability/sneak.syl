@@ -14,8 +14,10 @@ ability sneak(cost: Cost) {
           thisSpell,
           altCost = payingInstead(
             compound(
-              [$cost, perform(returnToHand(a(and([isCreature, isUnblocked, youControl]))))]))),
-        and([asInstant, duringPart(declareBlockers, you)]))),
+              costs = [
+                $cost,
+                perform(returnToHand(a(and([isCreature, isUnblocked, youControl]))))]))),
+        timing = and(conjuncts = [asInstant, duringPart(declareBlockers, whose = you)]))),
     static(
       replace(
         would(actor(thisPermanent), enter),
@@ -30,5 +32,5 @@ ability sneak(cost: Cost) {
                       or([isPlayer, isPlaneswalker, isBattle]),
                       inCombat(
                         attackedBy,
-                        the(and([was(returnToHand(which)), isCreature])))])))]))))]
+                        counterpart = the(and([was(returnToHand(which)), isCreature])))])))]))))]
 }

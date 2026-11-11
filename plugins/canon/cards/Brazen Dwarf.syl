@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [dwarf, shaman],
     text = [
       whenever(
-        does(actor(you), rollDice(anyAmount, anyDie)),
-        instruct(thisCreature, dealDamage(1, eachOpponent)))],
+        does(actor(you), rollDice(count = anyAmount, sides = anyDie)),
+        instruct(thisCreature, dealDamage(amount = 1, recipient = eachOpponent)))],
     power = 1,
     toughness = 3})

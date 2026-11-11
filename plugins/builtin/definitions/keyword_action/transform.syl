@@ -6,5 +6,5 @@ action transform(subject: NounPhrase, into: Option(Predicate) = none) {
     verbs = [
       {lemma = "transform", frames = [Monotransitive, Intransitive, Prepositional(["into"])]}],
     adjectives = ["transformed"]},
-  body = turnOver($subject, $into)
+  body = turnOver($subject, into = $into)
 }

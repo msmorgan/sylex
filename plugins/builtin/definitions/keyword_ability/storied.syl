@@ -7,7 +7,8 @@ ability storied {
   body = [
     static(
       whileHolds(
-        and([
+        and(
+          conjuncts = [
             compareAmt(
               countOf(
                 and([
@@ -17,5 +18,5 @@ ability storied {
               atLeast,
               3),
             not(is(you, hasDesignation(enduringStory)))]),
-        gainDesignation(you, enduringStory, restOfGame)))]
+        gainDesignation(you, enduringStory, duration = restOfGame)))]
 }

@@ -5,7 +5,8 @@
 sba deathtouchDestruction {
   body = {
     scope = isCreature,
-    when = and([
+    when = and(
+      conjuncts = [
         compareAmt(toughnessOf(this), greater, 0),
         did(
           by(a(and([isSource, hasKeyword(theKeyword(deathtouch))]))),

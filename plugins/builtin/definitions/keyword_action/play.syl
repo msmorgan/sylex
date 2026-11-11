@@ -14,8 +14,8 @@ action play(
     play,
     $subject,
     $payment,
-    $resulting,
-    $from,
+    resulting = $resulting,
+    from = $from,
     altCost = $altCost,
     addedCost = $addedCost)
 }

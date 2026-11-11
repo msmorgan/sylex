@@ -6,4 +6,4 @@ card singleFaced({
       static(
         altCost(
           payingInstead(mana([pip(white), pip(blue), pip(black), pip(red), pip(green)])),
-          allOf(and([isSpell, did(actor(you), cast(which), thisObject)]))))]})
+          allOf(and([isSpell, did(actor(you), cast(which), within = thisObject)]))))]})

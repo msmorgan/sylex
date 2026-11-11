@@ -6,5 +6,5 @@ card singleFaced({
       static(
         can(
           actor(each(and([isCreature, youControl]))),
-          block(counted(additional(exactly(1)), isCreature)),
+          block(attacker = counted(additional(exactly(1)), isCreature)),
           timing = eachCombat))]})

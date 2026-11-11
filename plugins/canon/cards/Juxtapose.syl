@@ -8,7 +8,8 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             exchangeControl(
               the(
                 and([

@@ -6,9 +6,9 @@ card singleFaced({
     text = [
       at(
         beginningOfYour(endStep),
+        putCounters(1, printedKind(p1p1Counter), thisCreature),
         if = was(
           putInto(a(or([isArtifact, isCreature])), graveyard, from = battlefield),
-          within(soFarThisTurn)),
-        action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
+          within(soFarThisTurn)))],
     power = 2,
     toughness = 3})

@@ -3,5 +3,10 @@
 ability forecast(ability: Ability) {
   lexical = {lemma = "forecast", parameters = [[DashAbility]]},
   spelling = "forecast — <ability>",
-  body = [qualified($ability, duringPart(upkeep, ownerOf(this)), oncePerTurn, from = hand)]
+  body = [
+    qualified(
+      $ability,
+      timing = duringPart(upkeep, whose = ownerOf(this)),
+      limit = oncePerTurn,
+      from = hand)]
 }

@@ -8,6 +8,6 @@ card singleFaced({
         does(actor(thisCreature), enter),
         may(
           chooseOne(sacrifice(a(isCreature)), discard(a(and([isCreature, in(yourHand)])))),
-          draw(1)))],
+          ifDid = draw(1)))],
     power = 3,
     toughness = 4})

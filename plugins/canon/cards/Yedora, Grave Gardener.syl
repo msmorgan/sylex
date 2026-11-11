@@ -8,10 +8,11 @@ card singleFaced({
       whenever(
         does(actor(a(and([isNontoken, and([isCreature, youControl]), isOther]))), die),
         may(
-          sequentially([
+          sequentially(
+            steps = [
               returnToBattlefield(
                 it,
-                [
+                riders = [
                   faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
                   under(ownerOf(it))])])))],
     power = 5,

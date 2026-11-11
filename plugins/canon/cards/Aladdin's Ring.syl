@@ -4,5 +4,5 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([mana([generic(8)]), tapSymbol]),
-        instruct(thisArtifact, dealDamage(4, target(isAnyTarget))))]})
+        compound(costs = [mana([generic(8)]), tapSymbol]),
+        instruct(thisArtifact, dealDamage(amount = 4, recipient = target(isAnyTarget))))]})

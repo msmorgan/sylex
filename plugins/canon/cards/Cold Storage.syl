@@ -8,4 +8,4 @@ card singleFaced({
         perform(sacrifice(thisArtifact)),
         returnToBattlefield(
           each(and([isCreature, cardIn(exiledWith(thisArtifact))])),
-          [under(you)]))]})
+          riders = [under(you)]))]})

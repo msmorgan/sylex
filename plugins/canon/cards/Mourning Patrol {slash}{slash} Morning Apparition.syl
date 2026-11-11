@@ -1,5 +1,4 @@
-card transforming(
-  front = {
+card transforming({
     name = "Mourning Patrol",
     cost = [generic(2), pip(white)],
     types = [creature],
@@ -7,7 +6,7 @@ card transforming(
     text = [vigilance, disturb(mana([generic(3), pip(white)]))],
     power = 2,
     toughness = 3},
-  back = {
+  {
     name = "Morning Apparition",
     colors = [white],
     types = [creature],

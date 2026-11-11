@@ -14,7 +14,7 @@ card singleFaced({
                 and([isCreature, youControl, hasKeyword(thatKeyword)])),
               untilEndOfTurn),
             exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
-        [
+        keywords = [
           theKeyword(flying),
           theKeyword(fear),
           theKeyword(firstStrike),

@@ -9,7 +9,13 @@ card singleFaced({
         chooseModes(
           upTo(2),
           [
-            mode(none, none, returnToHand(target(and([isArtifact, isCard])), yourGraveyard)),
-            mode(none, none, returnToHand(target(and([isCreature, isCard])), yourGraveyard)),
-            mode(none, none, returnToHand(target(and([isEnchantment, isCard])), yourGraveyard)),
-            mode(none, none, returnToHand(target(and([isLand, isCard])), yourGraveyard))]))]})
+            mode(none, none, returnToHand(target(and([isArtifact, isCard])), from = yourGraveyard)),
+            mode(none, none, returnToHand(target(and([isCreature, isCard])), from = yourGraveyard)),
+            mode(
+              none,
+              none,
+              returnToHand(target(and([isEnchantment, isCard])), from = yourGraveyard)),
+            mode(
+              none,
+              none,
+              returnToHand(target(and([isLand, isCard])), from = yourGraveyard))]))]})

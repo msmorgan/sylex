@@ -4,5 +4,5 @@
 # [CR#113.2c,613.1f]
 template abilityGrant(subject: NounPhrase, abilities: List(Ability)): StaticSpec {
   spelling = "<subject> has <abilities>",
-  body = characteristicChange($subject, [addedAbilities($abilities)])
+  body = characteristicChange($subject, edits = [addedAbilities($abilities)])
 }

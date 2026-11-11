@@ -5,13 +5,26 @@ card singleFaced({
     text = [
       cumulativeUpkeep(mana([generic(2)])),
       when(
-        does(actor(a(isPlayer)), pay(anyCost, once, unpaid, thisEnchantment, cumulativeUpkeep)),
-        sequentially([
-            simultaneously([
-                instruct(this, dealDamage(letter(x), target(or([isPlaneswalker, isPlayer])))),
+        does(
+          actor(a(isPlayer)),
+          pay(
+            anyCost,
+            once,
+            outcome = unpaid,
+            whose = thisEnchantment,
+            keyword = cumulativeUpkeep)),
+        sequentially(
+          steps = [
+            simultaneously(
+              steps = [
                 instruct(
                   this,
                   dealDamage(
-                    letter(x),
-                    each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
+                    amount = letter(x),
+                    recipient = target(or([isPlaneswalker, isPlayer])))),
+                instruct(
+                  this,
+                  dealDamage(
+                    amount = letter(x),
+                    recipient = each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
             define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]})

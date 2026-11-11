@@ -28,7 +28,7 @@ ability enchant(subject: Predicate) {
         would(any, move(thisAura, not(stack), battlefield, [not(attachedTo(any))])),
         doIf(
           exists(legalHostOf(thisAura)),
-          before(choose(a(legalHostOf(thisAura))), alongside(attachTo(thisAura, it)))))),
+          before(choose(a(legalHostOf(thisAura))), body = alongside(attachTo(thisAura, it)))))),
     static(
       replace(
         would(

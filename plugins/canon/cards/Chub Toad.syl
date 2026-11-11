@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         or([does(actor(thisCreature), block), does(any, becomeBlocked(thisCreature))]),
-        action = get(it, up(2), up(2), untilEndOfTurn))],
+        get(it, up(2), up(2), duration = untilEndOfTurn))],
     power = 1,
     toughness = 1})

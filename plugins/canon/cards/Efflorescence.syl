@@ -8,4 +8,4 @@ card singleFaced({
         spell(
           doIf(
             did(actor(you), gainLife(anyAmount), within(soFarThisTurn)),
-            gain(that(creature), [trample, indestructible], untilEndOfTurn))))]})
+            gain(that(creature), [trample, indestructible], duration = untilEndOfTurn))))]})

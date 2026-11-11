@@ -24,10 +24,11 @@ card_type creature {
         any,
         activate(allOf(and([abilityHead(anyActivated), abilityOf(this), tapOrUntapInCost]))),
         unless = controlledSinceTheirTurnBegan(this))),
-    damageResult(markDamage(this, thatMuch)),
+    damageResult(markDamage(this, amount = thatMuch)),
     stateBased(compareAmt(toughnessOf(this), atMost, 0), putInto(this, graveyard)),
     stateBased(
-      and([
+      and(
+        conjuncts = [
           compareAmt(toughnessOf(this), greater, 0),
           compareAmt(statOf(markedDamage, this), greater, 0),
           compareAmt(statOf(markedDamage, this), atLeast, toughnessOf(this))]),

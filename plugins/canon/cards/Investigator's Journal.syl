@@ -10,9 +10,12 @@ card singleFaced({
           aggregateOver(max, isPlayer, countOf(and([isCreature, controlledBy(they)]))),
           suspectCounter)),
       activated(
-        compound([
+        compound(
+          costs = [
             mana([generic(2)]),
             tapSymbol,
             perform(removeCounters(exactly(1), printedKind(suspectCounter), thisArtifact))]),
         draw(1)),
-      activated(compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]), draw(1))]})
+      activated(
+        compound(costs = [mana([generic(2)]), perform(sacrifice(thisArtifact))]),
+        draw(1))]})

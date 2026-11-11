@@ -8,4 +8,4 @@ card singleFaced({
           allOf(and([isCreature, ofYourChoice(subtype(creature))])),
           up(0),
           up(4),
-          untilEndOfTurn))]})
+          duration = untilEndOfTurn))]})

@@ -4,7 +4,8 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             reveal(topSlice(5)),
             separateIntoPiles(them, 2),
             instruct(anOpponent, choose(onePile)),

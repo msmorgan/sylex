@@ -4,10 +4,11 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             doForEachKind(
               value(power),
-              allOf(isCreature),
+              domain = allOf(isCreature),
               number,
               choose(a(and([isCreature, hasPower(equal, chosenNumber)])))),
             destroy(each(and([isCreature, notChosen])))]))]})

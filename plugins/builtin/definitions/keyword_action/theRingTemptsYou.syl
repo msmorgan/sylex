@@ -4,7 +4,8 @@
 action theRingTemptsYou {
   lexical = {verbs = [{lemma = "tempt", frames = [Monotransitive]}], nouns = ["Ring"]},
   spelling = "The Ring tempts you",
-  body = sequentially([
+  body = sequentially(
+    steps = [
       doIf(
         not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy(actor)]))),
         getNamedEmblem(
@@ -13,7 +14,7 @@ action theRingTemptsYou {
             static(
               characteristicChange(
                 allOf(and([hasDesignation(ringBearer), youControl])),
-                [typeLine(adds, {supertypes = [legendary]})])),
+                edits = [typeLine(adds, {supertypes = [legendary]})])),
             static(
               cant(
                 by(
@@ -23,14 +24,15 @@ action theRingTemptsYou {
                         hasPower(
                           greater,
                           powerOf(a(and([hasDesignation(ringBearer), youControl]))))]))),
-                block(allOf(and([hasDesignation(ringBearer), youControl]))))),
+                block(attacker = allOf(and([hasDesignation(ringBearer), youControl]))))),
             static(
               asLongAs(
                 compareAmt(
                   eventCount(
                     ownScope(
                       theRingTemptsYou,
-                      sequentially([
+                      sequentially(
+                        steps = [
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     actor(you),
@@ -42,14 +44,15 @@ action theRingTemptsYou {
                   [
                     whenever(
                       does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                      sequentially([draw(1), discard(a(cardIn(hand)))]))]))),
+                      sequentially(steps = [draw(1), discard(a(cardIn(hand)))]))]))),
             static(
               asLongAs(
                 compareAmt(
                   eventCount(
                     ownScope(
                       theRingTemptsYou,
-                      sequentially([
+                      sequentially(
+                        steps = [
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     actor(you),
@@ -62,7 +65,7 @@ action theRingTemptsYou {
                     whenever(
                       does(
                         by(a(isCreature)),
-                        block(a(and([hasDesignation(ringBearer), youControl])))),
+                        block(attacker = a(and([hasDesignation(ringBearer), youControl])))),
                       atNext(endOfCombat, controllerSacrifices(that(creature))))]))),
             static(
               asLongAs(
@@ -70,7 +73,8 @@ action theRingTemptsYou {
                   eventCount(
                     ownScope(
                       theRingTemptsYou,
-                      sequentially([
+                      sequentially(
+                        steps = [
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     actor(you),

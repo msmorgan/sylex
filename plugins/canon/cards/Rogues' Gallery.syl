@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         doForEachKind(
           color,
-          sort = color,
-          body = returnToHand(
+          color,
+          returnToHand(
             targets(upTo(1), and([isCreature, ofChosen(color), in(yourGraveyard)])),
-            yourGraveyard)))]})
+            from = yourGraveyard)))]})

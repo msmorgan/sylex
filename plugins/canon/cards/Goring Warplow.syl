@@ -1,5 +1,4 @@
-card prototype(
-  inner = {
+card prototype({
     name = "Goring Warplow",
     cost = [generic(6)],
     types = [artifact, creature],
@@ -7,4 +6,4 @@ card prototype(
     text = [prototype, deathtouch],
     power = 5,
     toughness = 4},
-  alternative = {cost = [generic(1), pip(black)], power = 1, toughness = 1})
+  {cost = [generic(1), pip(black)], power = 1, toughness = 1})

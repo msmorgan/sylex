@@ -6,5 +6,5 @@ ability skulk {
     static(
       cant(
         by(allOf(and([isCreature, hasPower(greater, powerOf(thisCreature))]))),
-        block(thisCreature)))]
+        block(attacker = thisCreature)))]
 }

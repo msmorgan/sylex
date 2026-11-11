@@ -4,14 +4,14 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([mana([generic(2)]), tapSymbol]),
+        compound(costs = [mana([generic(2)]), tapSymbol]),
         establish(
           qualityChange(
             target(and([isLand, hasSupertype(snow)])),
             loses,
             bundle({characteristics = {supertypes = [snow]}})))),
       activated(
-        compound([mana([generic(2)]), tapSymbol]),
+        compound(costs = [mana([generic(2)]), tapSymbol]),
         establish(
           qualityChange(
             target(and([isLand, hasSupertype(basic), not(hasSupertype(snow))])),

@@ -4,14 +4,15 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             establishFor(
               target(isCreature),
               [
                 abilityGrant(it, [trample]),
                 getsPt(it, up(letter(x)), up(0)),
                 letterDefinition(x, powerOf(it))],
-              untilEndOfTurn),
+              duration = untilEndOfTurn),
             atNext(
               beginningOfNext(endStep),
               doOnlyIf(

@@ -2,8 +2,8 @@
 //!
 //! A temporary validator that guards `.syl` until the Rust resolution layer
 //! (step 7 of the semantics-v3 plan) replaces it. It checks names, sorts and
-//! arity only, following `docs/decisions/syl.md` §3; it expands nothing and
-//! reads no meaning.
+//! argument binding only, following `docs/decisions/syl.md` §2 and §3; it
+//! expands nothing and reads no meaning.
 //!
 //! [`check`] first runs [`sylex_syl::check()`] (constructor clauses, and words
 //! that name no declaration at any sort), then resolves every value at its
@@ -14,6 +14,7 @@
 //! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3).
 //! The coercions are declared in `.syl`; [`coercion`] reads and checks them.
 
+mod call;
 mod coercion;
 mod cycles;
 mod refusal;
@@ -30,7 +31,6 @@ use std::sync::Arc;
 
 use clap::Args;
 use sylex_syl::Bundle;
-use sylex_syl::Call;
 use sylex_syl::Declaration;
 use sylex_syl::FileId;
 use sylex_syl::Item;
@@ -116,6 +116,8 @@ struct Slot {
     name: String,
     sort: SortKey,
     optional: bool,
+    /// A parameter's declared default; `None` for a field.
+    default: Option<Value>,
 }
 
 /// What a word resolves to at one sort.
@@ -325,6 +327,7 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
             name: param_name.to_owned(),
             sort: sort_key(&param.sort)?,
             optional: param.default.is_some(),
+            default: param.default.clone(),
         });
     }
     Ok(decl(name.map(str::to_owned), sort, params))
@@ -557,6 +560,7 @@ impl Resolver<'_> {
                 name: spec.name.to_owned(),
                 sort: spec.sort.map_or_else(|| decl.sort.clone(), SortKey::table),
                 optional: !spec.required,
+                default: None,
             })
             .collect();
         self.fields(block, &slots, &at);
@@ -617,6 +621,7 @@ impl Resolver<'_> {
                 name: (*name).to_owned(),
                 sort: SortKey::table(sort),
                 optional: *optional,
+                default: None,
             })
             .collect();
         self.fields(record, &slots, spec.sort);
@@ -771,66 +776,6 @@ impl Resolver<'_> {
                     expected: expected.to_string(),
                 },
             ),
-        }
-    }
-
-    /// Binds a call's arguments in written order: a named argument binds its
-    /// parameter, a positional one the first parameter not yet bound.
-    fn call(&mut self, call: &Call, signature: &Signature) {
-        let word = call.head.ident.as_str();
-        // Temporary: `syl-ring-tempts-you-raw-scope` deletes this exception.
-        if signature.ring_only && !self.ring {
-            let reserved = schema::RING_EXCEPTION.1.to_owned();
-            self.refuse(call.head.span, RefusalKind::ReservedConstructor(reserved));
-        }
-        self.edges.extend(signature.node);
-        let mut bound: Vec<&str> = Vec::new();
-        for arg in call.args.iter().filter_map(Item::node) {
-            let param = if let Some(name) = arg.name {
-                signature
-                    .params
-                    .iter()
-                    .find(|p| p.name == name.ident.as_str())
-            } else {
-                signature
-                    .params
-                    .iter()
-                    .find(|p| !bound.contains(&p.name.as_str()))
-            };
-            let Some(param) = param else {
-                let kind = match arg.name {
-                    Some(name) => RefusalKind::UnknownArgument {
-                        word: word.to_owned(),
-                        argument: name.ident.as_str().to_owned(),
-                    },
-                    None => RefusalKind::TooManyArguments(word.to_owned()),
-                };
-                self.refuse(arg.name.map_or(arg.span, |name| name.span), kind);
-                continue;
-            };
-            if bound.contains(&param.name.as_str()) {
-                self.refuse(
-                    arg.span,
-                    RefusalKind::DuplicateArgument {
-                        word: word.to_owned(),
-                        argument: param.name.clone(),
-                    },
-                );
-                continue;
-            }
-            bound.push(&param.name);
-            self.value(&arg.value, &param.sort);
-        }
-        for param in &signature.params {
-            if !param.optional && !bound.contains(&param.name.as_str()) {
-                self.refuse(
-                    call.span,
-                    RefusalKind::MissingArgument {
-                        word: word.to_owned(),
-                        argument: param.name.clone(),
-                    },
-                );
-            }
         }
     }
 }

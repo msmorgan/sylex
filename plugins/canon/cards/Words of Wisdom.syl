@@ -2,4 +2,4 @@ card singleFaced({
     name = "Words of Wisdom",
     cost = [generic(1), pip(blue)],
     types = [instant],
-    text = [spell(sequentially([draw(2), instruct(each(isOtherPlayer), draw(1))]))]})
+    text = [spell(sequentially(steps = [draw(2), instruct(each(isOtherPlayer), draw(1))]))]})

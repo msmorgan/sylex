@@ -4,8 +4,9 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             putCounters(1, printedKind(p1p1Counter), target(and([isCreature, youControl]))),
             establishThroughout(
-              must(actor(target(and([isCreature, isOther]))), block(it)),
+              must(actor(target(and([isCreature, isOther]))), block(attacker = it)),
               thisTurn)]))]})

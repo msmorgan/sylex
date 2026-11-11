@@ -11,5 +11,5 @@ token powerstoneToken {
           tapSymbol,
           addMana(
             symbols([colorlessPip]),
-            [cantSpendOn([toCast(and([non(isArtifact), isSpell]))])]))]}}
+            riders = [cantSpendOn([toCast(and([non(isArtifact), isSpell]))])]))]}}
 }

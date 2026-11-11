@@ -10,5 +10,5 @@ card singleFaced({
           nthOccurrence(
             nth(1),
             would(by(you), createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []))),
-            turn),
+            per = turn),
           instead(may(create(groupSize, copyOf(enchanted(permanent)))))))]})

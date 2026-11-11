@@ -17,5 +17,5 @@ card singleFaced({
                 text = [flying],
                 power = 2,
                 toughness = 2}},
-            land))),
+            retained = land))),
       when(does(actor(enchanted(land)), die), returnToHand(that(card)))]})

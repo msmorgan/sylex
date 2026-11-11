@@ -17,11 +17,15 @@ ability impending(amount: Amount, cost: Cost) {
     static(
       asLongAs(
         and(
-          [keywordCostPaid(impending, thisPermanent), is(thisPermanent, hasCounter(timeCounter))]),
-        characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]))),
+          conjuncts = [
+            keywordCostPaid(impending, thisPermanent),
+            is(thisPermanent, hasCounter(kind = timeCounter))]),
+        characteristicChange(thisPermanent, edits = [typeLine(loses, {types = [creature]})]))),
     at(
       beginningOfYour(endStep),
       removeCounters(oneThrough(1), printedKind(timeCounter), thisPermanent),
       if = and(
-        [keywordCostPaid(impending, thisPermanent), is(thisPermanent, hasCounter(timeCounter))]))]
+        conjuncts = [
+          keywordCostPaid(impending, thisPermanent),
+          is(thisPermanent, hasCounter(kind = timeCounter))]))]
 }

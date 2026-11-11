@@ -8,6 +8,6 @@ card singleFaced({
         tapSymbol,
         addMana(
           symbols([pip(blue)]),
-          [spendOnly([toPay(ofKeyword(disturb)), toCast(isInstantOrSorcery)])]))],
+          riders = [spendOnly([toPay(ofKeyword(disturb)), toCast(isInstantOrSorcery)])]))],
     power = 2,
     toughness = 1})

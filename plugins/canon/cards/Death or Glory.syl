@@ -4,7 +4,8 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             separateIntoPiles(allOf(and([isCreature, in(yourGraveyard)])), 2),
             exile(pileOfChoice(anOpponent)),
             returnToBattlefield(theOther)]))]})

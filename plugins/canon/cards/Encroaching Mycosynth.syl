@@ -5,7 +5,8 @@ card singleFaced({
     text = [
       static(
         qualityChange(
-          and([
+          and(
+            phrases = [
               allOf(and([isPermanent, non(isLand), youControl])),
               allOf(
                 and([

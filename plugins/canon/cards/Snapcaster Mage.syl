@@ -10,6 +10,6 @@ card singleFaced({
         gain(
           target(and([isInstantOrSorcery, cardIn(yourGraveyard)])),
           [flashback(itsManaCost)],
-          untilEndOfTurn))],
+          duration = untilEndOfTurn))],
     power = 2,
     toughness = 1})

@@ -6,9 +6,10 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), die),
-        if = not(is(it, hasSubtype(demon))),
-        action = sequentially([
+        sequentially(
+          steps = [
             returnToBattlefieldWithCounters(it, ownerOf(it), 2, p1p1Counter),
-            become(it, {characteristics = {subtypes = [demon]}})]))],
+            become(it, {characteristics = {subtypes = [demon]}})]),
+        if = not(is(it, hasSubtype(demon))))],
     power = 2,
     toughness = 1})

@@ -4,7 +4,8 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(a(qualityFrom(subtype(creature), typeOtherThan(wall)))),
             establishThroughout(
               qualityChange(each(isCreature), sets, chosenQuality(ofChosen(subtype(creature)))),

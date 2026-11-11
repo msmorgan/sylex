@@ -4,10 +4,11 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             search(
               yourLibrary,
-              a(
+              for = a(
                 and([
                     isPermanentCard,
                     shares(cardName, share, target(and([isCreature, isNontoken])))]))),

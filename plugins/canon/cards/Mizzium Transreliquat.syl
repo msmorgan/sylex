@@ -8,4 +8,5 @@ card singleFaced({
         establishThroughout(copyChange(thisArtifact, target(isArtifact)), untilEndOfTurn)),
       activated(
         mana([generic(1), pip(blue), pip(red)]),
-        establish(copyChange(thisArtifact, target(isArtifact), [exceptThisAbility])))]})
+        establish(
+          copyChange(thisArtifact, target(isArtifact), exceptions = [exceptThisAbility])))]})

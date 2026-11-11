@@ -3,5 +3,6 @@
 # [CR#304.1]
 template castableFrom(zone: Location, timing: Timing): Conferral {
   spelling = "You may cast this card from <zone> <timing>",
-  body = property(can(actor(you), procedure(cast, this, itsOwnCost, from = $zone), $timing))
+  body = property(
+    can(actor(you), procedure(cast, this, itsOwnCost, from = $zone), timing = $timing))
 }

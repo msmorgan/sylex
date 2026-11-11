@@ -1,27 +1,27 @@
-card flip(
-  normal = {
+card flip({
     name = "Orochi Eggwatcher",
     cost = [generic(2), pip(green)],
     types = [creature],
     subtypes = [snake, shaman],
     text = [
       activated(
-        compound([mana([generic(2), pip(green)]), tapSymbol]),
-        sequentially([
+        compound(costs = [mana([generic(2), pip(green)]), tapSymbol]),
+        sequentially(
+          steps = [
             create(1, written(creatureToken(1, 1, [green], [snake]))),
             doIf(
               compareAmt(countOf(and([isCreature, youControl])), atLeast, 10),
               flip(thisCreature))]))],
     power = 1,
     toughness = 1},
-  alternative = {
+  {
     name = "Shidako, Broodmistress",
     supertypes = [legendary],
     types = [creature],
     subtypes = [snake, shaman],
     text = [
       activated(
-        compound([mana([pip(green)]), perform(sacrifice(a(isCreature)))]),
-        get(target(isCreature), up(3), up(3), untilEndOfTurn))],
+        compound(costs = [mana([pip(green)]), perform(sacrifice(a(isCreature)))]),
+        get(target(isCreature), up(3), up(3), duration = untilEndOfTurn))],
     power = 3,
     toughness = 3})

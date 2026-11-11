@@ -8,7 +8,8 @@ card singleFaced({
       static(cant(actor(yourOpponents), cast(bare(and([isSpell, named(chosenName)]))))),
       static(
         costShift(
-          allOf(and([isSpell, named(chosenName), did(actor(you), cast(which), thisObject)])),
+          allOf(
+            and([isSpell, named(chosenName), did(actor(you), cast(which), within = thisObject)])),
           less(2)))],
     power = 2,
     toughness = 4})

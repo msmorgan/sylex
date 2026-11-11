@@ -24,6 +24,8 @@ use super::sort::SortKey;
 pub(super) struct Coercion {
     pub(super) from: SortKey,
     pub(super) to: SortKey,
+    /// The primitive its body applies to the parameter.
+    pub(super) wrap: String,
     /// The coercion's node in the dependency graph.
     pub(super) node: usize,
     pub(super) span: Span,
@@ -141,7 +143,7 @@ fn read(
     }
     // The resolver refuses a missing `body`, a required field.
     let body = decl.field("body")?;
-    let wraps = match &body.kind {
+    let wrap = match &body.kind {
         ValueKind::Call(call) => {
             let head = call.head.ident.as_str();
             let primitive = decls.iter().any(|other| {
@@ -156,24 +158,25 @@ fn read(
                 }
                 (None | Some(_), _) => false,
             };
-            primitive && reads_param
+            (primitive && reads_param).then(|| head.to_owned())
         }
         ValueKind::String(_)
         | ValueKind::Integer(_)
         | ValueKind::List(_)
         | ValueKind::Record(_)
-        | ValueKind::Parameter(_) => false,
+        | ValueKind::Parameter(_) => None,
     };
-    if !wraps {
+    let Some(wrap) = wrap else {
         refusals.push(Refusal {
             span: body.span,
             kind: RefusalKind::CoercionBody(decl.sort.to_string()),
         });
         return None;
-    }
+    };
     Some(Coercion {
         from: param.sort.clone(),
         to: decl.sort.clone(),
+        wrap,
         node: index,
         span,
     })

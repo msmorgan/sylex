@@ -16,6 +16,8 @@ ability crew(amount: Amount) {
             $amount,
             allOf(and([isUntapped, and([isCreature, youControl, isOther])]))))),
       establishThroughout(
-        characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})]),
+        characteristicChange(
+          thisPermanent,
+          edits = [typeLine(adds, {types = [artifact, creature]})]),
         untilEndOfTurn))]
 }

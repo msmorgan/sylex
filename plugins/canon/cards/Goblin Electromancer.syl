@@ -6,7 +6,8 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), thisObject)])),
+          allOf(
+            and([isInstantOrSorcery, isSpell, did(actor(you), cast(which), within = thisObject)])),
           less(1)))],
     power = 2,
     toughness = 2})

@@ -9,7 +9,8 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        sequentially([
+        sequentially(
+          steps = [
             gainDesignation(target(isOpponent), monarch),
             establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
       static(

@@ -7,7 +7,7 @@ card singleFaced({
       flavorWord("Targeting Relay", at(beginningOfYour(combat), choose(anOpponent))),
       static(
         abilityGrant(
-          allOf(and([isCreature, inCombat(attackerOf, the(isChosenPlayer))])),
+          allOf(and([isCreature, inCombat(attackerOf, counterpart = the(isChosenPlayer))])),
           [menace]))],
     power = 4,
     toughness = 5})

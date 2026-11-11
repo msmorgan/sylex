@@ -4,6 +4,7 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
-            instruct(this, dealDamage(letter(x), each(isCreature))),
+        sequentially(
+          steps = [
+            instruct(this, dealDamage(amount = letter(x), recipient = each(isCreature))),
             define(x, countOf(isCreature))]))]})

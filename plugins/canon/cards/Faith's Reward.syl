@@ -11,4 +11,4 @@ card singleFaced({
                 in(yourGraveyard),
                 was(
                   putInto(which, yourGraveyard, from = battlefield),
-                  within(soFarThisTurn))]))))]})
+                  within = within(soFarThisTurn))]))))]})

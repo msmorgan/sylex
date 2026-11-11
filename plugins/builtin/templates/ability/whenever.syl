@@ -5,5 +5,5 @@ template whenever(
   limit: Option(UsageLimit) = none,
   if: Option(Condition) = none): Ability {
   # TODO(spelling): Include or omit the clauses supplied by limit and if.
-  body = triggered(whenever($event), $if, $action, $limit)
+  body = triggered(whenever($event), intervening = $if, $action, limit = $limit)
 }

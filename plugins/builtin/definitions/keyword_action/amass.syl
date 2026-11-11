@@ -3,7 +3,8 @@
 action amass(subtype: Subtype, count: Amount) {
   spelling = "amass <subtype> <count>",
   lexical = {verbs = [{lemma = "amass", frames = [TransitiveAmount, Monotransitive]}]},
-  body = sequentially([
+  body = sequentially(
+    steps = [
       doIf(
         not(exists(and([hasSubtype(army), isCreature, actorControls]))),
         create(1, written(creatureToken(0, 0, [black], [$subtype, army])))),

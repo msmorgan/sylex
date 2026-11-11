@@ -5,7 +5,8 @@ card singleFaced({
     subtypes = [arcane],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             reveal(topSlice(3)),
             instruct(anOpponent, choose(someOf(exactly(1), them))),
             putInto(that(card), graveyard),

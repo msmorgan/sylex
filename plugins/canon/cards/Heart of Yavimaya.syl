@@ -8,7 +8,7 @@ card singleFaced({
           instead(
             doIfDone(
               sacrifice(a(and([isLand, hasSubtype(forest)]))),
-              putOntoBattlefield(thisLand),
-              putInto(it, graveyard))))),
+              ifDid = putOntoBattlefield(thisLand),
+              ifNot = putInto(it, graveyard))))),
       activated(tapSymbol, addMana(symbols([pip(green)]))),
-      activated(tapSymbol, get(target(isCreature), up(1), up(1), untilEndOfTurn))]})
+      activated(tapSymbol, get(target(isCreature), up(1), up(1), duration = untilEndOfTurn))]})

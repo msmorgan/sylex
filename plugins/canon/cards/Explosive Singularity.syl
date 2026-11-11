@@ -10,4 +10,4 @@ card singleFaced({
           plusAdditional(
             perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped]))))))),
       static(costShift(this, less(times(1, groupSize)))),
-      spell(instruct(this, dealDamage(10, target(isAnyTarget))))]})
+      spell(instruct(this, dealDamage(amount = 10, recipient = target(isAnyTarget))))]})

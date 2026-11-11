@@ -7,6 +7,10 @@ card singleFaced({
       partnerWith(named(printedName("Blaring Recruiter"))),
       whenever(
         does(actor(thisCreature), attack),
-        get(allOf(and([hasSubtype(warrior), isAttacking])), up(1), up(1), untilEndOfTurn))],
+        get(
+          allOf(and([hasSubtype(warrior), isAttacking])),
+          up(1),
+          up(1),
+          duration = untilEndOfTurn))],
     power = 2,
     toughness = 2})

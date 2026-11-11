@@ -12,7 +12,8 @@ card singleFaced({
       vigilance,
       whenever(
         or([does(actor(thisCreature), attack), does(actor(thisCreature), block)]),
-        action = sequentially([
+        sequentially(
+          steps = [
             may(attachTo(counted(anyNumber, and([hasSubtype(aura), in(battlefield)])), it)),
             may(
               putOntoBattlefieldAttachedTo(

@@ -10,6 +10,8 @@ card singleFaced({
           1,
           p1p1Counter)),
       static(
-        abilityGrant(each(and([isCreature, youControl, hasCounter(p1p1Counter)])), [trample]))],
+        abilityGrant(
+          each(and([isCreature, youControl, hasCounter(kind = p1p1Counter)])),
+          [trample]))],
     power = 2,
     toughness = 2})

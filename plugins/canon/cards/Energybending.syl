@@ -5,7 +5,8 @@ card singleFaced({
     subtypes = [lesson],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             establishThroughout(
               qualityChange(allOf(and([isLand, youControl])), adds, everyTypeOf(basicLand)),
               untilEndOfTurn),

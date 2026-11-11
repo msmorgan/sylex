@@ -6,7 +6,8 @@ ability livingWeapon {
   body = [
     when(
       does(actor(thisEquipment), enter),
-      sequentially([
+      sequentially(
+        steps = [
           create(1, written(creatureToken(0, 0, [black], [phyrexian, germ]))),
           attachTo(thisEquipment, thatToken)]))]
 }

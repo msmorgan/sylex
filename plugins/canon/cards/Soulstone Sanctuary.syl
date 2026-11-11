@@ -16,4 +16,4 @@ card singleFaced({
                   power = 3,
                   toughness = 3},
                 qualities = [withEveryType(creature)]},
-              land))))]})
+              retained = land))))]})

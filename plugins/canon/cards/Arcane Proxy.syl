@@ -1,5 +1,4 @@
-card prototype(
-  inner = {
+card prototype({
     name = "Arcane Proxy",
     cost = [generic(7)],
     types = [artifact, creature],
@@ -8,8 +7,8 @@ card prototype(
       prototype,
       when(
         does(actor(thisCreature), enter),
-        if = is(it, did(actor(you), cast(which), thisObject)),
-        action = sequentially([
+        sequentially(
+          steps = [
             exile(
               target(
                 and([
@@ -18,7 +17,8 @@ card prototype(
                     hasManaValue(atMost, powerOf(thisCreature)),
                     in(yourGraveyard)]))),
             copy(fromCardZone, that(card), 1, []),
-            may(cast(that(copy), altCost = withoutPaying))]))],
+            may(cast(that(copy), altCost = withoutPaying))]),
+        if = is(it, did(actor(you), cast(which), within = thisObject)))],
     power = 4,
     toughness = 3},
-  alternative = {cost = [generic(1), pip(blue), pip(blue)], power = 2, toughness = 1})
+  {cost = [generic(1), pip(blue), pip(blue)], power = 2, toughness = 1})

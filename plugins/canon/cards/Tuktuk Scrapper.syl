@@ -12,14 +12,15 @@ card singleFaced({
     text = [
       whenever(
         does(actor(eitherOf(thisCreature, a(and([hasSubtype(ally), youControl, isOther])))), enter),
-        sequentially([
+        sequentially(
+          steps = [
             may(destroy(target(isArtifact))),
             doIf(
               did(actor(that(artifact)), putInto(actor, graveyard), thisWay),
               instruct(
                 thisCreature,
                 dealDamage(
-                  countOf(and([hasSubtype(ally), youControl])),
-                  controllerOf(that(artifact)))))]))],
+                  amount = countOf(and([hasSubtype(ally), youControl])),
+                  recipient = controllerOf(that(artifact)))))]))],
     power = 2,
     toughness = 2})

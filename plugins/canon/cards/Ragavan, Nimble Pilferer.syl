@@ -9,7 +9,8 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
-        sequentially([
+        sequentially(
+          steps = [
             create(1, defined(treasureToken)),
             exile(slice(top, 1, libraryOf(that(player)))),
             establishThroughout(can(actor(you), cast(that(card))), untilEndOfTurn)])),

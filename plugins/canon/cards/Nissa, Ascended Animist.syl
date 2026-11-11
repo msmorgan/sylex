@@ -8,7 +8,8 @@ card singleFaced({
       compleated,
       activated(
         loyaltySymbol(up(1)),
-        sequentially([
+        sequentially(
+          steps = [
             create(1, written(creatureTokenOf(letter(x), letter(x), [green], [phyrexian, horror]))),
             define(x, statOf(stat(loyalty), thisPlaneswalker))])),
       activated(loyaltySymbol(down(1)), destroy(target(or([isArtifact, isEnchantment])))),
@@ -19,5 +20,5 @@ card singleFaced({
           [
             getsBoth(them, up(forEach(1, and([hasSubtype(forest), youControl])))),
             abilityGrant(them, [trample])],
-          untilEndOfTurn))],
+          duration = untilEndOfTurn))],
     loyalty = 7})

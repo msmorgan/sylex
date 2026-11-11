@@ -13,10 +13,11 @@ card singleFaced({
                   did(
                     actor(thisCreature),
                     dealDamage(recipient = which),
-                    within(soFarThisTurn))]))),
+                    within = within(soFarThisTurn))]))),
           die),
-        sequentially([
-            returnToBattlefield(it, [under(you)]),
+        sequentially(
+          steps = [
+            returnToBattlefield(it, riders = [under(you)]),
             become(that(creature), {characteristics = {colors = [black], subtypes = [zombie]}})]))],
     power = 3,
     toughness = 5})

@@ -6,4 +6,4 @@ card singleFaced({
         tapSymbol,
         addMana(
           symbols([colorlessPip, colorlessPip, colorlessPip]),
-          [spendOnly([toCast(and([isArtifact, isSpell]))])]))]})
+          riders = [spendOnly([toCast(and([isArtifact, isSpell]))])]))]})

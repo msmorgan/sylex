@@ -7,6 +7,6 @@ ability dethrone {
     whenever(
       does(
         actor(thisCreature),
-        attack(a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
+        attack(defender = a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
       putCounters(1, printedKind(p1p1Counter), thisCreature))]
 }

@@ -9,7 +9,7 @@ ability sunburst {
   body = [
     static(
       replace(
-        would(actor(thisPermanent), enter(stack)),
+        would(actor(thisPermanent), enter(from = stack)),
         doIf(
           coloredManaSpentToCast(thisSpell),
           doIf(

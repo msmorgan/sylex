@@ -7,5 +7,7 @@ template gain(
   subject: NounPhrase,
   abilities: List(Ability),
   duration: Option(Duration) = none): Action {
-  body = establish(characteristicChange($subject, [addedAbilities($abilities)]), $duration)
+  body = establish(
+    characteristicChange($subject, edits = [addedAbilities($abilities)]),
+    duration = $duration)
 }

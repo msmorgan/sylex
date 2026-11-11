@@ -8,4 +8,4 @@ card singleFaced({
           would(
             actor(a(and([isCreature, youControl]))),
             dealDamage(recipient = a(or([isPermanent, isPlayer])))),
-          instead(instruct(it, dealDamage(times(2, thatMuch))))))]})
+          instead(instruct(it, dealDamage(amount = times(2, thatMuch))))))]})

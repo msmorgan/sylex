@@ -4,7 +4,8 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             destroy(allOf(isCreature)),
             create(
               1,
@@ -14,4 +15,4 @@ card singleFaced({
                     subtypes = [phyrexian, horror],
                     power = letter(x),
                     toughness = letter(x)}})),
-            define(x, countOf(and([isCreature, was(destroy(which), thisWay)])))]))]})
+            define(x, countOf(and([isCreature, was(destroy(which), within = thisWay)])))]))]})

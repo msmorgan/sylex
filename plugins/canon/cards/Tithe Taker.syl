@@ -10,13 +10,13 @@ card singleFaced({
           you,
           conjunction([
               costShift(
-                allOf(and([isSpell, did(actor(yourOpponents), cast(which), thisObject)])),
+                allOf(and([isSpell, did(actor(yourOpponents), cast(which), within = thisObject)])),
                 more(1)),
               costShift(
                 allOf(
                   and([
                       abilityHead(anyActivated),
-                      did(actor(yourOpponents), activate(which), thisObject),
+                      did(actor(yourOpponents), activate(which), within = thisObject),
                       not(isManaAbility)])),
                 more(1))]))),
       afterlife(1)],

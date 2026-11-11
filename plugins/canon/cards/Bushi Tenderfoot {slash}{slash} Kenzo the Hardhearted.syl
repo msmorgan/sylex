@@ -1,5 +1,4 @@
-card flip(
-  normal = {
+card flip({
     name = "Bushi Tenderfoot",
     cost = [pip(white)],
     types = [creature],
@@ -14,12 +13,12 @@ card flip(
                   did(
                     actor(thisCreature),
                     dealDamage(recipient = which),
-                    within(soFarThisTurn))]))),
+                    within = within(soFarThisTurn))]))),
           die),
         flip(thisCreature))],
     power = 1,
     toughness = 1},
-  alternative = {
+  {
     name = "Kenzo the Hardhearted",
     supertypes = [legendary],
     types = [creature],

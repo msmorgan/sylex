@@ -9,4 +9,7 @@ card singleFaced({
           mandatory,
           plusAdditional(
             perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped]))))))),
-      spell(instruct(this, dealDamage(times(3, groupSize), target(isAnyTarget))))]})
+      spell(
+        instruct(
+          this,
+          dealDamage(amount = times(3, groupSize), recipient = target(isAnyTarget))))]})

@@ -7,12 +7,9 @@ card singleFaced({
       lifelink,
       when(
         does(actor(thisCreature), enter),
-        if = or([
-            did(actor(it), enter(from = yourGraveyard), triggering),
-            is(it, did(actor(you), cast(which, from = yourGraveyard), thisObject))]),
-        action = doIfDone(
+        doIfDone(
           exile(it),
-          create(
+          ifDid = create(
             1,
             written({
                 characteristics = {
@@ -21,6 +18,10 @@ card singleFaced({
                   subtypes = [demon],
                   text = [flying],
                   power = 5,
-                  toughness = 5}}))))],
+                  toughness = 5}}))),
+        if = or(
+          disjuncts = [
+            did(actor(it), enter(from = yourGraveyard), triggering),
+            is(it, did(actor(you), cast(which, from = yourGraveyard), within = thisObject))]))],
     power = 1,
     toughness = 1})

@@ -10,5 +10,5 @@ template preventAllBy(
     replace(
       would(by($source), dealDamage(recipient = $to, kind = $kind)),
       instead(preventDamage(allDamage))),
-    $duration)
+    duration = $duration)
 }

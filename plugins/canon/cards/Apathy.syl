@@ -10,4 +10,4 @@ card singleFaced({
         beginningOfPossessed(controllerOf(enchanted(creature)), upkeep),
         instruct(
           that(player),
-          may(discard(aAtRandom(cardIn(handOf(that(player))))), untap(that(creature)))))]})
+          may(discard(aAtRandom(cardIn(handOf(that(player))))), ifDid = untap(that(creature)))))]})

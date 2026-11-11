@@ -4,9 +4,10 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             establishThroughout(cant(actor(bare(isPlayer)), gainLife(anyAmount)), thisTurn),
             establishThroughout(
               cant(any, preventDamage(allDamage, damage = would(any, dealDamage))),
               thisTurn),
-            instruct(this, dealDamage(3, target(isAnyTarget)))]))]})
+            instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget)))]))]})

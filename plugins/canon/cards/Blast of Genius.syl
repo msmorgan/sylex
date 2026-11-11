@@ -4,12 +4,13 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             choose(target(isAnyTarget)),
             draw(3),
             discard(a(cardIn(yourHand))),
             instruct(
               this,
               dealDamage(
-                statOf(stat(manaValue), the(and([was(discard(which)), isCard]))),
-                thatJoin))]))]})
+                amount = statOf(stat(manaValue), the(and([was(discard(which)), isCard]))),
+                recipient = thatJoin))]))]})

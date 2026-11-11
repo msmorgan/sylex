@@ -7,7 +7,8 @@ card singleFaced({
       enchant(and([isCreature, isCard, in(graveyard)])),
       when(
         does(actor(thisAura), enter),
-        sequentially([
+        sequentially(
+          steps = [
             establish(
               conjunction([
                   abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),
@@ -31,4 +32,4 @@ card singleFaced({
         beginningOfPossessed(controllerOf(enchanted(creature)), upkeep),
         instruct(
           that(player),
-          may(pay(mana([generic(1), pip(black)]), once), untap(that(creature)))))]})
+          may(pay(mana([generic(1), pip(black)]), once), ifDid = untap(that(creature)))))]})

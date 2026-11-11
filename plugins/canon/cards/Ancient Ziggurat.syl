@@ -6,4 +6,4 @@ card singleFaced({
         tapSymbol,
         addMana(
           counted(1, ofAnyColor(sameColor)),
-          [spendOnly([toCast(and([isCreature, isSpell]))])]))]})
+          riders = [spendOnly([toCast(and([isCreature, isSpell]))])]))]})

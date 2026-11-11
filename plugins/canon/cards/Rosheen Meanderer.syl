@@ -9,6 +9,6 @@ card singleFaced({
         tapSymbol,
         addMana(
           symbols([colorlessPip, colorlessPip, colorlessPip, colorlessPip]),
-          [spendOnly([toPay(containing(variable))])]))],
+          riders = [spendOnly([toPay(containing(variable))])]))],
     power = 4,
     toughness = 4})

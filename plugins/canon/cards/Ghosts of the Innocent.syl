@@ -7,6 +7,6 @@ card singleFaced({
       static(
         replace(
           would(actor(a(isSource)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
-          instead(instruct(it, dealDamage(half(down, thatMuch), thatJoin)))))],
+          instead(instruct(it, dealDamage(amount = half(down, thatMuch), recipient = thatJoin)))))],
     power = 4,
     toughness = 5})

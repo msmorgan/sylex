@@ -8,7 +8,8 @@ card singleFaced({
       static(
         replace(
           would(
-            actor(a(and([isCreature, isNontoken, not(did(any, cast(which), thisObject))]))),
+            actor(
+              a(and([isCreature, isNontoken, not(did(any, cast(which), within = thisObject))]))),
             enter),
           instead(exile(it))))],
     power = 2,

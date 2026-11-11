@@ -10,4 +10,4 @@ card singleFaced({
         does(actor(thisCreature), enter),
         may(
           putOntoBattlefieldTapped(a(and([isLand, in(yourHand)]))),
-          sequentially([draw(1), repeat(again)])))]})
+          ifDid = sequentially(steps = [draw(1), repeat(again)])))]})

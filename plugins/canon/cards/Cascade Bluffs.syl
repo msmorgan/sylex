@@ -4,7 +4,7 @@ card singleFaced({
     text = [
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
-        compound([mana([hybridPip(blue, red)]), tapSymbol]),
+        compound(costs = [mana([hybridPip(blue, red)]), tapSymbol]),
         addMana(
           or([
               symbols([pip(blue), pip(blue)]),

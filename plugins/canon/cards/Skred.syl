@@ -7,5 +7,5 @@ card singleFaced({
         instruct(
           this,
           dealDamage(
-            countOf(and([hasSupertype(snow), isPermanent, youControl])),
-            target(isCreature))))]})
+            amount = countOf(and([hasSupertype(snow), isPermanent, youControl])),
+            recipient = target(isCreature))))]})

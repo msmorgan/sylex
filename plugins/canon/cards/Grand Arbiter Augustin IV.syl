@@ -7,15 +7,15 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(and([hasColor(white), isSpell, did(actor(you), cast(which), thisObject)])),
+          allOf(and([hasColor(white), isSpell, did(actor(you), cast(which), within = thisObject)])),
           less(1))),
       static(
         costShift(
-          allOf(and([hasColor(blue), isSpell, did(actor(you), cast(which), thisObject)])),
+          allOf(and([hasColor(blue), isSpell, did(actor(you), cast(which), within = thisObject)])),
           less(1))),
       static(
         costShift(
-          allOf(and([isSpell, did(actor(yourOpponents), cast(which), thisObject)])),
+          allOf(and([isSpell, did(actor(yourOpponents), cast(which), within = thisObject)])),
           more(1)))],
     power = 2,
     toughness = 3})

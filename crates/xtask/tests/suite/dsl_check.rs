@@ -73,7 +73,7 @@ fn resolved_calls_parameters_literals_and_records_pass() {
     let source = format!(
         "{COLORS}{PAIR}\
          template n: Nat {{ body = pair(1) }}\n\
-         template m: Nat {{ body = pair(b = 2, 3) }}\n\
+         template m: Nat {{ body = pair(3, b = 2) }}\n\
          template i: Int {{ body = -4 }}\n\
          template c: Option(Color) {{ body = white }}\n\
          template o: Option(Color) {{ body = none }}\n\
@@ -142,9 +142,9 @@ fn wrong_arity_is_refused() {
     let source = format!(
         "{PAIR}\
          template missing: Nat {{ body = pair }}\n\
-         template over: Nat {{ body = pair(1, 2, 3) }}\n\
+         template over: Nat {{ body = pair(1, b = 2, 3) }}\n\
          template unknown: Nat {{ body = pair(1, c = 2) }}\n\
-         template twice: Nat {{ body = pair(1, a = 2) }}"
+         template twice: Nat {{ body = pair(1, b = 2, b = 3) }}"
     );
     assert_eq!(
         refusals(&[("a.syl", &source)]),
@@ -167,10 +167,111 @@ fn wrong_arity_is_refused() {
             (
                 RefusalKind::DuplicateArgument {
                     word: s("pair"),
-                    argument: s("a")
+                    argument: s("b")
                 },
-                s("a = 2")
+                s("b = 3")
             ),
+        ]
+    );
+}
+
+/// `nominal`-shaped: an optional parameter declared before a required one,
+/// so a call reads in printed order.
+const FRAMED: &str = "template framed(pre: Nat = 0, x: Nat, post: Nat = 0): Nat { body = $x }\n";
+
+#[test]
+fn a_positional_argument_binds_the_next_required_parameter() {
+    let source = format!(
+        "{FRAMED}\
+         template bare: Nat {{ body = framed(1) }}\n\
+         template both: Nat {{ body = framed(pre = 2, 1, post = 3) }}\n\
+         template after: Nat {{ body = framed(1, post = 3) }}"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+#[test]
+fn a_required_argument_passed_by_name_is_refused() {
+    let source = format!("{PAIR}template t: Nat {{ body = pair(a = 1, b = 2) }}");
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::NamedRequired {
+                word: s("pair"),
+                argument: s("a")
+            },
+            s("a = 1")
+        )]
+    );
+}
+
+#[test]
+fn a_defaulted_argument_passed_positionally_is_refused() {
+    let source = format!("{FRAMED}template t: Nat {{ body = framed(1, 2) }}");
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::PositionalDefaulted {
+                word: s("framed"),
+                argument: s("post")
+            },
+            s("2")
+        )]
+    );
+}
+
+#[test]
+fn arguments_out_of_declaration_order_are_refused() {
+    let source = format!(
+        "{FRAMED}\
+         template late: Nat {{ body = framed(1, pre = 2) }}\n\
+         template swapped: Nat {{ body = framed(post = 3, 1) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::OutOfOrder {
+                    word: s("framed"),
+                    argument: s("pre"),
+                    after: s("x")
+                },
+                s("pre = 2")
+            ),
+            (
+                RefusalKind::OutOfOrder {
+                    word: s("framed"),
+                    argument: s("x"),
+                    after: s("post")
+                },
+                s("1")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn a_named_argument_equal_to_its_default_is_refused() {
+    let source = format!(
+        "{COLORS}{PAIR}\
+         template list(x: Nat, cs: List(Color) = [white, blue]): Nat {{ body = $x }}\n\
+         template echo(x: Nat, y: Nat = $x): Nat {{ body = $y }}\n\
+         template zero: Nat {{ body = pair(1, b = 0) }}\n\
+         template laidOut: Nat {{ body = list(1, cs = [\n  white,\n  blue]) }}\n\
+         template reread: Nat {{ body = echo(4, y = 4) }}\n\
+         template differs: Nat {{ body = list(1, cs = [blue, white]) }}\n\
+         template other: Nat {{ body = echo(4, y = 5) }}"
+    );
+    let redundant = |word: &str, argument: &str| RefusalKind::RedundantDefault {
+        word: s(word),
+        argument: s(argument),
+    };
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (redundant("pair", "b"), s("b = 0")),
+            (redundant("list", "cs"), s("cs = [\n  white,\n  blue]")),
+            (redundant("echo", "y"), s("y = 4")),
         ]
     );
 }
@@ -770,7 +871,7 @@ fn a_characteristics_wrap_on_a_card_face_is_refused() {
 fn a_card_face_is_a_characteristics_record() {
     let source = format!(
         "{COLORS}primitive transforming(front: Characteristics, back: Characteristics): Card = Transforming\n\
-         card transforming(front = {{ name = \"F\", colors = [white] }}, back = {{ name = \"B\", colors = [1] }})"
+         card transforming({{ name = \"F\", colors = [white] }}, {{ name = \"B\", colors = [1] }})"
     );
     assert_eq!(kinds(&source), [RefusalKind::IntegerAt(s("Color"))]);
 }
@@ -845,7 +946,7 @@ fn any_declared_card_form_resolves() {
     assert_eq!(
         kinds(
             "primitive meld(front: Characteristics, back: Characteristics): Card = Meld\n\
-             card meld(front = { name = \"Bruna\" }, back = { name = \"Brisela\" })"
+             card meld({ name = \"Bruna\" }, { name = \"Brisela\" })"
         ),
         []
     );
@@ -949,14 +1050,14 @@ fn joined_trigger_conditions_are_one_disjunction() {
                    and([\n\
                      at(beginningOfYour(upkeep)),\n\
                      whenever(does(actor(you), cast(a(and([isSpell, hasColor(black)])))))]),\n\
-                   action = putCounters(lit(1), printedKind(chargeCounter), thisArtifact))]})\n\
+                   putCounters(lit(1), printedKind(chargeCounter), thisArtifact))]})\n\
              card singleFaced({\n\
                name = \"Minsc & Boo, Timeless Heroes\",\n\
                types = [planeswalker],\n\
                text = [\n\
                  triggered(\n\
                    and([when(does(actor(thisPlaneswalker), enter)), at(beginningOfYour(upkeep))]),\n\
-                   action = may(\n\
+                   may(\n\
                      create(\n\
                        lit(1),\n\
                        written({\n\
@@ -975,7 +1076,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                text = [\n\
                  triggered(\n\
                    and([when(does(actor(thisCreature), die)), when(does(actor(you), discard(thisCard)))]),\n\
-                   action = create(lit(1), defined(foodToken)))]})\n\
+                   create(lit(1), defined(foodToken)))]})\n\
              card singleFaced({\n\
                name = \"Tenuous Truce\",\n\
                types = [enchantment],\n\
@@ -983,19 +1084,19 @@ fn joined_trigger_conditions_are_one_disjunction() {
                text = [\n\
                  triggered(\n\
                    or([\n\
-                     when(does(actor(you), attack(enchanted(player)))),\n\
+                     when(does(actor(you), attack(defender = enchanted(player)))),\n\
                      when(\n\
                        does(\n\
                          actor(enchanted(player)),\n\
-                         attack(youOr(a(and([isPlaneswalker, youControl]))))))]),\n\
-                   action = sacrifice(thisAura))]})\n\
+                         attack(defender = youOr(a(and([isPlaneswalker, youControl]))))))]),\n\
+                   sacrifice(thisAura))]})\n\
              card singleFaced({\n\
                name = \"Bartered Cow\",\n\
                types = [creature],\n\
                text = [\n\
                  triggered(\n\
                    and([when(does(actor(thisCreature), die)), does(actor(you), discard(thisCard))]),\n\
-                   action = create(lit(1), defined(foodToken)))]})"
+                   create(lit(1), defined(foodToken)))]})"
         ),
         [(
             RefusalKind::UnknownWord {
@@ -1035,6 +1136,32 @@ fn a_coercion_applies_at_a_sort_mismatch() {
          template arg: Predicate {{ body = noun(goblin) }}"
     );
     assert_eq!(kinds(&source), []);
+}
+
+/// The redundant-default refusal looks through a coercion: `n = 0` is the
+/// default `lit(0)`, and `w = type(creature)` the default `creature`.
+#[test]
+fn a_named_argument_equal_to_its_default_through_a_coercion_is_refused() {
+    let source = format!(
+        "{COERCIONS}\
+         template amt(x: Int, n: Amount = lit(0)): Int {{ body = $x }}\n\
+         template noun(x: Int, w: NounWord = creature): Int {{ body = $x }}\n\
+         template bare: Int {{ body = amt(1, n = 0) }}\n\
+         template wrapped: Int {{ body = noun(1, w = type(creature)) }}\n\
+         template other: Int {{ body = amt(1, n = 1) }}\n\
+         template sub: Int {{ body = noun(1, w = goblin) }}"
+    );
+    let redundant = |word: &str, argument: &str| RefusalKind::RedundantDefault {
+        word: s(word),
+        argument: s(argument),
+    };
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (redundant("amt", "n"), s("n = 0")),
+            (redundant("noun", "w"), s("w = type(creature)")),
+        ]
+    );
 }
 
 #[test]

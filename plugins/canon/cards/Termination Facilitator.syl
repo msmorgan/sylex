@@ -16,7 +16,7 @@ card singleFaced({
               and([
                   or([isCreature, isPlaneswalker]),
                   anOpponentControls,
-                  hasCounter(bountyCounter)])))),
+                  hasCounter(kind = bountyCounter)])))),
         destroy(it))],
     power = 1,
     toughness = 3})

@@ -5,7 +5,8 @@ card singleFaced({
     text = [
       willOfTheCouncil(
         spell(
-          sequentially([
+          sequentially(
+            steps = [
               instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["death", "torture"]))),
               doIf(
                 getsMoreVotes("death"),

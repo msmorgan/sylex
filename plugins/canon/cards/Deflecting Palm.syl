@@ -10,6 +10,8 @@ card singleFaced({
             instead(
               preventDamage(
                 allDamage,
-                also = instruct(this, dealDamage(thatMuch, controllerOf(thatSource))))),
+                also = instruct(
+                  this,
+                  dealDamage(amount = thatMuch, recipient = controllerOf(thatSource))))),
             use = nextTimeOnly),
           thisTurn))]})

@@ -6,12 +6,12 @@ ability eternalize(cost: Cost) {
   spelling = "eternalize <cost>",
   body = [
     activatedOnlyDuring(
-      compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
+      compound(costs = [$cost, perform(exileFrom(thisCard, yourGraveyard))]),
       create(
         1,
         copyOf(
           this,
-          [
+          exceptions = [
             characteristicEdits([
                 colors(sets, colors([black])),
                 stat(power, set(4)),

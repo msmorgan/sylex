@@ -11,5 +11,5 @@ template preventAll(
     replace(
       would(any, dealDamage(recipient = $to, kind = $kind)),
       instead(preventDamage(allDamage))),
-    $duration)
+    duration = $duration)
 }

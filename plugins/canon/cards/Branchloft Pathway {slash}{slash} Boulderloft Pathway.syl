@@ -1,9 +1,8 @@
-card modalDfc(
-  front = {
+card modalDfc({
     name = "Branchloft Pathway",
     types = [land],
     text = [activated(tapSymbol, addMana(symbols([pip(green)])))]},
-  back = {
+  {
     name = "Boulderloft Pathway",
     types = [land],
     text = [activated(tapSymbol, addMana(symbols([pip(white)])))]})

@@ -13,7 +13,7 @@ card singleFaced({
                 did(
                   actor(you),
                   cast(which),
-                  thisObject,
+                  within = thisObject,
                   ordinal = {ordinal = nth(2), per = turn})])),
           less(1)))],
     power = 1,

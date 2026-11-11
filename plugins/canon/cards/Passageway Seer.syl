@@ -8,7 +8,7 @@ card singleFaced({
       when(does(actor(thisCreature), enter), gainDesignation(you, initiative)),
       at(
         beginningOfYour(endStep),
-        if = is(you, hasDesignation(initiative)),
-        action = putCounters(1, printedKind(p1p1Counter), thisCreature))],
+        putCounters(1, printedKind(p1p1Counter), thisCreature),
+        if = is(you, hasDesignation(initiative)))],
     power = 2,
     toughness = 2})

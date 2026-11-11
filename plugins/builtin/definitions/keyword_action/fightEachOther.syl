@@ -11,5 +11,7 @@ action fightEachOther(pair: NounPhrase) {
   deed = "fight",
   permanent = performs,
   spelling = "<pair> fight each other",
-  body = doIf(is($pair, isCreature), instruct(eachOf($pair), dealDamage(powerOf(it), theOther)))
+  body = doIf(
+    is($pair, isCreature),
+    instruct(eachOf($pair), dealDamage(amount = powerOf(it), recipient = theOther)))
 }

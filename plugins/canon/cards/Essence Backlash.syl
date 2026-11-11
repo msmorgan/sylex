@@ -7,8 +7,11 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             counter(target(and([isCreature, isSpell]))),
             instruct(
               thisSpell,
-              dealDamage(statOf(stat(power), that(spell)), controllerOf(it)))]))]})
+              dealDamage(
+                amount = statOf(stat(power), that(spell)),
+                recipient = controllerOf(it)))]))]})

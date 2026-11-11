@@ -4,7 +4,8 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             establishThroughout(
               can(actor(you), play(counted(additional(exactly(1)), isLand))),
               thisTurn),

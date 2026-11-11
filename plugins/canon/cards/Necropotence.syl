@@ -6,7 +6,10 @@ card singleFaced({
       static(partSkip(you, drawStep)),
       whenever(does(actor(you), discard(a(isCard))), exileFrom(that(card), yourGraveyard)),
       activated(
-        perform(payLife(1)),
-        sequentially([
+        perform(payLife(amount = 1)),
+        sequentially(
+          steps = [
             exileFaceDown(topSlice(1)),
-            atNext(beginningOf(endStep, you, nextTime(you)), putInto(that(card), hand))]))]})
+            atNext(
+              beginningOf(endStep, you, nextTime(player = you)),
+              putInto(that(card), hand))]))]})

@@ -20,5 +20,5 @@ ability protection(quality: Predicate) {
       replace(
         would(by(allOf(and([isSource, $quality]))), dealDamage(recipient = this)),
         instead(preventDamage(allDamage)))),
-    static(cant(by(allOf(and([isCreature, $quality]))), block(thisCreature)))]
+    static(cant(by(allOf(and([isCreature, $quality]))), block(attacker = thisCreature)))]
 }

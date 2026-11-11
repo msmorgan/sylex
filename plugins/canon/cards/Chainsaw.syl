@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisEquipment), enter),
-        instruct(it, dealDamage(3, targets(upTo(1), isCreature)))),
+        instruct(it, dealDamage(amount = 3, recipient = targets(upTo(1), isCreature)))),
       whenever(
         does(actor(counted(orMore(1), isCreature)), die),
         putCounters(1, printedKind(revCounter), thisEquipment)),

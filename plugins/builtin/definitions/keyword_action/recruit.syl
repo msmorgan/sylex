@@ -3,10 +3,11 @@
 action recruit {
   lexical = {verbs = [{lemma = "recruit", frames = [Intransitive]}]},
   spelling = "recruit",
-  body = sequentially([
+  body = sequentially(
+    steps = [
       draw(1),
       discard(a(cardIn(handOf(actor)))),
       doIf(
-        not(is(the(and([isCard, was(discard(which), thisWay)])), isLand)),
+        not(is(the(and([isCard, was(discard(which), within = thisWay)])), isLand)),
         create(1, written(creatureToken(1, 1, [white], [human, soldier]))))])
 }

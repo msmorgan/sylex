@@ -9,7 +9,10 @@ card singleFaced({
             byAnEffect,
             would(
               any,
-              createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []), you))),
+              createObject(
+                anyAmount,
+                token(copyOf(counted(orMore(1), isToken)), []),
+                under = you))),
           instead(create(times(2, groupSize), asThose)))),
       static(
         replace(

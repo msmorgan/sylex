@@ -9,7 +9,7 @@ card singleFaced({
     cost = [generic(2), pip(white)],
     types = [enchantment],
     text = [
-      static(cant(actor(you), loseGame(nonpositiveLife))),
+      static(cant(actor(you), loseGame(cause = nonpositiveLife))),
       static(
         asLongAs(
           compareAmt(lifeTotalOf(you), atMost, 0),

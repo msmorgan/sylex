@@ -9,8 +9,8 @@ card singleFaced({
     text = [
       at(
         beginningOfYour(endStep),
+        create(1, written(creatureToken(1, 1, [white], [soldier]))),
         if = exists(
-          comparesOwnStat(power, and([isCreature, youControl]), greater, basePowerOf(ownMember))),
-        action = create(1, written(creatureToken(1, 1, [white], [soldier]))))],
+          comparesOwnStat(power, and([isCreature, youControl]), greater, basePowerOf(ownMember))))],
     power = 2,
     toughness = 2})

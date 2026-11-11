@@ -11,8 +11,9 @@ card singleFaced({
           1,
           p1p1Counter)),
       activated(
-        compound([mana([generic(1)]), tapSymbol]),
-        sequentially([
+        compound(costs = [mana([generic(1)]), tapSymbol]),
+        sequentially(
+          steps = [
             repeatTimes(letter(x), proliferate),
             define(
               x,
@@ -21,6 +22,6 @@ card singleFaced({
                     isNontoken,
                     isCreature,
                     youControl,
-                    did(actor(which), enter, within(soFarThisTurn))])))]))],
+                    did(actor(which), enter, within = within(soFarThisTurn))])))]))],
     power = 2,
     toughness = 3})

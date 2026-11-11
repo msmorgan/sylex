@@ -9,7 +9,7 @@ ability vanishing(amount: Amount) {
     at(
       beginningOfYour(upkeep),
       removeCounters(oneThrough(1), printedKind(timeCounter), thisPermanent),
-      if = is(thisPermanent, hasCounter(timeCounter))),
+      if = is(thisPermanent, hasCounter(kind = timeCounter))),
     when(
       does(any, removeCounters(theLast, printedKind(timeCounter), thisPermanent)),
       sacrifice(thisPermanent))]

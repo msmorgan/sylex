@@ -12,7 +12,7 @@ card singleFaced({
         nthOccurrence(
           nth(1),
           does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
-          turn),
+          per = turn),
         putCounters(1, printedKind(p1p1Counter), it)),
       static(
         asLongAs(

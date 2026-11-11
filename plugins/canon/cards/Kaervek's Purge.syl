@@ -4,10 +4,13 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
+        sequentially(
+          steps = [
             destroy(target(and([isCreature, hasManaValue(equal, letter(x))]))),
             doIf(
               did(actor(that(creature)), die, thisWay),
               instruct(
                 this,
-                dealDamage(powerOf(that(creature)), controllerOf(that(creature)))))]))]})
+                dealDamage(
+                  amount = powerOf(that(creature)),
+                  recipient = controllerOf(that(creature)))))]))]})

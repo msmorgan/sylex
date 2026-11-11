@@ -6,11 +6,12 @@ ability transfigure(cost: Cost) {
   spelling = "transfigure <cost>",
   body = [
     activatedOnlyDuring(
-      compound([$cost, perform(sacrifice(thisPermanent))]),
-      sequentially([
+      compound(costs = [$cost, perform(sacrifice(thisPermanent))]),
+      sequentially(
+        steps = [
           search(
             yourLibrary,
-            a(
+            for = a(
               and([
                   isCard,
                   isCreature,

@@ -4,10 +4,11 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([mana([generic(4)]), tapSymbol]),
+        compound(costs = [mana([generic(4)]), tapSymbol]),
         putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
-        compound([
+        compound(
+          costs = [
             tapSymbol,
             perform(removeCounters(exactly(3), printedKind(chargeCounter), thisArtifact))]),
         extraTurn(1))]})

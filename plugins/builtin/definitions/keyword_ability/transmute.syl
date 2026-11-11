@@ -6,11 +6,12 @@ ability transmute(cost: Cost) {
   spelling = "transmute <cost>",
   body = [
     activatedOnlyDuring(
-      compound([$cost, perform(discard(this))]),
-      sequentially([
+      compound(costs = [$cost, perform(discard(this))]),
+      sequentially(
+        steps = [
           search(
             yourLibrary,
-            a(
+            for = a(
               and([
                   isCard,
                   hasManaValue(

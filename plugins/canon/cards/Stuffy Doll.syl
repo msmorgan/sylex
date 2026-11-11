@@ -8,7 +8,9 @@ card singleFaced({
       static(entersChoosingPlayer(thisCreature, a(isPlayer))),
       whenever(
         does(any, dealDamage(recipient = thisCreature)),
-        instruct(it, dealDamage(thatMuch, the(isChosenPlayer)))),
-      activated(tapSymbol, instruct(thisCreature, dealDamage(1, thisCreature)))],
+        instruct(it, dealDamage(amount = thatMuch, recipient = the(isChosenPlayer)))),
+      activated(
+        tapSymbol,
+        instruct(thisCreature, dealDamage(amount = 1, recipient = thisCreature)))],
     power = 0,
     toughness = 1})

@@ -6,7 +6,8 @@ card singleFaced({
       static(entersWithCounters(thisEnchantment, 7, omenCounter)),
       at(
         beginningOfYour(upkeep),
-        sequentially([
+        sequentially(
+          steps = [
             removeCounters(exactly(1), printedKind(omenCounter), thisEnchantment),
             doIf(
               compareAmt(countersOn(omenCounter, thisEnchantment), atMost, 0),
@@ -16,6 +17,6 @@ card singleFaced({
                     orMore(2),
                     and([isPlayer, tiedFor(max, playerStat(lifeTotal), isPlayer)]))),
                 drawGame,
-                instruct(
+                otherwise = instruct(
                   the(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])),
                   winGame)))]))]})

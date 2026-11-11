@@ -2,4 +2,4 @@ card singleFaced({
     name = "Lightning Bolt",
     cost = [pip(red)],
     types = [instant],
-    text = [spell(instruct(this, dealDamage(3, target(isAnyTarget))))]})
+    text = [spell(instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))))]})

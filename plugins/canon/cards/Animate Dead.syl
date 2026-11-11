@@ -7,7 +7,8 @@ card singleFaced({
       enchant(and([isCreature, isCard, in(graveyard)])),
       when(
         does(actor(thisAura), enter),
-        sequentially([
+        sequentially(
+          steps = [
             establish(
               conjunction([
                   abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),
@@ -15,7 +16,7 @@ card singleFaced({
                     it,
                     [enchant(and([isCreature, did(by(thisAura), putOntoBattlefield(which))]))])],
                 subject = it)),
-            returnToBattlefield(enchanted(ofType(card, creature)), [under(you)]),
+            returnToBattlefield(enchanted(ofType(card, creature)), riders = [under(you)]),
             attachTo(thisAura, it),
             delay(
               does(actor(thisAura), leave),

@@ -12,5 +12,5 @@ card singleFaced({
             bundle({
                 characteristics = {types = [creature], power = 2, toughness = 2},
                 qualities = [withEveryType(creature)]},
-              land)),
+              retained = land)),
           untilEndOfTurn))]})

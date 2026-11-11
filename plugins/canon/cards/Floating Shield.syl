@@ -12,4 +12,4 @@ card singleFaced({
             doesnt(actor(thisEffect), remove(thisAura))])),
       activated(
         perform(sacrifice(thisAura)),
-        gain(target(isCreature), [protection(ofChosen(color))], untilEndOfTurn))]})
+        gain(target(isCreature), [protection(ofChosen(color))], duration = untilEndOfTurn))]})

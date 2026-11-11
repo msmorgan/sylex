@@ -10,4 +10,4 @@ card singleFaced({
             perform(
               exile(a(and([hasColor(black), hasManaValue(equal, letter(x)), in(yourHand)]))))),
           this)),
-      spell(get(target(isCreature), down(letter(x)), down(letter(x)), untilEndOfTurn))]})
+      spell(get(target(isCreature), down(letter(x)), down(letter(x)), duration = untilEndOfTurn))]})

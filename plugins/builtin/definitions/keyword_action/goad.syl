@@ -3,5 +3,5 @@
 action goad(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "goad", frames = [Monotransitive]}]},
   spelling = "goad <subject>",
-  body = gainDesignation($subject, goaded, untilYourNextTurn)
+  body = gainDesignation($subject, goaded, duration = untilYourNextTurn)
 }

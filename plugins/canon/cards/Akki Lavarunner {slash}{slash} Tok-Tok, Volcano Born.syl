@@ -1,5 +1,4 @@
-card flip(
-  normal = {
+card flip({
     name = "Akki Lavarunner",
     cost = [generic(3), pip(red)],
     types = [creature],
@@ -9,7 +8,7 @@ card flip(
       whenever(does(actor(thisCreature), dealDamage(recipient = anOpponent)), flip(thisCreature))],
     power = 1,
     toughness = 1},
-  alternative = {
+  {
     name = "Tok-Tok, Volcano Born",
     supertypes = [legendary],
     types = [creature],
@@ -19,6 +18,7 @@ card flip(
       static(
         replace(
           would(actor(a(and([isSource, hasColor(red)]))), dealDamage(recipient = a(isPlayer))),
-          instead(instruct(it, dealDamage(plus(thatMuch, 1), that(player))))))],
+          instead(
+            instruct(it, dealDamage(amount = plus(thatMuch, 1), recipient = that(player))))))],
     power = 2,
     toughness = 2})

@@ -8,5 +8,7 @@ ability livingMetal {
       partScope(
         turn,
         you,
-        characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})])))]
+        characteristicChange(
+          thisPermanent,
+          edits = [typeLine(adds, {types = [artifact, creature]})])))]
 }

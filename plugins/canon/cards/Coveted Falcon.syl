@@ -14,7 +14,8 @@ card singleFaced({
       disguise(mana([generic(1), pip(blue)])),
       when(
         does(any, turnFaceUp(thisCreature)),
-        sequentially([
+        sequentially(
+          steps = [
             instruct(
               target(isOpponent),
               gainControl(targets(anyNumber, and([isPermanent, youControl])))),

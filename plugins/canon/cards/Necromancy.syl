@@ -6,7 +6,8 @@ card singleFaced({
       asThoughFlashSacrificedAtCleanup,
       when(
         does(actor(thisEnchantment), enter),
-        sequentially([
+        sequentially(
+          steps = [
             establish(
               conjunction([
                   addSubtype(it, aura),

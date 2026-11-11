@@ -4,6 +4,8 @@ card singleFaced({
     types = [artifact],
     subtypes = [equipment],
     text = [
-      when(does(actor(thisEquipment), enter), instruct(it, dealDamage(2, target(isAnyTarget)))),
+      when(
+        does(actor(thisEquipment), enter),
+        instruct(it, dealDamage(amount = 2, recipient = target(isAnyTarget)))),
       static(getsPt(equipped(creature), up(2), up(1))),
       equip(mana([generic(2)]))]})

@@ -5,6 +5,6 @@ card singleFaced({
     subtypes = [juggernaut],
     text = [
       static(must(actor(thisCreature), attack)),
-      static(cant(actor(bare(hasSubtype(wall))), block(thisCreature)))],
+      static(cant(actor(bare(hasSubtype(wall))), block(attacker = thisCreature)))],
     power = 5,
     toughness = 3})

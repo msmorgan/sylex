@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       when(does(actor(thisEnchantment), enter), draw(1)),
-      static(allAbilityLoss(allOf(isLand), isManaAbility))]})
+      static(allAbilityLoss(allOf(isLand), except = isManaAbility))]})

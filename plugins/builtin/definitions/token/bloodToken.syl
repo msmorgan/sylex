@@ -8,7 +8,8 @@ token bloodToken {
       subtypes = [blood],
       text = [
         activated(
-          compound([
+          compound(
+            costs = [
               mana([generic(1)]),
               tapSymbol,
               perform(discard(a(cardIn(yourHand)))),

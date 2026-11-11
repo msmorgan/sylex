@@ -6,16 +6,16 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        if = thereAre(
-          withTheSameName(
-            counted(orMore(2), and([isPermanent, non(isLand), isNontoken, youControl])))),
-        action = create(
+        create(
           1,
           written({
               characteristics = {
                 types = [artifact, creature],
                 subtypes = [construct],
                 power = 4,
-                toughness = 4}})))],
+                toughness = 4}})),
+        if = thereAre(
+          withTheSameName(
+            counted(orMore(2), and([isPermanent, non(isLand), isNontoken, youControl])))))],
     power = 4,
     toughness = 4})

@@ -6,6 +6,7 @@ card singleFaced({
       static(entersChoosingPlayer(thisArtifact, anOpponent)),
       at(
         beginningOfPossessed(the(isChosenPlayer), upkeep),
-        sequentially([
-            instruct(thisArtifact, dealDamage(letter(x), that(player))),
+        sequentially(
+          steps = [
+            instruct(thisArtifact, dealDamage(amount = letter(x), recipient = that(player))),
             define(x, minus(countOf(cardIn(handOf(they))), 4))]))]})

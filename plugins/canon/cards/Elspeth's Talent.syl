@@ -19,4 +19,4 @@ card singleFaced({
         establishFor(
           allOf(and([isCreature, youControl])),
           [getsPt(them, up(2), up(2)), abilityGrant(them, [vigilance])],
-          untilEndOfTurn))]})
+          duration = untilEndOfTurn))]})

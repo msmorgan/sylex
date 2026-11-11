@@ -5,6 +5,8 @@ ability flanking {
   spelling = "flanking",
   body = [
     whenever(
-      does(by(a(and([isCreature, not(hasKeyword(theKeyword(flanking)))]))), block(thisCreature)),
-      get(that(creature), down(1), down(1), untilEndOfTurn))]
+      does(
+        by(a(and([isCreature, not(hasKeyword(theKeyword(flanking)))]))),
+        block(attacker = thisCreature)),
+      get(that(creature), down(1), down(1), duration = untilEndOfTurn))]
 }

@@ -7,5 +7,5 @@ template gainControl(
   duration: Option(Duration) = none,
   controller: NounPhrase = actor): Action {
   # TODO(spelling): Include or omit the clauses supplied by duration.
-  body = establish(controlGrant($controller, $subject), $duration)
+  body = establish(controlGrant($controller, $subject), duration = $duration)
 }

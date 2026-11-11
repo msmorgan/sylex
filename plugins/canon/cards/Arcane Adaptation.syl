@@ -6,7 +6,8 @@ card singleFaced({
       static(entersChoosing(thisEnchantment, subtype(creature))),
       static(
         qualityChange(
-          and([
+          and(
+            phrases = [
               allOf(and([isCreature, youControl])),
               allOf(and([isCreature, isSpell, youControl])),
               allOf(and([isCard, isCreature, youOwn, not(in(battlefield))]))]),

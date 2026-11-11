@@ -7,9 +7,9 @@ card singleFaced({
       static(
         cant(
           actor(allOf(and([isCreature, hasColor(blue)]))),
-          block(allOf(and([isCreature, youControl]))))),
+          block(attacker = allOf(and([isCreature, youControl]))))),
       static(
         gatedBy(
-          perform(payLife(forEach(1, and([isCreature, isBlocking, controlledBy(they)])))),
+          perform(payLife(amount = forEach(1, and([isCreature, isBlocking, controlledBy(they)])))),
           actor(allOf(and([isCreature, non(hasColor(blue))]))),
-          block(allOf(and([isCreature, youControl])))))]})
+          block(attacker = allOf(and([isCreature, youControl])))))]})

@@ -7,7 +7,8 @@ card singleFaced({
     text = [
       activated(
         loyaltySymbol(up(1)),
-        sequentially([
+        sequentially(
+          steps = [
             establishThroughout(
               qualityChange(
                 thisPlaneswalker,
@@ -19,7 +20,7 @@ card singleFaced({
                       text = [indestructible],
                       power = 5,
                       toughness = 5}},
-                  planeswalker)),
+                  retained = planeswalker)),
               untilEndOfTurn),
             preventAll(it, thisTurn)])),
       activated(

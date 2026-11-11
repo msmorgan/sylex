@@ -9,7 +9,7 @@ card singleFaced({
       vigilance,
       at(
         beginningOfYour(endStep),
-        if = not(did(actor(you), cast(a(isSpell), from = yourHand), within(soFarThisTurn))),
-        action = draw(1))],
+        draw(1),
+        if = not(did(actor(you), cast(a(isSpell), from = yourHand), within(soFarThisTurn))))],
     power = 3,
     toughness = 3})

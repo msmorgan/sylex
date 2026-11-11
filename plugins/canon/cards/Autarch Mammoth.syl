@@ -11,7 +11,7 @@ card singleFaced({
               timed(
                 does(actor(thisCreature), attack),
                 whileTrue(is(thisCreature, hasDesignation(saddled)))))]),
-        action = create(1, written(creatureToken(3, 3, [green], [elephant])))),
+        create(1, written(creatureToken(3, 3, [green], [elephant])))),
       saddle(5)],
     power = 5,
     toughness = 5})

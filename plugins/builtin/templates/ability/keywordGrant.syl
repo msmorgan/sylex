@@ -5,5 +5,5 @@
 template keywordGrant(subject: NounPhrase, term: KeywordTerm, holders: Predicate): StaticSpec {
   # TODO(spelling): A bare term grants the keyword; a family term instead names the abilities of
   # holders.
-  body = characteristicChange($subject, [addedKeywordTerm($term, $holders)])
+  body = characteristicChange($subject, edits = [addedKeywordTerm($term, $holders)])
 }

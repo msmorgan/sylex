@@ -11,9 +11,10 @@ card singleFaced({
           target(allOf(and([isCreature, opponentsControl, hasKeyword(theKeyword(hexproof))]))),
           asThough = holds(is(them, not(hasKeyword(theKeyword(hexproof))))))),
       activated(
-        compound([mana([generic(3)]), perform(sacrifice(thisArtifact))]),
-        sequentially([
-            gain(allOf(and([isCreature, youControl])), [hexproof], untilEndOfTurn),
+        compound(costs = [mana([generic(3)]), perform(sacrifice(thisArtifact))]),
+        sequentially(
+          steps = [
+            gain(allOf(and([isCreature, youControl])), [hexproof], duration = untilEndOfTurn),
             establishThroughout(
-              cant(any, block(allOf(and([isCreature, youControl])))),
+              cant(any, block(attacker = allOf(and([isCreature, youControl])))),
               thisTurn)]))]})

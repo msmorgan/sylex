@@ -7,10 +7,11 @@ card singleFaced({
       flying,
       when(
         does(actor(thisCreature), enter),
-        sequentially([
+        sequentially(
+          steps = [
             exile(target(and([isPermanent, isOther]))),
             atNext(
               beginningOfNext(endStep),
-              returnToBattlefield(that(card), [under(ownerOf(it))]))]))],
+              returnToBattlefield(that(card), riders = [under(ownerOf(it))]))]))],
     power = 3,
     toughness = 1})

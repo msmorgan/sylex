@@ -6,5 +6,5 @@ card singleFaced({
     text = [
       enchant(isPlayer),
       at(
-        nthOccurrence(nth(1), beginningOfPossessed(enchanted(player), upkeep), turn),
+        nthOccurrence(nth(1), beginningOfPossessed(enchanted(player), upkeep), per = turn),
         instruct(that(player), additionalStep(upkeep, none, 1)))]})

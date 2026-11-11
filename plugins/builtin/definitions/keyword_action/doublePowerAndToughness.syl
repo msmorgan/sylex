@@ -4,5 +4,5 @@ action doublePowerAndToughness(subject: NounPhrase, duration: Option(Duration) =
   # TODO(spelling): Include or omit the clauses supplied by duration.
   lexical = {verbs = [{lemma = "double", frames = [Monotransitive]}]},
   deed = "double",
-  body = get($subject, up(powerOf($subject)), up(toughnessOf($subject)), $duration)
+  body = get($subject, up(powerOf($subject)), up(toughnessOf($subject)), duration = $duration)
 }

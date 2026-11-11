@@ -11,7 +11,7 @@ card singleFaced({
           alongside(may(exchangeTextBoxes(thisCreature, a(and([isCreature, isOther]))))))),
       at(beginningOfYour(upkeep), loseLife(3)),
       activated(
-        compound([mana([generic(3)]), perform(sacrifice(thisCreature))]),
+        compound(costs = [mana([generic(3)]), perform(sacrifice(thisCreature))]),
         instruct(each(isOtherPlayer), draw(1)))],
     power = 5,
     toughness = 3})

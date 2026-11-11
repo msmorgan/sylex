@@ -8,5 +8,5 @@ ability undying {
     when(
       does(actor(thisPermanent), die),
       returnToBattlefieldWithCounters(thisPermanent, ownerOf(thisPermanent), 1, p1p1Counter),
-      if = not(is(thisPermanent, hasCounter(p1p1Counter))))]
+      if = not(is(thisPermanent, hasCounter(kind = p1p1Counter))))]
 }

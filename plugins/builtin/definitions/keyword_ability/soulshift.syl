@@ -11,5 +11,5 @@ ability soulshift(amount: Amount) {
         returnToHand(
           target(
             and([isCard, hasSubtype(spirit), hasManaValue(atMost, $amount), in(yourGraveyard)])),
-          yourGraveyard)))]
+          from = yourGraveyard)))]
 }

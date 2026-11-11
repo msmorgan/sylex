@@ -5,8 +5,9 @@ card singleFaced({
     subtypes = [human, wizard],
     text = [
       activated(
-        compound([mana([generic(2), pip(blue)]), tapSymbol]),
-        sequentially([
+        compound(costs = [mana([generic(2), pip(blue)]), tapSymbol]),
+        sequentially(
+          steps = [
             instruct(controllerOf(target(and([isInstantOrSorcery, isSpell]))), copyOnStack(it)),
             instruct(that(player), may(chooseNewTargets(that(copy))))]))],
     power = 2,

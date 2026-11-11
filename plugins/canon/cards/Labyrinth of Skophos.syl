@@ -4,5 +4,5 @@ card singleFaced({
     text = [
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
-        compound([mana([generic(4)]), tapSymbol]),
+        compound(costs = [mana([generic(4)]), tapSymbol]),
         removeFromCombat(target(and([isCreature, or([isAttacking, isBlocking])]))))]})

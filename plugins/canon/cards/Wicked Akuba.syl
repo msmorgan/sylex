@@ -10,7 +10,10 @@ card singleFaced({
           target(
             and([
                 isPlayer,
-                did(actor(thisCreature), dealDamage(recipient = which), within(soFarThisTurn))])),
+                did(
+                  actor(thisCreature),
+                  dealDamage(recipient = which),
+                  within = within(soFarThisTurn))])),
           loseLife(1)))],
     power = 2,
     toughness = 2})

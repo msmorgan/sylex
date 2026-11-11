@@ -10,7 +10,7 @@ card singleFaced({
             does(actor(a(and([isCreature, isOther]))), die),
             does(any, putInto(a(and([isCard, isCreature])), graveyard, from = not(battlefield))),
             does(actor(a(and([isCreature, in(yourGraveyard)]))), leave(from = yourGraveyard))]),
-        action = instruct(this, dealDamage(1, eachOpponent))),
+        instruct(this, dealDamage(amount = 1, recipient = eachOpponent))),
       activated(mana([generic(1), pip(black)]), instruct(eachPlayer, mill(1)))],
     power = 5,
     toughness = 4})

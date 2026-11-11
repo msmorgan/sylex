@@ -4,5 +4,5 @@ card singleFaced({
     types = [artifact],
     text = [
       activated(
-        compound([tapSymbol, perform(sacrifice(counted(exactly(5), isArtifact)))]),
+        compound(costs = [tapSymbol, perform(sacrifice(counted(exactly(5), isArtifact)))]),
         extraTurn(1))]})

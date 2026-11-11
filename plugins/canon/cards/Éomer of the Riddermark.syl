@@ -8,11 +8,11 @@ card singleFaced({
       haste,
       whenever(
         does(actor(thisCreature), attack),
+        create(1, written(creatureToken(1, 1, [white], [human, soldier]))),
         if = exists(
           and([
               isCreature,
               youControl,
-              superlative(max, stat(power), and([isCreature, isPermanent]))])),
-        action = create(1, written(creatureToken(1, 1, [white], [human, soldier]))))],
+              superlative(max, stat(power), and([isCreature, isPermanent]))])))],
     power = 5,
     toughness = 4})

@@ -6,5 +6,6 @@ token clueToken {
     characteristics = {
       types = [artifact],
       subtypes = [clue],
-      text = [activated(compound([mana([generic(2)]), perform(sacrifice(thisToken))]), draw(1))]}}
+      text = [
+        activated(compound(costs = [mana([generic(2)]), perform(sacrifice(thisToken))]), draw(1))]}}
 }

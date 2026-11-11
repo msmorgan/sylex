@@ -4,7 +4,8 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially([
-            gainControl(target(or([isArtifact, isCreature])), untilEndOfTurn),
+        sequentially(
+          steps = [
+            gainControl(target(or([isArtifact, isCreature])), duration = untilEndOfTurn),
             untap(it),
-            gain(it, [haste], untilEndOfTurn)]))]})
+            gain(it, [haste], duration = untilEndOfTurn)]))]})
