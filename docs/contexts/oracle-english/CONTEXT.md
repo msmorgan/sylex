@@ -269,16 +269,19 @@ only where it holds one of its cards.
 
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5], and
-the name of a meld result in the text of either card of its meld pair, each of
-which carries half of the result's face [CR#712.4]. The grammar reads it as any other Proper Name.
+the full name of a meld result, never its Shortened Name, in the text of either
+card of its meld pair, each of which carries half of the result's face
+[CR#712.4]. The grammar reads it as any other Proper Name.
 
 **Another Card's Name**:
-A card's full name in the text of any face but its own. Only a position that
-opts in admits it, through the grammar's `OtherCardName()` symbol: the
-predicative complement of *named* (*cards named Relentless Rats*), the
-Keyword Parameter of *Partner with* [CR#702.124j], and the complement of
-*among* after *from*, wherever that phrase attaches, as in the options of a
-choice (*choose a card name ... from among Disenchant, ..., and Black Lotus*).
+A card's full name in the text of a face where it is no Own Name: any face but
+its own, except that a meld result's full name is own on both cards of its
+meld pair. Only a position that opts in admits it, through the grammar's
+`OtherCardName()` symbol: the predicative complement of *named* (*cards named
+Relentless Rats*), the Keyword Parameter of *Partner with* [CR#702.124j], and
+the complement of *among* after *from*, wherever that phrase attaches, as in
+the options of a choice (*choose a card name ... from among Disenchant, ...,
+and Black Lotus*).
 
 **Introduced Name**:
 A name a card's own text gives an object that is not a card, such as the name

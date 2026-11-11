@@ -56,3 +56,6 @@
 + <card=Bruna, the Fading Light> Exile them, then meld them into Brisela, Voice of Nightmares. => NounPhrase "Brisela, Voice of Nightmares" as Complement of into
 * <card=Lightning Bolt> Exile them, then meld them into Brisela, Voice of Nightmares.
 * Exile them, then meld them into Brisela, Voice of Nightmares.
+# a meld result's name is in its Full form alone on its pair's cards: neither card's text shortens it, so *Mishra* and *Titania* are no name there
+* <card=Phyrexian Dragon Engine> Mishra deals 3 damage to any target.
+* <card=Argoth, Sanctum of Nature> When Titania enters, draw a card.

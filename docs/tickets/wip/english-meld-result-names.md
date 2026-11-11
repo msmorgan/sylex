@@ -17,7 +17,10 @@ ticket.
   which carries half of the result's face on its back [CR#712.4]: on the card that prints the
   meld ability [CR#712.4a] (Gisela, the Broken Blade; Graf Rats; Hanweir Battlements; Mishra,
   Claimed by Gix; Titania, Voice of Gaea; Urza, Lord Protector; Vanille, Cheerful l'Cie) and on
-  its partner, which never names it.
+  its partner, which never names it. Only its Full form is in scope there
+  (`CardScope::insert(result, NameForm::Full)`); a face's own names keep every form. Neither
+  card's text shortens the result's name, so *Mishra* on Phyrexian Dragon Engine and *Titania* on
+  Argoth, Sanctum of Nature are no names.
 - The pairing comes from the card data, which records each meld part's result for both parts
   alike: Scryfall's `all_parts` entry with component `meld_result`, as mtgjson's
   `Gisela, the Broken Blade // Brisela, Voice of Nightmares` (layout `meld`, side `a`) does.
@@ -30,7 +33,8 @@ ticket.
 - The deferred meld units read, their deferral lines are gone, and `cargo xtask english strata
   --check` passes.
 - Positive judgments cover the meld units, a negative judgment shows the result's name does not
-  read as own on an unrelated card, and the Mishra comma-scope judgment holds on the full text.
+  read as own on an unrelated card, negative judgments show its Shortened Name does not read on
+  its pair's cards, and the Mishra comma-scope judgment holds on the full text.
 
 ## Pointers
 

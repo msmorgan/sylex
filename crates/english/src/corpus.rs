@@ -17,7 +17,7 @@ use std::collections::BTreeSet;
 use std::io::BufRead;
 
 use sylex_lexicon::CardScope;
-use sylex_lexicon::LexemeId;
+use sylex_lexicon::NameForm;
 use sylex_upstream::oracle_text::strip_reminder_text;
 use sylex_upstream::scryfall::OracleCardReader;
 use sylex_upstream::scryfall::OracleUnit;
@@ -189,28 +189,27 @@ pub enum CorpusError {
 }
 
 /// The card names a face's text uses as its own: the face's name and its
-/// card's [CR#201.5c], and on a meld card the name of its meld result, whose
-/// face is half on that card's back [CR#712.4], which the data records as
-/// the card's `meld_result` part.
+/// card's, in every form [CR#201.5c], and on a meld card the name of its meld
+/// result, whose face is half on that card's back [CR#712.4], which the data
+/// records as the card's `meld_result` part. The meld result's name is in its
+/// Full form alone: it is the name of neither card, so neither card's text
+/// shortens it.
 ///
 /// The faces of a double-faced card are named apart
 /// [CR#712.8d,712.8e,712.8f], and two faces that shorten to one spelling
 /// (*Ral*) name one object, not two, so a face's text shortens its own name.
 #[must_use]
 pub fn own_names(unit: &OracleUnit<'_>) -> CardScope {
-    CardScope::own_names(own_name_ids(unit))
-}
-
-fn own_name_ids<'u>(unit: &'u OracleUnit<'_>) -> impl Iterator<Item = LexemeId> + 'u {
-    let melded = unit
-        .related_cards()
-        .iter()
-        .filter(|part| part.component == RelatedComponent::MeldResult)
-        .map(|part| part.name.as_str());
-    [unit.display_name(), unit.group_name()]
-        .into_iter()
-        .chain(melded)
-        .map(card_name_id)
+    let mut scope = CardScope::own_names([
+        card_name_id(unit.display_name()),
+        card_name_id(unit.group_name()),
+    ]);
+    for part in unit.related_cards() {
+        if part.component == RelatedComponent::MeldResult {
+            scope.insert(card_name_id(&part.name), NameForm::Full);
+        }
+    }
+    scope
 }
 
 /// The rules-text units of a face: its paragraph lines after balanced
@@ -442,7 +441,7 @@ mod tests {
     }
 
     #[test]
-    fn both_cards_of_a_meld_pair_have_the_meld_result_s_name_in_scope() {
+    fn both_cards_of_a_meld_pair_have_the_meld_result_s_full_name_in_scope() {
         let parts = r#""all_parts":[{"object":"related_card","id":"r","component":"meld_result","name":"Brisela, Voice of Nightmares","type_line":"Legendary Creature — Eldrazi Angel"},{"object":"related_card","id":"g","component":"meld_part","name":"Gisela, the Broken Blade","type_line":"Legendary Creature — Angel Horror"},{"object":"related_card","id":"b","component":"meld_part","name":"Bruna, the Fading Light","type_line":"Legendary Creature — Angel Horror"}]"#;
         let input = [
             format!(
@@ -456,15 +455,22 @@ mod tests {
         .join("\n");
         let corpus = Corpus::read(std::io::Cursor::new(input), |_| true).unwrap();
         let result = card_name_id("Brisela, Voice of Nightmares");
+        let melded = |card: &str| {
+            let mut scope = CardScope::own_names([card_name_id(card)]);
+            scope.insert(result, NameForm::Full);
+            scope
+        };
         let scopes: Vec<_> = corpus.faces.iter().map(|f| f.scope.clone()).collect();
         assert_eq!(
             scopes,
             [
-                CardScope::own_names([card_name_id("Gisela, the Broken Blade"), result]),
-                CardScope::own_names([card_name_id("Bruna, the Fading Light"), result]),
+                melded("Gisela, the Broken Blade"),
+                melded("Bruna, the Fading Light"),
                 CardScope::own_names([card_name_id("Lightning Bolt")]),
             ]
         );
+        // Neither card's text shortens the meld result's name.
+        assert!(!scopes[0].holds(result, NameForm::Shortened));
     }
 
     #[test]
