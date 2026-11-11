@@ -104,7 +104,8 @@
     // *the opponent to your left*
     (lemma: "opponent", frames: [Complement(PP(["to"]))]),
     (lemma: "order", countability: [Count, Mass]),
-    "outlaw",
+    // A prefix joins it with a hyphen, as a subtype (*non-outlaw*).
+    (lemma: "outlaw", prefix_hyphenation: Hyphenated),
     (lemma: "owner", frames: [Complement(PP(["of"]))]),
     "pack",
     (lemma: "pair", frames: [Complement(PP(["of"]))]),

@@ -77,7 +77,7 @@ fn replace(
     form: WordForm,
     person: Option<Person>,
     number: Option<Number>,
-    surfaces: &[String],
+    surface: &str,
 ) -> bool {
     let mut found = false;
     for slot in &mut lexeme.forms {
@@ -85,7 +85,7 @@ fn replace(
             && person.is_none_or(|p| slot.features.person == Some(p))
             && number.is_none_or(|n| slot.features.number == Some(n))
         {
-            slot.surfaces = Some(surfaces.to_vec());
+            slot.surface = Some(surface.to_owned());
             found = true;
         }
     }
@@ -127,8 +127,21 @@ impl Builder {
             .properties
             .features
             .insert("Cardinality".into(), Ident::new("NonCardinal"));
-        lexeme.forms[0].surfaces.clone_from(&entry.spellings);
         lexeme.forms[0].features.number = entry.number;
+        if let Some(allomorphs) = &entry.allomorphs {
+            let slot = lexeme.forms.remove(0);
+            lexeme.forms = allomorphs
+                .iter()
+                .map(|(onset, surface)| FormDeclaration {
+                    features: FeatureBundle {
+                        following_onset: Some(*onset),
+                        ..slot.features.clone()
+                    },
+                    surface: Some(surface.clone()),
+                    ..slot.clone()
+                })
+                .collect();
+        }
         if let Some(countability) = entry.countability {
             lexeme.properties.features.insert(
                 "Countability".into(),
@@ -213,7 +226,7 @@ impl Builder {
         for (forms, spellings, (person, number)) in fields {
             let Some(spellings) = spellings else { continue };
             for form in forms {
-                if !replace(&mut lexeme, *form, person, number, &spellings.to_vec()) {
+                if !replace(&mut lexeme, *form, person, number, spellings) {
                     return Err(invalid(&format!("no {form:?} slot to spell")));
                 }
             }
@@ -227,7 +240,7 @@ impl Builder {
                     finiteness: Some(Finiteness::Finite),
                     ..FeatureBundle::default()
                 },
-                surfaces: Some(irrealis.to_vec()),
+                surface: Some(irrealis.clone()),
             });
         }
         for slot in &entry.forms {
@@ -236,7 +249,7 @@ impl Builder {
                 slot.form,
                 slot.person,
                 slot.number,
-                &slot.surfaces.to_vec(),
+                &slot.surface,
             ) {
                 return Err(invalid(&format!("no {:?} slot to spell", slot.form)));
             }
@@ -255,12 +268,12 @@ impl Builder {
             // Spell every form from this entry's own lemma before naming it.
             let spelled = lexeme.clone();
             for slot in &mut lexeme.forms {
-                if slot.surfaces.is_none() {
-                    slot.surfaces = Some(vec![sylex_lexicon::default_surface(
+                if slot.surface.is_none() {
+                    slot.surface = Some(sylex_lexicon::default_surface(
                         &spelled,
                         slot.form,
                         &slot.features,
-                    )]);
+                    ));
                 }
             }
             lexeme.lemma.clone_from(base);
@@ -300,8 +313,9 @@ impl Builder {
                 .insert("Variable".into(), Ident::new("Cited"));
         }
         if let Some(plural) = &entry.plural {
-            replace(&mut lexeme, WordForm::Plural, None, None, &plural.to_vec());
+            replace(&mut lexeme, WordForm::Plural, None, None, plural);
         }
+        lexeme.properties.prefix_hyphenation = entry.prefix_hyphenation;
         let id = lexeme.id;
         self.push(lexeme);
         self.frames(id, Category::Noun, &entry.frames);
@@ -333,13 +347,7 @@ impl Builder {
                 source.clone(),
             );
             if spelling != &entry.lemma {
-                replace(
-                    &mut lexeme,
-                    WordForm::Invariant,
-                    None,
-                    None,
-                    std::slice::from_ref(spelling),
-                );
+                replace(&mut lexeme, WordForm::Invariant, None, None, spelling);
             }
             if let Some(position) = entry.position {
                 lexeme.properties.features.insert(
@@ -690,9 +698,8 @@ pub(crate) fn exact(id: &str, lemma: &str, category: Category, source: Source) -
     lexeme
 }
 
-/// A Lexeme whose spellings are in scope only on `cards`.
+/// A Lexeme in scope only on `cards`.
 pub(crate) fn card_scoped(mut lexeme: Lexeme, cards: &[String]) -> Lexeme {
-    lexeme.card_scoped_surfaces = [lexeme.lemma.clone()].into();
     lexeme.card_scope = cards
         .iter()
         .map(|card| crate::names::card_name_id(card))
@@ -700,17 +707,38 @@ pub(crate) fn card_scoped(mut lexeme: Lexeme, cards: &[String]) -> Lexeme {
     lexeme
 }
 
-/// A bound Lexeme with its Spelling Variants.
+/// A bound Lexeme spelled exactly.
 pub(crate) fn bound(
     id: &str,
     lemma: &str,
     category: Category,
-    spellings: &[String],
     binding: Binding,
     source: Source,
 ) -> Lexeme {
     let mut lexeme = exact(id, lemma, category, source);
-    lexeme.forms[0].surfaces = Some(spellings.to_vec());
     lexeme.binding = binding;
+    lexeme
+}
+
+/// A bound Lexeme with its allomorphs, each the form its features select,
+/// the first spelling its lemma.
+pub(crate) fn allomorphic(
+    id: &str,
+    category: Category,
+    allomorphs: impl IntoIterator<Item = (FeatureBundle, String)>,
+    binding: Binding,
+    source: Source,
+) -> Lexeme {
+    let forms: Vec<FormDeclaration> = allomorphs
+        .into_iter()
+        .map(|(features, surface)| FormDeclaration {
+            form: WordForm::Invariant,
+            features,
+            surface: Some(surface),
+        })
+        .collect();
+    let lemma = forms[0].surface.clone().expect("an allomorph is spelled");
+    let mut lexeme = bound(id, &lemma, category, binding, source);
+    lexeme.forms = forms;
     lexeme
 }

@@ -31,7 +31,6 @@ fn declared_measured_compounds_preserve_the_complete_lexical_value() {
                 number: Some(number),
                 ..Default::default()
             },
-            variant: 0,
             capitalization: SurfaceCase::Declared,
         });
         assert_eq!(lexicon.realize(&expected).unwrap(), text);
@@ -103,7 +102,6 @@ fn a_declared_signed_zero_preserves_its_written_sign_in_both_noun_forms() {
                 number: Some(number),
                 ..Default::default()
             },
-            variant: 0,
             capitalization: SurfaceCase::Declared,
         });
         assert_eq!(lexicon.realize(&expected).unwrap(), text);

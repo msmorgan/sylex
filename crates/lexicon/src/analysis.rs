@@ -173,6 +173,7 @@ pub struct Lexicon {
     lexemes: BTreeMap<crate::LexemeId, Lexeme>,
     surfaces: BTreeMap<LexicalValue, String>,
     surface_features: BTreeMap<LexicalValue, crate::SurfaceFeatures>,
+    edges: BTreeMap<LexicalValue, crate::Edges>,
     trie: Vec<TrieNode>,
 }
 
@@ -180,13 +181,14 @@ impl Lexicon {
     /// Validate declarations and freeze both analysis and realization indexes.
     ///
     /// # Errors
-    /// Rejects duplicate identities/slots/variants, empty forms, and
-    /// inapplicable features.
+    /// Rejects duplicate identities and slots, empty forms, inapplicable
+    /// features and incomplete agreement paradigms.
     pub fn new(lexemes: impl IntoIterator<Item = Lexeme>) -> Result<Self, LexicalError> {
         let mut result = Self {
             lexemes: BTreeMap::new(),
             surfaces: BTreeMap::new(),
             surface_features: BTreeMap::new(),
+            edges: BTreeMap::new(),
             trie: vec![TrieNode::default()],
         };
         for lexeme in lexemes {
@@ -238,97 +240,79 @@ impl Lexicon {
                 if let Some(reason) = missing_explicit_spelling(declaration) {
                     return Err(error(reason));
                 }
-                let surfaces = declaration.surfaces.clone().unwrap_or_else(|| {
-                    vec![morphology::default_surface(
-                        &lexeme,
-                        declaration.form,
-                        &declaration.features,
-                    )]
+                let surface = declaration.surface.clone().unwrap_or_else(|| {
+                    morphology::default_surface(&lexeme, declaration.form, &declaration.features)
                 });
-                if surfaces.is_empty() {
-                    return Err(error(
-                        "an unavailable slot must be omitted, not given an empty override",
-                    ));
+                if surface.trim() != surface || surface.is_empty() {
+                    return Err(error("empty or padded spelling"));
                 }
-                let mut distinct = BTreeSet::new();
-                for (variant, surface) in surfaces.into_iter().enumerate() {
-                    realized_surfaces.insert(surface.clone());
-                    if surface.trim() != surface
-                        || surface.is_empty()
-                        || !distinct.insert(surface.clone())
-                    {
-                        return Err(error("empty, padded or duplicate spelling variant"));
-                    }
-                    if !valid_surface(&surface, lexeme.surface_structure, lexeme.binding) {
-                        return Err(error("spelling violates its declared word boundaries"));
-                    }
+                if !valid_surface(&surface, lexeme.surface_structure, lexeme.binding) {
+                    return Err(error("spelling violates its declared word boundaries"));
+                }
+                realized_surfaces.insert(surface.clone());
+                let value = LexicalValue {
+                    lexeme: lexeme.id,
+                    form: declaration.form,
+                    features: declaration.features.clone(),
+                    capitalization: SurfaceCase::Declared,
+                };
+                let features = crate::SurfaceFeatures {
+                    onset: lexeme
+                        .onsets
+                        .get(&surface)
+                        .copied()
+                        .or_else(|| crate::pronunciation::default_onset(&surface)),
+                    initial: initial_surface(&surface) == surface,
+                    interior: true,
+                };
+                let edges = crate::Edges {
+                    left: crate::LeftEdge {
+                        onset: features.onset,
+                        prefix_hyphenation: lexeme.properties.prefix_hyphenation,
+                        genitive: declaration.features.genitive,
+                    },
+                    right: crate::RightEdge {
+                        genitive_host: genitive_host(declaration.form, &surface),
+                        following_onset: declaration.features.following_onset,
+                        hyphenation: declaration.features.hyphenation,
+                    },
+                };
+                // Only its own card admits a card name's Shortened form
+                // [CR#201.5c]; only its cards admit a card-scoped Lexeme.
+                let card_scoped = !lexeme.card_scope.is_empty()
+                    || declaration.features.name == Some(crate::NameForm::Shortened);
+                let initial = initial_surface(&surface);
+                let capitalized =
+                    lexeme.capitalization == Capitalization::Initial && initial != surface;
+                result.surface_features.insert(value.clone(), features);
+                result.edges.insert(value.clone(), edges);
+                result.insert(value.clone(), surface, lexeme.binding, card_scoped);
+                if capitalized {
                     let value = LexicalValue {
-                        lexeme: lexeme.id,
-                        form: declaration.form,
-                        features: declaration.features.clone(),
-                        variant,
-                        capitalization: SurfaceCase::Declared,
+                        capitalization: SurfaceCase::Initial,
+                        ..value
                     };
-                    let features = crate::SurfaceFeatures {
-                        onset: lexeme
-                            .onsets
-                            .get(&surface)
-                            .copied()
-                            .or_else(|| crate::pronunciation::default_onset(&surface)),
-                        article_onset: lexeme.article_onsets.get(&surface).copied(),
-                        initial: initial_surface(&surface) == surface,
-                        interior: true,
-                    };
-                    result.surface_features.insert(value.clone(), features);
-                    let card_scoped = lexeme.card_scoped_surfaces.contains(&surface);
-                    result.insert(value.clone(), surface.clone(), lexeme.binding, card_scoped);
-                    if lexeme.capitalization == Capitalization::Initial {
-                        let initial = initial_surface(&surface);
-                        if initial != surface {
-                            result.surface_features.insert(
-                                LexicalValue {
-                                    capitalization: SurfaceCase::Initial,
-                                    ..value.clone()
-                                },
-                                crate::SurfaceFeatures {
-                                    initial: true,
-                                    interior: false,
-                                    ..features
-                                },
-                            );
-                            result.insert(
-                                LexicalValue {
-                                    capitalization: SurfaceCase::Initial,
-                                    ..value
-                                },
-                                initial,
-                                lexeme.binding,
-                                card_scoped,
-                            );
-                        }
-                    }
+                    result.surface_features.insert(
+                        value.clone(),
+                        crate::SurfaceFeatures {
+                            initial: true,
+                            interior: false,
+                            ..features
+                        },
+                    );
+                    result.edges.insert(value.clone(), edges);
+                    result.insert(value, initial, lexeme.binding, card_scoped);
                 }
             }
-            if let Some(reason) = card_scope_defect(&lexeme, &realized_surfaces) {
+            if let Some(reason) = card_scope_defect(&lexeme).or_else(|| agreement_defect(&lexeme)) {
                 return Err(error(reason));
             }
             if lexeme
                 .onsets
                 .keys()
-                .chain(lexeme.article_onsets.keys())
                 .any(|surface| !realized_surfaces.contains(surface))
             {
                 return Err(error("onset override has no declared spelling"));
-            }
-            if !lexeme.article_onsets.is_empty()
-                && (lexeme.category != Category::Determinative
-                    || realized_surfaces
-                        .iter()
-                        .any(|surface| !lexeme.article_onsets.contains_key(surface)))
-            {
-                return Err(error(
-                    "article onsets must cover every determinative spelling",
-                ));
             }
             result.lexemes.insert(lexeme.id, lexeme);
         }
@@ -387,7 +371,6 @@ impl Lexicon {
                 self.realize(reading)?;
                 Ok(crate::SurfaceFeatures {
                     onset: None,
-                    article_onset: None,
                     initial: true,
                     interior: false,
                 })
@@ -405,10 +388,27 @@ impl Lexicon {
                 let text = self.realize(reading)?;
                 Ok(crate::SurfaceFeatures {
                     onset: crate::pronunciation::numeral_onset(*value),
-                    article_onset: None,
                     initial: initial_surface(&text) == text,
                     interior: *capitalization == SurfaceCase::Declared,
                 })
+            }
+        }
+    }
+
+    /// What Adjacency Agreement reads at the edges of one licensed
+    /// realization ([`crate::RightEdge::agrees`]).
+    ///
+    /// # Errors
+    /// Rejects undeclared word values and noncanonical numeral values.
+    pub fn edges(&self, reading: &LexicalReading) -> Result<crate::Edges, LexicalError> {
+        match reading {
+            LexicalReading::Word(value) => self
+                .edges
+                .get(value)
+                .copied()
+                .ok_or(LexicalError::UnlicensedValue),
+            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
+                Ok(crate::Edges::plain(self.surface_features(reading)?.onset))
             }
         }
     }
@@ -555,9 +555,9 @@ impl Lexicon {
         })
     }
 
-    /// Whether a card in `scope` admits the card-scoped spellings of
-    /// `lexeme`: one of its `card_scope`, or the Lexeme itself when that is
-    /// empty.
+    /// Whether a card in `scope` admits the card-scoped forms of `lexeme`:
+    /// one of its `card_scope`, or the Lexeme itself, a card name, when that
+    /// is empty.
     fn in_card_scope(&self, lexeme: &crate::LexemeId, scope: &BTreeSet<crate::LexemeId>) -> bool {
         let cards = &self.lexemes[lexeme].card_scope;
         if cards.is_empty() {
@@ -580,8 +580,8 @@ impl Lexicon {
         self.analyze_source_scoped(raw, normalized, &BTreeSet::new())
     }
 
-    /// Analyzes declared forms with card-scoped variants admitted only for
-    /// the lexical identities in `scope`. Full-name forms remain available.
+    /// Analyzes declared forms with card-scoped forms admitted only for the
+    /// lexical identities in `scope`. Full-name forms remain available.
     #[must_use]
     pub fn analyze_source_scoped(
         &self,
@@ -677,24 +677,76 @@ impl Lexicon {
     }
 }
 
-/// Why a Lexeme's card scope is malformed: a card-scoped spelling it does not
-/// declare, cards that admit no card-scoped spelling, or a scope of its own
-/// card on a Lexeme that is no card name.
-fn card_scope_defect(lexeme: &Lexeme, realized: &BTreeSet<String>) -> Option<&'static str> {
-    if !lexeme.card_scoped_surfaces.is_subset(realized) {
-        Some("card scope has no declared spelling")
-    } else if !lexeme.card_scope.is_empty() && lexeme.card_scoped_surfaces.is_empty() {
-        Some("card scope has no card-scoped spelling")
-    } else if lexeme.card_scope.is_empty()
-        && !lexeme.card_scoped_surfaces.is_empty()
-        && !lexeme.card_name
-    {
-        // An empty card scope means the Lexeme's own card.
-        Some("card-scoped spelling with no card scope on a Lexeme that is no card name")
-    } else if lexeme.card_name && !lexeme.card_scope.is_empty() {
+/// Why a Lexeme's card scope or name forms are malformed: a card name scoped
+/// to other cards, a card name without exactly one Full form and at most one
+/// Shortened form, or name forms on a Lexeme that is no card name.
+fn card_scope_defect(lexeme: &Lexeme) -> Option<&'static str> {
+    let names: Vec<_> = lexeme.forms.iter().map(|slot| slot.features.name).collect();
+    let count = |form| names.iter().filter(|name| **name == Some(form)).count();
+    if !lexeme.card_name {
+        names
+            .iter()
+            .any(Option::is_some)
+            .then_some("name forms on a Lexeme that is no card name")
+    } else if !lexeme.card_scope.is_empty() {
         Some("a card name is scoped to its own card, never to others")
+    } else if names.iter().any(Option::is_none)
+        || count(crate::NameForm::Full) != 1
+        || count(crate::NameForm::Shortened) > 1
+    {
+        Some("a card name has one Full form and at most one Shortened form")
     } else {
         None
+    }
+}
+
+/// Why a Lexeme's Adjacency Agreement paradigm is incomplete: a dimension
+/// some form carries must be carried by every form, with every value, since
+/// the context may fix any of them.
+fn agreement_defect(lexeme: &Lexeme) -> Option<&'static str> {
+    fn complete<T: PartialEq + Copy>(
+        lexeme: &Lexeme,
+        dimension: impl Fn(&crate::FeatureBundle) -> Option<T>,
+        domain: &[T],
+    ) -> bool {
+        let values: Vec<Option<T>> = lexeme
+            .forms
+            .iter()
+            .map(|slot| dimension(&slot.features))
+            .collect();
+        values.iter().all(Option::is_none)
+            || values.iter().all(Option::is_some)
+                && domain.iter().all(|value| values.contains(&Some(*value)))
+    }
+    let complete = complete(
+        lexeme,
+        |features| features.following_onset,
+        &[crate::Onset::Consonant, crate::Onset::Vowel],
+    ) && complete(
+        lexeme,
+        |features| features.hyphenation,
+        &[crate::Hyphenation::Solid, crate::Hyphenation::Hyphenated],
+    ) && complete(
+        lexeme,
+        |features| features.genitive,
+        &[
+            crate::GenitiveAlternant::ApostropheS,
+            crate::GenitiveAlternant::Bare,
+        ],
+    );
+    (!complete).then_some("an agreement dimension lacks a form for some value")
+}
+
+/// The genitive alternant a host form takes: the bare genitive after a Plural
+/// noun form ending in *s*, regular or irregular, a base plural included
+/// (*players'*, *elves'*, *Thalakos'*); else the *'s* genitive, after a
+/// singular ending in *s* too (*Rats's*), and after a Plural not ending in *s*
+/// (*Spawn's*). CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596.
+fn genitive_host(form: WordForm, surface: &str) -> crate::GenitiveAlternant {
+    if form == WordForm::Plural && surface.ends_with('s') {
+        crate::GenitiveAlternant::Bare
+    } else {
+        crate::GenitiveAlternant::ApostropheS
     }
 }
 
@@ -708,7 +760,7 @@ fn valid_flavor_label(label: &str) -> bool {
 }
 
 fn missing_explicit_spelling(slot: &crate::FormDeclaration) -> Option<&'static str> {
-    if slot.surfaces.is_some() {
+    if slot.surface.is_some() {
         return None;
     }
     match slot.form {

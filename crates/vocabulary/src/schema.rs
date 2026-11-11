@@ -10,28 +10,13 @@ use serde::Deserialize;
 use sylex_lexicon::Binding;
 use sylex_lexicon::Case;
 use sylex_lexicon::Countability;
+use sylex_lexicon::GenitiveAlternant;
+use sylex_lexicon::Hyphenation;
 use sylex_lexicon::Number;
+use sylex_lexicon::Onset;
 use sylex_lexicon::Person;
 use sylex_lexicon::WordForm;
 use sylex_syntax::frames::Hosts;
-
-/// One spelling, or several Spelling Variants.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(untagged)]
-pub enum Spellings {
-    One(String),
-    Many(Vec<String>),
-}
-
-impl Spellings {
-    #[must_use]
-    pub fn to_vec(&self) -> Vec<String> {
-        match self {
-            Self::One(one) => vec![one.clone()],
-            Self::Many(many) => many.clone(),
-        }
-    }
-}
 
 /// A rule of the Comprehensive Rules, written as a citation: `[CR#701.8]`.
 /// The citation tool checks it like any other.
@@ -180,7 +165,7 @@ pub struct FormOverride {
     pub person: Option<Person>,
     #[serde(default)]
     pub number: Option<Number>,
-    pub surfaces: Spellings,
+    pub surface: String,
 }
 
 /// A verb with its full paradigm and active Subcategorization Frames.
@@ -190,19 +175,19 @@ pub struct VerbEntry {
     pub lemma: String,
     /// The third-person singular present.
     #[serde(default)]
-    pub third_singular: Option<Spellings>,
+    pub third_singular: Option<String>,
     /// Both the preterite and the past participle.
     #[serde(default)]
-    pub past: Option<Spellings>,
+    pub past: Option<String>,
     #[serde(default)]
-    pub preterite: Option<Spellings>,
+    pub preterite: Option<String>,
     #[serde(default)]
-    pub past_participle: Option<Spellings>,
+    pub past_participle: Option<String>,
     #[serde(default)]
-    pub gerund: Option<Spellings>,
+    pub gerund: Option<String>,
     /// The singular irrealis (*were*), for the one verb that has it.
     #[serde(default)]
-    pub irrealis: Option<Spellings>,
+    pub irrealis: Option<String>,
     /// Person- or number-specific replacements, applied after the fields above.
     #[serde(default)]
     pub forms: Vec<FormOverride>,
@@ -261,7 +246,7 @@ pub struct NounEntry {
     #[serde(default = "count")]
     pub countability: Vec<Countability>,
     #[serde(default)]
-    pub plural: Option<Spellings>,
+    pub plural: Option<String>,
     #[serde(default)]
     pub frames: Vec<FrameSpec>,
     /// The noun names a variable whose values are cited names, so that a
@@ -270,6 +255,10 @@ pub struct NounEntry {
     /// pp. 266-269). `type` has it.
     #[serde(default)]
     pub variable: bool,
+    /// How a prefix joins the noun: hyphenated, as before a subtype, which the
+    /// loader marks itself (*non-Vampire*), or solid (*nonland*).
+    #[serde(default)]
+    pub prefix_hyphenation: Hyphenation,
 }
 
 fn count() -> Vec<Countability> {
@@ -297,6 +286,7 @@ impl NounDecl {
                 plural: None,
                 frames: Vec::new(),
                 variable: false,
+                prefix_hyphenation: Hyphenation::Solid,
             },
             Self::Entry(entry) => entry.clone(),
         }
@@ -481,9 +471,10 @@ pub struct DeterminativeEntry {
     /// `det:LEMMA.SENSE`.
     #[serde(default)]
     pub sense: Option<String>,
-    /// Spelling Variants, when the lemma is not the only spelling.
+    /// The forms the Onset of the word after it selects (*a*, *an*), when
+    /// the lemma is not the only spelling.
     #[serde(default)]
-    pub spellings: Option<Vec<String>>,
+    pub allomorphs: Option<BTreeMap<Onset, String>>,
     #[serde(default)]
     pub frames: Vec<FrameSpec>,
 }
@@ -546,7 +537,7 @@ pub struct PronounForm {
     pub number: Number,
     #[serde(default)]
     pub case: Option<Case>,
-    pub surfaces: Spellings,
+    pub surface: String,
 }
 
 fn invariant() -> WordForm {
@@ -577,13 +568,14 @@ pub enum PronounKind {
     Relative,
 }
 
-/// An affix or clitic, bound to its host.
+/// An affix or clitic, bound to its host, with its forms: each is the one
+/// a value of its Adjacency Agreement dimension `T` selects.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct BoundEntry {
+pub struct BoundEntry<T: Ord> {
     /// The identity-bearing name, such as `genitive`.
     pub name: String,
-    pub spellings: Vec<String>,
+    pub allomorphs: BTreeMap<T, String>,
     pub binding: Binding,
 }
 
@@ -599,8 +591,10 @@ pub struct ClosedClass {
     pub subordinators: Vec<String>,
     /// Auxiliaries and modals, including their negative forms.
     pub auxiliaries: Vec<VerbEntry>,
-    pub affixes: Vec<BoundEntry>,
-    pub clitics: Vec<BoundEntry>,
+    /// Prefixes, whose form the host after them selects.
+    pub affixes: Vec<BoundEntry<Hyphenation>>,
+    /// Suffixes, whose form the host before them selects.
+    pub clitics: Vec<BoundEntry<GenitiveAlternant>>,
     /// Braced and other notation symbols, spelled exactly.
     pub symbols: Vec<SymbolEntry>,
 }

@@ -41,7 +41,7 @@ fn finite(person: Person, number: Number, tense: Tense) -> FeatureBundle {
         person: Some(person),
         tense: Some(tense),
         finiteness: Some(Finiteness::Finite),
-        case: None,
+        ..FeatureBundle::default()
     }
 }
 
@@ -57,7 +57,6 @@ fn word(id: &str, form: WordForm, features: FeatureBundle) -> LexicalReading {
         lexeme: id.into(),
         form,
         features,
-        variant: 0,
         capitalization: SurfaceCase::Declared,
     })
 }
@@ -99,10 +98,10 @@ fn complete(lexicon: &Lexicon, text: &str) -> BTreeSet<LexicalReading> {
     at(&lexicon.analyze(text), 0, text.chars().count())
 }
 
-fn override_form(lexeme: &mut Lexeme, form: WordForm, surfaces: &[&str]) {
+fn override_form(lexeme: &mut Lexeme, form: WordForm, surface: &str) {
     for declaration in &mut lexeme.forms {
         if declaration.form == form {
-            declaration.surfaces = Some(surfaces.iter().map(|s| (*s).to_owned()).collect());
+            declaration.surface = Some(surface.to_owned());
         }
     }
 }
@@ -127,8 +126,8 @@ fn counters_preserves_noun_and_correlated_finite_verb() {
 #[test]
 fn cast_preserves_plain_present_preterite_and_participle_alternatives() {
     let mut cast = verb("v:cast", "cast");
-    override_form(&mut cast, WordForm::Preterite, &["cast"]);
-    override_form(&mut cast, WordForm::PastParticiple, &["cast"]);
+    override_form(&mut cast, WordForm::Preterite, "cast");
+    override_form(&mut cast, WordForm::PastParticiple, "cast");
     let lexicon = Lexicon::new([cast]).unwrap();
     let readings = complete(&lexicon, "cast");
 
@@ -159,8 +158,8 @@ fn cast_preserves_plain_present_preterite_and_participle_alternatives() {
 #[test]
 fn declarations_roundtrip_with_overridden_forms() {
     let mut cast = verb("v:cast", "cast");
-    override_form(&mut cast, WordForm::Preterite, &["cast"]);
-    override_form(&mut cast, WordForm::PastParticiple, &["cast"]);
+    override_form(&mut cast, WordForm::Preterite, "cast");
+    override_form(&mut cast, WordForm::PastParticiple, "cast");
 
     let serialized = ron::to_string(&cast).unwrap();
     let restored: Lexeme = ron::from_str(&serialized).unwrap();
@@ -321,7 +320,7 @@ fn default_morphology_handles_y_sibilants_e_and_ie() {
         assert_eq!(complete(&lexicon, surface), BTreeSet::from([reading]));
     }
     for (surface, id) in [("copied", "v:copy"), ("exiled", "v:exile")] {
-        assert_eq!(complete(&lexicon, surface), past_readings(id, 0));
+        assert_eq!(complete(&lexicon, surface), past_readings(id));
     }
     for malformed in [
         "abilitys", "boxs", "copys", "watchs", "copyed", "exileed", "exileing", "dieing",
@@ -330,7 +329,7 @@ fn default_morphology_handles_y_sibilants_e_and_ie() {
     }
 }
 
-fn past_readings(id: &str, variant: usize) -> BTreeSet<LexicalReading> {
+fn past_readings(id: &str) -> BTreeSet<LexicalReading> {
     let mut readings: BTreeSet<_> = [
         (Person::First, Number::Singular),
         (Person::Second, Number::Singular),
@@ -344,25 +343,16 @@ fn past_readings(id: &str, variant: usize) -> BTreeSet<LexicalReading> {
     .collect();
     readings.insert(word(id, WordForm::PastParticiple, nonfinite()));
     readings
-        .into_iter()
-        .map(|reading| match reading {
-            LexicalReading::Word(value) => LexicalReading::Word(LexicalValue { variant, ..value }),
-            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => unreachable!(),
-        })
-        .collect()
 }
 
 #[test]
-fn overrides_replace_defaults_and_keep_explicit_syncretic_variants() {
+fn overrides_replace_defaults() {
     let mut tap = verb("v:tap", "tap");
-    override_form(&mut tap, WordForm::GerundParticiple, &["tapping"]);
+    override_form(&mut tap, WordForm::GerundParticiple, "tapping");
     let mut draw = verb("v:draw", "draw");
-    override_form(&mut draw, WordForm::Preterite, &["drew"]);
-    override_form(&mut draw, WordForm::PastParticiple, &["drawn"]);
-    let mut burn = verb("v:burn", "burn");
-    override_form(&mut burn, WordForm::Preterite, &["burned", "burnt"]);
-    override_form(&mut burn, WordForm::PastParticiple, &["burned", "burnt"]);
-    let lexicon = Lexicon::new([tap, draw, burn]).unwrap();
+    override_form(&mut draw, WordForm::Preterite, "drew");
+    override_form(&mut draw, WordForm::PastParticiple, "drawn");
+    let lexicon = Lexicon::new([tap, draw]).unwrap();
     assert_eq!(
         complete(&lexicon, "tapping"),
         BTreeSet::from([word("v:tap", WordForm::GerundParticiple, nonfinite()),])
@@ -371,12 +361,10 @@ fn overrides_replace_defaults_and_keep_explicit_syncretic_variants() {
         complete(&lexicon, "drawn"),
         BTreeSet::from([word("v:draw", WordForm::PastParticiple, nonfinite()),])
     );
-    let expected_drew: BTreeSet<_> = past_readings("v:draw", 0).into_iter().filter(|reading| {
+    let expected_drew: BTreeSet<_> = past_readings("v:draw").into_iter().filter(|reading| {
         matches!(reading, LexicalReading::Word(value) if value.form == WordForm::Preterite)
     }).collect();
     assert_eq!(complete(&lexicon, "drew"), expected_drew);
-    assert_eq!(complete(&lexicon, "burned"), past_readings("v:burn", 0));
-    assert_eq!(complete(&lexicon, "burnt"), past_readings("v:burn", 1));
     for obsolete in ["taping", "drawed"] {
         assert!(complete(&lexicon, obsolete).is_empty(), "{obsolete}");
     }
@@ -397,7 +385,7 @@ fn be_agreement_keeps_complete_bundles_instead_of_crossing_features() {
     .map(|(surface, person, number)| FormDeclaration {
         form: WordForm::Present,
         features: finite(person, number, Tense::Present),
-        surfaces: Some(vec![surface.to_owned()]),
+        surface: Some(surface.to_owned()),
     })
     .collect();
     let lexicon = Lexicon::new([be]).unwrap();
@@ -764,7 +752,6 @@ fn an_italic_run_no_declaration_spells_is_a_flavor_word() {
             lexeme: "lexeme:ability_word/battalion".into(),
             form: WordForm::Invariant,
             features: FeatureBundle::default(),
-            variant: 0,
             capitalization: SurfaceCase::Declared,
         }),
         "a declared ability word is not a flavor word",
@@ -816,7 +803,7 @@ fn declared_alphabetic_slash_compounds_preserve_identity_without_guessing_parts(
             assert!(Lexicon::new([entry]).is_err(), "{surface} {binding:?}");
         }
         let mut entry = invariant("invalid-variant", "ordinary", Category::Coordinator);
-        entry.forms[0].surfaces = Some(vec![surface.into()]);
+        entry.forms[0].surface = Some(surface.into());
         assert!(Lexicon::new([entry]).is_err(), "override {surface}");
     }
     let notation = Lexicon::new([invariant("notation", "1/2", Category::Symbol)]).unwrap();
@@ -842,7 +829,7 @@ fn ordinary_recipes_reject_separator_and_quote_boundaries() {
             "{surface:?}"
         );
         let mut lexeme = noun("noun", "card");
-        lexeme.forms[0].surfaces = Some(vec![surface.into()]);
+        lexeme.forms[0].surface = Some(surface.into());
         assert!(Lexicon::new([lexeme]).is_err(), "override {surface:?}");
     }
     for surface in [
@@ -1111,7 +1098,6 @@ fn an_anchor_word_is_a_registered_label_on_the_cards_that_admit_it() {
         .properties
         .features
         .insert("LabelKind".into(), "AnchorWord".into());
-    khans.card_scoped_surfaces.insert("Khans".into());
     khans.card_scope = BTreeSet::from([LexemeId::new("name:Citadel Siege")]);
     let lexicon = Lexicon::new([khans]).unwrap();
     assert!(matches!(
@@ -1187,24 +1173,31 @@ fn lexical_ids_are_interned_across_declarations_values_and_wire_formats() {
 }
 
 #[test]
-fn serialized_surface_scope_filters_matching_and_keeps_realization() {
-    let mut card = invariant(
+fn a_shortened_name_is_admitted_only_on_its_own_card_and_realizes_alone() {
+    let card = Lexeme::card_name(
         "card:Chandra, Pyromaster",
         "Chandra, Pyromaster",
-        Category::Catalog,
+        Some("Chandra".into()),
+        source("card:Chandra, Pyromaster"),
     );
-    card.capitalization = Capitalization::Exact;
-    card.card_name = true;
-    card.forms[0].surfaces = Some(vec!["Chandra, Pyromaster".into(), "Chandra".into()]);
-    card.card_scoped_surfaces.insert("Chandra".into());
     let decoded: Lexeme = ron::from_str(&ron::to_string(&card).unwrap()).unwrap();
     assert_eq!(decoded, card);
     let lexicon = Lexicon::new([decoded, noun("subtype:Chandra", "Chandra")]).unwrap();
+    let name = |form| FeatureBundle {
+        name: Some(form),
+        ..FeatureBundle::default()
+    };
+    let shortened = word(
+        card.id.as_str(),
+        WordForm::Invariant,
+        name(NameForm::Shortened),
+    );
+    assert_eq!(lexicon.realize(&shortened).unwrap(), "Chandra");
     let scope = BTreeSet::from([card.id]);
     for (scope, expected) in [
-        (BTreeSet::new(), 0),
-        (BTreeSet::from([LexemeId::new("another-card")]), 0),
-        (scope, 1),
+        (BTreeSet::new(), false),
+        (BTreeSet::from([LexemeId::new("another-card")]), false),
+        (scope.clone(), true),
     ] {
         let input = lexicon.analyze_source_scoped("raw metadata", Some("Chandra"), &scope);
         assert_eq!(input.raw, "raw metadata");
@@ -1212,47 +1205,46 @@ fn serialized_surface_scope_filters_matching_and_keeps_realization() {
         let words: Vec<_> = input
             .matches
             .iter()
-            .filter_map(|m| match &m.reading {
-                LexicalReading::Word(v) if v.lexeme == card.id => Some(v),
-                _ => None,
-            })
+            .filter(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == card.id))
+            .map(|m| m.reading.clone())
             .collect();
-        assert_eq!(words.len(), expected);
-        for value in words {
-            assert_eq!(value.variant, 1);
-            assert_eq!(
-                lexicon
-                    .realize(&LexicalReading::Word(value.clone()))
-                    .unwrap(),
-                "Chandra"
-            );
-        }
+        assert_eq!(
+            words,
+            if expected { vec![shortened.clone()] } else { vec![] }
+        );
         assert!(input.matches.iter().any(
             |m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == "subtype:Chandra")
         ));
-        let full = lexicon.analyze_source_scoped("Chandra, Pyromaster", None, &scope);
-        assert!(full.matches.iter().any(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == card.id && v.variant == 0)));
     }
-    card.card_scoped_surfaces
-        .insert("undeclared spelling".into());
-    assert!(Lexicon::new([card]).is_err());
+    // The Full form is admitted everywhere.
+    let full = word(card.id.as_str(), WordForm::Invariant, name(NameForm::Full));
+    for scope in [BTreeSet::new(), scope] {
+        let analyzed = lexicon.analyze_source_scoped("Chandra, Pyromaster", None, &scope);
+        assert!(analyzed.matches.iter().any(|m| m.reading == full));
+    }
 }
 
 #[test]
-fn only_a_card_name_is_scoped_to_its_own_card() {
+fn only_a_card_name_has_name_forms() {
     // Chandra, Pyromaster's own text shortens its name to *Chandra*
-    // [CR#201.5c]: that scope is its own card's only when it is a card name.
-    let mut card = invariant(
+    // [CR#201.5c]: only a card name has a Shortened form, and only its own
+    // card admits it.
+    let mut card = Lexeme::card_name(
         "card:Chandra, Pyromaster",
         "Chandra, Pyromaster",
-        Category::Catalog,
+        Some("Chandra".into()),
+        source("card:Chandra, Pyromaster"),
     );
-    card.forms[0].surfaces = Some(vec!["Chandra, Pyromaster".into(), "Chandra".into()]);
-    card.card_scoped_surfaces.insert("Chandra".into());
+    assert!(Lexicon::new([card.clone()]).is_ok());
+    card.card_name = false;
     assert!(Lexicon::new([card.clone()]).is_err());
     card.card_name = true;
-    assert!(Lexicon::new([card.clone()]).is_ok());
     card.card_scope = BTreeSet::from([LexemeId::new("name:Chandra, Torch of Defiance")]);
+    assert!(Lexicon::new([card.clone()]).is_err());
+    card.card_scope.clear();
+    // A card name has one Full form.
+    card.forms
+        .retain(|slot| slot.features.name == Some(NameForm::Shortened));
     assert!(Lexicon::new([card]).is_err());
 }
 
@@ -1264,7 +1256,6 @@ fn a_card_scope_admits_spellings_on_the_cards_it_names() {
         Category::Catalog,
     );
     token.capitalization = Capitalization::Exact;
-    token.card_scoped_surfaces.insert("Marit Lage".into());
     token.card_scope = BTreeSet::from([
         LexemeId::new("name:Dark Depths"),
         LexemeId::new("name:Marit Lage's Slumber"),
@@ -1284,8 +1275,6 @@ fn a_card_scope_admits_spellings_on_the_cards_it_names() {
     assert!(!found(&["name:Vampire Hexmage"]));
     // The Lexeme's own identity is not one of the cards that admit it.
     assert!(!found(&["introduced_name:Marit Lage"]));
-    token.card_scoped_surfaces.clear();
-    assert!(Lexicon::new([token]).is_err());
 }
 
 #[test]
@@ -1331,7 +1320,7 @@ fn independent_genitive_is_a_declared_pronoun_paradigm_cell() {
     pronoun.forms = vec![FormDeclaration {
         form: WordForm::IndependentGenitive,
         features: features.clone(),
-        surfaces: Some(vec!["yours".into()]),
+        surface: Some("yours".into()),
     }];
     let lexicon = Lexicon::new([pronoun]).unwrap();
     let expected = word("you", WordForm::IndependentGenitive, features);
@@ -1354,7 +1343,7 @@ fn independent_genitive_requires_pronoun_genitive_features_and_explicit_spelling
     pronoun.forms = vec![FormDeclaration {
         form: WordForm::IndependentGenitive,
         features,
-        surfaces: Some(vec!["yours".into()]),
+        surface: Some("yours".into()),
     }];
     let mut wrong_category = pronoun.clone();
     wrong_category.category = Category::Noun;
@@ -1367,7 +1356,7 @@ fn independent_genitive_requires_pronoun_genitive_features_and_explicit_spelling
     let mut missing_number = pronoun.clone();
     missing_number.forms[0].features.number = None;
     let mut missing_spelling = pronoun;
-    missing_spelling.forms[0].surfaces = None;
+    missing_spelling.forms[0].surface = None;
     for invalid in [
         wrong_category,
         wrong_case,

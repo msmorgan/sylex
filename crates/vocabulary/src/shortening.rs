@@ -109,7 +109,7 @@ fn parse_type_line(
 // Shortened self-reference has the full name's referent [CR#201.5c]. The
 // truncation patterns propose candidates; the unit's Oracle text must attest
 // the candidate outside an occurrence of any complete card title.
-// The full and shortened spellings remain distinct variants of one Lexeme.
+// The full and shortened names are the Full and Shortened forms of one Lexeme.
 fn attested_short_name<'a>(
     name: &str,
     candidate: &'a str,

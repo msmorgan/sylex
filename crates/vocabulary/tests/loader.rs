@@ -85,6 +85,7 @@ fn a_frame_belongs_to_its_head_category() {
             plural: None,
             frames: vec![FrameSpec::Monotransitive],
             variable: false,
+            prefix_hyphenation: sylex_lexicon::Hyphenation::Solid,
         }));
     rejects(&sources, "is not a frame of a Noun");
 }

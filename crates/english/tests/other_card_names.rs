@@ -38,16 +38,18 @@ const UNITS: [(&str, &str); 6] = [
 ];
 
 /// The lexicon with every card name number-neutral and, unless
-/// `card_names` holds, no longer marked a card name, its Shortened Name
-/// dropped with the mark that scopes it to its own card.
+/// `card_names` holds, no longer marked a card name: its Full form alone,
+/// with no name form, and its Shortened form dropped.
 fn neutral(env: &LexicalEnvironment, card_names: bool) -> Lexicon {
     let lexemes = env.lexicon.lexemes().values().cloned().map(|mut lexeme| {
         if lexeme.card_name {
             lexeme.properties.features.remove("Number");
             lexeme.card_name = card_names;
             if !card_names {
-                lexeme.forms[0].surfaces = None;
-                lexeme.card_scoped_surfaces.clear();
+                lexeme
+                    .forms
+                    .retain(|slot| slot.features.name == Some(sylex_lexicon::NameForm::Full));
+                lexeme.forms[0].features.name = None;
             }
         }
         lexeme

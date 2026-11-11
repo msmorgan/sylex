@@ -1,0 +1,233 @@
+//! Adjacency Agreement: each allomorph is a form selected by a property of
+//! the word next to it, never a free choice.
+
+use sylex_lexicon::Category;
+use sylex_lexicon::Countability;
+use sylex_lexicon::FeatureBundle;
+use sylex_lexicon::FormDeclaration;
+use sylex_lexicon::GenitiveAlternant;
+use sylex_lexicon::Hyphenation;
+use sylex_lexicon::Lexeme;
+use sylex_lexicon::LexicalReading;
+use sylex_lexicon::LexicalValue;
+use sylex_lexicon::Lexicon;
+use sylex_lexicon::Onset;
+use sylex_lexicon::Source;
+use sylex_lexicon::SourceKind;
+use sylex_lexicon::SurfaceCase;
+use sylex_lexicon::WordForm;
+
+fn source(id: &str) -> Source {
+    Source {
+        kind: SourceKind::Core,
+        path: "agreement-fixture".into(),
+        owner: id.into(),
+    }
+}
+
+fn allomorphs(
+    id: &str,
+    category: Category,
+    forms: impl IntoIterator<Item = (FeatureBundle, &'static str)>,
+) -> Lexeme {
+    let mut lexeme = Lexeme::invariant(id, id, category, source(id));
+    lexeme.forms = forms
+        .into_iter()
+        .map(|(features, surface)| FormDeclaration {
+            form: WordForm::Invariant,
+            features,
+            surface: Some(surface.into()),
+        })
+        .collect();
+    lexeme
+}
+
+fn lexicon() -> Lexicon {
+    let article = allomorphs(
+        "a",
+        Category::Determinative,
+        [Onset::Consonant, Onset::Vowel]
+            .into_iter()
+            .zip(["a", "an"])
+            .map(|(onset, surface)| {
+                (
+                    FeatureBundle {
+                        following_onset: Some(onset),
+                        ..FeatureBundle::default()
+                    },
+                    surface,
+                )
+            }),
+    );
+    let mut non = allomorphs(
+        "non",
+        Category::Affix,
+        [Hyphenation::Solid, Hyphenation::Hyphenated]
+            .into_iter()
+            .zip(["non", "non-"])
+            .map(|(hyphenation, surface)| {
+                (
+                    FeatureBundle {
+                        hyphenation: Some(hyphenation),
+                        ..FeatureBundle::default()
+                    },
+                    surface,
+                )
+            }),
+    );
+    non.binding = sylex_lexicon::Binding::Prefix;
+    let mut genitive = allomorphs(
+        "genitive",
+        Category::Clitic,
+        [GenitiveAlternant::ApostropheS, GenitiveAlternant::Bare]
+            .into_iter()
+            .zip(["'s", "'"])
+            .map(|(genitive, surface)| {
+                (
+                    FeatureBundle {
+                        genitive: Some(genitive),
+                        ..FeatureBundle::default()
+                    },
+                    surface,
+                )
+            }),
+    );
+    genitive.binding = sylex_lexicon::Binding::Suffix;
+    let count_noun = |id: &str| Lexeme::noun(id, id, vec![Countability::Count], source(id));
+    let mut vampire = count_noun("Vampire");
+    vampire.properties.prefix_hyphenation = Hyphenation::Hyphenated;
+    // The zero plural (*four Eldrazi Spawn*).
+    let mut spawn = count_noun("Spawn");
+    for slot in &mut spawn.forms {
+        slot.surface = Some("Spawn".into());
+    }
+    // A base plural ending in *s* (*Thalakos*), and an irregular plural
+    // (*Elves*).
+    let mut thalakos = count_noun("Thalakos");
+    for slot in &mut thalakos.forms {
+        slot.surface = Some("Thalakos".into());
+    }
+    let mut elf = count_noun("Elf");
+    for slot in &mut elf.forms {
+        if slot.form == WordForm::Plural {
+            slot.surface = Some("Elves".into());
+        }
+    }
+    Lexicon::new([
+        thalakos,
+        elf,
+        article,
+        non,
+        genitive,
+        count_noun("artifact"),
+        count_noun("creature"),
+        count_noun("land"),
+        count_noun("player"),
+        vampire,
+        spawn,
+    ])
+    .unwrap()
+}
+
+fn value(id: &str, form: WordForm, features: FeatureBundle) -> LexicalReading {
+    LexicalReading::Word(LexicalValue {
+        lexeme: id.into(),
+        form,
+        features,
+        capitalization: SurfaceCase::Declared,
+    })
+}
+
+fn noun(id: &str, form: WordForm) -> LexicalReading {
+    value(
+        id,
+        form,
+        FeatureBundle {
+            number: Some(if form == WordForm::Plural {
+                sylex_lexicon::Number::Plural
+            } else {
+                sylex_lexicon::Number::Singular
+            }),
+            ..FeatureBundle::default()
+        },
+    )
+}
+
+fn agree(lexicon: &Lexicon, before: &LexicalReading, after: &LexicalReading) -> bool {
+    lexicon
+        .edges(before)
+        .unwrap()
+        .right
+        .agrees(lexicon.edges(after).unwrap().left)
+}
+
+#[test]
+fn each_allomorph_realizes_one_spelling_its_neighbor_selects() {
+    let lexicon = lexicon();
+    let article = |onset| {
+        value(
+            "a",
+            WordForm::Invariant,
+            FeatureBundle {
+                following_onset: Some(onset),
+                ..FeatureBundle::default()
+            },
+        )
+    };
+    let (a, an) = (article(Onset::Consonant), article(Onset::Vowel));
+    assert_eq!(lexicon.realize(&a).unwrap(), "a");
+    assert_eq!(lexicon.realize(&an).unwrap(), "an");
+    let creature = noun("creature", WordForm::Singular);
+    let artifact = noun("artifact", WordForm::Singular);
+    assert!(agree(&lexicon, &a, &creature) && agree(&lexicon, &an, &artifact));
+    assert!(!agree(&lexicon, &a, &artifact) && !agree(&lexicon, &an, &creature));
+
+    let prefix = |hyphenation| {
+        value(
+            "non",
+            WordForm::Invariant,
+            FeatureBundle {
+                hyphenation: Some(hyphenation),
+                ..FeatureBundle::default()
+            },
+        )
+    };
+    let (solid, hyphenated) = (prefix(Hyphenation::Solid), prefix(Hyphenation::Hyphenated));
+    assert_eq!(lexicon.realize(&hyphenated).unwrap(), "non-");
+    let land = noun("land", WordForm::Singular);
+    let vampire = noun("Vampire", WordForm::Singular);
+    assert!(agree(&lexicon, &solid, &land) && agree(&lexicon, &hyphenated, &vampire));
+    assert!(!agree(&lexicon, &hyphenated, &land) && !agree(&lexicon, &solid, &vampire));
+
+    let genitive = |alternant| {
+        value(
+            "genitive",
+            WordForm::Invariant,
+            FeatureBundle {
+                genitive: Some(alternant),
+                ..FeatureBundle::default()
+            },
+        )
+    };
+    let (suffixed, bare) = (
+        genitive(GenitiveAlternant::ApostropheS),
+        genitive(GenitiveAlternant::Bare),
+    );
+    assert_eq!(lexicon.realize(&bare).unwrap(), "'");
+    let player = noun("player", WordForm::Singular);
+    let players = noun("player", WordForm::Plural);
+    // The zero plural ends in no *s*, so it takes the *'s* genitive.
+    let spawn = noun("Spawn", WordForm::Plural);
+    assert!(agree(&lexicon, &player, &suffixed) && agree(&lexicon, &players, &bare));
+    assert!(agree(&lexicon, &spawn, &suffixed) && !agree(&lexicon, &spawn, &bare));
+    assert!(!agree(&lexicon, &player, &bare) && !agree(&lexicon, &players, &suffixed));
+    // Every Plural ending in *s* takes the bare genitive, a base plural and
+    // an irregular one included (CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596); the
+    // singular of a base plural takes *'s*.
+    let thalakos = noun("Thalakos", WordForm::Plural);
+    let elves = noun("Elf", WordForm::Plural);
+    let one_thalakos = noun("Thalakos", WordForm::Singular);
+    assert!(agree(&lexicon, &thalakos, &bare) && !agree(&lexicon, &thalakos, &suffixed));
+    assert!(agree(&lexicon, &one_thalakos, &suffixed));
+    assert!(agree(&lexicon, &elves, &bare) && !agree(&lexicon, &elves, &suffixed));
+}

@@ -26,7 +26,7 @@ fn lexicon() -> Lexicon {
             slot.form,
             sylex_lexicon::WordForm::Preterite | sylex_lexicon::WordForm::PastParticiple
         ) {
-            slot.surfaces = Some(vec!["cost".to_owned()]);
+            slot.surface = Some("cost".to_owned());
         }
     }
     Lexicon::new([

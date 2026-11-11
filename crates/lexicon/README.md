@@ -2,7 +2,7 @@
 
 Lexical analysis and realization for the English layer. It reads text as every
 declared Lexeme occurrence it could be, and spells a lexical value back out.
-Morphology, spelling variants, Onsets and the numeral codecs live here. It
+Morphology, Onsets, Adjacency Agreement and the numeral codecs live here. It
 depends on no grammar, vocabulary file or Game Model.
 
 The design of this layer is [Lexicon](../../docs/decisions/lexicon.md); what it

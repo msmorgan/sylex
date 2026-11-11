@@ -3,13 +3,17 @@ use crate::NumeralCodec;
 use crate::Onset;
 
 /// Normalization recipe for declared spellings, read from the first word of a
-/// multiword or hyphenated form: digits are spoken as a cardinal, an uppercase
+/// multiword or hyphenated form: a leading sign is spoken *plus* or *minus*
+/// (*a +1/+1 counter*, *a -1/-1 counter*), digits as a cardinal, an uppercase
 /// initialism by its first letter name, and declared silent-`h` and
 /// consonantal-vowel prefixes override the first letter. Otherwise the first
 /// ASCII letter decides; an unknown onset stays `None`. Declared overrides
 /// take precedence, and the grammar reads only the resulting [`Onset`],
 /// never the spelling.
 pub(crate) fn default_onset(surface: &str) -> Option<Onset> {
+    if let Some(onset) = surface.chars().next().and_then(mark_onset) {
+        return Some(onset);
+    }
     let word = surface
         .split(|c: char| c.is_whitespace() || c == '-')
         .next()?;
@@ -76,6 +80,15 @@ pub(crate) fn default_onset(surface: &str) -> Option<Onset> {
     }
 }
 
-pub(crate) fn numeral_onset(value: i32) -> Option<Onset> {
+/// The Onset of a mark spoken as a word: a sign, *plus* or *minus* (*a
+/// +8/+8 creature*). Any other mark is not spoken and has none.
+#[must_use]
+pub fn mark_onset(mark: char) -> Option<Onset> {
+    matches!(mark, '+' | '-').then_some(Onset::Consonant)
+}
+
+/// The Onset of an integer, spoken as a cardinal (*an 8/8*, *a 1/1*).
+#[must_use]
+pub fn numeral_onset(value: i32) -> Option<Onset> {
     default_onset(&Numeral::Cardinal.format(value))
 }

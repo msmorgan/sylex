@@ -22,22 +22,25 @@ fn row(id: &str, spelling: &str) -> Lexeme {
 }
 
 #[test]
-fn normalized_pronunciation_respects_overrides_spelling_variants_and_numerals() {
-    let mut alternative = row("alternative", "heir");
-    alternative.forms[0].surfaces = Some(vec!["heir".into(), "unicorn".into()]);
+fn normalized_pronunciation_respects_overrides_and_numerals() {
     let mut overridden = row("override", "xenic");
     overridden.onsets.insert("xenic".into(), Onset::Vowel);
-    let lexicon = Lexicon::new([alternative, overridden, row("default", "xenic")]).unwrap();
+    let lexicon = Lexicon::new([
+        row("heir", "heir"),
+        row("unicorn", "unicorn"),
+        overridden,
+        row("default", "xenic"),
+    ])
+    .unwrap();
     for value in lexicon.values() {
         let reading = LexicalReading::Word(value.clone());
         let surface = lexicon.realize(&reading).unwrap();
         let properties = lexicon.surface_features(&reading).unwrap();
-        let expected =
-            if value.lexeme == "override" || value.lexeme == "alternative" && value.variant == 0 {
-                Onset::Vowel
-            } else {
-                Onset::Consonant
-            };
+        let expected = if value.lexeme == "override" || value.lexeme == "heir" {
+            Onset::Vowel
+        } else {
+            Onset::Consonant
+        };
         assert_eq!(properties.onset, Some(expected), "{value:?}");
         assert_eq!(
             properties.initial,
@@ -87,26 +90,22 @@ fn invalid_pronunciation_declarations_fail_loading() {
             .contains("no declared spelling")
     );
     let mut not_an_article = row("adjective", "uniform");
-    not_an_article
-        .article_onsets
-        .insert("uniform".into(), Onset::Vowel);
+    not_an_article.forms[0].features.following_onset = Some(Onset::Vowel);
     assert!(
         Lexicon::new([not_an_article])
             .unwrap_err()
             .to_string()
-            .contains("determinative")
+            .contains("inapplicable")
     );
+    // *a* alone, with no form for a vowel Onset.
     let mut incomplete = row("article", "a");
     incomplete.category = Category::Determinative;
-    incomplete.forms[0].surfaces = Some(vec!["a".into(), "an".into()]);
-    incomplete
-        .article_onsets
-        .insert("a".into(), Onset::Consonant);
+    incomplete.forms[0].features.following_onset = Some(Onset::Consonant);
     assert!(
         Lexicon::new([incomplete])
             .unwrap_err()
             .to_string()
-            .contains("every determinative spelling")
+            .contains("lacks a form")
     );
 }
 
@@ -118,6 +117,9 @@ fn multiword_names_and_bound_forms_take_the_first_pronounced_onset() {
         ("Urza's Saga", Onset::Vowel),
         ("island", Onset::Vowel),
         ("forest", Onset::Consonant),
+        // A sign is spoken: *a +1/+1 counter*, *a -1/-1 counter*.
+        ("+1/+1 counter", Onset::Consonant),
+        ("-1/-1 counter", Onset::Consonant),
     ] {
         let mut entry = row("onset", spelling);
         entry.category = Category::Catalog;

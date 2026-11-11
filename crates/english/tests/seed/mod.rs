@@ -64,7 +64,7 @@ fn set(
             && person.is_none_or(|p| declaration.features.person == Some(p))
             && number.is_none_or(|n| declaration.features.number == Some(n))
         {
-            declaration.surfaces = Some(vec![surface.to_owned()]);
+            declaration.surface = Some(surface.to_owned());
         }
     }
 }
@@ -112,7 +112,7 @@ fn pronoun(lemma: &str, person: Person, number: Option<Number>) -> Lexeme {
             number,
             ..FeatureBundle::default()
         },
-        surfaces: None,
+        surface: None,
     }];
     lexeme
 }
@@ -210,7 +210,7 @@ pub fn lexicon() -> Lexicon {
     set(&mut be, GerundParticiple, None, None, "being");
     set(&mut be, PastParticiple, None, None, "been");
     let mut genitive = invariant("clitic", "genitive", Category::Clitic, Core);
-    genitive.forms[0].surfaces = Some(vec!["'s".to_owned()]);
+    genitive.forms[0].surface = Some("'s".to_owned());
     genitive.binding = Binding::Suffix;
 
     let mut lexemes = vec![

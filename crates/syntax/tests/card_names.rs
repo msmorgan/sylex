@@ -24,8 +24,7 @@ fn lexicon() -> Lexicon {
     };
     // From Excise's *Exile target attacking creature*: *Exile* is also a
     // card's name.
-    let mut card = Lexeme::invariant("name:Exile", "Exile", Category::Catalog, catalog.clone());
-    card.card_name = true;
+    let card = Lexeme::card_name("name:Exile", "Exile", None, catalog.clone());
     let token = Lexeme::invariant("token:Young Hero", "Young Hero", Category::Catalog, catalog);
     Lexicon::new([card, token]).unwrap()
 }

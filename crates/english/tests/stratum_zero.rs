@@ -36,7 +36,6 @@ fn keyword(lemma: &str, capitalization: SurfaceCase) -> Reading {
         lexeme: format!("keyword:{lemma}").as_str().into(),
         form: WordForm::Invariant,
         features: FeatureBundle::default(),
-        variant: 0,
         capitalization,
     }));
     let parameters = node(

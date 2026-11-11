@@ -56,7 +56,7 @@ fn zero_plural(lemma: &str) -> Lexeme {
     let mut lexeme = noun(lemma);
     for form in &mut lexeme.forms {
         if form.form == WordForm::Plural {
-            form.surfaces = Some(vec![lemma.to_owned()]);
+            form.surface = Some(lemma.to_owned());
         }
     }
     lexeme
@@ -78,7 +78,7 @@ fn pronoun(id: &str, lemma: &str, bundles: &[(Number, Person)]) -> Lexeme {
                 person: Some(person),
                 ..FeatureBundle::default()
             },
-            surfaces: None,
+            surface: None,
         })
         .collect();
     lexeme
@@ -157,7 +157,6 @@ fn leaf(
         lexeme: lexeme.into(),
         form,
         features,
-        variant: 0,
         capitalization,
     }))
 }
@@ -227,7 +226,7 @@ fn every_homograph_reaches_every_production_accepting_it() {
     let mut cast = Lexeme::verb("v:cast", "cast", core());
     for form in &mut cast.forms {
         if matches!(form.form, WordForm::Preterite | WordForm::PastParticiple) {
-            form.surfaces = Some(vec!["cast".to_owned()]);
+            form.surface = Some("cast".to_owned());
         }
     }
     let lexicon = Lexicon::new([
@@ -992,7 +991,7 @@ fn removing_an_alternative_removes_exactly_its_readings() {
 }
 
 /// Obligation 13: both round-trip laws hold for every declared lexical
-/// value, spelling variants, capitalization and non-ASCII surfaces
+/// value, irregular overrides, capitalization and non-ASCII surfaces
 /// included. Each value is built as a Reading without parsing; the parse
 /// of its realization has exactly that Reading.
 #[test]
@@ -1000,13 +999,13 @@ fn every_declared_lexical_value_round_trips() {
     let mut burn = Lexeme::verb("v:burn", "burn", core());
     for form in &mut burn.forms {
         if matches!(form.form, WordForm::Preterite | WordForm::PastParticiple) {
-            form.surfaces = Some(vec!["burned".to_owned(), "burnt".to_owned()]);
+            form.surface = Some("burnt".to_owned());
         }
     }
     let mut cafe = noun("café");
     for form in &mut cafe.forms {
         if form.form == WordForm::Plural {
-            form.surfaces = Some(vec!["cafés".to_owned(), "caféses".to_owned()]);
+            form.surface = Some("cafés".to_owned());
         }
     }
     let mut aether = word("n:Æther", "Æther", Category::Noun);
@@ -1023,7 +1022,6 @@ fn every_declared_lexical_value_round_trips() {
     .unwrap();
     let grammar = bind(WORD, &lexicon, NO_FRAMES).unwrap();
     let values: Vec<LexicalValue> = lexicon.values().cloned().collect();
-    assert!(values.iter().any(|v| v.variant == 1));
     assert!(
         values
             .iter()
@@ -1036,11 +1034,10 @@ fn every_declared_lexical_value_round_trips() {
             word_reading(production_for(category), LexicalReading::Word(value))
         })
         .collect();
-    // Each spelling in both capitalizations: `burn` 22 (plain, gerund, six
-    // present, past participle and six preterite in two variants each),
-    // `café` 3, `élan` 2, `naïve` 1, `each` 1; `Æther` has only its
-    // declared capitalization.
-    assert_eq!(assert_family(&grammar, &lexicon, "Sentence", family), 59);
+    // Each value in both capitalizations: `burn` 15 (plain, gerund, six
+    // present, past participle and six preterite), `café` 2, `élan` 2,
+    // `naïve` 1, `each` 1; `Æther` has only its declared capitalization.
+    assert_eq!(assert_family(&grammar, &lexicon, "Sentence", family), 43);
 }
 
 /// Imperatives with nominal and predicate attachment of Preposition Phrases.

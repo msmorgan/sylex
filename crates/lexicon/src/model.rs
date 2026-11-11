@@ -9,10 +9,10 @@ use serde::Serialize;
 pub struct FormDeclaration {
     pub form: crate::WordForm,
     pub features: crate::FeatureBundle,
-    /// None requests the default; Some replaces it with exactly these
-    /// alternatives. An unavailable slot is omitted from the lexeme's
-    /// forms.
-    pub surfaces: Option<Vec<String>>,
+    /// None requests the default spelling; Some replaces it. A slot has
+    /// exactly one spelling, and an unavailable slot is omitted from the
+    /// lexeme's forms.
+    pub surface: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize, Serialize)]
@@ -23,6 +23,9 @@ pub struct LexicalProperties {
     pub countability: Vec<crate::Countability>,
     /// Declared distribution features retained by name for the grammar adapter.
     pub features: BTreeMap<dpsi::Ident, dpsi::Ident>,
+    /// How a prefix before the Lexeme joins it ([`crate::FeatureBundle::hyphenation`]).
+    #[serde(default)]
+    pub prefix_hyphenation: crate::Hyphenation,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
@@ -99,26 +102,21 @@ pub struct Lexeme {
     pub binding: Binding,
     #[serde(default)]
     pub surface_structure: SurfaceStructure,
-    /// Surface variants admitted only in the lexical scope of a card in
-    /// `card_scope`.
-    #[serde(default)]
-    pub card_scoped_surfaces: BTreeSet<String>,
-    /// The cards whose own text admits `card_scoped_surfaces`: the cards
-    /// that introduce an Introduced Name or an Anchor Word. Empty means the
-    /// Lexeme's own card, as for a Shortened Name [CR#201.5c].
+    /// The cards whose own text alone admits the Lexeme: the cards that
+    /// introduce an Introduced Name or an Anchor Word. Empty means the
+    /// Lexeme is admitted everywhere, but for a card name's Shortened form,
+    /// which only its own card admits [CR#201.5c].
     #[serde(default)]
     pub card_scope: BTreeSet<crate::LexemeId>,
     /// The Lexeme is a card name [CR#201.1]: a face's lexical scope holds it
     /// when the face is that card or one of its faces, and it is another
-    /// card's name everywhere else.
+    /// card's name everywhere else. Its forms are told apart by
+    /// [`crate::FeatureBundle::name`].
     #[serde(default)]
     pub card_name: bool,
     /// Per-spelling pronunciation overrides, before positional capitalization.
     #[serde(default)]
     pub onsets: BTreeMap<String, crate::Onset>,
-    /// The onset required of an article's following pronounced constituent.
-    #[serde(default)]
-    pub article_onsets: BTreeMap<String, crate::Onset>,
 }
 
 impl Lexeme {
@@ -137,16 +135,14 @@ impl Lexeme {
             forms: vec![FormDeclaration {
                 form: crate::WordForm::Invariant,
                 features: crate::FeatureBundle::default(),
-                surfaces: None,
+                surface: None,
             }],
             source,
             capitalization: Capitalization::Initial,
             binding: Binding::Free,
-            card_scoped_surfaces: BTreeSet::new(),
             card_scope: BTreeSet::new(),
             card_name: false,
             onsets: BTreeMap::new(),
-            article_onsets: BTreeMap::new(),
             surface_structure: if matches!(
                 category,
                 crate::Category::Catalog | crate::Category::Symbol
@@ -156,6 +152,33 @@ impl Lexeme {
                 SurfaceStructure::Word
             },
         }
+    }
+
+    /// A card name [CR#201.1]: its Full form, spelled `name`, and its
+    /// Shortened form [CR#201.5c] when it has one.
+    #[must_use]
+    pub fn card_name(
+        id: impl AsRef<str>,
+        name: &str,
+        shortened: Option<String>,
+        source: Source,
+    ) -> Self {
+        let mut lexeme = Self::invariant(id, name, crate::Category::Catalog, source);
+        lexeme.capitalization = Capitalization::Exact;
+        lexeme.card_name = true;
+        lexeme.forms = [(crate::NameForm::Full, None)]
+            .into_iter()
+            .chain(shortened.map(|short| (crate::NameForm::Shortened, Some(short))))
+            .map(|(form, surface)| FormDeclaration {
+                form: crate::WordForm::Invariant,
+                features: crate::FeatureBundle {
+                    name: Some(form),
+                    ..crate::FeatureBundle::default()
+                },
+                surface,
+            })
+            .collect();
+        lexeme
     }
 
     #[must_use]
@@ -186,7 +209,7 @@ impl Lexeme {
                     }),
                     ..crate::FeatureBundle::default()
                 },
-                surfaces: None,
+                surface: None,
             })
             .collect();
         lexeme
@@ -211,7 +234,7 @@ impl Lexeme {
                     .then_some(crate::Finiteness::Nonfinite),
                 ..crate::FeatureBundle::default()
             },
-            surfaces: None,
+            surface: None,
         })
         .collect();
         for (form, tense) in [
@@ -231,9 +254,9 @@ impl Lexeme {
                             person: Some(person),
                             tense: Some(tense),
                             finiteness: Some(crate::Finiteness::Finite),
-                            case: None,
+                            ..crate::FeatureBundle::default()
                         },
-                        surfaces: None,
+                        surface: None,
                     });
                 }
             }
@@ -245,13 +268,13 @@ impl Lexeme {
     /// person and spelling into one slot unmarked for number: that verb form
     /// does not agree in number (*entered*, *can*). Call it after spelling.
     pub fn merge_number_neutral_forms(&mut self) {
-        let spelled: Vec<Vec<String>> = self
+        let spelled: Vec<String> = self
             .forms
             .iter()
             .map(|slot| {
-                slot.surfaces.clone().unwrap_or_else(|| {
-                    vec![crate::default_surface(self, slot.form, &slot.features)]
-                })
+                slot.surface
+                    .clone()
+                    .unwrap_or_else(|| crate::default_surface(self, slot.form, &slot.features))
             })
             .collect();
         let mut merged = vec![false; self.forms.len()];
@@ -276,7 +299,7 @@ impl Lexeme {
             merged[partner] = true;
             let slot = &mut self.forms[singular];
             slot.features.number = None;
-            slot.surfaces = Some(spelled[singular].clone());
+            slot.surface = Some(spelled[singular].clone());
         }
         let mut merged = merged.into_iter();
         self.forms.retain(|_| !merged.next().unwrap_or(false));

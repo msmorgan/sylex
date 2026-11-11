@@ -28,6 +28,7 @@ use sylex_lexicon::SurfaceStructure;
 use sylex_syntax::FrameCatalog;
 
 use crate::build::Builder;
+use crate::build::allomorphic;
 use crate::build::bound;
 use crate::build::card_scoped;
 use crate::build::exact;
@@ -322,7 +323,7 @@ impl Sources {
                         case: form.case,
                         ..Default::default()
                     },
-                    surfaces: Some(form.surfaces.to_vec()),
+                    surface: Some(form.surface.clone()),
                 })
                 .collect();
             builder.push(lexeme);
@@ -345,28 +346,41 @@ impl Sources {
             let id = format!("verb:{}", entry.lemma);
             builder.verb(&id, entry, core(CLOSED_CLASS, &id))?;
         }
-        for (prefix, category, entries) in [
-            ("affix", Category::Affix, &closed.affixes),
-            ("clitic", Category::Clitic, &closed.clitics),
-        ] {
-            for entry in entries {
-                let id = format!("{prefix}:{}", entry.name);
-                let mut lexeme = bound(
-                    &id,
-                    &entry.spellings[0],
-                    category,
-                    &entry.spellings,
-                    entry.binding,
-                    core(CLOSED_CLASS, &id),
-                );
-                // Initial capitalization belongs to the affix, so
-                // sentence-initial forms need no duplicate
-                // capitalized catalog spellings.
-                if category == Category::Affix {
-                    lexeme.capitalization = sylex_lexicon::Capitalization::Initial;
-                }
-                builder.push(lexeme);
-            }
+        for entry in &closed.affixes {
+            let id = format!("affix:{}", entry.name);
+            let mut lexeme = allomorphic(
+                &id,
+                Category::Affix,
+                entry.allomorphs.iter().map(|(hyphenation, surface)| {
+                    let features = sylex_lexicon::FeatureBundle {
+                        hyphenation: Some(*hyphenation),
+                        ..Default::default()
+                    };
+                    (features, surface.clone())
+                }),
+                entry.binding,
+                core(CLOSED_CLASS, &id),
+            );
+            // Initial capitalization belongs to the affix, so sentence-initial
+            // forms need no duplicate capitalized catalog spellings.
+            lexeme.capitalization = sylex_lexicon::Capitalization::Initial;
+            builder.push(lexeme);
+        }
+        for entry in &closed.clitics {
+            let id = format!("clitic:{}", entry.name);
+            builder.push(allomorphic(
+                &id,
+                Category::Clitic,
+                entry.allomorphs.iter().map(|(genitive, surface)| {
+                    let features = sylex_lexicon::FeatureBundle {
+                        genitive: Some(*genitive),
+                        ..Default::default()
+                    };
+                    (features, surface.clone())
+                }),
+                entry.binding,
+                core(CLOSED_CLASS, &id),
+            ));
         }
         for symbol in &closed.symbols {
             let id = format!("symbol:{}", symbol.surface);
@@ -479,6 +493,9 @@ impl Sources {
             let id = format!("subtype:{lemma}");
             builder.noun(&id, &decl.entry(), catalog(SUBTYPES, &id));
             let lexeme = builder.lexemes.last_mut().expect("just pushed");
+            // A prefix joins a subtype with a hyphen (*non-Vampire*;
+            // `docs/oracle-style-guide.md` §7, Negation with non-).
+            lexeme.properties.prefix_hyphenation = sylex_lexicon::Hyphenation::Hyphenated;
             lexeme.properties.classes = families
                 .iter()
                 .map(|family| Ident::new(&format!("{family:?}Type")))
@@ -498,6 +515,7 @@ impl Sources {
                 plural: None,
                 frames: Vec::new(),
                 variable: false,
+                prefix_hyphenation: sylex_lexicon::Hyphenation::Solid,
             };
             builder.noun(&id, &entry, catalog(COUNTERS, &id));
             // A counter's name is its kind, the first base of its Compound
@@ -735,7 +753,6 @@ impl Sources {
                     &format!("keyword:{}:bound", ability.lemma),
                     &surface.surface,
                     Category::Keyword,
-                    std::slice::from_ref(&surface.surface),
                     Binding::Suffix,
                     catalog(KEYWORD_ABILITIES, owner),
                 ));
@@ -750,7 +767,6 @@ impl Sources {
                 &id,
                 &stem,
                 Category::Noun,
-                std::slice::from_ref(&stem),
                 Binding::Prefix,
                 catalog(KEYWORD_ABILITIES, &id),
             ));

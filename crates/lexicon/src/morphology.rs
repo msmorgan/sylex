@@ -8,6 +8,26 @@ use crate::Tense;
 use crate::WordForm;
 
 pub(crate) fn applicable(category: Category, form: WordForm, features: &FeatureBundle) -> bool {
+    // Each Adjacency Agreement dimension, and the card name's form, belongs
+    // to one Category's invariant form.
+    for (present, owner) in [
+        (features.following_onset.is_some(), Category::Determinative),
+        (features.hyphenation.is_some(), Category::Affix),
+        (features.genitive.is_some(), Category::Clitic),
+        (features.name.is_some(), Category::Catalog),
+    ] {
+        if present && (category != owner || form != WordForm::Invariant) {
+            return false;
+        }
+    }
+    let inflectional = FeatureBundle {
+        following_onset: None,
+        hyphenation: None,
+        genitive: None,
+        name: None,
+        ..features.clone()
+    };
+    let features = &inflectional;
     let nominal =
         features.person.is_none() && features.tense.is_none() && features.finiteness.is_none();
     match form {

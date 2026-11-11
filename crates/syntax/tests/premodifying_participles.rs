@@ -26,10 +26,10 @@ fn lexicon() -> Lexicon {
     for slot in &mut tap.forms {
         match slot.form {
             sylex_lexicon::WordForm::Preterite | sylex_lexicon::WordForm::PastParticiple => {
-                slot.surfaces = Some(vec!["tapped".to_owned()]);
+                slot.surface = Some("tapped".to_owned());
             }
             sylex_lexicon::WordForm::GerundParticiple => {
-                slot.surfaces = Some(vec!["tapping".to_owned()]);
+                slot.surface = Some("tapping".to_owned());
             }
             _ => {}
         }

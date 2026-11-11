@@ -12,7 +12,6 @@ use sylex_lexicon::SourceKind;
 
 use crate::AttestedShortenings;
 use crate::CARD_NAMES;
-use crate::build::exact;
 use crate::build::source;
 
 /// The Shortened Name of a full card name: the shortened spelling its own
@@ -67,9 +66,10 @@ pub fn card_name_id(name: &str) -> LexemeId {
     LexemeId::new(&format!("name:{name}"))
 }
 
-/// One Lexeme per card name, each with its Shortened Name in its own card's
-/// scope only. The full name is spelled everywhere: on its own card's faces
-/// it is that card's own name, and elsewhere another card's [CR#201.5].
+/// One Lexeme per card name, each with its Shortened form, when it has one, in
+/// its own card's scope only. The Full form is spelled everywhere: on its own
+/// card's faces it is that card's own name, and elsewhere another card's
+/// [CR#201.5].
 pub(crate) fn card_names(
     text: &str,
     attested: &AttestedShortenings,
@@ -80,18 +80,12 @@ pub(crate) fn card_names(
         .map(str::trim)
         .filter(|name| !name.is_empty() && seen.insert(*name))
         .map(|name| {
-            let mut lexeme = exact(
+            Lexeme::card_name(
                 card_name_id(name).as_str(),
                 name,
-                Category::Catalog,
+                shortened_name(name, attested.get(name), vocabulary),
                 source(SourceKind::Catalog, CARD_NAMES, name),
-            );
-            lexeme.card_name = true;
-            if let Some(short) = shortened_name(name, attested.get(name), vocabulary) {
-                lexeme.forms[0].surfaces = Some(vec![name.to_owned(), short.clone()]);
-                lexeme.card_scoped_surfaces = [short].into();
-            }
-            lexeme
+            )
         })
         .collect()
 }
