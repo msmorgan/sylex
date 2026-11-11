@@ -1,0 +1,17 @@
+card singleFaced({
+    name = "The Caretaker",
+    cost = [generic(5), pip(blue)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [elemental],
+    text = [
+      vigilance,
+      ward(mana([generic(2)])),
+      at(
+        beginningOfEach(endStep),
+        if = did(actor(you), faceDilemma, within(soFarThisTurn)),
+        sequentially([
+            instruct(target(isOpponent), exile(run(top, non(isLand), libraryOf(they)))),
+            may(cast(that(card), altCost = withoutPaying))]))],
+    power = 5,
+    toughness = 6})

@@ -1,0 +1,28 @@
+card singleFaced({
+    name = "Captain Benjamin Sisko",
+    cost = [generic(1), pip(white)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [human, officer],
+    text = [
+      at(
+        beginningOfYour(endStep),
+        create(
+          eventCount(faceDilemma, actor(you), soFarThisTurn),
+          written(creatureToken(1, 1, [red], [officer])))),
+      activated(
+        compound(
+          [mana([generic(2), pip(white), pip(blue), pip(black), pip(red), pip(green)]), tapSymbol]),
+        sequentially([
+            exile(topSlice(5)),
+            may(
+              cast(
+                fromAmong(
+                  anyNumber,
+                  and([
+                      isSpell,
+                      hasManaValue(atMost, countOf(and([hasSubtype(officer), youControl])))]),
+                  those(card)),
+                altCost = withoutPaying))]))],
+    power = 2,
+    toughness = 2})

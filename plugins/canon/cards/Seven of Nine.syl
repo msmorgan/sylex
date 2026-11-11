@@ -1,0 +1,9 @@
+card singleFaced({
+    name = "Seven of Nine",
+    cost = [generic(2), pip(blue), pip(black)],
+    supertypes = [legendary],
+    types = [artifact, creature],
+    subtypes = [human, scientist],
+    text = [whenever(does(actor(you), faceDilemma), draw(1))],
+    power = 2,
+    toughness = 4})

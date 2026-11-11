@@ -1,0 +1,6 @@
+# "<subject> faces a dilemma": a player faces one each time they choose one or more modes for a
+# spell or ability, so "faced a dilemma this turn" looks back over those choices and "each dilemma
+# you've faced this turn" counts the spells and abilities they chose modes for [CR#700.17].
+primitive faceDilemma: Action = FaceDilemma {
+  spelling = "faces a dilemma"
+}
