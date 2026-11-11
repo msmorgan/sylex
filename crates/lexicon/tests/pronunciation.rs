@@ -21,22 +21,28 @@ fn row(id: &str, spelling: &str) -> Lexeme {
     )
 }
 
+/// A word's Onset is its first letter's unless its Lexeme declares one: the
+/// silent *h* of *hour* (Midnight Clock's *an hour counter*) and the /j/ of
+/// *unity* (Call for Unity's *a unity counter*).
 #[test]
-fn normalized_pronunciation_respects_overrides_and_numerals() {
-    let mut overridden = row("override", "xenic");
-    overridden.onsets.insert("xenic".into(), Onset::Vowel);
+fn a_declared_onset_replaces_the_first_letter_s() {
+    let declared = |id: &str, onset| {
+        let mut lexeme = row(id, id);
+        lexeme.onset = Some(onset);
+        lexeme
+    };
     let lexicon = Lexicon::new([
-        row("heir", "heir"),
-        row("unicorn", "unicorn"),
-        overridden,
-        row("default", "xenic"),
+        declared("hour", Onset::Vowel),
+        declared("unity", Onset::Consonant),
+        row("island", "island"),
+        row("forest", "forest"),
     ])
     .unwrap();
     for value in lexicon.values() {
         let reading = LexicalReading::Word(value.clone());
         let surface = lexicon.realize(&reading).unwrap();
         let properties = lexicon.surface_features(&reading).unwrap();
-        let expected = if value.lexeme == "override" || value.lexeme == "heir" {
+        let expected = if value.lexeme == "hour" || value.lexeme == "island" {
             Onset::Vowel
         } else {
             Onset::Consonant
@@ -58,6 +64,7 @@ fn normalized_pronunciation_respects_overrides_and_numerals() {
                 .any(|m| m.reading == reading)
         );
     }
+    // A numeral is spoken as its cardinal, whose *one* begins with /w/.
     for (value, expected) in [
         (1, Onset::Consonant),
         (8, Onset::Vowel),
@@ -81,13 +88,15 @@ fn normalized_pronunciation_respects_overrides_and_numerals() {
 
 #[test]
 fn invalid_pronunciation_declarations_fail_loading() {
-    let mut missing = row("missing", "uniform");
-    missing.onsets.insert("unicorn".into(), Onset::Vowel);
+    // A declaration is an irregularity: *forest* begins with a consonant
+    // anyway.
+    let mut redundant = row("forest", "forest");
+    redundant.onset = Some(Onset::Consonant);
     assert!(
-        Lexicon::new([missing])
+        Lexicon::new([redundant])
             .unwrap_err()
             .to_string()
-            .contains("no declared spelling")
+            .contains("by default")
     );
     let mut not_an_article = row("adjective", "uniform");
     not_an_article.forms[0].features.following_onset = Some(Onset::Vowel);
@@ -112,14 +121,15 @@ fn invalid_pronunciation_declarations_fail_loading() {
 #[test]
 fn multiword_names_and_bound_forms_take_the_first_pronounced_onset() {
     for (spelling, expected) in [
-        ("Eight-and-a-Half-Tails", Onset::Vowel),
-        ("One with Nothing", Onset::Consonant),
-        ("Urza's Saga", Onset::Vowel),
-        ("island", Onset::Vowel),
-        ("forest", Onset::Consonant),
-        // A sign is spoken: *a +1/+1 counter*, *a -1/-1 counter*.
-        ("+1/+1 counter", Onset::Consonant),
-        ("-1/-1 counter", Onset::Consonant),
+        ("Eight-and-a-Half-Tails", Some(Onset::Vowel)),
+        ("Urza's Saga", Some(Onset::Vowel)),
+        ("island", Some(Onset::Vowel)),
+        ("forest", Some(Onset::Consonant)),
+        // A numeral is spoken as its cardinal.
+        ("2ˣ", Some(Onset::Consonant)),
+        // No letter or numeral begins these, and they declare no Onset.
+        ("Éomer", None),
+        ("{T}", None),
     ] {
         let mut entry = row("onset", spelling);
         entry.category = Category::Catalog;
@@ -132,7 +142,40 @@ fn multiword_names_and_bound_forms_take_the_first_pronounced_onset() {
             let reading = LexicalReading::Word(value.clone());
             assert_eq!(
                 lexicon.surface_features(&reading).unwrap().onset,
-                Some(expected)
+                expected,
+                "{spelling}"
+            );
+        }
+    }
+}
+
+/// A measure's sign is spoken, *plus* or *minus*: *a +1/+1 counter*, *a
+/// -1/-1 counter*.
+#[test]
+fn a_measured_compound_takes_the_onset_of_its_measure() {
+    for (spelling, expected) in [
+        ("+1/+1 counter", Onset::Consonant),
+        ("-1/-1 counter", Onset::Consonant),
+        ("8/8 counter", Onset::Vowel),
+    ] {
+        let mut entry = Lexeme::noun(
+            "counter",
+            spelling,
+            vec![sylex_lexicon::Countability::Count],
+            Source {
+                kind: SourceKind::Catalog,
+                path: "pronunciation-fixture".into(),
+                owner: "counter".into(),
+            },
+        );
+        entry.surface_structure = sylex_lexicon::SurfaceStructure::MeasuredCompound;
+        let lexicon = Lexicon::new([entry]).unwrap();
+        for value in lexicon.values() {
+            let reading = LexicalReading::Word(value.clone());
+            assert_eq!(
+                lexicon.surface_features(&reading).unwrap().onset,
+                Some(expected),
+                "{spelling}"
             );
         }
     }

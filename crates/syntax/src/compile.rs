@@ -1380,8 +1380,13 @@ impl<'a> Binder<'a> {
                 )));
             }
             SymbolDecl::Mark(c, binding) => ("", Symbol::Punct(*c, *binding, None)),
-            SymbolDecl::SpokenMark(c, binding, onset) => {
-                ("", Symbol::Punct(*c, *binding, Some(*onset)))
+            SymbolDecl::SpokenMark(c, binding) => {
+                let onset = sylex_lexicon::sign_onset(*c).ok_or_else(|| {
+                    invalid(format!(
+                        "mark `{c}` is declared spoken, but no sign word speaks it"
+                    ))
+                })?;
+                ("", Symbol::Punct(*c, *binding, Some(onset)))
             }
             SymbolDecl::Punct(c) => ("", Symbol::Punct(*c, Binding::Suffix, None)),
         })

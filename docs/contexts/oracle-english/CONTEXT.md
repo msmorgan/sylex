@@ -186,7 +186,8 @@ vocabulary; and **Symbol**, notation symbols.
 
 **Onset**:
 Whether a word begins with a consonant or vowel sound. The indefinite article
-agrees with the Onset of the word after it (Adjacency Agreement).
+agrees with the Onset of the word after it (Adjacency Agreement). It is the
+first letter's unless the Lexeme declares it (*an hour*, *a Unicorn*).
 
 ## Oracle text
 

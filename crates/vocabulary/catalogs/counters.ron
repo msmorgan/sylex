@@ -132,8 +132,9 @@
     (kind: "hit"),
     (kind: "hoofprint"),
     (kind: "hope"),
-    (kind: "hour"),
-    (kind: "hourglass"),
+    // A silent *h*: *an hour counter*.
+    (kind: "hour", onset: Vowel),
+    (kind: "hourglass", onset: Vowel),
     (kind: "hunger"),
     (kind: "ice"),
     (kind: "impostor"),
@@ -231,7 +232,8 @@
     (kind: "training"),
     (kind: "trap"),
     (kind: "treasure"),
-    (kind: "unity"),
+    // *Unity* begins with /j/: *a unity counter*.
+    (kind: "unity", onset: Consonant),
     (kind: "unlock"),
     (kind: "valor"),
     (kind: "velocity"),

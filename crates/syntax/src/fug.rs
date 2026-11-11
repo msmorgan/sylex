@@ -43,8 +43,8 @@
 //!
 //! A right-hand-side symbol is `[role:]Category` (role `head` when omitted),
 //! `[role:]"Category"` (set in quotation marks), `'c'` (punctuation),
-//! `'c':Binding` (a mark), `'c':Binding:Onset` (a mark spoken as a word, a
-//! sign: `'+':Prefix:Consonant`), or `[role:]Kind(args)` for the other
+//! `'c':Binding` (a mark), `'c':Binding:Spoken` (a mark spoken as a word, a
+//! sign: `'+':Prefix:Spoken`), or `[role:]Kind(args)` for the other
 //! [`SymbolDecl`] kinds (`Class(X)`, `Word(X)`, `Lex(Noun)`, `Free(X)`,
 //! `FreeLex(Noun)`, `OtherCardName()`, `Numeral(Cardinal)`, `Numeral(Arabic(false))`,
 //! `Hosted(X, Nominal)`, `Attached(X, Suffix)`, `Selected(X, Of, ...)`). An
@@ -229,8 +229,8 @@ struct RhsSymbol {
     role: Option<String>,
     term: Value,
     binding: Option<String>,
-    /// A spoken mark's Onset.
-    onset: Option<String>,
+    /// Whether the mark is declared spoken (`:Spoken`).
+    spoken: bool,
 }
 
 struct Item {
@@ -376,12 +376,20 @@ impl Parser {
             } else {
                 None
             };
-            let onset = if binding.is_some() && self.eat(":") { Some(self.ident()?) } else { None };
+            let spoken = if binding.is_some() && self.eat(":") {
+                let at = self.pos();
+                if self.ident()? != "Spoken" {
+                    return fail(at, "a mark's third part is `Spoken`");
+                }
+                true
+            } else {
+                false
+            };
             symbols.push(RhsSymbol {
                 role,
                 term,
                 binding,
-                onset,
+                spoken,
             });
         }
         Ok(symbols)
@@ -955,15 +963,15 @@ impl Item {
 
 /// A right-hand-side symbol as the `SymbolDecl` variant it writes:
 /// `role:B` is `Cat(role, B)`, `"B"` is `Quoted(head, B)`, `','` is
-/// `Punct(',')`, `'—':Free` is `Mark('—', Free)`, `'+':Prefix:Consonant` is
-/// `SpokenMark('+', Prefix, Consonant)`, and `Kind(args)` is
+/// `Punct(',')`, `'—':Free` is `Mark('—', Free)`, `'+':Prefix:Spoken` is
+/// `SpokenMark('+', Prefix)`, and `Kind(args)` is
 /// `Kind(role, args)`, a `Selected`'s Closed Words gathered in a list.
 fn symbol(symbol: RhsSymbol) -> Result<Value, LoadError> {
     let RhsSymbol {
         role,
         term,
         binding,
-        onset,
+        spoken,
     } = symbol;
     let at = term.at;
     let char_term = matches!(term.kind, ValueKind::Char(_));
@@ -975,19 +983,11 @@ fn symbol(symbol: RhsSymbol) -> Result<Value, LoadError> {
         at,
     );
     let (kind, args) = match term.kind {
-        ValueKind::Char(_) => match (binding, onset) {
-            (None, _) => ("Punct".to_owned(), vec![term]),
-            (Some(binding), None) => (
-                "Mark".to_owned(),
+        ValueKind::Char(_) => match binding {
+            None => ("Punct".to_owned(), vec![term]),
+            Some(binding) => (
+                if spoken { "SpokenMark" } else { "Mark" }.to_owned(),
                 vec![term, Value::new(ValueKind::Ident(binding), at)],
-            ),
-            (Some(binding), Some(onset)) => (
-                "SpokenMark".to_owned(),
-                vec![
-                    term,
-                    Value::new(ValueKind::Ident(binding), at),
-                    Value::new(ValueKind::Ident(onset), at),
-                ],
             ),
         },
         ValueKind::Ident(_) => ("Cat".to_owned(), vec![role, term]),

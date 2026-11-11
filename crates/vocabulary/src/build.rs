@@ -316,6 +316,7 @@ impl Builder {
             replace(&mut lexeme, WordForm::Plural, None, None, plural);
         }
         lexeme.properties.prefix_hyphenation = entry.prefix_hyphenation;
+        lexeme.onset = entry.onset;
         let id = lexeme.id;
         self.push(lexeme);
         self.frames(id, Category::Noun, &entry.frames);

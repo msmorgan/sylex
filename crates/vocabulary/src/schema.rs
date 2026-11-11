@@ -262,6 +262,10 @@ pub struct NounEntry {
     /// without declaring it (*non-Vampire*).
     #[serde(default)]
     pub prefix_hyphenation: Option<Hyphenation>,
+    /// Its Onset, where its first letter's is not it (*an hour*, *a
+    /// Unicorn*).
+    #[serde(default)]
+    pub onset: Option<sylex_lexicon::Onset>,
 }
 
 fn count() -> Vec<Countability> {
@@ -290,6 +294,7 @@ impl NounDecl {
                 frames: Vec::new(),
                 variable: false,
                 prefix_hyphenation: None,
+                onset: None,
             },
             Self::Entry(entry) => entry.clone(),
         }
@@ -759,6 +764,9 @@ pub struct CounterKind {
     /// The rule that names it, when the CR does.
     #[serde(default)]
     pub rule: Option<Rule>,
+    /// Its Onset, where its first letter's is not it (*an hour counter*).
+    #[serde(default)]
+    pub onset: Option<sylex_lexicon::Onset>,
 }
 
 /// A designation and the nouns and adjectives that name it.
@@ -826,6 +834,10 @@ pub struct AnchorWord {
 pub struct SymbolEntry {
     pub surface: String,
     pub classes: Vec<String>,
+    /// Its Onset, where its first letter's is not it: a letter is spoken by
+    /// its name (*an X/X*).
+    #[serde(default)]
+    pub onset: Option<sylex_lexicon::Onset>,
 }
 
 fn complement_relation() -> sylex_syntax::frames::SlotRelation {

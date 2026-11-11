@@ -86,6 +86,7 @@ fn a_frame_belongs_to_its_head_category() {
             frames: vec![FrameSpec::Monotransitive],
             variable: false,
             prefix_hyphenation: None,
+            onset: None,
         }));
     rejects(&sources, "is not a frame of a Noun");
 }

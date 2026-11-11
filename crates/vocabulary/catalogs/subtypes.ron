@@ -335,7 +335,8 @@
         "Troll",
         "Turtle",
         "Tyranid",
-        "Unicorn",
+        // Begins with /j/: *a Unicorn*.
+        (lemma: "Unicorn", onset: Consonant),
         "Utrom",
         "Vampire",
         "Varmint",

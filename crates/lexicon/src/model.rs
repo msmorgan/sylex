@@ -118,9 +118,11 @@ pub struct Lexeme {
     /// [`crate::FeatureBundle::name`].
     #[serde(default)]
     pub card_name: bool,
-    /// Per-spelling pronunciation overrides, before positional capitalization.
+    /// The Onset of every spelling of the Lexeme, declared where it is not
+    /// the one its first letter gives (*hour*, *unity*; the default rule is
+    /// `pronunciation::default_onset`).
     #[serde(default)]
-    pub onsets: BTreeMap<String, crate::Onset>,
+    pub onset: Option<crate::Onset>,
 }
 
 impl Lexeme {
@@ -146,7 +148,7 @@ impl Lexeme {
             binding: Binding::Free,
             card_scope: BTreeSet::new(),
             card_name: false,
-            onsets: BTreeMap::new(),
+            onset: None,
             surface_structure: if matches!(
                 category,
                 crate::Category::Catalog | crate::Category::Symbol

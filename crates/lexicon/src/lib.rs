@@ -26,6 +26,7 @@ pub use crate::morphology::default_surface;
 pub use crate::numeral::NumeralCodec;
 pub use crate::numeral::ParseNumeralError;
 pub use crate::pronunciation::numeral_onset;
+pub use crate::pronunciation::sign_onset;
 pub use crate::scope::CardScope;
 pub use crate::types::Case;
 pub use crate::types::Category;

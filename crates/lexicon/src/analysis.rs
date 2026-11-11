@@ -228,7 +228,8 @@ impl Lexicon {
                 return Err(error("lemma violates its declared word boundaries"));
             }
             let mut slots = BTreeSet::new();
-            let mut realized_surfaces = BTreeSet::new();
+            // Whether a declared Onset is the one every spelling has anyway.
+            let mut redundant_onset = lexeme.onset.is_some();
             let prefix_hyphenation = match (
                 lexeme.category.hosts_prefix(),
                 lexeme.properties.prefix_hyphenation,
@@ -270,7 +271,11 @@ impl Lexicon {
                 if !valid_surface(&surface, lexeme.surface_structure, lexeme.binding) {
                     return Err(error("spelling violates its declared word boundaries"));
                 }
-                realized_surfaces.insert(surface.clone());
+                let default_onset =
+                    crate::pronunciation::default_onset(&surface, lexeme.surface_structure);
+                redundant_onset &= lexeme
+                    .onset
+                    .is_none_or(|onset| default_onset == Some(onset));
                 let value = LexicalValue {
                     lexeme: lexeme.id,
                     form: declaration.form,
@@ -278,11 +283,7 @@ impl Lexicon {
                     capitalization: SurfaceCase::Declared,
                 };
                 let features = crate::SurfaceFeatures {
-                    onset: lexeme
-                        .onsets
-                        .get(&surface)
-                        .copied()
-                        .or_else(|| crate::pronunciation::default_onset(&surface)),
+                    onset: lexeme.onset.or(default_onset),
                     initial: initial_surface(&surface) == surface,
                     interior: true,
                 };
@@ -320,12 +321,8 @@ impl Lexicon {
             if let Some(reason) = card_scope_defect(&lexeme).or_else(|| agreement_defect(&lexeme)) {
                 return Err(error(reason));
             }
-            if lexeme
-                .onsets
-                .keys()
-                .any(|surface| !realized_surfaces.contains(surface))
-            {
-                return Err(error("onset override has no declared spelling"));
+            if redundant_onset {
+                return Err(error("a declared Onset its spellings have by default"));
             }
             result.lexemes.insert(lexeme.id, lexeme);
         }

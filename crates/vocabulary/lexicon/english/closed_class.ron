@@ -230,7 +230,8 @@
         // The pawprint symbol [CR#107.18].
         (surface: "{P}", classes: ["Pawprint"]),
         // Placeholder letters for numbers [CR#107.3,107.3p].
-        (surface: "X", classes: ["Variable"]), (surface: "Y", classes: ["Variable"]),
+        // *X* is spoken by its letter name, *ex* (*an X/X*).
+        (surface: "X", classes: ["Variable"], onset: Vowel), (surface: "Y", classes: ["Variable"]),
         // Two to the power X in mathematical notation, a number written in
         // terms of X that fills a variable's places (*draws 2ˣ cards*).
         (surface: "2ˣ", classes: ["Variable"]),

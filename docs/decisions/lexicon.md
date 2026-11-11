@@ -38,9 +38,14 @@ the gap is never reported.
 
 **Every irregularity is declared.** Each Word Form has one default spelling
 rule, and every exception, consonant doubling included (*committed*), is an
-override on its Lexeme; nothing infers stress or a paradigm class. Why: each
-irregularity is a reviewable fact, and the rules that analyze a form are the
-rules that realize it.
+override on its Lexeme; nothing infers stress or a paradigm class. A word's
+Onset is its first letter's, a vowel letter's Vowel and any other's Consonant,
+and a Lexeme whose first sound is not its first letter's declares its Onset
+(*an hour counter*, *a unity counter*, *a Unicorn*, *an X/X*); a numeral's is
+its spoken cardinal's (*an 8/8*, *a 1/1*), and a measure's sign is spoken
+*plus* or *minus*. A spelling with neither has no Onset. Why: each irregularity
+is a reviewable fact, and the rules that analyze a form are the rules that
+realize it.
 
 **A missing feature is inapplicable, not a wildcard.** Forms spelled alike keep
 their own Feature Bundles. The one merge is a finite form spelled alike in both
@@ -70,11 +75,11 @@ for a singular proper name ending in *s* the bare genitive is only a variant,
 [35ii], p. 1595, and Oracle writes *'s*). The host's realized forms decide it:
 no word lists the hosts. The grammar checks the agreement between each word and
 the next, whatever Constituents they end and begin; a mark is a word there only
-where its Production declares it spoken, with its Onset, as a sign is (*plus*,
-*minus*: *a +8/+8 creature*), since one character is a sign in one construction
-and a range's dash in another. Why: a free choice of spelling lets the parser
-accept *a artifact* and *players's*, and leaves realization nothing to derive
-the spelling from but the source text.
+where its Production declares it spoken, as a sign is, and the lexicon's word
+for the sign gives its Onset (*plus*, *minus*: *a +8/+8 creature*), since one
+character is a sign in one construction and a range's dash in another. Why: a
+free choice of spelling lets the parser accept *a artifact* and *players's*,
+and leaves realization nothing to derive the spelling from but the source text.
 
 **A word in two Parts of Speech is two Lexemes**, related by Conversion, never
 one Lexeme with a fused-head use standing in for the other: *red* is a noun in

@@ -395,6 +395,7 @@ impl Sources {
                 .properties
                 .classes
                 .extend(symbol.classes.iter().map(|class| Ident::new(class)));
+            lexeme.onset = symbol.onset;
             builder.push(lexeme);
         }
         for entry in &self.prepositions {
@@ -525,6 +526,7 @@ impl Sources {
                 frames: Vec::new(),
                 variable: false,
                 prefix_hyphenation: None,
+                onset: counter.onset,
             };
             builder.noun(&id, &entry, catalog(COUNTERS, &id));
             // A counter's name is its kind, the first base of its Compound
