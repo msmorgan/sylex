@@ -464,6 +464,26 @@ pub enum SchemaDecl {
         /// beside the `interleaved` one.
         #[serde(default)]
         interleaved_internalised: Option<Ident>,
+        /// Function Category of an Adjunct in central position between a
+        /// verb and its first Complement (*is [still] on top of your
+        /// library*, *is [still] a land*), derived from a frame of
+        /// `central_heads` or of `central_families` whose phrase keeps a
+        /// Complement, never from a catenative frame. In a clause headed by
+        /// an auxiliary, central position is more often just after the verb
+        /// (CGEL, Ch. 6 §7.1, p. 575); a catenative's verbal Complement takes
+        /// a central Adjunct in its own phrase. Verbs only.
+        #[serde(default)]
+        central: Option<Ident>,
+        /// The lexical Class whose members take a `central` Adjunct before
+        /// any Complement: the phrase is derived from each frame a member
+        /// declares, and its head is a member (CGEL, Ch. 3 §2.1.5, p. 102,
+        /// [35]). Required with `central`.
+        #[serde(default)]
+        central_heads: Option<Ident>,
+        /// Frame families whose frames take a `central` Adjunct whatever
+        /// head declares them (*become [no longer] suspected*).
+        #[serde(default)]
+        central_families: Vec<crate::frames::FrameFamily>,
         /// Postpose the Object to the end of the phrase: past selected
         /// Preposition Phrase Complements, and, when it is heavy, past a
         /// predicative Complement or an `interleaved` Adjunct alone (CGEL,

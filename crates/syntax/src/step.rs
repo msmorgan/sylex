@@ -159,6 +159,13 @@ pub(crate) enum Test {
     Frame(usize),
     /// A free (unbound) lexeme that declares this Subcategorization Frame.
     FreeFrame(usize),
+    /// A member of the lexical class that declares the Subcategorization
+    /// Frame; with `free`, an unbound one.
+    ClassFrame {
+        class: usize,
+        frame: usize,
+        free: bool,
+    },
     /// A preposition that declares this complement frame.
     PrepositionFrame(usize),
     /// Another card's name (`LeafFacts::other_card_name`), which no other
@@ -1668,9 +1675,12 @@ impl Production {
             next.preposition = leaf.lexeme.map(|l| (l, *frame));
         }
         let key = match (&self.rhs[position], leaf.lexeme) {
-            (Symbol::Leaf(Test::Frame(frame) | Test::FreeFrame(frame)), Some(lexeme)) => {
-                Some((lexeme, Some(*frame)))
-            }
+            (
+                Symbol::Leaf(
+                    Test::Frame(frame) | Test::FreeFrame(frame) | Test::ClassFrame { frame, .. },
+                ),
+                Some(lexeme),
+            ) => Some((lexeme, Some(*frame))),
             (
                 Symbol::Leaf(
                     Test::FreeLexical(_) | Test::FreeOptional(_) | Test::FreeNotActiveOnly(_),
@@ -2224,6 +2234,15 @@ impl CompiledGrammar {
             Test::FreeFrame(frame) => facts.is_some_and(|f| {
                 f.frames.contains(frame) && f.binding == sylex_lexicon::Binding::Free
             }),
+            Test::ClassFrame { class, frame, free } => {
+                leaf.lexeme
+                    .as_ref()
+                    .is_some_and(|l| self.classes[*class].contains(l))
+                    && facts.is_some_and(|f| {
+                        f.frames.contains(frame)
+                            && (!free || f.binding == sylex_lexicon::Binding::Free)
+                    })
+            }
             Test::PrepositionFrame(frame) => {
                 facts.is_some_and(|f| f.preposition_frames.contains(frame))
             }

@@ -323,6 +323,9 @@ struct Draft {
     remnant: crate::step::RemnantRole,
     /// `SchemaDecl::Coordination::parallel`.
     parallel: bool,
+    /// Whether a Valence schema's `central` Adjunct derives a variant of
+    /// this phrase, and which heads that variant takes.
+    central_site: CentralSite,
 }
 
 /// What a Valence schema declares its derived phrases carry, beyond their
@@ -335,6 +338,29 @@ struct Derivations<'d> {
     passive: Option<PassiveDecl<'d>>,
     /// The Adjectival Passive's Category and its equations.
     adjectival: Option<(&'d str, &'d [Equation])>,
+    central: Option<CentralDecl<'d>>,
+}
+
+/// A Valence schema's central Adjunct (`SchemaDecl::Valence::central`).
+#[derive(Clone, Copy)]
+struct CentralDecl<'d> {
+    /// The Adjunct's function Category.
+    category: &'d str,
+    /// The lexical Class whose members take one before any Complement.
+    class: usize,
+    /// The frame families whose frames take one, whatever their head.
+    families: &'d [FrameFamily],
+}
+
+/// Whether a phrase has a variant with a central Adjunct: an active phrase
+/// that keeps a Complement, of a non-catenative frame that takes one.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum CentralSite {
+    None,
+    /// Any head that declares the frame takes it (`central_families`).
+    AnyHead,
+    /// Only a member of the central Class does (`central_heads`).
+    ClassHead,
 }
 
 /// A Valence schema's passive derivations.
@@ -407,6 +433,7 @@ impl Draft {
             clusters: None,
             remnant: crate::step::RemnantRole::None,
             parallel: false,
+            central_site: CentralSite::None,
         }
     }
 
@@ -1610,14 +1637,22 @@ impl<'a> Binder<'a> {
                     .iter()
                     .map(ToString::to_string)
                     .collect(),
-                Test::Frame(frame) | Test::FreeFrame(frame) | Test::PrepositionFrame(frame) => self
+                Test::Frame(frame)
+                | Test::FreeFrame(frame)
+                | Test::PrepositionFrame(frame)
+                | Test::ClassFrame { frame, .. } => self
                     .out
                     .lexemes
                     .iter()
-                    .filter(|(_, facts)| match test {
+                    .filter(|(id, facts)| match test {
                         Test::Frame(_) => facts.frames.contains(frame),
                         Test::FreeFrame(_) => {
                             facts.frames.contains(frame) && facts.binding == Binding::Free
+                        }
+                        Test::ClassFrame { class, free, .. } => {
+                            self.out.classes[*class].contains(*id)
+                                && facts.frames.contains(frame)
+                                && (!free || facts.binding == Binding::Free)
                         }
                         _ => facts.preposition_frames.contains(frame),
                     })
@@ -1833,6 +1868,10 @@ impl<'a> Binder<'a> {
             prepositional_passive,
             adjectival,
             adjectival_passive,
+            head,
+            central,
+            central_heads,
+            central_families,
             ..
         } = schema
         else {
@@ -1882,11 +1921,36 @@ impl<'a> Binder<'a> {
                 }
             })
             .transpose()?;
+        let central = central
+            .as_deref()
+            .map(|category| {
+                if *head != LexicalCategory::Verb {
+                    return Err(invalid(format!(
+                        "valence `{phrase}`: `central` on a non-verb head"
+                    )));
+                }
+                let Some(heads) = central_heads else {
+                    return Err(invalid(format!(
+                        "central schema on `{phrase}` needs `central_heads`"
+                    )));
+                };
+                let class =
+                    self.class_names.get(heads).copied().ok_or_else(|| {
+                        invalid(format!("central heads: unknown class `{heads}`"))
+                    })?;
+                Ok(CentralDecl {
+                    category,
+                    class,
+                    families: central_families,
+                })
+            })
+            .transpose()?;
         Ok(Derivations {
             complement_kind,
             active,
             passive,
             adjectival,
+            central,
         })
     }
 
@@ -1950,6 +2014,12 @@ impl<'a> Binder<'a> {
                     self.internalised_equations(draft, internalised)?;
                 }
                 self.slot_agreement(phrase, &mut drafts, agree)?;
+                let central = match derivations.central {
+                    Some(decl) => {
+                        central_adjuncts(&drafts, self.category(decl.category)?, decl.class)?
+                    }
+                    None => Vec::new(),
+                };
                 let remnants = remnants
                     .iter()
                     .map(|(kind, remnant)| {
@@ -1989,6 +2059,7 @@ impl<'a> Binder<'a> {
                 // phrase (*deals [half X damage, rounded down, to any target],
                 // and [half X damage, rounded up, to you]*).
                 ordered.extend(self.valence_order(clustered, interleaved, None, host)?);
+                ordered.extend(self.valence_order(central, interleaved, None, host)?);
                 ordered.extend(elided);
                 Ok(ordered)
             }
@@ -2545,6 +2616,33 @@ impl<'a> Binder<'a> {
                 let kind = self.value(f, &format!("{:?}", first.kind()))?;
                 for draft in &mut family {
                     draft.equations.push((Path::Mother(f), Target::Value(kind)));
+                }
+            }
+            let site = match derivations.central {
+                Some(_)
+                    if matches!(
+                        frame.family,
+                        FrameFamily::Catenative | FrameFamily::ComplexCatenative
+                    ) =>
+                {
+                    CentralSite::None
+                }
+                Some(decl) if decl.families.contains(&frame.family) => CentralSite::AnyHead,
+                Some(decl)
+                    if self.out.classes[decl.class].iter().any(|member| {
+                        self.out
+                            .lexemes
+                            .get(member)
+                            .is_some_and(|facts| facts.frames.contains(&index))
+                    }) =>
+                {
+                    CentralSite::ClassHead
+                }
+                Some(_) | None => CentralSite::None,
+            };
+            for draft in &mut family {
+                if draft.children.len() > 1 {
+                    draft.central_site = site;
                 }
             }
             drafts.extend(family);
@@ -4746,6 +4844,78 @@ fn path_after(path: Path, split: usize) -> bool {
         Path::Child(i, _) => i >= split,
     }
 }
+/// Each central site's phrase with a central Adjunct of `category` (a
+/// function Category) between its head and its first Complement; a
+/// `ClassHead` site's head is a member of `class`
+/// (`SchemaDecl::Valence::central`).
+fn central_adjuncts(
+    drafts: &[Draft],
+    category: usize,
+    class: usize,
+) -> Result<Vec<Draft>, LoadError> {
+    let mut central = Vec::new();
+    for draft in drafts
+        .iter()
+        .filter(|d| d.central_site != CentralSite::None)
+    {
+        // Every index a central site carries is one `remap_draft` moves.
+        if draft.internalised.is_some()
+            || draft.host_check.is_some()
+            || draft.fills_preposition.is_some()
+            || draft.clusters.is_some()
+            || draft.coordinator.is_some()
+            || draft.requires_coordination.is_some()
+            || !draft.uncoordinated.is_empty()
+            || !draft.coordinated.is_empty()
+            || !draft.unlinked.is_empty()
+            || !draft.nonfinal_conjuncts.is_empty()
+        {
+            return Err(invalid(format!(
+                "central site `{}` carries a child index the central Adjunct would shift",
+                draft.id
+            )));
+        }
+        let mut variant = draft.clone();
+        variant.id = Ident::new(&format!("{}/central", draft.id));
+        variant.central_site = CentralSite::None;
+        variant.children[0].symbol = match (&draft.children[0].symbol, draft.central_site) {
+            (symbol, CentralSite::AnyHead) => symbol.clone(),
+            (Symbol::Leaf(Test::Frame(frame)), _) => Symbol::Leaf(Test::ClassFrame {
+                class,
+                frame: *frame,
+                free: false,
+            }),
+            (Symbol::Leaf(Test::FreeFrame(frame)), _) => Symbol::Leaf(Test::ClassFrame {
+                class,
+                frame: *frame,
+                free: true,
+            }),
+            _ => {
+                return Err(invalid(format!(
+                    "central site `{}` is not headed by a frame's lexeme",
+                    draft.id
+                )));
+            }
+        };
+        variant.children.insert(
+            1,
+            Child {
+                name: Ident::new("adjunct"),
+                symbol: Symbol::Cat {
+                    category,
+                    binding: None,
+                    prepositions: None,
+                    host: None,
+                },
+                gap: GapRule::Closed,
+            },
+        );
+        remap_draft(&mut variant, |i| if i == 0 { 0 } else { i + 1 });
+        central.push(variant);
+    }
+    Ok(central)
+}
+
 fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
     let path = |p: &mut Path| {
         if let Path::Child(i, _) = p {
