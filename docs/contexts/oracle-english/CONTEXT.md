@@ -157,9 +157,16 @@ test evidence.
 A lexical item underlying its Word Forms. It may span several orthographic
 words, as *mana value* does.
 
-**Spelling Variant**:
-One of two or more declared Word Forms of a Lexeme with the same features,
-each kept as a distinct value.
+**Adjacency Agreement**:
+The selection of a word's form by a property of the word next to it, through
+a feature of its Feature Bundle that the context fixes: the indefinite
+article's by the Onset of the word after it (*a creature*, *an artifact*),
+*non*'s by how the host after it takes a prefix (*nonland*, *non-Vampire*), and
+the genitive's by the host before it: an apostrophe alone after a Plural noun
+form ending in *s* (*players'*, *Thalakos'*), and *'s* after any other form
+(*player's*, *Rats's*, *Spawn's*; CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596). No
+form is a free choice, and each has one spelling.
+_Avoid_: Spelling Variant
 
 **Closed Word**:
 A core closed-class Lexeme that the grammar names individually.
@@ -176,8 +183,8 @@ Where a lexical value comes from, part of its identity. It has three kinds:
 vocabulary; and **Symbol**, notation symbols.
 
 **Onset**:
-Whether a realized expression begins with a consonant or vowel sound, which
-selects *a* or *an*.
+Whether a word begins with a consonant or vowel sound. The indefinite article
+agrees with the Onset of the word after it (Adjacency Agreement).
 
 ## Oracle text
 
@@ -246,8 +253,9 @@ _Avoid_: flavor text
 The CR term [CR#614.12c]. It is in scope only on the cards that print it.
 
 **Shortened Name**:
-A shortened card name [CR#201.5c], in scope only in the text of the face whose
-name it shortens.
+A shortened card name [CR#201.5c]: the Shortened form of the card name's
+Lexeme, beside its Full form, in scope only in the text of the face whose name
+it shortens.
 
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5]. The

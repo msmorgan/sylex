@@ -48,6 +48,25 @@ numbers (*entered*, *can*), which is one bundle unmarked for Number. Why: two
 bundles would be two Readings differing in a Number the text does not mark, a
 second tree ([English](english.md) §8).
 
+**A form has one spelling, and its context selects it.** Each slot of a
+Lexeme is spelled one way, so each lexical value realizes one way. Oracle
+text has no free variation, and no curly quotation mark or apostrophe. Its
+allomorphs are forms of one Lexeme told apart by an Adjacency Agreement
+feature, which the word next to it fixes as a subject fixes a verb's Number:
+the indefinite article's by the Onset of the word after it (*a creature*, *an
+artifact*, *an 8/8*, *a +1/+1 counter*), *non*'s by how the host after it takes
+a prefix, hyphenated before a subtype or *outlaw* and solid before any other
+word (*non-Vampire*, *nonland*), and the genitive's by the host before it: the
+bare genitive after any Plural noun form ending in *s*, regular or irregular,
+a base plural included, and the *'s* genitive after any other form, a singular
+ending in *s* included (*players'*, *elves'*, *Thalakos'*, *player's*,
+*Spawn's*, *Rats's*; CGEL, Ch. 18 §4.2 [35i], pp. 1595–1596, where the bare
+genitive of such a singular is only a variant, [35ii], and Oracle writes
+*'s*). The grammar checks the agreement between each word and the
+next, whatever Constituents they end and begin. Why: a free choice of spelling
+lets the parser accept *a artifact* and *players's*, and leaves realization
+nothing to derive the spelling from but the source text.
+
 **A word in two Parts of Speech is two Lexemes**, related by Conversion, never
 one Lexeme with a fused-head use standing in for the other: *red* is a noun in
 *protection from red*. An adjective heads a fused-head Quality only where it
@@ -110,6 +129,16 @@ never one that other vocabulary in scope on that card already spells: a token
 name or Introduced Name always, any other word unless it is the name before the
 comma or a planeswalker type. Why: admitted everywhere, every word spelled like
 one would be read as a name on every card.
+
+**A Shortened Name is a form of its card name.** A card name's Lexeme has a
+Full form and, where the card has a Shortened Name, a Shortened form, told
+apart by a feature and each with one spelling. Text that uses the Shortened
+Name refers to the card as its full name does [CR#201.5c], so a Reading of
+*Chandra* on Chandra, Pyromaster is that card's own Lexeme in its Shortened
+form, and realization spells *Chandra* from the tree alone. Only its own card
+admits the Shortened form; the scope is keyed by form, not by spelling. Why:
+one name is one Lexeme, and a spelling chosen apart from the form would be a
+free variant the tree does not record.
 
 **Another card's name stands only after *named* or *Partner with*.** A card's
 full name is spelled on every face, and off its own card it is another card's

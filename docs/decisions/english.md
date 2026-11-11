@@ -220,8 +220,8 @@ v is an admitted Reading of s                      =>  render(v) = s
 v is independently constructed and grammatical     =>  v is a Reading of parse(render(v))
 ```
 
-Equality in the second law preserves structure, lexical identities, features
-and retained Spelling Variants. Computed source positions are not identity,
+Equality in the second law preserves structure, lexical identities and
+features, which fix each word's spelling. Computed source positions are not identity,
 and no echo of the source buffer or opaque catch-all leaf counts as
 realization. Why: these laws carry the system's exact round trip at this layer
 ([Architecture](architecture.md), "Exact round trip").
