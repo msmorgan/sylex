@@ -6,7 +6,7 @@ needs: [syl-argument-naming, syl-single-face-card-call]
 
 ## Why
 
-Six declarations are named or spelled for one use, or read poorly for what they build:
+Seven declarations are named or spelled for one use, or read poorly for what they build:
 
 - `modifiesPrecedingAction` (`primitives/timing/`) is a `Duration` spelled "It can't be
   regenerated", though it is any rider that modifies the action before it [CR#608.2c].
@@ -28,6 +28,10 @@ Six declarations are named or spelled for one use, or read poorly for what they 
   what *Tenuous Truce*'s printed "or" spells. 6 canon cards call `and` there (*Autarch Mammoth*,
   *Bartered Cow*, *Balemurk Leech*, *Crack in Time*, *Up the Beanstalk*, *Shrine of Boundless
   Growth*) and 1 calls `or` (*Tenuous Truce*); nothing in `plugins/builtin/` calls either.
+- `onlyIfSo` (`templates/static/onlyIfSo.syl`), spelled "<spec> if <condition>", prints no
+  "so". It is renamed `onlyIf`. 6 calls in 6 files use it: `freerunning`, `prowl`, `spectacle`
+  and `surge` (`definitions/keyword_ability/`), `mayDeclineUntap` (`templates/ability/`) and
+  *Academy Journeymage*.
 
 `syl-argument-naming` rewrites 4 arguments that hold these declarations' calls, and lands first.
 
@@ -46,6 +50,7 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 - The trigger-condition primitive is `or`, the printed "and" is the Template `and` over it, and
   no Template `or` exists at `TriggerCondition`; each of the 7 callers is checked against its
   card's Oracle text, so the 6 that print "and" call `and` and *Tenuous Truce* calls `or`.
+- The `StaticSpec` Template is `onlyIf`, and no `onlyIfSo` is left in `plugins/`.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
@@ -56,4 +61,5 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 `plugins/builtin/templates/pronoun/splitOverPermanent.syl`, `plugins/builtin/primitives/noun/actor.syl`,
 `plugins/builtin/primitives/static/doesnt.syl`,
 `plugins/builtin/primitives/triggerCondition/and.syl`,
-`plugins/builtin/templates/triggerCondition/or.syl`.
+`plugins/builtin/templates/triggerCondition/or.syl`,
+`plugins/builtin/templates/static/onlyIfSo.syl`.
