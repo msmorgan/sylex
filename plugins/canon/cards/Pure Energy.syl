@@ -1,0 +1,7 @@
+card singleFaced({
+    name = "Pure Energy",
+    cost = [generic(1), pip(white)],
+    types = [sorcery],
+    text = [
+      spell(distributeCounters(2, p1p1Counter, targets(oneThrough(2), isCreature))),
+      beamMeUp(mana([generic(2), pip(white)]))]})

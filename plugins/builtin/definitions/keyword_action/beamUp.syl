@@ -1,0 +1,9 @@
+# "beam <subject> up": return it to its owner's hand to pay the portion of a beam me up cost that
+# requires returning a creature you control, the verb beam me up defines for itself
+# [CR#702.196b]. It is done by returning, so "can't be beamed up" forbids that return and no
+# other. Named apart from `beamMeUp`, the keyword ability.
+action beamUp(subject: NounPhrase) {
+  ofAbility = beamMeUp,
+  spelling = "beam <subject> up",
+  body = returnToHand($subject)
+}

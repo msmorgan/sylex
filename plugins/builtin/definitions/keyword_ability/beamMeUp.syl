@@ -1,0 +1,26 @@
+# "Beam me up [cost]" means "You may cast this card from your graveyard if the resulting spell is
+# an instant or sorcery spell by paying [cost] and returning a creature you control to its owner's
+# hand rather than paying its mana cost" and "If the beam me up cost was paid, exile this card
+# instead of putting it anywhere else any time it would leave the stack" [CR#702.196a]. The
+# creature returned for that cost is beamed up [CR#702.196b].
+ability beamMeUp(cost: Cost) {
+  lexical = {
+    lemma = "beam me up",
+    parameters = [[Cost]],
+    verbs = [{lemma = "beam", frames = [TransitiveWithPP(["up"])]}]},
+  spelling = "beam me up <cost>",
+  body = [
+    static(
+      can(
+        actor(you),
+        cast(
+          this,
+          from = yourGraveyard,
+          resulting = isInstantOrSorcery,
+          altCost = payingInstead(
+            compound([$cost, perform(beamUp(a(and([isCreature, youControl]))))]))))),
+    static(
+      replace(
+        would(actor(thisSpell), leave(from = stack)),
+        doIf(keywordCostPaid(beamMeUp, thisSpell), instead(exile(thisSpell)))))]
+}

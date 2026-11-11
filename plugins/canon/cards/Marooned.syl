@@ -1,0 +1,13 @@
+card singleFaced({
+    name = "Marooned",
+    cost = [pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(or([isArtifact, isCreature])),
+      when(
+        does(actor(thisAura), enter),
+        may(pay(mana([generic(3)]), once), ifDid = tap(enchanted(permanent)))),
+      static(
+        conjunction(
+          [doesntUntap(enchanted(permanent), controllerOf(it)), cant(any, beamUp(it))]))]})
