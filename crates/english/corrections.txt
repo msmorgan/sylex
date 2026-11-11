@@ -27,3 +27,8 @@ card: Kutzil, Malamet Exemplar
 oracle: power greater than its base power deals combat damage
 corrected: power greater than its base power deal combat damage
 evidence: Ungrammatical Oracle text: the subject "one or more creatures you control each with power greater than its base power" is plural, so the verb is "deal". The printed card (LCI 232) has the same "deals", so the ground is grammar, not a printed-card disagreement. Every other "one or more creatures ... deal combat damage" trigger in Oracle uses "deal".
+
+card: Azlask, the Swelling Scourge
+oracle: Scions and Spawns you control
+corrected: Scions and Spawn you control
+evidence: Ungrammatical Oracle text: Spawn has the zero plural. Hand of Emrakul, from Rise of the Eldrazi, the set that introduced the type, reads "sacrifice four Eldrazi Spawn", kept through every Oracle rewording, and no other in-scope Oracle text writes "Spawns". The printed card (M3C) has the same "Spawns", so the ground is grammar, not a printed-card disagreement.
