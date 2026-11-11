@@ -8,6 +8,8 @@
 +NounPhrase an additional two creatures => AdjectivePhrase "additional"; Nominal "two creatures"
 # from: Kaervek's Hex
 +NounPhrase an additional 2 damage => AdjectivePhrase "additional"; Nominal "2 damage"
+# from: Sage of Hours
++NounPhrase each five counters removed this way => DeterminerPhrase "each" as Determiner of counter; readings 1
 *NounPhrase much one
 
 *NounPhrase a two creatures

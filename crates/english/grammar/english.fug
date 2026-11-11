@@ -87,10 +87,9 @@ feature Sign = Negative | Zero | Positive
 feature PronounKind = Personal | Existential | Relative
 // `FreeChoice`: only *any*. Determined excludes it so *any* takes number
 // transparency (FreeChoiceDetermined, TransparentQuantity,
-// TemporalQuantity; never *any number of target creatures becomes*); with
-// DeterminedModifiedQuantity's exclusion, neither builds a second tree of
-// an analysis FreeChoiceDetermined or AgreeingModifiedQuantity builds
-// (admission gates, ADR §6, §8).
+// TemporalQuantity; never *any number of target creatures becomes*), and
+// builds no second tree of an analysis FreeChoiceDetermined builds
+// (admission gate, ADR §6, §8).
 // `IndefiniteArticle`: only *a*. `SingularOrQuantified`: only *another*,
 // which also takes a quantified plural (*another three bodies*; CGEL
 // 5§3.4:353) and a temporal location (*another day*, never *a day*; a gate
@@ -1520,9 +1519,16 @@ DistributiveQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNomina
           $.Determination = Overt
 // A singular determinative over a quantified plural, which *a* selects only
 // with *further* or *additional* (*an additional two creatures*; CGEL
-// 5§3.4:353). An agreeing determiner is AgreeingModifiedQuantity's.
+// 5§3.4:353). The determiner carries Singular: a number-neutral one (*the*,
+// *any*) or a plural one is AgreeingModifiedQuantity's. A distributive one
+// is DistributiveModifiedQuantity's, and an admission gate (ADR §6) keeps it
+// out: without it *each five counters removed this way* (Sage of Hours) and
+// *every five creature types among ...* (Sarek, Federation Ambassador) are
+// also a DeterminedModifiedQuantity duplicate of their
+// DistributiveModifiedQuantity.
 DeterminedModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQuantifiedNominal
-    where determiner.DeterminativeDistribution != Dependent | FreeChoice | Distributive,
+    where determiner.Number := Singular,
+          determiner.DeterminativeDistribution != Distributive,
           head.QuantityNumber = Plural,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
