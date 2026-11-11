@@ -2,8 +2,6 @@
 //! coordination, standing for further conjuncts of its kind (*and so on*;
 //! CGEL, Ch. 17 §7.7.3(e), p. 1540).
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -71,7 +69,7 @@ fn count(text: &str) -> usize {
     let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(
-            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            grammar.admit(reading, &lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "{text}"
         );

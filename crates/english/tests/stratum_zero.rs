@@ -1,7 +1,6 @@
 //! Independent Reading construction and document round trips for Stratum 0.
 
 use std::collections::BTreeMap;
-use std::collections::BTreeSet;
 
 use sylex_lexicon::FeatureBundle;
 use sylex_lexicon::LexicalReading;
@@ -66,7 +65,7 @@ fn independently_constructed_keyword_list_round_trips() {
         vec![node("KeywordAbilityList", "Ability", vec![list])],
     );
     grammar
-        .admit(&reading, &env.lexicon, &BTreeSet::new())
+        .admit(&reading, &env.lexicon, &sylex_lexicon::CardScope::default())
         .unwrap();
     let surface = "Flying, vigilance";
     assert_eq!(grammar.realize(&reading, &env.lexicon).unwrap(), surface);
@@ -192,7 +191,11 @@ fn modal_choice_headers_have_one_analysis_and_round_trip() {
         let readings = parse.best_readings(1).collect::<Vec<_>>();
         assert_eq!(readings.len(), 1, "{choice}");
         grammar
-            .admit(&readings[0], &env.lexicon, &BTreeSet::new())
+            .admit(
+                &readings[0],
+                &env.lexicon,
+                &sylex_lexicon::CardScope::default(),
+            )
             .unwrap();
         let text = grammar.realize(&readings[0], &env.lexicon).unwrap();
         assert_eq!(text, choice);

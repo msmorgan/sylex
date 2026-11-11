@@ -97,6 +97,10 @@ pub enum NameForm {
     Shortened,
 }
 
+impl NameForm {
+    pub const ALL: &[Self] = &[Self::Full, Self::Shortened];
+}
+
 /// One correlated lexical alternative.
 ///
 /// A missing dimension is inapplicable, not a wildcard. Which combinations

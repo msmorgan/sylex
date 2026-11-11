@@ -3,8 +3,6 @@
 //! can hold it, that Reading ranks first, and the stacked Reading stays a
 //! costlier alternative.
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -96,5 +94,8 @@ fn a_stacked_dependent_with_no_other_site_is_the_reading() {
         .collect::<Vec<_>>();
     assert_eq!(found.len(), 1, "{found:#?}");
     assert!(uses(&found[0], "PreposedPair"));
-    assert_eq!(grammar.admit(&found[0], &lexicon, &BTreeSet::new()), Ok(()));
+    assert_eq!(
+        grammar.admit(&found[0], &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
 }

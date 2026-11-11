@@ -65,9 +65,9 @@ pub struct AnalyzedText {
     pub normalized: Option<String>,
     pub tokens: Vec<char>,
     pub matches: Vec<LexicalMatch>,
-    /// The card-name Lexemes the text was analyzed in the scope of: the
-    /// names of the face whose text it is.
-    pub scope: BTreeSet<crate::LexemeId>,
+    /// The card names the text was analyzed in the scope of: the names of
+    /// the face whose text it is.
+    pub scope: crate::CardScope,
 }
 
 impl AnalyzedText {
@@ -156,7 +156,7 @@ impl AnalyzedText {
 #[derive(Debug, Default)]
 struct TrieNode {
     children: Vec<(char, usize)>,
-    values: Vec<(LexicalValue, Binding, bool)>,
+    values: Vec<(LexicalValue, Binding)>,
 }
 
 impl TrieNode {
@@ -277,16 +277,12 @@ impl Lexicon {
                         hyphenation: declaration.features.hyphenation,
                     },
                 };
-                // Only its own card admits a card name's Shortened form
-                // [CR#201.5c]; only its cards admit a card-scoped Lexeme.
-                let card_scoped = !lexeme.card_scope.is_empty()
-                    || declaration.features.name == Some(crate::NameForm::Shortened);
                 let initial = initial_surface(&surface);
                 let capitalized =
                     lexeme.capitalization == Capitalization::Initial && initial != surface;
                 result.surface_features.insert(value.clone(), features);
                 result.edges.insert(value.clone(), edges);
-                result.insert(value.clone(), surface, lexeme.binding, card_scoped);
+                result.insert(value.clone(), surface, lexeme.binding);
                 if capitalized {
                     let value = LexicalValue {
                         capitalization: SurfaceCase::Initial,
@@ -301,7 +297,7 @@ impl Lexicon {
                         },
                     );
                     result.edges.insert(value.clone(), edges);
-                    result.insert(value, initial, lexeme.binding, card_scoped);
+                    result.insert(value, initial, lexeme.binding);
                 }
             }
             if let Some(reason) = card_scope_defect(&lexeme).or_else(|| agreement_defect(&lexeme)) {
@@ -319,13 +315,7 @@ impl Lexicon {
         Ok(result)
     }
 
-    fn insert(
-        &mut self,
-        value: LexicalValue,
-        surface: String,
-        binding: Binding,
-        card_scoped: bool,
-    ) {
+    fn insert(&mut self, value: LexicalValue, surface: String, binding: Binding) {
         let mut node = 0;
         for ch in surface.chars() {
             node = match self.trie[node]
@@ -341,9 +331,7 @@ impl Lexicon {
                 }
             };
         }
-        self.trie[node]
-            .values
-            .push((value.clone(), binding, card_scoped));
+        self.trie[node].values.push((value.clone(), binding));
         self.surfaces.insert(value, surface);
     }
 
@@ -421,11 +409,12 @@ impl Lexicon {
             LexicalReading::FlavorWord { label } => {
                 // A registered label is never a Flavor Word, so neither
                 // analysis nor realization admits one. Realization has no
-                // card scope, so only a label registered everywhere refuses.
+                // card scope, so only a label registered everywhere refuses;
+                // [`Lexicon::stands_in`] refuses the rest in their scope.
                 if !valid_flavor_label(label)
                     || !self.title_cased(label)
                     || self
-                        .registered_label(label, Some(&BTreeSet::new()))
+                        .registered_label(label, Some(&crate::CardScope::default()))
                         .is_some()
                 {
                     return Err(LexicalError::UnlicensedValue);
@@ -495,12 +484,12 @@ impl Lexicon {
     /// Lexeme, which is an Ability Word [CR#207.2c], an Anchor Word
     /// [CR#614.12c] or a Keyword Ability [CR#702.1]. A declared label kind is
     /// preferred to a Keyword Ability. A registered label is never also an
-    /// open Flavor Word. With a `scope`, a card-scoped label registers only
-    /// on the cards that admit it; without one, every label registers.
+    /// open Flavor Word. With a `scope`, a label registers only where it
+    /// stands ([`Lexicon::stands_in`]); without one, every label registers.
     fn registered_label(
         &self,
         label: &str,
-        scope: Option<&BTreeSet<crate::LexemeId>>,
+        scope: Option<&crate::CardScope>,
     ) -> Option<LexicalValue> {
         let mut node = 0;
         for ch in label.chars() {
@@ -509,10 +498,8 @@ impl Lexicon {
         let mut registered: Vec<&LexicalValue> = self.trie[node]
             .values
             .iter()
-            .filter(|(value, _, card_scoped)| {
-                !card_scoped || scope.is_none_or(|scope| self.in_card_scope(&value.lexeme, scope))
-            })
-            .map(|(value, _, _)| value)
+            .map(|(value, _)| value)
+            .filter(|value| scope.is_none_or(|scope| self.word_stands_in(value, scope)))
             .filter(|value| self.lexemes[&value.lexeme].category == Category::Keyword)
             .collect();
         registered.sort_by_key(|value| self.label_kind(value).is_none());
@@ -543,7 +530,7 @@ impl Lexicon {
                 None => return false,
             }
         }
-        self.trie[node].values.iter().any(|(value, _, _)| {
+        self.trie[node].values.iter().any(|(value, _)| {
             matches!(
                 self.lexemes[&value.lexeme].category,
                 Category::Determinative
@@ -555,15 +542,46 @@ impl Lexicon {
         })
     }
 
-    /// Whether a card in `scope` admits the card-scoped forms of `lexeme`:
-    /// one of its `card_scope`, or the Lexeme itself, a card name, when that
-    /// is empty.
-    fn in_card_scope(&self, lexeme: &crate::LexemeId, scope: &BTreeSet<crate::LexemeId>) -> bool {
-        let cards = &self.lexemes[lexeme].card_scope;
-        if cards.is_empty() {
-            scope.contains(lexeme)
-        } else {
-            !cards.is_disjoint(scope)
+    /// Whether a lexical value stands in the text of a face whose card names
+    /// are `scope`: analysis finds it there, and admission admits it there.
+    ///
+    /// - A card name's Full form stands everywhere: in its scope it is the
+    ///   card's own name, and elsewhere another card's [CR#201.5]. Its
+    ///   Shortened form stands only where the scope holds that form
+    ///   [CR#201.5c].
+    /// - A card-scoped Lexeme, an Introduced Name or an Anchor Word, stands
+    ///   only where the scope holds one of its cards.
+    /// - A Flavor Word stands only where no label registered there spells it.
+    /// - Every other value stands everywhere.
+    ///
+    /// It checks scope alone: whether the lexicon licenses the value is
+    /// [`Lexicon::realize`]'s question, which admission asks first.
+    ///
+    /// # Panics
+    /// On a word value of no Lexeme of this lexicon.
+    #[must_use]
+    pub fn stands_in(&self, reading: &LexicalReading, scope: &crate::CardScope) -> bool {
+        match reading {
+            LexicalReading::Word(value) => self.word_stands_in(value, scope),
+            LexicalReading::FlavorWord { label } => {
+                self.registered_label(label, Some(scope)).is_none()
+            }
+            LexicalReading::Numeral { .. } => true,
+        }
+    }
+
+    fn word_stands_in(&self, value: &LexicalValue, scope: &crate::CardScope) -> bool {
+        let lexeme = self
+            .lexemes
+            .get(&value.lexeme)
+            .expect("a word value asked about scope is a Lexeme of this lexicon");
+        match value.features.name {
+            Some(crate::NameForm::Full) => true,
+            Some(form) => scope.holds(value.lexeme, form),
+            None => {
+                lexeme.card_scope.is_empty()
+                    || lexeme.card_scope.iter().any(|card| scope.holds_card(*card))
+            }
         }
     }
 
@@ -577,17 +595,17 @@ impl Lexicon {
 
     #[must_use]
     pub fn analyze_source(&self, raw: &str, normalized: Option<&str>) -> AnalyzedText {
-        self.analyze_source_scoped(raw, normalized, &BTreeSet::new())
+        self.analyze_source_scoped(raw, normalized, &crate::CardScope::default())
     }
 
-    /// Analyzes declared forms with card-scoped forms admitted only for the
-    /// lexical identities in `scope`. Full-name forms remain available.
+    /// Analyzes the values that stand in the text of a face whose card names
+    /// are `scope` ([`Lexicon::stands_in`]).
     #[must_use]
     pub fn analyze_source_scoped(
         &self,
         raw: &str,
         normalized: Option<&str>,
-        scope: &BTreeSet<crate::LexemeId>,
+        scope: &crate::CardScope,
     ) -> AnalyzedText {
         let tokens: Vec<char> = normalized.unwrap_or(raw).chars().collect();
         let mut candidates = Vec::new();
@@ -598,8 +616,8 @@ impl Lexicon {
                     break;
                 };
                 node = next;
-                for (value, binding, card_scoped) in &self.trie[node].values {
-                    if *card_scoped && !self.in_card_scope(&value.lexeme, scope) {
+                for (value, binding) in &self.trie[node].values {
+                    if !self.word_stands_in(value, scope) {
                         continue;
                     }
                     candidates.push((
@@ -663,9 +681,9 @@ impl Lexicon {
         flavor_word_matches(&tokens, &mut matches);
         matches.retain(|found| match &found.reading {
             LexicalReading::FlavorWord { label } => {
-                self.title_cased(label) && self.registered_label(label, Some(scope)).is_none()
+                self.title_cased(label) && self.stands_in(&found.reading, scope)
             }
-            _ => true,
+            LexicalReading::Word(_) | LexicalReading::Numeral { .. } => true,
         });
         AnalyzedText {
             raw: raw.to_owned(),

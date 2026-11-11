@@ -257,6 +257,13 @@ A shortened card name [CR#201.5c]: the Shortened form of the card name's
 Lexeme, beside its Full form, in scope only in the text of the face whose name
 it shortens.
 
+**Card Scope**:
+The card names a text is in the scope of, each with the forms of it that the
+text admits. A face's text holds its own names in every form [CR#201.5c]; a
+Card Scope may hold a name in its Full form alone. A Shortened form stands only
+where its Card Scope holds that form, and an Introduced Name or Anchor Word
+only where it holds one of its cards.
+
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5]. The
 grammar reads it as any other Proper Name.

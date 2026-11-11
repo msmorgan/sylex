@@ -71,7 +71,7 @@ fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Deceiver");
-    let scope = std::collections::BTreeSet::from([own]);
+    let scope = sylex_lexicon::CardScope::own_names([own]);
     let text = "Nicol Bolas deals 7 damage to each opponent.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
@@ -81,6 +81,42 @@ fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
             .iter()
             .all(|h| *h == own)
     );
+}
+
+/// After *named*, the face's own Shortened Name and another card's full name
+/// spelled alike are two Readings with one key: neither ranks first. A minimal
+/// repro on Nicol Bolas, the Ravager, whose own text shortens its name to
+/// *Nicol Bolas*; no card prints *named* before its own Shortened Name.
+#[test]
+fn after_named_a_face_s_own_name_ties_with_another_card_s_spelled_alike() {
+    let env = LexicalEnvironment::load().unwrap();
+    let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
+    let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Ravager");
+    let scope = sylex_lexicon::CardScope::own_names([
+        own,
+        sylex_vocabulary::card_name_id("Nicol Bolas, the Ravager // Nicol Bolas, the Arisen"),
+    ]);
+    let text = "Search your library for a card named Nicol Bolas.";
+    let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
+    assert_eq!(ranked.len(), 2);
+    assert_eq!(ranked[0].0, ranked[1].0);
+    let other = sylex_vocabulary::card_name_id("Nicol Bolas");
+    let mut heads: Vec<_> = ranked
+        .iter()
+        .map(|(_, reading)| {
+            let mut names = names(&grammar, &env, reading);
+            names.dedup();
+            names
+        })
+        .collect();
+    heads.sort();
+    let mut expected = vec![vec![own], vec![other]];
+    expected.sort();
+    assert_eq!(heads, expected);
+    for (key, reading) in &ranked {
+        assert_eq!(grammar.ranking_key(reading, &env.lexicon), Ok(*key));
+    }
 }
 
 /// The card names that head a Reading's Constituents.
@@ -106,7 +142,7 @@ fn names(
 fn forest_keys_follow_each_packed_prefix_s_own_division_of_the_text() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let scope = std::collections::BTreeSet::new();
+    let scope = sylex_lexicon::CardScope::default();
     let text = "Return to the battlefield tapped creature cards at random that were put into your graveyard this turn.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();

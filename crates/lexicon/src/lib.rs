@@ -6,6 +6,7 @@ mod model;
 mod morphology;
 pub mod numeral;
 mod pronunciation;
+mod scope;
 mod types;
 
 pub use crate::analysis::*;
@@ -16,6 +17,7 @@ pub use crate::numeral::NumeralCodec;
 pub use crate::numeral::ParseNumeralError;
 pub use crate::pronunciation::mark_onset;
 pub use crate::pronunciation::numeral_onset;
+pub use crate::scope::CardScope;
 pub use crate::types::Case;
 pub use crate::types::Category;
 pub use crate::types::Countability;

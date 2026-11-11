@@ -155,7 +155,7 @@ pub struct Parse<'g> {
     /// Words no declared lexeme spells, as char ranges.
     pub vocabulary_gaps: Vec<Range<usize>>,
     /// The card names the text was analyzed in the scope of.
-    pub(crate) scope: std::collections::BTreeSet<sylex_lexicon::LexemeId>,
+    pub(crate) scope: sylex_lexicon::CardScope,
 }
 
 impl<'g> Parse<'g> {

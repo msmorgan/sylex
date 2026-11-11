@@ -3,6 +3,7 @@
 
 use std::collections::BTreeSet;
 
+use sylex_lexicon::CardScope;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
@@ -75,7 +76,7 @@ fn a_shortened_name_never_spells_vocabulary_in_scope_on_its_card() {
 fn a_shortened_name_is_in_scope_only_on_its_own_card() {
     let environment = LexicalEnvironment::load().unwrap();
     let dina = LexemeId::new("name:Dina, Soul Steeper");
-    let names = |scope: &BTreeSet<LexemeId>| -> BTreeSet<LexemeId> {
+    let names = |scope: &CardScope| -> BTreeSet<LexemeId> {
         environment
             .lexicon
             .analyze_source_scoped("Dina", None, scope)
@@ -87,8 +88,8 @@ fn a_shortened_name_is_in_scope_only_on_its_own_card() {
             })
             .collect()
     };
-    assert!(names(&[dina].into()).contains(&dina));
-    assert!(!names(&BTreeSet::new()).contains(&dina));
+    assert!(names(&CardScope::own_names([dina])).contains(&dina));
+    assert!(!names(&CardScope::default()).contains(&dina));
     // The full name is spelled everywhere: off its own card the grammar
     // reads it as another card's name, only after *named*, *Partner with* or
     // *from among*.
@@ -101,10 +102,11 @@ fn a_shortened_name_is_in_scope_only_on_its_own_card() {
 
 /// Whether `text` analyzes, whole, as `lexeme` with `scope`'s cards in scope.
 fn spells(environment: &LexicalEnvironment, text: &str, lexeme: &str, scope: &[&str]) -> bool {
-    let scope: BTreeSet<LexemeId> = scope
-        .iter()
-        .map(|card| LexemeId::new(&format!("name:{card}")))
-        .collect();
+    let scope = CardScope::own_names(
+        scope
+            .iter()
+            .map(|card| LexemeId::new(&format!("name:{card}"))),
+    );
     let analyzed = environment
         .lexicon
         .analyze_source_scoped(text, None, &scope);

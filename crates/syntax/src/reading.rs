@@ -10,6 +10,7 @@ use dpsi::Ident;
 use serde::Deserialize;
 use serde::Serialize;
 use sylex_lexicon::Binding;
+use sylex_lexicon::CardScope;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::LexicalValue;
@@ -104,6 +105,10 @@ pub enum AdmissionError {
     Root(String),
     #[error("a leaf is not a value of this lexicon")]
     Leaf,
+    /// A leaf the lexicon licenses but that does not stand in the card scope
+    /// ([`sylex_lexicon::Lexicon::stands_in`]).
+    #[error("a leaf does not stand in this card scope")]
+    OutOfScope,
 }
 
 impl Parse<'_> {
@@ -978,7 +983,7 @@ impl CompiledGrammar {
         &self,
         reading: &Reading,
         lexicon: &Lexicon,
-        scope: &BTreeSet<LexemeId>,
+        scope: &CardScope,
     ) -> Result<(), AdmissionError> {
         self.admit_as(reading, lexicon, self.root, scope)
     }
@@ -993,7 +998,7 @@ impl CompiledGrammar {
         reading: &Reading,
         lexicon: &Lexicon,
         category: &str,
-        scope: &BTreeSet<LexemeId>,
+        scope: &CardScope,
     ) -> Result<(), AdmissionError> {
         let root = self
             .category_id(category)
@@ -1007,7 +1012,7 @@ impl CompiledGrammar {
         reading: &Reading,
         lexicon: &Lexicon,
         root: usize,
-        scope: &BTreeSet<LexemeId>,
+        scope: &CardScope,
     ) -> Result<(), AdmissionError> {
         let (category, summary) = self.summarize(reading, lexicon, scope)?;
         if category != root || summary.gap != Gap::None {
@@ -1115,7 +1120,7 @@ impl CompiledGrammar {
         &self,
         reading: &Reading,
         lexicon: &Lexicon,
-        scope: &BTreeSet<LexemeId>,
+        scope: &CardScope,
     ) -> Result<(usize, Summary), AdmissionError> {
         let Reading::Node(node) = reading else {
             return Err(AdmissionError::Leaf);
@@ -1139,6 +1144,9 @@ impl CompiledGrammar {
                         return Err(reject("expected a lexical leaf"));
                     };
                     lexicon.realize(value).map_err(|_| AdmissionError::Leaf)?;
+                    if !lexicon.stands_in(value, scope) {
+                        return Err(AdmissionError::OutOfScope);
+                    }
                     let facts = self.leaf_facts(value, scope).ok_or(AdmissionError::Leaf)?;
                     let edges = self.leaf_edges(value).ok_or(AdmissionError::Leaf)?;
                     if !self.leaf_matches(test, &facts) {

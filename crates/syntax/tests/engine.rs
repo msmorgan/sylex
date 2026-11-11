@@ -1,7 +1,6 @@
 //! Engine core: loading, feature agreement, packing, Admission and both
 //! round-trip laws, over a small hand-written grammar.
 
-use std::collections::BTreeSet;
 use std::fmt::Write;
 
 use sylex_lexicon::Category;
@@ -90,7 +89,7 @@ fn readings(grammar: &CompiledGrammar, lexicon: &Lexicon, text: &str) -> Vec<Rea
     );
     for reading in &readings {
         assert_eq!(
-            grammar.admit(reading, lexicon, &BTreeSet::new()),
+            grammar.admit(reading, lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "{reading:#?}"
         );
@@ -215,7 +214,11 @@ fn feature_exclusion_is_shared_by_parsing_and_admission() {
         .collect::<Vec<_>>()
         .pop()
         .unwrap();
-    assert!(grammar.admit(&finite, &lexicon, &BTreeSet::new()).is_err());
+    assert!(
+        grammar
+            .admit(&finite, &lexicon, &sylex_lexicon::CardScope::default())
+            .is_err()
+    );
 }
 
 #[test]
@@ -258,7 +261,7 @@ fn hand_built_readings_reparse() {
         // parse of its realization.
         let rebuilt: Reading = ron::from_str(&ron::to_string(&built).unwrap()).unwrap();
         assert_eq!(
-            grammar.admit(&rebuilt, &lexicon, &BTreeSet::new()),
+            grammar.admit(&rebuilt, &lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "tree {index}"
         );
@@ -283,10 +286,18 @@ fn admission_rejects_broken_readings() {
     )
     .unwrap();
     assert_ne!(plural, reading, "the edit changed the noun");
-    assert!(grammar.admit(&plural, &lexicon, &BTreeSet::new()).is_err());
+    assert!(
+        grammar
+            .admit(&plural, &lexicon, &sylex_lexicon::CardScope::default())
+            .is_err()
+    );
     let unknown: Reading =
         ron::from_str(&text.replace("\"Transitive\"", "\"Ditransitive\"")).unwrap();
-    assert!(grammar.admit(&unknown, &lexicon, &BTreeSet::new()).is_err());
+    assert!(
+        grammar
+            .admit(&unknown, &lexicon, &sylex_lexicon::CardScope::default())
+            .is_err()
+    );
 }
 
 #[test]
@@ -407,7 +418,10 @@ fn best_readings_do_not_enumerate_every_attachment() {
     let best = parse.best_readings(2).collect::<Vec<_>>();
     assert_eq!(best.len(), 2);
     for reading in &best {
-        assert_eq!(grammar.admit(reading, &lexicon, &BTreeSet::new()), Ok(()));
+        assert_eq!(
+            grammar.admit(reading, &lexicon, &sylex_lexicon::CardScope::default()),
+            Ok(())
+        );
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
     println!("{:?}", parse.forest.metrics());
@@ -510,12 +524,17 @@ fn a_phrase_parses_and_admits_as_its_own_category() {
     assert_eq!(readings.len(), 1);
     assert_eq!(parse.admit(&readings[0], &lexicon), Ok(()));
     assert_eq!(
-        grammar.admit_category(&readings[0], &lexicon, "NounPhrase", &BTreeSet::new()),
+        grammar.admit_category(
+            &readings[0],
+            &lexicon,
+            "NounPhrase",
+            &sylex_lexicon::CardScope::default()
+        ),
         Ok(())
     );
     assert!(
         grammar
-            .admit(&readings[0], &lexicon, &BTreeSet::new())
+            .admit(&readings[0], &lexicon, &sylex_lexicon::CardScope::default())
             .is_err()
     );
     assert_eq!(parse.verify_realization(&lexicon), Ok(()));

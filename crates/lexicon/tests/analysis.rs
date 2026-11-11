@@ -1106,7 +1106,7 @@ fn an_anchor_word_is_a_registered_label_on_the_cards_that_admit_it() {
     ));
     let text = "• Khans — At the beginning of combat on your turn, draw a card.";
     let readings = |scope: &[&str]| {
-        let scope = scope.iter().map(|card| LexemeId::new(card)).collect();
+        let scope = CardScope::own_names(scope.iter().map(|card| LexemeId::new(card)));
         let analyzed = lexicon.analyze_source_scoped(text, None, &scope);
         (
             at(&analyzed, 2, 7)
@@ -1193,10 +1193,10 @@ fn a_shortened_name_is_admitted_only_on_its_own_card_and_realizes_alone() {
         name(NameForm::Shortened),
     );
     assert_eq!(lexicon.realize(&shortened).unwrap(), "Chandra");
-    let scope = BTreeSet::from([card.id]);
+    let scope = CardScope::own_names([card.id]);
     for (scope, expected) in [
-        (BTreeSet::new(), false),
-        (BTreeSet::from([LexemeId::new("another-card")]), false),
+        (CardScope::default(), false),
+        (CardScope::own_names([LexemeId::new("another-card")]), false),
         (scope.clone(), true),
     ] {
         let input = lexicon.analyze_source_scoped("raw metadata", Some("Chandra"), &scope);
@@ -1218,7 +1218,7 @@ fn a_shortened_name_is_admitted_only_on_its_own_card_and_realizes_alone() {
     }
     // The Full form is admitted everywhere.
     let full = word(card.id.as_str(), WordForm::Invariant, name(NameForm::Full));
-    for scope in [BTreeSet::new(), scope] {
+    for scope in [CardScope::default(), scope] {
         let analyzed = lexicon.analyze_source_scoped("Chandra, Pyromaster", None, &scope);
         assert!(analyzed.matches.iter().any(|m| m.reading == full));
     }
@@ -1262,7 +1262,7 @@ fn a_card_scope_admits_spellings_on_the_cards_it_names() {
     ]);
     let lexicon = Lexicon::new([token.clone()]).unwrap();
     let found = |scope: &[&str]| {
-        let scope = scope.iter().map(|card| LexemeId::new(card)).collect();
+        let scope = CardScope::own_names(scope.iter().map(|card| LexemeId::new(card)));
         lexicon
             .analyze_source_scoped("Marit Lage", None, &scope)
             .matches

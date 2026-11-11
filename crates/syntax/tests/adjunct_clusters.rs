@@ -3,8 +3,6 @@
 //! one beginning with a remnant, its preposition elided (CGEL, Ch. 15 §4.3,
 //! p. 1343, note 65: *We'll be in Paris for a week and Bonn for three days*).
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -91,7 +89,7 @@ fn count(text: &str) -> usize {
     let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(
-            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            grammar.admit(reading, &lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "{text}"
         );

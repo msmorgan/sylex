@@ -4,9 +4,9 @@
 use std::collections::BTreeSet;
 
 use sylex_lexicon::Binding;
+use sylex_lexicon::CardScope;
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
-use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Number;
 use sylex_lexicon::Person;
@@ -133,8 +133,11 @@ fn every_value_realizes_and_analyzes_back() {
         let reading = LexicalReading::Word(value.clone());
         let surface = lexicon.realize(&reading).unwrap();
         let cards = &lexicon.lexemes()[&value.lexeme].card_scope;
-        let scope: BTreeSet<LexemeId> =
-            if cards.is_empty() { [value.lexeme].into() } else { cards.clone() };
+        let scope = CardScope::own_names(if cards.is_empty() {
+            BTreeSet::from([value.lexeme])
+        } else {
+            cards.clone()
+        });
         let analyzed = lexicon.analyze_source_scoped(&surface, None, &scope);
         let whole = analyzed.tokens.len();
         assert!(

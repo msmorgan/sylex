@@ -43,7 +43,7 @@ fn spelled_by_other_vocabulary(
     explicit: bool,
     vocabulary: &Lexicon,
 ) -> bool {
-    let scope = BTreeSet::from([card]);
+    let scope = sylex_lexicon::CardScope::own_names([card]);
     let analyzed = vocabulary.analyze_source_scoped(candidate, None, &scope);
     let whole = analyzed.tokens.len();
     analyzed.matches.iter().any(|found| {

@@ -2,8 +2,6 @@
 //! its Frame Slots, each optionally ending in Adjuncts (right
 //! nonce-constituent coordination, CGEL, Ch. 15 §4.3, pp. 1341–1343).
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -91,7 +89,7 @@ fn count(text: &str) -> usize {
     let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(
-            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            grammar.admit(reading, &lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "{text}"
         );
@@ -266,7 +264,7 @@ fn remnant_count(text: &str) -> usize {
     let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &found {
         assert_eq!(
-            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            grammar.admit(reading, &lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "{text}"
         );

@@ -3,8 +3,6 @@
 #[allow(dead_code, reason = "the seed module also serves seed_proof.rs")]
 mod seed;
 
-use std::collections::BTreeSet;
-
 use sylex_english::census::Unread;
 use sylex_english::census::Verdict;
 use sylex_english::corpus::Corpus;
@@ -22,7 +20,7 @@ fn face(identity: &str, text: &str) -> Face {
         identity: identity.to_owned(),
         name: identity.to_owned(),
         card: identity.to_owned(),
-        scope: BTreeSet::new(),
+        scope: sylex_lexicon::CardScope::default(),
         type_line: Some("Sorcery".to_owned()),
         oracle_text: Some(text.to_owned()),
     }

@@ -1,11 +1,11 @@
 //! The judgment set: hand-written linguistic judgments, one line per entry
 //! (`judgments/README.md`), and their evaluation against a bound grammar.
 
-use std::collections::BTreeSet;
 use std::fmt;
 use std::path::Path;
 
 use dpsi::Ident;
+use sylex_lexicon::CardScope;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::Lexicon;
 use sylex_syntax::CompiledGrammar;
@@ -13,7 +13,6 @@ use sylex_syntax::Constituent;
 use sylex_syntax::Gap;
 use sylex_syntax::Parse;
 use sylex_syntax::Reading;
-
 use sylex_vocabulary::card_name_id;
 
 /// More Readings than this and an entry is not evaluated tree by tree.
@@ -344,8 +343,8 @@ fn parse_assertion(text: &str) -> Result<Assertion, String> {
 
 /// The card names an entry puts in scope.
 #[must_use]
-pub fn scope(entry: &Judgment) -> BTreeSet<LexemeId> {
-    entry.card.iter().map(|c| card_name_id(c)).collect()
+pub fn scope(entry: &Judgment) -> CardScope {
+    CardScope::own_names(entry.card.iter().map(|c| card_name_id(c)))
 }
 
 /// Round-trip law 2 for one Reading of `parse`: admitted, realized, and
@@ -363,7 +362,7 @@ pub fn law_two(
     lexicon: &Lexicon,
     parse: &Parse<'_>,
     reading: &Reading,
-    scope: &BTreeSet<LexemeId>,
+    scope: &CardScope,
 ) -> Result<(), String> {
     parse
         .admit(reading, lexicon)

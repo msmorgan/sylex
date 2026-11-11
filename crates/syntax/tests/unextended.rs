@@ -4,8 +4,6 @@
 //! Extension after its Displaced Subject, CGEL Ch. 16 §6.2.1, p. 1394). A
 //! phrase the Complement cannot take stays a postmodifier.
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -73,7 +71,7 @@ fn a_phrase_the_sibling_selects_is_its_complement_only() {
         let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
         assert_eq!(found.len(), 1, "{text}: {found:#?}");
         assert_eq!(
-            grammar.admit(&found[0], &lexicon, &BTreeSet::new()),
+            grammar.admit(&found[0], &lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "{text}"
         );
@@ -114,7 +112,10 @@ fn a_child_before_a_selected_complement_does_not_end_in_one() {
         .readings()
         .collect::<Vec<_>>();
     assert_eq!(found.len(), 1, "{found:#?}");
-    assert_eq!(grammar.admit(&found[0], &lexicon, &BTreeSet::new()), Ok(()));
+    assert_eq!(
+        grammar.admit(&found[0], &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
     let subject = found[0].node().unwrap().children[0]
         .node()
         .unwrap()

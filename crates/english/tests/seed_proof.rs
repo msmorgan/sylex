@@ -4,8 +4,6 @@
 
 mod seed;
 
-use std::collections::BTreeSet;
-
 use dpsi::Ident;
 use sylex_lexicon::Lexicon;
 use sylex_syntax::CompiledGrammar;
@@ -53,7 +51,8 @@ impl Seed {
         let readings = parse.readings().collect::<Vec<_>>();
         for reading in &readings {
             assert_eq!(
-                self.grammar.admit(reading, &self.lexicon, &BTreeSet::new()),
+                self.grammar
+                    .admit(reading, &self.lexicon, &sylex_lexicon::CardScope::default()),
                 Ok(())
             );
             assert_eq!(self.grammar.realize(reading, &self.lexicon).unwrap(), text);
@@ -113,8 +112,11 @@ impl Seed {
     fn reparses(&self, reading: &Reading) {
         let rebuilt: Reading = ron::from_str(&ron::to_string(reading).unwrap()).unwrap();
         assert_eq!(
-            self.grammar
-                .admit(&rebuilt, &self.lexicon, &BTreeSet::new()),
+            self.grammar.admit(
+                &rebuilt,
+                &self.lexicon,
+                &sylex_lexicon::CardScope::default()
+            ),
             Ok(())
         );
         let surface = self.surface(&rebuilt);
@@ -553,7 +555,7 @@ fn normal_form_identifies_clause_and_verb_phrase_coordination_of_imperatives() {
     let excluded = replace(&clauses, coordination, &excluded);
     assert!(
         s.grammar
-            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .admit(&excluded, &s.lexicon, &sylex_lexicon::CardScope::default())
             .is_err(),
         "a chain of bare imperatives is coordinated imperative Clauses"
     );
@@ -599,7 +601,7 @@ fn normal_form_identifies_bare_noun_phrase_and_nominal_coordination() {
     assert_eq!(s.surface(&excluded), s.surface(phrases));
     assert!(
         s.grammar
-            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .admit(&excluded, &s.lexicon, &sylex_lexicon::CardScope::default())
             .is_err(),
         "a bare Noun Phrase's Nominal is no coordination"
     );
@@ -676,7 +678,7 @@ fn normal_form_identifies_same_head_complement_priority() {
     });
     assert!(
         s.grammar
-            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .admit(&excluded, &s.lexicon, &sylex_lexicon::CardScope::default())
             .is_err()
     );
     assert_eq!(
@@ -710,7 +712,7 @@ fn normal_form_identifies_groupings_of_one_coordinator() {
     let nested = replace(&serial, top, &nested);
     assert!(
         s.grammar
-            .admit(&nested, &s.lexicon, &BTreeSet::new())
+            .admit(&nested, &s.lexicon, &sylex_lexicon::CardScope::default())
             .is_err(),
         "one tree per chain"
     );
@@ -781,7 +783,7 @@ fn adjuncts_attach_below_a_non_modal_auxiliary() {
     assert_eq!(s.surface(&excluded), s.surface(verbal));
     assert!(
         s.grammar
-            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .admit(&excluded, &s.lexicon, &sylex_lexicon::CardScope::default())
             .is_err(),
         "an uncoordinated auxiliary Verb Phrase hosts no post-verbal Adjunct"
     );
@@ -863,7 +865,7 @@ fn normal_form_identifies_a_fronted_dependent_outermost() {
     assert_eq!(s.surface(&excluded), s.surface(canonical));
     assert!(
         s.grammar
-            .admit(&excluded, &s.lexicon, &BTreeSet::new())
+            .admit(&excluded, &s.lexicon, &sylex_lexicon::CardScope::default())
             .is_err()
     );
     assert_eq!(

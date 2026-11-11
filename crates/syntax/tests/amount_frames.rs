@@ -2,8 +2,6 @@
 //! *amass Zombies 2* and *waterbend {3}* select a numeric Amount or a Cost, not
 //! an Amount complement; amass additionally selects an Object.
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -107,7 +105,10 @@ fn only_reading(text: &str) -> Reading {
     let mut readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
     let reading = readings.remove(0);
-    assert_eq!(grammar.admit(&reading, &lexicon, &BTreeSet::new()), Ok(()));
+    assert_eq!(
+        grammar.admit(&reading, &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
     assert_eq!(grammar.realize(&reading, &lexicon).unwrap(), text);
     reading
 }

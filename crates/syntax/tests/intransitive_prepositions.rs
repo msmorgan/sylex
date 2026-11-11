@@ -2,8 +2,6 @@
 //! *phase out*, and a verb frame can select it, alone or as the fixed
 //! preposition of an Idiom (*come up heads*).
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -63,7 +61,10 @@ fn a_verb_selects_an_intransitive_preposition() {
         .collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{readings:#?}");
     let reading = readings.remove(0);
-    assert_eq!(grammar.admit(&reading, &lexicon, &BTreeSet::new()), Ok(()));
+    assert_eq!(
+        grammar.admit(&reading, &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
     assert_eq!(grammar.realize(&reading, &lexicon).unwrap(), "Phase out.");
     let clause = reading.node().unwrap().children[0].node().unwrap();
     assert_eq!(
@@ -134,7 +135,10 @@ fn an_idiom_selects_its_particle_and_a_predicative() {
         .collect::<Vec<_>>();
     assert_eq!(readings.len(), 1, "{readings:#?}");
     let reading = readings.remove(0);
-    assert_eq!(grammar.admit(&reading, &lexicon, &BTreeSet::new()), Ok(()));
+    assert_eq!(
+        grammar.admit(&reading, &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
     let clause = reading.node().unwrap().children[0].node().unwrap();
     assert_eq!(
         clause.selected_frame.as_ref().map(|frame| frame.family),

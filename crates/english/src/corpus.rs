@@ -16,10 +16,10 @@
 use std::collections::BTreeSet;
 use std::io::BufRead;
 
-use sylex_lexicon::LexemeId;
+use sylex_lexicon::CardScope;
 use sylex_upstream::oracle_text::strip_reminder_text;
-use sylex_vocabulary::card_name_id;
 use sylex_upstream::scryfall::OracleCardReader;
+use sylex_vocabulary::card_name_id;
 
 /// One Card Face record of the supported corpus.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -32,7 +32,7 @@ pub struct Face {
     pub card: String,
     /// Card-name lexemes in scope on this face: its own name and its
     /// card's [CR#201.5c].
-    pub scope: BTreeSet<LexemeId>,
+    pub scope: CardScope,
     pub type_line: Option<String>,
     /// Oracle rules text, reminder text included, with the face's Editorial
     /// Corrections applied.
@@ -245,7 +245,7 @@ impl Corpus {
                 // double-faced card are named apart [CR#712.8d,712.8e,712.8f],
                 // and two faces that shorten to one spelling (*Ral*) name one
                 // object, not two.
-                let scope = BTreeSet::from([
+                let scope = CardScope::own_names([
                     card_name_id(unit.display_name()),
                     card_name_id(&card.name),
                 ]);
@@ -415,8 +415,8 @@ mod tests {
         assert_eq!(
             scopes,
             [
-                BTreeSet::from([card_name_id("Ral, Monsoon Mage"), card]),
-                BTreeSet::from([card_name_id("Ral, Leyline Prodigy"), card]),
+                CardScope::own_names([card_name_id("Ral, Monsoon Mage"), card]),
+                CardScope::own_names([card_name_id("Ral, Leyline Prodigy"), card]),
             ]
         );
     }
@@ -428,7 +428,7 @@ mod tests {
             identity: "x#card".to_owned(),
             name: "Seedborn Muse".to_owned(),
             card: "Seedborn Muse".to_owned(),
-            scope: BTreeSet::new(),
+            scope: CardScope::default(),
             type_line: Some("Creature — Spirit".to_owned()),
             oracle_text: Some(
                 "Untap all permanents you control during each other player's untap step."

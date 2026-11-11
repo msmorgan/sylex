@@ -14,15 +14,15 @@ use anyhow::Result;
 use anyhow::ensure;
 use rayon::prelude::*;
 use serde::Serialize;
-use sylex_vocabulary::card_name_id;
 use sylex_lexicon::AnalyzedText;
+use sylex_lexicon::CardScope;
 use sylex_lexicon::Category;
-use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalProperties;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
 use sylex_lexicon::Source;
 use sylex_lexicon::SourceKind;
+use sylex_vocabulary::card_name_id;
 
 use crate::raw_corpus::CorpusSelectionArgs;
 use crate::raw_corpus::SelectedCorpus;
@@ -280,8 +280,11 @@ fn check_independent_values(lexicon: &Lexicon) -> Result<usize> {
         let reading = LexicalReading::Word(value.clone());
         let surface = lexicon.realize(&reading)?;
         let cards = &lexicon.lexemes()[&value.lexeme].card_scope;
-        let scope: BTreeSet<LexemeId> =
-            if cards.is_empty() { [value.lexeme].into() } else { cards.clone() };
+        let scope = CardScope::own_names(if cards.is_empty() {
+            BTreeSet::from([value.lexeme])
+        } else {
+            cards.clone()
+        });
         let analyzed = lexicon.analyze_source_scoped(&surface, None, &scope);
         ensure!(
             analyzed.matches.iter().any(|found| {
@@ -347,10 +350,7 @@ fn analyze_face(face: &SelectedFace, lexicon: &Lexicon) -> Result<Option<(FaceRe
         return Ok(None);
     };
     // A face's text names its own face and card [CR#201.5c].
-    let scope = BTreeSet::from([
-        card_name_id(&face.name),
-        card_name_id(&face.group_name),
-    ]);
+    let scope = CardScope::own_names([card_name_id(&face.name), card_name_id(&face.group_name)]);
     let analyzed = lexicon.analyze_source_scoped(raw, None, &scope);
     let mut inventory = Inventory::default();
     let (words, unrecognized_nonwords) = account_text(&analyzed, lexicon, &mut inventory)

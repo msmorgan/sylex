@@ -4,11 +4,9 @@
 //! its agreement needs, *Exile*, *Remove* and *Turn* (of *Turn // Burn*) are
 //! other cards' names that would otherwise read *[Name] targets …* here.
 
-use std::collections::BTreeSet;
-
-use sylex_vocabulary::card_name_id;
 use sylex_lexicon::Lexicon;
 use sylex_vocabulary::LexicalEnvironment;
+use sylex_vocabulary::card_name_id;
 
 const UNITS: [(&str, &str); 6] = [
     (
@@ -63,7 +61,7 @@ fn named_readings(lexicon: &Lexicon, env: &LexicalEnvironment) -> Vec<(&'static 
     UNITS
         .iter()
         .map(|(card, text)| {
-            let scope = BTreeSet::from([card_name_id(card)]);
+            let scope = sylex_lexicon::CardScope::own_names([card_name_id(card)]);
             let parse = grammar.parse_analyzed(&lexicon.analyze_source_scoped(text, None, &scope));
             let readings: Vec<_> = parse.readings().collect();
             assert!(!readings.is_empty(), "{card}: no Reading");

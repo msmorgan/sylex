@@ -6,8 +6,6 @@
 //! `initial` holds of the initial conjunct alone, where one over `first`
 //! holds of every conjunct but the last.
 
-use std::collections::BTreeSet;
-
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
 use sylex_lexicon::Lexeme;
@@ -73,7 +71,7 @@ fn readings_with(equations: &str, text: &str) -> Vec<Reading> {
     let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
         assert_eq!(
-            grammar.admit(reading, &lexicon, &BTreeSet::new()),
+            grammar.admit(reading, &lexicon, &sylex_lexicon::CardScope::default()),
             Ok(()),
             "{text}"
         );

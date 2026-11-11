@@ -136,9 +136,15 @@ apart by a feature and each with one spelling. Text that uses the Shortened
 Name refers to the card as its full name does [CR#201.5c], so a Reading of
 *Chandra* on Chandra, Pyromaster is that card's own Lexeme in its Shortened
 form, and realization spells *Chandra* from the tree alone. Only its own card
-admits the Shortened form; the scope is keyed by form, not by spelling. Why:
-one name is one Lexeme, and a spelling chosen apart from the form would be a
-free variant the tree does not record.
+admits the Shortened form; the scope is keyed by form, not by spelling. A Card
+Scope holds each of its card names in the forms the text admits, a face's own
+names in every form, and one predicate of the lexicon, `Lexicon::stands_in`,
+says whether a value stands in it: analysis finds only such values, and
+admission refuses any other, so a Reading built apart from a parse is held to
+the scope its text would be parsed in. Why: one name is one Lexeme, and a
+spelling chosen apart from the form would be a free variant the tree does not
+record; a scope checked by parsing alone would admit a tree that no parse of
+its text yields.
 
 **Another card's name stands only after *named*, *Partner with* or *from
 among*.** A card's full name is spelled on every face, and off its own card it

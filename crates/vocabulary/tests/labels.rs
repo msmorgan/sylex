@@ -109,7 +109,8 @@ fn an_anchor_word_is_a_registered_label_on_the_cards_that_print_it() {
             anchor.word
         );
         for card in &anchor.cards {
-            let scope = [LexemeId::new(&format!("name:{card}"))].into();
+            let scope =
+                sylex_lexicon::CardScope::own_names([LexemeId::new(&format!("name:{card}"))]);
             let analyzed = environment
                 .lexicon
                 .analyze_source_scoped(&line, None, &scope);

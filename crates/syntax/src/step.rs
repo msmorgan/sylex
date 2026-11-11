@@ -2243,7 +2243,7 @@ impl CompiledGrammar {
     pub(crate) fn leaf_facts(
         &self,
         reading: &LexicalReading,
-        scope: &std::collections::BTreeSet<LexemeId>,
+        scope: &sylex_lexicon::CardScope,
     ) -> Option<LeafFacts> {
         match reading {
             LexicalReading::Word(value) => {
@@ -2298,7 +2298,10 @@ impl CompiledGrammar {
                         .copied()
                         .unwrap_or_else(|| form_bit(value.form)),
                     other_card_name: self.card_names.contains(&value.lexeme)
-                        && !scope.contains(&value.lexeme),
+                        && !value
+                            .features
+                            .name
+                            .is_some_and(|form| scope.holds(value.lexeme, form)),
                 })
             }
             LexicalReading::Numeral {
