@@ -19,8 +19,9 @@ Written against the spine (`cleanup-step6-spine`).
 
 ## Design
 
-- The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `~` ties, `$xs<join>` lists,
-  `( … )` optional parts, `<Category: …>` Tails) with its load rules; where this ticket's text differs, §7 governs.
+- The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `~` ties, `$xs<join>`
+  lists, `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails) with its load
+  rules; where this ticket's text differs, §7 governs.
 
 ## Done when
 

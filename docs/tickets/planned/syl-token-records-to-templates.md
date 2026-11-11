@@ -62,7 +62,7 @@ in `docs/evidence/syl-token-records-to-templates/`.
   the imperative clause "create Marit Lage", inside the fronted "If you do,". So the description is
   not inside the object noun phrase, and a wording "$name, $spec" at the object's Hole would print
   it before anything else the clause prints after its object. Options: a Template taking the name
-  and the description, with the description a Tail on the clause (`<Clause: , $spec>`, `spelling.md`
+  and the description, with the description a Tail on the clause (`<~Clause: , $spec>`, `spelling.md`
   on Tails); or a `token` Definition in the card's plugin. Recommendation: the Template with the
   Tail, since `token` Definitions are the tokens the rules define
   (`plugins/builtin/definitions/token/`) and a Template adds no meaning. The name sets the token's

@@ -38,7 +38,7 @@ follow:
 
 - The exceptions print at the end of the clause that makes the copy, after whatever else that
   clause prints, so the copy's declaration prints them as a Tail on that clause
-  (`<Clause: , except …>`, `spelling.md` on Tails), and they stay an argument of the copy.
+  (`<~Clause: , except …>`, `spelling.md` on Tails), and they stay an argument of the copy.
 - "Except" and "except that" are two printed forms of one meaning, so two Tails, each its own
   Template wording.
 
