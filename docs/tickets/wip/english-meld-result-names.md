@@ -13,20 +13,22 @@ ticket.
 
 ## Design
 
-- The meld result's name is in scope as the face's own name only on the card of its meld pair
-  that prints the meld ability [CR#701.42a]: Gisela, the Broken Blade; Graf Rats; Hanweir
-  Battlements; Mishra, Claimed by Gix; Titania, Voice of Gaea; Urza, Lord Protector; Vanille,
-  Cheerful l'Cie. Its partner never mentions the result and does not have it in scope.
-- The pairing comes from the card data: mtgjson names each meld part with its result,
-  `Gisela, the Broken Blade // Brisela, Voice of Nightmares` (layout `meld`, side `a`).
-- The name reads through the face's scope like any own name, with no construct, gate or list of
-  its own. If the design needs special-casing of meld cards beyond their scope, the implementer
-  stops and reports.
+- The meld result's name is in scope as an own name on both cards of its meld pair
+  [CR#712.4a]: on the card that prints the meld ability (Gisela, the Broken Blade; Graf Rats;
+  Hanweir Battlements; Mishra, Claimed by Gix; Titania, Voice of Gaea; Urza, Lord Protector;
+  Vanille, Cheerful l'Cie) and on its partner, which never names it.
+- The pairing comes from the card data, which records each meld part's result for both parts
+  alike: Scryfall's `all_parts` entry with component `meld_result`, as mtgjson's
+  `Gisela, the Broken Blade // Brisela, Voice of Nightmares` (layout `meld`, side `a`) does.
+- The name reads through the face's scope (`corpus::own_names`) like any own name, with no
+  construct, gate or list of its own. A judgment's `<card=NAME>` takes the same own names.
 
 ## Done when
 
 - The deferred meld units read, their deferral lines are gone, and `cargo xtask english strata
   --check` passes.
+- Positive judgments cover the meld units, a negative judgment shows the result's name does not
+  read as own on an unrelated card, and the Mishra comma-scope judgment holds on the full text.
 
 ## Pointers
 
