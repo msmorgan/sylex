@@ -38,6 +38,19 @@ impl Resolver<'_> {
             |bound: &[(usize, &Arg)], index: usize| bound.iter().any(|(i, _)| *i == index);
         // The latest-declared parameter bound so far.
         let mut latest: Option<usize> = None;
+        // A positional argument past the required parameters binds nothing:
+        // it is refused once, as a defaulted argument while the call leaves
+        // a defaulted parameter unnamed, else as one too many.
+        let named: Vec<&str> = call
+            .args
+            .iter()
+            .filter_map(Item::node)
+            .filter_map(|arg| arg.name.map(|name| name.ident.as_str()))
+            .collect();
+        let mut unnamed_defaulted = params
+            .iter()
+            .filter(|p| p.optional && !named.contains(&p.name.as_str()))
+            .count();
         for arg in call.args.iter().filter_map(Item::node) {
             let index = if let Some(name) = arg.name {
                 let Some(index) = params.iter().position(|p| p.name == name.ident.as_str()) else {
@@ -61,32 +74,19 @@ impl Resolver<'_> {
                 }
                 index
             } else {
-                let unbound = |i: &usize| !is_bound(&bound, *i);
-                let required = (0..params.len()).find(|i| !params[*i].optional && unbound(i));
-                // The defaulted parameter the argument would fill in
-                // declaration order: the first unbound one after those bound,
-                // else the first unbound one.
-                let defaulted = || {
-                    let after = latest.map_or(0, |latest| latest + 1);
-                    (after..params.len())
-                        .find(unbound)
-                        .or_else(|| (0..params.len()).find(unbound))
-                };
-                if let Some(index) = required {
-                    index
-                } else if let Some(index) = defaulted() {
-                    self.refuse(
-                        arg.span,
-                        RefusalKind::PositionalDefaulted {
-                            word: word.to_owned(),
-                            argument: params[index].name.clone(),
-                        },
-                    );
-                    index
-                } else {
-                    self.refuse(arg.span, RefusalKind::TooManyArguments(word.to_owned()));
+                let required =
+                    (0..params.len()).find(|&i| !params[i].optional && !is_bound(&bound, i));
+                let Some(index) = required else {
+                    let kind = if unnamed_defaulted > 0 {
+                        unnamed_defaulted -= 1;
+                        RefusalKind::PositionalDefaulted(word.to_owned())
+                    } else {
+                        RefusalKind::TooManyArguments(word.to_owned())
+                    };
+                    self.refuse(arg.span, kind);
                     continue;
-                }
+                };
+                index
             };
             if is_bound(&bound, index) {
                 self.refuse(
@@ -157,10 +157,12 @@ impl Resolver<'_> {
                 );
             }
             // A required parameter left unbound is refused above; a default
-            // reading it then compares unsubstituted.
-            if let Some(value) = written_value.or(default) {
-                values.insert(&param.name, value);
-            }
+            // reading it reads the callee's parameter, never one of the
+            // caller's of the same name.
+            let value = written_value
+                .or(default)
+                .unwrap_or_else(|| format!("{word}.${}", param.name));
+            values.insert(&param.name, value);
         }
     }
 
@@ -197,14 +199,23 @@ impl Resolver<'_> {
                 format!("[{}]", items.join(", "))
             }
             ValueKind::Record(record) => {
+                let spec = at.and_then(|at| {
+                    schema::RECORDS
+                        .iter()
+                        .find(|spec| at.args.is_empty() && spec.sort == at.head)
+                });
                 let mut fields: Vec<String> = record
                     .nodes()
                     .map(|field| {
-                        format!(
-                            "{} = {}",
-                            field.name.ident.as_str(),
-                            self.canonical(&field.value, None, params)
-                        )
+                        let name = field.name.ident.as_str();
+                        let sort = spec.and_then(|spec| {
+                            spec.fields
+                                .iter()
+                                .find(|(field, _, _)| *field == name)
+                                .map(|(_, sort, _)| SortKey::table(sort))
+                        });
+                        let value = self.canonical(&field.value, sort.as_ref(), params);
+                        format!("{name} = {value}")
                     })
                     .collect();
                 fields.sort();
@@ -235,7 +246,21 @@ impl Resolver<'_> {
             {
                 return self.canonical(&arg.value, Some(&coercion.from), params);
             }
-            if let Some(signature) = self.registry.get(&(head.to_owned(), at.clone())) {
+            let key = (head.to_owned(), at.clone());
+            if !self.registry.contains_key(&key) {
+                // A call that stands at `at` only through a coercion is
+                // printed at the coercion's from-sort.
+                let mut from = self.coercions.iter().filter(|c| {
+                    c.to == *at
+                        && self
+                            .registry
+                            .contains_key(&(head.to_owned(), c.from.clone()))
+                });
+                if let (Some(coercion), None) = (from.next(), from.next()) {
+                    return self.canonical_call(call, Some(&coercion.from), params);
+                }
+            }
+            if let Some(signature) = self.registry.get(&key) {
                 let mut bound: Vec<Option<&Arg>> = vec![None; signature.params.len()];
                 let mut unbound = Vec::new();
                 for arg in args {

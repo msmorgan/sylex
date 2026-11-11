@@ -210,13 +210,28 @@ fn a_defaulted_argument_passed_positionally_is_refused() {
     let source = format!("{FRAMED}template t: Nat {{ body = framed(1, 2) }}");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
-        [(
-            RefusalKind::PositionalDefaulted {
-                word: s("framed"),
-                argument: s("post")
-            },
-            s("2")
-        )]
+        [(RefusalKind::PositionalDefaulted(s("framed")), s("2"))]
+    );
+}
+
+/// A positional argument past the required parameters binds nothing, so it
+/// is refused once and never resolved: no order or sort refusal follows.
+#[test]
+fn surplus_positional_arguments_on_an_optional_first_declaration_are_refused_once() {
+    let source = format!(
+        "{COLORS}{FRAMED}\
+         template t: Nat {{ body = framed(1, white, 3, 4) }}\n\
+         template u: Nat {{ body = framed(pre = 2, 1, 3, post = 4, 5) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (RefusalKind::PositionalDefaulted(s("framed")), s("white")),
+            (RefusalKind::PositionalDefaulted(s("framed")), s("3")),
+            (RefusalKind::TooManyArguments(s("framed")), s("4")),
+            (RefusalKind::TooManyArguments(s("framed")), s("3")),
+            (RefusalKind::TooManyArguments(s("framed")), s("5")),
+        ]
     );
 }
 
@@ -1161,6 +1176,69 @@ fn a_named_argument_equal_to_its_default_through_a_coercion_is_refused() {
             (redundant("amt", "n"), s("n = 0")),
             (redundant("noun", "w"), s("w = type(creature)")),
         ]
+    );
+}
+
+/// A value reached through a coercion keeps its arguments bound by name:
+/// `sq(1)` at Amount is the default `lit(sq(1))`.
+#[test]
+fn a_named_argument_equal_to_its_default_through_a_coerced_call_is_refused() {
+    let source = format!(
+        "{COERCIONS}\
+         template sq(n: Int, k: Int = 0): Int {{ body = $n }}\n\
+         template h(x: Int, y: Amount = lit(sq(1))): Int {{ body = $x }}\n\
+         template g(x: Int, y: Amount = sq(1)): Int {{ body = $x }}\n\
+         template a: Int {{ body = h(1, y = sq(1)) }}\n\
+         template b: Int {{ body = g(1, y = lit(sq(1))) }}\n\
+         template c: Int {{ body = h(1, y = sq(2)) }}\n\
+         template d: Int {{ body = g(1, y = sq(1, k = 2)) }}"
+    );
+    let redundant = |word: &str, argument: &str| RefusalKind::RedundantDefault {
+        word: s(word),
+        argument: s(argument),
+    };
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (redundant("h", "y"), s("y = sq(1)")),
+            (redundant("g", "y"), s("y = lit(sq(1))")),
+        ]
+    );
+}
+
+/// A record's fields are compared at their sorts, so a coercion inside one
+/// is looked through.
+#[test]
+fn a_named_record_argument_equal_to_its_default_is_refused() {
+    let source = "primitive lit(value: Int): Amount = Literal\n\
+                  coercion(value: Int): Amount { body = lit($value) }\n\
+                  template f(x: Int, c: Characteristics = { name = \"a\", power = lit(2) }): Int { body = $x }\n\
+                  template same: Int { body = f(1, c = { power = 2, name = \"a\" }) }\n\
+                  template other: Int { body = f(1, c = { name = \"a\", power = 3 }) }";
+    assert_eq!(
+        refusals(&[("a.syl", source)]),
+        [(
+            RefusalKind::RedundantDefault {
+                word: s("f"),
+                argument: s("c")
+            },
+            s("c = { power = 2, name = \"a\" }")
+        )]
+    );
+}
+
+/// A default reading the callee's own parameter never matches a caller's
+/// parameter of the same name.
+#[test]
+fn a_default_reading_an_unbound_parameter_is_no_callers_parameter() {
+    let source = "template echo(x: Nat, y: Nat = $x): Nat { body = $y }\n\
+                  template t(x: Nat): Nat { body = echo(y = $x) }";
+    assert_eq!(
+        kinds(source),
+        [RefusalKind::MissingArgument {
+            word: s("echo"),
+            argument: s("x")
+        }]
     );
 }
 

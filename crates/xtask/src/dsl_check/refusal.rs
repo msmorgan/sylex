@@ -125,8 +125,11 @@ pub enum RefusalKind {
     MissingArgument { word: String, argument: String },
     #[error("required argument `{argument}` to `{word}` is passed by name; pass it positionally")]
     NamedRequired { word: String, argument: String },
-    #[error("defaulted argument `{argument}` to `{word}` is passed positionally; pass it by name")]
-    PositionalDefaulted { word: String, argument: String },
+    #[error(
+        "positional argument to `{0}` binds no required parameter; pass a defaulted argument by \
+         name"
+    )]
+    PositionalDefaulted(String),
     #[error("argument `{argument}` to `{word}` is its declared default; omit it")]
     RedundantDefault { word: String, argument: String },
     #[error(
