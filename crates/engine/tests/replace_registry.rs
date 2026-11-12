@@ -921,6 +921,431 @@ fn regeneration_shield_expires_end_of_turn() {
     );
 }
 
+/// A board where one simultaneous destruction needs two replacement choices:
+/// each player's Drudge Skeletons (`skeletons`) holding two regeneration
+/// shields and Grizzly Bears (`bears`), each as object and card, and player
+/// 0's Chainsaw-shaped watcher. Player 0 holds Day of Judgment in hand.
+struct ShieldBoard {
+    state: GameState,
+    skeletons: [(ObjectId, CardId); 2],
+    bears: [(ObjectId, CardId); 2],
+    watcher: ObjectId,
+}
+
+/// Lower a hand-spelled semantic card through the builtin plugin.
+fn lowered(source: &str) -> Arc<Card> {
+    let builtin =
+        Plugin::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/builtin"))
+            .unwrap();
+    Arc::new(
+        builtin
+            .card_from_str(source)
+            .unwrap_or_else(|error| panic!("fixture did not load: {error}\n{source}"))
+            .core,
+    )
+}
+
+/// Move the `name` card out of `owner`'s hand into `zone`, returning it as
+/// object and card.
+fn take_from_hand(
+    state: &mut GameState,
+    owner: PlayerId,
+    name: &str,
+    zone: Zone,
+) -> (ObjectId, CardId) {
+    let at = state.zones.hands[owner.index()]
+        .iter()
+        .position(|&o| face_name(state, o) == Some(name))
+        .unwrap_or_else(|| panic!("expected '{name}' in {owner:?}'s hand"));
+    let id = state.zones.hands[owner.index()].remove(at);
+    state.objects.obj_mut(id).zone = Some(zone);
+    if zone == Zone::Battlefield {
+        state.zones.battlefield.push(id);
+    }
+    let card = state.objects.obj(id).card_id().expect("backed by a card");
+    (id, card)
+}
+
+fn shield_board() -> ShieldBoard {
+    let creature = |name: &str, power: i32, toughness: i32| {
+        Arc::new(Card::Normal(CardFace::from(Characteristics {
+            name: name.into(),
+            types: vec![Type::Creature.def()],
+            power: Some(StatValue::Number(power)),
+            toughness: Some(StatValue::Number(toughness)),
+            ..Characteristics::default()
+        })))
+    };
+    let skeleton = creature("Drudge Skeletons", 1, 1);
+    let bears = creature("Grizzly Bears", 2, 2);
+    // Chainsaw's trigger; its rev counter is spelled as a life gain, which
+    // never resolves here.
+    let watcher = lowered(
+        "Normal(name: \"Chainsaw\", types: [Artifact], abilities: [\
+             Triggered(\
+                 event: OneOrMore(ZoneChange(what: Type(Creature), from: Battlefield, to: Graveyard)), \
+                 effect: ChangeLife(You, Up(1))),\
+         ])",
+    );
+    let day_of_judgment = lowered(
+        "Normal(name: \"Day of Judgment\", mana_cost: [Generic(2), White, White], \
+         types: [Sorcery], abilities: [\
+             Spell(effect: Each(binder: Existing(SelectAll(Type(Creature))), effect: Destroy(It))),\
+         ])",
+    );
+    let mut state = GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig {
+                deck: vec![
+                    Arc::clone(&skeleton),
+                    Arc::clone(&bears),
+                    watcher,
+                    day_of_judgment,
+                ],
+            },
+            PlayerConfig {
+                deck: vec![skeleton, bears],
+            },
+        ],
+        seed: 7,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    });
+    // Lethal damage destroys through the builtin state-based rows.
+    state.sba_rules = builtin_sba_rules();
+    // Each deck is shorter than an opening hand, so every card starts in its
+    // owner's hand. Battlefield order is member order: each skeleton's choice
+    // is followed by a bear the destruction still has to reach.
+    let mut skeletons = Vec::new();
+    let mut bears = Vec::new();
+    for owner in [PlayerId(0), PlayerId(1)] {
+        skeletons.push(take_from_hand(
+            &mut state,
+            owner,
+            "Drudge Skeletons",
+            Zone::Battlefield,
+        ));
+        bears.push(take_from_hand(
+            &mut state,
+            owner,
+            "Grizzly Bears",
+            Zone::Battlefield,
+        ));
+    }
+    let (watcher, _) = take_from_hand(&mut state, PlayerId(0), "Chainsaw", Zone::Battlefield);
+
+    // "{B}: Regenerate this creature.", activated twice for each skeleton.
+    for &(skeleton, _) in [&skeletons, &skeletons].into_iter().flatten() {
+        resolve_region_and_drive(
+            &mut state,
+            regenerate_effect(Reference::Reg(sylex_core::RefId(0))),
+            skeleton,
+        );
+    }
+    assert_eq!(state.shields.len(), 4, "two shields on each skeleton");
+    state.agenda.clear();
+    state.pending = None;
+    ShieldBoard {
+        state,
+        skeletons: skeletons.try_into().expect("one skeleton per player"),
+        bears: bears.try_into().expect("one bears per player"),
+        watcher,
+    }
+}
+
+/// Answer a shield choice: one of a skeleton's two shields, recording who
+/// chose.
+fn choose_a_shield(state: &mut GameState, choice: DecisionPointKind, choosers: &mut Vec<PlayerId>) {
+    let DecisionPointKind::ChooseReplacement(sylex_engine::ChooseReplacement {
+        chooser,
+        applicable,
+    }) = choice
+    else {
+        panic!("expected a shield choice, got {choice:?}");
+    };
+    assert_eq!(applicable.len(), 2, "both of one skeleton's shields apply");
+    choosers.push(chooser);
+    state
+        .submit_decision(Decision::ReplacementChoice(applicable[0]))
+        .expect("an offered shield is a legal choice");
+}
+
+/// Both skeletons regenerated, each spending one of its two shields, and both
+/// bears died.
+fn assert_skeletons_regenerated_and_bears_died(
+    state: &GameState,
+    skeletons: &[(ObjectId, CardId)],
+    bears: &[(ObjectId, CardId)],
+) {
+    for &(skeleton, card) in skeletons {
+        let live = find_on_battlefield(state, card);
+        assert!(
+            state.objects.obj(live).tapped && state.objects.obj(live).total_damage() == 0,
+            "{skeleton:?} regenerated: tapped and healed [CR#701.19a]"
+        );
+        assert_eq!(
+            state
+                .shields
+                .iter()
+                .filter(|s| s.subject == skeleton)
+                .count(),
+            1,
+            "{skeleton:?} spent exactly one of its two shields [CR#614.3]"
+        );
+    }
+    for (&(_, card), owner) in bears.iter().zip([PlayerId(0), PlayerId(1)]) {
+        assert!(
+            find_in_graveyard(state, owner, card).is_some(),
+            "{owner:?}'s bears died — no member of the destruction is lost"
+        );
+    }
+}
+
+/// How many times `watcher` has triggered and waits to be put on the stack.
+fn triggers_of(state: &GameState, watcher: ObjectId) -> usize {
+    let source = state.objects.obj(watcher).source;
+    state
+        .pending_triggers
+        .iter()
+        .filter(|t| t.source == source)
+        .count()
+}
+
+/// Day of Judgment ("Destroy all creatures.") resolves over two Drudge
+/// Skeletons, one per player, that each hold two regeneration shields
+/// ([CR#701.19a]), and two unshielded Grizzly Bears, while a Chainsaw-shaped
+/// "Whenever one or more creatures die" watcher is out. Each skeleton's
+/// destruction has two applicable shields, so its controller chooses one
+/// ([CR#616.1]): both choices surface, one after the other, and the
+/// destroy-all stays one event ([CR#603.2c]). Both skeletons regenerate, both
+/// bears die, and the watcher triggers once.
+#[test]
+fn destroy_all_over_two_double_shielded_creatures_stays_one_event() {
+    let mut board = shield_board();
+    let state = &mut board.state;
+    let (spell, _) = take_from_hand(state, PlayerId(0), "Day of Judgment", Zone::Stack);
+    state.stack.push(sylex_engine::StackEntry {
+        id: spell,
+        activation: sylex_engine::ActivationId::NONE,
+        object: sylex_engine::StackObject::Spell(spell),
+        controller: PlayerId(0),
+        targets: Vec::new(),
+        chosen_modes: Arc::from([]),
+        x: None,
+        paid_costs: Vec::new(),
+        copy: false,
+    });
+    state.agenda.push_front(WorkItem::Resolve(spell));
+
+    let mut choosers = Vec::new();
+    for _ in 0..200 {
+        match state.step() {
+            StepOutcome::Progress(_) => {}
+            StepOutcome::NeedsDecision(choice) => choose_a_shield(state, choice, &mut choosers),
+            StepOutcome::GameOver(outcome) => panic!("the game ended: {outcome:?}"),
+        }
+        if state.agenda.is_empty() && state.pending.is_none() {
+            break;
+        }
+    }
+    assert!(
+        state.agenda.is_empty() && state.pending.is_none(),
+        "the resolution settled"
+    );
+
+    // [CR#616.1]: each skeleton's controller chose for it.
+    assert_eq!(
+        choosers,
+        [PlayerId(0), PlayerId(1)],
+        "both choices surfaced"
+    );
+    assert_skeletons_regenerated_and_bears_died(&board.state, &board.skeletons, &board.bears);
+    assert_eq!(
+        triggers_of(&board.state, board.watcher),
+        1,
+        "\"whenever one or more creatures die\" sees one event [CR#603.2c]"
+    );
+}
+
+/// The same board destroyed by state-based actions: one check finds lethal
+/// damage on all four creatures and destroys them as one event [CR#704.3].
+/// Both shield choices surface, the batch commits as one occurrence of the
+/// bears' two destructions [CR#603.2c], and because it performed something
+/// the check runs again: after both regenerations and the bears' moves have
+/// settled, and before the work that was queued behind the batch.
+#[test]
+fn suspended_state_based_batch_commits_once_then_checks_again() {
+    let mut board = shield_board();
+    let state = &mut board.state;
+    for &(creature, _) in board.skeletons.iter().chain(&board.bears) {
+        state.objects.obj_mut(creature).set_marked_damage(5);
+    }
+    // The work queued behind the state-based check.
+    let behind = WorkItem::BeginStep(sylex_core::PhaseStep::PostcombatMain);
+    let is_behind = |item: Option<&WorkItem>| {
+        matches!(
+            item,
+            Some(WorkItem::BeginStep(sylex_core::PhaseStep::PostcombatMain))
+        )
+    };
+    state.agenda.push_back(behind);
+    state.agenda.push_front(WorkItem::CheckSbas);
+
+    let mut choosers = Vec::new();
+    let mut checks = Vec::new();
+    let mut commits = Vec::new();
+    for _ in 0..200 {
+        if state.pending.is_none() && is_behind(state.agenda.front()) {
+            break;
+        }
+        let front = state.agenda.front();
+        let committing =
+            state.pending.is_none() && matches!(front, Some(WorkItem::CommitReplaced { .. }));
+        if state.pending.is_none()
+            && matches!(front, Some(WorkItem::CheckSbas))
+            && !checks.is_empty()
+        {
+            // The re-check sees every follow-on of the batch settled.
+            assert_skeletons_regenerated_and_bears_died(state, &board.skeletons, &board.bears);
+        }
+        match state.step() {
+            StepOutcome::Progress(sylex_engine::Progress::SbasChecked { actions }) => {
+                checks.push(actions);
+            }
+            StepOutcome::Progress(sylex_engine::Progress::Applied(occurrence)) if committing => {
+                commits.push(occurrence);
+            }
+            StepOutcome::Progress(_) => {}
+            StepOutcome::NeedsDecision(choice) => choose_a_shield(state, choice, &mut choosers),
+            StepOutcome::GameOver(outcome) => panic!("the game ended: {outcome:?}"),
+        }
+    }
+    assert!(
+        is_behind(state.agenda.front()),
+        "the queued-behind work is still waiting, and nothing else is ahead of it"
+    );
+
+    // [CR#616.1]: each skeleton's controller chose for it.
+    assert_eq!(
+        choosers,
+        [PlayerId(0), PlayerId(1)],
+        "both choices surfaced"
+    );
+    // [CR#704.3]: the batch performed something, so the check repeated, and
+    // found nothing more.
+    assert_eq!(checks, [4, 0], "one sweep of four, then one clean re-check");
+    let [sylex_engine::Occurrence::Batch(destroyed)] = commits.as_slice() else {
+        panic!("the batch commits once, as one occurrence: {commits:?}");
+    };
+    assert_eq!(
+        destroyed.len(),
+        2,
+        "the two bears' destructions commit together [CR#603.2c]"
+    );
+    assert_skeletons_regenerated_and_bears_died(state, &board.skeletons, &board.bears);
+    assert_eq!(
+        triggers_of(state, board.watcher),
+        1,
+        "\"whenever one or more creatures die\" sees one event [CR#603.2c]"
+    );
+}
+
+/// Three Urza's Armors ("If a source would deal damage to you, prevent 1 of
+/// that damage.") and 5 damage dealt to their controller. All three apply,
+/// so the player chooses one [CR#616.1]; it leaves 4 damage that the other
+/// two still apply to, so the same event needs a second choice before the
+/// last Armor applies on its own [CR#616.1f]. The player takes 2.
+#[test]
+fn a_resumed_event_that_needs_another_choice_suspends_again() {
+    let armor = lowered(
+        "Normal(name: \"Urza's Armor\", mana_cost: [Generic(6)], types: [Artifact], \
+         abilities: [Static(Prevention(PreventNext(n: 1, from: Any, to: Ref(You))))])",
+    );
+    let source = Arc::new(Card::Normal(CardFace::from(Characteristics {
+        name: "Grizzly Bears".into(),
+        types: vec![Type::Creature.def()],
+        power: Some(StatValue::Number(2)),
+        toughness: Some(StatValue::Number(2)),
+        ..Characteristics::default()
+    })));
+    let mut state = GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig {
+                deck: vec![Arc::clone(&armor), Arc::clone(&armor), armor],
+            },
+            PlayerConfig { deck: vec![source] },
+        ],
+        seed: 7,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    });
+    for _ in 0..3 {
+        take_from_hand(&mut state, PlayerId(0), "Urza's Armor", Zone::Battlefield);
+    }
+    let (source, _) = take_from_hand(&mut state, PlayerId(1), "Grizzly Bears", Zone::Battlefield);
+    state.agenda.clear();
+    state.pending = None;
+    let you = state.player(PlayerId(0)).object;
+    state
+        .agenda
+        .push_front(WorkItem::Emit(sylex_engine::Occurrence::Single(
+            sylex_engine::GameEvent::DamageDealt(DamageDealt {
+                source,
+                target: you,
+                amount: 5,
+                combat: false,
+            }),
+        )));
+
+    let mut offered = Vec::new();
+    for _ in 0..50 {
+        match state.step() {
+            StepOutcome::Progress(_) => {}
+            StepOutcome::NeedsDecision(DecisionPointKind::ChooseReplacement(
+                sylex_engine::ChooseReplacement {
+                    chooser,
+                    applicable,
+                },
+            )) => {
+                assert_eq!(
+                    chooser,
+                    PlayerId(0),
+                    "the damaged player chooses [CR#616.1]"
+                );
+                offered.push(applicable.len());
+                state
+                    .submit_decision(Decision::ReplacementChoice(applicable[0]))
+                    .expect("an offered Armor is a legal choice");
+            }
+            other => panic!("unexpected outcome while the damage is dealt: {other:?}"),
+        }
+        if state.agenda.is_empty() && state.pending.is_none() {
+            break;
+        }
+    }
+    assert_eq!(
+        offered,
+        [3, 2],
+        "three Armors apply, then the two left apply to the reduced damage"
+    );
+    assert_eq!(
+        state.players[0].life, 18,
+        "each Armor prevented 1 of the 5 damage [CR#615.1]"
+    );
+}
+
 // ── Task 7: Umbra/totem armor ([CR#702.89a]) ─────────────────────────────────
 
 /// Build a `GameState` with a 2/2 creature enchanted by an "Umbra Armor" Aura.

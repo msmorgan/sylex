@@ -258,25 +258,56 @@ pub struct ArrangePile {
     pub objects: Vec<crate::object::ObjectId>,
 }
 
-/// Suspended replacement-loop state ([CR#616.1]) — preserved across a
-/// `ChooseReplacement` decision so the loop can resume after the player picks.
+/// The replacement pass of one occurrence, suspended on a
+/// `ChooseReplacement` decision ([CR#616.1]) and resumed after the player
+/// picks.
 ///
-/// When `replace_event` needs a player choice (≥ 2 applicable replacements),
-/// it stores the in-progress event and lineage here, surfaces
-/// `DecisionPointKind::ChooseReplacement`, and returns `Suspend`. The submit
-/// handler resumes by running `apply_one` on the chosen replacement, then
-/// re-entering the replacement loop on the (possibly modified) event.
+/// An occurrence's members go through the cant and replacement passes in
+/// member order before any of them applies. When a member needs a choice
+/// (two or more applicable replacements), the pass stops there and this
+/// state holds the whole occurrence: the members already through the pass,
+/// the member being chosen for, and the tail not yet reached. Resuming
+/// applies the chosen replacement, finishes that member's loop, and walks on
+/// through the tail; a member there that needs a choice suspends again with
+/// all of it carried forward. Once the last choice resolves, every member
+/// commits together as one occurrence in member order
+/// (`WorkItem::CommitReplaced`) — a batch stays one event however many
+/// choices it needed ([CR#603.2c]).
 #[derive(Debug, Clone)]
 pub struct ReplaceState {
-    /// The event whose replacement choice is pending.
+    /// Members before `current`, in member order, that came through the
+    /// replacement pass: each one's final event, not yet applied. A member
+    /// suppressed or replaced away has none.
+    pub resolved: Vec<crate::event::GameEvent>,
+    /// The member whose replacement choice is pending.
     pub current: crate::event::GameEvent,
     /// [CR#614.5] lineage: replacements already applied to the current event
     /// chain — none of these may be applied again during this occurrence.
     pub applied: std::collections::HashSet<crate::replace_registry::ReplacementKey>,
-    /// Remaining events from the same batch occurrence that have not yet been
-    /// processed. Empty for a `Occurrence::Single`; non-empty when a batch
-    /// event suspends mid-processing.
+    /// The members after `current`, in member order, not yet through the
+    /// cant and replacement passes.
     pub remaining: Vec<crate::event::GameEvent>,
+    /// How the occurrence commits once every member is through.
+    pub commit: OccurrenceCommit,
+}
+
+/// How an occurrence commits once its members are through the replacement
+/// pass: the shape it applies as, and whether it closes a state-based-action
+/// check.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OccurrenceCommit {
+    /// An `Occurrence::Single`: commits as a `Single`, or as an empty `Batch`
+    /// when its member was suppressed or replaced away.
+    Single,
+    /// An `Occurrence::Batch`: one event of several occurrences
+    /// ([CR#603.2c]).
+    Batch,
+    /// A state-based-action batch ([CR#704.3]): commits as a `Batch` and
+    /// re-checks state-based actions when it performed anything. `behind`
+    /// counts the agenda items queued behind the batch when it was emitted;
+    /// the re-check goes ahead of them, after every follow-on the batch
+    /// produced.
+    SbaBatch { behind: usize },
 }
 
 /// Resolution-local registers suspended while a stackless mana ability runs.
@@ -1259,12 +1290,14 @@ mod tests {
             bindings: TriggerBindings::default(),
         });
         state.replace_state = Some(ReplaceState {
+            resolved: vec![],
             current: GameEvent::PlayerLost(PlayerLost {
                 player,
                 reason: LossReason::Conceded,
             }),
             applied: std::collections::HashSet::new(),
             remaining: vec![],
+            commit: OccurrenceCommit::Single,
         });
         let mut image = state.active().clone();
 

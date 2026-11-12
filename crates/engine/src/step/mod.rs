@@ -44,6 +44,7 @@ use crate::sba;
 use crate::stack::StackEntry;
 use crate::state::GameOutcome;
 use crate::state::GameState;
+use crate::state::OccurrenceCommit;
 use crate::turn::PriorityRound;
 use crate::turn::successor;
 
@@ -219,6 +220,9 @@ impl GameState {
         let progress = match item {
             WorkItem::Emit(occ) => Progress::Applied(self.apply_occurrence(occ)),
             WorkItem::EmitSbaBatch(events) => self.emit_sba_batch(events),
+            WorkItem::CommitReplaced { events, commit } => {
+                Progress::Applied(self.commit_occurrence(events, commit))
+            }
             WorkItem::BeginStep(s) => self.begin_step(s),
             WorkItem::CheckSbas => self.check_sbas(),
             WorkItem::PlaceTriggers => self.place_triggers(),
@@ -807,126 +811,97 @@ impl GameState {
         }
     }
 
-    /// Applies an occurrence: each event through the pipe, returned as the
-    /// facts that occurred. A `Batch` applies with no SBA/trigger interleaving.
-    /// After applying, runs `check_game_end` so a simultaneous multi-loss batch
-    /// is evaluated as a whole. A damage/counter event whose current-only
-    /// recipient departed after the event was queued is discarded before cant,
-    /// replacement, mutation, history, or trigger processing ([CR#608.2b]); a
-    /// stale damage source remains valid LKI ([CR#608.2h,113.7a]).
-    fn apply_occurrence(&mut self, mut occ: Occurrence) -> Occurrence {
+    /// Applies an occurrence: each member through the cant and replacement
+    /// passes, then the survivors committed together
+    /// ([`Self::commit_occurrence`]). A `Batch` applies with no SBA/trigger
+    /// interleaving. While a replacement choice is pending ([CR#616.1]) nothing
+    /// has happened yet: the result is an empty `Batch`, and the suspended
+    /// state commits the whole occurrence once its last choice resolves
+    /// ([`crate::replace_registry::resume_replacements`]).
+    fn apply_occurrence(&mut self, occ: Occurrence) -> Occurrence {
+        let (members, commit) = match occ {
+            Occurrence::Single(e) => (vec![e], OccurrenceCommit::Single),
+            Occurrence::Batch(events) => (events, OccurrenceCommit::Batch),
+        };
+        self.replace_and_commit(members, commit)
+    }
+
+    /// The shared body of [`Self::apply_occurrence`] and
+    /// [`Self::emit_sba_batch`]: settle the simultaneous win/loss, run the
+    /// replacement pass over every member, and commit unless a choice
+    /// suspended it.
+    fn replace_and_commit(
+        &mut self,
+        mut members: Vec<GameEvent>,
+        commit: OccurrenceCommit,
+    ) -> Occurrence {
         // [CR#104.3f]: a player who would simultaneously win and lose, loses
         // — drop any `PlayerWon{p}` that the same batch also carries a
         // `PlayerLost{p}` for, before the batch is applied. Guarded so the
         // common batch (no win at all) skips the scan entirely.
-        if let Occurrence::Batch(ref mut facts) = occ
-            && facts
-                .iter()
-                .any(|e| matches!(e, GameEvent::PlayerWon(PlayerWon { .. })))
+        if members
+            .iter()
+            .any(|e| matches!(e, GameEvent::PlayerWon(PlayerWon { .. })))
         {
-            let losers: std::collections::HashSet<PlayerId> = facts
+            let losers: std::collections::HashSet<PlayerId> = members
                 .iter()
                 .filter_map(|e| match e {
                     GameEvent::PlayerLost(PlayerLost { player, .. }) => Some(*player),
                     _ => None,
                 })
                 .collect();
-            facts.retain(
+            members.retain(
                 |e| !matches!(e, GameEvent::PlayerWon(PlayerWon { player }) if losers.contains(player)),
             );
         }
-        // Preserve whether the input was a Single or Batch — callers and tests
-        // observe the shape ([CR#616.1]: a batch is a simultaneous set).
-        let occurred = match occ {
-            Occurrence::Single(e) => {
-                // [CR#614.17]: can't-happen pass — suppressed before replacements.
-                if !self.event_current_recipient_is_live(&e)
-                    || crate::replace_registry::cant_event(self, &e)
-                {
-                    Occurrence::Batch(vec![]) // suppressed, nothing occurred
-                } else {
-                    // [CR#616.1]: replacement-effect loop.
-                    match crate::replace_registry::replace_event(self, e) {
-                        crate::replace_registry::ReplaceOutcome::Pass(e2) => {
-                            if self.event_current_recipient_is_live(&e2) {
-                                Occurrence::Single(self.apply(e2))
-                            } else {
-                                Occurrence::Batch(vec![])
-                            }
-                        }
-                        crate::replace_registry::ReplaceOutcome::Nothing => {
-                            Occurrence::Batch(vec![]) // replaced to nothing
-                        }
-                        crate::replace_registry::ReplaceOutcome::Suspend => {
-                            // [CR#616.1]: ChooseReplacement surfaced for a
-                            // Single event. The decision and ReplaceState are
-                            // already set; remaining is empty (no batch tail).
-                            // Produce an empty Batch — nothing happened yet;
-                            // the event will be applied (or not) after the
-                            // decision is answered via resume_replacements.
-                            Occurrence::Batch(vec![])
-                        }
+        match crate::replace_registry::replace_members(self, Vec::new(), members, commit) {
+            Some(events) => self.commit_occurrence(events, commit),
+            None => Occurrence::Batch(vec![]),
+        }
+    }
+
+    /// Commits an occurrence whose members have all been through the cant and
+    /// replacement passes: applies each member's final event in member order,
+    /// returned as the facts that occurred, then records, matches and sweeps
+    /// them as ONE occurrence ([CR#603.2c]). `commit` keeps the input's shape —
+    /// callers and tests observe it. Member evolutions collect into
+    /// `evolving_batch` and flush as ONE follow-on occurrence. After applying,
+    /// runs `check_game_end` so a simultaneous multi-loss batch is evaluated as
+    /// a whole. A damage/counter event whose current-only recipient departed
+    /// after the event was queued is discarded before mutation, history, or
+    /// trigger processing ([CR#608.2b]); a stale damage source remains valid
+    /// LKI ([CR#608.2h,113.7a]).
+    pub(crate) fn commit_occurrence(
+        &mut self,
+        events: Vec<GameEvent>,
+        commit: OccurrenceCommit,
+    ) -> Occurrence {
+        let occurred = match commit {
+            OccurrenceCommit::Single => {
+                let mut events = events.into_iter();
+                let event = events.next();
+                assert!(
+                    events.next().is_none(),
+                    "a Single occurrence commits at most its one member"
+                );
+                match event {
+                    Some(e) if self.event_current_recipient_is_live(&e) => {
+                        Occurrence::Single(self.apply(e))
                     }
+                    // Suppressed, replaced to nothing, or its recipient left.
+                    Some(_) | None => Occurrence::Batch(vec![]),
                 }
             }
-            Occurrence::Batch(events) => {
-                // Predicate out suppressed events first (cant pass borrows self
-                // immutably), then run the replacement loop + apply on each —
-                // each member is replaceable ON ITS OWN ([CR#616.1]);
-                // replacing one member never unapplies the others. Member
-                // evolutions collect into `evolving_batch` and flush as ONE
-                // follow-on occurrence ([CR#603.2c]).
-                let live: Vec<GameEvent> = events
-                    .into_iter()
-                    .filter(|e| self.event_current_recipient_is_live(e))
-                    .filter(|e| !crate::replace_registry::cant_event(self, e))
-                    .collect();
+            OccurrenceCommit::Batch | OccurrenceCommit::SbaBatch { .. } => {
                 debug_assert!(
                     self.evolving_batch.is_none(),
                     "batch applies never nest — apply schedules, it does not recurse"
                 );
                 self.evolving_batch = Some(Vec::new());
                 let mut facts = Vec::new();
-                let mut iter = live.into_iter();
-                while let Some(e) = iter.next() {
-                    match crate::replace_registry::replace_event(self, e) {
-                        crate::replace_registry::ReplaceOutcome::Pass(e2) => {
-                            if self.event_current_recipient_is_live(&e2) {
-                                facts.push(self.apply(e2));
-                            }
-                        }
-                        crate::replace_registry::ReplaceOutcome::Nothing => {}
-                        crate::replace_registry::ReplaceOutcome::Suspend => {
-                            // [CR#616.1]: a ChooseReplacement decision was
-                            // surfaced. Store the not-yet-processed tail of
-                            // the batch into the suspended replace_state so
-                            // `resume_replacements` can finish the batch after
-                            // the decision is answered. (The resumed tail's
-                            // evolutions run outside this collector — an
-                            // interactively split batch commits its halves as
-                            // separate occurrences.)
-                            let remaining: Vec<GameEvent> = iter
-                                .filter(|ev| self.event_current_recipient_is_live(ev))
-                                .filter(|ev| !crate::replace_registry::cant_event(self, ev))
-                                .collect();
-                            if let Some(rs) = self.replace_state.as_mut() {
-                                rs.remaining = remaining;
-                            }
-                            // Record and scan the partial facts that DID happen
-                            // before the suspension, then return — the decision
-                            // will drive the rest of the batch via resume.
-                            self.flush_evolving_batch();
-                            let partial = Occurrence::Batch(facts);
-                            self.record_history(&partial);
-                            self.check_game_end();
-                            if self.outcome.is_none() {
-                                self.scan_triggers(&partial);
-                                self.sweep_event_durations(&partial);
-                                self.sweep_condition_durations();
-                            }
-                            self.no_regen_subjects.clear();
-                            return partial;
-                        }
+                for e in events {
+                    if self.event_current_recipient_is_live(&e) {
+                        facts.push(self.apply(e));
                     }
                 }
                 self.flush_evolving_batch();
@@ -950,6 +925,27 @@ impl GameState {
         // so it never bleeds onto a later (e.g. SBA) destruction. Cheap: the
         // vec is empty except across a `ForThisEvent` destroy.
         self.no_regen_subjects.clear();
+        // [CR#704.3]: a state-based-action batch re-checks ONLY if it actually
+        // performed something. A batch whose events were all suppressed or
+        // replaced away (a destroy canted by indestructible) commits empty and
+        // must NOT re-check — otherwise a persistent condition (lethal damage
+        // on an indestructible creature) loops forever. The re-check goes
+        // ahead of the work that was queued behind the batch, so every
+        // follow-on the batch produced (its evolutions, a replacement's
+        // body) settles first: a destroyed creature has moved before the
+        // next sweep looks. A batch that ended the game cleared the agenda,
+        // and nothing is checked after it.
+        if let OccurrenceCommit::SbaBatch { behind } = commit
+            && self.outcome.is_none()
+            && !matches!(&occurred, Occurrence::Batch(facts) if facts.is_empty())
+        {
+            let at = self
+                .agenda
+                .len()
+                .checked_sub(behind)
+                .expect("the work queued behind an SBA batch stays queued until it commits");
+            self.agenda.insert(at, WorkItem::CheckSbas);
+        }
         occurred
     }
 
@@ -957,7 +953,7 @@ impl GameState {
     /// before application. Builders perform the same check at resolution time;
     /// this closes the queue window in which an earlier event can remint or
     /// remove the recipient before this event reaches the apply funnel.
-    fn event_current_recipient_is_live(&self, event: &GameEvent) -> bool {
+    pub(crate) fn event_current_recipient_is_live(&self, event: &GameEvent) -> bool {
         let recipient = match event {
             GameEvent::DamageDealt(DamageDealt { target, .. }) => Some(*target),
             GameEvent::CounterPlaced(CounterPlaced { object, .. })
@@ -1597,35 +1593,13 @@ impl GameState {
         items
     }
 
-    /// [CR#704.3]: apply a state-based-action batch, then re-check ONLY if it
-    /// actually performed something. A batch whose events were all suppressed
-    /// (e.g. a destroy canted by indestructible) applies to an empty result and
-    /// must NOT re-trigger the check — otherwise a persistent condition (lethal
-    /// damage on an indestructible creature) loops forever.
+    /// [CR#704.3]: apply a state-based-action batch as one simultaneous
+    /// event; committing it re-checks only if it performed something
+    /// ([`OccurrenceCommit::SbaBatch`]), whether it commits now or after a
+    /// replacement choice.
     fn emit_sba_batch(&mut self, events: Vec<GameEvent>) -> Progress {
-        // Snapshot the agenda length before applying: `apply_occurrence` may
-        // schedule follow-on work items at the front (e.g. `Emit(ZoneChange)`
-        // future-form from an `Act(Destroy).apply`). If we re-check immediately
-        // after, the follow-ons haven't run yet so the board looks unchanged —
-        // a destructible creature with lethal damage hasn't moved yet
-        // and the re-check re-emits an Act(Destroy), looping. By
-        // inserting the re-check AFTER the follow-on slots the re-check
-        // runs once the future-form and past-form `ZoneChange` facts
-        // have settled (and the creature is gone), so the next sweep is
-        // clean.
-        let n_before = self.agenda.len();
-        let applied = self.apply_occurrence(Occurrence::Batch(events));
-        let n_after = self.agenda.len();
-        let changed = !matches!(&applied, Occurrence::Batch(facts) if facts.is_empty());
-        if changed {
-            // `n_after - n_before` items were prepended by apply_occurrence
-            // (the follow-on Emit(ZoneChange) etc). Insert the
-            // re-check right behind them so they settle before the
-            // next sweep.
-            let added = n_after.saturating_sub(n_before);
-            self.agenda.insert(added, WorkItem::CheckSbas);
-        }
-        Progress::Applied(applied)
+        let behind = self.agenda.len();
+        Progress::Applied(self.replace_and_commit(events, OccurrenceCommit::SbaBatch { behind }))
     }
 
     /// [CR#704.3]: sweep; if anything acted, emit the whole sweep as ONE

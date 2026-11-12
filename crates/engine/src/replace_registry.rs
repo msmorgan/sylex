@@ -580,7 +580,7 @@ fn floating_watches(
     )
 }
 
-// ── Task 4: replace_event loop + lineage + apply Instead/Also ────────────────
+// ── The replacement loop + lineage + apply Instead/Also ──────────────────────
 
 /// The outcome of running the [CR#616.1] replacement loop for one event.
 #[derive(Debug)]
@@ -590,10 +590,16 @@ pub(crate) enum ReplaceOutcome {
     /// The event was replaced to nothing (`Instead` with a body that doesn't
     /// re-emit the event) — skip `apply`.
     Nothing,
-    /// Multiple applicable replacements require a player choice — the
-    /// `ChooseReplacement` decision has been surfaced and the loop is
-    /// suspended. The pending decision will resume processing via Task 5.
-    Suspend,
+    /// Two or more replacements apply to `current` ([CR#616.1]): its affected
+    /// player must choose one before the loop goes on. Nothing is surfaced
+    /// yet — the caller owns the rest of the occurrence and suspends it whole
+    /// ([`surface_choice`]).
+    Choose {
+        current: GameEvent,
+        /// [CR#614.5]: the lineage already spent on `current`'s chain.
+        applied: std::collections::HashSet<ReplacementKey>,
+        applicable: Vec<Applicable>,
+    },
 }
 
 /// The [CR#614.5] STARTING lineage a fresh `replace_event` call seeds its
@@ -613,7 +619,7 @@ fn inherited_seed(e: &GameEvent) -> std::collections::HashSet<ReplacementKey> {
 
 /// Run the [CR#616.1] replacement loop for intent `e` with the [CR#614.5]
 /// lineage set. Returns the modified event to apply, nothing (replaced away),
-/// or a suspension waiting for a `ChooseReplacement` decision.
+/// or the choice the loop stopped at.
 ///
 /// The affected object IS threaded into the body frame as the event
 /// `EventObject` (via `schedule_body`), so a body reads it with
@@ -625,61 +631,54 @@ fn inherited_seed(e: &GameEvent) -> std::collections::HashSet<ReplacementKey> {
 /// loop (and any further body it schedules, via `apply_one`/`schedule_body`
 /// threading the CURRENT accumulated set forward) never re-triggers the same
 /// replacement a second time, which [CR#614.5] forbids.
-///
-/// Seam: general [CR#614.15] self-replacement (resolution-time) is a
-/// `todo!`-tagged future concern; APNAP multi-player 616 ordering is also
-/// deferred.
 pub(crate) fn replace_event(state: &mut GameState, e: GameEvent) -> ReplaceOutcome {
-    use std::collections::HashSet;
-
     // Non-replaceable intents pass through immediately ([CR#614]: only
     // replaceable intents can be modified by replacement effects).
     if !replaceable(&e) {
         return ReplaceOutcome::Pass(e);
     }
-
     // [CR#614.5]: the lineage set — a replacement that has already been applied
     // to the current event chain (or an ancestor of it, [`inherited_seed`])
     // cannot apply again, terminating loops.
-    let mut applied: HashSet<ReplacementKey> = inherited_seed(&e);
-    let mut current = e;
+    let applied = inherited_seed(&e);
+    replace_loop(state, e, applied)
+}
 
+/// The [CR#616.1f] fixpoint over `current` with lineage `applied`: apply the
+/// one applicable replacement and look again, until none applies, the event
+/// is replaced away, or two or more apply and a player must choose.
+fn replace_loop(
+    state: &mut GameState,
+    mut current: GameEvent,
+    mut applied: std::collections::HashSet<ReplacementKey>,
+) -> ReplaceOutcome {
     loop {
-        let applicable: Vec<Applicable> = gather_applicable(state, &current)
+        let mut applicable: Vec<Applicable> = gather_applicable(state, &current)
             .into_iter()
             .filter(|a| !applied.contains(&a.key))
             .collect();
-
-        match applicable.len() {
-            // [CR#616.1]: no more replacements watch the (possibly modified)
-            // event — apply it as-is.
-            0 => return ReplaceOutcome::Pass(current),
-
-            // [CR#616.1]: exactly one applicable — auto-apply (no choice).
-            1 => {
-                let a = applicable.into_iter().next().unwrap();
-                applied.insert(a.key);
-                match apply_one(state, current, &a, &applied) {
-                    Some(modified) => {
-                        // Keep looping — the modified event may be watched by
-                        // further replacements ([CR#616.1f]).
-                        current = modified;
-                    }
-                    None => {
-                        // The event was replaced to nothing (Instead with no
-                        // re-emitted event).
-                        return ReplaceOutcome::Nothing;
-                    }
-                }
-            }
-
-            // [CR#616.1]: multiple applicable — surface a choice ([CR#616.1]).
-            // Store the suspended state and surface the decision; the resume
-            // is driven by `resume_replacements` after `submit_decision`.
-            _ => {
-                surface_choice(state, current, applied, &applicable);
-                return ReplaceOutcome::Suspend;
-            }
+        if applicable.len() >= 2 {
+            return ReplaceOutcome::Choose {
+                current,
+                applied,
+                applicable,
+            };
+        }
+        // [CR#616.1]: no more replacements watch the (possibly modified)
+        // event — apply it as-is.
+        let Some(a) = applicable.pop() else {
+            return ReplaceOutcome::Pass(current);
+        };
+        // Exactly one applies: no choice to make ([CR#616.1] orders two or
+        // more), so it applies.
+        applied.insert(a.key);
+        match apply_one(state, current, &a, &applied) {
+            // Keep looping — the modified event may be watched by further
+            // replacements ([CR#616.1f]).
+            Some(modified) => current = modified,
+            // The event was replaced to nothing (Instead with no re-emitted
+            // event).
+            None => return ReplaceOutcome::Nothing,
         }
     }
 }
@@ -868,7 +867,7 @@ fn consume_shield(state: &mut GameState, iid: InstanceId) {
     state.shields.retain(|s| s.id != iid);
 }
 
-// ── Task 5: ChooseReplacement decision ([CR#616.1]) ──────────────────────────
+// ── The ChooseReplacement decision ([CR#616.1]) ──────────────────────────────
 
 /// The player who experiences the event — they choose which replacement applies
 /// first when multiple are applicable ([CR#616.1]).
@@ -905,160 +904,137 @@ pub(crate) fn affected_player(state: &GameState, e: &GameEvent) -> PlayerId {
     }
 }
 
-/// Store a suspended replacement-loop state into `GameState.replace_state` and
-/// surface a `DecisionPointKind::ChooseReplacement` to the pending slot.
+/// Suspend an occurrence's replacement pass on a choice: store `suspended`
+/// in `GameState.replace_state` and surface a
+/// `DecisionPointKind::ChooseReplacement` for `suspended.current`, offering
+/// every key in `applicable`.
 ///
-/// Called when ≥ 2 applicable replacements are found for the same event.
-/// The `remaining` field is set to `vec![]` here because `replace_event` is
-/// called per-event from `apply_occurrence`; batch remainders are stored by
-/// the `Suspend` handler in `apply_occurrence` itself (see `step.rs`).
+/// [CR#616.1]: when two or more players must make these choices at the same
+/// time, they make them in APNAP order. The members of a batch reach this
+/// point one at a time in member order, so their choosers are asked in member
+/// order instead; `engine-replacement-choice-apnap` owns the fix.
 pub(crate) fn surface_choice(
     state: &mut GameState,
-    current: GameEvent,
-    applied: std::collections::HashSet<ReplacementKey>,
+    suspended: crate::state::ReplaceState,
     applicable: &[Applicable],
 ) {
-    let chooser = affected_player(state, &current);
-    let keys: Vec<ReplacementKey> = applicable.iter().map(|a| a.key).collect();
-    state.replace_state = Some(crate::state::ReplaceState {
-        current,
-        applied,
-        remaining: vec![], // batch remainders written by apply_occurrence after Suspend
-    });
+    assert!(
+        state.replace_state.is_none(),
+        "one replacement pass is suspended at a time — the pending choice blocks every other apply"
+    );
+    let chooser = affected_player(state, &suspended.current);
+    let offered = applicable.iter().map(|a| a.key).collect();
+    state.replace_state = Some(suspended);
     state.pending = Some(crate::decide::DecisionPointKind::ChooseReplacement(
         crate::decide::pending::ChooseReplacement {
             chooser,
-            applicable: keys,
+            applicable: offered,
         },
     ));
 }
 
-/// Resume the replacement loop after a `ChooseReplacement` decision. Called
-/// from `submit_decision` with the chosen key and the suspended `ReplaceState`.
+/// Run an occurrence's members through the cant ([CR#614.17]) and replacement
+/// ([CR#616.1]) passes in member order, appending each surviving member's
+/// final event to `resolved`. No member applies here: the whole occurrence
+/// is replaced before any of it happens, then commits as one
+/// ([CR#603.2c]). Returns the final events, ready to commit, or `None` when
+/// a member needs a replacement choice — the occurrence is then suspended
+/// whole ([`crate::state::ReplaceState`]) with the choice pending.
 ///
-/// Applies the chosen replacement to `rs.current`, continues the replacement
-/// loop on the (possibly modified) event, and then runs each `rs.remaining`
-/// event through the full cant→replace→apply pipeline. The results are
-/// scheduled as `WorkItem::Emit` occurrences at the agenda front.
+/// A member whose current-only recipient departed after it was queued is
+/// dropped ([CR#608.2b]).
+pub(crate) fn replace_members(
+    state: &mut GameState,
+    mut resolved: Vec<GameEvent>,
+    members: Vec<GameEvent>,
+    commit: crate::state::OccurrenceCommit,
+) -> Option<Vec<GameEvent>> {
+    let mut members = members.into_iter();
+    while let Some(e) = members.next() {
+        if !state.event_current_recipient_is_live(&e) || cant_event(state, &e) {
+            continue;
+        }
+        match replace_event(state, e) {
+            ReplaceOutcome::Pass(final_event) => resolved.push(final_event),
+            ReplaceOutcome::Nothing => {}
+            ReplaceOutcome::Choose {
+                current,
+                applied,
+                applicable,
+            } => {
+                let suspended = crate::state::ReplaceState {
+                    resolved,
+                    current,
+                    applied,
+                    remaining: members.collect(),
+                    commit,
+                };
+                surface_choice(state, suspended, &applicable);
+                return None;
+            }
+        }
+    }
+    Some(resolved)
+}
+
+/// Resume a suspended replacement pass after its `ChooseReplacement`
+/// decision. Called from `submit_decision` with the chosen key and the
+/// suspended `ReplaceState`.
+///
+/// Applies the chosen replacement to `rs.current`, finishes that member's
+/// replacement loop ([CR#616.1f]), and walks on through the tail. A choice
+/// anywhere in there suspends again, carrying every member forward; once the
+/// pass completes, the whole occurrence is scheduled to commit at the agenda
+/// front as one occurrence in member order.
 pub(crate) fn resume_replacements(
     state: &mut GameState,
-    mut rs: crate::state::ReplaceState,
+    rs: crate::state::ReplaceState,
     chosen_key: ReplacementKey,
 ) {
-    // Find the chosen applicable from a fresh gather (state may have changed),
-    // filtered to the key the player picked.
-    let gathered = gather_applicable(state, &rs.current);
-    let chosen_applicable = gathered
+    let crate::state::ReplaceState {
+        mut resolved,
+        current,
+        mut applied,
+        remaining,
+        commit,
+    } = rs;
+    // Find the chosen applicable from a fresh gather, filtered to the key the
+    // player picked.
+    let chosen = gather_applicable(state, &current)
         .into_iter()
         .find(|a| a.key == chosen_key)
         .expect("chosen replacement key must still be applicable");
-
-    // Apply the chosen replacement.
-    rs.applied.insert(chosen_key);
-    let next_event = apply_one(state, rs.current, &chosen_applicable, &rs.applied);
-
-    // Continue the replacement loop on the (possibly modified) event.
-    let mut facts: Vec<GameEvent> = Vec::new();
-    if let Some(modified) = next_event {
-        // Re-enter the replacement loop: the modified event may be watched by
-        // further replacements ([CR#616.1f]).
-        match resume_replace_loop(state, modified, rs.applied) {
-            ResumeOutcome::Fact(e) => facts.push(e),
-            ResumeOutcome::Nothing => {}
-            ResumeOutcome::Suspended => {
-                // Another choice needed: the new surface_choice stored the
-                // remaining batch in replace_state. We must not process the
-                // batch remainder (rs.remaining) yet; store it back.
-                if let Some(new_rs) = state.replace_state.as_mut() {
-                    new_rs.remaining = rs.remaining;
-                }
-                return;
-            }
-        }
-    }
-    // else: event replaced to nothing — no fact.
-
-    // Process each remaining event from the batch.
-    for e in rs.remaining {
-        if crate::replace_registry::cant_event(state, &e) {
-            continue;
-        }
-        match replace_event(state, e.clone()) {
-            ReplaceOutcome::Pass(e2) => {
-                // Schedule apply as an Emit work item.
-                state.schedule_front(vec![crate::agenda::WorkItem::Emit(
-                    crate::event::Occurrence::Single(e2),
-                )]);
-            }
+    applied.insert(chosen_key);
+    if let Some(modified) = apply_one(state, current, &chosen, &applied) {
+        // The modified event may be watched by further replacements
+        // ([CR#616.1f]).
+        match replace_loop(state, modified, applied) {
+            ReplaceOutcome::Pass(final_event) => resolved.push(final_event),
             ReplaceOutcome::Nothing => {}
-            ReplaceOutcome::Suspend => {
-                // Another replacement choice surfaced mid-batch. The
-                // remaining events after this one need to be stored.
-                // `surface_choice` already wrote replace_state for `e`;
-                // we don't have the tail here, so just return — the rest
-                // will be processed after that nested choice resolves.
-                // (For the simple two-shield test this branch isn't hit.)
+            ReplaceOutcome::Choose {
+                current,
+                applied,
+                applicable,
+            } => {
+                let suspended = crate::state::ReplaceState {
+                    resolved,
+                    current,
+                    applied,
+                    remaining,
+                    commit,
+                };
+                surface_choice(state, suspended, &applicable);
                 return;
             }
         }
     }
-
-    // Emit the facts from the chosen replacement path.
-    if !facts.is_empty() {
-        let occ = if facts.len() == 1 {
-            crate::event::Occurrence::Single(facts.pop().unwrap())
-        } else {
-            crate::event::Occurrence::Batch(facts)
-        };
-        state.schedule_front(vec![crate::agenda::WorkItem::Emit(occ)]);
+    if let Some(events) = replace_members(state, resolved, remaining, commit) {
+        state.schedule_front(vec![crate::agenda::WorkItem::CommitReplaced {
+            events,
+            commit,
+        }]);
     }
 }
-
-/// Outcome of re-entering the replacement loop on an already-partially-applied
-/// event during a `resume_replacements` call.
-enum ResumeOutcome {
-    /// The event survived the loop — apply it.
-    Fact(GameEvent),
-    /// The event was replaced to nothing.
-    Nothing,
-    /// Another `ChooseReplacement` was surfaced for this event.
-    Suspended,
-}
-
-/// Continue the replacement loop on `event` with the given lineage `applied`.
-/// Does NOT call `state.apply` — returns the final event for the caller to
-/// schedule.
-fn resume_replace_loop(
-    state: &mut GameState,
-    mut event: GameEvent,
-    mut applied: std::collections::HashSet<ReplacementKey>,
-) -> ResumeOutcome {
-    loop {
-        let applicable: Vec<Applicable> = gather_applicable(state, &event)
-            .into_iter()
-            .filter(|a| !applied.contains(&a.key))
-            .collect();
-        match applicable.len() {
-            0 => return ResumeOutcome::Fact(event),
-            1 => {
-                let a = applicable.into_iter().next().unwrap();
-                applied.insert(a.key);
-                match apply_one(state, event, &a, &applied) {
-                    Some(modified) => {
-                        event = modified;
-                    }
-                    None => return ResumeOutcome::Nothing,
-                }
-            }
-            _ => {
-                surface_choice(state, event, applied, &applicable);
-                return ResumeOutcome::Suspended;
-            }
-        }
-    }
-}
-
-// ── End Task 5 ───────────────────────────────────────────────────────────────
 
 #[cfg(test)]
 pub(crate) mod tests_support {
@@ -1805,6 +1781,18 @@ mod tests {
         assert!(replacement_watches(&state, &sacrifice_would, id, &e));
     }
 
+    /// A replacement pass suspended on `current`, the lone member of an
+    /// `Occurrence::Single`.
+    fn suspended_single(current: GameEvent) -> crate::state::ReplaceState {
+        crate::state::ReplaceState {
+            resolved: vec![],
+            current,
+            applied: std::collections::HashSet::new(),
+            remaining: vec![],
+            commit: crate::state::OccurrenceCommit::Single,
+        }
+    }
+
     /// [CR#616.1]: the replacement chooser for an event affecting a card in
     /// HAND is that card's OWNER, not whatever `controller` the object
     /// happens to carry. `controller` is deliberately set to the ACTIVE
@@ -1852,12 +1840,7 @@ mod tests {
             face: None,
             cause: Some(Cause::discard(Agency::EffectInstruction, None)),
         });
-        surface_choice(
-            &mut state,
-            e,
-            std::collections::HashSet::new(),
-            &two_applicable,
-        );
+        surface_choice(&mut state, suspended_single(e), &two_applicable);
 
         let Some(DecisionPointKind::ChooseReplacement(crate::decide::pending::ChooseReplacement {
             chooser,

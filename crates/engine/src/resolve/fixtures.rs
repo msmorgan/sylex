@@ -141,6 +141,9 @@ pub(super) fn run_injected(state: &mut GameState) {
             state.agenda.front(),
             Some(
                 WorkItem::Emit(_)
+                    // An occurrence whose replacement choice resolved commits
+                    // like the `Emit` it came from ([CR#616.1]).
+                    | WorkItem::CommitReplaced { .. }
                     | WorkItem::RunEffect { .. }
                     | WorkItem::Resolve(_)
                     | WorkItem::ChooseNoteNumber { .. }

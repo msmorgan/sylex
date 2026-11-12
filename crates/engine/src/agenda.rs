@@ -98,8 +98,18 @@ pub enum WorkItem {
     /// canted by indestructible) applies to an empty
     /// `Occurrence::Batch(vec![])` — that "nothing changed" signal
     /// terminates the SBA loop without looping forever on a persistent
-    /// condition.
+    /// condition. A batch suspended for a replacement choice makes that call
+    /// when it commits ([`WorkItem::CommitReplaced`]).
     EmitSbaBatch(Vec<GameEvent>),
+    /// [CR#616.1]: commit an occurrence whose last replacement choice has
+    /// resolved — `events` are its members' final events in member order,
+    /// already through the cant and replacement passes, so they go straight
+    /// to apply, history and trigger matching as ONE occurrence
+    /// ([CR#603.2c]).
+    CommitReplaced {
+        events: Vec<GameEvent>,
+        commit: crate::state::OccurrenceCommit,
+    },
     /// Turn-structure transition plus that step's schedule.
     BeginStep(PhaseStep),
     /// [CR#704.3]: state-based actions, checked before anyone gets priority.
