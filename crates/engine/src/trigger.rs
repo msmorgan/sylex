@@ -957,7 +957,7 @@ impl GameState {
     /// The kind-poly PATIENT of an event ([CR#120.3]): a card/token recipient
     /// carries its LKI snapshot, a player-proxy recipient carries its id
     /// (zoneless — never snapshotted). A stale/missing id yields no patient.
-    /// Mirrors `resolve::bind_element` / `replace_registry::schedule_body`.
+    /// Mirrors `resolve::bind_element` / `replace_registry::join_body`.
     fn event_patient(&self, id: ObjectId) -> Option<EventPatient> {
         match self.objects.get(id)?.source {
             ObjectSource::Player(p) => Some(EventPatient::Player(p)),

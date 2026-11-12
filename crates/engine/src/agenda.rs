@@ -102,12 +102,11 @@ pub enum WorkItem {
     /// when it commits ([`WorkItem::CommitReplaced`]).
     EmitSbaBatch(Vec<GameEvent>),
     /// [CR#616.1]: commit an occurrence whose last replacement choice has
-    /// resolved — `events` are its members' final events in member order,
-    /// already through the cant and replacement passes, so they go straight
-    /// to apply, history and trigger matching as ONE occurrence
-    /// ([CR#603.2c]).
+    /// resolved — `replaced` holds its final events, already through the cant
+    /// and replacement passes, so they go straight to apply, history and
+    /// trigger matching as ONE occurrence ([CR#603.2c]).
     CommitReplaced {
-        events: Vec<GameEvent>,
+        replaced: crate::state::Replaced,
         commit: crate::state::OccurrenceCommit,
     },
     /// [CR#611.2a,613.1b]: a resolving "gain control": `to` gains control of

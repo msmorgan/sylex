@@ -265,30 +265,95 @@ pub struct ArrangePile {
 /// An occurrence's members go through the cant and replacement passes in
 /// member order before any of them applies. When a member needs a choice
 /// (two or more applicable replacements), the pass stops there and this
-/// state holds the whole occurrence: the members already through the pass,
-/// the member being chosen for, and the tail not yet reached. Resuming
-/// applies the chosen replacement, finishes that member's loop, and walks on
-/// through the tail; a member there that needs a choice suspends again with
-/// all of it carried forward. Once the last choice resolves, every member
-/// commits together as one occurrence in member order
-/// (`WorkItem::CommitReplaced`) — a batch stays one event however many
-/// choices it needed ([CR#603.2c]).
+/// state holds the whole occurrence ([`OccurrencePass`]) and the member being
+/// chosen for. Resuming applies the chosen replacement, finishes that
+/// member's loop, and walks on; a member that needs a choice later suspends
+/// again with all of it carried forward. Once the last choice resolves, the
+/// occurrence commits as one (`WorkItem::CommitReplaced`) — a batch stays one
+/// event however many choices it needed ([CR#603.2c]).
 #[derive(Debug, Clone)]
 pub struct ReplaceState {
-    /// Members before `current`, in member order, that came through the
-    /// replacement pass: each one's final event, not yet applied. A member
-    /// suppressed or replaced away has none.
-    pub resolved: Vec<crate::event::GameEvent>,
+    /// The occurrence the pass is suspended in.
+    pub pass: OccurrencePass,
     /// The member whose replacement choice is pending.
     pub current: crate::event::GameEvent,
+    /// Whether `current` is a modified event a replacement produced
+    /// ([`OccurrencePass::joining`]) rather than one of the occurrence's own
+    /// members.
+    pub current_joined: bool,
     /// [CR#614.5] lineage: replacements already applied to the current event
-    /// chain — none of these may be applied again during this occurrence.
+    /// chain — none of these may be applied again to it or to the modified
+    /// events that replace it.
     pub applied: std::collections::HashSet<crate::replace_registry::ReplacementKey>,
-    /// The members after `current`, in member order, not yet through the
-    /// cant and replacement passes.
-    pub remaining: Vec<crate::event::GameEvent>,
-    /// How the occurrence commits once every member is through.
+}
+
+/// One occurrence on its way through the cant ([CR#614.17]) and replacement
+/// ([CR#616.1]) passes, before any of it applies.
+///
+/// A replaced event never happens; a modified event occurs instead
+/// [CR#614.6]. The modified events a replacement's body produces belong to
+/// the same event as the members, so they join the occurrence (`joining`)
+/// and go through the passes themselves, where further replacements may
+/// modify them [CR#616.1f]. The part of a body that can't happen at the same
+/// time as the rest waits in `after` (see
+/// `crate::replace_registry::join_body`).
+#[derive(Debug, Clone)]
+pub struct OccurrencePass {
+    /// The occurrence's own members not yet through the passes, in member
+    /// order.
+    pub remaining: std::collections::VecDeque<crate::event::GameEvent>,
+    /// Modified events replacement bodies produced, not yet through the
+    /// passes, each with the [CR#614.5] lineage of the chain it replaces.
+    pub joining: std::collections::VecDeque<(
+        crate::event::GameEvent,
+        std::collections::HashSet<crate::replace_registry::ReplacementKey>,
+    )>,
+    /// What came through the passes.
+    pub replaced: Replaced,
+    /// Work that runs once the occurrence has committed, in order: the
+    /// finalizers of the keyword actions that joined, and the body parts that
+    /// can't happen at the same time as the rest of the event.
+    pub after: Vec<crate::agenda::WorkItem>,
+    /// How the occurrence commits once everything is through.
     pub commit: OccurrenceCommit,
+}
+
+impl OccurrencePass {
+    /// An occurrence of `members` with nothing through the passes yet.
+    #[must_use]
+    pub fn new(members: Vec<crate::event::GameEvent>, commit: OccurrenceCommit) -> Self {
+        Self {
+            remaining: members.into(),
+            joining: std::collections::VecDeque::new(),
+            replaced: Replaced::default(),
+            after: Vec::new(),
+            commit,
+        }
+    }
+}
+
+/// An occurrence's final events once through the cant and replacement passes:
+/// what commits as one occurrence ([CR#603.2c]). A member suppressed or
+/// replaced away has none.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct Replaced {
+    /// The final events of the occurrence's own members, in member order.
+    pub members: Vec<crate::event::GameEvent>,
+    /// The final events of the modified events replacements produced
+    /// ([CR#614.6]).
+    pub joined: Vec<crate::event::GameEvent>,
+}
+
+impl Replaced {
+    /// Record a final event: one of the occurrence's own members, or
+    /// (`joined`) a modified event a replacement produced.
+    pub(crate) fn push(&mut self, event: crate::event::GameEvent, joined: bool) {
+        if joined {
+            self.joined.push(event);
+        } else {
+            self.members.push(event);
+        }
+    }
 }
 
 /// How an occurrence commits once its members are through the replacement
@@ -1304,14 +1369,13 @@ mod tests {
             bindings: TriggerBindings::default(),
         });
         state.replace_state = Some(ReplaceState {
-            resolved: vec![],
+            pass: OccurrencePass::new(vec![], OccurrenceCommit::Single),
             current: GameEvent::PlayerLost(PlayerLost {
                 player,
                 reason: LossReason::Conceded,
             }),
+            current_joined: false,
             applied: std::collections::HashSet::new(),
-            remaining: vec![],
-            commit: OccurrenceCommit::Single,
         });
         let mut image = state.active().clone();
 

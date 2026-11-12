@@ -220,6 +220,40 @@ impl GameState {
         }
     }
 
+    /// Write a verb's product to its `dest` register before the verb runs —
+    /// the object(s) it acts on, read by a later instruction of the same
+    /// region. A verb whose product is a runtime magnitude writes it after it
+    /// runs instead (`WorkItem::WriteMagnitude`).
+    pub(crate) fn write_act_product(
+        &self,
+        dest: sylex_core::DefId,
+        action: &Action,
+        frame: &ExecutionFrame,
+    ) {
+        match action {
+            // [CR#701.21a]: a sacrifice moves the permanent to its owner's
+            // graveyard, so — like any move — its product is that object,
+            // written at its pre-move identity and chased to its new one on
+            // read ([CR#400.7]). This is "the sacrificed creature" a cost
+            // block's body names.
+            Action::Move(subject, _, _, _) | Action::Sacrifice(_, subject) => {
+                let object = self.eval_reference(subject, frame);
+                self.activation_write_object(frame.activation, dest, object);
+            }
+            Action::MoveGroup { group, .. } => {
+                let objects = self.eval_selection_set(group, frame);
+                self.activation_write_objects(frame.activation, dest, &objects);
+            }
+            Action::DrawCard(who) => {
+                let player = self.acting_player(who, frame);
+                if let Some(&object) = self.zones.libraries[player.index()].front() {
+                    self.activation_write_object(frame.activation, dest, object);
+                }
+            }
+            _ => {}
+        }
+    }
+
     #[expect(
         clippy::too_many_lines,
         reason = "one arm per effect-frame variant; splitting would scatter the dispatch"
@@ -256,28 +290,7 @@ impl GameState {
                 if let Some(dest) = dest
                     && magnitude.is_none()
                 {
-                    match &action {
-                        // [CR#701.21a]: a sacrifice moves the permanent to its
-                        // owner's graveyard, so — like any move — its product
-                        // is that object, written at its pre-move identity and
-                        // chased to its new one on read ([CR#400.7]). This is
-                        // "the sacrificed creature" a cost block's body names.
-                        Action::Move(subject, _, _, _) | Action::Sacrifice(_, subject) => {
-                            let object = self.eval_reference(subject, frame);
-                            self.activation_write_object(frame.activation, dest, object);
-                        }
-                        Action::MoveGroup { group, .. } => {
-                            let objects = self.eval_selection_set(group, frame);
-                            self.activation_write_objects(frame.activation, dest, &objects);
-                        }
-                        Action::DrawCard(who) => {
-                            let player = self.acting_player(who, frame);
-                            if let Some(&object) = self.zones.libraries[player.index()].front() {
-                                self.activation_write_object(frame.activation, dest, object);
-                            }
-                        }
-                        _ => {}
-                    }
+                    self.write_act_product(dest, &action, frame);
                 }
                 if let Action::CreateReplacement {
                     subject,
@@ -1808,7 +1821,7 @@ fn split_evenly(total: Uint, n: usize) -> Vec<Uint> {
 /// — return its `parts`: the instruction-scoped statics to
 /// fold onto the preceding sibling in `Sequentially` lowering ([CR#611.2a]).
 /// `None` for every other effect.
-fn for_this_event_rider(effect: &Instruction) -> Option<&[StaticSpec]> {
+pub(crate) fn for_this_event_rider(effect: &Instruction) -> Option<&[StaticSpec]> {
     match effect {
         Instruction::Until(sylex_core::Duration::ForThisEvent, parts) => Some(parts),
         _ => None,

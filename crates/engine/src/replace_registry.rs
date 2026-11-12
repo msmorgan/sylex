@@ -33,7 +33,11 @@ use crate::object::ObjectId;
 use crate::object::ObjectSource;
 use crate::player::PlayerId;
 use crate::state::GameState;
-use crate::trigger::EventPatient;
+use crate::state::OccurrencePass;
+
+mod body;
+
+pub(crate) use body::join_body;
 
 /// What an intent affects — the object being moved/changed, or the player
 /// experiencing the event (e.g. the player drawing a card, gaining life).
@@ -655,14 +659,13 @@ pub(crate) enum ReplaceOutcome {
     },
 }
 
-/// The [CR#614.5] STARTING lineage a fresh `replace_event` call seeds its
-/// local `applied` set with: an ordinary event starts from empty (the common
-/// case), but a `GameEvent::Act` may carry a non-empty `inherited` set —
-/// planted by `schedule_body` (an `Instead`/`Also` body's re-emitted product)
-/// or by a passed aggregate `Batch` window's apply (its contained per-entity
-/// futures) — which pre-excludes those keys so the very replacement that
-/// produced this event can't be re-caught by it, per [CR#614.5]'s "or any
-/// modified events that may replace that event."
+/// The [CR#614.5] lineage a `GameEvent::Act` carries in from outside the
+/// pass: its `inherited` set — planted by a replacement body's frame (a body
+/// part that runs after its occurrence commits, [`join_body`]) or by a passed
+/// aggregate `Batch` window's apply (its contained per-entity futures) —
+/// which pre-excludes those keys so the very replacement that produced this
+/// event can't be re-caught by it, per [CR#614.5]'s "or any modified events
+/// that may replace that event." Every other event carries none.
 fn inherited_seed(e: &GameEvent) -> std::collections::HashSet<ReplacementKey> {
     match e {
         GameEvent::Act(Act { inherited, .. }) => inherited.clone(),
@@ -672,29 +675,28 @@ fn inherited_seed(e: &GameEvent) -> std::collections::HashSet<ReplacementKey> {
 
 /// Run the [CR#616.1] replacement loop for intent `e` with the [CR#614.5]
 /// lineage set. Returns the modified event to apply, nothing (replaced away),
-/// or the choice the loop stopped at.
+/// or the choice the loop stopped at. A replacement body's modified events
+/// join `pass` ([`join_body`]).
 ///
-/// The affected object IS threaded into the body frame as the event
-/// `EventObject` (via `schedule_body`), so a body reads it with
-/// `Ref(EventObject)` while `This` stays the source ability.
-///
-/// The [CR#614.5] `applied` lineage does not always start empty: see
-/// [`inherited_seed`] — a `GameEvent::Act` can arrive PRE-SEEDED with keys a
-/// prior application already spent against its upstream event chain, so this
-/// loop (and any further body it schedules, via `apply_one`/`schedule_body`
-/// threading the CURRENT accumulated set forward) never re-triggers the same
-/// replacement a second time, which [CR#614.5] forbids.
-pub(crate) fn replace_event(state: &mut GameState, e: GameEvent) -> ReplaceOutcome {
+/// The [CR#614.5] `applied` lineage does not always start empty: `lineage`
+/// is the chain `e` itself replaces (a modified event a body produced), and
+/// a `GameEvent::Act` can carry more ([`inherited_seed`]), so this loop
+/// never applies a replacement to the modified events of its own chain,
+/// which [CR#614.5] forbids.
+pub(crate) fn replace_event(
+    state: &mut GameState,
+    e: GameEvent,
+    lineage: std::collections::HashSet<ReplacementKey>,
+    pass: &mut OccurrencePass,
+) -> ReplaceOutcome {
     // Non-replaceable intents pass through immediately ([CR#614]: only
     // replaceable intents can be modified by replacement effects).
     if !replaceable(&e) {
         return ReplaceOutcome::Pass(e);
     }
-    // [CR#614.5]: the lineage set — a replacement that has already been applied
-    // to the current event chain (or an ancestor of it, [`inherited_seed`])
-    // cannot apply again, terminating loops.
-    let applied = inherited_seed(&e);
-    replace_loop(state, e, applied)
+    let mut applied = inherited_seed(&e);
+    applied.extend(lineage);
+    replace_loop(state, e, applied, pass)
 }
 
 /// The [CR#616.1f] fixpoint over `current` with lineage `applied`: apply the
@@ -704,6 +706,7 @@ fn replace_loop(
     state: &mut GameState,
     mut current: GameEvent,
     mut applied: std::collections::HashSet<ReplacementKey>,
+    pass: &mut OccurrencePass,
 ) -> ReplaceOutcome {
     loop {
         let mut applicable: Vec<Applicable> = gather_applicable(state, &current)
@@ -725,7 +728,7 @@ fn replace_loop(
         // Exactly one applies: no choice to make ([CR#616.1] orders two or
         // more), so it applies.
         applied.insert(a.key);
-        match apply_one(state, current, &a, &applied) {
+        match apply_one(state, current, &a, &applied, pass) {
             // Keep looping — the modified event may be watched by further
             // replacements ([CR#616.1f]).
             Some(modified) => current = modified,
@@ -738,15 +741,15 @@ fn replace_loop(
 
 /// Apply one replacement to `e`. Returns the modified event to continue
 /// looping on, or `None` when the event is replaced to nothing (Instead).
-/// Schedules body effects via `schedule_body`, threading `applied` — the
-/// CURRENT [CR#614.5] lineage (already including `a`'s own key) — forward so
-/// the body's frame carries it as the STARTING set for whatever it resolves
-/// into ([`inherited_seed`]).
+/// A body's modified events join `pass` ([`join_body`]), carrying `applied` —
+/// the CURRENT [CR#614.5] lineage, already including `a`'s own key — so no
+/// replacement of this chain applies to them again.
 fn apply_one(
     state: &mut GameState,
     e: GameEvent,
     a: &Applicable,
     applied: &std::collections::HashSet<ReplacementKey>,
+    pass: &mut OccurrencePass,
 ) -> Option<GameEvent> {
     // [CR#608.2]: the object the intent affects (the would-be-destroyed
     // permanent, the damaged creature, …) is bound to `That` for the body to
@@ -760,10 +763,10 @@ fn apply_one(
         ApplicableEffect::Replacement(replacement) => {
             match (**replacement).clone() {
                 Replacement::Instead { instead, .. } => {
-                    // [CR#614.1a,614.6]: the event is replaced — it does NOT happen.
-                    // Schedule the `instead` body; consume a one-shot shield if
-                    // present.
-                    schedule_body(
+                    // [CR#614.1a,614.6]: the event is replaced — it does NOT
+                    // happen; the `instead` body's modified events join the
+                    // occurrence. Consume a one-shot shield if present.
+                    join_body(
                         state,
                         instead,
                         a.source,
@@ -771,6 +774,7 @@ fn apply_one(
                         applied,
                         a.params.clone(),
                         event_amount,
+                        pass,
                     );
                     // [CR#614.3]: only consume a floating instance when it is one-shot
                     // (e.g. a regeneration shield). Duration-only floating
@@ -785,9 +789,10 @@ fn apply_one(
                     None // event replaced away
                 }
                 Replacement::Also { also, .. } => {
-                    // [CR#614.1c]: the event still happens AND `also` happens.
-                    // Schedule the body; the (unchanged) event continues.
-                    schedule_body(
+                    // [CR#614.1c]: the event still happens AND `also` happens:
+                    // the body's events join the occurrence; the (unchanged)
+                    // event continues.
+                    join_body(
                         state,
                         also,
                         a.source,
@@ -795,6 +800,7 @@ fn apply_one(
                         applied,
                         a.params.clone(),
                         event_amount,
+                        pass,
                     );
                     Some(e)
                 }
@@ -847,25 +853,6 @@ fn apply_one(
     }
 }
 
-/// Schedule an `instead`/`also` body effect as a `RunEffect` work item at
-/// the agenda front. The frame is anchored on `source`, with the replaced
-/// intent's affected recipient bound for the body to read while `This` stays
-/// the source ability. A card-backed recipient binds as `EventObject` (a body
-/// reads `Ref(EventObject)` — regeneration heals it, wither/infect put -1/-1
-/// counters on it, [CR#702.80a,702.90c]); a PLAYER recipient binds as the
-/// kind-poly `EventPatient` — infect gives that player poison counters
-/// ([CR#702.90b]). The retired `EventActor` compat alias (a player patient
-/// ALSO bound as `that_player`, so an old body could read it via
-/// `Ref(EventActor)`) is gone — `EventActor` names the responsible AGENT
-/// ([CR#119.9]'s distinction), and a replaced event's affected recipient is
-/// never that; `Infect.ron` was the one reader and now reads `EventPatient`.
-///
-/// `applied` is the [CR#614.5] lineage already spent against the event this
-/// body replaces (including the very key that just fired) — threaded into
-/// the scheduled frame's activation context (`inherited_replacements`) so a
-/// keyword-action window `effect` resolves into starts its OWN
-/// `replace_event` loop pre-excluding it ([`inherited_seed`]), rather than
-/// being caught by the SAME replacement all over again.
 /// The magnitude an amount-carrying intent supplies to a replacement body's
 /// `EventAmount` parameter ([CR#107.3], "that many"). An `Instead` replaces the
 /// intent away — it never reaches the apply funnel that a trigger's magnitude
@@ -874,44 +861,6 @@ fn apply_one(
 /// must have it supplied HERE, off the replaced intent.
 fn intent_magnitude(state: &GameState, e: &GameEvent) -> Option<sylex_core::Uint> {
     state.event_roles(e).event_amount
-}
-
-fn schedule_body(
-    state: &mut GameState,
-    effect: sylex_core::Instruction,
-    source: ObjectId,
-    that: Option<ObjectId>,
-    applied: &std::collections::HashSet<ReplacementKey>,
-    params: Arc<[sylex_core::Param]>,
-    event_amount: Option<sylex_core::Uint>,
-) {
-    let controller = state.controller_of(source);
-    // [CR#608.2,608.2k]: bind the affected recipient — the event PATIENT
-    // ([CR#120.3]) — so the body can read it while `This` falls back to
-    // `source` (`bindings.this` is `None`, the agent never moving off the
-    // ability). A frameless body (`that == None`) leaves bindings unset. The
-    // recipient is the provenance-explicit `EventPatient`; a card/token
-    // recipient ALSO mirrors into `that_object` so `EventObject` bodies keep
-    // reading it (regeneration/wither/infect-on-a-creature).
-    let (event_object, event_patient) =
-        that.map_or((None, None), |id| match state.objects.obj(id).source {
-            ObjectSource::Player(p) => (None, Some(EventPatient::Player(p))),
-            ObjectSource::Card(_) => {
-                let snapshot = LkiSnapshot::capture(state, id);
-                (Some(snapshot.clone()), Some(EventPatient::Object(snapshot)))
-            }
-        });
-    let mut frame = state.frame(source, controller);
-    state.frame_set_action_context(&mut frame, applied.clone(), false);
-    state.frame_set_event_bindings(&mut frame, event_object, None, event_patient);
-    // [CR#107.3]: the replaced intent's own magnitude reaches the body through
-    // the region's `EventAmount` parameter.
-    state.frame_set_event_extras(&mut frame, event_amount, Vec::new(), None);
-    frame.activation = state.enter_region(&sylex_core::Region::new(params, ()), &frame);
-    state.schedule_front(vec![crate::agenda::WorkItem::RunEffect {
-        effect: Arc::new(effect),
-        frame,
-    }]);
 }
 
 /// Remove a one-shot floating replacement instance from the shields list
@@ -1004,29 +953,34 @@ pub(crate) fn surface_choice(
     ));
 }
 
-/// Run an occurrence's members through the cant ([CR#614.17]) and replacement
-/// ([CR#616.1]) passes in member order, appending each surviving member's
-/// final event to `resolved`. No member applies here: the whole occurrence
-/// is replaced before any of it happens, then commits as one
-/// ([CR#603.2c]). Returns the final events, ready to commit, or `None` when
-/// a member needs a replacement choice — the occurrence is then suspended
+/// Run an occurrence through the cant ([CR#614.17]) and replacement
+/// ([CR#616.1]) passes: its own members in member order, then the modified
+/// events their replacements produce ([CR#614.6], [`join_body`]), each final
+/// event landing in `pass.replaced`. Nothing applies here: the whole
+/// occurrence is replaced before any of it happens, then commits as one
+/// ([CR#603.2c]). Returns the finished pass, ready to commit, or `None` when
+/// an event needs a replacement choice — the occurrence is then suspended
 /// whole ([`crate::state::ReplaceState`]) with the choice pending.
 ///
-/// A member whose current-only recipient departed after it was queued is
+/// An event whose current-only recipient departed after it was queued is
 /// dropped ([CR#608.2b]).
 pub(crate) fn replace_members(
     state: &mut GameState,
-    mut resolved: Vec<GameEvent>,
-    members: Vec<GameEvent>,
-    commit: crate::state::OccurrenceCommit,
-) -> Option<Vec<GameEvent>> {
-    let mut members = members.into_iter();
-    while let Some(e) = members.next() {
+    mut pass: OccurrencePass,
+) -> Option<OccurrencePass> {
+    loop {
+        let (e, lineage, joined) = if let Some(e) = pass.remaining.pop_front() {
+            (e, std::collections::HashSet::new(), false)
+        } else if let Some((e, lineage)) = pass.joining.pop_front() {
+            (e, lineage, true)
+        } else {
+            return Some(pass);
+        };
         if !state.event_current_recipient_is_live(&e) || cant_event(state, &e) {
             continue;
         }
-        match replace_event(state, e) {
-            ReplaceOutcome::Pass(final_event) => resolved.push(final_event),
+        match replace_event(state, e, lineage, &mut pass) {
+            ReplaceOutcome::Pass(final_event) => pass.replaced.push(final_event, joined),
             ReplaceOutcome::Nothing => {}
             ReplaceOutcome::Choose {
                 current,
@@ -1034,40 +988,38 @@ pub(crate) fn replace_members(
                 applicable,
             } => {
                 let suspended = crate::state::ReplaceState {
-                    resolved,
+                    pass,
                     current,
+                    current_joined: joined,
                     applied,
-                    remaining: members.collect(),
-                    commit,
                 };
                 surface_choice(state, suspended, &applicable);
                 return None;
             }
         }
     }
-    Some(resolved)
 }
 
 /// Resume a suspended replacement pass after its `ChooseReplacement`
 /// decision. Called from `submit_decision` with the chosen key and the
 /// suspended `ReplaceState`.
 ///
-/// Applies the chosen replacement to `rs.current`, finishes that member's
-/// replacement loop ([CR#616.1f]), and walks on through the tail. A choice
-/// anywhere in there suspends again, carrying every member forward; once the
-/// pass completes, the whole occurrence is scheduled to commit at the agenda
-/// front as one occurrence in member order.
+/// Applies the chosen replacement to `rs.current`, finishes that event's
+/// replacement loop ([CR#616.1f]), and walks on through the rest of the
+/// occurrence. A choice anywhere in there suspends again, carrying all of it
+/// forward; once the pass completes, the whole occurrence is scheduled to
+/// commit at the agenda front as one occurrence, ahead of the work that
+/// follows its commit.
 pub(crate) fn resume_replacements(
     state: &mut GameState,
     rs: crate::state::ReplaceState,
     chosen_key: ReplacementKey,
 ) {
     let crate::state::ReplaceState {
-        mut resolved,
+        mut pass,
         current,
+        current_joined,
         mut applied,
-        remaining,
-        commit,
     } = rs;
     // Find the chosen applicable from a fresh gather, filtered to the key the
     // player picked.
@@ -1076,11 +1028,11 @@ pub(crate) fn resume_replacements(
         .find(|a| a.key == chosen_key)
         .expect("chosen replacement key must still be applicable");
     applied.insert(chosen_key);
-    if let Some(modified) = apply_one(state, current, &chosen, &applied) {
+    if let Some(modified) = apply_one(state, current, &chosen, &applied, &mut pass) {
         // The modified event may be watched by further replacements
         // ([CR#616.1f]).
-        match replace_loop(state, modified, applied) {
-            ReplaceOutcome::Pass(final_event) => resolved.push(final_event),
+        match replace_loop(state, modified, applied, &mut pass) {
+            ReplaceOutcome::Pass(final_event) => pass.replaced.push(final_event, current_joined),
             ReplaceOutcome::Nothing => {}
             ReplaceOutcome::Choose {
                 current,
@@ -1088,22 +1040,26 @@ pub(crate) fn resume_replacements(
                 applicable,
             } => {
                 let suspended = crate::state::ReplaceState {
-                    resolved,
+                    pass,
                     current,
+                    current_joined,
                     applied,
-                    remaining,
-                    commit,
                 };
                 surface_choice(state, suspended, &applicable);
                 return;
             }
         }
     }
-    if let Some(events) = replace_members(state, resolved, remaining, commit) {
-        state.schedule_front(vec![crate::agenda::WorkItem::CommitReplaced {
-            events,
-            commit,
-        }]);
+    if let Some(OccurrencePass {
+        replaced,
+        after,
+        commit,
+        ..
+    }) = replace_members(state, pass)
+    {
+        let mut items = vec![crate::agenda::WorkItem::CommitReplaced { replaced, commit }];
+        items.extend(after);
+        state.schedule_front(items);
     }
 }
 
@@ -1769,7 +1725,12 @@ mod tests {
         let app = gather_applicable(&state, &e);
         assert_eq!(app.len(), 1, "prevention is applicable to the damage event");
 
-        let outcome = replace_event(&mut state, e);
+        let outcome = replace_event(
+            &mut state,
+            e,
+            std::collections::HashSet::new(),
+            &mut OccurrencePass::new(vec![], crate::state::OccurrenceCommit::Single),
+        );
         assert!(
             matches!(outcome, ReplaceOutcome::Nothing),
             "damage is fully prevented"
@@ -1802,7 +1763,12 @@ mod tests {
         let app = gather_applicable(&state, &e);
         assert_eq!(app.len(), 1, "prevention is applicable");
 
-        let outcome = replace_event(&mut state, e);
+        let outcome = replace_event(
+            &mut state,
+            e,
+            std::collections::HashSet::new(),
+            &mut OccurrencePass::new(vec![], crate::state::OccurrenceCommit::Single),
+        );
         if let ReplaceOutcome::Pass(GameEvent::DamageDealt(DamageDealt { amount, .. })) = outcome {
             assert_eq!(amount, 1, "3 damage is reduced by 2 to 1");
         } else {
@@ -1856,11 +1822,10 @@ mod tests {
     /// `Occurrence::Single`.
     fn suspended_single(current: GameEvent) -> crate::state::ReplaceState {
         crate::state::ReplaceState {
-            resolved: vec![],
+            pass: OccurrencePass::new(vec![], crate::state::OccurrenceCommit::Single),
             current,
+            current_joined: false,
             applied: std::collections::HashSet::new(),
-            remaining: vec![],
-            commit: crate::state::OccurrenceCommit::Single,
         }
     }
 

@@ -695,9 +695,10 @@ pub struct Act {
     /// `replace_event` loop starts pre-applied with — "a replacement
     /// effect doesn't invoke itself repeatedly; it gets only one
     /// opportunity to affect an event OR ANY MODIFIED EVENTS THAT MAY
-    /// REPLACE THAT EVENT." Populated by `schedule_body` (an `Instead`/
-    /// `Also` body that re-emits an event of the SAME shape its own
-    /// replacement watches must not be caught by it again) and by a
+    /// REPLACE THAT EVENT." Populated by a replacement body's frame
+    /// (`replace_registry::join_body`: an `Instead`/`Also` body that
+    /// re-emits an event of the SAME shape its own replacement watches must
+    /// not be caught by it again) and by a
     /// PASSED aggregate `Batch` window's apply (the aggregate's own
     /// inherited-plus-applied set rides into each of the n contained
     /// per-entity futures it schedules, so THEY aren't re-caught either

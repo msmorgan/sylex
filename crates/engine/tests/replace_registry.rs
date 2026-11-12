@@ -966,6 +966,67 @@ fn take_from_hand(
     (id, card)
 }
 
+/// Day of Judgment: "Destroy all creatures."
+fn day_of_judgment() -> Arc<Card> {
+    lowered(
+        "Normal(name: \"Day of Judgment\", mana_cost: [Generic(2), White, White], \
+         types: [Sorcery], abilities: [\
+             Spell(effect: Each(binder: Existing(SelectAll(Type(Creature))), effect: Destroy(It))),\
+         ])",
+    )
+}
+
+/// Put the spell `name` from `caster`'s hand on the stack and queue its
+/// resolution, as if it was cast and every player passed.
+fn put_on_stack_to_resolve(state: &mut GameState, caster: PlayerId, name: &str) {
+    let (spell, _) = take_from_hand(state, caster, name, Zone::Stack);
+    state.stack.push(sylex_engine::StackEntry {
+        id: spell,
+        activation: sylex_engine::ActivationId::NONE,
+        object: sylex_engine::StackObject::Spell(spell),
+        controller: caster,
+        targets: Vec::new(),
+        chosen_modes: Arc::from([]),
+        x: None,
+        paid_costs: Vec::new(),
+        copy: false,
+    });
+    state.agenda.push_front(WorkItem::Resolve(spell));
+}
+
+/// Step until the agenda drains, failing on any decision or game end, and
+/// return every occurrence applied on the way, in order.
+fn drive_recording_occurrences(state: &mut GameState) -> Vec<sylex_engine::Occurrence> {
+    let mut occurred = Vec::new();
+    for _ in 0..200 {
+        match state.step() {
+            StepOutcome::Progress(sylex_engine::Progress::Applied(occurrence)) => {
+                occurred.push(occurrence);
+            }
+            StepOutcome::Progress(_) => {}
+            other => panic!("expected no decision, got {other:?}"),
+        }
+        if state.agenda.is_empty() {
+            return occurred;
+        }
+    }
+    panic!("the agenda did not drain");
+}
+
+/// Step until the agenda drains, failing on any decision or game end.
+fn drive_without_decisions(state: &mut GameState) {
+    for _ in 0..200 {
+        match state.step() {
+            StepOutcome::Progress(_) => {}
+            other => panic!("expected no decision, got {other:?}"),
+        }
+        if state.agenda.is_empty() {
+            return;
+        }
+    }
+    panic!("the agenda did not drain");
+}
+
 fn shield_board() -> ShieldBoard {
     let creature = |name: &str, power: i32, toughness: i32| {
         Arc::new(Card::Normal(CardFace::from(Characteristics {
@@ -987,12 +1048,7 @@ fn shield_board() -> ShieldBoard {
                  effect: ChangeLife(You, Up(1))),\
          ])",
     );
-    let day_of_judgment = lowered(
-        "Normal(name: \"Day of Judgment\", mana_cost: [Generic(2), White, White], \
-         types: [Sorcery], abilities: [\
-             Spell(effect: Each(binder: Existing(SelectAll(Type(Creature))), effect: Destroy(It))),\
-         ])",
-    );
+    let day_of_judgment = day_of_judgment();
     let mut state = GameState::new(GameConfig {
         players: vec![
             PlayerConfig {
@@ -1129,19 +1185,7 @@ fn triggers_of(state: &GameState, watcher: ObjectId) -> usize {
 fn destroy_all_over_two_double_shielded_creatures_stays_one_event() {
     let mut board = shield_board();
     let state = &mut board.state;
-    let (spell, _) = take_from_hand(state, PlayerId(0), "Day of Judgment", Zone::Stack);
-    state.stack.push(sylex_engine::StackEntry {
-        id: spell,
-        activation: sylex_engine::ActivationId::NONE,
-        object: sylex_engine::StackObject::Spell(spell),
-        controller: PlayerId(0),
-        targets: Vec::new(),
-        chosen_modes: Arc::from([]),
-        x: None,
-        paid_costs: Vec::new(),
-        copy: false,
-    });
-    state.agenda.push_front(WorkItem::Resolve(spell));
+    put_on_stack_to_resolve(state, PlayerId(0), "Day of Judgment");
 
     let mut choosers = Vec::new();
     for _ in 0..200 {
@@ -1173,12 +1217,419 @@ fn destroy_all_over_two_double_shielded_creatures_stays_one_event() {
     );
 }
 
+/// Day of Judgment resolves over two Grizzly Bears, one per player, while
+/// Rest in Peace ("If a card or token would be put into a graveyard from
+/// anywhere, exile it instead.") is out. Each destruction is replaced by its
+/// exile [CR#614.6], and the exiles happen as the one event the destroy-all
+/// was [CR#603.2c], so a watcher derived from Ketramose, the New Dawn
+/// ("Whenever one or more cards are put into exile from graveyards and/or the
+/// battlefield during your turn, ...", narrowed to the battlefield and to a
+/// life loss) triggers once.
+#[test]
+fn destroy_all_exiled_instead_is_one_exile_event() {
+    let rest_in_peace = lowered(
+        "Normal(name: \"Rest in Peace\", mana_cost: [Generic(1), White], \
+         types: [Enchantment], abilities: [\
+             Static(Replacement(Instead(\
+                 would: ZoneChange(what: Any, to: Graveyard), \
+                 instead: Exile(EventObject)))),\
+         ])",
+    );
+    let ketramose = lowered(
+        "Normal(name: \"Ketramose, the New Dawn\", types: [Enchantment], abilities: [\
+             Triggered(\
+                 event: OneOrMore(ZoneChange(what: Any, from: Battlefield, to: Exile)), \
+                 effect: ChangeLife(You, Down(1))),\
+         ])",
+    );
+    let bears = Arc::new(Card::Normal(CardFace::from(Characteristics {
+        name: "Grizzly Bears".into(),
+        types: vec![Type::Creature.def()],
+        power: Some(StatValue::Number(2)),
+        toughness: Some(StatValue::Number(2)),
+        ..Characteristics::default()
+    })));
+    let mut state = GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig {
+                deck: vec![
+                    Arc::clone(&bears),
+                    rest_in_peace,
+                    ketramose,
+                    day_of_judgment(),
+                ],
+            },
+            PlayerConfig { deck: vec![bears] },
+        ],
+        seed: 7,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    });
+    let bears = [PlayerId(0), PlayerId(1)]
+        .map(|owner| take_from_hand(&mut state, owner, "Grizzly Bears", Zone::Battlefield).1);
+    take_from_hand(&mut state, PlayerId(0), "Rest in Peace", Zone::Battlefield);
+    let (watcher, _) = take_from_hand(
+        &mut state,
+        PlayerId(0),
+        "Ketramose, the New Dawn",
+        Zone::Battlefield,
+    );
+    state.agenda.clear();
+    state.pending = None;
+
+    put_on_stack_to_resolve(&mut state, PlayerId(0), "Day of Judgment");
+    drive_without_decisions(&mut state);
+
+    for card in bears {
+        assert!(
+            find_in_exile(&state, card).is_some(),
+            "each bears was exiled instead of put into a graveyard [CR#614.6]"
+        );
+    }
+    assert_eq!(
+        triggers_of(&state, watcher),
+        1,
+        "\"whenever one or more cards are put into exile\" sees one event [CR#603.2c]"
+    );
+}
+
+/// Akroma's Vengeance ("Destroy all artifacts, creatures, and enchantments.")
+/// resolves over, in member order, Glorious Anthem ("Creatures you control get
+/// +1/+1"), a Grizzly Bears and Rest in Peace. Rest in Peace exiles each of
+/// them instead [CR#614.6], so every member's move comes from a replacement
+/// body, the Anthem's ahead of the bears'. The exiles are still the one event
+/// the destruction was, and the bears left as they last existed immediately
+/// before it [CR#603.10]: a 3/3, with the Anthem's bonus.
+#[test]
+fn a_replaced_member_leaves_as_the_whole_event_found_it() {
+    let canon = Plugin::load_with_sibling_prelude(
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
+    )
+    .unwrap();
+    let anthem = Arc::new(canon.card("Glorious Anthem").unwrap().core);
+    let bears = Arc::new(canon.card("Grizzly Bears").unwrap().core);
+    let rest_in_peace = lowered(
+        "Normal(name: \"Rest in Peace\", mana_cost: [Generic(1), White], \
+         types: [Enchantment], abilities: [\
+             Static(Replacement(Instead(\
+                 would: ZoneChange(what: Any, to: Graveyard), \
+                 instead: Exile(EventObject)))),\
+         ])",
+    );
+    let vengeance = lowered(
+        "Normal(name: \"Akroma's Vengeance\", mana_cost: [Generic(4), White, White], \
+         types: [Sorcery], abilities: [\
+             Spell(effect: Each(\
+                 binder: Existing(SelectAll(Or([Type(Artifact), Type(Creature), Type(Enchantment)]))), \
+                 effect: Destroy(It))),\
+         ])",
+    );
+    let mut state = GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig {
+                deck: vec![anthem, bears, rest_in_peace, vengeance],
+            },
+            PlayerConfig { deck: vec![] },
+        ],
+        seed: 7,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    });
+    // Battlefield order is member order.
+    take_from_hand(
+        &mut state,
+        PlayerId(0),
+        "Glorious Anthem",
+        Zone::Battlefield,
+    );
+    let (bears, card) = take_from_hand(&mut state, PlayerId(0), "Grizzly Bears", Zone::Battlefield);
+    take_from_hand(&mut state, PlayerId(0), "Rest in Peace", Zone::Battlefield);
+    state.agenda.clear();
+    state.pending = None;
+
+    put_on_stack_to_resolve(&mut state, PlayerId(0), "Akroma's Vengeance");
+    let occurred = drive_recording_occurrences(&mut state);
+    assert!(
+        find_in_exile(&state, card).is_some(),
+        "the bears was exiled instead [CR#614.6]"
+    );
+    let exiled = occurred
+        .iter()
+        .flat_map(|occurrence| match occurrence {
+            sylex_engine::Occurrence::Single(e) => std::slice::from_ref(e),
+            sylex_engine::Occurrence::Batch(es) => es.as_slice(),
+        })
+        .find_map(|e| match e {
+            sylex_engine::GameEvent::ZoneChange(sylex_engine::ZoneChange {
+                object,
+                snapshot: Some(snapshot),
+                ..
+            }) if *object == bears => Some(snapshot),
+            _ => None,
+        })
+        .expect("the bears left the battlefield");
+    assert_eq!(
+        exiled.characteristics.as_ref().and_then(|c| c.power),
+        Some(3),
+        "the bears last existed under the Anthem [CR#603.10]"
+    );
+}
+
+/// Day of Judgment resolves over two of player 1's Grizzly Bears while player
+/// 0 controls The Darkness Crystal ("If a nontoken creature an opponent
+/// controls would die, instead exile it and you gain 2 life.", its creature
+/// filter without "nontoken") and the Ketramose-derived watcher of
+/// [`destroy_all_exiled_instead_is_one_exile_event`]. The exiles happen
+/// together, as the destroy-all's one event [CR#603.2c,614.6]. Each life
+/// gain follows its exile in the body, so it waits for the event: neither
+/// gain is in the exiles' occurrence, and both come after it.
+#[test]
+fn a_body_part_after_a_move_follows_the_event() {
+    let crystal = lowered(
+        "Normal(name: \"The Darkness Crystal\", mana_cost: [Generic(2), Black, Black], \
+         types: [Artifact], abilities: [\
+             Static(Replacement(Instead(\
+                 would: Dies(And([Creature, ControlledBy(OpponentOf(Ref(You)))])), \
+                 instead: Exile(EventObject)))),\
+         ])",
+    );
+    // "... and you gain 2 life": the region's controller parameter
+    // (`event_region_params`) gains it, after the exile.
+    let crystal = {
+        let Card::Normal(mut face) = Arc::unwrap_or_clone(crystal) else {
+            unreachable!("The Darkness Crystal is a normal card")
+        };
+        let [Ability::Static(region)] = face.characteristics.abilities.as_mut_slice() else {
+            panic!("the fixture has one static ability")
+        };
+        let StaticSpec::Replacement(replacement) = &mut Arc::make_mut(region).body else {
+            panic!("the static ability is a replacement")
+        };
+        let Replacement::Instead { instead, .. } = Arc::make_mut(replacement) else {
+            panic!("the replacement is an instead")
+        };
+        *instead = Instruction::Sequentially(
+            vec![
+                instead.clone(),
+                Instruction::act(Action::ChangeLife(
+                    Reference::Reg(sylex_core::RefId(1)),
+                    LifeOp::Up(sylex_core::Count::Literal(2)),
+                )),
+            ]
+            .into(),
+        );
+        Arc::new(Card::Normal(face))
+    };
+    let ketramose = lowered(
+        "Normal(name: \"Ketramose, the New Dawn\", types: [Enchantment], abilities: [\
+             Triggered(\
+                 event: OneOrMore(ZoneChange(what: Any, from: Battlefield, to: Exile)), \
+                 effect: ChangeLife(You, Down(1))),\
+         ])",
+    );
+    let bears = Arc::new(Card::Normal(CardFace::from(Characteristics {
+        name: "Grizzly Bears".into(),
+        types: vec![Type::Creature.def()],
+        power: Some(StatValue::Number(2)),
+        toughness: Some(StatValue::Number(2)),
+        ..Characteristics::default()
+    })));
+    let mut state = GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig {
+                deck: vec![crystal, ketramose, day_of_judgment()],
+            },
+            PlayerConfig {
+                deck: vec![Arc::clone(&bears), bears],
+            },
+        ],
+        seed: 7,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    });
+    let bears = [(); 2]
+        .map(|()| take_from_hand(&mut state, PlayerId(1), "Grizzly Bears", Zone::Battlefield).1);
+    take_from_hand(
+        &mut state,
+        PlayerId(0),
+        "The Darkness Crystal",
+        Zone::Battlefield,
+    );
+    let (watcher, _) = take_from_hand(
+        &mut state,
+        PlayerId(0),
+        "Ketramose, the New Dawn",
+        Zone::Battlefield,
+    );
+    state.agenda.clear();
+    state.pending = None;
+
+    put_on_stack_to_resolve(&mut state, PlayerId(0), "Day of Judgment");
+    let occurred = drive_recording_occurrences(&mut state);
+
+    for card in bears {
+        assert!(
+            find_in_exile(&state, card).is_some(),
+            "each bears was exiled instead [CR#614.6]"
+        );
+    }
+    let events = |occurrence: &sylex_engine::Occurrence| match occurrence {
+        sylex_engine::Occurrence::Single(e) => vec![e.clone()],
+        sylex_engine::Occurrence::Batch(es) => es.clone(),
+    };
+    let exiles = |e: &sylex_engine::GameEvent| {
+        matches!(
+            e,
+            sylex_engine::GameEvent::ZoneChange(sylex_engine::ZoneChange {
+                snapshot: None,
+                from: Some(Zone::Battlefield),
+                to: Zone::Exile,
+                ..
+            })
+        )
+    };
+    let gains = |e: &sylex_engine::GameEvent| matches!(e, sylex_engine::GameEvent::LifeGained(_));
+    let exiled_in = occurred
+        .iter()
+        .position(|o| events(o).iter().filter(|e| exiles(e)).count() == 2)
+        .expect("both exiles are in one occurrence [CR#603.2c,614.6]");
+    let gained_in: Vec<usize> = occurred
+        .iter()
+        .enumerate()
+        .flat_map(|(i, o)| events(o).into_iter().filter(gains).map(move |_| i))
+        .collect();
+    assert_eq!(gained_in.len(), 2, "one life gain for each exile");
+    assert!(
+        gained_in.iter().all(|&i| i > exiled_in),
+        "each life gain comes after the exiles' occurrence: exiles at {exiled_in}, gains at \
+         {gained_in:?}"
+    );
+    assert_eq!(state.players[0].life, 24, "2 life for each exile");
+    assert_eq!(
+        triggers_of(&state, watcher),
+        1,
+        "\"whenever one or more cards are put into exile\" sees one event [CR#603.2c]"
+    );
+}
+
+/// Day of Judgment resolves over two of player 0's Drudge Skeletons, each
+/// holding one regeneration shield. Each destruction is replaced by its
+/// regeneration, which taps the creature [CR#701.19a,614.6], and both taps
+/// happen as the one event the destroy-all was [CR#603.2c], so a watcher
+/// derived from Deeproot Pilgrimage ("Whenever one or more nontoken Merfolk
+/// you control become tapped, ...", widened to creatures and given a life
+/// gain) triggers once.
+#[test]
+fn destroy_all_regenerated_twice_is_one_tap_event() {
+    let skeleton = Arc::new(Card::Normal(CardFace::from(Characteristics {
+        name: "Drudge Skeletons".into(),
+        types: vec![Type::Creature.def()],
+        power: Some(StatValue::Number(1)),
+        toughness: Some(StatValue::Number(1)),
+        ..Characteristics::default()
+    })));
+    let pilgrimage = lowered(
+        "Normal(name: \"Deeproot Pilgrimage\", mana_cost: [Generic(1), Blue], \
+         types: [Enchantment], abilities: [\
+             Triggered(\
+                 event: OneOrMore(BecomesTapped(And([Type(Creature), ControlledBy(Ref(You))]))), \
+                 effect: ChangeLife(You, Up(1))),\
+         ])",
+    );
+    let mut state = GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig {
+                deck: vec![
+                    Arc::clone(&skeleton),
+                    skeleton,
+                    pilgrimage,
+                    day_of_judgment(),
+                ],
+            },
+            PlayerConfig { deck: vec![] },
+        ],
+        seed: 7,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    });
+    let skeletons = [(); 2].map(|()| {
+        take_from_hand(
+            &mut state,
+            PlayerId(0),
+            "Drudge Skeletons",
+            Zone::Battlefield,
+        )
+    });
+    let (watcher, _) = take_from_hand(
+        &mut state,
+        PlayerId(0),
+        "Deeproot Pilgrimage",
+        Zone::Battlefield,
+    );
+    // "{B}: Regenerate this creature.", activated once for each skeleton.
+    for (skeleton, _) in skeletons {
+        resolve_region_and_drive(
+            &mut state,
+            regenerate_effect(Reference::Reg(sylex_core::RefId(0))),
+            skeleton,
+        );
+    }
+    assert_eq!(state.shields.len(), 2, "one shield on each skeleton");
+    state.agenda.clear();
+    state.pending = None;
+
+    put_on_stack_to_resolve(&mut state, PlayerId(0), "Day of Judgment");
+    drive_without_decisions(&mut state);
+
+    for (skeleton, card) in skeletons {
+        let live = find_on_battlefield(&state, card);
+        assert!(
+            state.objects.obj(live).tapped,
+            "{skeleton:?} regenerated: tapped [CR#701.19a]"
+        );
+    }
+    assert!(
+        state.shields.is_empty(),
+        "both shields were spent [CR#614.3]"
+    );
+    assert_eq!(
+        triggers_of(&state, watcher),
+        1,
+        "\"whenever one or more creatures you control become tapped\" sees one event [CR#603.2c]"
+    );
+}
+
 /// The same board destroyed by state-based actions: one check finds lethal
 /// damage on all four creatures and destroys them as one event [CR#704.3].
 /// Both shield choices surface, the batch commits as one occurrence of the
-/// bears' two destructions [CR#603.2c], and because it performed something
-/// the check runs again: after both regenerations and the bears' moves have
-/// settled, and before the work that was queued behind the batch.
+/// bears' two destructions and the regenerations that replaced the
+/// skeletons' [CR#603.2c,614.6], and because it performed something the
+/// check runs again: after the bears' moves have settled, and before the work
+/// that was queued behind the batch.
 #[test]
 fn suspended_state_based_batch_commits_once_then_checks_again() {
     let mut board = shield_board();
@@ -1240,13 +1691,21 @@ fn suspended_state_based_batch_commits_once_then_checks_again() {
     // [CR#704.3]: the batch performed something, so the check repeated, and
     // found nothing more.
     assert_eq!(checks, [4, 0], "one sweep of four, then one clean re-check");
-    let [sylex_engine::Occurrence::Batch(destroyed)] = commits.as_slice() else {
+    let [sylex_engine::Occurrence::Batch(committed)] = commits.as_slice() else {
         panic!("the batch commits once, as one occurrence: {commits:?}");
     };
+    let count =
+        |kind: fn(&sylex_engine::GameEvent) -> bool| committed.iter().filter(|e| kind(e)).count();
     assert_eq!(
-        destroyed.len(),
-        2,
-        "the two bears' destructions commit together [CR#603.2c]"
+        (
+            count(|e| matches!(e, sylex_engine::GameEvent::Act(_))),
+            count(|e| matches!(e, sylex_engine::GameEvent::DamageRemoved(_))),
+            count(|e| matches!(e, sylex_engine::GameEvent::Tapped(_))),
+            committed.len(),
+        ),
+        (2, 2, 2, 6),
+        "the bears' two destructions and the skeletons' two regenerations, each \
+         removing damage and tapping, commit together [CR#603.2c,614.6]: {committed:?}"
     );
     assert_skeletons_regenerated_and_bears_died(state, &board.skeletons, &board.bears);
     assert_eq!(
