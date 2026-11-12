@@ -1,7 +1,6 @@
 //! The judgment set: hand-written linguistic judgments, one line per entry
 //! (`judgments/README.md`), and their evaluation against a bound grammar.
 
-use std::collections::BTreeMap;
 use std::fmt;
 use std::path::Path;
 
@@ -14,8 +13,7 @@ use sylex_syntax::Constituent;
 use sylex_syntax::Gap;
 use sylex_syntax::Parse;
 use sylex_syntax::Reading;
-
-use crate::corpus::Face;
+use sylex_vocabulary::card_name_id;
 
 /// More Readings than this and an entry is not evaluated tree by tree.
 pub const READING_LIMIT: u128 = 4096;
@@ -343,47 +341,35 @@ fn parse_assertion(text: &str) -> Result<Assertion, String> {
     Ok(assertion)
 }
 
-/// The scope a `<card=NAME>` entry is read with: the card names in the scope
-/// the census gives every face so named ([`Face::scope`]).
-///
-/// Faces of several cards can share a name (a prepared spell's face and the
-/// card it reprints, *Lightning Bolt*; the three *Peer Review* faces). Their
-/// scopes differ only in their cards' names, and the entry's text is read with
-/// the names all of them have, so it holds whichever face it is. A name no
-/// supported face has is an error naming the entry.
-#[derive(Debug, Clone, Default)]
-pub struct CardScopes {
-    faces: BTreeMap<String, CardScope>,
+/// Whether `name` is a card name of `lexicon`: the name a text may be read
+/// as if on a card of.
+#[must_use]
+pub fn is_card_name(lexicon: &Lexicon, name: &str) -> bool {
+    lexicon
+        .lexemes()
+        .get(&card_name_id(name))
+        .is_some_and(|lexeme| lexeme.card_name)
 }
 
-impl CardScopes {
-    #[must_use]
-    pub fn new<'a>(faces: impl IntoIterator<Item = &'a Face>) -> Self {
-        let mut scopes = Self::default();
-        for face in faces {
-            scopes
-                .faces
-                .entry(face.name.clone())
-                .and_modify(|scope| scope.retain_common(&face.scope))
-                .or_insert_with(|| face.scope.clone());
-        }
-        scopes
-    }
-
-    /// The card names `entry` puts in scope.
+impl Judgment {
+    /// The Card Scope the entry's text is read in: the own name of the card
+    /// it states with `<card=NAME>` ([`crate::corpus::own_names`]), or the
+    /// empty scope. The name is an input like the text; no card is looked up.
     ///
     /// # Errors
-    /// A `<card=NAME>` that names no face of the supported corpus.
-    pub fn scope(&self, entry: &Judgment) -> Result<CardScope, String> {
-        let Some(name) = &entry.card else {
+    /// A stated name that is no card name of `lexicon`, naming the entry.
+    pub fn scope(&self, lexicon: &Lexicon) -> Result<CardScope, String> {
+        let Some(name) = &self.card else {
             return Ok(CardScope::default());
         };
-        self.faces.get(name).cloned().ok_or_else(|| {
-            format!(
-                "{}: `<card={name}>` names no face of the supported corpus",
-                entry.location
-            )
-        })
+        if is_card_name(lexicon, name) {
+            Ok(crate::corpus::own_names(name))
+        } else {
+            Err(format!(
+                "{}: `<card={name}>` states a name that is no card name of the lexicon",
+                self.location
+            ))
+        }
     }
 }
 
@@ -452,18 +438,17 @@ pub struct Located {
 pub struct Judge<'g> {
     pub grammar: &'g CompiledGrammar,
     pub lexicon: &'g Lexicon,
-    /// The scopes `<card=NAME>` entries are read with.
-    pub scopes: &'g CardScopes,
 }
 
 impl Judge<'_> {
-    /// Parses an entry's text as it asks, with its card's names in scope.
+    /// Parses an entry's text as it asks, with the name of the card it states
+    /// in scope.
     ///
     /// # Errors
-    /// The entry's [`CardScopes::scope`] error, or a Category the grammar
+    /// The entry's [`Judgment::scope`] error, or a Category the grammar
     /// lacks.
     pub fn parse(&self, entry: &Judgment) -> Result<Parse<'_>, String> {
-        self.parse_scoped(entry, &self.scopes.scope(entry)?)
+        self.parse_scoped(entry, &entry.scope(self.lexicon)?)
     }
 
     /// Parses an entry's text as it asks, with `scope` in scope.
@@ -489,7 +474,7 @@ impl Judge<'_> {
     /// Reading.
     #[must_use]
     pub fn evaluate(&self, entry: &Judgment) -> Outcome {
-        match self.scopes.scope(entry) {
+        match entry.scope(self.lexicon) {
             Ok(scope) => self.evaluate_scoped(entry, &scope),
             Err(why) => Outcome::Fails(why),
         }
@@ -703,55 +688,4 @@ fn has_antecedent(reading: &Located, index: usize, antecedent: &str) -> bool {
 /// Whether a Constituent bearing `function` (none at the root) bears `name`.
 fn bears(function: Option<Ident>, name: &str) -> bool {
     function.is_some_and(|f| f == name)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use sylex_vocabulary::card_name_id;
-
-    fn face(name: &str, card: &str) -> Face {
-        Face {
-            identity: format!("{card}#{name}"),
-            name: name.to_owned(),
-            card: card.to_owned(),
-            scope: CardScope::own_names([card_name_id(name), card_name_id(card)]),
-            type_line: None,
-            oracle_text: None,
-        }
-    }
-
-    fn entry(card: &str) -> Judgment {
-        parse_file("test", &format!("+ <card={card}> Draw a card.")).unwrap()[0].clone()
-    }
-
-    #[test]
-    fn a_shared_face_name_has_the_names_every_face_so_named_has() {
-        let faces = [
-            face("Lightning Bolt", "Lightning Bolt"),
-            face("Lightning Bolt", "Emeritus of Conflict // Lightning Bolt"),
-            face(
-                "Emeritus of Conflict",
-                "Emeritus of Conflict // Lightning Bolt",
-            ),
-        ];
-        let scopes = CardScopes::new(&faces);
-        assert_eq!(
-            scopes.scope(&entry("Lightning Bolt")),
-            Ok(CardScope::own_names([card_name_id("Lightning Bolt")]))
-        );
-        assert_eq!(
-            scopes.scope(&entry("Emeritus of Conflict")),
-            Ok(faces[2].scope.clone())
-        );
-    }
-
-    #[test]
-    fn a_card_no_face_has_is_an_error_naming_the_entry() {
-        let scopes = CardScopes::new(&[face("Lightning Bolt", "Lightning Bolt")]);
-        assert_eq!(
-            scopes.scope(&entry("Lightning Blot")),
-            Err("test:1: `<card=Lightning Blot>` names no face of the supported corpus".to_owned())
-        );
-    }
 }

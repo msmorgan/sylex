@@ -141,7 +141,7 @@ term are a second tree of its analysis ([English](english.md) §8).
 ## 6. Names and notation
 
 **Names are scoped.** A card's own name, full or Shortened, is its own only in
-the text of its own face [CR#201.5,201.5c,712.6c..712.6e], and everywhere in
+the text of its own face [CR#201.5,201.5c,712.6], and everywhere in
 that text. A face's Card Scope is its own name and nothing else: it is computed
 from the name alone, so a text parsed as if its card had a given name needs
 nothing but that name. The name of a meld result is the name of neither card of

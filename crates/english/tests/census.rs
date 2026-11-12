@@ -20,7 +20,6 @@ fn face(identity: &str, text: &str) -> Face {
         identity: identity.to_owned(),
         name: identity.to_owned(),
         card: identity.to_owned(),
-        scope: sylex_lexicon::CardScope::default(),
         type_line: Some("Sorcery".to_owned()),
         oracle_text: Some(text.to_owned()),
     }

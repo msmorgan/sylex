@@ -403,7 +403,7 @@ fn selected_face(
         face_index: unit.face_index(),
         name: unit.display_name().to_owned(),
         card_names: card_names.clone(),
-        scope: sylex_english::corpus::own_names(&unit),
+        scope: sylex_english::corpus::own_names(unit.display_name()),
         face_name: unit.face_index().map(|_| unit.display_name().to_owned()),
         side: unit.face_index().map(face_side),
         layout: unit.layout().to_owned(),

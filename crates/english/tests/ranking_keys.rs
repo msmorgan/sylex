@@ -1,8 +1,6 @@
 //! The Ranking Key extracted from the Packed Forest equals the key computed
 //! from each Reading's tree, over the judgment set.
 
-use sylex_english::corpus::Corpus;
-use sylex_english::judgment::CardScopes;
 use sylex_english::judgment::Judge;
 use sylex_vocabulary::LexicalEnvironment;
 
@@ -10,12 +8,9 @@ use sylex_vocabulary::LexicalEnvironment;
 fn forest_keys_equal_tree_keys_over_the_judgment_set() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let corpus = Corpus::load(|_| true).unwrap();
-    let scopes = CardScopes::new(&corpus.faces);
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
-        scopes: &scopes,
     };
     let files = sylex_english::judgment::load_dir(&sylex_english::judgments_dir()).unwrap();
     let mut checked = 0;
@@ -53,7 +48,6 @@ fn a_distributive_adjunct_attaches_to_the_outermost_predicate() {
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
-        scopes: &CardScopes::default(),
     };
     let entry = &sylex_english::judgment::parse_file(
         "test",
@@ -98,10 +92,7 @@ fn after_named_a_face_s_own_name_ties_with_another_card_s_spelled_alike() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Ravager");
-    let scope = sylex_lexicon::CardScope::own_names([
-        own,
-        sylex_vocabulary::card_name_id("Nicol Bolas, the Ravager // Nicol Bolas, the Arisen"),
-    ]);
+    let scope = sylex_lexicon::CardScope::own_names([own]);
     let text = "Search your library for a card named Nicol Bolas.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();

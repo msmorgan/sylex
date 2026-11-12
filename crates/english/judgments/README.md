@@ -35,12 +35,12 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
   [What a negative entry may claim](#what-a-negative-entry-may-claim)).
   The text is parsed as the grammar's root unless the mark names a Category,
   as in `+NounPhrase` or `*PrepositionPhrase`.
-- **Card.** `<card=Seedborn Muse>` reads the text with the scope the census
-  gives the face so named (`Face::scope`, its `corpus::own_names`), for a
-  self-reference by its full or Shortened Name ([CR#201.5,201.5c]). Where
-  faces of several cards share the name (*Lightning Bolt* and a prepared
-  spell's face), it is the names all of their scopes have. A name no
-  supported face has is an error (`judgment::CardScopes`).
+- **Card.** `<card=Seedborn Muse>` reads the text as if it were on the card so
+  named: with that card's own name in scope (`Judgment::scope`,
+  `corpus::own_names`), for a self-reference by its full or Shortened Name
+  ([CR#201.5,201.5c]). The name is an input like the text, and no card is
+  looked up. A name that is no card name of the lexicon is an error naming
+  the entry.
 - **Text.** The exact expression, with its final punctuation; it runs to the
   end of the line or to `=>`.
 - **Assertions** follow `=>`, separated by `;`. `||` separates alternative
@@ -167,10 +167,13 @@ Each was settled while adjudicating the migrated judgments.
 - A card's own name, full or Shortened, is its own only on that card:
   `<card=...>` is needed for any self-reference by name. Without it a card
   name is another card's, which stands only after *named* (`NameComplement
-  "Relentless Rats"`) or *Partner with* ([CR#702.124j]).
+  "Relentless Rats"`), *Partner with* ([CR#702.124j]), *from among* or *meld
+  ... into*: a meld result's name is another card's on every card, its meld
+  pair's included.
 - `*` holds when the text has no Reading for any reason, an undeclared word
   included: an off-card Shortened Name is a free negative, and so is another
-  card's name outside *named*.
+  card's name outside *named*, *Partner with*, *from among* and *meld ...
+  into*.
 
 ## Examples
 

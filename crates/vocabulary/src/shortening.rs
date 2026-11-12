@@ -11,7 +11,6 @@ use sylex_core::TypeDef;
 use sylex_lexicon::Numeral;
 use sylex_lexicon::NumeralCodec;
 use sylex_upstream::scryfall::OracleCard;
-use sylex_upstream::scryfall::OracleCardReadError;
 use sylex_upstream::scryfall::oracle_cards;
 
 use crate::SourceError;
@@ -27,15 +26,13 @@ impl AttestedShortenings {
     /// Computes every face's attested shortening from the Oracle corpus.
     ///
     /// # Errors
-    /// A corpus record that fails `OracleCardReader` validation, or a
-    /// supported legendary face with no type line.
-    pub fn from_corpus(
-        cards: impl IntoIterator<Item = Result<OracleCard, OracleCardReadError>>,
+    /// A supported legendary face with no type line.
+    pub fn from_corpus<'a>(
+        cards: impl IntoIterator<Item = &'a OracleCard>,
     ) -> Result<Self, SourceError> {
         let mut titles = BTreeSet::new();
         let mut faces: Vec<(String, String, String)> = Vec::new();
         for card in cards {
-            let card = card.map_err(|error| SourceError::Invalid(error.to_string()))?;
             for unit in card.oracle_units() {
                 titles.insert(unit.display_name().to_owned());
                 if card.supported() {
@@ -329,7 +326,6 @@ mod tests {
         let mut titles = BTreeSet::new();
         let mut observed = BTreeMap::new();
         for card in oracle_cards().unwrap() {
-            let card = card.unwrap();
             for unit in card.oracle_units() {
                 let name = unit.display_name();
                 titles.insert(name.to_owned());

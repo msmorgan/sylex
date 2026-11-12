@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::io;
 use std::io::BufRead;
+use std::sync::OnceLock;
 
 use serde::Deserialize;
 use serde::Serialize;
@@ -633,21 +634,42 @@ impl<R: BufRead> Iterator for OracleCardReader<R> {
     }
 }
 
-/// Opens the pinned decompressed Oracle Cards snapshot.
+/// Why the pinned Oracle Cards snapshot could not be read.
+#[derive(Debug, Error)]
+pub enum OracleSnapshotError {
+    #[error(transparent)]
+    Data(#[from] crate::DataError),
+    #[error(transparent)]
+    Read(#[from] OracleCardReadError),
+}
+
+/// Every record of the pinned decompressed Oracle Cards snapshot at
+/// `data/scryfall/oracle-cards.jsonl`, in file order.
+///
+/// The snapshot is read once per process: the first call reads and decodes
+/// it, and every later call returns the same records, or the same error. A
+/// change to the file while the process runs is not seen.
 ///
 /// # Errors
 ///
-/// Returns an error when `data/scryfall/oracle-cards.jsonl` cannot be opened.
-pub fn oracle_cards() -> Result<OracleCardReader<io::BufReader<std::fs::File>>, crate::DataError> {
-    let path = DataRoot::workspace_default()
-        .0
-        .join("scryfall/oracle-cards.jsonl");
-    let file = std::fs::File::open(&path).map_err(|source| crate::DataError::Io {
-        operation: "opening",
-        path,
-        source,
-    })?;
-    Ok(OracleCardReader::new(io::BufReader::new(file)))
+/// The snapshot cannot be opened, or a record fails [`OracleCardReader`]
+/// validation.
+pub fn oracle_cards() -> Result<&'static [OracleCard], &'static OracleSnapshotError> {
+    static CARDS: OnceLock<Result<Vec<OracleCard>, OracleSnapshotError>> = OnceLock::new();
+    CARDS
+        .get_or_init(|| {
+            let path = DataRoot::workspace_default()
+                .0
+                .join("scryfall/oracle-cards.jsonl");
+            let file = std::fs::File::open(&path).map_err(|source| crate::DataError::Io {
+                operation: "opening",
+                path,
+                source,
+            })?;
+            Ok(OracleCardReader::new(io::BufReader::new(file)).collect::<Result<_, _>>()?)
+        })
+        .as_ref()
+        .map(Vec::as_slice)
 }
 
 #[cfg(test)]

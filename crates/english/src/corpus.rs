@@ -17,11 +17,9 @@ use std::collections::BTreeSet;
 use std::io::BufRead;
 
 use sylex_lexicon::CardScope;
-use sylex_lexicon::NameForm;
 use sylex_upstream::oracle_text::strip_reminder_text;
+use sylex_upstream::scryfall::OracleCard;
 use sylex_upstream::scryfall::OracleCardReader;
-use sylex_upstream::scryfall::OracleUnit;
-use sylex_upstream::scryfall::RelatedComponent;
 use sylex_vocabulary::card_name_id;
 
 /// One Card Face record of the supported corpus.
@@ -33,8 +31,6 @@ pub struct Face {
     pub name: String,
     /// The whole card's name.
     pub card: String,
-    /// Card-name lexemes in scope on this face: its [`own_names`].
-    pub scope: CardScope,
     pub type_line: Option<String>,
     /// Oracle rules text, reminder text included, with the face's Editorial
     /// Corrections applied.
@@ -42,6 +38,12 @@ pub struct Face {
 }
 
 impl Face {
+    /// The Card Scope the face's text is read in: its [`own_names`].
+    #[must_use]
+    pub fn scope(&self) -> CardScope {
+        own_names(&self.name)
+    }
+
     /// The face's units as (kind, index, text): its trimmed type line, then
     /// its rules-text lines ([`split_lines`]).
     fn units(&self) -> impl Iterator<Item = (UnitKind, usize, String)> {
@@ -183,33 +185,23 @@ pub struct Corpus {
 #[derive(Debug, thiserror::Error)]
 pub enum CorpusError {
     #[error(transparent)]
-    Data(#[from] sylex_upstream::DataError),
-    #[error("{0}")]
-    Read(String),
+    Snapshot(#[from] &'static sylex_upstream::scryfall::OracleSnapshotError),
+    #[error(transparent)]
+    Read(#[from] sylex_upstream::scryfall::OracleCardReadError),
 }
 
-/// The card names a face's text uses as its own: the face's name and its
-/// card's, in every form [CR#201.5c], and on a meld card the name of its meld
-/// result, whose face is half on that card's back [CR#713.1], which the data
-/// records as the card's `meld_result` part. The meld result's name is in its
-/// Full form alone: it is the name of neither card, so neither card's text
-/// shortens it.
+/// The Card Scope of a face named `name`: its own name in every form
+/// [CR#201.5c]. Nothing else of the card is in it, so the scope of a text is
+/// computed from the name of the face it is on.
 ///
-/// The faces of a double-faced card are named apart
-/// [CR#712.6c,712.6d,712.6e], and two faces that shorten to one spelling
-/// (*Ral*) name one object, not two, so a face's text shortens its own name.
+/// Each face of a double-faced card has its own name [CR#712.6], and two faces
+/// that shorten to one spelling (*Ral*) name one object, not two, so a face's
+/// text shortens its own name. The whole card's name (*A // B*) is no card-name
+/// Lexeme, and a meld result's name is another card's on both cards of its pair
+/// (`docs/decisions/lexicon.md` §6).
 #[must_use]
-pub fn own_names(unit: &OracleUnit<'_>) -> CardScope {
-    let mut scope = CardScope::own_names([
-        card_name_id(unit.display_name()),
-        card_name_id(unit.group_name()),
-    ]);
-    for part in unit.related_cards() {
-        if part.component == RelatedComponent::MeldResult {
-            scope.insert(card_name_id(&part.name), NameForm::Full);
-        }
-    }
-    scope
+pub fn own_names(name: &str) -> CardScope {
+    CardScope::own_names([card_name_id(name)])
 }
 
 /// The rules-text units of a face: its paragraph lines after balanced
@@ -257,57 +249,25 @@ impl Corpus {
         keep: impl Fn(&Face) -> bool,
         deferrals: BTreeSet<(&str, &str)>,
     ) -> Result<Self, CorpusError> {
-        let corrections = editorial_corrections();
-        let mut applied = vec![false; corrections.len()];
-        let mut unmatched = deferrals;
-        let mut corpus = Self::default();
+        let mut builder = Builder::new(deferrals);
         for card in OracleCardReader::new(reader) {
-            let card = card.map_err(|e| CorpusError::Read(e.to_string()))?;
-            if !card.supported() {
-                continue;
-            }
-            for unit in card.oracle_units() {
-                let scope = own_names(&unit);
-                let face = Face {
-                    identity: unit.identity().to_string(),
-                    name: unit.display_name().to_owned(),
-                    card: unit.group_name().to_owned(),
-                    scope,
-                    type_line: unit.type_line().map(str::to_owned),
-                    oracle_text: unit
-                        .oracle_text()
-                        .map(|text| correct(unit.display_name(), text, &corrections, &mut applied)),
-                };
-                if !unmatched.is_empty() {
-                    let texts: Vec<String> = face.units().map(|(_, _, text)| text).collect();
-                    unmatched.retain(|&(name, text)| {
-                        name != face.name || !texts.iter().any(|t| t == text)
-                    });
-                }
-                if keep(&face) {
-                    corpus.push(face);
-                }
-            }
+            builder.card(&card?, &keep);
         }
-        corpus.stale_corrections = corrections
-            .into_iter()
-            .zip(applied)
-            .filter_map(|(correction, applied)| (!applied).then_some(correction))
-            .collect();
-        corpus.unmatched_deferrals = unmatched
-            .into_iter()
-            .map(|(name, text)| format!("{name} | {text}"))
-            .collect();
-        Ok(corpus)
+        Ok(builder.finish())
     }
 
-    /// Reads the pinned snapshot at `data/scryfall/oracle-cards.jsonl`.
+    /// The supported corpus of the pinned snapshot at
+    /// `data/scryfall/oracle-cards.jsonl`, from the records the process
+    /// holds (`sylex_upstream::scryfall::oracle_cards`).
     ///
     /// # Errors
-    /// As [`Corpus::read`], or a missing snapshot.
+    /// A missing or invalid snapshot.
     pub fn load(keep: impl Fn(&Face) -> bool) -> Result<Self, CorpusError> {
-        let reader = sylex_upstream::scryfall::oracle_cards()?;
-        Self::read(reader.into_inner(), keep)
+        let mut builder = Builder::new(crate::census::deferrals());
+        for card in sylex_upstream::scryfall::oracle_cards()? {
+            builder.card(card, &keep);
+        }
+        Ok(builder.finish())
     }
 
     /// Adds a face and its units.
@@ -321,6 +281,74 @@ impl Corpus {
                 text,
             }));
         self.faces.push(face);
+    }
+}
+
+/// Builds a [`Corpus`] card by card, tracking which Editorial Corrections
+/// applied and which deferrals matched.
+struct Builder<'d> {
+    corpus: Corpus,
+    corrections: Vec<EditorialCorrection>,
+    applied: Vec<bool>,
+    unmatched: BTreeSet<(&'d str, &'d str)>,
+}
+
+impl<'d> Builder<'d> {
+    fn new(deferrals: BTreeSet<(&'d str, &'d str)>) -> Self {
+        let corrections = editorial_corrections();
+        Self {
+            corpus: Corpus::default(),
+            applied: vec![false; corrections.len()],
+            corrections,
+            unmatched: deferrals,
+        }
+    }
+
+    /// Adds the faces of `card` that `keep` holds for, if it is supported.
+    fn card(&mut self, card: &OracleCard, keep: impl Fn(&Face) -> bool) {
+        if !card.supported() {
+            return;
+        }
+        for unit in card.oracle_units() {
+            let face = Face {
+                identity: unit.identity().to_string(),
+                name: unit.display_name().to_owned(),
+                card: unit.group_name().to_owned(),
+                type_line: unit.type_line().map(str::to_owned),
+                oracle_text: unit.oracle_text().map(|text| {
+                    correct(
+                        unit.display_name(),
+                        text,
+                        &self.corrections,
+                        &mut self.applied,
+                    )
+                }),
+            };
+            if !self.unmatched.is_empty() {
+                let texts: Vec<String> = face.units().map(|(_, _, text)| text).collect();
+                self.unmatched
+                    .retain(|&(name, text)| name != face.name || !texts.iter().any(|t| t == text));
+            }
+            if keep(&face) {
+                self.corpus.push(face);
+            }
+        }
+    }
+
+    fn finish(self) -> Corpus {
+        let mut corpus = self.corpus;
+        corpus.stale_corrections = self
+            .corrections
+            .into_iter()
+            .zip(self.applied)
+            .filter_map(|(correction, applied)| (!applied).then_some(correction))
+            .collect();
+        corpus.unmatched_deferrals = self
+            .unmatched
+            .into_iter()
+            .map(|(name, text)| format!("{name} | {text}"))
+            .collect();
+        corpus
     }
 }
 
@@ -429,19 +457,21 @@ mod tests {
         // Both faces shorten to *Ral*; each face's text names only itself.
         let input = r#"{"object":"card","id":"p","oracle_id":"o","name":"Ral, Monsoon Mage // Ral, Leyline Prodigy","layout":"transform","legalities":{"vintage":"legal"},"card_faces":[{"name":"Ral, Monsoon Mage","type_line":"Creature — Human Wizard","oracle_text":"Transform Ral."},{"name":"Ral, Leyline Prodigy","type_line":"Legendary Planeswalker — Ral","oracle_text":"Ral deals 2 damage to any target."}]}"#;
         let corpus = Corpus::read(std::io::Cursor::new(input), |_| true).unwrap();
-        let card = card_name_id("Ral, Monsoon Mage // Ral, Leyline Prodigy");
-        let scopes: Vec<_> = corpus.faces.iter().map(|f| f.scope.clone()).collect();
+        let scopes: Vec<_> = corpus.faces.iter().map(Face::scope).collect();
         assert_eq!(
             scopes,
             [
-                CardScope::own_names([card_name_id("Ral, Monsoon Mage"), card]),
-                CardScope::own_names([card_name_id("Ral, Leyline Prodigy"), card]),
+                CardScope::own_names([card_name_id("Ral, Monsoon Mage")]),
+                CardScope::own_names([card_name_id("Ral, Leyline Prodigy")]),
             ]
         );
+        // The whole card's name is the name of no face.
+        let card = card_name_id("Ral, Monsoon Mage // Ral, Leyline Prodigy");
+        assert!(scopes.iter().all(|scope| !scope.holds_card(card)));
     }
 
     #[test]
-    fn both_cards_of_a_meld_pair_have_the_meld_result_s_full_name_in_scope() {
+    fn a_meld_card_s_scope_holds_its_own_name_and_not_the_meld_result_s() {
         let parts = r#""all_parts":[{"object":"related_card","id":"r","component":"meld_result","name":"Brisela, Voice of Nightmares","type_line":"Legendary Creature — Eldrazi Angel"},{"object":"related_card","id":"g","component":"meld_part","name":"Gisela, the Broken Blade","type_line":"Legendary Creature — Angel Horror"},{"object":"related_card","id":"b","component":"meld_part","name":"Bruna, the Fading Light","type_line":"Legendary Creature — Angel Horror"}]"#;
         let input = [
             format!(
@@ -454,23 +484,18 @@ mod tests {
         ]
         .join("\n");
         let corpus = Corpus::read(std::io::Cursor::new(input), |_| true).unwrap();
-        let result = card_name_id("Brisela, Voice of Nightmares");
-        let melded = |card: &str| {
-            let mut scope = CardScope::own_names([card_name_id(card)]);
-            scope.insert(result, NameForm::Full);
-            scope
-        };
-        let scopes: Vec<_> = corpus.faces.iter().map(|f| f.scope.clone()).collect();
+        let scopes: Vec<_> = corpus.faces.iter().map(Face::scope).collect();
         assert_eq!(
             scopes,
             [
-                melded("Gisela, the Broken Blade"),
-                melded("Bruna, the Fading Light"),
+                CardScope::own_names([card_name_id("Gisela, the Broken Blade")]),
+                CardScope::own_names([card_name_id("Bruna, the Fading Light")]),
                 CardScope::own_names([card_name_id("Lightning Bolt")]),
             ]
         );
-        // Neither card's text shortens the meld result's name.
-        assert!(!scopes[0].holds(result, NameForm::Shortened));
+        // The meld result's name is another card's on both cards of the pair.
+        let result = card_name_id("Brisela, Voice of Nightmares");
+        assert!(scopes.iter().all(|scope| !scope.holds_card(result)));
     }
 
     #[test]
@@ -480,7 +505,6 @@ mod tests {
             identity: "x#card".to_owned(),
             name: "Seedborn Muse".to_owned(),
             card: "Seedborn Muse".to_owned(),
-            scope: CardScope::default(),
             type_line: Some("Creature — Spirit".to_owned()),
             oracle_text: Some(
                 "Untap all permanents you control during each other player's untap step."

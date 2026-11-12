@@ -64,7 +64,8 @@ on are the contract documented on `grammar::ProductionDecl`.
 
 - `cargo xtask english parse "<text>" … [--limit N]` prints the cheapest
   Readings of each input under the English grammar, with their Ranking Keys
-  and Constituents.
+  and Constituents; `--as-card NAME` reads the text as if on that card, and
+  `--card NAME` alone reads that card's own text.
 - `Parse::metrics()` gives chart items, forest nodes, families and leaves.
 - `PackedForest`'s accessors (`roots`, `node_span`, `node_items`,
   `item_families`, `leaf_span`), `Parse::count_node` and the `walk` module

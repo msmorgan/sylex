@@ -31,9 +31,10 @@ enum EnglishCommand {
 
 #[derive(Debug, Args)]
 struct StrataArgs {
-    /// The Oracle Cards snapshot.
-    #[arg(long, default_value = "data/scryfall/oracle-cards.jsonl")]
-    data: PathBuf,
+    /// An Oracle Cards JSON-lines file to read in place of the pinned
+    /// snapshot.
+    #[arg(long)]
+    data: Option<PathBuf>,
     /// Only faces of cards with this name (repeatable).
     #[arg(long = "card")]
     cards: Vec<String>,
@@ -58,16 +59,20 @@ pub fn run(args: &EnglishArgs, output: &mut dyn Write) -> Result<()> {
 
 fn strata(args: &StrataArgs, output: &mut dyn Write) -> Result<()> {
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
-    let reader = BufReader::new(
-        File::open(&args.data).with_context(|| format!("opening {}", args.data.display()))?,
-    );
-    let corpus = Corpus::read(reader, |face| {
+    let keep = |face: &sylex_english::corpus::Face| {
         args.cards.is_empty()
             || args
                 .cards
                 .iter()
                 .any(|c| *c == face.card || *c == face.name)
-    })?;
+    };
+    let corpus = match &args.data {
+        Some(data) => {
+            let file = File::open(data).with_context(|| format!("opening {}", data.display()))?;
+            Corpus::read(BufReader::new(file), keep)?
+        }
+        None => Corpus::load(keep)?,
+    };
     let judgments: Vec<_> = sylex_english::judgment::load_dir(&sylex_english::judgments_dir())?
         .into_iter()
         .filter(|(name, _)| name != "seed.txt")
@@ -132,23 +137,41 @@ fn strata(args: &StrataArgs, output: &mut dyn Write) -> Result<()> {
 
 #[derive(Debug, Args)]
 struct ParseArgs {
-    /// Judgment entries or bare Oracle text; quote each input separately.
-    #[arg(required = true, num_args = 1..)]
+    /// Text to parse: bare Oracle text or judgment entries (`+ TEXT =>
+    /// ASSERTIONS`); quote each input separately. An entry may state its own
+    /// card with `<card=NAME>`.
     inputs: Vec<String>,
+    /// Parse each input as if it were on the card so named. Nothing is
+    /// fetched: the name is an input like the text.
+    #[arg(long, value_name = "NAME", conflicts_with = "card")]
+    as_card: Option<String>,
+    /// Fetch the faces so named (a face's name, or its whole card's) from
+    /// the supported corpus and parse their own type lines and rules-text
+    /// lines. Takes no text.
+    #[arg(long, value_name = "NAME")]
+    card: Option<String>,
     /// Maximum number of cheapest Readings to display per input.
     #[arg(long, default_value_t = 8)]
     limit: usize,
 }
 
-fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
+/// One text `parse` reads.
+struct ParseItem {
+    /// Printed before the item when it begins a fetched face.
+    header: Option<String>,
+    entry: sylex_english::judgment::Judgment,
+    kind: sylex_english::corpus::UnitKind,
+    /// Whether to print the entry's outcome.
+    evaluate: bool,
+}
+
+/// The texts the inputs state, each as a judgment entry, with `as_card` the
+/// card of every entry.
+fn stated_items(inputs: &[String], as_card: Option<&str>) -> Result<Vec<ParseItem>> {
     use sylex_english::corpus::UnitKind;
     use sylex_english::judgment;
-    use sylex_english::judgment::CardScopes;
-    use sylex_english::judgment::Judge;
-    use sylex_english::profile::Profiler;
 
-    let entries = args
-        .inputs
+    inputs
         .iter()
         .enumerate()
         .map(|(index, input)| {
@@ -161,24 +184,118 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
                 entries.len() == 1,
                 "each input must contain one judgment entry"
             );
-            Ok((entries.remove(0), marked || input.contains(" => ")))
+            let mut entry = entries.remove(0);
+            if let Some(name) = as_card {
+                anyhow::ensure!(
+                    entry.card.is_none(),
+                    "input {} states its card with `<card=…>`; give that or `--as-card`, not both",
+                    index + 1
+                );
+                entry.card = Some(name.to_owned());
+            }
+            let kind = if entry.category.as_deref() == Some("TypeLine") {
+                UnitKind::TypeLine
+            } else {
+                UnitKind::Line
+            };
+            Ok(ParseItem {
+                header: None,
+                entry,
+                kind,
+                evaluate: marked || input.contains(" => "),
+            })
         })
-        .collect::<Result<Vec<_>>>()?;
+        .collect()
+}
+
+/// The units of the supported faces named `name` (a face's name or its whole
+/// card's), each read as the grammar's root, with
+/// its face's own name in scope.
+fn fetched_items(name: &str) -> Result<Vec<ParseItem>> {
+    use sylex_english::corpus::UnitKind;
+
+    let corpus = Corpus::load(|face| face.name == name || face.card == name)
+        .context("loading the supported corpus")?;
+    anyhow::ensure!(
+        !corpus.faces.is_empty(),
+        "`--card {name}` names no face of the supported corpus"
+    );
+    let mut items = Vec::new();
+    let mut last_face = None;
+    for unit in &corpus.units {
+        let face = &corpus.faces[unit.face];
+        let header = (last_face != Some(unit.face))
+            .then(|| format!("Face: {} (card: {})", face.name, face.card));
+        last_face = Some(unit.face);
+        let place = match unit.kind {
+            UnitKind::TypeLine => "type line".to_owned(),
+            UnitKind::Line => format!("line {}", unit.index + 1),
+        };
+        items.push(ParseItem {
+            header,
+            entry: sylex_english::judgment::Judgment {
+                location: format!("{} {place}", face.name),
+                grammatical: true,
+                category: None,
+                card: Some(face.name.clone()),
+                text: unit.text.clone(),
+                groups: Vec::new(),
+                negated: Vec::new(),
+                readings: None,
+            },
+            kind: unit.kind,
+            evaluate: false,
+        });
+    }
+    Ok(items)
+}
+
+fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
+    use sylex_english::judgment::Judge;
+    use sylex_english::profile::Profiler;
+
+    let items = match (&args.card, &args.as_card, args.inputs.is_empty()) {
+        (Some(name), _, false) => anyhow::bail!(
+            "`--card {name}` fetches that card and parses its own text, so it takes no text; \
+             to parse text as if it were on a card so named, use `--as-card`"
+        ),
+        (None, Some(name), true) => anyhow::bail!(
+            "`--as-card {name}` parses the text given as if it were on a card so named, and \
+             none was given; to fetch that card and parse its own text, use `--card`"
+        ),
+        (None, None, true) => {
+            anyhow::bail!("nothing to parse: give text, or `--card NAME` for a card's own text")
+        }
+        (Some(name), _, true) => fetched_items(name)?,
+        (None, as_card, false) => stated_items(&args.inputs, as_card.as_deref())?,
+    };
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
+    if let Some(name) = &args.as_card {
+        anyhow::ensure!(
+            sylex_english::judgment::is_card_name(&env.lexicon, name),
+            "`--as-card {name}` is no card name of the lexicon"
+        );
+    }
     let grammar = sylex_english::bind(&env.lexicon, &env.frames)?;
     let frame = sylex_english::segments::segment_frame(&grammar)?;
-    let corpus = Corpus::load(|_| true).context("loading the supported corpus")?;
-    let scopes = CardScopes::new(&corpus.faces);
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
-        scopes: &scopes,
     };
     let profiler = Profiler::new(&env);
-    for (entry, evaluate) in entries {
+    for ParseItem {
+        header,
+        entry,
+        kind,
+        evaluate,
+    } in items
+    {
+        if let Some(header) = header {
+            writeln!(output, "{header}")?;
+        }
         writeln!(output, "{}: {:?}", entry.location, entry.text)?;
         let text = sylex_upstream::oracle_text::strip_reminder_text(&entry.text);
-        let scope = match scopes.scope(&entry) {
+        let scope = match entry.scope(&env.lexicon) {
             Ok(scope) => scope,
             Err(why) => {
                 writeln!(output, "Unparsed: {why}")?;
@@ -186,11 +303,6 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
             }
         };
         let analyzed = env.lexicon.analyze_source_scoped(&text, None, &scope);
-        let kind = if entry.category.as_deref() == Some("TypeLine") {
-            UnitKind::TypeLine
-        } else {
-            UnitKind::Line
-        };
         let profile = profiler.profile(kind, &analyzed);
         writeln!(output, "Stratum: {}", profile.stratum)?;
         writeln!(
@@ -386,7 +498,8 @@ mod tests {
         assert!(output.contains("Outcome: vocabulary gaps"));
         assert!(output.contains("Unparsed: the grammar has no Category `MissingCategory`"));
         assert!(output.contains(
-            "Unparsed: input 3:1: `<card=Lightning Blot>` names no face of the supported corpus"
+            "Unparsed: input 3:1: `<card=Lightning Blot>` states a name that is no card name of \
+             the lexicon"
         ));
         assert!(output.contains("Outcome: holds"));
         assert!(!output.contains("Reading 1 (ranking key"));
@@ -406,14 +519,110 @@ mod tests {
         assert!(!output.contains("Reading 1 (ranking key"));
     }
 
+    /// *Jace, Cunning Castaway* shortens its own name: `--as-card` puts the
+    /// name in scope as `<card=…>` does, and without it *Jace* is no word.
     #[test]
-    fn parse_rejects_missing_inputs_bad_limits_and_malformed_entries() {
-        for args in [
-            vec!["english", "parse"],
-            vec!["english", "parse", "--limit", "no", "text"],
-        ] {
-            assert!(Cli::try_parse_from(args).is_err());
-        }
+    fn as_card_parses_the_text_as_if_on_the_card_so_named() {
+        let text = "Jace draws two cards.";
+        let stated = dump(&["parse", "--as-card", "Jace, Cunning Castaway", text]);
+        let entry = dump(&["parse", &format!("<card=Jace, Cunning Castaway> {text}")]);
+        assert_eq!(stated, entry);
+        assert!(stated.contains("Packed Forest derivations: 1"), "{stated}");
+        assert!(stated.contains("name:Jace, Cunning Castaway / Invariant"));
+        let bare = dump(&["parse", text]);
+        assert!(bare.contains("Packed Forest derivations: 0"), "{bare}");
+    }
+
+    /// `--card` fetches the card's own units. *Delver of Secrets* is a
+    /// double-faced card: by its whole card's name both faces are read, each
+    /// under its own name, and by a face's name that face alone.
+    #[test]
+    fn card_fetches_the_faces_so_named_and_parses_their_own_units() {
+        let both = dump(&[
+            "parse",
+            "--limit",
+            "0",
+            "--card",
+            "Delver of Secrets // Insectile Aberration",
+        ]);
+        let headers: Vec<&str> = both.lines().filter(|l| l.starts_with("Face: ")).collect();
+        assert_eq!(
+            headers,
+            [
+                "Face: Delver of Secrets (card: Delver of Secrets // Insectile Aberration)",
+                "Face: Insectile Aberration (card: Delver of Secrets // Insectile Aberration)",
+            ]
+        );
+        assert!(both.contains("Delver of Secrets type line: \"Creature — Human Wizard\""));
+        assert!(
+            both.contains("Insectile Aberration line 1: \"Flying\""),
+            "{both}"
+        );
+        assert!(!both.contains("Unparsed"), "{both}");
+        let back = dump(&["parse", "--limit", "0", "--card", "Insectile Aberration"]);
+        assert_eq!(back.matches("Face: ").count(), 1);
+        assert_eq!(
+            back.matches("Packed Forest derivations:").count(),
+            2,
+            "{back}"
+        );
+    }
+
+    /// *Gisela, the Broken Blade* melds into *Brisela, Voice of Nightmares*,
+    /// another card's name cited after *into*; her text also shortens her own
+    /// name.
+    #[test]
+    fn a_meld_card_s_own_text_reads_its_meld_result_as_a_name_complement() {
+        let output = dump(&[
+            "parse",
+            "--limit",
+            "1",
+            "--card",
+            "Gisela, the Broken Blade",
+        ]);
+        assert!(
+            output.contains(
+                "OtherCardNameComplement\tNameComplement\t148..176\t\"Brisela, Voice of \
+                 Nightmares\"\tcomplement"
+            ),
+            "{output}"
+        );
+        assert!(output.contains("name:Gisela, the Broken Blade / Invariant"));
+        assert!(!output.contains("derivations: 0"), "{output}");
+    }
+
+    #[test]
+    fn card_and_as_card_each_say_which_flag_was_meant() {
+        let fail = |inputs: &[&str]| {
+            let cli = Cli::try_parse_from(std::iter::once("english").chain(inputs.iter().copied()))
+                .unwrap();
+            run(&cli.args, &mut Vec::new()).unwrap_err().to_string()
+        };
+        let with_text = fail(&["parse", "--card", "Seedborn Muse", "Flying"]);
+        assert!(with_text.contains("use `--as-card`"), "{with_text}");
+        let without_text = fail(&["parse", "--as-card", "Seedborn Muse"]);
+        assert!(without_text.contains("use `--card`"), "{without_text}");
+        assert!(fail(&["parse"]).contains("nothing to parse"));
+        assert!(fail(&["parse", "--card", "Lightning Blot"]).contains("names no face"));
+        assert_eq!(
+            fail(&["parse", "--as-card", "Lightning Blot", "Draw a card."]),
+            "`--as-card Lightning Blot` is no card name of the lexicon"
+        );
+        let twice = fail(&[
+            "parse",
+            "--as-card",
+            "Seedborn Muse",
+            "<card=Seedborn Muse> Flying",
+        ]);
+        assert!(twice.contains("not both"), "{twice}");
+        assert!(
+            Cli::try_parse_from(["english", "parse", "--card", "A", "--as-card", "B"]).is_err()
+        );
+    }
+
+    #[test]
+    fn parse_rejects_bad_limits_and_malformed_entries() {
+        assert!(Cli::try_parse_from(["english", "parse", "--limit", "no", "text"]).is_err());
         for input in [
             "",
             "+ <card=Unclosed text",
@@ -422,6 +631,8 @@ mod tests {
         ] {
             let args = ParseArgs {
                 inputs: vec![input.to_owned()],
+                as_card: None,
+                card: None,
                 limit: 8,
             };
             assert!(parse(&args, &mut Vec::new()).is_err(), "{input}");

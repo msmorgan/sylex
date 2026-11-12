@@ -65,9 +65,9 @@ per seed sentence.
 
 `corpus` reads the supported corpus (Vintage legal or restricted, outside
 `set_type: funny`) from `data/scryfall/oracle-cards.jsonl` through
-`sylex_upstream`, one `Face` per Card Face record with its own names
-(`corpus::own_names`: its name and its card's in every form and, on a meld
-card, its meld result's in its Full form) in lexical scope. Each face yields
+`sylex_upstream`, which reads the snapshot once per process, one `Face` per
+Card Face record with its own name in every form in lexical scope
+(`corpus::own_names`, a function of the face's name alone). Each face yields
 Corpus Units: its Type Line, and each paragraph line of its rules text after
 balanced reminder text is removed
 (`sylex_upstream::oracle_text::strip_reminder_text`). The split needs no parse.
@@ -170,13 +170,28 @@ stale deferral (read, or naming no unit) or a unit that is not segmentable.
 ## Inspecting a parse
 
 ```sh
-cargo xtask english parse "+ <card=Seedborn Muse> Untap all permanents you control."
 cargo xtask english parse --limit 2 'Destroy target creature.' '+NounPhrase target creature => NounPhrase "target creature" head creature' '*PrepositionPhrase target creature'
+cargo xtask english parse --as-card 'Seedborn Muse' 'Untap all permanents you control.'
+cargo xtask english parse --card 'Delver of Secrets // Insectile Aberration'
 ```
 
-Quote each input separately. Inputs use the [judgment-entry syntax](judgments/README.md),
-including category roots, card scopes and assertions. Bare Oracle text is parsed
-as a positive entry at the grammar root. Balanced reminder text is stripped.
+There are three ways to give it text:
+
+- **Text alone.** Quote each input separately. Inputs use the
+  [judgment-entry syntax](judgments/README.md), including category roots and
+  assertions. Bare Oracle text is parsed as a positive entry at the grammar
+  root. Balanced reminder text is stripped.
+- **`--as-card NAME` with text.** Each input is parsed as if it were on the
+  card so named: the name is an input like the text, and no card is fetched. A
+  name that is no card name is refused. An input in entry syntax may state its
+  card itself with `<card=NAME>` instead; giving both is an error.
+- **`--card NAME` with no text.** The faces so named (a face's name, or its
+  whole card's) are fetched from the supported corpus and their own Corpus
+  Units parsed: under a `Face: NAME (card: CARD)` line, the face's type line
+  and then each rules-text line, numbered from 1, each at the grammar root
+  with that face's own name in scope. A bracketed line of a cleave face is
+  parsed as printed; the census reads it as its two texts.
+
 Each argument must contain one entry.
 
 The command prints the profiled Stratum and Syntactic Families, vocabulary gaps,
