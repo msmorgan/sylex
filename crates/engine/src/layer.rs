@@ -327,7 +327,8 @@ fn base_values(state: &GameState, id: ObjectId) -> DerivedObject {
         },
         ability_runtimes: vec![crate::activation::AbilityRuntime::default(); cache.printed.len()],
         // Base controller ([CR#108.4]): what the object would have absent any
-        // control-change effect. Layer 2 may overwrite it.
+        // control-change effect. Layer 2 may overwrite it. The base field is
+        // the layer system's own input here.
         controller: obj.controller,
         cant_have: Vec::new(),
     }
@@ -455,9 +456,11 @@ struct ActiveEffect {
     /// re-evaluated against the in-progress derived map before the effect is
     /// considered or applied; nested `Conditionally` wrappers are conjunctive.
     conditions: Vec<Condition>,
-    /// The effect's controller ([CR#611.2c]) — resolves `You` in a layer-2
-    /// `SetController`. For a static ability it is the source permanent's base
-    /// controller; for a registry effect it is the locked value it carries.
+    /// The effect's controller as gathered: for a registry effect the
+    /// controller of the spell or ability that created it, the player its
+    /// "you" names ([CR#109.5]); for a static ability or a counter boost the
+    /// source's base controller. The pass reads
+    /// [`ActiveEffect::controller_in`], which derives the latter.
     controller: PlayerId,
     scope: ScopeResolved,
     changes: Vec<Modification>,
@@ -477,6 +480,22 @@ struct ActiveEffect {
     /// continues in each later layer even if its source ability is removed
     /// [CR#613.6]. Cleared at the start of each pass.
     locked: Option<Vec<ObjectId>>,
+}
+
+impl ActiveEffect {
+    /// The effect's controller at this point in the pass: for a static
+    /// ability or a counter boost its source's controller as derived so far
+    /// (a static ability's "you" is the current controller of the object it
+    /// is on, [CR#109.5], and layer 2 has already run for every later layer,
+    /// [CR#613.1b]); for a resolved effect the controller of the spell or
+    /// ability that created it, whose "you" it keeps ([CR#109.5]).
+    fn controller_in(&self, working: &BTreeMap<ObjectId, DerivedObject>) -> PlayerId {
+        match &self.origin {
+            EffectOrigin::Static { source, .. } => working[source].controller,
+            EffectOrigin::Counter { holder, .. } => working[holder].controller,
+            EffectOrigin::Resolved { .. } => self.controller,
+        }
+    }
 }
 
 impl ActiveEffect {
@@ -624,6 +643,11 @@ fn gather(
             continue;
         }
         let timestamp = obj.timestamp;
+        // The base controller, the layer system's own input: an effect's
+        // content is a function of its origin and the game state, never of a
+        // derived map. The pass reads the derived one through
+        // `ActiveEffect::controller_in`.
+        let controller = obj.controller;
         // Effect sources come from the DERIVED list once the fixpoint is
         // running: the first pass reads the PRINTED list (the cycle-safe base
         // that breaks the `layers() → derive::abilities → layers()`
@@ -676,7 +700,7 @@ fn gather(
                 let grant_runtimes = state.capture_grant_runtimes_in_created_region(
                     &changes,
                     effect,
-                    &state.frame(obj.id, obj.controller),
+                    &state.frame(obj.id, controller),
                     captures,
                 );
                 let copy = sources[..position]
@@ -706,7 +730,7 @@ fn gather(
                     // A static ability's continuous effect is controlled by the
                     // permanent it is on ([CR#611.2c]); its `You` is that
                     // permanent's controller.
-                    controller: obj.controller,
+                    controller,
                     scope,
                     changes,
                     grant_runtimes,
@@ -757,7 +781,7 @@ fn gather(
                     timestamp: obj.timestamp,
                     is_cda: false,
                     conditions: Vec::new(),
-                    controller: obj.controller,
+                    controller,
                     scope,
                     // Flatten first (so `bake` sees the flat P/T ops), then bake
                     // the self-scoped counter counts — the same single boundary
@@ -985,7 +1009,7 @@ fn matches_derived(
         return true;
     }
     let Some(c) = working.get(&id).map(|d| &d.characteristics) else {
-        return static_reference_matches(state, id, filter, watcher, params);
+        return static_reference_matches(state, working, id, filter, watcher, params);
     };
     // Combinators (`And`/`Or`/`Not`; `Any` handled above so it
     // matches even for ids absent from `working`) recurse through this same
@@ -1060,11 +1084,13 @@ fn matches_derived(
             };
             crate::target::stat_satisfies(value, *cmp, count)
         }
-        Predicate::Ref(_) => static_reference_matches(state, id, filter, watcher, params),
+        Predicate::Ref(_) => static_reference_matches(state, working, id, filter, watcher, params),
+        // The controller as derived so far this pass: layer 2 has already run
+        // for every later layer ([CR#613.1b]).
         Predicate::Relation(sylex_core::RelationPredicate::ControlledBy(inner)) => matches_derived(
             state,
             working,
-            state.player(state.objects.obj(id).controller).object,
+            state.player(working[&id].controller).object,
             inner,
             watcher,
             params,
@@ -1098,6 +1124,7 @@ fn matches_derived(
 
 fn static_reference_matches(
     state: &GameState,
+    working: &BTreeMap<ObjectId, DerivedObject>,
     id: ObjectId,
     filter: &Predicate,
     watcher: Option<ObjectSource>,
@@ -1114,8 +1141,18 @@ fn static_reference_matches(
         (Some(sylex_core::Provenance::Source), Some(source)) => {
             state.objects.obj(id).source == source
         }
+        // [CR#109.5]: the carrier's controller as derived so far this pass
+        // (layer 2 has already run, [CR#613.1b]); a player carrier is its own
+        // player.
         (Some(sylex_core::Provenance::Controller), Some(source)) => {
-            let controller = state.controller_of_source(source);
+            let controller = match source {
+                ObjectSource::Player(player) => Some(player),
+                ObjectSource::Card(_) => state
+                    .objects
+                    .iter()
+                    .find(|object| object.source == source)
+                    .map(|object| working[&object.id].controller),
+            };
             matches!(state.objects.obj(id).source,
                 ObjectSource::Player(player) if Some(player) == controller)
         }
@@ -1250,7 +1287,13 @@ fn effect_conditions_hold(
     effect: &ActiveEffect,
 ) -> bool {
     effect.conditions.iter().all(|condition| {
-        condition_holds_derived(state, working, condition, effect.watcher, effect.controller)
+        condition_holds_derived(
+            state,
+            working,
+            condition,
+            effect.watcher,
+            effect.controller_in(working),
+        )
     })
 }
 
@@ -1280,6 +1323,9 @@ fn resolve_count_ref(
         }
         Reference::ControllerOf(inner) => {
             let id = resolve_count_ref(state, working, inner, watcher, controller)?;
+            // A card's controller as derived so far this pass; an id absent
+            // from `working` is a player proxy, whose stored controller is its
+            // own player.
             let player = working.get(&id).map_or_else(
                 || state.objects.get(id).map(|o| o.controller),
                 |d| Some(d.controller),
@@ -2174,6 +2220,7 @@ fn apply_effect_in_layer(
         effect.locked = Some(resolve_scope(state, working, &effect.scope, effect.watcher));
     }
     let targets = effect.locked.clone().expect("locked just set");
+    let controller = effect.controller_in(working);
     for obj_id in targets {
         if working.contains_key(&obj_id) {
             for (m, runtime) in effect.changes.iter().zip(&effect.grant_runtimes) {
@@ -2181,7 +2228,7 @@ fn apply_effect_in_layer(
                     apply(
                         m,
                         runtime,
-                        effect.controller,
+                        controller,
                         state,
                         working,
                         obj_id,
@@ -2203,19 +2250,12 @@ fn probe_apply(
     layer: Layer,
 ) -> BTreeMap<ObjectId, DerivedObject> {
     let mut probe = working.clone();
+    let controller = d.controller_in(working);
     for obj_id in effect_targets(state, working, d) {
         if probe.contains_key(&obj_id) {
             for (m, runtime) in d.changes.iter().zip(&d.grant_runtimes) {
                 if layer_of(m, d.is_cda) == Some(layer) {
-                    apply(
-                        m,
-                        runtime,
-                        d.controller,
-                        state,
-                        &mut probe,
-                        obj_id,
-                        d.watcher,
-                    );
+                    apply(m, runtime, controller, state, &mut probe, obj_id, d.watcher);
                 }
             }
         }
@@ -2476,6 +2516,40 @@ fn fold_conferred_abilities(working: &mut BTreeMap<ObjectId, DerivedObject>) {
 // GameState::layers
 // ---------------------------------------------------------------------------
 
+thread_local! {
+    /// How many [`GameState::layers`] passes are in progress on this thread.
+    static DERIVING: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+}
+
+/// Whether a layer pass is in progress on this thread. The pass reads a
+/// card's controller from its in-progress `working` map where it can
+/// (`matches_derived`, `resolve_count_ref`, `static_reference_matches`, and
+/// `gather` from the previous fixpoint iteration). The shared helpers it also
+/// reaches (the frameless matcher it delegates player proxies to,
+/// `controller_of_source`, history gates, grant-runtime capture) have no
+/// `working` map; a controller read there is the layer system's own input, so
+/// [`GameState::controller_of`] answers it from the base controller instead
+/// of starting the pass again ([CR#613.1b]).
+pub(crate) fn deriving() -> bool {
+    DERIVING.with(|d| d.get() > 0)
+}
+
+/// RAII scope for [`DERIVING`]: restores the count on every exit of the pass.
+struct DerivingScope;
+
+impl DerivingScope {
+    fn enter() -> Self {
+        DERIVING.with(|d| d.set(d.get() + 1));
+        Self
+    }
+}
+
+impl Drop for DerivingScope {
+    fn drop(&mut self) {
+        DERIVING.with(|d| d.set(d.get() - 1));
+    }
+}
+
 impl GameState {
     /// Derive every object's characteristics ([CR#613.5]: fresh, continuously).
     /// Recomputed on each call; callers that need many lookups call once and
@@ -2528,6 +2602,9 @@ impl GameState {
         // call (caching is the noted later optimization). A partial re-run
         // would be incorrect per the layer note above.
         const MAX_PASSES: usize = 16;
+        // Every controller read made while this pass runs is the layer
+        // system's own input (see [`deriving`]).
+        let _deriving = DerivingScope::enter();
 
         // The first pass: gather from printed abilities (`derived = None`)
         // and run the full pass from base.

@@ -53,6 +53,8 @@ mod control;
 pub use control::ControlError;
 pub use control::ControlSnapshot;
 
+mod controller;
+
 pub mod copy;
 
 mod cost_options;

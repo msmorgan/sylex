@@ -155,14 +155,15 @@ impl EventApply for ControlChanged {
     // [CR#701.12b,613.1b]: a one-shot control TRANSITION — re-home
     // the object (a control change is never a zone move; the object
     // keeps its identity). The base controller moves; layer-2
-    // continuous control effects still override on top. The new
-    // controller has not controlled it continuously since their
-    // last turn began, so it is summoning-sick for them
-    // ([CR#302.6]).
+    // continuous control effects still override on top. This write is
+    // the one-shot path's base-field write, not a rules read. Whether
+    // the permanent is now summoning sick for a new controller
+    // ([CR#302.6]) is the control-change rule's call, the same one a
+    // continuous control change goes through.
     fn apply(&self, g: &mut GameState) -> Option<GameEvent> {
         if g.objects.get(self.object).is_some() {
             g.objects.obj_mut(self.object).controller = self.to;
-            g.objects.obj_mut(self.object).summoning_sick = true;
+            g.observe_control_changes();
         }
         None
     }

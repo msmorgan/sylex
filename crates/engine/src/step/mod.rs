@@ -213,6 +213,9 @@ impl GameState {
         if let Some(pending) = &self.pending {
             return StepOutcome::NeedsDecision(pending.clone());
         }
+        // [CR#302.6]: a control change since the last step, through either
+        // path, makes the permanent summoning sick before this step reads it.
+        self.observe_control_changes();
         let item = self
             .agenda
             .pop_front()
@@ -1337,12 +1340,17 @@ impl GameState {
             self.turn.active_player = self.next_live_after(self.turn.active_player);
         }
         // [CR#302.6]: a creature the active player has controlled continuously
-        // since this turn began sheds summoning sickness. Collect ids first to
-        // satisfy the borrow checker (mirrors `clear_marked_damage`).
+        // since this turn began sheds summoning sickness. Control is the
+        // derived controller ([CR#613.1b]): a creature stolen by a continuous
+        // effect sheds it on its new controller's turn, not its owner's. The
+        // step's opening `observe_control_changes` has already seen every
+        // change before this turn began. Collect ids first to satisfy the
+        // borrow checker (mirrors `clear_marked_damage`).
         let active = self.turn.active_player;
+        let view = self.layers();
         let ids: Vec<_> = self.zones.battlefield.clone();
         for id in ids {
-            if self.objects.obj(id).controller == active {
+            if view.controller(id) == active {
                 self.objects.obj_mut(id).summoning_sick = false;
             }
         }
@@ -1419,7 +1427,8 @@ impl GameState {
                 let mut consume_rider = Vec::new();
                 for id in ids {
                     let obj = self.objects.obj(id);
-                    if obj.controller != active {
+                    // The derived controller untaps it ([CR#502.3,613.1b]).
+                    if view.controller(id) != active {
                         continue;
                     }
                     if obj.skip_next_untap {
@@ -2262,7 +2271,7 @@ impl GameState {
             let source = next.source;
             let recipients = next.recipients.clone();
             // [CR#510.1c]: the divider is the source's (attacker's) controller.
-            let player = self.objects.obj(source).controller;
+            let player = self.controller_of(source);
             self.pending = Some(DecisionPointKind::AssignCombatDamage(
                 crate::decide::pending::AssignCombatDamage {
                     player,

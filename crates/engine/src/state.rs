@@ -1091,7 +1091,11 @@ impl GameState {
             .into_iter()
             .filter(|s| {
                 !(matches!(s.duration, FixedUntil(YourNextTurn))
-                    && self.objects.get(s.source).map(|o| o.controller) == Some(new_active))
+                    && self
+                        .objects
+                        .get(s.source)
+                        .map(|_| self.controller_of(s.source))
+                        == Some(new_active))
             })
             .collect();
     }
@@ -1178,8 +1182,8 @@ impl GameState {
         let mut drop_sh = vec![false; self.shields.len()];
         for (i, s) in self.shields.iter().enumerate() {
             if let ForAsLongAs(cond) = &s.duration
-                && let Some(obj) = self.objects.get(s.source)
-                && !self.condition_holds(cond, &self.frame(s.source, obj.controller))
+                && self.objects.get(s.source).is_some()
+                && !self.condition_holds(cond, &self.frame(s.source, self.controller_of(s.source)))
             {
                 drop_sh[i] = true;
             }

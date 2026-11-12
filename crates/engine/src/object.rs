@@ -290,6 +290,12 @@ pub struct GameObject {
     /// controller's turn start — a creature controlled continuously since the
     /// turn began is not summoning-sick. Meaningful only on the battlefield.
     pub summoning_sick: bool,
+    /// [CR#302.6]: the derived controller as of the last control observation
+    /// (`GameState::observe_control_changes`). A derived controller that
+    /// differs from it is a control change, which makes the permanent summoning
+    /// sick for its new controller. Starts as the controller the object is
+    /// minted under. Meaningful only on the battlefield.
+    pub observed_controller: PlayerId,
     /// [CR#502.3,701.43a]: the one-shot "doesn't untap during your next untap
     /// step" rider — exert, and the temple/painland mana riders. Set by an
     /// effect; consumed at this permanent's controller's next untap step (the
@@ -421,6 +427,7 @@ impl ObjectStore {
             timestamp,
             tapped: false,
             summoning_sick: false,
+            observed_controller: controller,
             skip_next_untap: false,
             damage: Vec::new(),
             counters: HashMap::new(),
