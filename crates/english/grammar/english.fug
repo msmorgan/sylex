@@ -50,19 +50,19 @@ feature Polarity = Affirmative | Negative
 feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
-    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | UnlikeObject
+    | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP | UnlikeObject
     | Name
 // The Slot Kind of a determinative's Preposition Phrase's Complement: the
 // values of ComplementKind, which it agrees with.
 feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
-    | QuotedAbility | Mention | FixedFrameNP | Cost | Intransitive | AmountOrNP | UnlikeObject
+    | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP | UnlikeObject
     | Name
 // `Quantity`: only *number*, the number-transparent noun (*any number
 // of target creatures*; CGEL 5§3.3:349–351). `Serial`: only *time*, a
 // frequency or multiplier head (*three times*; CGEL 8§9:715).
-feature NounDistribution = Ordinary | Quantity | DirectMeasure | HeadOnly | Serial | FixedFrame
+feature NounDistribution = Ordinary | Quantity | DirectMeasure | HeadOnly | Serial
 // `Quantity`: a fused-head quantity (*choose one*). `Manner`: only *way*,
 // the one noun that is a Manner Adjunct without a preposition (*do it this
 // way*; CGEL 8§2.1:671).
@@ -230,11 +230,6 @@ category MeasureNounPhrase : NounPhrase
 // A compound locative determinative, which a Preposition Phrase may
 // postmodify (*anywhere else*).
 category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKind, Countability]
-// A bare Noun Phrase that only a preposition's fixed frame admits (*from
-// outside the game*).
-category FixedFrameNounPhrase : NounPhrase [
-    Number, Person, Case, Determination, NounKind, Countability,
-]
 // DeterminativeDistribution is the determiner's, so an *and*-coordination
 // of distributive ones is singular (CGEL 5§18.4:508). The Measure Gap is
 // closed: only coordinated Nominals share a slash Measure (*base power and
@@ -626,7 +621,6 @@ slot Pred = Predicative
 slot AdjP = AdjectivePhrase
 slot AdvP = Adverbial
 slot LocativeNP = LocativeHead
-slot FixedFrameNP = FixedFrameNounPhrase
 slot Position = PositionPhrase
 slot MeasureNP = MeasureNounPhrase
 slot KeywordPhrase = KeywordPhrase
@@ -2265,15 +2259,6 @@ SuperlativeFusedHead: BareNominalComplement -> modifier:AdjectivePhrase
     where modifier.Grade := Superlative,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative
-// The frame, not the noun, licenses the missing determiner (*from outside
-// the game*, never *if it's [outside the game]*).
-FixedFrameBareNoun: FixedFrameNounPhrase -> Nominal
-    where head.NounDistribution = FixedFrame,
-          head.Number = Singular,
-          head.Countability = Count,
-          $.Determination = Bare,
-          $.Case = Plain,
-          $.Person = Third
 // A bare Noun Phrase is never a coordination of Nominals (BarePlural too):
 // the Noun Phrases coordinate (*creatures and lands*), Nominals only under
 // something shared (*all [creatures and lands]*; ADR §8).

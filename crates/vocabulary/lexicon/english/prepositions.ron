@@ -123,12 +123,13 @@
         (complement: Mention, hosts: ComplementOnly, named_only: true),
     ]),
     // *cast spells ... from the top of your library*; *a card you own from
-    // outside the game*, a noun bare in this fixed frame (`nouns.ron`);
+    // outside the game*, a Preposition Phrase Complement (CGEL, Ch. 7 §2,
+    // p. 617: *from behind the curtain*);
     // *from among them*; *from among Disenchant, ..., and Black Lotus*, a
     // name cited as a name
     (lemma: "from", frames: [
         (complement: NP, hosts: NominalAndPredicate),
-        (complement: FixedFrameNP, hosts: NominalAndPredicate),
+        (complement: PP(["outside"]), hosts: NominalAndPredicate),
         (complement: PP(["among"]), hosts: NominalAndPredicate),
         (complement: PPWith(["among"], Name), hosts: NominalAndPredicate),
     ]),

@@ -1,12 +1,12 @@
-# *Outside the game* is a compound noun after *from* and as a conjunct beside
-# zone nouns, naming where an object in none of the game's zones is
-# [CR#400.11]; elsewhere *outside* is the preposition.
+# *Outside the game* names where an object in none of the game's zones is
+# [CR#400.11]: a noun only as a conjunct beside zone nouns under their
+# determiner; elsewhere *outside* is the preposition, and *from* takes it as a
+# Preposition Phrase Complement (CGEL, Ch. 7 §2, p. 617).
 + <card=Invasion of Arcavios> When this Siege enters, search your library, graveyard, and/or outside the game for an instant or sorcery card you own, reveal it, and put it into your hand. => NounPhrase "your library, graveyard, and/or outside the game" as Object of search; Nominal "outside the game" head "outside the game"
 + <card=Turtles Forever> Search your library and/or outside the game for exactly four legendary creature cards you own with different names, then reveal those cards. => NounPhrase "your library and/or outside the game" as Object of search; Nominal "outside the game" head "outside the game"
-+ <card=Legion Angel> When this creature enters, you may reveal a card you own named Legion Angel from outside the game and put it into your hand. => NounPhrase "outside the game" as Complement of from
++ <card=Legion Angel> When this creature enters, you may reveal a card you own named Legion Angel from outside the game and put it into your hand. => PrepositionPhrase "outside the game" head outside as Complement of from; !NounPhrase "outside the game"
 # The preposition, where the noun has no place: a Nominal's Modifier.
 + <card=Spawnsire of Ulamog> {20}: Cast any number of Eldrazi spells from among cards you own outside the game without paying their mana costs. => PrepositionPhrase "outside the game" head outside; !NounPhrase "outside the game"
-# A predicative is no fixed frame for the noun, which stands bare only after
-# *from* (CGEL, Ch. 5 §8.5(b), pp. 409–410): *if it's outside the game* has the
-# preposition alone.
+# *Outside the game* is no role noun, so it never stands bare as a
+# predicative: *if it's outside the game* has the preposition alone.
 +PrepositionPhrase if it's outside the game => PrepositionPhrase "outside the game" head outside; !NounPhrase "outside the game"; readings 1
