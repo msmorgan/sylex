@@ -20,15 +20,17 @@ gate may not apply to a displaced Subject built by these Productions.
 `DegreeModifiedComparativeDeterminer` and `IndependentGenitive` also have no `head` child, with
 no comment saying why.
 
-## Open questions
+## Design
 
-- The done ticket `english-v4-reserved-child-names-contract` kept the renames on
-  `DistributiveCoordinationDetermined`, `TransparentQuantity` and `TemporalQuantity`, and
-  rejected an explicit agreement override. Revisit that and move these Productions to `head`
-  with `unshared`, or keep the renames?
-- Should a Nominal *and*-coordination of singulars carry `Number = Plural` at all, given that
-  `ConjunctNumber` and several gates (`BarePlural`, `Unmodified`, the single participial
-  postmodifiers) exist to read past it?
+- The seven Productions (`DistributiveCoordinationDetermined`, `JointCoordinationDetermined`,
+  `TransparentQuantity`, `TemporalQuantity`, `DeterminedTemporalQuantity`,
+  `DegreeModifiedComparativeDeterminer`, `IndependentGenitive`) name their head `head` and list
+  the features they override in `unshared`.
+- The three quantity Productions also list `Countability` in `unshared`: the phrase does not
+  take Count from *number*, since the transparent quantificational noun is non-count (CGEL,
+  Ch. 5 §3.3, p. 349), and the mother's Countability stays unvalued.
+- A Nominal *and*-coordination of singulars is `Number = Plural`, with `ConjunctNumber` as the
+  conjuncts' Number.
 
 ## Done when
 
@@ -36,8 +38,9 @@ no comment saying why.
   `NounKind` where the oblique supplies it) on a child named `head` gives the same Readings
   with the head lexeme kept, by making the change on one Production and comparing Readings.
 - Whether a renamed head defeats `ExistentialBe`'s `unextended` is confirmed by parse.
-- The Productions follow the owner's ruling, and every remaining Production without a `head`
-  child says why in its comment; no comment says a feature is set where an equation copies it.
+- The Productions follow the owner's ruling, and every remaining Production that names a
+  lexical head something other than `head` says why in its comment; no comment says a feature
+  is set where an equation copies it.
 - The census shows no Reading lost on the supported corpus.
 
 ## Pointers
