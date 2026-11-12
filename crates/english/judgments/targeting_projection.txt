@@ -48,3 +48,6 @@
 +NounPhrase a target creature => DeterminerPhrase "a target" as Determiner of creature; DeterminerPhrase "target" head det:target; readings 1
 # from: Guardian of Faith
 +NounPhrase any number of other target creatures you control => DeterminerPhrase "other target" head det:target as Determiner of creature; AdjectivePhrase "other"
+# a mass determinative is no determiner of a count noun through the Marker (CGEL 5§3.1:339, ∗*so much priest*)
+# from: Dead Ringers
+* <card=Dead Ringers> Destroy much target nonblack creature.

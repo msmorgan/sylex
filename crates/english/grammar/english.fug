@@ -2566,9 +2566,13 @@ UndeterminedModifiedMarker: DeterminerPhrase ->
           $.ComplementKind = Intransitive,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative
+// The phrase takes the outer determiner's Countability as it takes its
+// Number, so a mass determinative is no determiner of a count noun through
+// the Marker (*all target creature*).
 MarkedDeterminer: DeterminerPhrase -> determiner:DeterminerPhrase TargetingMarker
     where determiner.ComplementKind != PP,
           determiner.DeterminativeDistribution != Targeting,
+          determiner.Countability = $.Countability,
           $.Number = determiner.Number
 MarkedMaximum: DeterminerPhrase -> determiner:Selected(PrepositionPhrase, Up) TargetingMarker {
     uncoordinated: [determiner],
