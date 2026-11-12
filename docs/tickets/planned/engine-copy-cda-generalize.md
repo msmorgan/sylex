@@ -1,5 +1,5 @@
 ---
-needs: [core-copy-grammar, engine-layers-1-copy-facedown-text]
+needs: [core-copy-grammar, engine-layers-1-copy-facedown-text, engine-copy-exception-color-override]
 ---
 # A copy exception drops the copied object's characteristic-defining ability for every characteristic it provides or retains, as part of deriving the copiable values
 
