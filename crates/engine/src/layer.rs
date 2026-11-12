@@ -500,6 +500,72 @@ struct ActiveEffect {
     locked: Option<Vec<ObjectId>>,
 }
 
+/// What a layer-pass count resolves its references against.
+#[derive(Clone, Copy)]
+struct CountEnv<'a> {
+    /// The effect's carrier ([`ActiveEffect::watcher`]); anchors the `This`
+    /// and `You` a filter region inside the count names.
+    watcher: Option<ObjectSource>,
+    /// The effect's controller ([`ActiveEffect::controller`]).
+    controller: PlayerId,
+    /// The activation the count's registers are read from; `None` for a
+    /// counter boost (its self-scoped count is baked before the pass) and for
+    /// a resolved effect, whose changes carry no static region, so a register
+    /// there reads source-relative through the carrier.
+    registers: Option<Activation<'a>>,
+}
+
+/// The register values of one static ability's effect as it applies
+/// (engine law 1): `params` declares the registers of the region the count
+/// sits in, and each provenance names its value.
+#[derive(Clone, Copy)]
+struct Activation<'a> {
+    params: &'a [sylex_core::Param],
+    /// The ability's region when `params` is an `Each` body's, which a body's
+    /// `Capture` parameter reads through.
+    enclosing: Option<&'a [sylex_core::Param]>,
+    /// The ability's own captures, keyed by its region's registers.
+    captures: &'a [(sylex_core::RefId, crate::activation::Value)],
+    /// The static's source object.
+    source: ObjectId,
+    /// The object the effect is modifying, bound to a `Candidate` register;
+    /// `None` while the effect's conditions are evaluated.
+    candidate: Option<ObjectId>,
+}
+
+/// The parameters of the `Each` body region a gathered static's changes sit
+/// in, through any `Conditionally` wrappers; `None` when they sit in the
+/// ability's own region (a single-object `Modify`). The body's candidate is
+/// the object being modified.
+fn each_body_params(spec: &StaticSpec) -> Option<&[sylex_core::Param]> {
+    match spec {
+        StaticSpec::Each(_, body) => Some(&body.params),
+        StaticSpec::Conditionally(_, inner) => each_body_params(inner),
+        StaticSpec::Modify(..) => None,
+        StaticSpec::BecomesCopy(..)
+        | StaticSpec::Deontic(_)
+        | StaticSpec::Role { .. }
+        | StaticSpec::CostModifier { .. }
+        | StaticSpec::CostOption(_)
+        | StaticSpec::TriggerMultiplier { .. }
+        | StaticSpec::ModifyPlayer(..)
+        | StaticSpec::Replacement(_)
+        | StaticSpec::Prevention(_)
+        | StaticSpec::CantPrevent { .. }
+        | StaticSpec::SpendAsThough { .. }
+        | StaticSpec::AsThough(_)
+        | StaticSpec::ConditionallyDo { .. }
+        | StaticSpec::OutcomeGate { .. }
+        | StaticSpec::CantHappen(_)
+        | StaticSpec::ReplaceRoll { .. }
+        | StaticSpec::PayPips(..) => {
+            unreachable!(
+                "only Modify, Each and Conditionally statics are gathered as layer effects"
+            )
+        }
+    }
+}
+
 impl ActiveEffect {
     /// The effect's controller at this point in the pass: for a static
     /// ability or a counter boost its source's controller as derived so far
@@ -514,9 +580,46 @@ impl ActiveEffect {
             EffectOrigin::Resolved { .. } => self.controller,
         }
     }
-}
 
-impl ActiveEffect {
+    /// The environment the effect's counts and filters read at this point in
+    /// the pass: its changes as they modify `candidate`, or, with `None`, its
+    /// conditions and scope.
+    fn count_env(
+        &self,
+        working: &BTreeMap<ObjectId, DerivedObject>,
+        candidate: Option<ObjectId>,
+    ) -> CountEnv<'_> {
+        let registers = match &self.origin {
+            EffectOrigin::Static {
+                source,
+                ability,
+                captures,
+                ..
+            } => {
+                let Ability::Static(region) = ability else {
+                    unreachable!("a static origin holds a static ability")
+                };
+                let (params, enclosing) = match (each_body_params(&region.body), candidate) {
+                    (Some(body), Some(_)) => (body, Some(&*region.params)),
+                    (None, _) | (_, None) => (&*region.params, None),
+                };
+                Some(Activation {
+                    params,
+                    enclosing,
+                    captures,
+                    source: *source,
+                    candidate,
+                })
+            }
+            EffectOrigin::Counter { .. } | EffectOrigin::Resolved { .. } => None,
+        };
+        CountEnv {
+            watcher: self.watcher,
+            controller: self.controller_in(working),
+            registers,
+        }
+    }
+
     /// Whether this effect exists when its turn comes in `layer` of the pass
     /// that has produced `working` so far. One that has started applying exists
     /// for the rest of the pass [CR#613.6]. A static ability's effect that has
@@ -1004,19 +1107,22 @@ fn captured_objects(value: &crate::activation::Value) -> Vec<ObjectId> {
 ///
 /// Missing `id` in `working` (e.g. a player proxy) returns `false`.
 ///
-/// `watcher` is the carrier of the effect whose scope is being evaluated — the
-/// source permanent for a static ability, or `Player(controller)` for a
-/// spell-built floating effect ([CR#611.2c]). It anchors `Ref(This)`/`Ref(You)`
-/// in the scope: without it those refs hit the frameless-targeting `todo!` in
-/// `target::matches` the moment a layer rebuild touches a tribal-lord scope
-/// (`And([…, Not(Ref(This)), ControlledBy(Ref(You))])`). The live trigger
-/// lane (`filter_matches_live`) threads its watcher the same way.
+/// `env` is the environment of the effect whose scope or count is being
+/// evaluated. Its `watcher`, the carrier (the source permanent for a static
+/// ability, or `Player(controller)` for a spell-built floating effect), anchors
+/// `Ref(This)`/`Ref(You)` in the filter: without it those refs hit the
+/// frameless-targeting `todo!` in `target::matches` the moment a layer rebuild
+/// touches a tribal-lord scope (`And([…, Not(Ref(This)), ControlledBy(Ref(You))])`).
+/// The live trigger lane (`filter_matches_live`) threads its watcher the same
+/// way. Its activation is the region enclosing the filter's own (`params`),
+/// whose registers a `Capture` parameter of the filter reads: inside an `Each`
+/// body, the object being modified (see [`static_reference_matches`]).
 fn matches_derived(
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
     id: ObjectId,
     filter: &sylex_core::Predicate,
-    watcher: Option<ObjectSource>,
+    env: CountEnv<'_>,
     params: Option<&[sylex_core::Param]>,
 ) -> bool {
     use sylex_core::CharacteristicPredicate;
@@ -1027,14 +1133,14 @@ fn matches_derived(
         return true;
     }
     let Some(c) = working.get(&id).map(|d| &d.characteristics) else {
-        return static_reference_matches(state, working, id, filter, watcher, params);
+        return static_reference_matches(state, id, filter, env, params);
     };
     // Combinators (`And`/`Or`/`Not`; `Any` handled above so it
     // matches even for ids absent from `working`) recurse through this same
     // derived matcher via the shared walker; characteristic leaves fall through
     // below and everything else delegates to the printed matcher.
     if let Some(result) = crate::target::walk_combinators(filter, |f| {
-        matches_derived(state, working, id, f, watcher, params)
+        matches_derived(state, working, id, f, env, params)
     }) {
         return result;
     }
@@ -1102,7 +1208,7 @@ fn matches_derived(
             };
             crate::target::stat_satisfies(value, *cmp, count)
         }
-        Predicate::Ref(_) => static_reference_matches(state, working, id, filter, watcher, params),
+        Predicate::Ref(_) => static_reference_matches(state, id, filter, env, params),
         // The controller as derived so far this pass: layer 2 has already run
         // for every later layer ([CR#613.1b]).
         Predicate::Relation(sylex_core::RelationPredicate::ControlledBy(inner)) => matches_derived(
@@ -1110,7 +1216,7 @@ fn matches_derived(
             working,
             state.player(working[&id].controller).object,
             inner,
-            watcher,
+            env,
             params,
         ),
         Predicate::Relation(sylex_core::RelationPredicate::Owner(inner)) => matches_derived(
@@ -1118,7 +1224,7 @@ fn matches_derived(
             working,
             state.player(state.owner_of(id)).object,
             inner,
-            watcher,
+            env,
             params,
         ),
         // `Named` and everything non-characteristic (zone, status, kind,
@@ -1136,45 +1242,81 @@ fn matches_derived(
         // relations resolve over player proxies / object iteration; combat and
         // state read stored fields — so the layers()-free guarantee is
         // independent of the id's zone. Characteristic leaves are handled above.
-        _ => crate::target::matches_with(state, id, filter, watcher),
+        _ => crate::target::matches_with(state, id, filter, env.watcher),
     }
 }
 
+/// Whether the object `id` is the one a `Ref` leaf of a layer-pass filter
+/// names. A register of the filter's own region (`params`) reads by
+/// provenance: its candidate is `id` itself, `Source`/`Controller` anchor on
+/// the carrier, and a `Capture` reads the enclosing region's register from
+/// `env`'s activation, so "each other legendary creature" in a distributed
+/// count excludes the object being modified. A predicate with no region of
+/// its own (a condition's) reads the registers of the region it sits in.
 fn static_reference_matches(
     state: &GameState,
-    working: &BTreeMap<ObjectId, DerivedObject>,
     id: ObjectId,
     filter: &Predicate,
-    watcher: Option<ObjectSource>,
+    env: CountEnv<'_>,
     params: Option<&[sylex_core::Param]>,
 ) -> bool {
+    use sylex_core::Provenance;
     let Predicate::Ref(Reference::Reg(reference)) = filter else {
         return matches!(filter, Predicate::Any);
     };
-    let provenance = params
-        .and_then(|params| params.get(reference.0 as usize))
-        .map(|param| &param.provenance);
-    match (provenance, watcher) {
-        (Some(sylex_core::Provenance::Candidate(_)), _) => true,
-        (Some(sylex_core::Provenance::Source), Some(source)) => {
-            state.objects.obj(id).source == source
-        }
-        // [CR#109.5]: the carrier's controller as derived so far this pass
-        // (layer 2 has already run, [CR#613.1b]); a player carrier is its own
-        // player.
-        (Some(sylex_core::Provenance::Controller), Some(source)) => {
-            let controller = match source {
-                ObjectSource::Player(player) => Some(player),
-                ObjectSource::Card(_) => state
-                    .objects
-                    .iter()
-                    .find(|object| object.source == source)
-                    .map(|object| working[&object.id].controller),
-            };
+    let activation = || {
+        env.registers.unwrap_or_else(|| {
+            panic!(
+                "a layer-pass filter reads register {reference:?} through an effect with no \
+                 activation: a counter boost or a resolved effect, whose resolution frame the \
+                 layer pass does not keep"
+            )
+        })
+    };
+    let Some(params) = params else {
+        let activation = activation();
+        return read_register(
+            state,
+            env,
+            activation,
+            activation.params,
+            activation.enclosing,
+            *reference,
+        ) == Some(id);
+    };
+    let param = params.get(reference.0 as usize).unwrap_or_else(|| {
+        panic!(
+            "a layer-pass filter reads register {reference:?}, which its region does not declare"
+        )
+    });
+    let carrier = || {
+        env.watcher
+            .expect("a layer-pass effect has a carrier anchoring its filter's source")
+    };
+    match &param.provenance {
+        Provenance::Candidate(_) => true,
+        Provenance::Source => state.objects.obj(id).source == carrier(),
+        // [CR#109.5]: the effect's controller as derived so far this pass
+        // (layer 2 has already run, [CR#613.1b]).
+        Provenance::Controller => {
             matches!(state.objects.obj(id).source,
-                ObjectSource::Player(player) if Some(player) == controller)
+                ObjectSource::Player(player) if player == env.controller)
         }
-        _ => false,
+        &Provenance::Capture(outer) => {
+            let activation = activation();
+            read_register(
+                state,
+                env,
+                activation,
+                activation.params,
+                activation.enclosing,
+                outer,
+            ) == Some(id)
+        }
+        other => panic!(
+            "a layer-pass filter reads register {reference:?} of provenance {other:?}, which a \
+             static ability's activation never supplies"
+        ),
     }
 }
 
@@ -1194,21 +1336,14 @@ fn resolve_scope(
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
     scope: &ScopeResolved,
-    watcher: Option<ObjectSource>,
+    env: CountEnv<'_>,
 ) -> Vec<ObjectId> {
     match scope {
         ScopeResolved::Floating(filter) => working
             .keys()
             .copied()
             .filter(|&id| {
-                matches_derived(
-                    state,
-                    working,
-                    id,
-                    &filter.body,
-                    watcher,
-                    Some(&filter.params),
-                )
+                matches_derived(state, working, id, &filter.body, env, Some(&filter.params))
             })
             .collect(),
         ScopeResolved::Locked(ids) => ids.clone(),
@@ -1223,12 +1358,12 @@ fn condition_predicate_matches(
     working: &BTreeMap<ObjectId, DerivedObject>,
     id: ObjectId,
     filter: &Predicate,
-    watcher: Option<ObjectSource>,
+    env: CountEnv<'_>,
 ) -> bool {
     if working.contains_key(&id) {
-        matches_derived(state, working, id, filter, watcher, None)
+        matches_derived(state, working, id, filter, env, None)
     } else {
-        crate::target::matches_with(state, id, filter, watcher)
+        crate::target::matches_with(state, id, filter, env.watcher)
     }
 }
 
@@ -1240,42 +1375,37 @@ fn condition_holds_derived(
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
     condition: &Condition,
-    watcher: Option<ObjectSource>,
-    controller: PlayerId,
+    env: CountEnv<'_>,
 ) -> bool {
     match condition {
         Condition::Exists(filter) => state
             .objects
             .iter()
-            .any(|object| condition_predicate_matches(state, working, object.id, filter, watcher)),
-        Condition::Matches(reference, filter) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
-                .is_some_and(|id| condition_predicate_matches(state, working, id, filter, watcher))
-        }
+            .any(|object| condition_predicate_matches(state, working, object.id, filter, env)),
+        Condition::Matches(reference, filter) => resolve_count_ref(state, working, reference, env)
+            .is_some_and(|id| condition_predicate_matches(state, working, id, filter, env)),
         Condition::Compare(a, op, b) => {
-            let lhs = eval_count(a, state, working, watcher, controller).max(0);
-            let rhs = eval_count(b, state, working, watcher, controller).max(0);
+            let lhs = eval_count(a, state, working, env).max(0);
+            let rhs = eval_count(b, state, working, env).max(0);
             op.apply(lhs.cast_unsigned(), rhs.cast_unsigned())
         }
-        Condition::And(conditions) => conditions.iter().all(|condition| {
-            condition_holds_derived(state, working, condition, watcher, controller)
-        }),
-        Condition::Or(conditions) => conditions.iter().any(|condition| {
-            condition_holds_derived(state, working, condition, watcher, controller)
-        }),
-        Condition::Not(condition) => {
-            !condition_holds_derived(state, working, condition, watcher, controller)
-        }
+        Condition::And(conditions) => conditions
+            .iter()
+            .all(|condition| condition_holds_derived(state, working, condition, env)),
+        Condition::Or(conditions) => conditions
+            .iter()
+            .any(|condition| condition_holds_derived(state, working, condition, env)),
+        Condition::Not(condition) => !condition_holds_derived(state, working, condition, env),
         // Provenance is erased at `lower` (`sylex_lowering_v1`), so no
         // loaded value reaches here wrapped. The arm survives only because
         // the variant does; `core-demacro` deletes both.
-        Condition::YourTurn => state.turn.active_player == controller,
+        Condition::YourTurn => state.turn.active_player == env.controller,
         Condition::TurnOf(filter) => condition_predicate_matches(
             state,
             working,
             state.player(state.turn.active_player).object,
             filter,
-            watcher,
+            env,
         ),
         Condition::DuringPhase(phase) => state.turn.current == *phase,
         // History and paid-cost gates do not read derived characteristics.
@@ -1287,9 +1417,9 @@ fn condition_holds_derived(
         | Condition::CastWith(_)) => state
             .objects
             .iter()
-            .find(|object| Some(object.source) == watcher)
+            .find(|object| Some(object.source) == env.watcher)
             .is_some_and(|source| {
-                state.condition_holds(condition, &state.frame(source.id, controller))
+                state.condition_holds(condition, &state.frame(source.id, env.controller))
             }),
         // `LegallyAttached` needs the deontic attachment view, which cannot be
         // rebuilt recursively while this view is in progress. A crossing gate
@@ -1305,13 +1435,7 @@ fn effect_conditions_hold(
     effect: &ActiveEffect,
 ) -> bool {
     effect.conditions.iter().all(|condition| {
-        condition_holds_derived(
-            state,
-            working,
-            condition,
-            effect.watcher,
-            effect.controller_in(working),
-        )
+        condition_holds_derived(state, working, condition, effect.count_env(working, None))
     })
 }
 
@@ -1320,27 +1444,57 @@ fn effect_conditions_hold(
 // ---------------------------------------------------------------------------
 
 /// Resolve a `Count`'s `Reference` to a concrete `ObjectId` against the working
-/// pass, anchoring carrier refs (`This`, `AttachHostOf(This)`, …) to the
-/// effect's `watcher` ([CR#611.2c]). The watcher's live carrier object (the one
-/// whose `source == watcher`) is the `This` `resolve_source_relative` resolves
-/// from. A `ExecutionFrame`-only reference (`Target`, bindings, the
-/// player-valued `You`/`ControllerOf`/`OwnerOf`) yields nothing here — the same
-/// documented seam `resolve_source_relative` carries — so a count built on it
-/// defaults to `0`.
+/// pass. A register reads the activation `env` carries (engine law 1): a
+/// static ability's `Source` is its source, `Controller` its controller's
+/// proxy, a `Candidate` the object the effect is modifying, so Opalescence's
+/// "its mana value" reads each enchantment it modifies, and a `Capture` the
+/// enclosing region's register or the ability's captured value. With no
+/// activation (a counter boost or resolved effect), a register reads
+/// source-relative through the effect's `watcher`, the carrier object whose
+/// `source == watcher`.
+///
+/// A relation nobody holds (an unattached Aura's host, a departed captured
+/// object) yields nothing, so a count built on it is `0`. `Single`,
+/// `OpponentOf` and `Coalesce` need an `ExecutionFrame` the layer pass lacks
+/// and yield nothing too.
 fn resolve_count_ref(
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
     reference: &sylex_core::Reference,
-    watcher: Option<ObjectSource>,
-    controller: PlayerId,
+    env: CountEnv<'_>,
 ) -> Option<ObjectId> {
     use sylex_core::Reference;
     match reference {
-        reference if reference == &Reference::controller_parameter() => {
-            Some(state.player(controller).object)
+        &Reference::Reg(register) => match env.registers {
+            Some(activation) => read_register(
+                state,
+                env,
+                activation,
+                activation.params,
+                activation.enclosing,
+                register,
+            ),
+            None if reference == &Reference::controller_parameter() => {
+                Some(state.player(env.controller).object)
+            }
+            None => {
+                let source = state
+                    .objects
+                    .iter()
+                    .find(|o| Some(o.source) == env.watcher)?
+                    .id;
+                resolve_source_relative(state, source, reference, None, &[])
+                    .into_iter()
+                    .next()
+            }
+        },
+        // The host an attachment is attached to ([CR#301.5,303.4]).
+        Reference::AttachHostOf(inner) => {
+            let id = resolve_count_ref(state, working, inner, env)?;
+            state.objects.get(id).and_then(|o| o.attached_to)
         }
         Reference::ControllerOf(inner) => {
-            let id = resolve_count_ref(state, working, inner, watcher, controller)?;
+            let id = resolve_count_ref(state, working, inner, env)?;
             // A card's controller as derived so far this pass; an id absent
             // from `working` is a player proxy, whose stored controller is its
             // own player.
@@ -1351,19 +1505,65 @@ fn resolve_count_ref(
             Some(state.player(player).object)
         }
         Reference::OwnerOf(inner) => {
-            let id = resolve_count_ref(state, working, inner, watcher, controller)?;
+            let id = resolve_count_ref(state, working, inner, env)?;
             state
                 .objects
                 .get(id)
                 .and_then(crate::object::GameObject::card_id)
                 .map(|_| state.player(state.owner_of(id)).object)
         }
-        _ => {
-            let source = state.objects.iter().find(|o| Some(o.source) == watcher)?.id;
-            resolve_source_relative(state, source, reference, None, &[])
-                .into_iter()
-                .next()
+        Reference::Single(_) | Reference::OpponentOf(_) | Reference::Coalesce(_) => None,
+    }
+}
+
+/// The object register `register` of the region declaring `params` holds in
+/// `activation`; `enclosing` declares the registers a `Capture` parameter of
+/// that region reads (`None` at the ability's own region, whose captures are
+/// the ability's captured values).
+fn read_register(
+    state: &GameState,
+    env: CountEnv<'_>,
+    activation: Activation<'_>,
+    params: &[sylex_core::Param],
+    enclosing: Option<&[sylex_core::Param]>,
+    register: sylex_core::RefId,
+) -> Option<ObjectId> {
+    use sylex_core::Provenance;
+    let param = params.get(register.0 as usize).unwrap_or_else(|| {
+        panic!("a layer-pass count reads register {register:?}, which its region does not declare")
+    });
+    match &param.provenance {
+        Provenance::Source => Some(activation.source),
+        Provenance::Controller => Some(state.player(env.controller).object),
+        Provenance::Candidate(_) => Some(activation.candidate.unwrap_or_else(|| {
+            panic!(
+                "a layer-pass count reads candidate register {register:?} while no object is \
+                 being modified"
+            )
+        })),
+        &Provenance::Capture(outer) => {
+            if let Some(enclosing) = enclosing {
+                return read_register(state, env, activation, enclosing, None, outer);
+            }
+            let (_, value) = activation
+                .captures
+                .iter()
+                .find(|(here, _)| *here == register)
+                .unwrap_or_else(|| {
+                    panic!("static ability capture {register:?} has no captured value")
+                });
+            let objects = captured_objects(value);
+            assert!(
+                objects.len() <= 1,
+                "a layer-pass count names one object, but capture {register:?} holds {}",
+                objects.len()
+            );
+            objects.into_iter().next()
         }
+        other => panic!(
+            "a layer-pass count reads register {register:?} of provenance {other:?}, which a \
+             static ability's activation never supplies"
+        ),
     }
 }
 
@@ -1422,11 +1622,10 @@ fn eval_stat_of(
     working: &BTreeMap<ObjectId, DerivedObject>,
     reference: &sylex_core::Reference,
     stat: sylex_core::Stat,
-    watcher: Option<ObjectSource>,
-    controller: PlayerId,
+    env: CountEnv<'_>,
 ) -> Int {
     use sylex_core::Stat;
-    let Some(id) = resolve_count_ref(state, working, reference, watcher, controller) else {
+    let Some(id) = resolve_count_ref(state, working, reference, env) else {
         return 0;
     };
     let value = match stat {
@@ -1497,8 +1696,7 @@ fn eval_count(
     n: &Count,
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
-    watcher: Option<ObjectSource>,
-    controller: PlayerId,
+    env: CountEnv<'_>,
 ) -> Int {
     match n {
         Count::Literal(v) => (*v).cast_signed(),
@@ -1514,14 +1712,7 @@ fn eval_count(
                     .keys()
                     .copied()
                     .filter(|&id| {
-                        matches_derived(
-                            state,
-                            working,
-                            id,
-                            &filter.body,
-                            watcher,
-                            Some(&filter.params),
-                        )
+                        matches_derived(state, working, id, &filter.body, env, Some(&filter.params))
                     })
                     .count();
                 Int::try_from(count).expect("object count fits Int")
@@ -1531,8 +1722,7 @@ fn eval_count(
             // 0 (never-crash), mirroring the other `resolve_count_ref`
             // consumers above.
             Countable::ManaSymbols(reference, pred) => {
-                let Some(id) = resolve_count_ref(state, working, reference, watcher, controller)
-                else {
+                let Some(id) = resolve_count_ref(state, working, reference, env) else {
                     return 0;
                 };
                 let Some(o) = state.objects.get(id) else {
@@ -1552,8 +1742,7 @@ fn eval_count(
             // [CR#105.2]: the cardinality of a one-object "set" — 1 when the
             // reference resolves to a real card-backed object, else 0.
             Countable::Singleton(reference) => {
-                let Some(id) = resolve_count_ref(state, working, reference, watcher, controller)
-                else {
+                let Some(id) = resolve_count_ref(state, working, reference, env) else {
                     return 0;
                 };
                 if state
@@ -1575,82 +1764,69 @@ fn eval_count(
         // `working`. Mana value / loyalty / defense are layer-stable base state
         // (read off the card face / counter map, as `resolve.rs` does). A
         // negative result counts as `0` ([CR#107.1b,613]).
-        Count::StatOf(reference, stat) => {
-            eval_stat_of(state, working, reference, *stat, watcher, controller)
-        }
+        Count::StatOf(reference, stat) => eval_stat_of(state, working, reference, *stat, env),
         // [CR#119.1,402.2]: a player's numeric attribute — read straight off
         // state (players have no [CR#613] layers). A non-player or unresolved
         // reference contributes 0.
-        Count::PlayerStatOf(reference, attr) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
-                .and_then(|id| state.objects.get(id))
-                .and_then(|o| match o.source {
-                    ObjectSource::Player(p) => Some(p),
-                    ObjectSource::Card(_) => None,
-                })
-                .map_or(0, |p| {
-                    Int::try_from(state.player_attr(p, *attr)).expect("player attr fits Int")
-                })
-        }
+        Count::PlayerStatOf(reference, attr) => resolve_count_ref(state, working, reference, env)
+            .and_then(|id| state.objects.get(id))
+            .and_then(|o| match o.source {
+                ObjectSource::Player(p) => Some(p),
+                ObjectSource::Card(_) => None,
+            })
+            .map_or(0, |p| {
+                Int::try_from(state.player_attr(p, *attr)).expect("player attr fits Int")
+            }),
         // [CR#102.1]: how many opponents the referenced player has.
-        Count::Opponents(reference) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
-                .and_then(|id| state.objects.get(id))
-                .and_then(|o| match o.source {
-                    ObjectSource::Player(p) => Some(p),
-                    ObjectSource::Card(_) => None,
-                })
-                .map_or(0, |p| {
-                    Int::try_from(state.opponent_count(p)).expect("opponent count fits Int")
-                })
-        }
+        Count::Opponents(reference) => resolve_count_ref(state, working, reference, env)
+            .and_then(|id| state.objects.get(id))
+            .and_then(|o| match o.source {
+                ObjectSource::Player(p) => Some(p),
+                ObjectSource::Card(_) => None,
+            })
+            .map_or(0, |p| {
+                Int::try_from(state.opponent_count(p)).expect("opponent count fits Int")
+            }),
         // [CR#122.1]: the count of a counter kind on the resolved object, read
         // off the raw counter map (base state — no derived/recursion). An absent
         // object or kind is `0`.
-        Count::CounterCount(reference, kind) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
-                .and_then(|id| state.objects.get(id))
-                .and_then(|o| o.counters.get(kind.as_str()).copied())
-                .map_or(0, |c| Int::try_from(c).expect("counter count fits Int"))
-        }
+        Count::CounterCount(reference, kind) => resolve_count_ref(state, working, reference, env)
+            .and_then(|id| state.objects.get(id))
+            .and_then(|o| o.counters.get(kind.as_str()).copied())
+            .map_or(0, |c| Int::try_from(c).expect("counter count fits Int")),
         // [CR#715.2d]: the greatest chapter number among the object's own
         // abilities, read off the derivation in progress so a stripped chapter
         // ([CR#613.1f]) stops counting. 0 when nothing watches a crossing.
         Count::GreatestWatchedThreshold(reference) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
+            resolve_count_ref(state, working, reference, env)
                 .and_then(|id| working.get(&id))
                 .map_or(0, |derived| {
                     watched_thresholds(&derived.characteristics.abilities)
-                        .map(|t| eval_count(t, state, working, watcher, controller))
+                        .map(|t| eval_count(t, state, working, env))
                         .max()
                         .unwrap_or(0)
                 })
         }
         // [CR#120.3]: marked damage on the resolved object (base state).
-        Count::Damage(reference) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
-                .and_then(|id| state.objects.get(id))
-                .map_or(0, |o| {
-                    Int::try_from(o.total_damage()).expect("damage fits Int")
-                })
-        }
+        Count::Damage(reference) => resolve_count_ref(state, working, reference, env)
+            .and_then(|id| state.objects.get(id))
+            .map_or(0, |o| {
+                Int::try_from(o.total_damage()).expect("damage fits Int")
+            }),
         // [CR#106.4]: the referenced player's total floated mana — read
         // straight off the pool (base state, no layers). A non-player or
         // unresolved reference contributes 0.
-        Count::ManaAvailable(reference) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
-                .and_then(|id| state.objects.get(id))
-                .and_then(|o| match o.source {
-                    ObjectSource::Player(p) => Some(p),
-                    ObjectSource::Card(_) => None,
-                })
-                .map_or(0, |p| {
-                    Int::try_from(state.player(p).mana_pool.units().len())
-                        .expect("mana pool fits Int")
-                })
-        }
+        Count::ManaAvailable(reference) => resolve_count_ref(state, working, reference, env)
+            .and_then(|id| state.objects.get(id))
+            .and_then(|o| match o.source {
+                ObjectSource::Player(p) => Some(p),
+                ObjectSource::Card(_) => None,
+            })
+            .map_or(0, |p| {
+                Int::try_from(state.player(p).mana_pool.units().len()).expect("mana pool fits Int")
+            }),
         Count::ManaAvailableKind(reference, kind) => {
-            resolve_count_ref(state, working, reference, watcher, controller)
+            resolve_count_ref(state, working, reference, env)
                 .and_then(|id| state.objects.get(id))
                 .and_then(|o| match o.source {
                     ObjectSource::Player(p) => Some(p),
@@ -1662,22 +1838,26 @@ fn eval_count(
                 })
         }
         // [CR#704.5q]: the lesser of two magnitudes.
-        Count::Min(a, b) => eval_count(a, state, working, watcher, controller)
-            .min(eval_count(b, state, working, watcher, controller)),
+        Count::Min(a, b) => {
+            eval_count(a, state, working, env).min(eval_count(b, state, working, env))
+        }
         // [CR#107.1] basic value arithmetic over the derived view. `Minus`
         // floors at 0 ([CR#107.1b]); `Half` rounds per the mode on the
         // non-negative magnitude.
-        Count::Max(a, b) => eval_count(a, state, working, watcher, controller)
-            .max(eval_count(b, state, working, watcher, controller)),
-        Count::Plus(a, b) => eval_count(a, state, working, watcher, controller)
-            .saturating_add(eval_count(b, state, working, watcher, controller)),
-        Count::Minus(a, b) => (eval_count(a, state, working, watcher, controller)
-            - eval_count(b, state, working, watcher, controller))
-        .max(0),
-        Count::Times(a, b) => eval_count(a, state, working, watcher, controller)
-            .saturating_mul(eval_count(b, state, working, watcher, controller)),
+        Count::Max(a, b) => {
+            eval_count(a, state, working, env).max(eval_count(b, state, working, env))
+        }
+        Count::Plus(a, b) => {
+            eval_count(a, state, working, env).saturating_add(eval_count(b, state, working, env))
+        }
+        Count::Minus(a, b) => {
+            (eval_count(a, state, working, env) - eval_count(b, state, working, env)).max(0)
+        }
+        Count::Times(a, b) => {
+            eval_count(a, state, working, env).saturating_mul(eval_count(b, state, working, env))
+        }
         Count::Half(mode, inner) => {
-            let v = eval_count(inner, state, working, watcher, controller).max(0);
+            let v = eval_count(inner, state, working, env).max(0);
             match mode {
                 // Widened to i64 to avoid overflow near i32::MAX (signed
                 // div_ceil is unstable on stable); the quotient is bounded
@@ -1694,26 +1874,18 @@ fn eval_count(
         // (never-crash) rather than panicking on integer division.
         Count::Divide(mode, a, b) => eval_divide(
             *mode,
-            eval_count(a, state, working, watcher, controller).max(0),
-            eval_count(b, state, working, watcher, controller).max(0),
+            eval_count(a, state, working, env).max(0),
+            eval_count(b, state, working, env).max(0),
         ),
         // [CR#107.1]: remainder — parity checks. A zero divisor fizzles to 0.
         Count::Mod(a, b) => {
-            let b = eval_count(b, state, working, watcher, controller).max(0);
-            if b == 0 {
-                0
-            } else {
-                eval_count(a, state, working, watcher, controller).max(0) % b
-            }
+            let b = eval_count(b, state, working, env).max(0);
+            if b == 0 { 0 } else { eval_count(a, state, working, env).max(0) % b }
         }
         // [CR#107.1]: exponentiation — doubling effects build `Pow(2, X)`.
-        Count::Pow(base, exp) => eval_count(base, state, working, watcher, controller)
+        Count::Pow(base, exp) => eval_count(base, state, working, env)
             .max(0)
-            .saturating_pow(
-                eval_count(exp, state, working, watcher, controller)
-                    .max(0)
-                    .cast_unsigned(),
-            ),
+            .saturating_pow(eval_count(exp, state, working, env).max(0).cast_unsigned()),
         // [CR#107.3]: distinct-union count over the derived working set.
         // Printed axes read the card face; power/toughness read the in-progress
         // derived characteristics, matched the same way `CountOf` is.
@@ -1721,14 +1893,8 @@ fn eval_count(
             Countable::Objects(filter) => {
                 let mut seen = std::collections::BTreeSet::new();
                 for id in working.keys().copied() {
-                    if matches_derived(
-                        state,
-                        working,
-                        id,
-                        &filter.body,
-                        watcher,
-                        Some(&filter.params),
-                    ) {
+                    if matches_derived(state, working, id, &filter.body, env, Some(&filter.params))
+                    {
                         for key in distinct_keys_derived(state, working, id, *characteristic) {
                             seen.insert(key);
                         }
@@ -1740,8 +1906,7 @@ fn eval_count(
             // Embiggen's "number of card types it has" =
             // `CountDistinct(Types, Singleton(This))`.
             Countable::Singleton(reference) => {
-                let Some(id) = resolve_count_ref(state, working, reference, watcher, controller)
-                else {
+                let Some(id) = resolve_count_ref(state, working, reference, env) else {
                     return 0;
                 };
                 if state
@@ -1872,20 +2037,20 @@ pub(crate) fn ability_is_named(a: &Ability, name: &Ident) -> bool {
 /// implemented. Subtypes ([CR#613.1d]) and `BecomeBasicLandType` ([CR#305.7])
 /// are explicit deferred stubs; controller/text ([CR#613.1b,613.1c]) and
 /// loyalty/defense (no 613 layer) are also stubs.
-/// `state`/`working`/`obj_id`/`watcher` are threaded for the count-bearing
-/// P/T arms: a dynamic `Count` ([CR#604.3] CDAs, "+X/+X for each …") is
-/// evaluated against `working` via `eval_count` BEFORE the object's entry is
-/// borrowed mutably, anchoring carrier refs to the effect's `watcher`. The
-/// immutable `working` read is scoped to end before the `get_mut`, so there is
-/// no borrow conflict.
+/// `state`/`working`/`obj_id`/`env` are threaded for the count-bearing
+/// P/T arms of layers 7a-7c [CR#613.4a..613.4c]: a dynamic `Count`
+/// ([CR#604.3] CDAs, "+X/+X for each …") is evaluated against `working` via
+/// `eval_count` BEFORE the object's entry is borrowed mutably, reading the
+/// registers `env` carries, whose candidate is `obj_id`. The immutable
+/// `working` read is scoped to end before the `get_mut`, so there is no borrow
+/// conflict.
 fn apply(
     m: &Modification,
     grant_runtime: &crate::activation::AbilityRuntime,
-    effect_controller: PlayerId,
     state: &GameState,
     working: &mut BTreeMap<ObjectId, DerivedObject>,
     obj_id: ObjectId,
-    watcher: Option<ObjectSource>,
+    env: CountEnv<'_>,
 ) {
     match m {
         // --- Layer 7a/7b/7c: power / toughness ([CR#613.4]) ---
@@ -1895,19 +2060,19 @@ fn apply(
         // [CR#122.1a,613.4c]). The count is evaluated against `working`
         // immutably before the `get_mut`.
         Modification::Power(op) => {
-            let v = eval_numeric_op(op, state, working, watcher, effect_controller);
+            let v = eval_numeric_op(op, state, working, env);
             if let Some(d) = working.get_mut(&obj_id) {
                 apply_numeric(op, &mut d.characteristics.power, v);
             }
         }
         Modification::Toughness(op) => {
-            let v = eval_numeric_op(op, state, working, watcher, effect_controller);
+            let v = eval_numeric_op(op, state, working, env);
             if let Some(d) = working.get_mut(&obj_id) {
                 apply_numeric(op, &mut d.characteristics.toughness, v);
             }
         }
         // Non-count ops: borrow the entry mutably and mutate in place.
-        m => apply_static(m, grant_runtime, effect_controller, state, working, obj_id),
+        m => apply_static(m, grant_runtime, env.controller, state, working, obj_id),
     }
 }
 
@@ -1919,12 +2084,11 @@ fn eval_numeric_op(
     op: &NumericOp,
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
-    watcher: Option<ObjectSource>,
-    controller: PlayerId,
+    env: CountEnv<'_>,
 ) -> Int {
     match op {
-        NumericOp::Set(v) => eval_stat_value(v, state, working, watcher, controller),
-        NumericOp::Up(c) | NumericOp::Down(c) => eval_count(c, state, working, watcher, controller),
+        NumericOp::Set(v) => eval_stat_value(v, state, working, env),
+        NumericOp::Up(c) | NumericOp::Down(c) => eval_count(c, state, working, env),
     }
 }
 
@@ -1935,12 +2099,11 @@ fn eval_stat_value(
     v: &StatValue,
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
-    watcher: Option<ObjectSource>,
-    controller: PlayerId,
+    env: CountEnv<'_>,
 ) -> Int {
     match v {
         StatValue::Number(n) => *n,
-        StatValue::Count(c) => eval_count(c, state, working, watcher, controller),
+        StatValue::Count(c) => eval_count(c, state, working, env),
         StatValue::Variable | StatValue::DefinedByAbility => 0,
     }
 }
@@ -2212,7 +2375,12 @@ fn effect_targets(
     }
     match &effect.locked {
         Some(ids) => ids.clone(),
-        None => resolve_scope(state, working, &effect.scope, effect.watcher),
+        None => resolve_scope(
+            state,
+            working,
+            &effect.scope,
+            effect.count_env(working, None),
+        ),
     }
 }
 
@@ -2229,22 +2397,26 @@ fn apply_effect_in_layer(
         return;
     }
     if effect.locked.is_none() {
-        effect.locked = Some(resolve_scope(state, working, &effect.scope, effect.watcher));
+        effect.locked = Some(resolve_scope(
+            state,
+            working,
+            &effect.scope,
+            effect.count_env(working, None),
+        ));
     }
-    let targets = effect.locked.clone().expect("locked just set");
-    let controller = effect.controller_in(working);
-    for obj_id in targets {
+    let effect = &*effect;
+    let targets = effect.locked.as_ref().expect("locked just set");
+    for &obj_id in targets {
         if working.contains_key(&obj_id) {
             for (m, runtime) in effect.changes.iter().zip(&effect.grant_runtimes) {
                 if layer_of(m, effect.is_cda) == Some(layer) {
                     apply(
                         m,
                         runtime,
-                        controller,
                         state,
                         working,
                         obj_id,
-                        effect.watcher,
+                        effect.count_env(working, Some(obj_id)),
                     );
                 }
             }
@@ -2262,12 +2434,18 @@ fn probe_apply(
     layer: Layer,
 ) -> BTreeMap<ObjectId, DerivedObject> {
     let mut probe = working.clone();
-    let controller = d.controller_in(working);
     for obj_id in effect_targets(state, working, d) {
         if probe.contains_key(&obj_id) {
             for (m, runtime) in d.changes.iter().zip(&d.grant_runtimes) {
                 if layer_of(m, d.is_cda) == Some(layer) {
-                    apply(m, runtime, controller, state, &mut probe, obj_id, d.watcher);
+                    apply(
+                        m,
+                        runtime,
+                        state,
+                        &mut probe,
+                        obj_id,
+                        d.count_env(working, Some(obj_id)),
+                    );
                 }
             }
         }
@@ -4135,8 +4313,11 @@ mod tests {
                 &colors,
                 &state,
                 &working,
-                Some(ObjectSource::Card(card_id)),
-                PlayerId(0)
+                super::CountEnv {
+                    watcher: Some(ObjectSource::Card(card_id)),
+                    controller: PlayerId(0),
+                    registers: None,
+                },
             ),
             1,
             "[CR#202.2]: {{W}}{{W}}{{W}} makes it white, one color"

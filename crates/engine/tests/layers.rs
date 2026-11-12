@@ -1071,19 +1071,25 @@ fn each_static(
 
 /// Opalescence ({2}{W}{W} Enchantment): "Each other non-Aura enchantment is a
 /// creature in addition to its other types and has base power and base
-/// toughness each equal to its mana value." Every enchantment these tests
-/// animate costs four, so the fixture sets base 4/4: the layer pass evaluates
-/// a count against the static's source, not the object it modifies
-/// (`engine-layer-count-per-affected-object`).
+/// toughness each equal to its mana value." "Its mana value" names the
+/// `Each` body's candidate, register 0: the enchantment being modified.
 fn opalescence() -> Arc<Card> {
     use sylex_core::CharacteristicPredicate;
     use sylex_core::CollectionOp;
+    use sylex_core::Count;
     use sylex_core::Modification;
     use sylex_core::NumericOp;
     use sylex_core::Predicate;
     use sylex_core::Reference;
+    use sylex_core::Stat;
     use sylex_core::StatValue;
     use sylex_core::Type;
+    let its_mana_value = || {
+        NumericOp::Set(StatValue::Count(Count::StatOf(
+            Reference::Reg(sylex_core::RefId(0)),
+            Stat::ManaValue,
+        )))
+    };
     let animate = each_static(
         Predicate::And(
             vec![
@@ -1099,8 +1105,8 @@ fn opalescence() -> Arc<Card> {
         ),
         vec![
             Modification::CardTypes(CollectionOp::Add(Type::Creature.name())),
-            Modification::Power(NumericOp::Set(StatValue::Number(4))),
-            Modification::Toughness(NumericOp::Set(StatValue::Number(4))),
+            Modification::Power(its_mana_value()),
+            Modification::Toughness(its_mana_value()),
         ],
     );
     fixture(
@@ -1119,6 +1125,32 @@ fn worship() -> Arc<Card> {
     fixture(
         "Worship",
         white_cost(3, 1),
+        &[sylex_core::Type::Enchantment],
+        &[],
+        None,
+        vec![],
+    )
+}
+
+/// Story Circle ({1}{W}{W} Enchantment). Its abilities are left off: these
+/// tests read only its types and power and toughness.
+fn story_circle() -> Arc<Card> {
+    fixture(
+        "Story Circle",
+        white_cost(1, 2),
+        &[sylex_core::Type::Enchantment],
+        &[],
+        None,
+        vec![],
+    )
+}
+
+/// Sphere of Safety ({4}{W} Enchantment). Its one ability, an attack tax, is
+/// left off: these tests read only its types and power and toughness.
+fn sphere_of_safety() -> Arc<Card> {
+    fixture(
+        "Sphere of Safety",
+        white_cost(4, 1),
         &[sylex_core::Type::Enchantment],
         &[],
         None,
@@ -1244,6 +1276,24 @@ fn assert_blank_animated(view: &sylex_engine::LayeredView, id: ObjectId, pt: i32
         (Some(pt), Some(pt)),
         "{what} is {pt}/{pt}"
     );
+}
+
+/// Opalescence sets each animated enchantment's base power and toughness to
+/// that enchantment's own mana value [CR#613.4b,202.3]: Story Circle (mana
+/// value 3) is 3/3 and Sphere of Safety (mana value 5) is 5/5, never
+/// Opalescence's own 4.
+#[test]
+fn opalescence_reads_each_enchantments_own_mana_value() {
+    let mut state = game_with_p0_deck(vec![opalescence(), story_circle(), sphere_of_safety()]);
+    let ids = enter_in_order(
+        &mut state,
+        &["Opalescence", "Story Circle", "Sphere of Safety"],
+    );
+    let [_opal, circle, sphere] = ids[..] else { unreachable!() };
+
+    let view = state.layers();
+    assert_blank_animated(&view, circle, 3, "Story Circle");
+    assert_blank_animated(&view, sphere, 5, "Sphere of Safety");
 }
 
 /// Humility's 2009-10-01 ruling, Opalescence entered first: "if Opalescence,
@@ -1444,4 +1494,256 @@ fn humility_loop_applies_in_timestamp_order() {
         (Some(4), Some(4))
     );
     assert_blank_animated(&view, second, 4, "the second Humility");
+}
+
+// ---------------------------------------------------------------------------
+// Counts in a distributed static ([CR#613.4c])
+// ---------------------------------------------------------------------------
+
+/// A semantic card read and lowered through the production boundary
+/// (`Plugin::card_from_str`), so its regions carry the register layout
+/// lowering produces.
+fn lowered(source: &str) -> Arc<Card> {
+    Arc::new(
+        plugin("canon")
+            .card_from_str(source)
+            .unwrap_or_else(|error| panic!("fixture did not load: {error}\n{source}"))
+            .core,
+    )
+}
+
+/// Heroes' Podium ({5} Legendary Artifact): "Each legendary creature you
+/// control gets +1/+1 for each other legendary creature you control." Its
+/// look-at-the-top ability and its own legendary supertype are left off (it is
+/// no creature, so no filter here reads it).
+///
+/// A core fixture with the register layout lowering gives a count filter
+/// nested in an `Each` body: the filter's candidate, then the body's
+/// candidate captured (`Capture(0)`), then the re-declared source and
+/// controller. "Other" excludes the captured candidate, the creature being
+/// modified. The v1 semantic language cannot spell that exclusion: `It` and
+/// `That(Creature)` inside the count filter both lower to the filter's own
+/// candidate.
+fn heroes_podium() -> Arc<Card> {
+    use sylex_core::CharacteristicPredicate;
+    use sylex_core::Count;
+    use sylex_core::Countable;
+    use sylex_core::DefId;
+    use sylex_core::Domain;
+    use sylex_core::Kind;
+    use sylex_core::Modification;
+    use sylex_core::NumericOp;
+    use sylex_core::Param;
+    use sylex_core::Predicate;
+    use sylex_core::Provenance;
+    use sylex_core::RefId;
+    use sylex_core::Reference;
+    use sylex_core::RelationPredicate;
+    use sylex_core::StaticSpec;
+    use sylex_core::Supertype;
+    use sylex_core::Type;
+    let entity = |def: u32, provenance: Provenance| Param {
+        def: DefId(def),
+        kind: Kind::Entity,
+        provenance,
+    };
+    let reg = |r: u32| Arc::new(Predicate::Ref(Reference::Reg(RefId(r))));
+    let legendary_creature_controlled_by = |you: u32| {
+        vec![
+            Predicate::Characteristic(CharacteristicPredicate::Supertype(Supertype::Legendary)),
+            Predicate::r#type(Type::Creature),
+            Predicate::Relation(RelationPredicate::ControlledBy(reg(you))),
+        ]
+    };
+    let mut other = legendary_creature_controlled_by(3);
+    other.push(Predicate::Not(reg(1)));
+    let other_legends = Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::new(
+        Arc::from([
+            entity(0, Provenance::Candidate(Domain::Object)),
+            entity(1, Provenance::Capture(RefId(0))),
+            entity(2, Provenance::Source),
+            entity(3, Provenance::Controller),
+        ]),
+        Predicate::And(other.into()),
+    ))));
+    let body = sylex_core::Region::new(
+        Arc::from([
+            entity(0, Provenance::Candidate(Domain::Object)),
+            entity(1, Provenance::Source),
+            entity(2, Provenance::Controller),
+        ]),
+        StaticSpec::Modify(
+            Reference::Reg(RefId(0)),
+            Modification::Several(
+                vec![
+                    Modification::Power(NumericOp::Up(other_legends.clone())),
+                    Modification::Toughness(NumericOp::Up(other_legends)),
+                ]
+                .into(),
+            ),
+        ),
+    );
+    let pump = sylex_core::Ability::r#static(StaticSpec::Each(
+        sylex_core::Selection::SelectAll(static_candidate_filter(Predicate::And(
+            legendary_creature_controlled_by(2).into(),
+        ))),
+        Arc::new(body),
+    ));
+    fixture(
+        "Heroes' Podium",
+        vec![sylex_core::ManaSymbol::Simple(
+            sylex_core::SimpleManaSymbol::Generic(5),
+        )],
+        &[Type::Artifact],
+        &[],
+        None,
+        vec![pump],
+    )
+}
+
+/// Isamaru, Hound of Konda ({W} Legendary Creature — Dog, 2/2). As in every
+/// lowered fixture here, a creature type is spelled only where a filter reads
+/// it.
+fn isamaru() -> Arc<Card> {
+    lowered(
+        r#"Normal(
+  name: "Isamaru, Hound of Konda",
+  mana_cost: [White],
+  supertypes: [Legendary],
+  types: [Creature],
+  power: 2,
+  toughness: 2,
+)"#,
+    )
+}
+
+/// Tobias Andrion ({3}{W}{U} Legendary Creature — Human Advisor, 4/4).
+fn tobias_andrion() -> Arc<Card> {
+    lowered(
+        r#"Normal(
+  name: "Tobias Andrion",
+  mana_cost: [Generic(3), White, Blue],
+  supertypes: [Legendary],
+  types: [Creature],
+  power: 4,
+  toughness: 4,
+)"#,
+    )
+}
+
+/// Joraga Warcaller ({G} Creature — Elf Warrior, 1/1): "Other Elf creatures
+/// you control get +1/+1 for each +1/+1 counter on this creature." Its
+/// multikicker and enters-with-counters abilities are left off; the test
+/// places the counters.
+fn joraga_warcaller() -> Arc<Card> {
+    lowered(
+        r#"Normal(
+  name: "Joraga Warcaller",
+  mana_cost: [Green],
+  types: [Creature],
+  subtypes: [Elf],
+  abilities: [
+    Static(Each(
+      SelectAll(And([Subtype(Elf), Creature, ControlledBy(Ref(You)), Not(Ref(This))])),
+      Modify(It, PowerAndToughnessBoth(Up(CounterCount(This, P1P1Counter)))),
+    )),
+  ],
+  power: 1,
+  toughness: 1,
+)"#,
+    )
+}
+
+/// Llanowar Elves ({G} Creature — Elf Druid, 1/1). Its mana ability is left
+/// off.
+fn llanowar_elves() -> Arc<Card> {
+    lowered(
+        r#"Normal(
+  name: "Llanowar Elves",
+  mana_cost: [Green],
+  types: [Creature],
+  subtypes: [Elf],
+  power: 1,
+  toughness: 1,
+)"#,
+    )
+}
+
+/// Heroes' Podium's count reads, for each legendary creature it modifies, the
+/// legendary creatures you control OTHER than that one [CR#613.4c]: with two
+/// legendary creatures each gets +1/+1, not +2/+2 from counting itself. The
+/// nonlegendary Grizzly Bears is neither modified nor counted.
+#[test]
+fn heroes_podium_counts_other_legends_than_the_one_it_modifies() {
+    let mut state = game_with_p0_deck(vec![
+        heroes_podium(),
+        isamaru(),
+        tobias_andrion(),
+        card("Grizzly Bears"),
+    ]);
+    let ids = enter_in_order(
+        &mut state,
+        &[
+            "Heroes' Podium",
+            "Isamaru, Hound of Konda",
+            "Tobias Andrion",
+            "Grizzly Bears",
+        ],
+    );
+    let [_podium, isamaru, tobias, bears] = ids[..] else { unreachable!() };
+
+    let view = state.layers();
+    assert_eq!(
+        (view.power(isamaru), view.toughness(isamaru)),
+        (Some(3), Some(3))
+    );
+    assert_eq!(
+        (view.power(tobias), view.toughness(tobias)),
+        (Some(5), Some(5))
+    );
+    assert_eq!(
+        (view.power(bears), view.toughness(bears)),
+        (Some(2), Some(2))
+    );
+}
+
+/// Joraga Warcaller's count names the static's source ("this creature")
+/// inside the `Each` body, whose register 1 lowering declares as the source,
+/// not the controller [CR#613.4c,122.1]: two +1/+1 counters on the Warcaller
+/// give the other Elf +2/+2.
+#[test]
+fn joraga_warcaller_counts_counters_on_itself() {
+    use sylex_core::Ability;
+    use sylex_core::Ident;
+    use sylex_core::Provenance;
+    use sylex_core::StaticSpec;
+
+    let warcaller = joraga_warcaller();
+    let Card::Normal(face) = &*warcaller else { unreachable!() };
+    let Ability::Static(region) = &face.characteristics.abilities[0] else {
+        panic!("Joraga Warcaller's ability is a static")
+    };
+    let StaticSpec::Each(_, body) = &region.body else {
+        panic!("Joraga Warcaller's static distributes")
+    };
+    assert_eq!(
+        body.params[1].provenance,
+        Provenance::Source,
+        "the Each body's register 1 is the static's source"
+    );
+
+    let mut state = game_with_p0_deck(vec![warcaller, llanowar_elves()]);
+    let ids = enter_in_order(&mut state, &["Joraga Warcaller", "Llanowar Elves"]);
+    let [warcaller, elves] = ids[..] else { unreachable!() };
+    state
+        .objects
+        .obj_mut(warcaller)
+        .counters
+        .insert(Ident::from("P1P1Counter"), 2);
+
+    let view = state.layers();
+    assert_eq!(
+        (view.power(elves), view.toughness(elves)),
+        (Some(3), Some(3))
+    );
 }
