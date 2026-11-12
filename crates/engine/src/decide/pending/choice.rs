@@ -334,13 +334,15 @@ impl DecisionHandler for OrderReplacements {
 }
 
 /// [CR#616.1]: two or more replacement effects are applicable to one event;
-/// the affected player chooses which to apply first. The loop resumes after
-/// the choice via `ReplaceState` in `GameState.replace_state`.
+/// the affected player chooses which to apply first. The occurrence's
+/// replacement pass resumes after the choice via `ReplaceState` in
+/// `GameState.replace_state`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChooseReplacement {
     pub chooser: PlayerId,
-    /// The replacement keys the player may choose among (all applicable
-    /// and not yet in the [CR#614.5] lineage set for this event chain).
+    /// The replacement keys the player may choose among: the applicable
+    /// effects not yet in the [CR#614.5] lineage set for this event chain,
+    /// narrowed to the first non-empty tier of [CR#616.1a..616.1e].
     pub applicable: Vec<crate::replace_registry::ReplacementKey>,
 }
 

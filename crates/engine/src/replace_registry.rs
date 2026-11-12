@@ -265,12 +265,53 @@ pub(crate) enum ApplicableEffect {
     Prevention(Arc<Prevention>),
 }
 
+/// The steps of a replacement choice [CR#616.1a..616.1e], in step order (the
+/// derived `Ord`): when two or more replacement and/or prevention effects
+/// apply to one event, one from the first non-empty tier must be chosen. Each
+/// replacement kind carries its tier.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) enum ReplacementTier {
+    /// [CR#616.1a]: a self-replacement effect ([CR#614.15]).
+    #[cfg_attr(
+        not(test),
+        expect(
+            dead_code,
+            reason = "no self-replacement kind is gathered yet; it carries this tier when it lands"
+        )
+    )]
+    SelfReplacement,
+    /// [CR#616.1b]: modifies under whose control an object enters the
+    /// battlefield.
+    #[expect(
+        dead_code,
+        reason = "no control-on-entry replacement kind is gathered yet; it carries this tier when it lands"
+    )]
+    EnterUnderControl,
+    /// [CR#616.1c]: makes an object enter the battlefield as a copy of
+    /// another.
+    #[expect(
+        dead_code,
+        reason = "no enter-as-copy replacement kind is gathered yet; it carries this tier when it lands"
+    )]
+    EnterAsCopy,
+    /// [CR#616.1d]: makes a card enter the battlefield with its back face up.
+    #[expect(
+        dead_code,
+        reason = "no back-face-up replacement kind is gathered yet; it carries this tier when it lands"
+    )]
+    EnterBackFaceUp,
+    /// [CR#616.1e]: every other replacement or prevention effect.
+    Any,
+}
+
 /// One replacement or prevention effect that is applicable to the current event
 /// — the key (for lineage), the effect itself, and the source object.
 #[derive(Debug, Clone)]
 pub(crate) struct Applicable {
     pub key: ReplacementKey,
     pub effect: ApplicableEffect,
+    /// Which [CR#616.1a..616.1e] step the effect belongs to.
+    pub tier: ReplacementTier,
     pub source: ObjectId,
     /// The static ability region that declares every register read by the
     /// replacement/prevention and its body. Floating instances are the
@@ -316,6 +357,10 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
                         effect: 0,
                     },
                     effect: ApplicableEffect::Replacement(r.clone()),
+                    // [CR#616.1e]: a static ability's replacement is a
+                    // continuous effect, never a [CR#614.15] self-replacement
+                    // ([CR#611.3]).
+                    tier: ReplacementTier::Any,
                     source: obj,
                     params: s.params.clone(),
                 });
@@ -323,8 +368,10 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
         }
     }
 
-    // [CR#702.35a]: SELF-replacements on the affected object even when it is
-    // OFF the battlefield. A static replacement whose source IS the object
+    // [CR#702.35a]: replacements an object's own static abilities apply to
+    // ITSELF, even when it is OFF the battlefield. (Not [CR#614.15]
+    // self-replacement effects, which replace a resolving spell or
+    // ability's own effect.) A static replacement whose source IS the object
     // the event affects functions from whatever zone that object is in —
     // madness's static ability ("if a player would discard THIS card")
     // functions while the card is in a player's hand, which the battlefield
@@ -334,7 +381,7 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
     // `would` matches an event whose patient is this same object), so an
     // other-watching ability idle in hand contributes nothing.
     //
-    // The AS-ENTERS self-replacements ([CR#614.12] — "enters tapped / with
+    // The AS-ENTERS replacements ([CR#614.12] — "enters tapped / with
     // counters / attached to X") are the ONE exception: a permanent's own
     // `enters the battlefield` replacement is applied atomically at MINT
     // (`as_enters_status`, `step.rs`) reading the reminted battlefield id, NOT
@@ -355,7 +402,7 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
     {
         // DERIVED read (see the battlefield sweep above): a Falkenrath-Gorger-
         // shape static confers madness on an owned off-battlefield card, so the
-        // self-replacement that redirects its discard is a CONFERRED ability
+        // replacement that redirects its discard is a CONFERRED ability
         // the printed-only spine would never surface here.
         let (abilities, _printed_len, _captures) =
             crate::derive::derived_abilities_of(state, Some(obj), state.objects.obj(obj).source);
@@ -371,6 +418,10 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
                         effect: 0,
                     },
                     effect: ApplicableEffect::Replacement(r.clone()),
+                    // [CR#616.1e]: a madness-style replacement watches its
+                    // own card, yet it is a static ability's continuous
+                    // effect, not a [CR#614.15] self-replacement ([CR#611.3]).
+                    tier: ReplacementTier::Any,
                     source: obj,
                     params: s.params.clone(),
                 });
@@ -398,6 +449,9 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
             out.push(Applicable {
                 key: ReplacementKey::Floating(inst.id),
                 effect: ApplicableEffect::Replacement(Arc::new(inst.replacement.clone())),
+                // [CR#616.1e]: a shield replaces a later event, not its creating
+                // effect's own ([CR#614.15]).
+                tier: ReplacementTier::Any,
                 source: inst.source,
                 // Stage 3 gives carried floating bodies explicit captures.
                 // Their Stage-2 bridge still has the fixed event-role prefix,
@@ -437,6 +491,8 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
                             effect: 0,
                         },
                         effect: ApplicableEffect::Prevention(p.clone()),
+                        // [CR#616.1e]: a static prevention effect.
+                        tier: ReplacementTier::Any,
                         source: obj,
                         params: s.params.clone(),
                     });
@@ -904,10 +960,28 @@ pub(crate) fn affected_player(state: &GameState, e: &GameEvent) -> PlayerId {
     }
 }
 
+/// [CR#616.1a..616.1e]: the effects a replacement choice offers — those of
+/// the first non-empty tier. Two or more effects apply, so one of them is
+/// chosen; a lone effect in that tier is still offered, as a choice with one
+/// option (the engine exposes every legal decision, `docs/decisions/engine.md`
+/// law 2).
+fn first_tier(applicable: &[Applicable]) -> Vec<ReplacementKey> {
+    let first = applicable
+        .iter()
+        .map(|a| a.tier)
+        .min()
+        .expect("a replacement choice has applicable effects");
+    applicable
+        .iter()
+        .filter(|a| a.tier == first)
+        .map(|a| a.key)
+        .collect()
+}
+
 /// Suspend an occurrence's replacement pass on a choice: store `suspended`
 /// in `GameState.replace_state` and surface a
 /// `DecisionPointKind::ChooseReplacement` for `suspended.current`, offering
-/// every key in `applicable`.
+/// the first non-empty [CR#616.1a..616.1e] tier of `applicable`.
 ///
 /// [CR#616.1]: when two or more players must make these choices at the same
 /// time, they make them in APNAP order. The members of a batch reach this
@@ -923,7 +997,7 @@ pub(crate) fn surface_choice(
         "one replacement pass is suspended at a time — the pending choice blocks every other apply"
     );
     let chooser = affected_player(state, &suspended.current);
-    let offered = applicable.iter().map(|a| a.key).collect();
+    let offered = first_tier(applicable);
     state.replace_state = Some(suspended);
     state.pending = Some(crate::decide::DecisionPointKind::ChooseReplacement(
         crate::decide::pending::ChooseReplacement {
@@ -1793,6 +1867,71 @@ mod tests {
         }
     }
 
+    /// [CR#616.1a,616.1e]: when a self-replacement effect and ordinary
+    /// replacement effects all apply to one event, the choice offers only the
+    /// self-replacement — one of the first non-empty tier must be chosen. No
+    /// self-replacement kind is gathered yet, so the applicable set is built
+    /// by hand: a destroy of a creature with two ordinary `Instead`s on it and
+    /// one [CR#614.15] self-replacement.
+    #[test]
+    fn choice_offers_only_the_self_replacement_tier() {
+        let (mut state, _view, id) = super::tests_support::lone_creature();
+        let applicable = |effect: usize, tier: ReplacementTier| Applicable {
+            key: ReplacementKey::Static {
+                source: id,
+                ability: 0,
+                effect,
+            },
+            effect: ApplicableEffect::Replacement(Arc::new(Replacement::Instead {
+                would: destroyed_self(),
+                instead: sylex_core::Instruction::Sequentially(vec![].into()),
+            })),
+            tier,
+            source: id,
+            params: Arc::from([]),
+        };
+        let all = [
+            applicable(0, ReplacementTier::Any),
+            applicable(1, ReplacementTier::SelfReplacement),
+            applicable(2, ReplacementTier::Any),
+        ];
+        let destroy = GameEvent::Act(Act {
+            verb: sylex_core::VerbName::from("Destroy"),
+            who: None,
+            on: vec![id],
+            from: Some(Zone::Battlefield),
+            to: Some(Zone::Graveyard),
+            cause: Some(Cause::destroy(Agency::EffectInstruction, None)),
+            committed: false,
+            contents: None,
+            batch: None,
+            inherited: std::collections::HashSet::new(),
+            contained: false,
+        });
+        let offered = |state: &mut GameState, applicable: &[Applicable]| {
+            state.replace_state = None;
+            surface_choice(state, suspended_single(destroy.clone()), applicable);
+            let Some(DecisionPointKind::ChooseReplacement(
+                crate::decide::pending::ChooseReplacement { applicable, .. },
+            )) = state.pending.take()
+            else {
+                panic!("expected a surfaced ChooseReplacement decision");
+            };
+            applicable
+        };
+        assert_eq!(
+            offered(&mut state, &all),
+            [all[1].key],
+            "only the self-replacement is offered [CR#616.1a]"
+        );
+        // [CR#616.1e]: with nothing in an earlier tier, every applicable
+        // effect is offered.
+        assert_eq!(
+            offered(&mut state, &[all[0].clone(), all[2].clone()]),
+            [all[0].key, all[2].key],
+        );
+    }
+
     /// [CR#616.1]: the replacement chooser for an event affecting a card in
     /// HAND is that card's OWNER, not whatever `controller` the object
     /// happens to carry. `controller` is deliberately set to the ACTIVE
@@ -1825,6 +1964,7 @@ mod tests {
                     },
                     instead: sylex_core::Instruction::Sequentially(vec![].into()),
                 })),
+                tier: ReplacementTier::Any,
                 source: id,
                 params: Arc::from([]),
             })
