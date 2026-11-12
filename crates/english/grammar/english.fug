@@ -1868,7 +1868,8 @@ MultipliedNounPhrase: NounPhrase -> factor:Numeral(Cardinal) multiplier:BareNomi
           head.DeterminativeDistribution != Numerical,
           head.Determination = Overt
 MultipliedAmount: Amount -> factor:Numeral(Cardinal) multiplier:BareNominal Amount
-    where multiplier.Number = Plural
+    where multiplier.NounDistribution = Serial,
+          multiplier.Number = Plural
 NumericArithmetic: NounPhrase -> Amount modifier:Selected(PrepositionPhrase, Plus, Minus)
     where modifier.ComplementKind = NP,
           modifier.Determination = Overt,
