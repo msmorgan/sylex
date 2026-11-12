@@ -1518,8 +1518,13 @@ CardinalMassPremodifier: QuantifiedNominal -> modifier:Numeral(Cardinal) BareNom
           head.Countability = Mass,
           head.NounDistribution = DirectMeasure
 ModifiedQuantity: ModifiedQuantifiedNominal -> modifier:AdjectivePhrase QuantifiedNominal
+// Free-choice *any* with a cardinal is the determinative phrase *any one*
+// (SingularQuantifier), so excluding `FreeChoice` is a gate (ADR §6, §8):
+// without it *add three mana of any one color* (Lotus Vale) is also *any
+// [one color]*, a second tree of FreeChoiceDetermined's.
 DeterminedQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNominal
-    where determiner.Number = head.QuantityNumber,
+    where determiner.DeterminativeDistribution != FreeChoice,
+          determiner.Number = head.QuantityNumber,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
           $.Countability = Count,
@@ -1537,8 +1542,8 @@ DistributiveQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNomina
           $.Determination = Overt
 // A singular determinative over a quantified plural, which *a* selects only
 // with *further* or *additional* (*an additional two creatures*; CGEL
-// 5§3.4:353). The determiner carries Singular: a number-neutral one (*the*,
-// *any*) or a plural one is AgreeingModifiedQuantity's. A distributive one
+// 5§3.4:353). The determiner carries Singular: a number-neutral one (*the*)
+// or a plural one is AgreeingModifiedQuantity's. A distributive one
 // is DistributiveModifiedQuantity's, and an admission gate (ADR §6) keeps it
 // out: without it *each five counters removed this way* (Sage of Hours) and
 // *every five creature types among ...* (Sarek, Federation Ambassador) are
@@ -1554,9 +1559,12 @@ DeterminedModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQu
           $.Case = Plain,
           $.Person = Third,
           $.Determination = Overt
+// Excluding `FreeChoice` is DeterminedQuantity's gate: without it *two mana
+// of any one color they choose* (Stadium Vendors) is also *any [one color
+// they choose]*.
 AgreeingModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQuantifiedNominal
     where determiner.Number = head.QuantityNumber,
-          determiner.DeterminativeDistribution != Distributive,
+          determiner.DeterminativeDistribution != Distributive | FreeChoice,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
           $.Countability = Count,

@@ -5,6 +5,8 @@
 + {T}: Add one mana of the chosen color. => Nominal "mana of the chosen color"; VerbPhrase "chosen" as Modifier of color
 +VerbPhrase add one mana of any color => NounPhrase "one mana of any color" as Object of add
 +NounPhrase two mana of any one color
++ <card=Lotus Vale> {T}: Add three mana of any one color. => DeterminerPhrase "any one" as Determiner of color; !Nominal "one color"; readings 1
++ <card=Stadium Vendors> When this creature enters, choose a player. That player adds two mana of any one color they choose. => DeterminerPhrase "any one" as Determiner of color; !Nominal "one color"
 +PrepositionPhrase as an additional cost to cast this spell => NounPhrase "an additional cost to cast this spell" as PredicativeComplement of as; AdjectivePhrase "additional" as Modifier of cost; Clause "to cast this spell" as Complement of cost
 *NounPhrase any two color
 *NounPhrase any one colors
