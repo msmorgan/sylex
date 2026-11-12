@@ -5,6 +5,8 @@
 
 use anyhow::Context;
 use anyhow::Result;
+use rusqlite::Connection;
+use rusqlite::Statement;
 use rusqlite::params;
 use sylex_syntax::Answer;
 use sylex_syntax::Dependency;
@@ -146,10 +148,34 @@ pub(super) fn rows(parse: &Parse<'_>, leaves: &[LeafRow]) -> Result<ForkRows> {
     })
 }
 
-pub(super) fn write(tx: &rusqlite::Transaction<'_>, u_id: i64, rows: &ForkRows) -> Result<()> {
-    let mut word_insert = tx.prepare_cached("INSERT INTO words VALUES (?1, ?2, ?3, ?4, ?5)")?;
+/// The `INSERT`s of a unit's fork rows, prepared once for the transaction.
+pub(super) struct Inserts<'t> {
+    word: Statement<'t>,
+    head_line: Statement<'t>,
+    fork: Statement<'t>,
+    alias: Statement<'t>,
+    option: Statement<'t>,
+    answer: Statement<'t>,
+}
+
+impl<'t> Inserts<'t> {
+    pub(super) fn prepare(tx: &'t Connection) -> Result<Self> {
+        Ok(Self {
+            word: tx.prepare("INSERT INTO words VALUES (?1, ?2, ?3, ?4, ?5)")?,
+            head_line: tx.prepare("INSERT INTO head_lines VALUES (?1, ?2, ?3, ?4)")?,
+            fork: tx.prepare("INSERT INTO forks VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?,
+            alias: tx.prepare("INSERT INTO fork_aliases VALUES (?1, ?2, ?3, ?4, ?5)")?,
+            option: tx.prepare("INSERT INTO fork_options VALUES (?1, ?2, ?3, ?4)")?,
+            answer: tx.prepare(
+                "INSERT INTO fork_answers VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+            )?,
+        })
+    }
+}
+
+pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Result<()> {
     for (w, word) in rows.words.iter().enumerate() {
-        word_insert.execute(params![
+        inserts.word.execute(params![
             u_id,
             index(w),
             index(word.start),
@@ -157,26 +183,16 @@ pub(super) fn write(tx: &rusqlite::Transaction<'_>, u_id: i64, rows: &ForkRows) 
             index(word.occurrence),
         ])?;
     }
-    let mut head_line_insert =
-        tx.prepare_cached("INSERT INTO head_lines VALUES (?1, ?2, ?3, ?4)")?;
     for line in &rows.head_lines {
-        head_line_insert.execute(params![
+        inserts.head_line.execute(params![
             u_id,
             index(line.node),
             line.word.map(index),
             int(line.derivations)?,
         ])?;
     }
-    let mut fork_insert = tx.prepare_cached("INSERT INTO forks VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?;
-    let mut alias_insert =
-        tx.prepare_cached("INSERT INTO fork_aliases VALUES (?1, ?2, ?3, ?4, ?5)")?;
-    let mut option_insert =
-        tx.prepare_cached("INSERT INTO fork_options VALUES (?1, ?2, ?3, ?4)")?;
-    let mut answer_insert = tx.prepare_cached(
-        "INSERT INTO fork_answers VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
-    )?;
     for (f, fork) in rows.forks.iter().enumerate() {
-        fork_insert.execute(params![
+        inserts.fork.execute(params![
             u_id,
             index(f),
             kind_name(fork.kind),
@@ -185,7 +201,7 @@ pub(super) fn write(tx: &rusqlite::Transaction<'_>, u_id: i64, rows: &ForkRows) 
             fork.conditional,
         ])?;
         for (a, (kind, word)) in fork.aliases.iter().enumerate() {
-            alias_insert.execute(params![
+            inserts.alias.execute(params![
                 u_id,
                 index(f),
                 index(a + 1),
@@ -194,7 +210,9 @@ pub(super) fn write(tx: &rusqlite::Transaction<'_>, u_id: i64, rows: &ForkRows) 
             ])?;
         }
         for (o, option) in fork.options.iter().enumerate() {
-            option_insert.execute(params![u_id, index(f), index(o), int(option.derivations)?])?;
+            inserts
+                .option
+                .execute(params![u_id, index(f), index(o), int(option.derivations)?])?;
             for (q, answer) in option.answers.iter().enumerate() {
                 let (leaf, dependency, governor, function, category, frames) = match answer {
                     AnswerRow::Lexical(leaf) => (Some(index(*leaf)), None, None, None, None, None),
@@ -220,7 +238,7 @@ pub(super) fn write(tx: &rusqlite::Transaction<'_>, u_id: i64, rows: &ForkRows) 
                         Some(serde_json::to_string(productions)?),
                     ),
                 };
-                answer_insert.execute(params![
+                inserts.answer.execute(params![
                     u_id,
                     index(f),
                     index(o),

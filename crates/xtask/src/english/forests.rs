@@ -18,8 +18,8 @@ use std::time::Instant;
 use anyhow::Context;
 use anyhow::Result;
 use clap::Args;
-use rayon::prelude::*;
 use rusqlite::Connection;
+use rusqlite::Statement;
 use rusqlite::params;
 use sylex_english::corpus::Corpus;
 use sylex_english::corpus::UnitKind;
@@ -34,6 +34,7 @@ use sylex_vocabulary::LexicalEnvironment;
 
 mod context;
 mod forks;
+mod pipeline;
 mod schema;
 
 use schema::SCHEMA;
@@ -167,8 +168,9 @@ impl std::fmt::Display for Summary {
     }
 }
 
-/// How many units are parsed in parallel before their rows are written.
-const BATCH: usize = 256;
+/// How many units past the next one to write may be parsed ahead of it,
+/// which bounds the parsed units held in memory at once.
+const WINDOW: usize = 256;
 
 /// Writes the database for `corpus` to `path`, replacing it.
 pub(crate) fn write(
@@ -190,40 +192,42 @@ pub(crate) fn write(
     db.execute_batch(VIEWS)?;
     let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
     let reader = context::Reader::new(grammar, &env.lexicon);
-    let mut lexemes = BTreeSet::new();
-    let mut embeddings: BTreeMap<Embedding, i64> = BTreeMap::new();
-    let mut summary = Summary::default();
     // Lexemes and Embeddings are written last, so references are checked
     // once at the end (`foreign_key_check`), not on each insert.
     db.execute_batch("PRAGMA foreign_keys = OFF;")?;
-    let tx = db.transaction()?;
-    write_grammar(&tx, grammar)?;
-    for start in (0..corpus.units.len()).step_by(BATCH) {
-        let end = (start + BATCH).min(corpus.units.len());
-        let rows: Vec<UnitRows> = (start..end)
-            .into_par_iter()
-            .map(|unit| {
-                unit_rows(corpus, unit, cleaves[unit].as_ref(), env, grammar, &reader)
-                    .with_context(|| describe(corpus, unit))
-            })
-            .collect::<Result<_>>()?;
-        for (offset, rows) in rows.iter().enumerate() {
-            let unit = start + offset;
-            write_unit(
-                &tx,
-                corpus,
-                unit,
-                rows,
-                &mut lexemes,
-                &mut embeddings,
-                &mut summary,
-            )
-            .with_context(|| describe(corpus, unit))?;
-        }
-    }
-    write_embeddings(&tx, &embeddings, &reader, &mut lexemes)?;
-    write_lexemes(&tx, &lexemes, env)?;
-    tx.commit()?;
+    // Units are written in order, so each `(unit, …)` table grows at its
+    // end and Embeddings are numbered as they are first met in unit order.
+    let mut summary = pipeline::run(
+        corpus.units.len(),
+        WINDOW,
+        |unit| describe(corpus, unit),
+        |unit| unit_rows(corpus, unit, cleaves[unit].as_ref(), env, grammar, &reader),
+        |units| {
+            let tx = db.transaction()?;
+            write_grammar(&tx, grammar)?;
+            let mut lexemes = BTreeSet::new();
+            let mut embeddings: BTreeMap<Embedding, i64> = BTreeMap::new();
+            let mut summary = Summary::default();
+            let mut inserts = Inserts::prepare(&tx)?;
+            while let Some((unit, rows)) = units.next()? {
+                write_unit(
+                    &mut inserts,
+                    corpus,
+                    unit,
+                    &rows,
+                    &mut lexemes,
+                    &mut embeddings,
+                    &mut summary,
+                )
+                .with_context(|| describe(corpus, unit))?;
+            }
+            drop(inserts);
+            write_embeddings(&tx, &embeddings, &reader, &mut lexemes)?;
+            write_lexemes(&tx, &lexemes, env)?;
+            tx.commit()?;
+            Ok(summary)
+        },
+    )?;
     let dangling: i64 = db.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| {
         r.get(0)
     })?;
@@ -548,8 +552,43 @@ fn write_grammar(tx: &rusqlite::Transaction<'_>, grammar: &CompiledGrammar) -> R
     Ok(())
 }
 
+/// The per-unit `INSERT`s, prepared once for the transaction.
+struct Inserts<'t> {
+    unit: Statement<'t>,
+    node: Statement<'t>,
+    alternative: Statement<'t>,
+    head: Statement<'t>,
+    embedding: Statement<'t>,
+    conjunct: Statement<'t>,
+    item: Statement<'t>,
+    family: Statement<'t>,
+    leaf: Statement<'t>,
+    forks: forks::Inserts<'t>,
+}
+
+impl<'t> Inserts<'t> {
+    fn prepare(tx: &'t Connection) -> Result<Self> {
+        Ok(Self {
+            unit: tx
+                .prepare("INSERT INTO units VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)")?,
+            node: tx.prepare(
+                "INSERT INTO nodes VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+            )?,
+            alternative: tx.prepare("INSERT INTO alternatives VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?,
+            head: tx.prepare("INSERT INTO heads VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)")?,
+            embedding: tx
+                .prepare("INSERT INTO alternative_embeddings VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?,
+            conjunct: tx.prepare("INSERT INTO conjuncts VALUES (?1, ?2, ?3, ?4, ?5)")?,
+            item: tx.prepare("INSERT INTO items VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?,
+            family: tx.prepare("INSERT INTO families VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?,
+            leaf: tx.prepare("INSERT INTO leaves VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)")?,
+            forks: forks::Inserts::prepare(tx)?,
+        })
+    }
+}
+
 fn write_unit(
-    tx: &rusqlite::Transaction<'_>,
+    inserts: &mut Inserts<'_>,
     corpus: &Corpus,
     unit: usize,
     rows: &UnitRows,
@@ -573,33 +612,21 @@ fn write_unit(
         ),
     };
     let u_id = index(unit);
-    tx.prepare_cached("INSERT INTO units VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)")?
-        .execute(params![
-            u_id,
-            oracle_id,
-            face_index,
-            face.name,
-            face.card,
-            match u.kind {
-                UnitKind::TypeLine => "type line",
-                UnitKind::Line => "line",
-            },
-            index(u.index),
-            u.text,
-            rows.parsed,
-            int(rows.derivations)?,
-        ])?;
-    let mut node_insert = tx.prepare_cached(
-        "INSERT INTO nodes VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
-    )?;
-    let mut alternative_insert =
-        tx.prepare_cached("INSERT INTO alternatives VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?;
-    let mut head_insert =
-        tx.prepare_cached("INSERT INTO heads VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)")?;
-    let mut embedding_insert =
-        tx.prepare_cached("INSERT INTO alternative_embeddings VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?;
-    let mut conjunct_insert =
-        tx.prepare_cached("INSERT INTO conjuncts VALUES (?1, ?2, ?3, ?4, ?5)")?;
+    inserts.unit.execute(params![
+        u_id,
+        oracle_id,
+        face_index,
+        face.name,
+        face.card,
+        match u.kind {
+            UnitKind::TypeLine => "type line",
+            UnitKind::Line => "line",
+        },
+        index(u.index),
+        u.text,
+        rows.parsed,
+        int(rows.derivations)?,
+    ])?;
     for node in &rows.nodes {
         let (coordinator, link) = match node.coordinator {
             Some(Coordinator::Lexeme(id)) => {
@@ -609,7 +636,7 @@ fn write_unit(
             Some(Coordinator::Link(id)) => (None, Some(id.as_str())),
             None => (None, None),
         };
-        node_insert.execute(params![
+        inserts.node.execute(params![
             u_id,
             index(node.node),
             index(node.category),
@@ -626,7 +653,7 @@ fn write_unit(
         ])?;
         for (a, alternative) in node.alternatives.iter().enumerate() {
             let key = (u_id, index(node.node), index(a));
-            alternative_insert.execute(params![
+            inserts.alternative.execute(params![
                 key.0,
                 key.1,
                 key.2,
@@ -638,7 +665,7 @@ fn write_unit(
                 if let Some((lexeme, _)) = word {
                     lexemes.insert(*lexeme);
                 }
-                head_insert.execute(params![
+                inserts.head.execute(params![
                     key.0,
                     key.1,
                     key.2,
@@ -650,9 +677,14 @@ fn write_unit(
                 ])?;
             }
             for (embedding, outside, derivations) in &alternative.embeddings {
-                let next = index(embeddings.len());
-                let id = *embeddings.entry(embedding.clone()).or_insert(next);
-                embedding_insert.execute(params![
+                let id = if let Some(&id) = embeddings.get(embedding) {
+                    id
+                } else {
+                    let id = index(embeddings.len());
+                    embeddings.insert(embedding.clone(), id);
+                    id
+                };
+                inserts.embedding.execute(params![
                     key.0,
                     key.1,
                     key.2,
@@ -662,7 +694,7 @@ fn write_unit(
                 ])?;
             }
             for (conjuncts, derivations) in &alternative.conjuncts {
-                conjunct_insert.execute(params![
+                inserts.conjunct.execute(params![
                     key.0,
                     key.1,
                     key.2,
@@ -672,9 +704,9 @@ fn write_unit(
             }
         }
     }
-    let families = write_items(tx, u_id, &rows.items)?;
-    write_leaves(tx, u_id, &rows.leaves, lexemes)?;
-    forks::write(tx, u_id, &rows.forks)?;
+    let families = write_items(inserts, u_id, &rows.items)?;
+    write_leaves(inserts, u_id, &rows.leaves, lexemes)?;
+    forks::write(&mut inserts.forks, u_id, &rows.forks)?;
     summary.units += 1;
     let size = (rows.nodes.len() + rows.items.len()) as u64 + families;
     if summary.largest.as_ref().is_none_or(|(n, _)| size > *n) {
@@ -691,14 +723,10 @@ fn write_unit(
 }
 
 /// Writes a unit's items and their families; returns the families written.
-fn write_items(tx: &rusqlite::Transaction<'_>, u_id: i64, items: &[ItemRow]) -> Result<u64> {
-    let mut item_insert =
-        tx.prepare_cached("INSERT INTO items VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?;
-    let mut family_insert =
-        tx.prepare_cached("INSERT INTO families VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?;
+fn write_items(inserts: &mut Inserts<'_>, u_id: i64, items: &[ItemRow]) -> Result<u64> {
     let mut families = 0u64;
     for item in items {
-        item_insert.execute(params![
+        inserts.item.execute(params![
             u_id,
             index(item.item),
             index(item.production),
@@ -713,7 +741,7 @@ fn write_items(tx: &rusqlite::Transaction<'_>, u_id: i64, items: &[ItemRow]) -> 
                 ChildRef::Leaf(l) => (None, Some(index(*l))),
                 ChildRef::Punct => (None, None),
             };
-            family_insert.execute(params![
+            inserts.family.execute(params![
                 u_id,
                 index(item.item),
                 index(f),
@@ -729,13 +757,11 @@ fn write_items(tx: &rusqlite::Transaction<'_>, u_id: i64, items: &[ItemRow]) -> 
 }
 
 fn write_leaves(
-    tx: &rusqlite::Transaction<'_>,
+    inserts: &mut Inserts<'_>,
     u_id: i64,
     leaves: &[LeafRow],
     lexemes: &mut BTreeSet<LexemeId>,
 ) -> Result<()> {
-    let mut leaf_insert =
-        tx.prepare_cached("INSERT INTO leaves VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)")?;
     for leaf in leaves {
         let (kind, lexeme, form, value) = match &leaf.reading {
             LexicalReading::Word(word) => {
@@ -750,7 +776,7 @@ fn write_leaves(
             LexicalReading::FlavorWord { .. } => ("flavor word", None, None, None),
             LexicalReading::Numeral { value, .. } => ("numeral", None, None, Some(*value)),
         };
-        leaf_insert.execute(params![
+        inserts.leaf.execute(params![
             u_id,
             index(leaf.leaf),
             index(leaf.span.start),
