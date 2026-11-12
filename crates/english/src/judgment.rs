@@ -128,25 +128,30 @@ pub fn parse_file(name: &str, text: &str) -> Result<Vec<Judgment>, SyntaxError> 
 ///
 /// # Errors
 /// An unreadable directory or file, or a malformed entry.
+///
+/// # Panics
+/// When a directory entry has no file name, which `read_dir` never yields.
 pub fn load_dir(dir: &Path) -> Result<Vec<(String, Vec<Judgment>)>, SyntaxError> {
     let io = |e: std::io::Error| SyntaxError {
         location: dir.display().to_string(),
         message: e.to_string(),
     };
-    let mut names: Vec<_> = std::fs::read_dir(dir)
-        .map_err(io)?
-        .filter_map(Result::ok)
-        .map(|e| e.path())
-        .filter(|p| p.extension().is_some_and(|x| x == "txt"))
-        .collect();
-    names.sort();
-    names
+    let mut paths = Vec::new();
+    for entry in std::fs::read_dir(dir).map_err(io)? {
+        let path = entry.map_err(io)?.path();
+        if path.extension().is_some_and(|x| x == "txt") {
+            paths.push(path);
+        }
+    }
+    paths.sort();
+    paths
         .into_iter()
         .map(|path| {
             let name = path
                 .file_name()
-                .map(|n| n.to_string_lossy().into_owned())
-                .unwrap_or_default();
+                .expect("a directory entry names a file")
+                .to_string_lossy()
+                .into_owned();
             let text = std::fs::read_to_string(&path).map_err(io)?;
             Ok((name.clone(), parse_file(&name, &text)?))
         })
