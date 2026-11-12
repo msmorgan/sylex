@@ -25,7 +25,7 @@ pub(crate) const MAX_DISTINCT_COORDINATORS: usize = 2;
 /// The most features one coordination Production may resolve.
 pub(crate) const MAX_RESOLUTIONS: usize = 4;
 /// The most conditions the joint exclusions of one Production may list.
-pub(crate) const MAX_JOINT_CONDITIONS: usize = 8;
+pub(crate) const MAX_JOINT_CONDITIONS: usize = 32;
 
 /// One feature value, with the final byte value reserved for an unbound slot.
 /// Binding validates the domain before any value reaches a chart State.
@@ -1268,7 +1268,7 @@ pub(crate) struct State {
     nonlast: [FeatureValue; MAX_RESOLUTIONS],
     last: [FeatureValue; MAX_RESOLUTIONS],
     /// The joint-exclusion conditions (as bits) that hold so far.
-    joint_hits: u8,
+    joint_hits: u32,
     host_extensions: u16,
     adjunct_extension: Option<Extension>,
     /// A child so far carries `Summary::internal_comma` up.
@@ -1853,7 +1853,7 @@ impl Production {
         }
         let mut start = 0;
         for &end in &self.joint_exclusions {
-            let mask = u8::try_from((1u16 << end) - (1u16 << start)).expect("validated");
+            let mask = u32::try_from((1u64 << end) - (1u64 << start)).expect("validated");
             if next.joint_hits & mask == mask {
                 return None;
             }
