@@ -32,6 +32,8 @@ use crate::grammar::Side;
 use crate::grammar::SymbolDecl;
 use crate::lexeme::Lexeme;
 use crate::lexeme::Lexemes;
+use crate::projection::NUMBER;
+use crate::projection::Projection;
 use crate::step::Extension;
 use crate::step::Gap;
 use crate::step::GapRule;
@@ -44,43 +46,9 @@ use crate::step::Weight;
 /// Feature names that would police attachment rather than describe grammar.
 const FORBIDDEN_SUFFIXES: [&str; 5] = ["Use", "Licence", "License", "Present", "Restriction"];
 
-/// Lexical features the engine projects onto leaves, by grammar feature name.
-///
-/// With [`crate::step::projected_values`] and `LeafFacts` projection
-/// ([`CompiledGrammar::leaf_facts`]), this is the lexicon feature-bundle
-/// mapping table: the one declared lexicon-to-syntax interface, and the only
-/// place the engine names a grammar feature or value
-/// (`docs/decisions/english.md` §1).
-pub(crate) const PROJECTED: [&str; 8] = [
-    "Number",
-    "Person",
-    "Tense",
-    "VerbForm",
-    "Case",
-    "Inflection",
-    "Countability",
-    "Sign",
-];
-
-/// The index in [`PROJECTED`] of a numeral's or noun's Number.
-pub(crate) const NUMBER: usize = 0;
-/// The index in [`PROJECTED`] of a word's inflectional Word Form.
-pub(crate) const INFLECTION: usize = 5;
-/// The index in [`PROJECTED`] of a noun's Countability.
-pub(crate) const COUNTABILITY: usize = 6;
-/// The index in [`PROJECTED`] of a numeral's Sign.
-pub(crate) const SIGN: usize = 7;
-
 /// The lexical facts a bound grammar keeps about one lexeme.
 #[derive(Debug, Clone)]
-#[expect(
-    clippy::struct_excessive_bools,
-    reason = "independent facts of one lexeme"
-)]
 pub(crate) struct LexemeFacts {
-    pub countability: Option<Ident>,
-    /// A noun both count and mass is count in its plural form.
-    pub countable_plural: bool,
     pub features: Vec<(usize, u16)>,
     pub category: LexicalCategory,
     pub binding: Binding,
@@ -112,6 +80,8 @@ pub(crate) struct ValueFacts {
     /// The word forms of every Word spelled like it, ignoring case, as a
     /// mask (`step::form_bit`; `LeafFacts::forms`).
     pub forms: u16,
+    /// The features its leaf carries (`Projection::leaf_features`).
+    pub leaf_features: Vec<(usize, u16)>,
 }
 
 impl ValueFacts {
@@ -168,9 +138,9 @@ pub struct CompiledGrammar {
     /// Categories some Production's `unadjoined` child may not end in, the
     /// only ones a Summary's `final_adjunct` records.
     pub(crate) unadjoined_categories: BTreeSet<u16>,
-    /// Projected inflectional feature ids; additional properties are
-    /// grammar-declared.
-    pub(crate) projected: [Option<usize>; 8],
+    /// The projected features' values (`crate::projection`); additional
+    /// properties are grammar-declared.
+    pub(crate) projection: Projection,
     /// The grammar's `high_attachment` declarations: `(Category, feature,
     /// value)`.
     pub(crate) high_attachment: Vec<(Ident, Ident, Ident)>,
@@ -434,10 +404,19 @@ impl CompiledGrammar {
 }
 
 /// Each declared Lexeme's licensed values, by `Lexeme::index`
-/// (`CompiledGrammar::word_values`): their edges, and the word forms of
-/// every Word spelled like each, ignoring case (a value that has no
-/// spelling has only its own form).
-fn word_values(lexicon: &Lexicon, lexemes: &Lexemes) -> Vec<Vec<ValueFacts>> {
+/// (`CompiledGrammar::word_values`): their edges, the word forms of every
+/// Word spelled like each, ignoring case (a value that has no spelling has
+/// only its own form), and the features its leaf carries.
+///
+/// # Errors
+/// A licensed value whose projected feature the grammar has no value for
+/// (`Projection::leaf_features`).
+fn word_values(
+    lexicon: &Lexicon,
+    lexemes: &Lexemes,
+    facts: &[LexemeFacts],
+    projection: &Projection,
+) -> Result<Vec<Vec<ValueFacts>>, LoadError> {
     let spelled: Vec<(Option<String>, &sylex_lexicon::LexicalValue)> = lexicon
         .values()
         .map(|value| {
@@ -464,6 +443,11 @@ fn word_values(lexicon: &Lexicon, lexemes: &Lexemes) -> Vec<Vec<ValueFacts>> {
                 value.lexeme
             )
         });
+        let leaf_features = projection.leaf_features(
+            &facts[lexeme.index()].features,
+            &lexicon.lexemes()[&value.lexeme].properties.countability,
+            value,
+        )?;
         table[lexeme.index()].push(ValueFacts {
             form: value.form,
             features: value.features.clone(),
@@ -473,9 +457,10 @@ fn word_values(lexicon: &Lexicon, lexemes: &Lexemes) -> Vec<Vec<ValueFacts>> {
                 || crate::step::form_bit(value.form),
                 |spelling| by_spelling[spelling],
             ),
+            leaf_features,
         });
     }
-    table
+    Ok(table)
 }
 
 fn invalid(message: impl Into<String>) -> LoadError {
@@ -836,17 +821,7 @@ impl<'a> Binder<'a> {
                 )));
             }
         }
-        let projected = PROJECTED.map(|name| features.iter().position(|f| f == name));
-        for (slot, name) in PROJECTED.iter().zip(projected) {
-            let Some(id) = name else { continue };
-            for value in crate::step::projected_values(slot) {
-                if !values[id].iter().any(|v| v == value) {
-                    return Err(invalid(format!(
-                        "feature `{slot}` must include lexical value `{value}`"
-                    )));
-                }
-            }
-        }
+        let projection = Projection::new(&features, &values)?;
 
         // Frames, deduplicated into global ids.
         let mut frames: Vec<Frame> = Vec::new();
@@ -874,18 +849,6 @@ impl<'a> Binder<'a> {
                         )
                     })
                     .collect::<Result<Vec<_>, _>>()?,
-                countability: match lexeme.properties.countability.as_slice() {
-                    [value] => Some(Ident::new(&format!("{value:?}"))),
-                    _ => lexeme
-                        .properties
-                        .features
-                        .get(PROJECTED[COUNTABILITY])
-                        .copied(),
-                },
-                countable_plural: lexeme
-                    .properties
-                    .countability
-                    .contains(&sylex_lexicon::Countability::Count),
                 category: lexeme.category,
                 binding: lexeme.binding,
                 frames: BTreeSet::new(),
@@ -1081,6 +1044,7 @@ impl<'a> Binder<'a> {
             classes.push(members);
         }
         let by_lhs = vec![Vec::new(); categories.len()];
+        let word_values = word_values(lexicon, &lexeme_ids, &lexemes, &projection)?;
         Ok(Self {
             grammar,
             catalog,
@@ -1101,7 +1065,7 @@ impl<'a> Binder<'a> {
                 by_id: BTreeMap::new(),
                 by_lhs,
                 root,
-                word_values: word_values(lexicon, &lexeme_ids),
+                word_values,
                 lexeme_ids,
                 lexemes,
                 frames,
@@ -1112,7 +1076,7 @@ impl<'a> Binder<'a> {
                 classes,
                 unextended_prepositions: BTreeSet::new(),
                 unadjoined_categories: BTreeSet::new(),
-                projected,
+                projection,
                 high_attachment: grammar.high_attachment.clone(),
                 prediction: crate::prediction::Prediction::default(),
                 report,
@@ -1912,8 +1876,8 @@ impl<'a> Binder<'a> {
             }
         }
         let projected = |feature: usize| -> &'static [&'static str] {
-            if out.projected.contains(&Some(feature)) {
-                crate::step::projected_values(&out.features[feature])
+            if out.projection.ids.contains(&Some(feature)) {
+                crate::projection::projected_values(&out.features[feature])
             } else {
                 &[]
             }
@@ -2633,11 +2597,9 @@ impl<'a> Binder<'a> {
             }
             // The leaf is of this Word Form: the lexicon feature-bundle
             // mapping table projects it.
-            let inflection = self.feature(PROJECTED[INFLECTION])?;
-            leaf.equations.push((
-                Path::Child(child, inflection),
-                Target::Value(self.value(inflection, &crate::step::inflection_name(*form))?),
-            ));
+            let (inflection, value) = self.out.projection.inflection(*form)?;
+            leaf.equations
+                .push((Path::Child(child, inflection), Target::Value(value)));
             drafts.push(leaf);
         }
         if let Some((form, _)) = equations.iter().find(|(f, _)| !forms.contains(f)) {
@@ -3231,7 +3193,7 @@ impl<'a> Binder<'a> {
                 "the Complement is no phrase of a Category".to_owned(),
             ));
         };
-        let number = self.out.projected[NUMBER]
+        let number = self.out.projection.ids[NUMBER]
             .ok_or_else(|| fault("the grammar projects no Number".to_owned()))?;
         if !self.out.category_features[category].contains(&number) {
             return Err(fault(format!(

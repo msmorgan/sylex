@@ -677,19 +677,19 @@ impl CompiledGrammar {
             }) {
                 continue;
             }
-            if let Some(facts) = self.leaf_facts(&found.reading, &analyzed.scope) {
-                let edges = self
-                    .leaf_edges(&found.reading)
-                    .expect("an analyzed lexical match is licensed by the grammar's lexicon");
-                by_start[found.start].push(forest.leaves.len());
-                forest.leaves.push(Leaf {
-                    start: found.start,
-                    end: found.end,
-                    reading: found.reading.clone(),
-                    facts,
-                    edges,
-                });
-            }
+            let licensed = "an analyzed lexical match is licensed by the grammar's lexicon";
+            let facts = self
+                .leaf_facts(&found.reading, &analyzed.scope)
+                .expect(licensed);
+            let edges = self.leaf_edges(&found.reading).expect(licensed);
+            by_start[found.start].push(forest.leaves.len());
+            forest.leaves.push(Leaf {
+                start: found.start,
+                end: found.end,
+                reading: found.reading.clone(),
+                facts,
+                edges,
+            });
         }
         // A word whose spelling ends in terminal punctuation (*Blood for the
         // Blood God!*, *Agents of S.H.I.E.L.D.*) ends a sentence with it: the

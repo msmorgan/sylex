@@ -2363,7 +2363,9 @@ impl CompiledGrammar {
     }
 
     /// Projects a lexical alternative into the leaf a Production sees, in
-    /// the text of a face whose own card names are `scope`.
+    /// the text of a face whose own card names are `scope`, or `None` if the
+    /// lexicon licenses no such value. Its features were resolved at bind
+    /// time (`crate::projection`).
     pub(crate) fn leaf_facts(
         &self,
         reading: &LexicalReading,
@@ -2373,42 +2375,10 @@ impl CompiledGrammar {
             LexicalReading::Word(value) => {
                 let lexeme = self.lexeme(&value.lexeme)?;
                 let facts = self.facts(lexeme);
-                let f = &value.features;
-                let verb_form = match value.form {
-                    WordForm::Plain => Some("Plain"),
-                    // Irrealis *were* is a finite form, like the tensed ones.
-                    WordForm::Present | WordForm::Preterite | WordForm::Irrealis => Some("Finite"),
-                    WordForm::GerundParticiple => Some("GerundParticiple"),
-                    WordForm::PastParticiple => Some("PastParticiple"),
-                    _ => None,
-                };
-                let names = [
-                    f.number.map(|n| format!("{n:?}")),
-                    f.person.map(|p| format!("{p:?}")),
-                    f.tense.map(|t| format!("{t:?}")),
-                    verb_form.map(str::to_owned),
-                    f.case.map(|c| format!("{c:?}")),
-                    Some(inflection_name(value.form)),
-                    facts
-                        .countability
-                        .map(|c| c.as_str().to_owned())
-                        .or_else(|| {
-                            (facts.countable_plural
-                                && f.number == Some(sylex_lexicon::Number::Plural))
-                            .then(|| "Count".to_owned())
-                        }),
-                    None,
-                ];
+                let licensed = self.value_facts(value)?;
                 let mut features = [None; MAX_FEATURES];
-                // A lexeme's own value for a feature outranks a projected one.
-                for &(id, value) in &facts.features {
-                    features[id].get_or_insert(value);
-                }
-                for (id, name) in self.projected.iter().zip(names) {
-                    if let (Some(id), Some(name)) = (id, name) {
-                        let value = self.values[*id].iter().position(|v| *v == name.as_str())?;
-                        features[*id].get_or_insert(u16::try_from(value).ok()?);
-                    }
+                for &(feature, value) in &licensed.leaf_features {
+                    features[feature] = Some(value);
                 }
                 Some(LeafFacts {
                     binding: facts.binding,
@@ -2417,7 +2387,7 @@ impl CompiledGrammar {
                     lexeme: Some(lexeme),
                     category: facts.category,
                     features,
-                    forms: self.value_facts(value)?.forms,
+                    forms: licensed.forms,
                     other_card_name: facts.card_name
                         && !value
                             .features
@@ -2433,31 +2403,7 @@ impl CompiledGrammar {
                 notation: Some(*notation),
                 lexeme: None,
                 category: LexicalCategory::Numeral,
-                features: {
-                    let number = matches!(
-                        notation,
-                        sylex_lexicon::Numeral::Cardinal | sylex_lexicon::Numeral::Arabic(_)
-                    )
-                    .then_some(if *value == 1 { "Singular" } else { "Plural" });
-                    let sign = match value.cmp(&0) {
-                        std::cmp::Ordering::Less => "Negative",
-                        std::cmp::Ordering::Equal => "Zero",
-                        std::cmp::Ordering::Greater => "Positive",
-                    };
-                    let mut features = [None; MAX_FEATURES];
-                    for (id, name) in [
-                        (self.projected[crate::compile::NUMBER], number),
-                        (self.projected[crate::compile::SIGN], Some(sign)),
-                    ] {
-                        let (Some(id), Some(name)) = (id, name) else { continue };
-                        if let Some(value) = self.values[id].iter().position(|v| v == name)
-                            && let Ok(value) = u16::try_from(value)
-                        {
-                            features[id].get_or_insert(value);
-                        }
-                    }
-                    features
-                },
+                features: self.projection.numeral_features(*value, *notation),
                 forms: 0,
                 other_card_name: false,
             }),
@@ -2472,37 +2418,6 @@ impl CompiledGrammar {
                 other_card_name: false,
             }),
         }
-    }
-}
-
-/// The `Inflection` value the engine projects from a Word Form: its name.
-pub(crate) fn inflection_name(form: WordForm) -> String {
-    format!("{form:?}")
-}
-
-/// Every lexical value the engine projects onto a grammar feature of this name.
-pub(crate) fn projected_values(feature: &str) -> &'static [&'static str] {
-    match feature {
-        "Number" => &["Singular", "Plural"],
-        "Sign" => &["Negative", "Zero", "Positive"],
-        "Person" => &["Second", "Third"],
-        "Tense" => &["Present", "Past"],
-        "VerbForm" => &["Plain", "Finite", "GerundParticiple", "PastParticiple"],
-        "Case" => &["Nominative", "Accusative", "Genitive"],
-        "Countability" => &["Count", "Mass"],
-        "Inflection" => &[
-            "Invariant",
-            "IndependentGenitive",
-            "Singular",
-            "Plural",
-            "Plain",
-            "Present",
-            "Preterite",
-            "Irrealis",
-            "GerundParticiple",
-            "PastParticiple",
-        ],
-        _ => &[],
     }
 }
 

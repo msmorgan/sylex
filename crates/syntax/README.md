@@ -88,8 +88,7 @@ on are the contract documented on `grammar::ProductionDecl`.
 ## Working rules
 
 - **The engine names no grammar term.** Outside the lexicon feature-bundle
-  mapping table (`PROJECTED` in `compile.rs`, `projected_values` and
-  `leaf_facts` in `step.rs`), no feature, value or Category name appears in
+  mapping table (`projection.rs`), no feature, value or Category name appears in
   the engine; anything English belongs in `sylex_english`'s grammar data.
 - **No defaults.** A derivation the grammar does not declare is not built, or
   binding fails; the engine never supplies a grammar default.

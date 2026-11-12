@@ -21,6 +21,7 @@ mod laws;
 mod lexeme;
 mod normal_form;
 mod prediction;
+mod projection;
 mod reading;
 mod settled_spine;
 mod step;

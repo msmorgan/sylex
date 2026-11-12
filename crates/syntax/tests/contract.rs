@@ -764,6 +764,37 @@ const SEE_BOTH: &str = r#"(frames: { "v:see": [
 const SEE_TRANSITIVE: &str =
     r#"(frames: { "v:see": [(family: Monotransitive, slots: [(relation: Object, fill: NP)])] })"#;
 
+/// A lexical value whose projected feature the grammar declares without a
+/// value for it is a bind error, never a leaf the chart silently drops.
+#[test]
+fn a_projected_variant_the_grammar_omits_is_a_bind_error() {
+    let lexicon = Lexicon::new([
+        pronoun("pr:it", "it", &[(Number::Singular, Person::Third)]),
+        pronoun("pr:x", "x", &[(Number::Singular, Person::First)]),
+    ])
+    .unwrap();
+    let grammar = |person: &str| {
+        format!(
+            r"
+                root Subject
+                feature Number = Singular | Plural
+                feature Person = {person}
+                category Subject [Number, Person]
+                Pronoun: Subject -> Lex(Pronoun)
+            "
+        )
+    };
+    let bound = bind(&grammar("First | Second | Third"), &lexicon, NO_FRAMES).unwrap();
+    assert_eq!(readings(&bound, &lexicon, "X").len(), 1);
+    match bind(&grammar("Second | Third"), &lexicon, NO_FRAMES) {
+        Err(LoadError::Invalid(message)) => assert!(
+            message.contains("`pr:x`") && message.contains("Person is First"),
+            "{message}"
+        ),
+        other => panic!("expected a bind error, got {other:?}"),
+    }
+}
+
 /// Obligation 8: a Gap opened by a descendant passes up through transparent
 /// children, survives packing beside the gapless Constituent of the same
 /// span, and is discharged only at the governing parent; a Constituent with
