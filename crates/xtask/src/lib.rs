@@ -17,6 +17,7 @@ pub mod coverage;
 pub mod derive_cards;
 pub mod dsl;
 pub mod dsl_check;
+pub mod dsl_expand;
 pub mod dsl_fmt;
 pub mod english;
 pub mod entailments;
