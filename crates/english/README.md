@@ -378,6 +378,37 @@ reported without stopping later inputs; malformed entries and operational
 errors fail the command. The dump is diagnostic output, not tracked judgment
 evidence.
 
+## Surveying a unit's forest
+
+```sh
+cargo xtask english forestwalk --card 'Draugr Necromancer' --line 2
+cargo xtask english forestwalk --card 'Draugr Necromancer' --type-line
+cargo xtask english forestwalk --as-card 'Jace, Cunning Castaway' 'Jace draws two cards.'
+```
+
+`forestwalk` shows one unit's ambiguity without enumerating its Readings, so a
+unit of thousands of Readings fits on a screen. The unit is given as `parse`
+gives it: text (one entry, without assertions; `--as-card` or `<card=NAME>`
+for its card), or `--card NAME` with exactly one of `--line N` and
+`--type-line`, which pick a unit as `parse` labels it (`FACE line N`,
+`FACE type line`). `NAME` is a face's name, or the whole card's when the card
+has one face. Faces of two cards that share a name (*Lightning Bolt*) give one
+unit when the picked units have the same text. A wrong choice is an error
+that lists the face's units or names.
+
+It prints the Derivation count, then the settled spine
+(`ForkForest::settled_spine`): from the root, each node every Derivation
+builds alike, as `function: Category [Production] "surface"`, a chain of
+single children folded into one line and a leaf as its word and lexical
+reading. The spine stops at a node with several alternatives, or one whose
+children differ between Derivations. Then come the forks
+(`ForkForest::forks`), each named by its kind and word, with whether it is
+conditional and its aliases, and under it each option's exact Derivation
+count and answer (an alias's answer after `=`). A word is printed
+`"surface"#N`, its surface and 1-based occurrence. Options are in the forks'
+order, never ranked: the survey decides nothing
+([english.md](../../docs/decisions/english.md) §4, §5).
+
 ## Judgment set
 
 [`judgments/`](judgments/README.md) holds the hand-written judgments, one line

@@ -15,6 +15,7 @@ use sylex_english::corpus::Corpus;
 use sylex_vocabulary::LexicalEnvironment;
 
 mod forests;
+mod forestwalk;
 
 #[derive(Debug, Args)]
 pub struct EnglishArgs {
@@ -32,6 +33,9 @@ enum EnglishCommand {
     /// Write every Corpus Unit's Packed Forest, with exact Derivation
     /// counts, to one SQLite database. Questions are SQL over it.
     Forests(forests::ForestsArgs),
+    /// Survey one unit's forest without enumerating it: its settled spine,
+    /// then its forks, each option with its exact Derivation count.
+    Forestwalk(forestwalk::ForestwalkArgs),
 }
 
 #[derive(Debug, Args)]
@@ -60,6 +64,7 @@ pub fn run(args: &EnglishArgs, output: &mut dyn Write) -> Result<()> {
         EnglishCommand::Strata(args) => strata(args, output),
         EnglishCommand::Parse(args) => parse(args, output),
         EnglishCommand::Forests(args) => forests::run(args, output),
+        EnglishCommand::Forestwalk(args) => forestwalk::run(args, output),
     }
 }
 
@@ -214,44 +219,85 @@ fn stated_items(inputs: &[String], as_card: Option<&str>) -> Result<Vec<ParseIte
         .collect()
 }
 
-/// The units of the supported faces named `name` (a face's name or its whole
-/// card's), each read as the grammar's root, with
-/// its face's own name in scope.
-fn fetched_items(name: &str) -> Result<Vec<ParseItem>> {
-    use sylex_english::corpus::UnitKind;
+/// One unit of a fetched face.
+struct FetchedUnit {
+    face: String,
+    card: String,
+    kind: sylex_english::corpus::UnitKind,
+    /// Its [`sylex_english::corpus::Unit::index`].
+    index: usize,
+    text: String,
+}
 
+impl FetchedUnit {
+    /// The unit as `parse` labels it: `FACE line N` or `FACE type line`.
+    fn label(&self) -> String {
+        use sylex_english::corpus::UnitKind;
+
+        match self.kind {
+            UnitKind::TypeLine => format!("{} type line", self.face),
+            UnitKind::Line => format!("{} line {}", self.face, self.index + 1),
+        }
+    }
+
+    /// The unit as a judgment entry on its face, which puts the face's own
+    /// name in scope ([`sylex_english::judgment::Judgment::scope`]).
+    fn item(&self, header: Option<String>) -> ParseItem {
+        ParseItem {
+            header,
+            entry: sylex_english::judgment::Judgment {
+                location: self.label(),
+                grammatical: true,
+                category: None,
+                card: Some(self.face.clone()),
+                text: self.text.clone(),
+                groups: Vec::new(),
+                negated: Vec::new(),
+                readings: None,
+            },
+            kind: self.kind,
+            evaluate: false,
+        }
+    }
+}
+
+/// The units of the supported faces named `name` (a face's name or its whole
+/// card's), in corpus order.
+fn fetched_units(name: &str) -> Result<Vec<FetchedUnit>> {
     let corpus = Corpus::load(|face| face.name == name || face.card == name)
         .context("loading the supported corpus")?;
     anyhow::ensure!(
         !corpus.faces.is_empty(),
         "`--card {name}` names no face of the supported corpus"
     );
-    let mut items = Vec::new();
-    let mut last_face = None;
-    for unit in &corpus.units {
-        let face = &corpus.faces[unit.face];
-        let header = (last_face != Some(unit.face))
-            .then(|| format!("Face: {} (card: {})", face.name, face.card));
-        last_face = Some(unit.face);
-        let place = match unit.kind {
-            UnitKind::TypeLine => "type line".to_owned(),
-            UnitKind::Line => format!("line {}", unit.index + 1),
-        };
-        items.push(ParseItem {
-            header,
-            entry: sylex_english::judgment::Judgment {
-                location: format!("{} {place}", face.name),
-                grammatical: true,
-                category: None,
-                card: Some(face.name.clone()),
+    Ok(corpus
+        .units
+        .iter()
+        .map(|unit| {
+            let face = &corpus.faces[unit.face];
+            FetchedUnit {
+                face: face.name.clone(),
+                card: face.card.clone(),
+                kind: unit.kind,
+                index: unit.index,
                 text: unit.text.clone(),
-                groups: Vec::new(),
-                negated: Vec::new(),
-                readings: None,
-            },
-            kind: unit.kind,
-            evaluate: false,
-        });
+            }
+        })
+        .collect())
+}
+
+/// The units of the supported faces named `name` (a face's name or its whole
+/// card's), each read as the grammar's root, with
+/// its face's own name in scope.
+fn fetched_items(name: &str) -> Result<Vec<ParseItem>> {
+    let mut items = Vec::new();
+    let mut last_face: Option<(String, String)> = None;
+    for unit in fetched_units(name)? {
+        let face = (unit.face.clone(), unit.card.clone());
+        let header = (last_face.as_ref() != Some(&face))
+            .then(|| format!("Face: {} (card: {})", unit.face, unit.card));
+        last_face = Some(face);
+        items.push(unit.item(header));
     }
     Ok(items)
 }
