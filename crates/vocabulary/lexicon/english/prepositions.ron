@@ -35,7 +35,17 @@
     // *from among flying, first strike, and lifelink*; a slash measure names
     // a +X/+Y counter's kind as a keyword names a keyword counter's
     // [CR#122.1a,122.1b] (*from among flying, ..., and +1/+1*).
-    (lemma: "among", frames: [
+    // Its Complement is plural (CGEL, Ch. 7 §5.1(a), p. 636): a coordination
+    // itself, with any coordinator (*among flying, first strike, lifelink,
+    // or vigilance*, Elspeth Resplendent; *among all permanents or a color
+    // tied for most common*, Tsabo's Assassin), or else a Noun Phrase that is
+    // not Singular (*among one or two targets*), never a single keyword,
+    // slash measure or name, nor a singular Noun Phrase over a coordinated
+    // Nominal (*among a creature or planeswalker*). An open Number passes
+    // (*among any of the creatures blocking it*, Defensive Formation), and a
+    // collective singular (*among the crowd*) is not admitted. It keeps *of [a counter from among first strike],
+    // vigilance, ...* off Aragorn, Company Leader.
+    (lemma: "among", plural_complement: true, frames: [
         (complement: NP, hosts: Nominal),
         (complement: KeywordPhrase, hosts: Nominal),
         (complement: MeasureNP, hosts: Nominal),

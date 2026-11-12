@@ -17,9 +17,12 @@ singular (*among the crowd*)", which no card prints.
 
 ## Design
 
-- *Among*'s Complement is a plural Noun Phrase or a coordination, with any coordinator (*among
-  one or two targets*; *among flying, first strike, lifelink, or vigilance*, Elspeth
+- *Among*'s Complement is a plural Noun Phrase (*among one or two targets*) or a coordination,
+  with any coordinator (*among flying, first strike, lifelink, or vigilance*, Elspeth
   Resplendent). A collective singular is not admitted.
+- A Complement whose Number is open is admitted (*among any of the creatures blocking it*,
+  Defensive Formation).
+- A stranded *among* is not checked: the requirement applies to a Complement that is present.
 
 ## Done when
 

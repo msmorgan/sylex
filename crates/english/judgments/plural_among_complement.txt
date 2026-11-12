@@ -1,0 +1,7 @@
+# *Among* takes a plural Complement: a Noun Phrase that is not Singular, or a coordination (CGEL, Ch. 7 §5.1(a), p. 636)
++ <card=Aragorn, Company Leader> Whenever the Ring tempts you, if you chose a creature other than Aragorn as your Ring-bearer, put your choice of a counter from among first strike, vigilance, deathtouch, and lifelink on Aragorn. => PrepositionPhrase "among first strike, vigilance, deathtouch, and lifelink" as Complement of from; !NounPhrase "a counter from among first strike"
++ <card=Elspeth Resplendent> +1: Choose up to one target creature. Put a +1/+1 counter and a counter from among flying, first strike, lifelink, or vigilance on it. => PrepositionPhrase "among flying, first strike, lifelink, or vigilance" as Complement of from
+# an open Number passes: *any of the creatures* is a partitive whose Number its oblique leaves open
++ <card=Defensive Formation> You can divide that creature's combat damage as you choose among any of the creatures blocking it. => PrepositionPhrase "among any of the creatures blocking it"
+# from: Forked Bolt
+* <card=Forked Bolt> Forked Bolt deals 2 damage divided as you choose among one target.
