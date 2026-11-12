@@ -192,7 +192,8 @@ Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
 - per unit, its forks (`sylex_syntax::ForkForest::forks`): `words`, `forks`
   (kind, word, context, conditional), `fork_aliases`, `fork_options` (with
   their Derivations) and `fork_answers` (each option's answer to the fork's
-  question and to each alias's);
+  question and to each alias's), and `head_lines` (each node with the words
+  whose Head Line runs through it across Derivations, with counts);
 - views `verb_phrases`, `verb_phrase_spans`, `verb_phrase_tokens`,
   `coordinations`, `coordination_heads` and `wide_narrow_attachments`.
 
@@ -326,8 +327,8 @@ modifies *gets +2/+2 and gains trample* or *gains trample*, and in *put a
 +1/+1 counter on each creature you control and those creatures gain trample
 until end of turn* the Clause coordination or the Verb Phrase *gain*. Each
 option's count is the whole option's: where an option also packs Derivations
-that coordinate differently, `narrow_derivations` counts those too. 4,868
-forks in 3,848 units, by each option's function and governor Category:
+that coordinate differently, `narrow_derivations` counts those too. 4,882
+forks in 3,856 units, by each option's function and governor Category:
 
 ```sql
 SELECT wide_function, wide_governor_category, narrow_function, narrow_governor_category,
@@ -338,9 +339,9 @@ FROM wide_narrow_attachments GROUP BY 1, 2, 3, 4 ORDER BY forks DESC LIMIT 6;
 ```
 wide_function  wide_governor_category  narrow_function  narrow_governor_category  forks  units
 modifier       Nominal                 modifier         Nominal                    1635   1361
-adjunct        VerbPhrase              adjunct          VerbPhrase                 1460   1228
+adjunct        VerbPhrase              adjunct          VerbPhrase                 1461   1229
 adjunct        Clause                  adjunct          VerbPhrase                  734    633
-adjunct        Clause                  adjunct          Clause                      700    630
+adjunct        Clause                  adjunct          Clause                      718    643
 adjunct        Clause                  modifier         Nominal                     336    296
 adjunct        VerbPhrase              modifier         Nominal                     247    209
 ```

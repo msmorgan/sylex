@@ -383,53 +383,15 @@ JOIN productions p ON p.production = a.production
 LEFT JOIN lexemes l ON l.lexeme = n.coordinator;
 
 -- Each coordination node (one with a coordinator or a link that is no tail)
--- with the word its Head Line ends in, once per such word its alternatives
--- reach: the leaf it takes as its `coordinator`, in its own items or in those
--- of the tails it continues in through its last child; for a Linked
--- Coordination, which has none, the first word of its linked conjunct (the
--- last child that is no tail), which is the conjunct's connective.
+-- with the word its Head Line ends in (`head_lines`), once per such word its
+-- alternatives reach: its coordinator, or a Linked Coordination's connective.
 CREATE VIEW coordination_heads AS
-WITH RECURSIVE
-spine (unit, coordination, node) AS (
-    SELECT n.unit, n.node, n.node FROM nodes n
-    WHERE (n.coordinator IS NOT NULL OR n.link IS NOT NULL)
-        AND NOT EXISTS (SELECT 1 FROM alternatives a JOIN productions p USING (production)
-            WHERE a.unit = n.unit AND a.node = n.node AND p.tail)
-    UNION
-    SELECT s.unit, s.coordination, f.child_node
-    FROM spine s
-    JOIN alternatives a ON a.unit = s.unit AND a.node = s.node
-    JOIN families f ON f.unit = a.unit AND f.item = a.item
-    JOIN alternatives k ON k.unit = f.unit AND k.node = f.child_node
-    JOIN productions p ON p.production = k.production AND p.tail
-),
-chain (unit, coordination, item) AS (
-    SELECT s.unit, s.coordination, a.item
-    FROM spine s JOIN alternatives a ON a.unit = s.unit AND a.node = s.node
-    UNION
-    SELECT c.unit, c.coordination, f.previous
-    FROM chain c JOIN families f ON f.unit = c.unit AND f.item = c.item
-    WHERE f.previous IS NOT NULL
-)
-SELECT c.unit, c.coordination, w.word
-FROM chain c
-JOIN items i ON i.unit = c.unit AND i.item = c.item
-JOIN productions p ON p.production = i.production
-JOIN families f ON f.unit = c.unit AND f.item = c.item
-JOIN leaves l ON l.unit = f.unit AND l.leaf = f.child_leaf
-JOIN words w ON w.unit = l.unit AND w.start = l.start
-WHERE json_extract(p.functions, '$[' || (i.dot - 1) || ']') = 'coordinator'
-UNION
-SELECT s.unit, s.coordination,
-    (SELECT w.word FROM words w WHERE w.unit = k.unit AND w.start >= k.start
-        ORDER BY w.start LIMIT 1)
-FROM spine s
-JOIN nodes n ON n.unit = s.unit AND n.node = s.coordination AND n.link IS NOT NULL
-JOIN alternatives a ON a.unit = s.unit AND a.node = s.node
-JOIN families f ON f.unit = a.unit AND f.item = a.item
-JOIN nodes k ON k.unit = f.unit AND k.node = f.child_node
-WHERE NOT EXISTS (SELECT 1 FROM alternatives ka JOIN productions kp USING (production)
-    WHERE ka.unit = k.unit AND ka.node = k.node AND kp.tail);
+SELECT h.unit, h.node AS coordination, h.word
+FROM head_lines h
+JOIN nodes n ON n.unit = h.unit AND n.node = h.node
+WHERE (n.coordinator IS NOT NULL OR n.link IS NOT NULL) AND h.word IS NOT NULL
+    AND NOT EXISTS (SELECT 1 FROM alternatives a JOIN productions p USING (production)
+        WHERE a.unit = n.unit AND a.node = n.node AND p.tail);
 
 -- Every fork whose options are a wide and a narrow attachment over a
 -- coordination: a dependency question (`question` 0, the fork's own, or an
@@ -444,9 +406,9 @@ WHERE NOT EXISTS (SELECT 1 FROM alternatives ka JOIN productions kp USING (produ
 --   bracketing, not an attachment;
 -- - in the narrow option its governor's head-line word lies inside that
 --   coordination's span, between its head word and the dependent, and some
---   node of the narrow governor's Category, headed by that word
---   (`heads`), holds the dependent's word but not the coordination's head
---   word: the dependent attaches inside the conjunct next to it. The narrow
+--   node of the narrow governor's Category on that word's Head Line
+--   (`head_lines`) holds the dependent's word but not the coordination's
+--   head word: the dependent attaches inside the conjunct next to it. The narrow
 --   governor may be of any Category and bear any function; each option's
 --   function and governor Category are columns, so a query can keep like
 --   pairs only.
@@ -492,11 +454,10 @@ WHERE q.kind = 'dependency'
     AND (cw.start < nw.start AND nw.start < d.start
         OR d.start < nw.start AND nw.start < cw.start)
     AND EXISTS (
-        SELECT 1 FROM nodes n
+        SELECT 1 FROM head_lines hl
+        JOIN nodes n ON n.unit = hl.unit AND n.node = hl.node
         JOIN categories nc ON nc.category = n.category AND nc.name = na.governor_category
-        JOIN heads hh ON hh.unit = n.unit AND hh.node = n.node
-        JOIN leaves hl ON hl.unit = hh.unit AND hl.leaf = hh.leaf AND hl.start = nw.start
-        WHERE n.unit = q.unit
+        WHERE hl.unit = q.unit AND hl.word = na.governor
             AND n.start <= d.start AND d.start < n.end
             AND NOT (n.start <= cw.start AND cw.start < n.end));
 ";

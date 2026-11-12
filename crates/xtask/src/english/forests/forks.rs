@@ -504,7 +504,10 @@ mod tests {
     /// a trigger and *in any order* over a Linked Coordination (*look …, then
     /// put …*) or inside one of its conjuncts (*Sage Owl*), and premodifiers
     /// over a serial coordination or on its first conjunct (*Sands of
-    /// Time*). Not *Kessig Naturalist*'s *Until end of turn, you don't lose
+    /// Time*). *Court Hussar*'s *in any order* and *on the bottom* attach
+    /// over *look …, then put …* or inside its last conjunct, among them on
+    /// the Complement Cluster *the rest on the bottom*, whose Head Line ends
+    /// in *rest* though no `head` child leads there. Not *Kessig Naturalist*'s *Until end of turn, you don't lose
     /// this mana as steps and phases end*: every Clause headed by *don't*
     /// that holds *Until* also holds *and*, which there joins only *steps and
     /// phases*; the options differ in what is coordinated. Its back face,
@@ -519,6 +522,7 @@ mod tests {
             "Valentin, Dean of the Vein // Lisette, Dean of the Root",
             "Sage Owl",
             "Sands of Time",
+            "Court Hussar",
             "Kessig Naturalist // Lord of the Ulvenwald",
             "Crook of Condemnation",
         ]);
@@ -564,6 +568,28 @@ mod tests {
             [
                 "Bull's Strength | until | adjunct | VerbPhrase | and | adjunct | VerbPhrase | \
                  gains | 1 | 1 | 2",
+                "Court Hussar | When | adjunct | Clause | then | adjunct | Clause | look | 19 | 19 \
+                 | 38",
+                "Court Hussar | in | adjunct | Clause | then | adjunct | VerbPhrase | put | 8 | 6 \
+                 | 38",
+                "Court Hussar | in | adjunct | Clause | then | adjunct | ComplementCluster | rest \
+                 | 8 | 2 | 38",
+                "Court Hussar | in | adjunct | Clause | then | complement | ComplementCluster | \
+                 rest | 8 | 4 | 38",
+                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | rest | 8 | 2 | \
+                 38",
+                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | bottom | 8 | 8 \
+                 | 38",
+                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | library | 8 | \
+                 8 | 38",
+                "Court Hussar | on | adjunct | Clause | then | adjunct | VerbPhrase | put | 6 | 8 \
+                 | 38",
+                "Court Hussar | on | adjunct | Clause | then | adjunct | ComplementCluster | rest \
+                 | 6 | 2 | 38",
+                "Court Hussar | on | adjunct | Clause | then | complement | ComplementCluster | \
+                 rest | 6 | 10 | 38",
+                "Court Hussar | on | adjunct | Clause | then | modifier | Nominal | rest | 6 | 12 \
+                 | 38",
                 "Iroas's Blessing | controls | modifier | Nominal | or | modifier | Nominal | \
                  planeswalker | 1 | 1 | 2",
                 "Lisette, Dean of the Root | until | adjunct | Clause | and | adjunct | \
