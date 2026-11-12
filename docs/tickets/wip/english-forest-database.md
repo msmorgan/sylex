@@ -15,36 +15,42 @@ The forest stays packed (`docs/decisions/english.md` §4): there is never a row 
 
 ## Design
 
-- A command writes one SQLite file for the census corpus. Tables:
-  - units: the face's Oracle id and face name (which join to `cardIdentifiers.scryfallOracleId`
-    and `cards` in `data/mtgjson/AllPrintings.sqlite`, and from there to `cardLegalities`), the
-    unit's kind and index, its text and its Derivation count;
-  - nodes: Category, span, surface, Gap, features, exact count and the settled flag;
-  - alternatives and edges: each node alternative with its Production, head lemma and form and
-    Selected Frame (which belong to the alternative, not the node), and the edges with their
-    children, exact counts and the alternative each belongs to.
-- A named view of every verb phrase with its verb, Selected Frame and Voice and the node it
-  stands under.
-- The command has no query features: questions are SQL.
-- The file lives under `data/derived/`, which is already untracked (`/data/` is in
-  `.gitignore`).
-
-## Open questions
-
-- How edges are stored. The forest is binarized: a node's alternative is a (Production, item)
-  pair and each item a chain of (previous item, child) families. Storing the item chains is
-  exact and stays packed; flattening each alternative to its list of children multiplies where
-  an item's prefixes branch.
-- Whether a unit needs a cap, and what happens to it: answered by the measurement below.
+- `cargo xtask english forests` writes one SQLite file, `data/derived/english-forests.sqlite`
+  (`/data/` is gitignored), for every unit of the census corpus, read through
+  `sylex_upstream::scryfall::oracle_cards`. It has no query features: questions are SQL. Its
+  help gives example queries with their output on the pool.
+- The SQLite dependency is `rusqlite` with its bundled SQLite.
+- Units carry the keys that join to mtgjson: the face's Scryfall Oracle id (to
+  `cardIdentifiers.scryfallOracleId`), the face name and card name as the corpus has them, the
+  unit kind and index, the text parsed and its Derivation total. An mtgjson `uuid` names a
+  printing, not a face, so it is no unit key.
+- The stored tables keep the forest exactly as packed and binarized: a node's alternative is a
+  (Production, completed item) pair, and an item's families are (previous item, child) pairs.
+  Every node, alternative, item and family carries its exact Derivation count from `Counts`,
+  and every node its settled flag. Only the part of the forest some Derivation uses is stored.
+  Nothing is flattened into per-alternative child lists in a stored table, since that multiplies
+  where an item's prefixes branch.
+- Production, Selected Frame (with its Valence Alternation variant), head lexeme, lemma and form
+  belong to a node's alternatives, not the node. One alternative may reach more than one head
+  word through its items, so heads are rows of their own with exact counts.
+- Each alternative's Embedding, the chain of dependent functions it stands under, is stored with
+  exact counts per alternative, so a view over it can ask "in every Derivation" (count equals the
+  unit's total) and "in some Derivation" (count above zero) alike.
+- Views: every verb phrase alternative with its verb, Selected Frame, Voice and alternation
+  variant, form and Embedding; and every coordination node with its Category, coordinator and
+  conjunct count. A view that flattens says in its comment what it shows and what it must not be
+  used to count.
+- No unit is capped.
 
 ## Done when
 
-- Before the schema is fixed, the landing reports for the pool: total nodes and edges,
-  the largest unit by each, the file size and the run time; and says, from those numbers,
-  whether any unit needs a cap.
-- The database is written for every unit of the census corpus, and a test checks on real units
-  that each unit's stored counts equal what `english-forest-counts-and-forks` computes.
-- The named view is exercised by a query in the landing, with its row count.
+- The landing reports for the pool: total units, nodes, items, families and rows per table, the
+  largest unit, the file size and the run time.
+- The database is written for every unit of the census corpus, and tests on real units check
+  that each unit's stored total equals `derivation_count`, that a node's alternatives' counts
+  sum to the node's, and that the stored rows reproduce the forest.
+- Writing the database twice gives the same content.
+- The views are exercised by example queries in the landing, with their output.
 - The landing reports how many census faces have no Vintage `Legal` or `Restricted` printing in
   mtgjson by the join (the census corpus is chosen by Scryfall's legality, `OracleCard::supported`).
 - `jj --no-pager status` shows no database file, and `cargo test` and
@@ -58,7 +64,7 @@ The forest stays packed (`docs/decisions/english.md` §4): there is never a row 
 
 ## Pointers
 
-- `crates/syntax/src/chart.rs` (`PackedForest`, `Node`, `Item`), `reading.rs`.
+- `crates/syntax/src/chart.rs` (`PackedForest`, `Node`, `Item`), `counts.rs`, `reading.rs`.
 - `crates/english/src/census.rs`, `corpus.rs`, `crates/upstream/src/scryfall.rs`
   (`OracleCard::supported`).
 - `crates/english/grammar/english.fug` (`feature Voice`, the `VerbPhrase` Categories).
