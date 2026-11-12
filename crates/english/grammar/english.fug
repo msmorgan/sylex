@@ -88,8 +88,8 @@ feature PronounKind = Personal | Existential | Relative
 // `FreeChoice`: only *any*. Determined excludes it so *any* takes number
 // transparency (FreeChoiceDetermined, TransparentQuantity,
 // TemporalQuantity; never *any number of target creatures becomes*), and
-// builds no second tree of an analysis FreeChoiceDetermined builds
-// (admission gate, ADR §6, §8).
+// builds no second tree of an analysis FreeChoiceDetermined builds (the
+// gate is Determined's).
 // `IndefiniteArticle`: only *a*. `SingularOrQuantified`: only *another*,
 // which also takes a quantified plural (*another three bodies*; CGEL
 // 5§3.4:353) and a temporal location (*another day*, never *a day*; a gate
@@ -188,7 +188,9 @@ category SubjectGapClause : Clause [Number, Person, VerbForm, Inflection] { gap 
 category AdjunctGapClause : Clause [VerbForm] { gap }
 // A finite clause that opens with its Subject, as a bare relative's must
 // (CGEL 12§3.5.5:1055). An admission gate (ADR §6): it restates the Clause
-// Productions that open with the Subject.
+// Productions that open with the Subject, which keeps *each turn, those coins
+// come up heads* from an adverbial relative of *The first time you flip one
+// or more coins* (Edgar, King of Figaro).
 category SubjectInitialClause : Clause [VerbForm, Inflection] { gap }
 // A coordination of bare adverbial relatives' Clauses.
 category SubjectInitialCoordination : Clause [VerbForm, Inflection] { gap }
@@ -259,10 +261,12 @@ category ModifiedQuantifiedNominal : Nominal [
     QuantityNumber, NounKind, Determination, NounDistribution,
 ]
 // A temporal nominal bounded by a relative clause (*next time you cast a
-// spell*). An admission gate (ADR §6): it takes a *when*-less adverbial
-// relative, then at most a temporal bound, and no other postmodifier, so
-// RelativeTime and RelativeTimePostmodifier restate NominalPostmodifier and
-// TemporalPostmodifier.
+// spell*). An admission gate (ADR §6): RelativeTime and
+// RelativeTimePostmodifier restate NominalPostmodifier and
+// TemporalPostmodifier, so it takes a *when*-less adverbial relative, then
+// only temporal bounds. What it gates is the relative it requires: without
+// one, every determined temporal nominal is one too (*End [the turn]*, Time
+// Stop, with *the turn* a temporal Adjunct).
 category RelativeTemporalNominal : Nominal [
     Number, Countability, NounKind, Determination, NounDistribution,
 ]
@@ -290,7 +294,8 @@ category BareNominalComplement : Nominal
 // A genitive's possessor, never postmodified: Oracle fronts the player noun
 // "to avoid a dangling possessive" (OSG §6, Controller and owner). An
 // admission gate (ADR §6): it restates the Noun Phrase Productions over
-// BareNominal.
+// BareNominal, which keeps *[the top card of target player]'s library* from
+// a possessor (Merfolk Observer).
 category Possessor : NounPhrase [Number, Person, Case]
 // One genitive over coordinated nominals (*target artifact or creature's
 // owner*).
@@ -403,8 +408,7 @@ category AmountOrNounPhrase : NounPhrase [ComplementKind] { function }
 category PostmodifierConjunct : Postmodifier [ComplementKind] { function }
 category PostmodifierCoordination : Postmodifier [ComplementKind] { function }
 category Attribute : Attributes [ComplementKind, Polarity] { function }
-// An asyndetic chain of premodifiers. An admission gate (ADR §6): every
-// attribute in it is `Polarity: Negative`.
+// The premodifiers of an asyndetic chain after its first.
 category AttributeChain : Attributes [ComplementKind] { function }
 category AdjunctCoordination : PredicateAdjunct [ComplementKind] { function }
 // An Adverb Phrase or a frequency Noun Phrase as Complement (*more than
@@ -2232,6 +2236,11 @@ AdjectivalAttribute: Attribute -> filler:AdjectivePhrase
 // head, so each premodifier of an asyndetic chain is `Polarity: Negative`
 // (OSG §6, Determiners and modifier order). Any other comma is a serial
 // coordination's (*a Swamp, Mountain, black permanent, or red permanent*).
+// The `Polarity := Negative` carries here and in AttributeSequence and
+// FinalAttribute are one admission gate (ADR §6), with no effect apart: they
+// keep *Plains* from an asyndetic premodifier before the coordination
+// *Island, Swamp, or Mountain* (*a Plains, Island, Swamp, or Mountain card*,
+// Farseek).
 AsyndeticAttributes: Attributes -> first:Attribute ',' rest:AttributeChain
     where first.Polarity := Negative
 AttributeSequence: AttributeChain -> first:Attribute ',' rest:AttributeChain
@@ -2291,6 +2300,9 @@ ProperName: NounPhrase -> Name
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
+// Excluding `FreeChoice` is an admission gate (ADR §6): it keeps *any number
+// of Ally cards* (Munda, Ambush Leader) from a second tree with the singular
+// head *number* beside TransparentQuantity's.
 Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [head] }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           $.Determination = Overt,
@@ -3309,9 +3321,9 @@ coordination NounPhrase {
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           last.Number = Singular
-// An admission gate (ADR §6): a Numeric Noun Phrase is no first conjunct
-// (never *is dealt [3] or [more damage]*); numbers alone are an Amount
-// coordination.
+// An admission gate (ADR §6): a Numeric Noun Phrase is no first conjunct,
+// which keeps *lost [3] or [more life]* from a Noun Phrase coordination
+// (Davros, Dalek Creator); numbers alone are an Amount coordination.
 // `raising_delimiter`: commas may set off the final coordinate of Right
 // Node Raising (*some amount of, or all of, the mana*, Illusionary Mask).
 coordination NounPhrase {
