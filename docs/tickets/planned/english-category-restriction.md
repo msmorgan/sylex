@@ -17,8 +17,10 @@ above `RelativeSubjectPredicate`:
 - `FloatedAll` / `RelativeFloatedAll`
 - `AdjunctGap` / `RelativeAdjunctGap`
 
-Other Categories say in their comments that they restate Productions without naming twins:
-`category Possessor` (the Noun Phrase Productions over `BareNominal`) and
+`category QuotedCostNominal` likewise restates `Determined` as `DeterminedQuotedCost` (flagged
+`// Twin: Determined`, for Brutal Suppression and Drought) to keep `QuotedCost` out of `Nominal`
+coordination. Other Categories say in their comments that they restate Productions without naming
+twins: `category Possessor` (the Noun Phrase Productions over `BareNominal`) and
 `category RelativeTemporalNominal` (`RelativeTime` and `RelativeTimePostmodifier` restating
 `NominalPostmodifier` and `TemporalPostmodifier`). `TemporalNounPhrase` and
 `TargetedNounPhrase` may be further cases.
@@ -41,8 +43,7 @@ Other Categories say in their comments that they restate Productions without nam
 ## Pointers
 
 - `crates/english/grammar/english.fug`: the Productions above, `category SubjectInitialClause`,
-  `category Possessor`, `category RelativeTemporalNominal`, `category TemporalNounPhrase`,
+  `category QuotedCostNominal`, `DeterminedQuotedCost`, `category Possessor`,
+  `category RelativeTemporalNominal`, `category TemporalNounPhrase`,
   `category TargetedNounPhrase`.
 - `crates/syntax/src/fug.rs`, `crates/syntax/src/grammar.rs`.
-- Local evidence (gitignored): `docs/evidence/english-fug-hax-check/fable.md` (§2 Cleared, §3),
-  `docs/evidence/english-fug-hax-check/gemini.md` (§2 Cleared, §3).

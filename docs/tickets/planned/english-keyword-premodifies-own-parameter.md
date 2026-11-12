@@ -33,4 +33,3 @@ Two more premodifier Readings stand beside a correct one for other reasons:
 ## Pointers
 
 - `crates/english/grammar/english.fug`: `KeywordPremodifier`, `NumeralNominal`, `SymbolNominal`.
-- `docs/tickets/done/english-keyword-premodifier-bare.md`.

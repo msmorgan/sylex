@@ -45,8 +45,10 @@ each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
   mother's Number from its Complement, or the capability that already does it is named.
 - The selections follow the owner's ruling: declared as frames with the classes and word list
   gone, or kept with each class's comment saying why it is not a frame.
-- Where the partitive selection moves to the lexicon, `QuantityPartitiveOfEach` and the
-  `DegreeArithmetic` exclusion are deleted or kept with an ablation that justifies each.
+- Regardless of that ruling, no Production sets a `DeterminativeDistribution` its head does not
+  have (retiring `QuantityPartitiveOfEach`'s `Distributive` value over a `Numerical` head), and
+  `QuantityPartitiveOfEach` and the `DegreeArithmetic` exclusion are deleted or kept with an
+  ablation that justifies each.
 - The census shows no Reading lost on the supported corpus.
 
 ## Not in scope
@@ -61,4 +63,3 @@ each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
   `LocatedProximateExistentialBe`, `valence DeterminerPhrase`.
 - `crates/vocabulary/lexicon/english/closed_class.ron`, `crates/syntax/src/compile.rs`.
 - `docs/decisions/english.md` §1, §3.
-- Local evidence (gitignored): `docs/evidence/english-fug-hax-check/fable.md` (F3, F11, §3).

@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-degree-determinative-distribution]
 ---
 # The Noun Phrase multiplier Productions restate `Multiplier`
 

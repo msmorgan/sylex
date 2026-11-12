@@ -28,4 +28,3 @@ Complement of the first *to*, which leaves *to you* a second recipient of *X dam
 - `crates/english/grammar/english.fug`: the `NounPhrase` coordination schema,
   `DeterminedQuantity`.
 - `crates/english/judgments/targeting_projection.txt`, the Eternal Flame entry.
-- `docs/tickets/done/english-multiplied-degree-quantity.md`.

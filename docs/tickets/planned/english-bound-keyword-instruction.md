@@ -27,4 +27,3 @@ prints a bound keyword with a period.
 
 - `crates/english/grammar/english.fug`: `KeywordInstruction`, `KeywordForm`.
 - `crates/vocabulary/src/lib.rs`, where a parameter pattern values `KeywordForm`.
-- `docs/tickets/done/english-keyword-premodifier-bare.md`.
