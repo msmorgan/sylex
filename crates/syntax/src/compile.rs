@@ -101,6 +101,9 @@ pub struct CompiledGrammar {
     pub(crate) category_gap: Vec<u16>,
     /// Categories that name a function (`CategoryDecl::function`).
     pub(crate) function_categories: BTreeSet<Ident>,
+    /// The Categories of Linked Conjuncts: the `link` of a coordination
+    /// schema, opened by its linking connective.
+    pub(crate) link_categories: BTreeSet<usize>,
     pub(crate) features: Vec<Ident>,
     pub(crate) values: Vec<Vec<Ident>>,
     pub(crate) productions: Vec<Production>,
@@ -263,26 +266,61 @@ impl CompiledGrammar {
     }
 
     /// The child a Production's head line runs through, by its index among
-    /// the Production's children, punctuation included: its `head`; in a
-    /// coordination that has none, the child that carries its coordinator
-    /// (the coordinator itself, or the serial tail that ends in it), so that a
-    /// coordination's head line ends in its coordinator leaf; and in any
-    /// other Production, its first child besides punctuation (a relative
-    /// clause's relative word or `clause`, an Adjunct's `filler`, a Linked
-    /// Coordination's first conjunct, since it has no coordinator). Each
-    /// Production names at most one, so a word's maximal projection is the
-    /// only one whose head line ends in that word. `None` for a Production
-    /// of punctuation alone.
+    /// the Production's children, punctuation included. In order:
+    ///
+    /// 1. In a Linked Conjunct (a Category that is a coordination schema's
+    ///    `link`), its linking connective: its first child besides punctuation
+    ///    that is not its `head`, so that a Linked Coordination's head line,
+    ///    which runs through its coordinator slot to the Linked Conjunct, ends
+    ///    in the connective as an ordinary coordination's ends in its
+    ///    coordinator leaf.
+    /// 2. Its `head`.
+    /// 3. The child that carries a coordination schema's coordinator (the
+    ///    coordinator itself, or the serial tail that ends in it).
+    /// 4. Its only child besides punctuation (a relative clause's `clause`, an
+    ///    Adjunct's `filler`).
+    /// 5. A closed-class marker, by its name: a `coordinator` (written in the
+    ///    grammar outside a coordination schema), else a `marker` (a relative
+    ///    or interrogative clause's).
+    /// 6. Its first child besides punctuation that does not bear a dependent
+    ///    function ([`DEPENDENT_FUNCTIONS`]): `not`'s `filler`, not the
+    ///    `modifier` *not*.
+    /// 7. Its first child besides punctuation.
+    ///
+    /// The `head` itself ([`Self::head_index`]) is unchanged. Each Production
+    /// names at most one head-line child, so a word's maximal projection is
+    /// the only one whose head line ends in that word. `None` for a
+    /// Production of punctuation alone.
     #[must_use]
     pub fn head_line_child(&self, production: usize) -> Option<usize> {
         let p = &self.productions[production];
-        self.head_index(production)
-            .or(p.coordinator.filter(|_| p.link.is_none()))
+        let head = self.head_index(production);
+        let children: Vec<usize> = p
+            .rhs
+            .iter()
+            .enumerate()
+            .filter(|(_, symbol)| !matches!(symbol, Symbol::Punct(..)))
+            .map(|(at, _)| at)
+            .collect();
+        let named = |name: &str| children.iter().copied().find(|&at| p.names[at] == name);
+        if self.link_categories.contains(&p.lhs) {
+            return children.iter().copied().find(|&at| Some(at) != head);
+        }
+        let only = match children.as_slice() {
+            [only] => Some(*only),
+            _ => None,
+        };
+        head.or(p.coordinator)
+            .or(only)
+            .or_else(|| named("coordinator"))
+            .or_else(|| named("marker"))
             .or_else(|| {
-                p.rhs
+                children
                     .iter()
-                    .position(|symbol| !matches!(symbol, Symbol::Punct(..)))
+                    .copied()
+                    .find(|&at| !DEPENDENT_FUNCTIONS.contains(&p.names[at].as_str()))
             })
+            .or_else(|| children.first().copied())
     }
 
     /// Whether a Production is one of a head line's frame Productions: it
@@ -979,6 +1017,7 @@ impl<'a> Binder<'a> {
                 category_features,
                 category_gap,
                 function_categories,
+                link_categories: BTreeSet::new(),
                 features,
                 values,
                 productions: Vec::new(),
@@ -3830,6 +3869,8 @@ impl<'a> Binder<'a> {
         let serials = serial_shapes.unwrap_or(conjoin.unlike.is_none());
         let Some(coordinators) = coordinators else {
             let link = link.as_deref().expect("a coordination names its link");
+            let link_category = self.category(link)?;
+            self.out.link_categories.insert(link_category);
             return self
                 .linked_coordination(&conjoin, link, *cost, *delimiter, *delimited, serials);
         };
@@ -5469,3 +5510,18 @@ fn gap_named(name: &str) -> Option<Gap> {
         _ => return None,
     })
 }
+
+/// The child names that bear a dependent function in their mother (CGEL's
+/// functions, as the grammar names them): a head line does not run through
+/// one while its Production has another child.
+pub(crate) const DEPENDENT_FUNCTIONS: [&str; 9] = [
+    "subject",
+    "object",
+    "indirect_object",
+    "complement",
+    "predicative_complement",
+    "adjunct",
+    "modifier",
+    "determiner",
+    "supplement",
+];
