@@ -27,5 +27,5 @@ narrow attachment over a coordination") needs the forks of `english-forest-forks
 
 ## Pointers
 
-- `docs/tickets/planned/english-forest-database.md` (its schema and command).
+- `docs/tickets/done/english-forest-database.md` (its schema and command).
 - `crates/english/src/census.rs`; `crates/syntax/src/forks.rs`.
