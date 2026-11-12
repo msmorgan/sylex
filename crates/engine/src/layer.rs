@@ -61,7 +61,8 @@ pub enum ScopeResolved {
 #[derive(Debug, Clone)]
 pub struct ContinuousEffect {
     pub timestamp: Timestamp,
-    /// The effect's controller, locked at creation ([CR#611.2c]). Resolves the
+    /// The controller of the spell or ability that created the effect, the
+    /// player its "you" names ([CR#109.5]). Resolves the
     /// `You` in a layer-2 `SetController(You)` ("you gain control of …"); for
     /// effects with no controller-relative reference it is inert.
     pub controller: PlayerId,
@@ -727,9 +728,9 @@ fn gather(
                     // static routes through the non-CDA layers.
                     is_cda: false,
                     conditions,
-                    // A static ability's continuous effect is controlled by the
-                    // permanent it is on ([CR#611.2c]); its `You` is that
-                    // permanent's controller.
+                    // A static ability's `You` is the current controller of
+                    // the permanent it is on ([CR#109.5]); this is the base
+                    // one, and the pass reads `controller_in`.
                     controller,
                     scope,
                     changes,
