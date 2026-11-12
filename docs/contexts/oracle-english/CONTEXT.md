@@ -278,9 +278,9 @@ its own. Only a position that opts in admits it, through the grammar's
 Relentless Rats*), the Keyword Parameter of *Partner with* [CR#702.124j], the
 complement of *among* after *from*, wherever that phrase attaches, as in the
 options of a choice (*choose a card name ... from among Disenchant, ..., and
-Black Lotus*), and the complement of *into* after *meld*, in the ability of a
-meld pair that melds it [CR#713.1a] (*meld them into Brisela, Voice of
-Nightmares*): a meld result's name is the name of neither card of its pair.
+Black Lotus*), and the complement of *into* after *meld* (*meld them into
+Brisela, Voice of Nightmares*): a meld result's name is the name of neither
+card of its pair [CR#713.2a..713.2g].
 
 **Introduced Name**:
 A name a card's own text gives an object that is not a card, such as the name

@@ -46,8 +46,8 @@ feature Polarity = Affirmative | Negative
 // (*your choice of 5/1 or 1/5*) and *among* (*from among flying, ..., and
 // +1/+1*). `QuotedAbility`: only Nominal-hosted
 // *with* (*a token with "This token can't block."*; [CR#113.1a]). `Name`:
-// only *among* (*from among Disenchant, ..., and Black Lotus*) and *into*
-// (*meld them into Brisela, Voice of Nightmares*).
+// only *among* (*from among Disenchant, ..., and Black Lotus*) and, under
+// *meld*, *into* (*meld them into Brisela, Voice of Nightmares*).
 feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | ExpandableClause
     | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase
@@ -156,13 +156,13 @@ category Quality
 // text shows none it stays unvalued. Never another card's name, which
 // `Lex(Catalog)` does not admit.
 category Name [Number]
-// A name cited as a name: after *named*, as the parameter of *Partner
-// with* [CR#702.124j], as the complement of *among* after *from*,
-// wherever that attaches, as in a choice (*choose a card name ... from among
-// Disenchant, ..., and Black Lotus*), and as the complement of *into* after
-// *meld* (*meld them into Brisela, Voice of Nightmares*). Only these admit
-// another card's name,
-// through `OtherCardName()` (`docs/decisions/lexicon.md` §6).
+// A name in a position that takes a card's name: after *named*, as the
+// parameter of *Partner with* [CR#702.124j], as the complement of *among*
+// after *from*, wherever that attaches, as in a choice (*choose a card name
+// ... from among Disenchant, ..., and Black Lotus*), and as the complement of
+// *into* after *meld* (*meld them into Brisela, Voice of Nightmares*). Only
+// these admit another card's name, through `OtherCardName()`
+// (`docs/decisions/lexicon.md` §6).
 category NameComplement
 category Condition
 category Measure

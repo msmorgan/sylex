@@ -130,9 +130,13 @@
         (lemma: "support", frames: [Amount]),
     ]),
     (rule: "[CR#701.42]", name: "Meld", verbs: [
-        // The meld result's name is the name of neither card of the pair:
-        // another card's name, cited after *into* (*meld them into Brisela,
-        // Voice of Nightmares*).
+        // *into* takes a card's name, like *named*, *Partner with* and
+        // *from among* (`docs/decisions/lexicon.md` §6): *meld them into
+        // Brisela, Voice of Nightmares*. Oracle text uses "the full name when
+        // the words identify an actual card name or face", meld text
+        // included (`docs/oracle-style-guide.md` §5). *Meld* selects the
+        // preposition together with its Complement (CGEL, Ch. 4 §6,
+        // pp. 273–274).
         (lemma: "meld", frames: [TransitiveWithComplement(PPWith(["into"], Name))]),
     ]),
     (rule: "[CR#701.43]", name: "Exert", verbs: [

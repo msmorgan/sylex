@@ -62,7 +62,7 @@ pub enum FillSpec {
     /// word: `PPWith(["for"], Mention)`).
     PPWith(Vec<String>, Box<FillSpec>),
     Pred,
-    /// A name cited as a name, where another card's name stands: the
+    /// A card's name, in a position where another card's name stands: the
     /// predicative complement of *name* (*cards named Relentless Rats*), the
     /// complement of *among* after *from* (*from among Disenchant, ..., and
     /// Black Lotus*), or the complement of *into* after *meld* (*meld them

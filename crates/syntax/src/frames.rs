@@ -71,9 +71,11 @@ pub enum SlotFill {
     /// kind (*do the same for [Vampire]*, a cited word, never *for flying*).
     PP(Vec<LexemeId>, #[serde(default)] Option<SlotKind>),
     Pred,
-    /// A name cited as a name: the predicative complement of *name* (*cards
-    /// named Relentless Rats*), or the complement of *among* after *from*
-    /// (*from among Disenchant, ..., and Black Lotus*).
+    /// A card's name, in a position where another card's name stands: the
+    /// predicative complement of *name* (*cards named Relentless Rats*), the
+    /// complement of *among* after *from* (*from among Disenchant, ..., and
+    /// Black Lotus*), or the complement of *into* after *meld* (*meld them
+    /// into Brisela, Voice of Nightmares*).
     Name,
     AdjP,
     /// An adverbial: an Adverb Phrase or a Noun Phrase of frequency, as

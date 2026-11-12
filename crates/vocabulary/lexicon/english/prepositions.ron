@@ -174,8 +174,11 @@
     ]),
     (lemma: "into", frames: [
         (complement: NP, hosts: ComplementOnly),
-        // A name cited as a name, where another card's name stands, only as
-        // *meld*'s Complement (*meld them into Brisela, Voice of Nightmares*).
+        // A card's name, where another card's name stands, only as *meld*'s
+        // Complement (*meld them into Brisela, Voice of Nightmares*): Oracle
+        // text uses "the full name when the words identify an actual card
+        // name or face", meld text included (`docs/oracle-style-guide.md`
+        // §5).
         (complement: Name, hosts: ComplementOnly, named_only: true),
     ]),
     // *5 minus X damage*

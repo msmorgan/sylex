@@ -184,14 +184,17 @@ Parameter of *Partner with*, whose name is the one its ability searches for as
 *a card named [name]* [CR#702.124j]; the complement of *among* after
 *from*, wherever that phrase attaches, as in the options of a choice (*choose a
 card name ... from among Disenchant, ..., and Black Lotus*); and the complement
-of *into* after *meld*, in the ability of a meld pair that melds it
-[CR#713.1a] (*meld them into Brisela, Voice of Nightmares*). *From* selects
+of *into* after *meld* (*meld them into Brisela, Voice of Nightmares*), where
+Oracle text uses "the full name when the words identify an actual card name or
+face", meld text included (`docs/oracle-style-guide.md` §5); one card of each
+meld pair has the ability that melds it [CR#713.1a], and the pairs and their
+results are fixed [CR#713.2,713.2a..713.2g]. *From* selects
 that *among* phrase by its Complement's kind and *among* takes a name only so
 selected, as *do the same for* selects *for* with a cited word
 (`PPWith(["for"], Mention)`): a name after *among* under any other head
 (*divide it among Black Lotus*) is refused. *Meld* selects its *into* phrase
-the same way, and *into* takes a name under no other head (*put it into Black
-Lotus*). Any other position, a Subject,
+the same way (CGEL, Ch. 4 §6, pp. 273–274), and *into* takes a name under no
+other head (*put it into Black Lotus*). Any other position, a Subject,
 Object, possessor or premodifier among them, refuses another card's name with
 no clause of its own. A name a card gives an object, or a vote option, spelled
 like another card's name is listed as that card's Introduced Name or vote

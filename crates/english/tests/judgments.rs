@@ -306,3 +306,28 @@ fn a_stated_name_that_is_no_card_name_is_refused_naming_the_entry() {
         );
     }
 }
+
+/// Any card's name reads after *meld them into*, the name of the card the
+/// text is on included: *Gisela, the Broken Blade*'s own name there, and
+/// *Lightning Bolt*, a card of no meld pair, on *Gisela* and with no card.
+#[test]
+fn any_card_s_name_reads_after_meld_into_the_card_s_own_included() {
+    let (env, grammar) = environment();
+    let judge = Judge {
+        grammar,
+        lexicon: &env.lexicon,
+    };
+    for line in [
+        "+ <card=Gisela, the Broken Blade> Meld them into Gisela, the Broken Blade.",
+        "+ <card=Gisela, the Broken Blade> Meld them into Lightning Bolt.",
+        "+ <card=Lightning Bolt> Meld them into Lightning Bolt.",
+        "+ Meld them into Lightning Bolt.",
+    ] {
+        let entry = sylex_english::judgment::parse_file("test", line)
+            .unwrap()
+            .remove(0);
+        let parse = judge.parse(&entry).unwrap();
+        assert!(parse.vocabulary_gaps.is_empty(), "{line}");
+        assert!(parse.derivation_count() > 0, "{line}");
+    }
+}

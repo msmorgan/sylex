@@ -569,8 +569,8 @@ mod tests {
     }
 
     /// *Gisela, the Broken Blade* melds into *Brisela, Voice of Nightmares*,
-    /// another card's name cited after *into*; her text also shortens her own
-    /// name.
+    /// another card's name, which *into* takes after *meld*; her text also
+    /// shortens her own name.
     #[test]
     fn a_meld_card_s_own_text_reads_its_meld_result_as_a_name_complement() {
         let output = dump(&[
