@@ -304,7 +304,7 @@ impl GameState {
         )
         .expect("priority legality validated the cost structure")
         .tap;
-        let controller_player = self.objects.obj(source).controller;
+        let controller_player = self.controller_of(source);
         let source_snapshot = LkiSnapshot::capture(self, source);
         let id = self.mint_mana_action();
         let record = self.mint_payment_record();
@@ -365,7 +365,7 @@ impl GameState {
         )
         .expect("can_activate_mana validated the cost structure")
         .tap;
-        let controller_player = self.objects.obj(source).controller;
+        let controller_player = self.controller_of(source);
         let source_snapshot = LkiSnapshot::capture(self, source);
 
         // Validation above is read-only. The child starts from a full clone of

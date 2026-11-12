@@ -332,7 +332,9 @@ impl<'a> FactView<'a> {
             Some(ObjectSource::Player(p)) => Part::Player(p),
             _ => Part::Obj(id),
         };
-        let controller_of = |id: ObjectId| state.objects.get(id).map(|o| o.controller);
+        // The live object's derived controller ([CR#613.1b]); a stale id has
+        // none.
+        let controller_of = |id: ObjectId| state.objects.get(id).map(|_| state.controller_of(id));
 
         let mut v: FactView<'a>;
         match event {
@@ -1490,6 +1492,6 @@ impl GameState {
         self.objects
             .iter()
             .find(|ob| ob.source == watcher)
-            .map(|ob| self.frame(ob.id, ob.controller))
+            .map(|ob| self.frame(ob.id, self.controller_of(ob.id)))
     }
 }

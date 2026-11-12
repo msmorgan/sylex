@@ -397,16 +397,17 @@ fn choose_targets(
 ) -> Vec<Vec<ObjectId>> {
     let opp = opponent(player);
     let candidates = &legal[0];
+    let view = state.layers();
     let board_creatures = state
         .zones
         .battlefield
         .iter()
-        .filter(|&&o| state.objects.obj(o).controller == opp && is_creature(state, o))
+        .filter(|&&o| is_creature(state, o) && view.controller(o) == opp)
         .count();
     if board_creatures >= 2
         && let Some(&creature) = candidates
             .iter()
-            .find(|&&id| state.objects.obj(id).controller == opp && is_creature(state, id))
+            .find(|&&id| is_creature(state, id) && view.controller(id) == opp)
     {
         return vec![vec![creature]];
     }

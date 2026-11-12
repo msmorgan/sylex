@@ -396,7 +396,7 @@ impl GameState {
                                 self,
                                 frame,
                                 riders,
-                                self.objects.obj(object).controller,
+                                self.controller_of(object),
                                 self.owner_of(object),
                             ))
                         } else {
@@ -451,7 +451,11 @@ impl GameState {
                     return vec![];
                 }
                 let player = self.acting_player(to, frame);
-                if self.objects.obj(object).controller == player {
+                // Already controlled (derived, [CR#613.1b]) by `player`: no
+                // transition happens. Lowering a resolved gain-control to a
+                // base-controller write ignores its timestamp against
+                // layer-2 effects; owner: engine-gain-control-layer-2-effect.
+                if self.controller_of(object) == player {
                     return vec![];
                 }
                 vec![WorkItem::Emit(Occurrence::single(
@@ -565,7 +569,7 @@ impl GameState {
                             self,
                             frame,
                             riders,
-                            self.objects.obj(object).controller,
+                            self.controller_of(object),
                             self.owner_of(object),
                         ))
                     } else {
@@ -751,12 +755,14 @@ impl GameState {
                 if let Some(what) = sylex_core::discard_body_what(body) {
                     // "Discard this/that card" ([CR#702.29a]): a single move.
                     // The performer is the patient's controller (the affected
-                    // player discards their own card, [CR#701.9b]).
+                    // player discards their own card, [CR#701.9b]); a card in
+                    // hand has no controller, so that is its owner
+                    // ([CR#108.4a]).
                     let on = self.eval_reference(what, frame);
                     let player = self
                         .objects
                         .get(on)
-                        .map_or(frame.controller(self), |o| o.controller);
+                        .map_or(frame.controller(self), |_| self.owner_of(on));
                     let Some((to, guard)) = composite_body_move(body) else {
                         return vec![];
                     };

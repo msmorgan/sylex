@@ -850,7 +850,7 @@ impl GameState {
                 };
                 if actor != payer
                     || candidate.zone != Some(Zone::Battlefield)
-                    || candidate.controller != actor
+                    || self.controller_of(object) != actor
                 {
                     return false;
                 }
@@ -877,7 +877,9 @@ impl GameState {
                     crate::object::ObjectSource::Card(_) => Some(self.owner_of(object)),
                     crate::object::ObjectSource::Player(_) => None,
                 };
-                let mut controller = candidate.controller;
+                // The default controller after the move mirrors the real
+                // apply's: the object's current (derived) controller.
+                let mut controller = self.controller_of(object);
                 for rider in riders.iter() {
                     match rider {
                         sylex_core::EnterRider::UnderControlOf(who) => {
@@ -934,7 +936,7 @@ impl GameState {
                     return false;
                 };
                 if candidate.zone != Some(Zone::Battlefield)
-                    || candidate.controller != payer
+                    || self.controller_of(object) != payer
                     || candidate.tapped == tap
                 {
                     return false;

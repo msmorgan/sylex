@@ -582,11 +582,12 @@ impl GameState {
             Action::Sacrifice(agent, what) => {
                 let sacrificer = self.eval_reference(agent, frame);
                 let subjects = self.eval_reference_set(what, frame);
+                let view = self.layers();
                 !subjects.is_empty()
                     && subjects.iter().all(|&id| {
                         self.objects.get(id).is_some_and(|object| {
                             object.zone == Some(sylex_core::Zone::Battlefield)
-                                && self.player(object.controller).object == sacrificer
+                                && self.player(view.controller(id)).object == sacrificer
                         })
                     })
             }
@@ -692,7 +693,8 @@ impl GameState {
         if ability.effect.params.is_empty() {
             ability.effect.params = sylex_core::announced_region_params(ability.targets.len());
         }
-        let controller = self.objects.obj(object).controller;
+        // [CR#602.2]: only the source's controller activates its abilities.
+        let controller = self.controller_of(object);
         if self.payment.is_none() {
             self.begin_payment_proposal(controller);
         }
@@ -1622,6 +1624,42 @@ mod tests {
                 obj,
             ),
             "a self-sacrifice always has its one object to pay with"
+        );
+    }
+
+    /// [CR#701.21a,613.1b]: only a permanent's controller can sacrifice it,
+    /// and control is the derived controller. The self-sacrifice cost (Bottle
+    /// Gnomes' "Sacrifice this creature: You gain 3 life.") of a permanent a
+    /// locked layer-2 `SetController` (Control Magic's "You control enchanted
+    /// creature") hands to player 1 is payable by player 1 and not by its
+    /// owner.
+    #[test]
+    fn stolen_permanent_is_sacrificed_by_its_new_controller_only() {
+        let mut state = game();
+        let obj = make_object_on_battlefield(&mut state, PlayerId(0));
+        state.continuous.push(crate::layer::ContinuousEffect {
+            timestamp: crate::object::Timestamp(1_000),
+            controller: PlayerId(1),
+            scope: crate::layer::ScopeResolved::Locked(vec![obj]),
+            changes: vec![sylex_core::Modification::SetController(Reference::Reg(
+                sylex_core::RefId(1),
+            ))],
+            duration: sylex_core::Duration::EndOfGame,
+            rows: vec![],
+            origin: None,
+            is_cda: false,
+        });
+        let sacrifice_this = [Action::Sacrifice(
+            Reference::Reg(sylex_core::RefId(1)),
+            Reference::Reg(sylex_core::RefId(0)),
+        )];
+        assert!(
+            state.can_pay_verbs(PlayerId(1), &sacrifice_this, obj),
+            "the new controller can sacrifice the stolen permanent"
+        );
+        assert!(
+            !state.can_pay_verbs(PlayerId(0), &sacrifice_this, obj),
+            "its owner no longer controls it, so can't sacrifice it"
         );
     }
 

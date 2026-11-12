@@ -192,7 +192,7 @@ impl GameState {
         entering: crate::object::ObjectId,
         region: &sylex_core::Region<T>,
     ) -> crate::stack::ExecutionFrame {
-        let mut frame = self.frame(entering, self.objects.obj(entering).controller);
+        let mut frame = self.frame(entering, self.controller_of(entering));
         frame.activation = self.enter_region(region, &frame);
         frame
     }

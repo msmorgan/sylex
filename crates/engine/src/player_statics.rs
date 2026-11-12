@@ -61,6 +61,7 @@ impl GameState {
     /// Reading printed (not layer-derived) abilities keeps this cycle-safe;
     /// a `ModifyPlayer` granted by a layer-6 effect is a rare seam.
     fn for_each_player_mod(&self, mut visit: impl FnMut(PlayerId, &PlayerMod)) {
+        let view = self.layers();
         for obj in self.objects.iter() {
             if obj.card_id().is_none() {
                 continue; // player proxy — no static abilities
@@ -86,7 +87,7 @@ impl GameState {
                 // affected player directly), so only the top-level shape is
                 // matched here.
                 if let StaticSpec::ModifyPlayer(reference, pmod) = &effect.body
-                    && let Some(p) = resolve_player_ref(reference, obj.controller, effect)
+                    && let Some(p) = resolve_player_ref(reference, view.controller(obj.id), effect)
                 {
                     visit(p, pmod);
                 }

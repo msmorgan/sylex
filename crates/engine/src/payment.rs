@@ -472,7 +472,7 @@ pub(crate) fn automatic_activation_cost_usable(
     if (summary.tap && object.tapped) || (summary.untap && !object.tapped) {
         return false;
     }
-    let controller = object.controller;
+    let controller = state.controller_of(source);
     let frame = state.frame(source, controller);
     let mana = state.resolve_cost_mana(&summary, source, controller);
     if !crate::cast::can_pay(&state.spendable_pool(controller, source), &mana)

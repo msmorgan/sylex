@@ -255,7 +255,7 @@ pub(crate) fn matches_with_activation(
                     .objects
                     .iter()
                     .find(|ob| ob.source == w)
-                    .map(|ob| (ob.id, ob.controller))
+                    .map(|ob| (ob.id, state.controller_of(ob.id)))
                 {
                     None => false,
                     Some((carrier, controller)) => {
@@ -406,7 +406,7 @@ pub(crate) fn matches_with_activation(
         // The object's controller, as a player proxy ([CR#109.5]). Recurses
         // with the SAME watcher so a nested `Ref(You)` still anchors right.
         Predicate::Relation(RelationPredicate::ControlledBy(f)) => {
-            let c = state.objects.obj(id).controller;
+            let c = state.controller_of(id);
             let proxy = state.player(c).object;
             matches_with_activation(state, proxy, f, watcher, activation)
         }
@@ -456,8 +456,13 @@ pub(crate) fn matches_with_activation(
         // any zone restriction (proxies, zone `None`, fall out of e.g.
         // `Permanent`). A card is never a controlling player.
         Predicate::Relation(RelationPredicate::Controls(f)) => match state.objects.obj(id).source {
+            // The derived controller ([CR#613.1b]), read only for an object
+            // `f` already matched: `controller_of` is guard-safe when this
+            // runs inside a layer pass, where a whole-scan view would start
+            // the pass again.
             ObjectSource::Player(p) => state.objects.iter().any(|ob| {
-                ob.controller == p && matches_with_activation(state, ob.id, f, watcher, activation)
+                matches_with_activation(state, ob.id, f, watcher, activation)
+                    && state.controller_of(ob.id) == p
             }),
             ObjectSource::Card(_) => false,
         },
@@ -678,14 +683,14 @@ pub(crate) fn matches_with_activation(
 /// (see `Reference::Reg`), introducing no binding,
 /// so every one of them is resolvable exactly where its innermost register is.
 /// That is why this walks the derivation itself rather than deferring to
-/// [`crate::state::GameState::eval_reference`]: that evaluator reads the
-/// DERIVED controller through `state.layers()`, and this matcher is reachable
-/// from inside a layer rebuild (`layer::condition_predicate_matches` delegates
-/// player proxies here), where re-entering `layers()` would recurse. The stored
-/// controller read below is the same one the sibling
-/// `Predicate::Relation(ControlledBy)` arm uses, so the two spellings of
-/// "controlled by the same player as X" agree; both share the narrowness that a
-/// control-changing effect, which applies in layer 2 [CR#613.1b], is not seen.
+/// [`crate::state::GameState::eval_reference`]: this matcher is reachable from
+/// inside a layer rebuild (`layer::condition_predicate_matches` delegates
+/// player proxies here), where that evaluator's frame would recurse. The
+/// controller read below is `GameState::controller_of`, the same one the
+/// sibling `Predicate::Relation(ControlledBy)` arm uses, so the two spellings
+/// of "controlled by the same player as X" agree: the derived controller
+/// ([CR#613.1b]), or the base one inside a layer pass, where it is the layer
+/// system's own input.
 fn resolve_frameless_reference(
     state: &GameState,
     r: &Reference,
@@ -709,7 +714,7 @@ fn resolve_frameless_reference(
                 state, inner, watcher, activation,
             )?)?;
             object.card_id()?;
-            Some(state.player(object.controller).object)
+            Some(state.player(state.controller_of(object.id)).object)
         }
         // [CR#108.3]: the owner of a referenced card-backed object; a player
         // proxy has no owner.
@@ -925,7 +930,7 @@ fn resolve_count(
     if let Some(w) = watcher
         && let Some(carrier) = state.objects.iter().find(|o| o.source == w)
     {
-        let mut frame = state.frame(carrier.id, carrier.controller);
+        let mut frame = state.frame(carrier.id, state.controller_of(carrier.id));
         if activation != crate::ActivationId::NONE {
             frame.activation = activation;
         }
@@ -1019,7 +1024,7 @@ pub(crate) fn matches_region_with_activation(
                 .objects
                 .iter()
                 .find(|object| object.source == wanted)
-                .map(|object| (object.id, object.controller))
+                .map(|object| (object.id, state.controller_of(object.id)))
         }) else {
             return false;
         };
@@ -2470,6 +2475,80 @@ mod tests {
         assert!(
             matches_with(&state, bear, &derived, watcher),
             "sanity: the carrier is controlled by its own controller, so both spellings hold"
+        );
+    }
+
+    /// [CR#613.1b]: the controller relations read the DERIVED controller. A
+    /// locked layer-2 `SetController` (Control Magic's "You control enchanted
+    /// creature") hands player 0's Bear to player 1: player 1 now controls it
+    /// in all three spellings (`ControllerOf`, `ControlledBy`, `Controls`), and
+    /// player 0 controls it in none.
+    #[test]
+    fn controller_relations_read_a_continuous_steal() {
+        use sylex_core::Duration;
+        use sylex_core::Modification;
+
+        use crate::layer::ContinuousEffect;
+        use crate::layer::ScopeResolved;
+        use crate::object::Timestamp;
+
+        let (mut state, bear) = game_with_a_bear_on_the_field();
+        state.continuous.push(ContinuousEffect {
+            timestamp: Timestamp(1_000),
+            controller: PlayerId(1),
+            scope: ScopeResolved::Locked(vec![bear]),
+            changes: vec![Modification::SetController(sylex_core::Reference::Reg(
+                sylex_core::RefId(1),
+            ))],
+            duration: Duration::EndOfGame,
+            rows: vec![],
+            origin: None,
+            is_cda: false,
+        });
+        let watcher = Some(state.objects.obj(bear).source);
+        let p0 = state.player(PlayerId(0)).object;
+        let p1 = state.player(PlayerId(1)).object;
+        let controller_of_source = Predicate::Ref(sylex_core::Reference::ControllerOf(Arc::new(
+            sylex_core::Reference::source_parameter(),
+        )));
+        // "creatures you control", carried by player 1's Forest (its `You`
+        // is player 1) and by a Bear still in player 0's hand (player 0).
+        let you_control = Predicate::Relation(RelationPredicate::ControlledBy(Arc::new(
+            Predicate::Ref(sylex_core::Reference::controller_parameter()),
+        )));
+        let forest = state.zones.hands[1][0];
+        state.zones.hands[1].retain(|&o| o != forest);
+        state.objects.obj_mut(forest).zone = Some(sylex_core::Zone::Battlefield);
+        state.zones.battlefield.push(forest);
+        let p1_carrier = Some(state.objects.obj(forest).source);
+        let p0_carrier = Some(state.objects.obj(state.zones.hands[0][0]).source);
+        let controls_source = Predicate::Relation(RelationPredicate::Controls(Arc::new(
+            Predicate::Ref(sylex_core::Reference::source_parameter()),
+        )));
+
+        assert!(
+            matches_with(&state, p1, &controller_of_source, watcher),
+            "the stolen Bear's controller is player 1"
+        );
+        assert!(
+            !matches_with(&state, p0, &controller_of_source, watcher),
+            "its owner no longer controls it"
+        );
+        assert!(
+            matches_with(&state, p1, &controls_source, watcher),
+            "player 1 controls the stolen Bear"
+        );
+        assert!(
+            !matches_with(&state, p0, &controls_source, watcher),
+            "player 0 does not control the stolen Bear"
+        );
+        assert!(
+            matches_with(&state, bear, &you_control, p1_carrier),
+            "player 1's \"creatures you control\" matches the stolen Bear"
+        );
+        assert!(
+            !matches_with(&state, bear, &you_control, p0_carrier),
+            "player 0's \"creatures you control\" no longer matches it"
         );
     }
 

@@ -406,7 +406,7 @@ pub(crate) fn attackable(state: &GameState, view: &LayeredView, id: ObjectId) ->
 #[must_use]
 pub(crate) fn is_combatant(state: &GameState, view: &LayeredView, id: ObjectId) -> bool {
     let carrier = state.objects.obj(id).source;
-    let controller = state.objects.obj(id).controller;
+    let controller = view.controller(id);
     let frame = state.frame(id, controller);
     let mut enter = |cond: &sylex_core::Condition| state.condition_holds(cond, &frame);
     conferred_statics(view, id).any(|spec| {
@@ -941,7 +941,7 @@ pub(crate) fn for_each_static<F: FnMut(&StaticSpec)>(
     // itself), so a condition that reads characteristics triggers a FRESH,
     // non-recursive `state.layers()` — the escape `conferred_rule_abilities`
     // uses ([CR#611.3a]).
-    let controller = state.objects.obj(id).controller;
+    let controller = view.controller(id);
     let frame = state.frame(id, controller);
     let mut enter = |cond: &sylex_core::Condition| state.condition_holds(cond, &frame);
     // The visitor never breaks, so the only outcome is the run-to-completion
@@ -1015,7 +1015,7 @@ pub(crate) fn arrangement_forbidden_by(
             // than its power" — `StatOf(This, Power)`) evaluates instead of
             // panicking. `Ref(This)`/`StatOf(This)` anchor on the carrier, so
             // build a carrier-source frame with no resolution context.
-            let frame = state.frame(r.carrier_id, state.objects.obj(r.carrier_id).controller);
+            let frame = state.frame(r.carrier_id, state.controller_of(r.carrier_id));
             r.count
                 .as_ref()
                 .expect("filtered to Some")
@@ -1211,7 +1211,7 @@ fn masked_self_rows_forbid(
         .filter(|a| !ability_names_keyword(a, keyword))
         .cloned()
         .collect();
-    let controller = state.objects.obj(target).controller;
+    let controller = view.controller(target);
     let frame = state.frame(target, controller);
     let mut enter = |cond: &sylex_core::Condition| state.condition_holds(cond, &frame);
     let hit = walk_abilities(&abilities, &mut enter, &mut |e: &StaticSpec| {

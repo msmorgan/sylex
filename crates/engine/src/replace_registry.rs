@@ -549,7 +549,7 @@ fn replacement_frame(
     event: &GameEvent,
     params: Arc<[sylex_core::Param]>,
 ) -> crate::stack::ExecutionFrame {
-    let controller = state.objects.obj(source).controller;
+    let controller = state.controller_of(source);
     let roles = state
         .event_roles(event)
         .bindings_over(crate::trigger::TriggerBindings {
@@ -885,7 +885,7 @@ fn schedule_body(
     params: Arc<[sylex_core::Param]>,
     event_amount: Option<sylex_core::Uint>,
 ) {
-    let controller = state.objects.obj(source).controller;
+    let controller = state.controller_of(source);
     // [CR#608.2,608.2k]: bind the affected recipient — the event PATIENT
     // ([CR#120.3]) — so the body can read it while `This` falls back to
     // `source` (`bindings.this` is `None`, the agent never moving off the
@@ -944,12 +944,12 @@ pub(crate) fn affected_player(state: &GameState, e: &GameEvent) -> PlayerId {
                 .objects
                 .get(o)
                 .map_or(state.turn.active_player, |x| match x.zone {
-                    Some(Zone::Battlefield | Zone::Stack) => x.controller,
+                    Some(Zone::Battlefield | Zone::Stack) => state.controller_of(o),
                     _ => match x.source {
                         ObjectSource::Card(c) => state.cards.get(c).owner,
                         // A player proxy has no owner distinct from itself
-                        // ([CR#109]) — `controller` IS the player, set at mint.
-                        ObjectSource::Player(_) => x.controller,
+                        // ([CR#109]).
+                        ObjectSource::Player(p) => p,
                     },
                 })
         }

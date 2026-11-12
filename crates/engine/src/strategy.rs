@@ -297,7 +297,7 @@ impl StrategyEvaluator {
                 // player — each attacker is paired with the sole opponent's
                 // player proxy. Planeswalker-target selection is a follow-up.
                 .map(|o| {
-                    let controller = state.objects.obj(o).controller;
+                    let controller = state.controller_of(o);
                     (o, state.player(state.next_live_after(controller)).object)
                 })
                 .collect()

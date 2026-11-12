@@ -320,7 +320,7 @@ impl GameState {
         self.objects
             .iter()
             .find(|ob| ob.source == source)
-            .map(|ob| ob.controller)
+            .map(|ob| self.controller_of(ob.id))
     }
 
     /// Evaluate `filter` against the last-known state of a moved object
@@ -570,7 +570,7 @@ impl GameState {
                 .objects
                 .iter()
                 .find(|ob| ob.source == watcher)
-                .map(|ob| (ob.id, ob.controller))
+                .map(|ob| (ob.id, self.controller_of(ob.id)))
             {
                 None => false,
                 Some((carrier, controller)) => {
@@ -882,9 +882,10 @@ impl GameState {
         let defending_player = match event {
             // The defending player controls the thing attacked ([CR#508.1b]):
             // a planeswalker's controller, or the attacked player's own proxy.
-            GameEvent::Attacking(Attacking { defending, .. }) => {
-                self.objects.get(*defending).map(|o| o.controller)
-            }
+            GameEvent::Attacking(Attacking { defending, .. }) => self
+                .objects
+                .get(*defending)
+                .map(|_| self.controller_of(*defending)),
             _ => None,
         };
         // The event MAGNITUDE — the amount-carrying set the apply funnel fixes
@@ -945,9 +946,10 @@ impl GameState {
     /// stale/missing id yields no snapshot.
     fn event_agent(&self, id: ObjectId) -> (Option<LkiSnapshot>, Option<PlayerId>) {
         match self.objects.get(id) {
-            Some(o) if matches!(o.source, ObjectSource::Card(_)) => {
-                (Some(LkiSnapshot::capture(self, id)), Some(o.controller))
-            }
+            Some(o) if matches!(o.source, ObjectSource::Card(_)) => (
+                Some(LkiSnapshot::capture(self, id)),
+                Some(self.controller_of(id)),
+            ),
             _ => (None, None),
         }
     }
@@ -1019,6 +1021,9 @@ impl GameState {
             watchers.push(Watcher::Leaving(snapshot.as_ref().clone()));
         }
 
+        // [CR#603.3a]: a triggered ability is controlled by its source's
+        // controller as it triggered — the derived one ([CR#613.1b]).
+        let view = self.layers();
         for watcher in watchers {
             // [CR#113.6,113.6b]: the zone this watcher currently functions in —
             // its live zone, or the battlefield for a just-left object (its
@@ -1037,7 +1042,11 @@ impl GameState {
             let (source, controller, this) = match watcher {
                 Watcher::Live(id) => {
                     let o = self.objects.obj(id);
-                    (o.source, o.controller, LkiSnapshot::capture(self, id))
+                    (
+                        o.source,
+                        view.controller(id),
+                        LkiSnapshot::capture(self, id),
+                    )
                 }
                 Watcher::Leaving(s) => (s.source, s.controller, s.clone()),
             };

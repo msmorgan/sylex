@@ -153,7 +153,7 @@ pub(super) fn validate_pay_pips_object(
     match act {
         PayAct::TapToPay(filter) => {
             if candidate.zone != Some(Zone::Battlefield)
-                || candidate.controller != locked.payer
+                || state.controller_of(object) != locked.payer
                 || candidate.tapped
                 || !crate::target::matches_with(state, object, filter, Some(watcher))
             {

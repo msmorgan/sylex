@@ -1179,7 +1179,9 @@ impl GameState {
     ///
     /// Panics if `object` is not in its controller's hand — engine invariant.
     pub(crate) fn begin_cast(&mut self, object: ObjectId) {
-        let controller = self.objects.obj(object).controller;
+        // [CR#108.4a]: a card in hand has no controller; its owner, whose hand
+        // it is in, casts it.
+        let controller = self.owner_of(object);
         self.begin_cast_from(object, Zone::Hand, controller, None);
     }
 
@@ -1211,7 +1213,7 @@ impl GameState {
             self.begin_payment_proposal(controller);
         }
         match origin {
-            Zone::Hand => self.remove_from_hand(self.objects.obj(object).controller, object),
+            Zone::Hand => self.remove_from_hand(self.owner_of(object), object),
             Zone::Exile => self.remove_from_exile(object),
             Zone::Graveyard => self.remove_from_graveyard(self.owner_of(object), object),
             Zone::Library => self.remove_from_library(self.owner_of(object), object),
@@ -2430,6 +2432,7 @@ impl GameState {
         // so the statics walk below never sees it).
         let source = self.objects.obj(object).source;
         let abilities = crate::derive::abilities_of_source(self, source);
+        let view = self.layers();
         let _ = crate::legal::walk_abilities(
             &abilities,
             // Presence scan of the spell's own rows: look through `Conditionally`
@@ -2439,25 +2442,18 @@ impl GameState {
                 if let sylex_core::StaticSpec::CostModifier { of, change } = e
                     && self.filter_matches_live(of, object, source)
                 {
-                    rows.push((
-                        self.frame(object, self.objects.obj(object).controller),
-                        change.clone(),
-                    ));
+                    rows.push((self.frame(object, view.controller(object)), change.clone()));
                 }
                 ControlFlow::<()>::Continue(())
             },
         );
         // Battlefield rows.
-        let view = self.layers();
         for &id in &self.zones.battlefield {
             crate::legal::for_each_static(self, &view, id, |e| {
                 if let sylex_core::StaticSpec::CostModifier { of, change } = e
                     && self.filter_matches_live(of, object, self.objects.obj(id).source)
                 {
-                    rows.push((
-                        self.frame(id, self.objects.obj(id).controller),
-                        change.clone(),
-                    ));
+                    rows.push((self.frame(id, view.controller(id)), change.clone()));
                 }
             });
         }

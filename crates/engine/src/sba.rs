@@ -75,12 +75,12 @@ pub fn sweep(state: &GameState) -> Vec<GameEvent> {
     // `M1M1Counter` decl confers it as a `Property::StateBased` SBA, swept
     // generically here alongside every other counter-conferred state-based
     // action.
-    actions.extend(counter_state_based_sbas(state));
+    actions.extend(counter_state_based_sbas(state, &view));
 
     // [CR#704.3]: rules-defined SBAs from `rules/sba/` data (toughness-0,
     // loyalty-0, battle-defense-0). Evaluated after counter SBAs so they join
     // the same simultaneous batch.
-    actions.extend(global_sba_rules(state));
+    actions.extend(global_sba_rules(state, &view));
 
     // [CR#704.5d,111.7]: a token in a zone other than the battlefield ceases
     // to exist. The move that stranded it already fired its zone-leave
@@ -180,7 +180,7 @@ fn attachment_sbas(state: &GameState, view: &crate::layer::LayeredView) -> Vec<G
     for &id in &state.zones.battlefield {
         // A `This`-anchored frame: `condition_holds`/`action_items` resolve
         // `Ref(This)` to this object via the frame source ([CR#603.10a]).
-        let frame = state.frame(id, state.objects.obj(id).controller);
+        let frame = state.frame(id, view.controller(id));
         let mut rows: Vec<(sylex_core::Condition, sylex_core::Instruction)> = Vec::new();
         // Type/subtype-conferred SBAs ([CR#704.5m]) — the ability-free
         // `Property::StateBased` flavor, read off the DERIVED types/subtypes so
@@ -243,14 +243,14 @@ fn attachment_sbas(state: &GameState, view: &crate::layer::LayeredView) -> Vec<G
 /// `This`-anchored frame resolves `Ref(This)` to the object) and run the
 /// `effect` of those whose `condition` holds. The +1/+1 vs -1/-1 annihilation
 /// ([CR#704.5q]) is the canonical instance — `M1M1Counter` confers it.
-fn counter_state_based_sbas(state: &GameState) -> Vec<GameEvent> {
+fn counter_state_based_sbas(state: &GameState, view: &crate::layer::LayeredView) -> Vec<GameEvent> {
     let mut out = Vec::new();
     for &id in &state.zones.battlefield {
         let obj = state.objects.obj(id);
         if obj.counters.is_empty() {
             continue;
         }
-        let frame = state.frame(id, obj.controller);
+        let frame = state.frame(id, view.controller(id));
         for kind in obj.counters.keys() {
             let Some(decl) = state.counter_decls.get(kind) else {
                 continue;
@@ -275,10 +275,10 @@ fn counter_state_based_sbas(state: &GameState) -> Vec<GameEvent> {
 /// `when` is its firing condition. Checking `scope` first means `when`'s stat
 /// reads only run on in-scope objects (a toughness read never runs on a
 /// non-creature).
-fn global_sba_rules(state: &GameState) -> Vec<GameEvent> {
+fn global_sba_rules(state: &GameState, view: &crate::layer::LayeredView) -> Vec<GameEvent> {
     let mut out = Vec::new();
     for &id in &state.zones.battlefield {
-        let bare = state.frame(id, state.objects.obj(id).controller);
+        let bare = state.frame(id, view.controller(id));
         for rule in &state.sba_rules {
             let mut frame = bare.clone();
             frame.activation = state.enter_region(&rule.region, &frame);
@@ -415,7 +415,7 @@ pub(crate) fn legend_rule_groups(
         {
             continue;
         }
-        let controller = state.objects.obj(id).controller;
+        let controller = view.controller(id);
         let name = crate::derive::face(state.def(id))
             .characteristics
             .name

@@ -93,7 +93,7 @@ impl EventApply for DamageDealt {
         if g.objects.get(source).is_some_and(|o| o.card_id().is_some())
             && crate::combat::has_keyword_named(&view, source, "Lifelink")
         {
-            let controller = g.objects.obj(source).controller;
+            let controller = view.controller(source);
             g.player_mut(controller).life +=
                 sylex_core::Int::try_from(amount).expect("damage fits in i32");
         }
