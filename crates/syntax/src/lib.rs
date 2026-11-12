@@ -7,6 +7,7 @@
 //! [`PackedForest`]; Readings are enumerated from it, checked by Admission
 //! without parsing, and realized back to text.
 
+mod alternatives;
 mod chart;
 mod compile;
 mod counts;
@@ -23,6 +24,11 @@ mod step;
 mod tree_key;
 pub mod walk;
 
+pub use alternatives::AlternativeDistribution;
+pub use alternatives::EMBEDDING_DEPTH;
+pub use alternatives::Embedding;
+pub use alternatives::EmbeddingStep;
+pub use alternatives::HeadWord;
 pub use chart::ChildRef;
 pub use chart::Metrics;
 pub use chart::PackedForest;

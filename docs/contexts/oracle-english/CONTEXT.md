@@ -58,6 +58,12 @@ Of a Constituent in a Packed Forest: used by every Derivation of the
 expression. A settled Constituent with several alternative Derivations is
 still a point of choice.
 
+**Embedding**:
+Of a Constituent in one Derivation: the dependent functions it stands under,
+nearest first, each the function the top of a head line bears in its
+governor, as *die* in *If a creature would die* stands as the Complement of
+*would*, itself in the Complement of *if*.
+
 **Preference**:
 A ranking over admitted Readings. It orders them and never adds or removes
 one.

@@ -68,8 +68,15 @@ on are the contract documented on `grammar::ProductionDecl`.
   `--card NAME` alone reads that card's own text.
 - `Parse::metrics()` gives chart items, forest nodes, families and leaves.
 - `PackedForest`'s accessors (`roots`, `node_span`, `node_items`,
-  `item_families`, `leaf_span`), `Parse::count_node` and the `walk` module
-  read the forest from outside; `sylex_english`'s census is built on them.
+  `node_alternatives`, `item_families`, `item_production`, `leaf_span`,
+  `leaf_reading`, ...), `Parse`'s (`node_features`, `node_gap`,
+  `node_coordinator`), `Parse::count_node` and the `walk` module read the
+  forest from outside; `sylex_english`'s census is built on them.
+- `Parse::counts()` gives every node's, item's and edge's exact Derivation
+  count (`counts.rs`); `alternative_heads`, `alternative_conjuncts` and
+  `alternative_embeddings` split each alternative's by its head word,
+  conjunct count and Embedding (`alternatives.rs`).
+  `cargo xtask english forests` writes all of it for the pool to SQLite.
 - The `tree-ranking-key` feature, enabled for this crate's tests, adds
   `CompiledGrammar::ranking_key`, which computes a Reading's key from its tree
   to check the forest's.

@@ -48,7 +48,7 @@ pub struct ForestCycle(String);
 
 /// A forest vertex.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Vertex {
+pub(crate) enum Vertex {
     Node(usize),
     Item(usize),
 }
@@ -135,7 +135,7 @@ impl Parse<'_> {
 
     /// The nodes and items the roots reach, each after everything it
     /// derives from, by an iterative depth-first search.
-    fn children_first(&self) -> Result<Vec<Vertex>, ForestCycle> {
+    pub(crate) fn children_first(&self) -> Result<Vec<Vertex>, ForestCycle> {
         #[derive(Clone, Copy, PartialEq)]
         enum Mark {
             New,
@@ -247,6 +247,18 @@ impl Counts<'_> {
     #[must_use]
     pub fn node(&self, node: usize) -> u128 {
         mul(self.node_inside[node], self.node_outside[node])
+    }
+
+    /// The ways the rest of a whole Derivation can surround a node.
+    #[must_use]
+    pub fn node_outside(&self, node: usize) -> u128 {
+        self.node_outside[node]
+    }
+
+    /// An item's own Derivations: the ways to build its children.
+    #[must_use]
+    pub fn item_inside(&self, item: usize) -> u128 {
+        self.item_inside[item]
     }
 
     /// Whether a node is in every Derivation of a unit that has one. A

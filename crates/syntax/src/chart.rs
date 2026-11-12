@@ -115,6 +115,48 @@ impl PackedForest {
         self.nodes[node].families.iter().map(|&(_, item)| item)
     }
 
+    /// A Constituent's alternatives: each a (Production, completed item)
+    /// pair, in the order of [`Self::node_items`].
+    pub fn node_alternatives(&self, node: usize) -> impl Iterator<Item = (usize, usize)> + '_ {
+        self.nodes[node].families.iter().copied()
+    }
+
+    /// The number of completed Constituents; a node's index is below it.
+    #[must_use]
+    pub fn node_count(&self) -> usize {
+        self.nodes.len()
+    }
+
+    /// The number of partial Productions; an item's index is below it.
+    #[must_use]
+    pub fn item_count(&self) -> usize {
+        self.items.len()
+    }
+
+    /// The Production of a partial Production.
+    #[must_use]
+    pub fn item_production(&self, item: usize) -> usize {
+        self.items[item].production
+    }
+
+    /// The number of children a partial Production has found.
+    #[must_use]
+    pub fn item_dot(&self, item: usize) -> usize {
+        self.items[item].dot
+    }
+
+    /// The extent of a partial Production, in chars.
+    #[must_use]
+    pub fn item_span(&self, item: usize) -> Range<usize> {
+        self.items[item].start..self.items[item].end
+    }
+
+    /// The lexical alternative a leaf is.
+    #[must_use]
+    pub fn leaf_reading(&self, leaf: usize) -> &LexicalReading {
+        &self.leaves[leaf].reading
+    }
+
     /// The (previous item, last child) alternatives of a partial Production.
     pub fn item_families(
         &self,
@@ -164,6 +206,34 @@ impl<'g> Parse<'g> {
     #[must_use]
     pub fn tokens(&self) -> &[char] {
         &self.tokens
+    }
+
+    /// The grammar the text was parsed with.
+    #[must_use]
+    pub fn grammar(&self) -> &'g CompiledGrammar {
+        self.grammar
+    }
+
+    /// The bound features of a completed Constituent, by feature name.
+    #[must_use]
+    pub fn node_features(
+        &self,
+        node: usize,
+    ) -> std::collections::BTreeMap<dpsi::Ident, dpsi::Ident> {
+        let node = &self.forest.nodes[node];
+        self.grammar.feature_map(node.category, &node.summary)
+    }
+
+    /// The unfilled Gap a completed Constituent contains.
+    #[must_use]
+    pub fn node_gap(&self, node: usize) -> crate::Gap {
+        self.forest.nodes[node].summary.gap
+    }
+
+    /// The coordinator of a completed Constituent that is a coordination.
+    #[must_use]
+    pub fn node_coordinator(&self, node: usize) -> Option<sylex_lexicon::LexemeId> {
+        self.forest.nodes[node].summary.coordinator
     }
 
     /// Parses another analyzed text as the Category this Parse was made for.

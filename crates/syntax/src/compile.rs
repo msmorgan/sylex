@@ -189,6 +189,80 @@ impl CompiledGrammar {
     pub fn category_id(&self, name: &str) -> Option<usize> {
         self.category_ids.get(name).copied()
     }
+
+    /// The name of every Category, by index.
+    #[must_use]
+    pub fn category_names(&self) -> &[Ident] {
+        &self.categories
+    }
+
+    /// The number of Productions; a Production's index is below it.
+    #[must_use]
+    pub fn production_count(&self) -> usize {
+        self.productions.len()
+    }
+
+    /// The stable id of a Production.
+    #[must_use]
+    pub fn production_id(&self, production: usize) -> Ident {
+        self.productions[production].id
+    }
+
+    /// The Category a Production forms.
+    #[must_use]
+    pub fn production_category(&self, production: usize) -> usize {
+        self.productions[production].lhs
+    }
+
+    /// The name of each child of a Production, in order, punctuation
+    /// included: the grammatical function each bears in the mother (empty
+    /// for punctuation).
+    #[must_use]
+    pub fn production_functions(&self, production: usize) -> &[Ident] {
+        &self.productions[production].names
+    }
+
+    /// Whether a Production builds a serial or polysyndetic tail of a
+    /// coordination (*…, [B, and C]*), not a whole coordination.
+    #[must_use]
+    pub fn production_is_tail(&self, production: usize) -> bool {
+        self.productions[production].tail
+    }
+
+    /// The index of a Production's `head` child, the one a head word is
+    /// followed through ([`Self::head_word`]).
+    pub(crate) fn head_index(&self, production: usize) -> Option<usize> {
+        self.productions[production]
+            .names
+            .iter()
+            .position(|name| *name == "head")
+    }
+
+    /// The Selected Frame of a frame-headed Production, with its name
+    /// (`Monotransitive(NP)`) and its Valence Alternation variant: what its id
+    /// adds after the frame's name, as `passive+by` or `passive/gap1`
+    /// (empty for the frame's own phrase).
+    ///
+    /// # Panics
+    /// When the id of a frame-headed Production does not contain its
+    /// frame's name.
+    #[must_use]
+    pub fn production_frame(&self, production: usize) -> Option<(&Frame, String, &str)> {
+        let production = &self.productions[production];
+        let frame = &self.frames[production.frame?];
+        let label = frame_label(frame);
+        let (_, variant) = production
+            .id
+            .as_str()
+            .split_once(&label)
+            .unwrap_or_else(|| {
+                panic!(
+                    "frame-headed Production `{}` does not name its frame `{label}`",
+                    production.id
+                )
+            });
+        Some((frame, label, variant.trim_start_matches('/')))
+    }
 }
 
 /// The word forms of every Word spelled like each lexical value, ignoring
@@ -4967,6 +5041,12 @@ fn adjunct_production_id(schema: &SchemaDecl) -> String {
 }
 
 pub(crate) fn frame_name(phrase: &str, frame: &Frame) -> String {
+    format!("Valence:{phrase}/{}", frame_label(frame))
+}
+
+/// A frame's name: its family and the fill of each slot, as in
+/// `Monotransitive(NP)` or `Copular(Pred)[ActiveOnly]`.
+pub(crate) fn frame_label(frame: &Frame) -> String {
     let slots: Vec<String> = frame
         .slots
         .iter()
@@ -4988,7 +5068,7 @@ pub(crate) fn frame_name(phrase: &str, frame: &Frame) -> String {
         family => format!("{family:?}"),
     };
     let voice = if frame.active_only { "[ActiveOnly]" } else { "" };
-    format!("Valence:{phrase}/{family}({}){voice}", slots.join(","))
+    format!("{family}({}){voice}", slots.join(","))
 }
 
 /// The frames a head's declared `frames` derive for the grammar's unlike
