@@ -41,12 +41,15 @@ the meld result's name is the one fact the name does not carry.
   census derives each face's scope from the record in hand. The whole card's name (`A // B`)
   leaves `own_names`.
 - A stated name that is no card-name Lexeme is refused with an error naming the entry.
-- `english parse --card NAME TEXT...` parses each text as if the card were so named, and fetches
-  nothing. `english parse --card NAME` with no text reads that card's record and parses its own
-  units: for each face so named, a `Face:` header with the face's name and its card's, then the
-  type line as `TypeLine` and each rules-text line, in order. `english parse TEXT...` reads with
-  no card. An input in judgment entry syntax still states its own card with `<card=NAME>`;
-  giving both `--card` and `<card=…>` is an error.
+- `english parse --as-card NAME TEXT...` parses each text as if it were on the card so named,
+  and fetches nothing. `english parse --card NAME`, with no text, reads the faces so named (a
+  face's name, or its whole card's) from the supported corpus and parses their own units as the
+  census reads them: under a `Face: NAME (card: CARD)` line, the type line and then each
+  rules-text line, numbered from 1. `english parse TEXT...` reads with no card. `--card` with
+  text, and `--as-card` without, are errors that name the other flag. An input in judgment entry
+  syntax still states its own card with `<card=NAME>`; giving that and `--as-card` is an error.
+- `english strata` reads the pinned snapshot from the process's records; `--data FILE` reads
+  another file.
 
 ## Done when
 
@@ -54,8 +57,10 @@ the meld result's name is the one fact the name does not carry.
   `tests/ranking_keys.rs` load no corpus; one `english parse` call reads the snapshot once.
 - `docs/decisions/lexicon.md` §6, the Own Name and Another Card's Name entries of
   `oracle-english/CONTEXT.md`, the judgments README and the meld entries of
-  `name_lexeme_scope.txt` and `comma_scope.txt` state the meld analysis above.
-- The pool census changes on no unit but the meld lines.
+  `name_lexeme_scope.txt` state the meld analysis above. `comma_scope.txt` needs no edit: its
+  two *Mishra, Claimed by Gix* entries assert only the Clause that is the Complement of *if*,
+  which the analysis of *into*'s Complement does not touch.
+- The pool census changes on no unit.
 - Tests on real cards: *Jace, Cunning Castaway* (*Jace draws two cards.*), a double-faced card's
   back face (*Insectile Aberration*), a meld card (*Gisela, the Broken Blade*), a line with no
   card, and an unknown name refused.
@@ -70,12 +75,14 @@ the meld result's name is the one fact the name does not carry.
 - The card-scoped catalogs (`introduced_names.ron`, `cited_names.ron`, `vote_options.ron`,
   `anchor_words.ron`) and the card-name list: names a card's own text introduces, listed with
   their cards in advance.
-- Text parsed as if the card had a name the lexicon does not list: `english-hypothetical-names`.
+- The Shortened Names' own read of the snapshot, and a Shortened form for a legendary card whose
+  text does not use it: `english-shortened-name-without-attestation`.
 
 ## Pointers
 
 - `crates/english/src/judgment.rs` (`CardScopes`, `Judge`), `crates/english/src/corpus.rs`
-  (`own_names`, `Face::scope`), `crates/english/src/census.rs` (`judge_parse`).
+  (`own_names`, `Face::scope`, `Corpus::load`), `crates/english/src/census.rs` (`judge_parse`).
+- `crates/upstream/src/scryfall.rs` (`oracle_cards`).
 - `crates/lexicon/src/scope.rs`, `crates/lexicon/src/analysis.rs` (`Lexicon::stands_in`),
   `crates/syntax/src/step.rs` (`leaf_facts`, `other_card_name`).
 - `crates/vocabulary/src/shortening.rs`, `crates/vocabulary/src/names.rs`.
