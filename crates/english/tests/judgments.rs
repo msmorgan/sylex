@@ -248,8 +248,9 @@ fn stratum_zero_spines_hold_over_seed_payloads() {
 /// An entry's Card Scope is computed from the name it states, with no card
 /// looked up: *Jace, Cunning Castaway* shortens its own name; *Insectile
 /// Aberration* is the back face of *Delver of Secrets*, with a name of its own
-/// [CR#712.6]; *Gisela, the Broken Blade* is a meld card, whose
-/// scope does not hold its meld result.
+/// [CR#712.6]; *Gisela, the Broken Blade* is a meld card, whose front face and
+/// combined back face each have their own name [CR#713.5], so its scope does
+/// not hold its meld result.
 #[test]
 fn an_entry_s_scope_is_the_own_name_of_the_card_it_states() {
     use sylex_lexicon::CardScope;
