@@ -416,22 +416,29 @@ WHERE NOT EXISTS (SELECT 1 FROM alternatives ka JOIN productions kp USING (produ
 
 -- Every fork whose options are a wide and a narrow attachment over a
 -- coordination: a dependency question (`question` 0, the fork's own, or an
--- alias) and two of its options in which the `dependent` word's maximal
--- projection bears one `function` to governors of one Category, where
--- - in the `wide` option the governor's head-line word is the head word of a
---   coordination (`coordination_heads`, its `coordinator`): the dependent
---   attaches above the whole coordination;
--- - in the `narrow` option the governor's head-line word lies inside that
---   coordination's span, between its head word and the dependent: the
---   dependent attaches inside the conjunct next to it;
--- - the coordination's Category is the governors' (a private Category read as
---   the one it copies: its name up to `#`) and its span does not hold the
---   dependent's word;
--- - the function is no part of a coordination (`first`, `last`, `rest`,
---   `coordinate`, `coordinator`, `correlative`): a conjunct that two
---   coordinations contend for is a bracketing, not an attachment.
+-- alias) and two of its options, `wide` and `narrow`, in which the
+-- `dependent` word's maximal projection is a dependent, where
+-- - in the wide option its governor's head-line word is the head word of a
+--   coordination (`coordination_heads`, its `coordinator`) whose Category is
+--   the governor's and whose span does not hold the dependent's word: the
+--   dependent attaches above the whole coordination. Its function is no part
+--   of a coordination (`first`, `last`, `rest`, `coordinate`, `coordinator`,
+--   `correlative`): a conjunct that two coordinations contend for is a
+--   bracketing, not an attachment;
+-- - in the narrow option its governor's head-line word lies inside that
+--   coordination's span, between its head word and the dependent, and some
+--   node of the narrow governor's Category, headed by that word
+--   (`heads`), holds the dependent's word but not the coordination's head
+--   word: the dependent attaches inside the conjunct next to it. The narrow
+--   governor may be of any Category and bear any function; each option's
+--   function and governor Category are columns, so a query can keep like
+--   pairs only.
 -- One row per (fork, question, wide option, narrow option), with each
--- option's Derivations (`fork_options`); a fork may have several such pairs.
+-- option's Derivations (`fork_options`). These are the whole option's: an
+-- option can also pack Derivations whose governor coordinates differently
+-- (contains the coordination's head word), so `narrow_derivations` is not
+-- the count of Derivations with the narrow attachment alone. A fork may
+-- have several such pairs.
 CREATE VIEW wide_narrow_attachments AS
 WITH questions (unit, fork, question, kind, word) AS (
     SELECT unit, fork, 0, kind, word FROM forks
@@ -439,11 +446,13 @@ WITH questions (unit, fork, question, kind, word) AS (
     SELECT unit, fork, alias, kind, word FROM fork_aliases
 )
 SELECT DISTINCT q.unit, q.fork, q.question, q.word AS dependent,
-    d.surface AS dependent_surface, wa.function, wa.governor_category,
-    wa.option AS wide, wa.governor AS coordinator, cw.surface AS coordinator_surface,
-    wo.derivations AS wide_derivations,
-    na.option AS narrow, na.governor AS narrow_governor, nw.surface AS narrow_governor_surface,
-    no.derivations AS narrow_derivations
+    d.surface AS dependent_surface,
+    wa.option AS wide, wa.function AS wide_function,
+    wa.governor_category AS wide_governor_category, wa.governor AS coordinator,
+    cw.surface AS coordinator_surface, wo.derivations AS wide_derivations,
+    na.option AS narrow, na.function AS narrow_function,
+    na.governor_category AS narrow_governor_category, na.governor AS narrow_governor,
+    nw.surface AS narrow_governor_surface, no.derivations AS narrow_derivations
 FROM questions q
 JOIN words d ON d.unit = q.unit AND d.word = q.word
 JOIN fork_answers wa
@@ -451,21 +460,26 @@ JOIN fork_answers wa
     AND wa.dependency = 'dependent'
 JOIN fork_answers na
     ON na.unit = q.unit AND na.fork = q.fork AND na.question = q.question
-    AND na.option <> wa.option AND na.function = wa.function
-    AND na.governor_category = wa.governor_category
+    AND na.option <> wa.option AND na.dependency = 'dependent'
 JOIN fork_options wo ON wo.unit = wa.unit AND wo.fork = wa.fork AND wo.option = wa.option
 JOIN fork_options no ON no.unit = na.unit AND no.fork = na.fork AND no.option = na.option
 JOIN words cw ON cw.unit = wa.unit AND cw.word = wa.governor
 JOIN words nw ON nw.unit = na.unit AND nw.word = na.governor
 JOIN coordination_heads h ON h.unit = q.unit AND h.word = wa.governor
 JOIN nodes c ON c.unit = h.unit AND c.node = h.coordination
-JOIN categories cc ON cc.category = c.category
+JOIN categories cc ON cc.category = c.category AND cc.name = wa.governor_category
 WHERE q.kind = 'dependency'
     AND wa.function NOT IN ('first', 'last', 'rest', 'coordinate', 'coordinator', 'correlative')
-    AND substr(cc.name, 1, instr(cc.name || '#', '#') - 1)
-        = substr(wa.governor_category, 1, instr(wa.governor_category || '#', '#') - 1)
     AND NOT (c.start <= d.start AND d.start < c.end)
     AND c.start <= nw.start AND nw.start < c.end
     AND (cw.start < nw.start AND nw.start < d.start
-        OR d.start < nw.start AND nw.start < cw.start);
+        OR d.start < nw.start AND nw.start < cw.start)
+    AND EXISTS (
+        SELECT 1 FROM nodes n
+        JOIN categories nc ON nc.category = n.category AND nc.name = na.governor_category
+        JOIN heads hh ON hh.unit = n.unit AND hh.node = n.node
+        JOIN leaves hl ON hl.unit = hh.unit AND hl.leaf = hh.leaf AND hl.start = nw.start
+        WHERE n.unit = q.unit
+            AND n.start <= d.start AND d.start < n.end
+            AND NOT (n.start <= cw.start AND cw.start < n.end));
 ";

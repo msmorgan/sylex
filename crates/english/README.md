@@ -317,27 +317,32 @@ DeterminerPhrase  or                           2        1969           1709
 ```
 
 Forks whose options are a wide and a narrow attachment over a coordination
-(`wide_narrow_attachments`): the dependent bears one function to governors of
-one Category, in one option the coordination's (whose Head Line ends in its
-coordinator, or a Linked Coordination's connective), in the other a word
-inside the conjunct next to it, as *until end of turn* modifies *gets +2/+2
-and gains trample* or *gains trample*. 4,004 forks in 3,326 units, by
-function and governor Category:
+(`wide_narrow_attachments`): in one option the dependent's governor is a
+coordination (whose Head Line ends in its coordinator, or a Linked
+Coordination's connective) of the governor's Category; in the other it is a
+word inside the conjunct next to the dependent, of any Category and function,
+in a Constituent that does not hold the coordinator. So *until end of turn*
+modifies *gets +2/+2 and gains trample* or *gains trample*, and in *put a
++1/+1 counter on each creature you control and those creatures gain trample
+until end of turn* the Clause coordination or the Verb Phrase *gain*. Each
+option's count is the whole option's: where an option also packs Derivations
+that coordinate differently, `narrow_derivations` counts those too. 4,868
+forks in 3,848 units, by each option's function and governor Category:
 
 ```sql
-SELECT function, governor_category, count(DISTINCT unit || ':' || fork) AS forks,
-  count(DISTINCT unit) AS units
-FROM wide_narrow_attachments GROUP BY 1, 2 ORDER BY forks DESC LIMIT 6;
+SELECT wide_function, wide_governor_category, narrow_function, narrow_governor_category,
+  count(DISTINCT unit || ':' || fork) AS forks, count(DISTINCT unit) AS units
+FROM wide_narrow_attachments GROUP BY 1, 2, 3, 4 ORDER BY forks DESC LIMIT 6;
 ```
 
 ```
-function    governor_category  forks  units
-modifier    Nominal             1635   1361
-adjunct     VerbPhrase          1461   1229
-adjunct     Clause               793    715
-supplement  Clause                96     94
-modifier    PrepositionPhrase     54     54
-modifier    NounPhrase            15     14
+wide_function  wide_governor_category  narrow_function  narrow_governor_category  forks  units
+modifier       Nominal                 modifier         Nominal                    1635   1361
+adjunct        VerbPhrase              adjunct          VerbPhrase                 1460   1228
+adjunct        Clause                  adjunct          VerbPhrase                  734    633
+adjunct        Clause                  adjunct          Clause                      700    630
+adjunct        Clause                  modifier         Nominal                     336    296
+adjunct        VerbPhrase              modifier         Nominal                     247    209
 ```
 
 Units where the two options are every Derivation:
@@ -353,12 +358,12 @@ ORDER BY u.face_name, u.line LIMIT 6;
 
 ```
 face_name                      dependent  wide  narrow       wide_derivations  narrow_derivations  derivations
+A Killer Among Us              until      and   gains                       1                   1            2
 Abandon Reason                 until      and   gain                        1                   1            2
 Aberrant                       controls   or    enchantment                 1                   1            2
 Aberrant Mind Sorcerer         When       then  choose                      5                   5           10
 Abeyance                       Until      and   can't                       1                   1            2
 Abomination, Irradiated Brute  control    or    Villain                     1                   1            2
-Absorb Essence                 until      and   gains                       1                   1            2
 ```
 
 The census faces with no Vintage `Legal` or `Restricted` printing in mtgjson
