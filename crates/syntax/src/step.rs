@@ -29,8 +29,26 @@ pub(crate) const MAX_JOINT_CONDITIONS: usize = 8;
 
 /// One feature value, with the final byte value reserved for an unbound slot.
 /// Binding validates the domain before any value reaches a chart State.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 pub(crate) struct FeatureValue(u8);
+
+/// A run of values hashes a word per eight: the `[FeatureValue; N]` arrays of
+/// a State and a Summary key the chart's indexes.
+impl std::hash::Hash for FeatureValue {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        state.write_u8(self.0);
+    }
+
+    fn hash_slice<H: std::hash::Hasher>(data: &[Self], state: &mut H) {
+        for chunk in data.chunks(8) {
+            let mut word = [0; 8];
+            for (byte, value) in word.iter_mut().zip(chunk) {
+                *byte = value.0;
+            }
+            state.write_u64(u64::from_le_bytes(word));
+        }
+    }
+}
 
 impl FeatureValue {
     pub(crate) const UNSET: Self = Self(u8::MAX);
@@ -2485,5 +2503,56 @@ pub(crate) fn projected_values(feature: &str) -> &'static [&'static str] {
             "PastParticiple",
         ],
         _ => &[],
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::hash::Hash;
+    use std::hash::Hasher;
+
+    use super::FeatureValue;
+
+    /// Records each write a value's hash makes.
+    #[derive(Default)]
+    struct Writes(Vec<String>);
+
+    impl Hasher for Writes {
+        fn finish(&self) -> u64 {
+            0
+        }
+
+        fn write(&mut self, bytes: &[u8]) {
+            self.0.push(format!("bytes {bytes:?}"));
+        }
+
+        fn write_u8(&mut self, value: u8) {
+            self.0.push(format!("u8 {value}"));
+        }
+
+        fn write_u64(&mut self, value: u64) {
+            self.0.push(format!("u64 {value:#018x}"));
+        }
+
+        fn write_usize(&mut self, value: usize) {
+            self.0.push(format!("usize {value}"));
+        }
+    }
+
+    #[test]
+    fn a_feature_value_array_hashes_a_word_per_eight_values() {
+        let mut values = [FeatureValue::UNSET; 10];
+        values[0] = FeatureValue::new(1);
+        values[9] = FeatureValue::new(2);
+        let mut writes = Writes::default();
+        values.hash(&mut writes);
+        assert_eq!(
+            writes.0,
+            [
+                "usize 10",
+                "u64 0xffffffffffffff01",
+                "u64 0x00000000000002ff",
+            ]
+        );
     }
 }
