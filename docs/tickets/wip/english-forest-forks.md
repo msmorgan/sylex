@@ -2,74 +2,95 @@
 needs: [english-forest-counts-and-forks]
 ---
 
-# Forks: where a unit's analyses differ, read off the forest
+# Forks: where a unit's Derivations differ, read off the forest
 
 ## Why
 
 The exact counts (`english-forest-counts-and-forks`) say how many Derivations use each node,
-item and edge, but not where a unit's analyses part. A **fork** is meant to be that place:
-anchored to a word of the unit, stated in the grammar's own terms (an attachment, a lexical or
-Category choice, a coordination's extent, a Gap's antecedent), with each option's exact count.
-The survey and narrowing commands and the judge build on it. Measured over the pool's 94,335
-units, a fork cannot be read off a forest vertex:
-
-- A vertex with several live families is where analyses re-merge, not where they diverge. Of
-  41,555 item vertices with several live families, 34,187 (82%) have options with the same
-  previous item and a child of the same Category and span, which differ only further down.
-  *Crook of Condemnation*'s "{1}, {T}: Exile target card from a graveyard." has 2 Derivations
-  and one such vertex, a settled item at w3 whose options are two Constituents of one Category
-  over "Exile target card from a graveyard"; the difference, whether "from a graveyard" modifies
-  "card" or adjoins the Verb Phrase, lies five levels below.
-- 21,537 node vertices also have several live families.
-- The root set is a fork of its own: 83 units have more than one live root (81 with 2, 2 with
-  3), which no vertex holds.
-- The function rules the judgments use (`locate`, which is private; `child_names`,
-  crate-private; `head_word`) work on a Reading, not on the forest.
-- Two anchor rules were measured over the vertex forks. Anchoring at the word where the item
-  starts puts 31,857 forks at a word another fork shares, in 6,628 units, up to 40 at one word;
-  anchoring at the first word of the option's child puts 27,329 there, in 5,784 units, up to 25
-  at one word (338 of them settled). 254 forks have no word to anchor at under either rule.
+item and edge, but not where a unit's analyses part. A forest vertex with several live families
+is where analyses re-merge, not where they differ: of 41,555 item vertices with several live
+families in the pool's 94,335 units, 34,187 have options with the same previous item and a child
+of the same Category and span, which differ only further down (*Crook of Condemnation*'s "Exile
+target card from a graveyard." has its one difference, whether "from a graveyard" modifies "card"
+or adjoins the Verb Phrase, five levels below its one such vertex). The survey and narrowing
+commands, the pool database and the judge need the places where analyses differ, stated in the
+grammar's terms, with exact counts, and a way to narrow a forest by them.
 
 ## Design
 
-- A fork is anchored to a 1-based word position of the unit (`wN`, counting
-  whitespace-delimited words as `words` in `reading.rs` does), the same across calls on the same
-  text and grammar. Each option carries its exact count in Derivations, and the options of a
-  fork sum to the Derivations that reach it.
-- A node's head word and Selected Frame belong to each of its alternatives, not to the node.
-- Forks are computed without enumerating a Reading, in `sylex_english` over the counts of
-  `sylex_syntax`.
-
-## Open questions
-
-- How two options are compared downward to find where they differ: the vertex holds them
-  together, but the analyses part only below it, possibly at several places.
-- Which word anchors a fork, given the collisions measured above.
-- How two forks at one word are told apart, and how a fork's options are ordered (both fix what
-  a selector `wN.K` of `english-forestwalk-narrowing` names). Never by count or by Ranking Key,
-  which would read as a recommendation (`english.md` §5).
-- How the function rules (`locate`, `head_word`, `child_names`, `has_antecedent`) are shared
-  between Readings and the forest, so that a fork is stated in the same terms as a judgment.
+- A **fork** is a question about one word of a unit whose answer differs between the unit's
+  Derivations; each option is one answer, with the exact number of Derivations that give it. A
+  fork is not a forest vertex. Its context is the Derivations in which its word has an answer:
+  the options are disjoint and sum to it. A fork whose context is not every Derivation is
+  conditional, and says so.
+- A word's **head line** runs from its leaf up through each mother of which it is the head-line
+  child: the `head` child; in a coordination that has no `head`, the child that carries its
+  coordinator, so a coordination is identified by its coordinator leaf; in any other
+  Production, its first child besides punctuation (a relative clause's relative word, an
+  Adjunct's `filler`, a Linked Coordination's first conjunct). Each Production names at most one,
+  so every Constituent is on exactly one word's head line. The top of a head line is the word's
+  maximal projection.
+- Three kinds of fork:
+  - lexical: which lexical alternative the leaf starting at the word is (its end, Lexeme, Word
+    Form and features);
+  - dependency: what the word's maximal projection depends on: the function it bears (its name
+    in its mother's Production), its governor's Category and its governor's head leaf, or that
+    it is a root. The Category is needed: in "that many plus one", "plus one" modifies a
+    Determiner Phrase or a Noun Phrase, both headed by "many";
+  - frame: the Productions on the word's head line that have one child besides punctuation or
+    a Selected Frame (a frame's phrase, a word mention, a quoted ability and the like), in order
+    from the leaf up.
+- A frame candidate is a fork only where the lexical and dependency candidates do not already
+  determine it: one whose partition of its context is a coarsening of the meet of the lexical
+  and dependency candidates' partitions there is discarded. Candidates that induce the same
+  partition are one fork, named by the first in display order. There is no stacking kind.
+- A fork is named by its kind, the surface of the leaf it is about (the shortest leaf starting at
+  its word) and that surface's 1-based occurrence among the unit's leaves, so "player's" is the
+  leaves "player" and "'s". An option is named by grammatical content, never by an index or a
+  count: a dependency option by its function, its governor's Category and the governor leaf's
+  surface and occurrence; a lexical option by its Lexeme, Word Form and features; a frame option
+  by its Productions. Forks are displayed in order of their word's position, then by kind;
+  options in order of their governor's position, then the rest of their content; never by count
+  or Ranking Key (`docs/decisions/english.md` §5).
+- Forks are computed on a split copy of the forest: each node is split by its head leaf's
+  position and its head line's frame Productions, and each item by those of its Production's
+  head-line child, so every node and item has one head and every option of every fork is an
+  exact set of edges.
+- Narrowing: excluding an option disables its edges, sweeps what dies and recounts; picking an
+  option of an unconditional fork excludes every other option; picking an option of a
+  conditional fork keeps the Derivations that realize it, splitting each vertex above its edges
+  on whether a Derivation through it uses one. Forks and counts after narrowing are computed by
+  the same code on the narrowed forest, with the unit's names.
+- The computation lives in `sylex_syntax` and names no English Category or Production.
+- Gap Antecedents and the secondary links of a Constituent (`Constituent::also`: Right Node
+  Raising, Complement Clusters, postposed modifiers) are not fork kinds.
 
 ## Done when
 
 - Forks are computed for every unit of the pool without enumerating a Reading, and the landing
-  reports the pool's totals by fork kind and the units with the most forks.
-- On every unit small enough to enumerate, each fork's option counts equal the number of
-  enumerated Readings that take that option.
+  reports the pool's forks by kind, its conditional forks, forks per ambiguous unit, how many
+  units the lexical and dependency forks alone separate fully, how many need frame forks and
+  which the three kinds do not separate, and the CPU time for the pool.
+- On every unit of the pool (an opt-in test) and on named real units in the default suite, each
+  fork's options are disjoint and sum to its context, the forks computed on the forest equal
+  those computed from the unit's enumerated Readings, and for every option of every fork,
+  picking it leaves exactly the Derivations enumeration says realize it and excluding it leaves
+  the rest; the landing reports how many Derivations remain after picking one option of every
+  fork.
+- A documented public API in `sylex_syntax` for the survey command and the database's fork
+  tables to build on.
 - The term *fork* has an entry in `docs/contexts/oracle-english/CONTEXT.md`.
 - `cargo test` and `cargo clippy --tests -- -D warnings` pass for each changed crate.
 
 ## Not in scope
 
-- Printing forks (`english-forestwalk-survey`), narrowing by them
-  (`english-forestwalk-narrowing`) and storing them (`english-forest-database-forks`).
+- Printing forks (`english-forestwalk-survey`), the narrowing command
+  (`english-forestwalk-narrowing`) and storing forks (`english-forest-database-forks`).
 - Choosing among options (`english.md` §4, §5).
 
 ## Pointers
 
 - `docs/decisions/english.md` §1, §4, §5, §8.
-- `crates/syntax/src/reading.rs` (`locate`, `head_word`, `child_names`, `words`), the outside
-  pass of `english-forest-counts-and-forks`.
-- `crates/english/src/judgment.rs` (`Function`, `holds`, `has_antecedent`).
-- The research probe in the gitignored `docs/evidence/english-forest-counts-and-forks/`.
+- `crates/syntax/src/counts.rs`, `alternatives.rs`, `chart.rs`, `reading.rs` (`locate`,
+  `head_word`, `child_names`).
+- The research and its review in the gitignored `docs/evidence/english-forest-forks/`.
