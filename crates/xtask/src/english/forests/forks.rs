@@ -263,19 +263,24 @@ mod tests {
             .map(Result::unwrap)
             .collect();
         let word = |w: usize| words[w].clone();
-        let mut aliases: BTreeMap<usize, Vec<(ForkKind, ForkWord)>> = BTreeMap::new();
-        let mut statement = db
+        // A fork's aliases in order; a fork without aliases has no row.
+        let mut alias_rows = db
             .prepare(
-                "SELECT fork, kind, word FROM fork_aliases WHERE unit = ?1 ORDER BY fork, alias",
+                "SELECT kind, word FROM fork_aliases WHERE unit = ?1 AND fork = ?2 ORDER BY alias",
             )
             .unwrap();
-        for row in statement
-            .query_map([unit], |r| Ok((at(r, 0), r.get::<_, String>(1)?, at(r, 2))))
-            .unwrap()
-        {
-            let (fork, k, w) = row.unwrap();
-            aliases.entry(fork).or_default().push((kind(&k), word(w)));
-        }
+        let mut aliases = |fork: usize| -> Vec<(ForkKind, ForkWord)> {
+            alias_rows
+                .query_map(rusqlite::params![unit, index(fork)], |r| {
+                    Ok((r.get::<_, String>(0)?, at(r, 1)))
+                })
+                .unwrap()
+                .map(|row| {
+                    let (k, w) = row.unwrap();
+                    (kind(&k), word(w))
+                })
+                .collect()
+        };
         let mut answers: BTreeMap<(usize, usize), Vec<Answer>> = BTreeMap::new();
         let mut statement = db
             .prepare(
@@ -358,7 +363,7 @@ mod tests {
             Fork {
                 kind: kind(&k),
                 word: word(w),
-                aliases: aliases.remove(&fork).unwrap_or_default(),
+                aliases: aliases(fork),
                 context: u128::try_from(context).unwrap(),
                 conditional,
                 options: options.remove(&fork).unwrap(),
