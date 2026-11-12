@@ -2,6 +2,8 @@
 //! AST as reified agenda work. Stage 3 wires the corpus's arms; the rest are
 //! `todo!`.
 
+use std::sync::Arc;
+
 use sylex_core::Ability;
 use sylex_core::Agency;
 use sylex_core::TargetSpec;
@@ -407,21 +409,26 @@ impl GameState {
             .any(|t| t.permanent_type)
     }
 
-    /// Returns the effect of the spell's first `Ability::Spell(SpellAbility {
-    /// effect, .. })`, cloned. Returns `None` if there is no Spell ability.
+    /// The object's `Ability::Spell`, which carries the targets a spell
+    /// announces and the instructions it follows, looked up through composite
+    /// keywords: Enchant confers the one that gives an Aura spell the target
+    /// its enchant ability defines [CR#303.4a,702.5a]. `None` for a spell
+    /// that has none (a creature spell).
+    #[must_use]
+    pub(crate) fn spell_ability(&self, id: ObjectId) -> Option<Arc<sylex_core::SpellAbility>> {
+        spell_ability_in(&crate::derive::abilities(self, id))
+    }
+
+    /// Returns the effect of the spell's spell ability, cloned. Returns `None`
+    /// if there is no spell ability.
     #[must_use]
     pub(crate) fn spell_effect(&self, id: ObjectId) -> Option<sylex_core::Region> {
-        let target_count = self.spell_targets(id).len();
-        crate::derive::abilities(self, id)
-            .iter()
-            .find_map(|a| spell_ability_effect(a))
-            .cloned()
-            .map(|mut effect| {
-                if effect.params.is_empty() {
-                    effect.params = sylex_core::announced_region_params(target_count);
-                }
-                effect
-            })
+        let spell = self.spell_ability(id)?;
+        let mut effect = spell.effect.clone();
+        if effect.params.is_empty() {
+            effect.params = sylex_core::announced_region_params(spell.targets.len());
+        }
+        Some(effect)
     }
 
     /// The spell's PRINTED ADDITIONAL cost ([CR#118.8,601.2b]) — the cost
@@ -429,35 +436,29 @@ impl GameState {
     /// cost. Empty for a spell with no additional cost.
     #[must_use]
     pub(crate) fn spell_additional_cost(&self, id: ObjectId) -> sylex_core::Cost {
-        crate::derive::abilities(self, id)
-            .iter()
-            .find_map(|ability| spell_ability(ability))
+        self.spell_ability(id)
             .map(|spell| spell.cost.clone())
             .unwrap_or_default()
     }
 
     #[must_use]
     pub(crate) fn spell_targets(&self, id: ObjectId) -> Vec<TargetSpec> {
-        crate::derive::abilities(self, id)
-            .iter()
-            .find_map(|ability| spell_ability(ability))
+        self.spell_ability(id)
             .map_or_else(Vec::new, |spell| spell.targets.to_vec())
     }
 }
 
-/// Extracts the `Instruction` from the first `Ability::Spell` arm.
-fn spell_ability_effect(ability: &Ability) -> Option<&sylex_core::Region> {
-    match ability {
-        Ability::Spell(s) => Some(&s.effect),
-        _ => None,
-    }
-}
-
-pub(crate) fn spell_ability(ability: &Ability) -> Option<&sylex_core::SpellAbility> {
-    match ability {
-        Ability::Spell(spell) => Some(spell),
-        _ => None,
-    }
+/// The first spell ability in `abilities`, composite keywords spliced
+/// (`derive::flatten_composites`).
+pub(crate) fn spell_ability_in(abilities: &[Ability]) -> Option<Arc<sylex_core::SpellAbility>> {
+    abilities.iter().find_map(|ability| {
+        let mut flat = Vec::new();
+        crate::derive::flatten_composites(ability, &mut flat);
+        flat.into_iter().find_map(|member| match member {
+            Ability::Spell(spell) => Some(spell),
+            _ => None,
+        })
+    })
 }
 
 /// One event → `Single`; several → a simultaneous `Batch`.

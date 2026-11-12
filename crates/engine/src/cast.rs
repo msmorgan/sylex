@@ -1492,14 +1492,7 @@ impl GameState {
         chosen_modes: &[Uint],
     ) -> Vec<TargetSpec> {
         match object {
-            StackObject::Spell(o) => view
-                .get(*o)
-                .abilities
-                .iter()
-                .find_map(|ability| match ability {
-                    sylex_core::Ability::Spell(spell) => Some(spell.as_ref()),
-                    _ => None,
-                })
+            StackObject::Spell(o) => crate::resolve::spell_ability_in(&view.get(*o).abilities)
                 .map_or_else(Vec::new, |spell| {
                     announced_target_specs(&spell.effect, &spell.targets, chosen_modes)
                 }),
