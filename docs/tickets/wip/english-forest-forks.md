@@ -33,6 +33,13 @@ grammar's terms, with exact counts, and a way to narrow a forest by them.
   child. The `head` itself, which features and `head_word` follow, is unchanged. Each Production
   names at most one head-line child, so every Constituent is on exactly one word's head line.
   The top of a head line is the word's maximal projection.
+- The rule's dependent-function step reads child names against a fixed list
+  (`DEPENDENT_FUNCTIONS`, nine names); today it decides one Production (`NegatedConjunct`), and a
+  dependent named outside the list would fall through to the first-child step unnoticed. The
+  grammar declaring each headless Production's head-line child would remove the list. No
+  load-time check refuses a headless Production whose head-line child has its own Category: by
+  index it would refuse the 46 engine-built serial tails, whose private Category hosts no
+  attachment, and by name also nine wrappers and the Linked Coordinations' binary Productions.
 - Three kinds of fork:
   - lexical: which lexical alternative the leaf starting at the word is (its end, Lexeme, Word
     Form and features);
@@ -52,7 +59,10 @@ grammar's terms, with exact counts, and a way to narrow a forest by them.
   leaves "player" and "'s". An option is named by grammatical content, never by an index or a
   count: a dependency option by its function, its governor's Category and the governor leaf's
   surface and occurrence; a lexical option by its Lexeme, Word Form and features; a frame option
-  by its Productions. Forks are displayed in order of their word's position, then by kind;
+  by its Productions. A name is the identity (`ForkWord::names`, `Answer::names`): no offset is
+  part of it, so it stays valid when text elsewhere changes. A word's start serves display order
+  only, and a lexical answer carries no end: two leaves starting at one word never share a
+  lexical reading (the split asserts it). Forks are displayed in order of their word's position, then by kind;
   options in order of their governor's position, then the rest of their content; never by count
   or Ranking Key (`docs/decisions/english.md` §5).
 - Forks are computed on a split copy of the forest: each node is split by its head leaf's
