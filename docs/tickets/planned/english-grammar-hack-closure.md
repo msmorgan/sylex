@@ -1,5 +1,5 @@
 ---
-needs: [english-require-on-unvalued-features, english-object-coordination-exclusions, english-outside-the-game-frame, english-fused-each-partitive, english-specifying-clause, english-tied-for-superlatives, english-synesis-each-partitive, english-renamed-children-head-agreement, english-interleaved-manner-gate, english-single-card-productions, english-cgel-citation-corrections, english-gate-ablation-records, english-targeting-marker-recursion, english-among-plural-complement, english-participle-coordination-inflection]
+needs: [english-require-on-unvalued-features, english-object-coordination-exclusions, english-outside-the-game-frame, english-fused-each-partitive, english-specifying-clause, english-tied-for-superlatives, english-synesis-each-partitive, english-renamed-children-head-agreement, english-interleaved-manner-gate, english-single-card-productions, english-cgel-citation-corrections, english-gate-ablation-records, english-targeting-marker-recursion, english-among-plural-complement, english-participle-coordination-inflection, english-quantity-bracketing]
 ---
 
 # Epic: every construct in the English grammar is the right mechanism, honestly described
@@ -31,6 +31,7 @@ the rows in its `needs:` are closed.
 | A determined Targeting Marker taken as a Marker again | `english-targeting-marker-recursion` | Equation admits more than the comment |
 | *Among* with a singular Complement | `english-among-plural-complement` | Frame admits more than English |
 | `ParticipialAttribute`'s test on a coordination with no Inflection | `english-participle-coordination-inflection` | Gate that admits everything |
+| *Any one color* and *half X damage* built twice; `MultipliedAmount` | `english-quantity-bracketing` | Second tree of one analysis |
 
 These are not required for this ticket to close. Each rests on a single reading, or on two that
 disagree, and joins `needs:` if it is moved to `planned/`:
