@@ -167,6 +167,120 @@ prints the summary and writes the full per-unit report to
 `target/english/strata.json` (untracked). `--check` fails on a regression, a
 stale deferral (read, or naming no unit) or a unit that is not segmentable.
 
+## The forest database
+
+```
+cargo xtask english forests [--card NAME]... [--output PATH]
+```
+
+writes every Corpus Unit's Packed Forest, with its exact Derivation counts
+(`sylex_syntax::Counts`), to one SQLite file, by default
+`data/derived/english-forests.sqlite` (untracked). Each unit is parsed as the
+census parses it. Questions across the pool are SQL over it, and its units
+join mtgjson's `cardIdentifiers.scryfallOracleId` by `units.oracle_id`. The
+forest stays packed (`docs/decisions/english.md` §4): there is no row per
+Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
+
+- `units`; `nodes` (Category, span, surface, Gap, features, coordinator,
+  settled); `alternatives` (Production, completed item); `items` (Production,
+  dot, span); `families` (previous item, child node or leaf); `leaves`;
+- per alternative: `heads` (head lexeme and form), `alternative_embeddings`
+  (the Embedding it stands under, `embeddings`) and, for a coordination,
+  `conjuncts`; and the grammar's `productions` (with Selected Frame and
+  variant), `categories` and `lexemes`;
+- views `verb_phrases` and `coordinations`.
+
+Every `derivations` column is exact. A fact holds in every Derivation where
+its node's rows with that fact sum to `units.derivations`, and in some
+Derivation where it has a row. Never sum `derivations` across different nodes
+of one unit: one Derivation uses many nodes.
+
+Passive verb phrases by verb and frame, in units where some Derivation has
+one, and where one node has it in every Derivation (*blocked* is passive or
+adjectival in most):
+
+```sql
+WITH passive AS (
+  SELECT v.unit, v.node, v.lemma, v.frame, sum(v.derivations) AS n, u.derivations AS total
+  FROM verb_phrases v JOIN units u USING (unit)
+  WHERE v.variant LIKE 'passive%'
+  GROUP BY v.unit, v.node, v.lemma, v.frame)
+SELECT lemma, frame, count(DISTINCT unit) AS some_units,
+  count(DISTINCT CASE WHEN n = total THEN unit END) AS every_units
+FROM passive GROUP BY lemma, frame ORDER BY some_units DESC LIMIT 6;
+```
+
+```
+lemma  frame                                                                              some_units  every_units
+block  Monotransitive(NP)                                                                        719            3
+put    TransitiveWithPP(NP,PP[prep:into|prep:in|prep:on|prep:onto|prep:back|prep:there])         558          238
+deal   TransitiveWithPP(NP,PP[prep:to])                                                          405          353
+deal   Ditransitive(NP,NP)                                                                       390           79
+name   ComplexTransitive(NP,Name)                                                                334          323
+exile  Monotransitive(NP)                                                                        323          255
+```
+
+The verbs of a replacement's *would* clause: the Complement of preterite
+*will* inside the Complement of *if*:
+
+```sql
+SELECT lemma, frame, count(DISTINCT unit) AS units
+FROM verb_phrases
+WHERE projection1 = 'BareInfinitival' AND function1 = 'complement'
+  AND governor_lemma1 = 'will' AND governor_form1 = 'Preterite'
+  AND function2 = 'complement' AND governor_lemma2 = 'if'
+GROUP BY lemma, frame ORDER BY units DESC LIMIT 6;
+```
+
+```
+lemma  frame                             units
+deal   TransitiveWithPP(NP,PP[prep:to])    100
+die    Intransitive()                       94
+draw   Monotransitive(NP)                   38
+be     Copular(Pred)                        26
+gain   Monotransitive(NP)                   20
+leave  Monotransitive(NP)                   14
+```
+
+Coordinations by Category, coordinator (a Linked Coordination's link
+Category where it has none) and conjunct count:
+
+```sql
+SELECT category, coalesce(coordinator_lemma, link) AS coordinator, conjuncts,
+  count(DISTINCT unit || ':' || node) AS some_nodes,
+  count(DISTINCT CASE WHEN settled THEN unit || ':' || node END) AS settled_nodes
+FROM coordinations GROUP BY 1, 2, 3 ORDER BY some_nodes DESC LIMIT 6;
+```
+
+```
+category          coordinator          conjuncts  some_nodes  settled_nodes
+Nominal           or                           2        4958           1006
+VerbPhrase        and                          2        4242           1146
+Clause            Clause#LinkedClause          2        2489            459
+Clause            and                          2        2411           1215
+NounPhrase        and                          2        2363            562
+DeterminerPhrase  or                           2        2020           1667
+```
+
+The census faces with no Vintage `Legal` or `Restricted` printing in mtgjson
+(run from the repository root):
+
+```sql
+ATTACH 'data/mtgjson/AllPrintings.sqlite' AS mtg;
+WITH legal AS (
+  SELECT DISTINCT i.scryfallOracleId AS oracle_id
+  FROM mtg.cardIdentifiers i JOIN mtg.cardLegalities l USING (uuid)
+  WHERE l.vintage IN ('Legal', 'Restricted'))
+SELECT count(*) AS faces,
+  sum(oracle_id NOT IN (SELECT oracle_id FROM legal)) AS without_vintage_printing
+FROM (SELECT DISTINCT oracle_id, face FROM units);
+```
+
+```
+faces  without_vintage_printing
+33295                         0
+```
+
 ## Inspecting a parse
 
 ```sh

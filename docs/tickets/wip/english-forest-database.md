@@ -17,8 +17,8 @@ The forest stays packed (`docs/decisions/english.md` §4): there is never a row 
 
 - `cargo xtask english forests` writes one SQLite file, `data/derived/english-forests.sqlite`
   (`/data/` is gitignored), for every unit of the census corpus, read through
-  `sylex_upstream::scryfall::oracle_cards`. It has no query features: questions are SQL. Its
-  help gives example queries with their output on the pool.
+  `sylex_upstream::scryfall::oracle_cards`. It has no query features: questions are SQL.
+  `crates/english/README.md` gives example queries with their output on the pool.
 - The SQLite dependency is `rusqlite` with its bundled SQLite.
 - Units carry the keys that join to mtgjson: the face's Scryfall Oracle id (to
   `cardIdentifiers.scryfallOracleId`), the face name and card name as the corpus has them, the

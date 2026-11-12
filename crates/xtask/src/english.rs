@@ -14,6 +14,8 @@ use sylex_english::census;
 use sylex_english::corpus::Corpus;
 use sylex_vocabulary::LexicalEnvironment;
 
+mod forests;
+
 #[derive(Debug, Args)]
 pub struct EnglishArgs {
     #[command(subcommand)]
@@ -27,6 +29,9 @@ enum EnglishCommand {
     Strata(StrataArgs),
     /// Inspect judgments and their cheapest Readings.
     Parse(ParseArgs),
+    /// Write every Corpus Unit's Packed Forest, with exact Derivation
+    /// counts, to one SQLite database. Questions are SQL over it.
+    Forests(forests::ForestsArgs),
 }
 
 #[derive(Debug, Args)]
@@ -54,6 +59,7 @@ pub fn run(args: &EnglishArgs, output: &mut dyn Write) -> Result<()> {
     match &args.command {
         EnglishCommand::Strata(args) => strata(args, output),
         EnglishCommand::Parse(args) => parse(args, output),
+        EnglishCommand::Forests(args) => forests::run(args, output),
     }
 }
 
