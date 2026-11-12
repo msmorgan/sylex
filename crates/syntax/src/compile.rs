@@ -262,6 +262,59 @@ impl CompiledGrammar {
             .position(|name| *name == "head")
     }
 
+    /// The child a Production's head line runs through, by its index among
+    /// the Production's children, punctuation included: its `head`; in a
+    /// coordination that has none, the child that carries its coordinator
+    /// (the coordinator itself, or the serial tail that ends in it), so that a
+    /// coordination's head line ends in its coordinator leaf; and in any
+    /// other Production, its first child besides punctuation (a relative
+    /// clause's relative word or `clause`, an Adjunct's `filler`, a Linked
+    /// Coordination's first conjunct, since it has no coordinator). Each
+    /// Production names at most one, so a word's maximal projection is the
+    /// only one whose head line ends in that word. `None` for a Production
+    /// of punctuation alone.
+    #[must_use]
+    pub fn head_line_child(&self, production: usize) -> Option<usize> {
+        let p = &self.productions[production];
+        self.head_index(production)
+            .or(p.coordinator.filter(|_| p.link.is_none()))
+            .or_else(|| {
+                p.rhs
+                    .iter()
+                    .position(|symbol| !matches!(symbol, Symbol::Punct(..)))
+            })
+    }
+
+    /// Whether a Production is one of a head line's frame Productions: it
+    /// has a Selected Frame, or one child besides punctuation (a word
+    /// mention, a quoted ability, a Category's other name).
+    #[must_use]
+    pub fn is_frame_production(&self, production: usize) -> bool {
+        let production = &self.productions[production];
+        production.frame.is_some()
+            || production
+                .rhs
+                .iter()
+                .filter(|symbol| !matches!(symbol, Symbol::Punct(..)))
+                .count()
+                == 1
+    }
+
+    /// The index of a Production, by its stable id.
+    #[must_use]
+    pub fn production_index(&self, id: Ident) -> Option<usize> {
+        self.by_id.get(&id).copied()
+    }
+
+    /// The index among a Reading node's children (punctuation is not stored)
+    /// of a Production's child at `index` among all its children.
+    pub(crate) fn reading_child(&self, production: usize, index: usize) -> usize {
+        self.productions[production].rhs[..index]
+            .iter()
+            .filter(|symbol| !matches!(symbol, Symbol::Punct(..)))
+            .count()
+    }
+
     /// The Selected Frame of a frame-headed Production, with its name
     /// (`Monotransitive(NP)`) and its Valence Alternation variant: what its id
     /// adds after the frame's name, as `passive+by` or `passive/gap1`

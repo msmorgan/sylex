@@ -112,6 +112,27 @@ pub enum AdmissionError {
 }
 
 impl Parse<'_> {
+    /// A Reading node: a forest node built by `production` over `children`,
+    /// with the node's bound features.
+    pub(crate) fn reading_node(
+        &self,
+        node: usize,
+        production: usize,
+        features: BTreeMap<Ident, Ident>,
+        children: Vec<Reading>,
+    ) -> Reading {
+        let grammar = self.grammar;
+        let production = &grammar.productions[production];
+        Reading::Node(ReadingNode {
+            production: production.id,
+            category: grammar.categories[production.lhs],
+            features,
+            gap: self.forest.nodes[node].summary.gap,
+            selected_frame: production.frame.map(|f| grammar.frames[f].clone()),
+            children,
+        })
+    }
+
     /// Number of Derivations in the forest, counted without building them
     /// (saturating). A Derivation never contains its own Constituent, so a
     /// unary cycle contributes no Derivation of its own.
@@ -792,8 +813,6 @@ impl<'a, 'g> Enumeration<'a, 'g> {
                 production,
                 mut children,
             } => {
-                let grammar = self.parse.grammar;
-                let production = &grammar.productions[production];
                 let mut readings = Vec::with_capacity(self.sequence_len(children));
                 while children.0 != 0 {
                     let entry = self.sequences[children.0 as usize - 1];
@@ -801,14 +820,12 @@ impl<'a, 'g> Enumeration<'a, 'g> {
                     children = entry.prefix;
                 }
                 readings.reverse();
-                Reading::Node(ReadingNode {
-                    production: production.id,
-                    category: grammar.categories[production.lhs],
-                    features: self.features[node].as_ref().unwrap().clone(),
-                    gap: self.parse.forest.nodes[node].summary.gap,
-                    selected_frame: production.frame.map(|f| grammar.frames[f].clone()),
-                    children: readings,
-                })
+                self.parse.reading_node(
+                    node,
+                    production,
+                    self.features[node].as_ref().unwrap().clone(),
+                    readings,
+                )
             }
         }
     }
@@ -1374,7 +1391,8 @@ impl CompiledGrammar {
 
     /// The names of a node's children, in order: the grammatical function
     /// each bears in it.
-    pub(crate) fn child_names(&self, node: &ReadingNode) -> Vec<Ident> {
+    #[must_use]
+    pub fn child_names(&self, node: &ReadingNode) -> Vec<Ident> {
         self.by_id
             .get(&node.production)
             .map_or_else(Vec::new, |&p| {
@@ -1405,11 +1423,25 @@ impl CompiledGrammar {
             Reading::Leaf(LexicalReading::Word(value)) => Some(value),
             Reading::Leaf(_) => None,
             Reading::Node(node) => {
-                let names = self.child_names(node);
-                let at = names.iter().position(|n| n == "head")?;
-                self.head_word(node.children.get(at)?)
+                let production = *self.by_id.get(&node.production)?;
+                let at = self.head_index(production)?;
+                self.head_word(node.children.get(self.reading_child(production, at))?)
             }
         }
+    }
+
+    /// The child of a Reading node its head line runs through
+    /// ([`Self::head_line_child`]), by its index among the node's children;
+    /// `None` when it is punctuation, which a Reading does not store.
+    ///
+    /// # Panics
+    /// When no Production has the node's id.
+    #[must_use]
+    pub fn reading_head_line_child(&self, node: &ReadingNode) -> Option<usize> {
+        let production = self.by_id[&node.production];
+        let at = self.head_line_child(production)?;
+        (!matches!(self.productions[production].rhs[at], Symbol::Punct(..)))
+            .then(|| self.reading_child(production, at))
     }
 
     /// Pushes a Reading's atoms (text, binding, punctuation) in order, and
