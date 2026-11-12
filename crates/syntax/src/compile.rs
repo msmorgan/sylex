@@ -284,6 +284,8 @@ struct Draft {
     paired_coordinator: Option<LexemeId>,
     uncoordinated: Vec<usize>,
     coordinated: Vec<usize>,
+    /// `Production::whole_coordination`.
+    whole_coordination: Vec<(usize, bool)>,
     /// Mother features not shared with the `head` child.
     unshared: Vec<usize>,
     /// Children that are not, nor are headed by, a Linked Coordination.
@@ -423,6 +425,7 @@ impl Draft {
             uncoordinated: Vec::new(),
             unlinked: Vec::new(),
             coordinated: Vec::new(),
+            whole_coordination: Vec::new(),
             unshared: Vec::new(),
             delimits: false,
             tail: false,
@@ -1912,6 +1915,7 @@ impl<'a> Binder<'a> {
         production.uncoordinated = draft.uncoordinated;
         production.unlinked = draft.unlinked;
         production.coordinated = draft.coordinated;
+        production.whole_coordination = draft.whole_coordination;
         production.delimits = draft.delimits;
         production.tail = draft.tail;
         production.chained = draft.chained;
@@ -2869,11 +2873,12 @@ impl<'a> Binder<'a> {
             let frame = &self.out.preposition_frames[index];
             let mut draft = Draft::new(
                 format!(
-                    "Valence:{phrase}/{}@{:?}{}{}",
+                    "Valence:{phrase}/{}@{:?}{}{}{}",
                     complement_label(&frame.complement),
                     frame.hosts,
                     if frame.relation == SlotRelation::Complement { "" } else { "/predicative" },
-                    if frame.named_only { "/named" } else { "" }
+                    if frame.named_only { "/named" } else { "" },
+                    if frame.plural_complement { "/plural" } else { "" }
                 ),
                 lhs,
                 cost,
@@ -2887,7 +2892,12 @@ impl<'a> Binder<'a> {
                 let kind = self.value(f, &self.kind_name(frame.complement.kind()))?;
                 draft.equations.push((Path::Mother(f), Target::Value(kind)));
             }
-            if frame.complement != SlotFill::Intransitive {
+            if frame.complement == SlotFill::Intransitive {
+                if frame.plural_complement {
+                    return Err(self.plural_fault(index, "it takes no Complement"));
+                }
+                drafts.push(draft);
+            } else {
                 let child = draft.child(
                     relation_name(frame.relation),
                     self.slot_symbol(&frame.complement)?,
@@ -2895,13 +2905,17 @@ impl<'a> Binder<'a> {
                 );
                 self.slot_equations(&mut draft, child, frame.complement.kind())?;
                 self.unlike_slot(&mut draft, child, &frame.complement)?;
+                if frame.plural_complement {
+                    drafts.extend(self.plural_complement(&draft, index, child)?);
+                } else {
+                    drafts.push(draft);
+                }
             }
-            drafts.push(draft);
             if gap_capable && matches!(frame.complement, SlotFill::NP | SlotFill::Amount) {
                 let amount = frame.complement == SlotFill::Amount;
                 let mut stranded = Draft::new(
                     format!(
-                        "Valence:{phrase}/{}@{:?}{}{}/gap0",
+                        "Valence:{phrase}/{}@{:?}{}{}{}/gap0",
                         complement_label(&frame.complement),
                         frame.hosts,
                         if frame.relation == SlotRelation::Complement {
@@ -2909,7 +2923,8 @@ impl<'a> Binder<'a> {
                         } else {
                             "/predicative"
                         },
-                        if frame.named_only { "/named" } else { "" }
+                        if frame.named_only { "/named" } else { "" },
+                        if frame.plural_complement { "/plural" } else { "" }
                     ),
                     lhs,
                     cost,
@@ -2931,6 +2946,78 @@ impl<'a> Binder<'a> {
             }
         }
         Ok(drafts)
+    }
+
+    /// A plural-Complement frame's phrases (`PrepositionFrame::plural_complement`):
+    /// one whose Complement is itself a coordination and, for a Noun Phrase
+    /// Complement, one whose Complement is not and requires the lexicon
+    /// mapping's Plural, a `Require` that an open Number passes. A keyword
+    /// phrase, slash measure, name or unlike coordination has no Number of
+    /// its own, so only a coordination of it is plural; a frame of any other
+    /// kind, or a Noun Phrase Category without Number, is a load error.
+    fn plural_complement(
+        &self,
+        draft: &Draft,
+        frame: usize,
+        child: usize,
+    ) -> Result<Vec<Draft>, LoadError> {
+        let fill = &self.out.preposition_frames[frame].complement;
+        let fault = |why: String| self.plural_fault(frame, &why);
+        let mut coordinated = draft.clone();
+        coordinated.id = Ident::new(&format!("{}/coordinated", draft.id));
+        coordinated.whole_coordination.push((child, true));
+        match fill.kind() {
+            SlotKind::KeywordPhrase
+            | SlotKind::MeasureNP
+            | SlotKind::Name
+            | SlotKind::Unlike(_) => {
+                return Ok(vec![coordinated]);
+            }
+            SlotKind::NP => {}
+            kind => {
+                return Err(fault(format!(
+                    "a {kind:?} Complement is neither a Noun Phrase nor a phrase without Number"
+                )));
+            }
+        }
+        let Symbol::Cat { category, .. } = draft.children[child].symbol else {
+            return Err(fault(
+                "the Complement is no phrase of a Category".to_owned(),
+            ));
+        };
+        let number = self.out.projected[NUMBER]
+            .ok_or_else(|| fault("the grammar projects no Number".to_owned()))?;
+        if !self.out.category_features[category].contains(&number) {
+            return Err(fault(format!(
+                "Category `{}` has no Number",
+                self.out.categories[category]
+            )));
+        }
+        let mut plural = draft.clone();
+        plural.id = Ident::new(&format!("{}/number", draft.id));
+        plural.whole_coordination.push((child, false));
+        let value = self.value(number, "Plural")?;
+        plural
+            .equations
+            .push((Path::Child(child, number), Target::Value(value)));
+        Ok(vec![coordinated, plural])
+    }
+
+    /// A plural-Complement frame that cannot be compiled, naming its
+    /// prepositions and Complement.
+    fn plural_fault(&self, frame: usize, why: &str) -> LoadError {
+        let prepositions: Vec<String> = self
+            .out
+            .lexemes
+            .iter()
+            .filter(|(_, f)| f.preposition_frames.contains(&frame))
+            .map(|(id, _)| id.to_string())
+            .collect();
+        invalid(format!(
+            "plural Complement of {} ({}): {why}",
+            prepositions.join(", "),
+            complement_label(&self.out.preposition_frames[frame].complement)
+        ))
     }
 
     /// The frames of every lexeme of `head`'s Category. A verb without one
@@ -4965,7 +5052,7 @@ fn unlike_preposition_frames(
     let mut derived = Vec::new();
     for (index, (name, kinds)) in slots.iter().enumerate() {
         let slot = u8::try_from(index).expect("at most 256 unlike slots");
-        let mut groups: BTreeMap<SlotRelation, (BTreeSet<SlotKind>, Option<Hosts>)> =
+        let mut groups: BTreeMap<SlotRelation, (BTreeSet<SlotKind>, Option<Hosts>, bool)> =
             BTreeMap::new();
         for frame in frames {
             let kind = frame.complement.kind();
@@ -4975,8 +5062,9 @@ fn unlike_preposition_frames(
             let group = groups.entry(frame.relation).or_default();
             group.0.insert(kind);
             group.1 = Some(group.1.map_or(frame.hosts, |hosts| hosts.meet(frame.hosts)));
+            group.2 |= frame.plural_complement;
         }
-        for (relation, (selected, hosts)) in groups {
+        for (relation, (selected, hosts, plural_complement)) in groups {
             let (true, Some(hosts)) = (selected.len() >= 2, hosts) else {
                 continue;
             };
@@ -4985,6 +5073,7 @@ fn unlike_preposition_frames(
                 complement: SlotFill::Unlike(unlike_fill(slot, name, kinds, &selected)),
                 hosts,
                 named_only: false,
+                plural_complement,
             });
         }
     }
@@ -5124,6 +5213,7 @@ fn central_adjuncts(
             || draft.requires_coordination.is_some()
             || !draft.uncoordinated.is_empty()
             || !draft.coordinated.is_empty()
+            || !draft.whole_coordination.is_empty()
             || !draft.unlinked.is_empty()
             || !draft.nonfinal_conjuncts.is_empty()
         {

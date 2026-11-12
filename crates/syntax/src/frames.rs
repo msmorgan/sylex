@@ -453,6 +453,14 @@ pub struct PrepositionFrame {
     /// tree of the bare noun.
     #[serde(default)]
     pub named_only: bool,
+    /// The Complement is plural (*among*; CGEL, Ch. 7 §5.1(a), p. 636): a
+    /// coordination itself, through a Production whose only child is its
+    /// head but not under a determiner or modifier, or else a Noun Phrase
+    /// that requires Plural (`Require`, which an open Number passes). A
+    /// keyword phrase, slash measure or name has no Number, so only a
+    /// coordination of it is plural.
+    #[serde(default)]
+    pub plural_complement: bool,
 }
 
 /// Subcategorization Frames by lexeme. Prepositions declare theirs in

@@ -415,6 +415,70 @@ fn load_errors() {
     }
 }
 
+/// A plural-Complement frame (*among*) that the grammar cannot check fails
+/// at load, naming its preposition: a Noun Phrase Category without Number, a
+/// grammar without Number, and a frame with no Complement.
+#[test]
+fn plural_complement_load_errors() {
+    let grammar = r#"
+    root Sentence
+    feature Number = Singular | Plural
+    feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+    category Nominal [Number]
+    category NounPhrase [Number]
+    category PrepositionPhrase
+    category Sentence
+    category VerbPhrase [VerbForm]
+    word The = "d:the"
+    slot NP = NounPhrase
+    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
+    Determined: NounPhrase -> det:Word(The) Nominal
+    Noun: Nominal -> Lex(Noun)
+    valence PrepositionPhrase { head: Preposition }
+"#;
+    let frames = |complement: &str| {
+        format!(
+            r#"(prepositions: {{ "p:on": [(complement: {complement}, hosts: Nominal, plural_complement: true)] }})"#
+        )
+    };
+    let error = |grammar: &str, complement: &str| match CompiledGrammar::bind(
+        &Grammar::from_fug_str(grammar).unwrap(),
+        &lexicon(),
+        &FrameCatalog::from_ron_str(&frames(complement)).unwrap(),
+    ) {
+        Err(LoadError::Invalid(message)) => message,
+        other => panic!("expected an invalid grammar, got {other:?}"),
+    };
+    CompiledGrammar::bind(
+        &Grammar::from_fug_str(grammar).unwrap(),
+        &lexicon(),
+        &FrameCatalog::from_ron_str(&frames("NP")).unwrap(),
+    )
+    .unwrap();
+    let message = error(
+        &grammar.replacen("category NounPhrase [Number]", "category NounPhrase", 1),
+        "NP",
+    );
+    assert!(
+        message.contains("p:on") && message.contains("`NounPhrase` has no Number"),
+        "{message}"
+    );
+    let unnumbered = grammar
+        .replacen("    feature Number = Singular | Plural\n", "", 1)
+        .replace(" [Number]", "");
+    let message = error(&unnumbered, "NP");
+    assert!(
+        message.contains("p:on") && message.contains("projects no Number"),
+        "{message}"
+    );
+    let message = error(grammar, "Intransitive");
+    assert!(
+        message.contains("p:on") && message.contains("no Complement"),
+        "{message}"
+    );
+}
+
 #[test]
 fn best_readings_are_the_cheapest_prefix() {
     let lexicon = lexicon();

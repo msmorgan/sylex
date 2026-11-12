@@ -196,3 +196,37 @@ fn a_subtype_declares_no_prefix_hyphenation() {
     decls[0] = sylex_vocabulary::schema::NounDecl::Entry(entry);
     rejects(&sources, "declares a prefix hyphenation");
 }
+
+/// A preposition's `plural_complement` reaches every frame it declares, and
+/// no other preposition's: *among* takes a plural Complement (*from among
+/// flying, first strike, lifelink, or vigilance*, Elspeth Resplendent).
+#[test]
+fn a_plural_complement_marks_every_frame_of_its_preposition() {
+    let sources = Sources::load().unwrap();
+    let (_, frames) = sources.vocabulary().unwrap();
+    for (id, list) in &frames.prepositions {
+        let among = id.as_str() == "prep:among";
+        assert!(!list.is_empty(), "{}", id.as_str());
+        assert!(
+            list.iter().all(|frame| frame.plural_complement == among),
+            "{}: {list:?}",
+            id.as_str()
+        );
+    }
+
+    let mut sources = Sources::load().unwrap();
+    let entry = sources
+        .prepositions
+        .iter_mut()
+        .find(|entry| entry.lemma == "among")
+        .unwrap();
+    entry.plural_complement = false;
+    let (_, frames) = sources.vocabulary().unwrap();
+    let among = frames
+        .prepositions
+        .iter()
+        .find(|(id, _)| id.as_str() == "prep:among")
+        .unwrap()
+        .1;
+    assert!(among.iter().all(|frame| !frame.plural_complement));
+}

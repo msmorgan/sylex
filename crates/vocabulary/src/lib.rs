@@ -383,7 +383,7 @@ impl Sources {
         }
         for entry in &self.prepositions {
             let id = format!("prep:{}", entry.lemma);
-            builder.preposition(&entry.lemma, &entry.frames, core(PREPOSITIONS, &id));
+            builder.preposition(entry, core(PREPOSITIONS, &id));
         }
         for entry in &self.verbs {
             let id = format!("verb:{}", entry.lemma);
@@ -412,7 +412,7 @@ impl Sources {
                 builder.adjective("status_adj", &adjective.entry(), &source);
             }
             for preposition in &status.prepositions {
-                builder.preposition(&preposition.lemma, &preposition.frames, source.clone());
+                builder.preposition(preposition, source.clone());
             }
         }
         for part in &self.turn_parts {

@@ -310,6 +310,9 @@ pub(crate) struct Production {
     pub uncoordinated: Vec<usize>,
     /// Children that must be a coordination.
     pub coordinated: Vec<usize>,
+    /// Children whose `Summary::whole_coordination` must be the given
+    /// value: a phrase that is itself a coordination, or one that is not.
+    pub whole_coordination: Vec<(usize, bool)>,
     /// Children that may not be, nor be headed by, a Linked Coordination
     /// (`Summary::link`).
     pub unlinked: Vec<usize>,
@@ -571,6 +574,7 @@ pub(crate) fn resolve(
         uncoordinated: Vec::new(),
         unlinked: Vec::new(),
         coordinated: Vec::new(),
+        whole_coordination: Vec::new(),
         delimits: false,
         tail: false,
         chained: None,
@@ -633,6 +637,7 @@ pub(crate) fn resolve(
             coordinator: None,
             coordinated_head: false,
             head_coordination: false,
+            only_head_coordination: false,
             conjunct_coordinators: [None; MAX_DISTINCT_COORDINATORS],
             other_preposition: None,
             mixed_prepositions: false,
@@ -765,6 +770,11 @@ pub(crate) struct Summary {
     /// It is a coordination, or its head is one, through head children: a
     /// coordinated phrase is heavy (`Weight::Postposable`).
     pub head_coordination: bool,
+    /// It is a coordination, or a Production whose only child is its head
+    /// over one (*[all permanents or a color ...]* under
+    /// `NonNumericComplement`): never a phrase that only contains one, as a
+    /// Noun Phrase over a coordinated Nominal (*a creature or planeswalker*).
+    pub whole_coordination: bool,
     /// The Host Categories it may modify unselected: a Preposition Phrase's
     /// frame's, every conjunct's for a coordination, any for the rest.
     pub hosts: u8,
@@ -1005,6 +1015,8 @@ pub(crate) struct State {
     coordinated_head: bool,
     /// The head child's `Summary::head_coordination`.
     head_coordination: bool,
+    /// The head child's `Summary::whole_coordination`.
+    only_head_coordination: bool,
     conjunct_coordinators: [Option<LexemeId>; MAX_DISTINCT_COORDINATORS],
     other_preposition: Option<LexemeId>,
     /// The conjuncts of a coordination have more than two prepositions, or
@@ -1127,6 +1139,7 @@ impl Production {
         }
         if self.head == Some(position) {
             next.head_coordination = summary.head_coordination;
+            next.only_head_coordination = summary.whole_coordination;
             next.preposition = summary.preposition;
             next.other_preposition = summary.other_preposition;
             next.extensions = summary.extensions;
@@ -1990,6 +2003,13 @@ impl Production {
                 if self.coordinated.contains(&position) && !summary.coordinated {
                     return None;
                 }
+                if self
+                    .whole_coordination
+                    .iter()
+                    .any(|&(child, whole)| child == position && whole != summary.whole_coordination)
+                {
+                    return None;
+                }
                 if self.post_adjunct_host(position) {
                     next.coordinated_head = summary.coordinated;
                 }
@@ -2061,6 +2081,8 @@ impl Production {
         if state.coordinator.is_some() && state.conjunct_coordinators.contains(&state.coordinator) {
             return None;
         }
+        // It is itself a coordination.
+        let coordination = self.link.is_some() || state.coordinator.is_some();
         if self.host_check.is_some()
             && let Some(e) = &state.adjunct_extension
             && grammar
@@ -2154,13 +2176,10 @@ impl Production {
             unlike_values: if self.unlike.is_some() { state.unlike_values } else { 0 },
             extensions: state.extensions,
             coordinator: self.link.or(state.coordinator),
-            coordinated: self.link.is_some()
-                || state.coordinator.is_some()
-                || state.coordinated_head,
-            head_coordination: self.link.is_some()
-                || state.coordinator.is_some()
-                || state.coordinated_head
-                || state.head_coordination,
+            coordinated: coordination || state.coordinated_head,
+            head_coordination: coordination || state.coordinated_head || state.head_coordination,
+            whole_coordination: coordination
+                || (self.rhs.len() == 1 && self.head == Some(0) && state.only_head_coordination),
             hosts,
             nominal_unhosted: hosts & crate::frames::host_bit(crate::grammar::HostKind::Nominal)
                 == 0

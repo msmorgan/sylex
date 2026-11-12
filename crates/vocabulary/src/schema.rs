@@ -457,6 +457,10 @@ pub struct PrepositionFrameSpec {
 pub struct PrepositionEntry {
     pub lemma: String,
     pub frames: Vec<PrepositionFrameSpec>,
+    /// Every frame's Complement is plural
+    /// (`sylex_syntax::frames::PrepositionFrame::plural_complement`).
+    #[serde(default)]
+    pub plural_complement: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]

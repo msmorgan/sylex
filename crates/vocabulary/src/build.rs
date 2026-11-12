@@ -41,6 +41,7 @@ use crate::schema::FrameSpec;
 use crate::schema::FusedHeadDetermination;
 use crate::schema::IdiomPart;
 use crate::schema::NounEntry;
+use crate::schema::PrepositionEntry;
 use crate::schema::PrepositionFrameSpec;
 use crate::schema::VerbEntry;
 
@@ -53,7 +54,7 @@ pub(crate) struct Builder {
     frames: Vec<(LexemeId, Category, Vec<FrameSpec>, String)>,
     /// Verbs whose every frame is restricted to active voice.
     active_only: std::collections::BTreeSet<LexemeId>,
-    prepositions: Vec<(LexemeId, Vec<PrepositionFrameSpec>, String)>,
+    prepositions: Vec<(LexemeId, Vec<PrepositionFrameSpec>, bool, String)>,
 }
 
 pub(crate) fn source(kind: SourceKind, path: &str, owner: &str) -> Source {
@@ -391,12 +392,8 @@ impl Builder {
         }
     }
 
-    pub(crate) fn preposition(
-        &mut self,
-        lemma: &str,
-        frames: &[PrepositionFrameSpec],
-        source: Source,
-    ) {
+    pub(crate) fn preposition(&mut self, entry: &PrepositionEntry, source: Source) {
+        let lemma = entry.lemma.as_str();
         let lexeme = Lexeme::invariant(
             format!("prep:{lemma}"),
             lemma,
@@ -405,8 +402,12 @@ impl Builder {
         );
         let id = lexeme.id;
         self.push(lexeme);
-        self.prepositions
-            .push((id, frames.to_vec(), id.to_string()));
+        self.prepositions.push((
+            id,
+            entry.frames.clone(),
+            entry.plural_complement,
+            id.to_string(),
+        ));
     }
 
     /// Validates and indexes everything gathered, resolving preposition lemmas.
@@ -439,7 +440,7 @@ impl Builder {
             }
             catalog.frames.insert(*id, frames);
         }
-        for (id, specs, owner) in &self.prepositions {
+        for (id, specs, plural_complement, owner) in &self.prepositions {
             let mut frames = Vec::new();
             for spec in specs {
                 let frame = PrepositionFrame {
@@ -447,6 +448,7 @@ impl Builder {
                     complement: resolver.fill(&spec.complement, owner)?,
                     hosts: spec.hosts,
                     named_only: spec.named_only,
+                    plural_complement: *plural_complement,
                 };
                 if frames
                     .iter()
