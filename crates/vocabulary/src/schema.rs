@@ -81,6 +81,9 @@ pub enum FillSpec {
     /// Phrase).
     MeasureNP,
     FiniteClause,
+    /// A temporal preposition's finite Clause, which locates its host's
+    /// situation at its own time (`sylex_syntax::frames::ClauseKind::Temporal`).
+    TemporalClause,
     /// An expandable declarative content clause (CGEL, Ch. 11 §4.8, p. 971).
     ExpandableClause,
     /// A Clause set off by a dash, the content of the Object before it.

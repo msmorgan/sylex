@@ -534,6 +534,7 @@ impl Resolver<'_> {
             FillSpec::Position => SlotFill::Position,
             FillSpec::MeasureNP => SlotFill::MeasureNP,
             FillSpec::FiniteClause => SlotFill::Clause(ClauseKind::Finite),
+            FillSpec::TemporalClause => SlotFill::Clause(ClauseKind::Temporal),
             FillSpec::ExpandableClause => SlotFill::ExpandableClause,
             FillSpec::SetOffClause => SlotFill::SetOffClause,
             FillSpec::VerblessClause => SlotFill::Clause(ClauseKind::Verbless),

@@ -52,6 +52,10 @@ pub enum SlotRelation {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum ClauseKind {
     Finite,
+    /// A finite Clause that locates its host's situation at its own time: a
+    /// temporal preposition's Complement (*when*, *whenever*, *until*,
+    /// *before*, *after*, *while*, *as*; CGEL, Ch. 8 §6, p. 700).
+    Temporal,
     Verbless,
     /// A non-finite or verbless clause with its Subject, the Complement of
     /// *with* and *without* (*with your hand revealed*; CGEL, Ch. 14 §8.3,
@@ -157,6 +161,7 @@ pub enum SlotKind {
     Position,
     MeasureNP,
     FiniteClause,
+    TemporalClause,
     ExpandableClause,
     SetOffClause,
     VerblessClause,
@@ -193,6 +198,7 @@ impl SlotFill {
             Self::Position => SlotKind::Position,
             Self::MeasureNP => SlotKind::MeasureNP,
             Self::Clause(ClauseKind::Finite) => SlotKind::FiniteClause,
+            Self::Clause(ClauseKind::Temporal) => SlotKind::TemporalClause,
             Self::ExpandableClause => SlotKind::ExpandableClause,
             Self::SetOffClause => SlotKind::SetOffClause,
             Self::Clause(ClauseKind::Verbless) => SlotKind::VerblessClause,
