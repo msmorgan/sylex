@@ -1,8 +1,11 @@
 //! Earley chart parsing into a Packed Forest.
 
-use std::collections::HashMap;
+use std::hash::BuildHasher;
 use std::hash::BuildHasherDefault;
 use std::ops::Range;
+
+use hashbrown::HashTable;
+use hashbrown::hash_table::Entry;
 
 use sylex_lexicon::AnalyzedText;
 use sylex_lexicon::LexicalReading;
@@ -19,11 +22,16 @@ use crate::step::State;
 use crate::step::Summary;
 use crate::step::Symbol;
 
-type ChartMap<K> = HashMap<K, usize, BuildHasherDefault<ChartHasher>>;
+/// The hasher of the chart's indexes, which hold indices into
+/// [`PackedForest`] and hash the key each index names.
+const CHART_HASHER: BuildHasherDefault<ChartHasher> = BuildHasherDefault::new();
 
 /// An item's identity among those ending at one position: (Production, dot,
 /// start, state, seam bits).
 type ItemKey = (usize, usize, usize, State, u64);
+
+/// A completed Constituent's identity: (Category, start, end, summary).
+type NodeKey = (usize, usize, usize, Summary);
 
 /// Sizes of one parse, for measurement only.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
@@ -83,6 +91,12 @@ pub(crate) struct Item {
     pub families: Vec<(Option<usize>, ChildRef)>,
 }
 
+impl Item {
+    fn key(&self) -> ItemKey {
+        (self.production, self.dot, self.start, self.state, self.seam)
+    }
+}
+
 /// A completed Constituent with its alternative Derivations.
 #[derive(Debug)]
 pub(crate) struct Node {
@@ -92,6 +106,12 @@ pub(crate) struct Node {
     pub summary: Summary,
     /// (Production, completed item) alternatives.
     pub families: Vec<(usize, usize)>,
+}
+
+impl Node {
+    fn key(&self) -> NodeKey {
+        (self.category, self.start, self.end, self.summary)
+    }
 }
 
 /// Every Derivation of an input, packed by (Category, span, summary).
@@ -583,8 +603,9 @@ impl CompiledGrammar {
             n,
         );
         let mut sets: Vec<Vec<usize>> = vec![Vec::new(); n + 1];
-        let mut item_index: Vec<ChartMap<ItemKey>> = (0..=n).map(|_| ChartMap::default()).collect();
-        let mut node_index: ChartMap<(usize, usize, usize, Summary)> = ChartMap::default();
+        // Each holds indices into `forest.items` (by end) and `forest.nodes`.
+        let mut item_index: Vec<HashTable<usize>> = (0..=n).map(|_| HashTable::new()).collect();
+        let mut node_index: HashTable<usize> = HashTable::new();
         let categories = self.categories.len();
         let mut waiting: Vec<Vec<usize>> = vec![Vec::new(); (n + 1) * categories];
         let mut predicted_at = vec![usize::MAX; categories];
@@ -599,23 +620,28 @@ impl CompiledGrammar {
                        seam: u64,
                        family: Option<(Option<usize>, ChildRef)>| {
             let key = (production, dot, start, state, seam);
-            let item_index = &mut item_index[end];
-            let index = if let Some(&i) = item_index.get(&key) {
-                i
-            } else {
-                let i = forest.items.len();
-                forest.items.push(Item {
-                    production,
-                    dot,
-                    start,
-                    end,
-                    state: key.3,
-                    seam,
-                    families: Vec::new(),
-                });
-                item_index.insert(key, i);
-                sets[end].push(i);
-                i
+            let items = &forest.items;
+            let index = match item_index[end].entry(
+                CHART_HASHER.hash_one(key),
+                |&i| items[i].key() == key,
+                |&i| CHART_HASHER.hash_one(items[i].key()),
+            ) {
+                Entry::Occupied(entry) => *entry.get(),
+                Entry::Vacant(entry) => {
+                    let i = forest.items.len();
+                    entry.insert(i);
+                    forest.items.push(Item {
+                        production,
+                        dot,
+                        start,
+                        end,
+                        state,
+                        seam,
+                        families: Vec::new(),
+                    });
+                    sets[end].push(i);
+                    i
+                }
             };
             if let Some(family) = family {
                 forest.items[index].families.push(family);
@@ -675,19 +701,29 @@ impl CompiledGrammar {
                         continue;
                     };
                     let key = (production.lhs, start, position, summary);
-                    if let Some(&node) = node_index.get(&key) {
-                        forest.nodes[node].families.push((production_id, id));
-                        continue;
-                    }
-                    let node = forest.nodes.len();
+                    let nodes = &forest.nodes;
+                    let node = match node_index.entry(
+                        CHART_HASHER.hash_one(key),
+                        |&node| nodes[node].key() == key,
+                        |&node| CHART_HASHER.hash_one(nodes[node].key()),
+                    ) {
+                        Entry::Occupied(entry) => {
+                            forest.nodes[*entry.get()].families.push((production_id, id));
+                            continue;
+                        }
+                        Entry::Vacant(entry) => {
+                            let node = forest.nodes.len();
+                            entry.insert(node);
+                            node
+                        }
+                    };
                     forest.nodes.push(Node {
                         category: production.lhs,
                         start,
                         end: position,
-                        summary: key.3,
+                        summary,
                         families: vec![(production_id, id)],
                     });
-                    node_index.insert(key, node);
                     for &parent in &waiting[start * categories + production.lhs] {
                         let item = &forest.items[parent];
                         let parent_production = &self.productions[item.production];
