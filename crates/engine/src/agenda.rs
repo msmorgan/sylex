@@ -126,8 +126,26 @@ pub enum WorkItem {
     /// `OrderTriggers` decision and target choice at placement). Sits between
     /// the SBA loop and `OpenPriority`.
     PlaceTriggers,
-    /// Cleanup's turn-based action ([CR#514.1]).
+    /// Cleanup's first turn-based action: the active player discards to
+    /// maximum hand size ([CR#514.1]).
     CheckHandSize,
+    /// Cleanup's second turn-based action: marked damage is removed and
+    /// "until end of turn" and "this turn" effects end, simultaneously
+    /// ([CR#514.2]).
+    EndTurnEffects,
+    /// [CR#514.3a]: cleanup's check, after its turn-based actions. Notes the
+    /// history length and whether any triggered ability is waiting, then runs
+    /// the state-based-action check and trigger placement, ending in
+    /// `CleanupPriority`.
+    CleanupCheck,
+    /// [CR#514.3a]: if the cleanup check performed a state-based action (a
+    /// fact was recorded since `history`) or a triggered ability was waiting,
+    /// the active player gets priority and another cleanup step follows;
+    /// otherwise the step, and the turn, end.
+    CleanupPriority {
+        history: usize,
+        triggers_waiting: bool,
+    },
     /// [CR#508.1]: the Declare Attackers step's turn-based action — surface a
     /// `DeclareAttackers` decision for the active player.
     DeclareAttackers,

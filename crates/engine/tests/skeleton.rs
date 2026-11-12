@@ -808,21 +808,28 @@ fn cleanup_clears_marked_damage_on_battlefield_creatures() {
     state.objects.obj_mut(bear).set_marked_damage(1);
     assert_eq!(state.objects.obj(bear).total_damage(), 1);
 
-    // Drive all-pass until the Cleanup step begins.  The cleanup step fires
-    // `clear_marked_damage` as a turn-based action ([CR#514.2]) and THEN
-    // checks hand size, so by the time we see `Advanced(Cleanup)` the damage
-    // has already been cleared.
+    // Drive all-pass until the Cleanup step begins. Damage removal is its
+    // second turn-based action ([CR#514.2]), after the discard to hand size
+    // ([CR#514.1]), so the damage is still marked as the step begins.
     step_until(&mut state, |s, o| {
         matches!(
             o,
             StepOutcome::Progress(Progress::Advanced(PhaseStep::Ending(EndingStep::Cleanup)))
         ) && s.turn.current == PhaseStep::Ending(EndingStep::Cleanup)
     });
+    assert_eq!(
+        state.objects.obj(bear).total_damage(),
+        1,
+        "[CR#514.1,514.2]: the damage stays marked until the second turn-based action"
+    );
 
+    step_until(&mut state, |_, o| {
+        matches!(o, StepOutcome::Progress(Progress::TurnEffectsEnded))
+    });
     assert_eq!(
         state.objects.obj(bear).total_damage(),
         0,
-        "[CR#514.2]: marked damage removed at start of Cleanup"
+        "[CR#514.2]: marked damage removed in Cleanup"
     );
 }
 

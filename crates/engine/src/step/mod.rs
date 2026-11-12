@@ -108,6 +108,17 @@ pub enum Progress {
     TriggersPlaced { placed: Uint },
     /// Cleanup's hand-size check ran ([CR#514.1]).
     HandSizeChecked { discarding: Uint },
+    /// [CR#514.2]: marked damage was removed and "until end of turn" and
+    /// "this turn" effects ended.
+    TurnEffectsEnded,
+    /// [CR#514.3a]: cleanup's check began; its state-based-action check and
+    /// trigger placement were scheduled.
+    CleanupChecked,
+    /// [CR#514.3a]: the cleanup check is decided. `acted` is true when a
+    /// state-based action was performed or a triggered ability was waiting:
+    /// the active player gets priority and another cleanup step follows.
+    /// Otherwise the turn ends.
+    CleanupDecided { acted: bool },
     /// [CR#705.1,705.2]: a resolving `FlipCoins` ran; `count` is the total
     /// requested — an uncalled flip drew all `count` coins immediately and
     /// front-scheduled their batch, while a called flip surfaced the first of
@@ -240,6 +251,12 @@ impl GameState {
             WorkItem::CheckSbas => self.check_sbas(),
             WorkItem::PlaceTriggers => self.place_triggers(),
             WorkItem::CheckHandSize => self.check_hand_size(),
+            WorkItem::EndTurnEffects => self.end_turn_effects(),
+            WorkItem::CleanupCheck => self.cleanup_check(),
+            WorkItem::CleanupPriority {
+                history,
+                triggers_waiting,
+            } => self.cleanup_priority(history, triggers_waiting),
             WorkItem::DeclareAttackers => self.declare_attackers(),
             WorkItem::DeclareBlockers => self.declare_blockers(),
             WorkItem::AssignCombatDamage => self.assign_combat_damage(),
@@ -1628,20 +1645,60 @@ impl GameState {
             // its priority window, scheduled from `end_of_step_items` (so an
             // "at end of combat" trigger resolving during that priority can still
             // read combat state).
-            // [CR#514.1]: discard to hand size — checked after StepBegan.
-            // [CR#514.2]: marked damage is removed from all permanents;
-            // "until end of turn" continuous effects expire ([CR#514.2]).
+            // [CR#514.1]: first, discard to hand size; [CR#514.2]: second,
+            // marked damage is removed and "until end of turn" and "this turn"
+            // effects end. The discard's submission front-schedules its events
+            // ahead of `EndTurnEffects`, so a "this turn" effect still applies
+            // to the discard.
             PhaseStep::Ending(EndingStep::Cleanup) => {
-                self.clear_marked_damage();
-                self.expire_end_of_turn();
-                vec![WorkItem::CheckHandSize]
+                vec![WorkItem::CheckHandSize, WorkItem::EndTurnEffects]
             }
             _ => vec![],
         }
     }
 
-    /// [CR#514.2]: remove all marked damage from battlefield permanents when
-    /// the Cleanup step begins.
+    /// [CR#514.2]: cleanup's second turn-based action. Marked damage is
+    /// removed and "until end of turn" and "this turn" effects end,
+    /// simultaneously: no event is applied between the two.
+    fn end_turn_effects(&mut self) -> Progress {
+        self.clear_marked_damage();
+        self.expire_end_of_turn();
+        Progress::TurnEffectsEnded
+    }
+
+    /// [CR#514.3a]: the cleanup step's check of state-based actions and
+    /// waiting triggered abilities. A trigger waiting now (the madness trigger
+    /// of a card discarded to hand size, say) or a fact recorded by the
+    /// state-based-action check means the check acted; `cleanup_priority`
+    /// decides from this mark after the check and trigger placement ran.
+    fn cleanup_check(&mut self) -> Progress {
+        let mark = WorkItem::CleanupPriority {
+            history: self.history.len(),
+            triggers_waiting: !self.pending_triggers.is_empty(),
+        };
+        self.schedule_front(vec![WorkItem::CheckSbas, WorkItem::PlaceTriggers, mark]);
+        Progress::CleanupChecked
+    }
+
+    /// [CR#514.3a]: if the cleanup check performed a state-based action or a
+    /// triggered ability was waiting, the active player gets priority; once
+    /// the stack is empty and all players pass, another cleanup step begins
+    /// (`end_of_step_items`). Otherwise no player gets priority and the turn
+    /// ends ([CR#514.3]). Between the mark and this item only the check ran,
+    /// so any fact recorded since was a state-based action performed (a batch
+    /// replaced to nothing records none, [CR#704.3]).
+    fn cleanup_priority(&mut self, history: usize, triggers_waiting: bool) -> Progress {
+        let acted = triggers_waiting || self.history.len() > history;
+        let items = if acted {
+            vec![WorkItem::OpenPriority]
+        } else {
+            self.end_step_into(PhaseStep::Beginning(BeginningStep::Untap))
+        };
+        self.schedule_front(items);
+        Progress::CleanupDecided { acted }
+    }
+
+    /// [CR#514.2]: remove all marked damage from battlefield permanents.
     fn clear_marked_damage(&mut self) {
         // Collect ids first to satisfy the borrow checker (can't hold a
         // shared ref to `self.zones` while mutably borrowing `self.objects`).
@@ -1651,22 +1708,13 @@ impl GameState {
         }
     }
 
-    /// What follows a step's turn-based actions: the priority barrier, or
-    /// the step end for the no-priority steps ([CR#502.4,514.3] — cleanup's
-    /// sweep runs per [CR#514.2] but can never act in the skeleton).
+    /// What follows a step's turn-based actions: the priority barrier, the
+    /// step end for the untap step ([CR#502.4]), or cleanup's check, which
+    /// gives priority only when it acts ([CR#514.3,514.3a]).
     fn step_tail(&self, s: PhaseStep) -> Vec<WorkItem> {
         match s {
             PhaseStep::Beginning(BeginningStep::Untap) => self.end_of_step_items(),
-            PhaseStep::Ending(EndingStep::Cleanup) => {
-                // [CR#514.3a]: if the sweep acts (or triggers are waiting),
-                // players DO get priority and cleanup repeats. Stage 3 must
-                // detect that and insert OpenPriority + another cleanup
-                // before the step end; in the skeleton the sweep can never
-                // act here.
-                let mut items = vec![WorkItem::CheckSbas, WorkItem::PlaceTriggers];
-                items.extend(self.end_of_step_items());
-                items
-            }
+            PhaseStep::Ending(EndingStep::Cleanup) => vec![WorkItem::CleanupCheck],
             // [CR#603.3]: the placement barrier sits between the SBA loop and
             // `OpenPriority` — noted triggers go on the stack before anyone
             // gets priority.
@@ -1678,9 +1726,21 @@ impl GameState {
         }
     }
 
-    /// [CR#500.5]: pools empty at the end of every step; then the next step
-    /// begins (wrapping into the next turn's untap).
+    /// The end of a step whose players all passed on an empty stack, or of the
+    /// untap step: the next step in turn order begins. A cleanup step ends
+    /// this way only after it gave priority, so another cleanup step follows
+    /// it ([CR#514.3a]); a cleanup step that gave no priority ends the turn
+    /// through `cleanup_priority`.
     pub(crate) fn end_of_step_items(&self) -> Vec<WorkItem> {
+        let next = match self.turn.current {
+            PhaseStep::Ending(EndingStep::Cleanup) => PhaseStep::Ending(EndingStep::Cleanup),
+            current => successor(current).expect("only the cleanup step ends a turn"),
+        };
+        self.end_step_into(next)
+    }
+
+    /// [CR#500.5]: pools empty at the end of every step; then `next` begins.
+    fn end_step_into(&self, next: PhaseStep) -> Vec<WorkItem> {
         let mut items: Vec<WorkItem> = self
             .players
             .iter()
@@ -1698,9 +1758,7 @@ impl GameState {
         if self.turn.current == PhaseStep::Combat(CombatStep::EndOfCombat) {
             items.push(WorkItem::EndOfCombat);
         }
-        items.push(WorkItem::BeginStep(
-            successor(self.turn.current).unwrap_or(PhaseStep::Beginning(BeginningStep::Untap)),
-        ));
+        items.push(WorkItem::BeginStep(next));
         items
     }
 
@@ -1775,8 +1833,8 @@ impl GameState {
     /// [CR#514.1]: the active player discards to maximum hand size.
     ///
     /// Setting `pending` blocks the next `step()` before the already-queued
-    /// `CheckSbas` is consumed; submission front-schedules the `Discarded`
-    /// emits ahead of it, so the sweep still runs after the discards apply.
+    /// `EndTurnEffects` is consumed; submission front-schedules the discard
+    /// events ahead of it, so the discard comes first ([CR#514.2]).
     fn check_hand_size(&mut self) -> Progress {
         let active = self.turn.active_player;
         let hand =

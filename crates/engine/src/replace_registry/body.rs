@@ -187,6 +187,9 @@ fn simultaneous_part(
             | WorkItem::CheckSbas
             | WorkItem::PlaceTriggers
             | WorkItem::CheckHandSize
+            | WorkItem::EndTurnEffects
+            | WorkItem::CleanupCheck
+            | WorkItem::CleanupPriority { .. }
             | WorkItem::DeclareAttackers
             | WorkItem::DeclareBlockers
             | WorkItem::AssignCombatDamage
