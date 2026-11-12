@@ -32,6 +32,9 @@
 //!   `remnant`;
 //! - single Objects in Complement Clusters: the `Bare` summary fact.
 
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+
 use dpsi::Ident;
 use sylex_lexicon::LexicalReading;
 
@@ -43,6 +46,95 @@ use crate::frames::SlotRelation;
 use crate::grammar::HostKind;
 use crate::reading::Reading;
 use crate::reading::ReadingNode;
+
+/// What Reading Normal Form reads of a bound grammar's Categories and
+/// Productions, resolved at bind time ([`NormalForms::compile`]).
+#[derive(Debug, Clone, Default)]
+pub(crate) struct NormalForms {
+    /// Each Category's base Category name, by Category: an engine-owned
+    /// serial tail's is its coordination schema's Category, any other's its
+    /// own reported name.
+    base: Vec<Ident>,
+    /// The id of each Category's flat coordination node, by Category:
+    /// `Coordination:` and its base.
+    flat: Vec<Ident>,
+    /// Every flat coordination node's id.
+    flat_ids: BTreeSet<Ident>,
+    /// Each frame Production's longer-frame links, by Production.
+    links: Vec<Option<FrameLink>>,
+}
+
+/// A frame Production's Valence Alternation variant, as same-head
+/// complement priority re-applies it: its id is its phrase's frame name
+/// (`frame_name`) followed by the variant.
+#[derive(Debug, Clone)]
+struct FrameLink {
+    /// The variant is a passive with its Internalised Complement (`+by`).
+    passive_by: bool,
+    /// Each frame that extends the Production's by one last `PP`
+    /// Complement slot naming no Complement kind, ascending, with the
+    /// Production of that frame and the same variant, if there is one.
+    longer: Vec<(usize, Option<usize>)>,
+}
+
+impl NormalForms {
+    /// Resolves them once binding has settled the Categories' reported
+    /// names; `tail_bases` maps each serial tail Category to its
+    /// coordination schema's.
+    pub(crate) fn compile(grammar: &CompiledGrammar, tail_bases: &BTreeMap<Ident, Ident>) -> Self {
+        let base: Vec<Ident> = grammar
+            .categories
+            .iter()
+            .map(|name| tail_bases.get(name).copied().unwrap_or(*name))
+            .collect();
+        let flat: Vec<Ident> = base
+            .iter()
+            .map(|base| Ident::new(&format!("Coordination:{base}")))
+            .collect();
+        let links = grammar
+            .productions
+            .iter()
+            .map(|production| {
+                let frame = &grammar.frames[production.frame?];
+                let phrase = grammar.categories[production.lhs];
+                let variant = production
+                    .id
+                    .as_str()
+                    .strip_prefix(&frame_name(&phrase, frame))?;
+                let longer = grammar
+                    .frames
+                    .iter()
+                    .enumerate()
+                    .filter(|(_, longer)| {
+                        longer.slots.len() == frame.slots.len() + 1
+                            && longer.slots[..frame.slots.len()] == frame.slots[..]
+                            && matches!(
+                                longer.slots.last(),
+                                Some(FrameSlot {
+                                    relation: SlotRelation::Complement,
+                                    fill: SlotFill::PP(_, None),
+                                })
+                            )
+                    })
+                    .map(|(index, longer)| {
+                        let id = format!("{}{variant}", frame_name(&phrase, longer));
+                        (index, grammar.production_index(Ident::new(&id)))
+                    })
+                    .collect();
+                Some(FrameLink {
+                    passive_by: variant.contains("+by"),
+                    longer,
+                })
+            })
+            .collect();
+        Self {
+            flat_ids: flat.iter().copied().collect(),
+            base,
+            flat,
+            links,
+        }
+    }
+}
 
 impl CompiledGrammar {
     /// The Reading Normal Form of `reading`: the canonicalizations the
@@ -78,8 +170,10 @@ impl CompiledGrammar {
             .by_id
             .get(&node.production)
             .map(|&p| &self.productions[p]);
-        if production.is_some_and(|p| p.coordinator.is_some()) {
-            return Self::flat_coordination(node, children);
+        if let Some(p) = production
+            && p.coordinator.is_some()
+        {
+            return self.flat_coordination(node, p.lhs, children);
         }
         // A Reading stores no punctuation: a Production position becomes a
         // child index by skipping the punctuation before it.
@@ -93,8 +187,7 @@ impl CompiledGrammar {
             && let Some(at) = p.distributed
             && let at = child(p, at)
             && let Some(Reading::Node(coordination)) = children.get(at)
-            && coordination.production.starts_with("Coordination:")
-            && !coordination.production.contains('/')
+            && self.normal_forms.flat_ids.contains(&coordination.production)
         {
             return self.distribute(node, &children, at, p.lhs);
         }
@@ -166,9 +259,16 @@ impl CompiledGrammar {
         }))
     }
 
-    fn flat_coordination(node: &ReadingNode, children: Vec<Reading>) -> Reading {
-        let category = Ident::new(base(&node.category));
-        let id = flat_id(&category);
+    /// `node`, a coordination of Category `category` over normalized
+    /// `children`, as one flat node.
+    fn flat_coordination(
+        &self,
+        node: &ReadingNode,
+        category: usize,
+        children: Vec<Reading>,
+    ) -> Reading {
+        let id = self.normal_forms.flat[category];
+        let category = self.normal_forms.base[category];
         // The chain's coordinator: its own leaf, or the one its serial tail
         // carries.
         let own = children.iter().rev().find_map(|child| match child {
@@ -245,17 +345,16 @@ impl CompiledGrammar {
                 }
             }
         }
-        let category = Ident::new(base(&node.category));
         let flat = Reading::Node(ReadingNode {
-            production: flat_id(&category),
-            category,
+            production: self.normal_forms.flat[lhs],
+            category: self.normal_forms.base[lhs],
             children: conjuncts.into_iter().chain(coordinator).collect(),
             selected_frame: None,
             ..node.clone()
         });
         // A coordination of coordinations by one coordinator is one chain.
         let Reading::Node(flat_node) = &flat else { unreachable!() };
-        Self::flat_coordination(flat_node, flat_node.children.clone())
+        self.flat_coordination(flat_node, lhs, flat_node.children.clone())
     }
 
     /// Adjuncts below a non-modal auxiliary, on the Reading as built: every
@@ -281,7 +380,7 @@ impl CompiledGrammar {
             .by_id
             .get(&node.production)
             .filter(|&&p| self.productions[p].post_adjunct_host(0))
-            .and_then(|_| self.below_auxiliary(node, &children));
+            .and_then(|&p| self.below_auxiliary(node, self.productions[p].lhs, &children));
         lowered.unwrap_or_else(|| {
             Reading::Node(ReadingNode {
                 children,
@@ -293,7 +392,12 @@ impl CompiledGrammar {
     /// `node`, an Adjunct Production over the auxiliary Verb Phrase that is
     /// its first child, as the auxiliary over that Production of its
     /// participial Complement's head Verb Phrase.
-    fn below_auxiliary(&self, node: &ReadingNode, children: &[Reading]) -> Option<Reading> {
+    fn below_auxiliary(
+        &self,
+        node: &ReadingNode,
+        category: usize,
+        children: &[Reading],
+    ) -> Option<Reading> {
         let Some(Reading::Node(auxiliary)) = children.first() else {
             return None;
         };
@@ -310,7 +414,8 @@ impl CompiledGrammar {
         let Some(Reading::Node(lexical)) = complement.children.get(head) else {
             return None;
         };
-        if base(&lexical.category) != base(&node.category) {
+        let lexical_category = self.productions[*self.by_id.get(&lexical.production)?].lhs;
+        if self.normal_forms.base[lexical_category] != self.normal_forms.base[category] {
             return None;
         }
         // The Production over the lexical Verb Phrase takes its features from
@@ -346,11 +451,11 @@ impl CompiledGrammar {
         let (Reading::Node(host), Reading::Node(phrase)) = (host, adjunct) else {
             return None;
         };
-        let frame = host.selected_frame.as_ref()?;
-        let suffix = host
-            .production
-            .strip_prefix(&frame_name(&host.category, frame))?;
-        if suffix.contains("+by") {
+        let production = *self.by_id.get(&host.production)?;
+        let link = self.normal_forms.links[production].as_ref()?;
+        if host.selected_frame.as_ref()? != &self.frames[self.productions[production].frame?]
+            || link.passive_by
+        {
             return None;
         }
         let Some(Reading::Leaf(LexicalReading::Word(head))) = host.children.first() else {
@@ -360,24 +465,21 @@ impl CompiledGrammar {
             return None;
         };
         let facts = self.facts(self.lexeme(&head.lexeme)?);
-        for &candidate in &facts.frames {
+        for &(candidate, longer_production) in &link.longer {
             let longer = &self.frames[candidate];
-            if longer.slots.len() == frame.slots.len() + 1
-                && longer.slots[..frame.slots.len()] == frame.slots[..]
-                // Only a slot that names no Complement kind: a Reading does
-                // not record which frame of its preposition a phrase has.
+            // Only a slot that names no Complement kind: a Reading does not
+            // record which frame of its preposition a phrase has.
+            if facts.frames.contains(&candidate)
                 && let Some(FrameSlot {
-                    relation: SlotRelation::Complement,
                     fill: SlotFill::PP(list, None),
+                    ..
                 }) = longer.slots.last()
                 && list.contains(&preposition.lexeme)
             {
-                let id = format!("{}{suffix}", frame_name(&host.category, longer));
-                let (&id, _) = self.by_id.get_key_value(id.as_str())?;
                 let mut children = host.children.clone();
                 children.push(Reading::Node(phrase.clone()));
                 return Some(Reading::Node(ReadingNode {
-                    production: id,
+                    production: self.productions[longer_production?].id,
                     selected_frame: Some(longer.clone()),
                     children,
                     ..host.clone()
@@ -386,14 +488,6 @@ impl CompiledGrammar {
         }
         None
     }
-}
-
-fn base(category: &str) -> &str {
-    category.split_once('#').map_or(category, |(base, _)| base)
-}
-
-fn flat_id(category: &str) -> Ident {
-    Ident::new(&format!("Coordination:{}", base(category)))
 }
 
 fn split(node: &ReadingNode) -> (Vec<Reading>, Option<LexicalReading>) {

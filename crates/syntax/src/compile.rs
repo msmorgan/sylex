@@ -148,6 +148,8 @@ pub struct CompiledGrammar {
     /// of the feature in its `Summary::values`, and the value.
     pub(crate) high_attachment: Vec<(usize, usize, FeatureValue)>,
     pub(crate) prediction: crate::prediction::Prediction,
+    /// What Reading Normal Form reads of each Category and Production.
+    pub(crate) normal_forms: crate::normal_form::NormalForms,
     report: LoadReport,
 }
 
@@ -447,6 +449,9 @@ struct Binder<'a> {
     valuers: BTreeMap<(usize, u16), BTreeSet<Ident>>,
     /// Pairs of distinct features some equation equates.
     links: BTreeSet<(usize, usize)>,
+    /// The engine-owned serial tail Categories, each with the Category of
+    /// its coordination schema.
+    tail_bases: BTreeMap<Ident, Ident>,
 }
 
 /// One child of a Production under construction.
@@ -718,6 +723,7 @@ impl<'a> Binder<'a> {
         };
         // Each coordination schema gets an engine-owned serial tail Category.
         let mut declared = grammar.categories.clone();
+        let mut tail_bases = BTreeMap::new();
         for schema in &grammar.schemas {
             if let SchemaDecl::Coordination {
                 category,
@@ -736,9 +742,10 @@ impl<'a> Binder<'a> {
                     .cloned()
                     .ok_or_else(|| invalid(format!("unknown category `{category}`")))?;
                 let tail = Ident::new(&serial_tail(&grammar.schemas, schema, category));
-                declared.insert(Ident::new(&format!("{tail}+")), declaration.clone());
-                declared.insert(Ident::new(&format!("{tail}++")), declaration.clone());
-                declared.insert(tail, declaration);
+                for name in [tail, Ident::new(&format!("{tail}+")), Ident::new(&format!("{tail}++"))] {
+                    declared.insert(name, declaration.clone());
+                    tail_bases.insert(name, *category);
+                }
             }
         }
         let categories: Vec<Ident> = declared.keys().copied().collect();
@@ -1043,6 +1050,7 @@ impl<'a> Binder<'a> {
                 projection,
                 high_attachment: Vec::new(),
                 prediction: crate::prediction::Prediction::default(),
+                normal_forms: crate::normal_form::NormalForms::default(),
                 report,
             },
             closed_words,
@@ -1050,6 +1058,7 @@ impl<'a> Binder<'a> {
             setters: BTreeMap::new(),
             valuers: BTreeMap::new(),
             links: BTreeSet::new(),
+            tail_bases,
         })
     }
 
@@ -1254,6 +1263,7 @@ impl<'a> Binder<'a> {
             let link = self.out.link_categories.contains(&production.lhs);
             production.seal(link, &self.out.unadjoined_categories);
         }
+        self.out.normal_forms = crate::normal_form::NormalForms::compile(&self.out, &self.tail_bases);
         self.out.cluster_shapes = cluster_shapes(&self.out.frames);
         self.out.prediction = crate::prediction::Prediction::compile(&self.out);
         Ok(self.out)
