@@ -461,6 +461,90 @@ impl Seams {
     }
 }
 
+/// The chart's item sets, each at a boundary: a position some item ends at.
+/// Only a boundary has a set, an index and waiting items, not every char
+/// offset between them (the offsets inside a word).
+struct Boundaries {
+    /// Each position's boundary: position 0's from the start, any other's
+    /// once an item ends there.
+    at: Vec<Option<usize>>,
+    /// Each boundary's items, in the order found.
+    sets: Vec<Vec<usize>>,
+    /// Each boundary's items by [`ItemKey`], as indices into `forest.items`.
+    index: Vec<HashTable<usize>>,
+    /// Each boundary's items waiting for a Category, by Category; allocated
+    /// when the parse reaches the boundary.
+    waiting: Vec<Vec<Vec<usize>>>,
+}
+
+impl Boundaries {
+    fn new(n: usize) -> Self {
+        Self {
+            at: vec![None; n + 1],
+            sets: Vec::new(),
+            index: Vec::new(),
+            waiting: Vec::new(),
+        }
+    }
+
+    /// The boundary at a position, made on first use.
+    fn boundary(&mut self, position: usize) -> usize {
+        if let Some(boundary) = self.at[position] {
+            return boundary;
+        }
+        let boundary = self.sets.len();
+        self.at[position] = Some(boundary);
+        self.sets.push(Vec::new());
+        self.index.push(HashTable::new());
+        self.waiting.push(Vec::new());
+        boundary
+    }
+
+    /// The boundary at a position the parse has reached.
+    fn reached(&self, position: usize) -> usize {
+        self.at[position].expect("a reached position is a boundary")
+    }
+
+    /// Adds the item `key` ending at `end`, unless it is there already, and
+    /// a family to it.
+    fn add(
+        &mut self,
+        forest: &mut PackedForest,
+        end: usize,
+        key: ItemKey,
+        family: Option<(Option<usize>, ChildRef)>,
+    ) {
+        let boundary = self.boundary(end);
+        let items = &forest.items;
+        let index = match self.index[boundary].entry(
+            CHART_HASHER.hash_one(key),
+            |&i| items[i].key() == key,
+            |&i| CHART_HASHER.hash_one(items[i].key()),
+        ) {
+            Entry::Occupied(entry) => *entry.get(),
+            Entry::Vacant(entry) => {
+                let i = forest.items.len();
+                entry.insert(i);
+                let (production, dot, start, state, seam) = key;
+                forest.items.push(Item {
+                    production,
+                    dot,
+                    start,
+                    end,
+                    state,
+                    seam,
+                    families: Vec::new(),
+                });
+                self.sets[boundary].push(i);
+                i
+            }
+        };
+        if let Some(family) = family {
+            forest.items[index].families.push(family);
+        }
+    }
+}
+
 impl CompiledGrammar {
     /// Parses `text` as the grammar's root Category.
     #[must_use]
@@ -602,57 +686,19 @@ impl CompiledGrammar {
                 .collect(),
             n,
         );
-        let mut sets: Vec<Vec<usize>> = vec![Vec::new(); n + 1];
-        // Each holds indices into `forest.items` (by end) and `forest.nodes`.
-        let mut item_index: Vec<HashTable<usize>> = (0..=n).map(|_| HashTable::new()).collect();
+        let mut boundaries = Boundaries::new(n);
+        boundaries.boundary(0);
+        // Indices into `forest.nodes`, by [`NodeKey`].
         let mut node_index: HashTable<usize> = HashTable::new();
         let categories = self.categories.len();
-        let mut waiting: Vec<Vec<usize>> = vec![Vec::new(); (n + 1) * categories];
         let mut predicted_at = vec![usize::MAX; categories];
-
-        let mut add = |forest: &mut PackedForest,
-                       sets: &mut Vec<Vec<usize>>,
-                       production: usize,
-                       dot: usize,
-                       start: usize,
-                       end: usize,
-                       state: State,
-                       seam: u64,
-                       family: Option<(Option<usize>, ChildRef)>| {
-            let key = (production, dot, start, state, seam);
-            let items = &forest.items;
-            let index = match item_index[end].entry(
-                CHART_HASHER.hash_one(key),
-                |&i| items[i].key() == key,
-                |&i| CHART_HASHER.hash_one(items[i].key()),
-            ) {
-                Entry::Occupied(entry) => *entry.get(),
-                Entry::Vacant(entry) => {
-                    let i = forest.items.len();
-                    entry.insert(i);
-                    forest.items.push(Item {
-                        production,
-                        dot,
-                        start,
-                        end,
-                        state,
-                        seam,
-                        families: Vec::new(),
-                    });
-                    sets[end].push(i);
-                    i
-                }
-            };
-            if let Some(family) = family {
-                forest.items[index].families.push(family);
-            }
-        };
 
         let mut active = self.prediction.signature();
         for position in 0..=n {
-            if position != 0 && sets[position].is_empty() {
+            let Some(here) = boundaries.at[position] else {
                 continue;
-            }
+            };
+            boundaries.waiting[here] = vec![Vec::new(); categories];
             active.fill(0);
             let at = skip(position);
             for &leaf in &by_start[at] {
@@ -672,23 +718,18 @@ impl CompiledGrammar {
                 predicted_at[root] = position;
                 for &p in &self.by_lhs[root] {
                     if self.prediction.production(p, &active) {
-                        add(
+                        boundaries.add(
                             &mut forest,
-                            &mut sets,
-                            p,
                             0,
-                            0,
-                            0,
-                            self.productions[p].start(),
-                            0,
+                            (p, 0, 0, self.productions[p].start(), 0),
                             None,
                         );
                     }
                 }
             }
             let mut cursor = 0;
-            while cursor < sets[position].len() {
-                let id = sets[position][cursor];
+            while cursor < boundaries.sets[here].len() {
+                let id = boundaries.sets[here][cursor];
                 cursor += 1;
                 let (production_id, dot, start) = {
                     let item = &forest.items[id];
@@ -708,7 +749,9 @@ impl CompiledGrammar {
                         |&node| CHART_HASHER.hash_one(nodes[node].key()),
                     ) {
                         Entry::Occupied(entry) => {
-                            forest.nodes[*entry.get()].families.push((production_id, id));
+                            forest.nodes[*entry.get()]
+                                .families
+                                .push((production_id, id));
                             continue;
                         }
                         Entry::Vacant(entry) => {
@@ -724,7 +767,10 @@ impl CompiledGrammar {
                         summary,
                         families: vec![(production_id, id)],
                     });
-                    for &parent in &waiting[start * categories + production.lhs] {
+                    let from = boundaries.reached(start);
+                    // Adding items never adds to a waiting list.
+                    for waiter in 0..boundaries.waiting[from][production.lhs].len() {
+                        let parent = boundaries.waiting[from][production.lhs][waiter];
                         let item = &forest.items[parent];
                         let parent_production = &self.productions[item.production];
                         let view = ChildView::Node(&forest.nodes[node].summary);
@@ -749,15 +795,10 @@ impl CompiledGrammar {
                             ) else {
                                 continue;
                             };
-                            add(
+                            boundaries.add(
                                 &mut forest,
-                                &mut sets,
-                                p,
-                                d + 1,
-                                s,
                                 position,
-                                state,
-                                seam,
+                                (p, d + 1, s, state, seam),
                                 Some((prev, ChildRef::Node(node))),
                             );
                         }
@@ -766,7 +807,7 @@ impl CompiledGrammar {
                 }
                 match &production.rhs[dot] {
                     Symbol::Cat { category, .. } => {
-                        waiting[position * categories + category].push(id);
+                        boundaries.waiting[here][*category].push(id);
                         if predicted_at[*category] == position {
                             continue;
                         }
@@ -776,15 +817,10 @@ impl CompiledGrammar {
                         }
                         for &p in &self.by_lhs[*category] {
                             if self.prediction.production(p, &active) {
-                                add(
+                                boundaries.add(
                                     &mut forest,
-                                    &mut sets,
-                                    p,
-                                    0,
                                     position,
-                                    position,
-                                    self.productions[p].start(),
-                                    0,
+                                    (p, 0, position, self.productions[p].start(), 0),
                                     None,
                                 );
                             }
@@ -819,15 +855,10 @@ impl CompiledGrammar {
                                 ) else {
                                     continue;
                                 };
-                                add(
+                                boundaries.add(
                                     &mut forest,
-                                    &mut sets,
-                                    production_id,
-                                    dot + 1,
-                                    start,
                                     end,
-                                    state,
-                                    seam,
+                                    (production_id, dot + 1, start, state, seam),
                                     Some((previous, ChildRef::Leaf(leaf))),
                                 );
                             }
@@ -881,15 +912,10 @@ impl CompiledGrammar {
                             )
                         {
                             state.unwritten_period = at == end;
-                            add(
+                            boundaries.add(
                                 &mut forest,
-                                &mut sets,
-                                production_id,
-                                dot + 1,
-                                start,
                                 end,
-                                state,
-                                seam,
+                                (production_id, dot + 1, start, state, seam),
                                 Some((previous, ChildRef::Punct)),
                             );
                         }
