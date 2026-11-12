@@ -2218,9 +2218,11 @@ NounAttribute: Attribute -> filler:NounPremodifier
     where $.ComplementKind = Nominal,
           $.Polarity = filler.Polarity
 // A gerund-participle as an unlike conjunct of an adjective (*tapped and
-// attacking token*).
+// attacking token*, Altaïr Ibn-La'Ahad). `Carry`, since a coordination of
+// participles not all gerund-participles leaves Inflection unvalued and
+// would pass a `Require`.
 ParticipialAttribute: Attribute -> filler:Participle
-    where filler.Inflection = GerundParticiple,
+    where filler.Inflection := GerundParticiple,
           $.ComplementKind = Gerund,
           $.Polarity = filler.Polarity
 AdjectivalAttribute: Attribute -> filler:AdjectivePhrase
@@ -3423,7 +3425,17 @@ coordination CompoundCoordination {
 }
     where first.CompoundPart = Base,
           last.CompoundPart = Whole
-coordination Participle { coordinators: Coordinator, unshared: [Inflection, Polarity] }
+// Conjuncts of one Inflection share it (*attacking or blocking creature*,
+// Aethertow).
+coordination Participle { coordinators: Coordinator, unshared: [Polarity] }
+// Conjuncts not all of one Inflection leave it unvalued (*blocking or
+// blocked*): this schema's alone, so one tree per analysis.
+coordination Participle {
+    coordinators: Coordinator,
+    unshared: [Inflection, Polarity],
+    serial: true,
+    unlike: Inflection,
+}
 // This coordination leaves Grade unvalued, so a gate that needs a Grade
 // writes `:=` (*red or green* is no comparative). A coordination whose last
 // coordinate is comparative is the next schema's alone: one tree per
