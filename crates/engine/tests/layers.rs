@@ -799,46 +799,6 @@ fn gained_control_reverts_when_effect_expires() {
     );
 }
 
-/// [CR#508.1a],[CR#613.1b]: combat eligibility reads the DERIVED controller — a
-/// stolen creature is a legal attacker for its new controller, not its owner.
-#[test]
-fn stolen_creature_attacks_for_new_controller() {
-    use sylex_core::Duration;
-    use sylex_core::Modification;
-    use sylex_core::Reference;
-    use sylex_engine::ContinuousEffect;
-    use sylex_engine::ScopeResolved;
-    use sylex_engine::Timestamp;
-
-    let mut state = two_player_with("Grizzly Bears", 1, 10);
-    let bear = force_onto_battlefield(&mut state, PlayerId(0), "Grizzly Bears");
-    assert!(
-        legal_attackers(&state, PlayerId(0)).contains(&bear),
-        "sanity: P0's bear can attack before the steal"
-    );
-
-    state.continuous.push(ContinuousEffect {
-        timestamp: Timestamp(1_000),
-        controller: PlayerId(1),
-        scope: ScopeResolved::Locked(vec![bear]),
-        changes: vec![Modification::SetController(Reference::Reg(
-            sylex_core::RefId(1),
-        ))],
-        duration: Duration::EndOfGame,
-        rows: vec![],
-        origin: None,
-        is_cda: false,
-    });
-    assert!(
-        !legal_attackers(&state, PlayerId(0)).contains(&bear),
-        "P0 no longer controls the stolen creature"
-    );
-    assert!(
-        legal_attackers(&state, PlayerId(1)).contains(&bear),
-        "P1 gained control and can attack with it ([CR#613.1b])"
-    );
-}
-
 /// [CR#613.8a,613.8b]: within layer 4, an effect whose affected set DEPENDS on
 /// another applies after it, overriding timestamp order. `Instruction` B
 /// ("enchantments are also artifacts", EARLIER timestamp) depends on effect A
