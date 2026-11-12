@@ -466,8 +466,9 @@ mod tests {
     /// resolves. A synthetic artifact (engine-test scaffolding, not a plugin
     /// fixture) whose trigger reads "if a creature is on the battlefield"
     /// resolves to its effect when a creature is present, and is removed from
-    /// the stack with no effect — only the `AbilityResolved` that discards the
-    /// entry, never a `RunEffect` — when the condition has become false. The
+    /// the stack with no effect when the condition has become false
+    /// [CR#608.2a]: no `RunEffect`, only the removal of an ability that
+    /// doesn't resolve, which carries the failed-resolution cause. The
     /// no-condition/true path is also covered e2e by the integration suite
     /// (`etb_trigger_draws_a_card`). When canon grows an intervening-if card
     /// (parser/canon-slice work), an e2e fixture test is the natural follow-up.
@@ -487,8 +488,9 @@ mod tests {
         use crate::trigger::TriggerBindings;
 
         // Resolve the conditional trigger and report whether its effect was
-        // scheduled (vs. removed with no effect).
-        let runs_effect = |creature_present: bool| -> bool {
+        // scheduled, and whether the ability was removed as one that doesn't
+        // resolve.
+        let resolve = |creature_present: bool| -> (bool, bool) {
             let mut state = game();
 
             // A synthetic artifact whose sole ability triggers "if a creature
@@ -562,18 +564,33 @@ mod tests {
             });
             state.resolve_object(stack_id);
 
-            state
+            let runs_effect = state
                 .agenda
                 .iter()
-                .any(|w| matches!(w, WorkItem::RunEffect { .. }))
+                .any(|w| matches!(w, WorkItem::RunEffect { .. }));
+            let removed = state.agenda.iter().any(|w| {
+                matches!(
+                    w,
+                    WorkItem::Emit(crate::event::Occurrence::Single(
+                        crate::event::GameEvent::AbilityCountered(crate::event::AbilityCountered {
+                            id,
+                            cause,
+                        })
+                    )) if *id == stack_id
+                        && cause.agency == sylex_core::Agency::FailedResolution
+                )
+            });
+            (runs_effect, removed)
         };
 
-        assert!(
-            runs_effect(true),
+        assert_eq!(
+            resolve(true),
+            (true, false),
             "condition true at resolution → effect scheduled"
         );
-        assert!(
-            !runs_effect(false),
+        assert_eq!(
+            resolve(false),
+            (false, true),
             "condition false at resolution → ability removed, no effect ([CR#603.4])"
         );
     }

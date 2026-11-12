@@ -102,6 +102,18 @@ impl Cause {
         Self::verb("Counter", agency, agent)
     }
 
+    /// "`RemoveFromStack`" ([CR#608.2a,608.2b,608.3b]) — a spell or ability
+    /// that doesn't resolve is removed from the stack, under
+    /// `Agency::FailedResolution`. Never "Counter": nothing counters it
+    /// [CR#701.6a], so a "becomes countered" view never sees it.
+    #[must_use]
+    pub fn remove_from_stack(
+        agency: sylex_core::Agency,
+        agent: Option<(ObjectId, PlayerId)>,
+    ) -> Self {
+        Self::verb("RemoveFromStack", agency, agent)
+    }
+
     /// "Cease" ([CR#704.5d,707.10a]) — an object ceasing to exist, distinct
     /// from being countered even though both currently share
     /// `AbilityCountered`'s removal apply (remove the stack entry, remove
@@ -502,14 +514,14 @@ pub struct AbilityUsed {
     pub ability: Uint,
 }
 
-/// [CR#608.2n]: a triggered or activated ability fizzled (an
-/// intervening-if no longer held, or every target went illegal) and
-/// vanishes — no zone move. [CR#701.6a]: a triggered or activated
-/// ability was countered and vanishes the same way. [CR#707.10a]: a
-/// countered COPY (of a spell or ability) also vanishes here — same
-/// shape, no card behind it either. Its apply removes the stack entry
-/// whose `id` is the carried (minted, for a spell copy freshly minted)
-/// token, and the backing object with it — no remint.
+/// A triggered or activated ability, or a copy of a spell or ability,
+/// leaves the stack without resolving and vanishes — no zone move, no card
+/// behind it. `cause` tells why: it doesn't resolve (an intervening-if no
+/// longer held, or every target went illegal, [CR#608.2a,608.2b];
+/// `Cause::remove_from_stack`), it was countered [CR#701.6a], or a copy
+/// ceased to exist [CR#704.5e,707.10a]. Its apply removes the
+/// stack entry whose `id` is the carried (minted, for a spell copy freshly
+/// minted) token, and the backing object with it — no remint.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AbilityCountered {
     pub id: ObjectId,

@@ -146,6 +146,12 @@ pub enum Agency {
     /// from the skill's events.md §3 agency list (erratum filed); the land
     /// play view ([CR#701.18a]) is unrepresentable without it.
     SpecialAction,
+    /// The resolution procedure removing an object that doesn't resolve: a
+    /// triggered ability whose intervening "if" no longer holds [CR#608.2a],
+    /// a spell or ability whose every target is illegal [CR#608.2b], or a
+    /// permanent spell with an illegal target [CR#608.3b]. Nothing counters
+    /// it [CR#701.6a], and it is no state-based action [CR#704.3].
+    FailedResolution,
 }
 
 /// A cause VERB NAME — a bareword name-atom drawn from the closed grammar

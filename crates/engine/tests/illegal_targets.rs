@@ -33,6 +33,7 @@ use sylex_engine::Priority;
 use sylex_engine::Progress;
 use sylex_engine::StartingPlayer;
 use sylex_engine::StepOutcome;
+use sylex_engine::TriggerFired;
 use sylex_engine::WorkItem;
 use sylex_engine::ZoneChange;
 use sylex_plugin_v1::plugin::Plugin;
@@ -107,6 +108,26 @@ const KEEPER_OF_KOOKUS: &str = r#"Normal(
     ],
     power: 1,
     toughness: 1,
+)"#;
+
+/// Derived from Multani's Presence ("Whenever a spell you've cast is
+/// countered, draw a card."): its trigger reads a spell's move from the stack
+/// to a graveyard narrowed to the "Counter" cause verb [CR#701.6a].
+const MULTANIS_PRESENCE: &str = r#"Normal(
+    name: "Multani's Presence",
+    mana_cost: [Green],
+    types: [Enchantment],
+    abilities: [
+        Triggered(
+            event: ZoneChange(
+                what: ControlledBy(Ref(You)),
+                from: Stack,
+                to: Graveyard,
+                cause: Cause(verb: Counter),
+            ),
+            effect: Draw(1),
+        ),
+    ],
 )"#;
 
 /// A two-player game with the builtin rules as data (lethal damage, the Aura
@@ -695,5 +716,111 @@ fn pacifism_entering_without_being_cast_chooses_a_creature_on_the_battlefield() 
         state.objects.obj(aura).attached_to,
         Some(theirs),
         "Pacifism chose the only creature on the battlefield"
+    );
+}
+
+/// [CR#608.2b,701.6a]: Lightning Bolt's only target gained hexproof, so Bolt
+/// doesn't resolve and goes to its owner's graveyard. Nothing countered it, so
+/// player 0's "whenever a spell you control is countered" trigger doesn't
+/// fire (Multani's Presence ruling: "A spell that doesn't resolve because its
+/// targets are illegal isn't countered, so this ability won't trigger").
+#[test]
+fn a_spell_whose_only_target_became_illegal_is_not_countered() {
+    let bolt = card("Lightning Bolt");
+    let mountain = basic("Mountain");
+    let presence = fixture(MULTANIS_PRESENCE);
+    let bears = card("Grizzly Bears");
+    let forest = basic("Forest");
+    let guile = fixture(RANGERS_GUILE);
+    let mut state = game(
+        deck(&[(&bolt, 2), (&presence, 1), (&mountain, 7)]),
+        deck(&[(&guile, 2), (&bears, 2), (&forest, 6)]),
+    );
+    to_main(&mut state);
+    let watcher = onto_battlefield(&mut state, PlayerId(0), "Multani's Presence");
+    let theirs = onto_battlefield(&mut state, PlayerId(1), "Grizzly Bears");
+    let spell = into_hand(&mut state, PlayerId(0), "Lightning Bolt");
+    let response = into_hand(&mut state, PlayerId(1), "Ranger's Guile");
+    float(
+        &mut state,
+        &[(PlayerId(0), Color::Red, 1), (PlayerId(1), Color::Green, 1)],
+    );
+    let hand = state.zones.hands[0].len();
+
+    let (trace, _) = cast_against_response(
+        &mut state,
+        spell,
+        vec![vec![theirs]],
+        &Action::CastSpell { object: response },
+        Some(vec![vec![theirs]]),
+    );
+
+    assert_eq!(
+        count_named(&state, &state.zones.graveyards[0], "Lightning Bolt"),
+        1,
+        "the Bolt went to its owner's graveyard"
+    );
+    assert!(damage_to(&trace, theirs).is_empty(), "the Bolt dealt no damage");
+    let watcher_source = state.objects.obj(watcher).source;
+    assert!(
+        !applied(&trace).iter().any(|event| matches!(
+            event,
+            GameEvent::TriggerFired(TriggerFired { source, .. }) if *source == watcher_source
+        )),
+        "the countered-spell trigger did not fire"
+    );
+    assert_eq!(
+        state.zones.hands[0].len(),
+        hand - 1,
+        "player 0 drew nothing (the hand lost only the Bolt)"
+    );
+}
+
+/// The control for the test above: Mana Leak counters the Bolt (player 0
+/// can't pay {3}), and the same trigger fires and draws a card [CR#701.6a].
+#[test]
+fn a_countered_spell_fires_the_countered_spell_trigger() {
+    let bolt = card("Lightning Bolt");
+    let mountain = basic("Mountain");
+    let presence = fixture(MULTANIS_PRESENCE);
+    let leak = card("Mana Leak");
+    let island = basic("Island");
+    let bears = card("Grizzly Bears");
+    let mut state = game(
+        deck(&[(&bolt, 2), (&presence, 1), (&mountain, 7)]),
+        deck(&[(&leak, 2), (&bears, 2), (&island, 6)]),
+    );
+    to_main(&mut state);
+    let watcher = onto_battlefield(&mut state, PlayerId(0), "Multani's Presence");
+    let theirs = onto_battlefield(&mut state, PlayerId(1), "Grizzly Bears");
+    let spell = into_hand(&mut state, PlayerId(0), "Lightning Bolt");
+    let response = into_hand(&mut state, PlayerId(1), "Mana Leak");
+    float(
+        &mut state,
+        &[(PlayerId(0), Color::Red, 1), (PlayerId(1), Color::Blue, 2)],
+    );
+    let hand = state.zones.hands[0].len();
+
+    let (trace, _) = cast_against_response(
+        &mut state,
+        spell,
+        vec![vec![theirs]],
+        &Action::CastSpell { object: response },
+        Some(vec![vec![spell]]),
+    );
+
+    assert!(damage_to(&trace, theirs).is_empty(), "the Bolt was countered");
+    let watcher_source = state.objects.obj(watcher).source;
+    assert!(
+        applied(&trace).iter().any(|event| matches!(
+            event,
+            GameEvent::TriggerFired(TriggerFired { source, .. }) if *source == watcher_source
+        )),
+        "the countered-spell trigger fired"
+    );
+    assert_eq!(
+        state.zones.hands[0].len(),
+        hand,
+        "player 0 lost the Bolt from hand and drew one card"
     );
 }

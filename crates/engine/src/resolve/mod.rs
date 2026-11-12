@@ -210,18 +210,17 @@ impl GameState {
                     let x = self.eval_count(where_x, &frame);
                     self.activation_set_x(frame.activation, x);
                 }
-                // [CR#603.4]: an intervening-if is rechecked as the ability
-                // resolves. If it no longer holds, the ability is removed from
-                // the stack and does nothing (the rule mirrors the
-                // illegal-target fizzle) — schedule only the
-                // `AbilityResolved` that discards the
-                // entry, never the effect.
+                // [CR#603.4,608.2a]: an intervening-if is rechecked as the
+                // ability resolves. If it no longer holds, the ability is
+                // removed from the stack and does nothing — it doesn't
+                // resolve, exactly like an ability whose targets are all
+                // illegal.
                 if t.condition
                     .as_ref()
                     .is_some_and(|c| !self.condition_holds(c, &frame))
                 {
                     self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
-                        GameEvent::AbilityResolved(entry.id),
+                        failed_resolution_exit(&entry),
                     ))]);
                 } else {
                     // [CR#608.2b] follows the intervening-if recheck.
@@ -465,10 +464,13 @@ pub(crate) fn spell_ability_in(abilities: &[Ability]) -> Option<Arc<sylex_core::
 }
 
 /// The event that removes `entry` from the stack when it doesn't resolve
-/// [CR#608.2b,608.3b]: a spell card goes to its owner's graveyard, while an
-/// ability or a spell copy leaves no card behind ([CR#707.10a]).
+/// [CR#608.2a,608.2b,608.3b]: a spell card goes to its owner's graveyard,
+/// while an ability or a spell copy leaves no card behind ([CR#707.10a]). The
+/// removal is the resolution procedure's own, never a counter [CR#701.6a] and
+/// never a state-based action [CR#704.3], so a "becomes countered" view never
+/// sees it.
 fn failed_resolution_exit(entry: &StackEntry) -> GameEvent {
-    let cause = Cause::counter(Agency::StateBasedAction, None);
+    let cause = Cause::remove_from_stack(Agency::FailedResolution, None);
     match &entry.object {
         StackObject::Spell(spell) if !entry.copy => GameEvent::ZoneChange(ZoneChange {
             snapshot: None,
