@@ -57,6 +57,7 @@ disagree, or on a spurious Reading left beside a correct one, and joins `needs:`
 | A bare keyword premodifying its own Keyword Parameter | `english-keyword-premodifies-own-parameter` |
 | A recipient coordinated with an amount of damage | `english-quantity-noun-phrase-in-recipient-coordination` |
 | The Noun Phrase multiplier Productions beside `Multiplier` | `english-multiplier-noun-phrase-productions` |
+| A bound keyword with a period as a keyword instruction | `english-bound-keyword-instruction` |
 
 ## Done when
 
