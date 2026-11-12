@@ -25,9 +25,9 @@ mod tree_key;
 pub mod walk;
 
 pub use alternatives::AlternativeDistribution;
-pub use alternatives::EMBEDDING_DEPTH;
 pub use alternatives::Embedding;
 pub use alternatives::EmbeddingStep;
+pub use alternatives::HeadLeaf;
 pub use alternatives::HeadWord;
 pub use chart::ChildRef;
 pub use chart::Metrics;

@@ -13,9 +13,9 @@ use dpsi::Ident;
 use sylex_english::corpus::Corpus;
 use sylex_lexicon::LexicalReading;
 use sylex_syntax::ChildRef;
-use sylex_syntax::EMBEDDING_DEPTH;
 use sylex_syntax::Embedding;
 use sylex_syntax::EmbeddingStep;
+use sylex_syntax::HeadLeaf;
 use sylex_syntax::HeadWord;
 use sylex_syntax::Parse;
 use sylex_vocabulary::LexicalEnvironment;
@@ -31,6 +31,10 @@ const SAMPLE: &[&str] = &[
     "Coram, the Undertaker",
     "Draugr Necromancer",
 ];
+
+/// The Embedding depth checked: small, so that cutting and wrappers are
+/// exercised.
+const DEPTH: usize = 2;
 
 /// One alternative of a node in one Derivation, with its children's trees.
 struct Tree {
@@ -108,7 +112,7 @@ fn copy(child: &Child) -> Child {
 /// What the enumeration finds, per (node, alternative).
 #[derive(Default)]
 struct Found {
-    heads: BTreeMap<(usize, usize, Option<HeadWord>), u128>,
+    heads: BTreeMap<(usize, usize, HeadLeaf), u128>,
     conjuncts: BTreeMap<(usize, usize, usize), u128>,
     embeddings: BTreeMap<(usize, usize, Embedding), u128>,
 }
@@ -123,17 +127,51 @@ impl Walk<'_, '_> {
         self.parse.grammar().production_functions(production)[at].as_str()
     }
 
-    /// The word reached through `head` children.
-    fn head(&self, tree: &Tree) -> Option<HeadWord> {
+    /// The leaf reached through `head` children.
+    fn head(&self, tree: &Tree) -> HeadLeaf {
         let functions = self.parse.grammar().production_functions(tree.production);
         let at = functions.iter().position(|f| *f == "head")?;
         match &tree.children[at] {
             Child::Tree(t) => self.head(t),
-            Child::Leaf(l) => match self.parse.forest.leaf_reading(*l) {
-                LexicalReading::Word(word) => Some((word.lexeme, word.form)),
-                _ => None,
-            },
+            Child::Leaf(l) => Some(*l),
             Child::Punct => None,
+        }
+    }
+
+    /// A head leaf's word.
+    fn word(&self, leaf: HeadLeaf) -> Option<HeadWord> {
+        match self.parse.forest.leaf_reading(leaf?) {
+            LexicalReading::Word(word) => Some((word.lexeme, word.form)),
+            _ => None,
+        }
+    }
+
+    /// A step the Embedding keeps but does not count: an Auxiliary
+    /// Complement or a part of a coordination.
+    fn wrapper(&self, step: &EmbeddingStep) -> bool {
+        let grammar = self.parse.grammar();
+        grammar.production_auxiliary(step.governor) == Some(step.child)
+            || grammar.production_is_coordination(step.governor)
+    }
+
+    /// The whole chain of steps cut after the [`DEPTH`]th that is no
+    /// wrapper.
+    fn cut(&self, chain: &[EmbeddingStep]) -> Embedding {
+        let mut counted = 0;
+        let mut steps = Vec::new();
+        for step in chain {
+            if counted == DEPTH {
+                return Embedding {
+                    steps,
+                    truncated: true,
+                };
+            }
+            counted += usize::from(!self.wrapper(step));
+            steps.push(step.clone());
+        }
+        Embedding {
+            steps,
+            truncated: false,
         }
     }
 
@@ -156,21 +194,22 @@ impl Walk<'_, '_> {
     fn visit(
         &mut self,
         tree: &Tree,
-        above: &Embedding,
-        step: Option<(Ident, usize, Option<HeadWord>)>,
+        above: &[EmbeddingStep],
+        step: Option<(usize, Ident, usize, Option<HeadWord>)>,
     ) {
-        let embedding: Embedding = match step {
-            Some((function, governor, governor_head)) => std::iter::once(EmbeddingStep {
+        let chain: Vec<EmbeddingStep> = match step {
+            Some((child, function, governor, governor_head)) => std::iter::once(EmbeddingStep {
                 projection: tree.production,
+                child,
                 function,
                 governor,
                 governor_head,
             })
             .chain(above.iter().cloned())
-            .take(EMBEDDING_DEPTH)
             .collect(),
-            None => above.clone(),
+            None => above.to_vec(),
         };
+        let embedding = self.cut(&chain);
         let key = (tree.node, tree.alternative);
         *self
             .found
@@ -185,16 +224,16 @@ impl Walk<'_, '_> {
         *self
             .found
             .embeddings
-            .entry((key.0, key.1, embedding.clone()))
+            .entry((key.0, key.1, embedding))
             .or_default() += 1;
-        let head = self.head(tree);
+        let head = self.word(self.head(tree));
         let functions = self.parse.grammar().production_functions(tree.production);
         for (at, child) in tree.children.iter().enumerate() {
             let Child::Tree(t) = child else { continue };
             if functions[at] == "head" {
-                self.visit(t, &embedding, None);
+                self.visit(t, &chain, None);
             } else {
-                self.visit(t, &embedding, Some((functions[at], tree.production, head)));
+                self.visit(t, &chain, Some((at, functions[at], tree.production, head)));
             }
         }
     }
@@ -207,6 +246,7 @@ fn alternatives_distributions_agree_with_enumerated_derivations_on_real_units() 
     let corpus = Corpus::load(|face| SAMPLE.contains(&face.card.as_str())).unwrap();
     let cleaves = sylex_english::census::cleave_texts(&corpus, &env.lexicon);
     let mut most = 0;
+    let (mut truncated, mut wrapped) = (false, false);
     for (unit, cleave) in corpus.units.iter().zip(&cleaves) {
         let face = &corpus.faces[unit.face];
         let text = cleave
@@ -224,13 +264,25 @@ fn alternatives_distributions_agree_with_enumerated_derivations_on_real_units() 
         let roots: Vec<usize> = parse.forest.roots().to_vec();
         for root in roots {
             for tree in trees(&parse, root, &mut memo) {
-                walk.visit(&tree, &Vec::new(), None);
+                walk.visit(&tree, &[], None);
             }
         }
-        let found = walk.found;
         let heads = parse.alternative_heads().unwrap();
         let conjuncts = parse.alternative_conjuncts().unwrap();
-        let embeddings = parse.alternative_embeddings().unwrap();
+        let embeddings = parse
+            .alternative_embeddings(DEPTH, |step| walk.wrapper(step))
+            .unwrap();
+        truncated |= embeddings
+            .iter()
+            .flatten()
+            .flat_map(|d| d.keys())
+            .any(|e| e.truncated);
+        wrapped |= embeddings
+            .iter()
+            .flatten()
+            .flat_map(|d| d.keys())
+            .any(|e| e.steps.iter().any(|step| walk.wrapper(step)));
+        let found = walk.found;
         let name = format!("{} | {text}", face.name);
         let mut computed = Found::default();
         for node in (0..parse.forest.node_count()).filter(|&n| counts.node(n) > 0) {
@@ -257,4 +309,8 @@ fn alternatives_distributions_agree_with_enumerated_derivations_on_real_units() 
         assert_eq!(computed.embeddings, found.embeddings, "embeddings: {name}");
     }
     assert!(most > 1000, "{most}");
+    assert!(
+        truncated && wrapped,
+        "truncated {truncated}, wrapped {wrapped}"
+    );
 }

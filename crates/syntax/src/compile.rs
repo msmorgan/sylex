@@ -222,11 +222,35 @@ impl CompiledGrammar {
         &self.productions[production].names
     }
 
+    /// Whether a Production builds the part of a frame's phrase before an
+    /// interleaved dependent (`/prefixN`): no whole phrase, but the head of
+    /// its `/interleaved` Production, which shares its head word.
+    #[must_use]
+    pub fn production_is_interleaved_prefix(&self, production: usize) -> bool {
+        self.productions[production].interleaved_prefix
+    }
+
     /// Whether a Production builds a serial or polysyndetic tail of a
     /// coordination (*…, [B, and C]*), not a whole coordination.
     #[must_use]
     pub fn production_is_tail(&self, production: usize) -> bool {
         self.productions[production].tail
+    }
+
+    /// The Auxiliary Complement child of a Production: the participial Verb
+    /// Phrase Complement of perfect *have* or of passive or progressive *be*.
+    #[must_use]
+    pub fn production_auxiliary(&self, production: usize) -> Option<usize> {
+        self.productions[production].auxiliary
+    }
+
+    /// Whether a Production builds a coordination or a part of one: its
+    /// children are conjuncts, the coordinator and the tails they continue
+    /// in.
+    #[must_use]
+    pub fn production_is_coordination(&self, production: usize) -> bool {
+        let production = &self.productions[production];
+        production.coordinator.is_some() || production.tail
     }
 
     /// The index of a Production's `head` child, the one a head word is
@@ -368,6 +392,9 @@ struct Draft {
     delimits: bool,
     /// A serial tail of a coordination, whose `first` conjunct follows another.
     tail: bool,
+    /// The part of a frame's phrase before an interleaved dependent, which
+    /// only its `/interleaved` Production takes, as its head.
+    interleaved_prefix: bool,
     /// Conjuncts that must not all share a feature value
     /// (`Production::unlike`).
     unlike: Option<Unlike>,
@@ -503,6 +530,7 @@ impl Draft {
             unshared: Vec::new(),
             delimits: false,
             tail: false,
+            interleaved_prefix: false,
             chained: None,
             gap_preposition: None,
             fills_preposition: None,
@@ -1992,6 +2020,7 @@ impl<'a> Binder<'a> {
         production.whole_coordination = draft.whole_coordination;
         production.delimits = draft.delimits;
         production.tail = draft.tail;
+        production.interleaved_prefix = draft.interleaved_prefix;
         production.chained = draft.chained;
         production.gap_preposition = draft.gap_preposition;
         production.fills_preposition = draft.fills_preposition;
@@ -3332,6 +3361,7 @@ impl<'a> Binder<'a> {
         };
         let mut prefix = base.clone();
         prefix.id = Ident::new(id);
+        prefix.interleaved_prefix = true;
         let a = prefix.child(function, symbol(adjunct, Some(host)), GapRule::Closed);
         prefix.host_check = Some((0, a, host));
         prefix.adjunct_unfit = self.unfit(adjunct)?;

@@ -33,8 +33,10 @@ use crate::counts::Vertex;
 /// them in a Reading.
 pub type HeadWord = (LexemeId, WordForm);
 
-/// The number of [`EmbeddingStep`]s an Embedding keeps, nearest first.
-pub const EMBEDDING_DEPTH: usize = 3;
+/// A head leaf: the leaf reached by following `head` children down, by its
+/// index in the forest; `None` where a `head` child is punctuation or there
+/// is no `head` child.
+pub type HeadLeaf = Option<usize>;
 
 /// One dependent function a Constituent stands under: going up from it
 /// through `head` children to the top of its head line, the Production
@@ -44,6 +46,8 @@ pub struct EmbeddingStep {
     /// The Production at the top of the head line: the alternative of the
     /// dependent itself.
     pub projection: usize,
+    /// The dependent's position among the governor's children.
+    pub child: usize,
     /// The dependent's function in the governor: its child name.
     pub function: Ident,
     /// The governor's Production.
@@ -53,9 +57,15 @@ pub struct EmbeddingStep {
 }
 
 /// The Embedding of an occurrence of a Constituent: its [`EmbeddingStep`]s,
-/// nearest first, at most [`EMBEDDING_DEPTH`] of them. A root's own head
-/// line stands under none.
-pub type Embedding = Vec<EmbeddingStep>;
+/// nearest first, up to and including the `depth`th step that is no wrapper
+/// ([`Parse::alternative_embeddings`]). A root's own head line stands under
+/// none.
+#[derive(Debug, Clone, Default, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Embedding {
+    pub steps: Vec<EmbeddingStep>,
+    /// Steps above the kept ones were cut.
+    pub truncated: bool,
+}
 
 /// For every node, for each of its alternatives (in the order of
 /// [`crate::PackedForest::node_alternatives`]), a distribution: a count for
@@ -74,6 +84,7 @@ struct Inside<K> {
 /// own alternative fills it.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 struct Pending {
+    child: usize,
     function: Ident,
     governor: usize,
     governor_head: Option<HeadWord>,
@@ -88,15 +99,12 @@ struct Above {
 }
 
 impl Parse<'_> {
-    /// The head words of each alternative ([`HeadWord`]), split over its own
-    /// Derivations; `None` where the head line ends in no word, or there is
-    /// no `head` child.
+    /// The head leaf of each alternative ([`HeadLeaf`]), split over its own
+    /// Derivations.
     ///
     /// # Errors
     /// A [`ForestCycle`] when the reachable forest has a unary cycle.
-    pub fn alternative_heads(
-        &self,
-    ) -> Result<AlternativeDistribution<Option<HeadWord>>, ForestCycle> {
+    pub fn alternative_heads(&self) -> Result<AlternativeDistribution<HeadLeaf>, ForestCycle> {
         let inside = self.head_inside(&self.children_first()?);
         Ok(self.per_alternative(&inside))
     }
@@ -125,7 +133,10 @@ impl Parse<'_> {
     }
 
     /// The [`Embedding`]s of each alternative, split over the ways to
-    /// surround its node.
+    /// surround its node. Each keeps its steps up to the `depth`th one for
+    /// which `wrapper` does not hold: a wrapper step (such as a passive
+    /// auxiliary's Complement, or a conjunct of a coordination) is kept but
+    /// not counted.
     ///
     /// # Errors
     /// A [`ForestCycle`] when the reachable forest has a unary cycle.
@@ -134,6 +145,8 @@ impl Parse<'_> {
     /// When a count overflows `u128`.
     pub fn alternative_embeddings(
         &self,
+        depth: usize,
+        wrapper: impl Fn(&EmbeddingStep) -> bool,
     ) -> Result<AlternativeDistribution<Embedding>, ForestCycle> {
         let order = self.children_first()?;
         let heads = self.head_inside(&order);
@@ -144,10 +157,10 @@ impl Parse<'_> {
             ChildRef::Node(n) => total(&heads.nodes[n]),
             ChildRef::Leaf(_) | ChildRef::Punct => 1,
         };
-        let child_heads = |child: ChildRef| -> Map<Option<HeadWord>> {
+        let child_heads = |child: ChildRef| -> Map<HeadLeaf> {
             match child {
                 ChildRef::Node(n) => heads.nodes[n].clone(),
-                leaf => BTreeMap::from([(self.leaf_head(leaf), 1)]),
+                leaf => BTreeMap::from([(head_leaf(leaf), 1)]),
             }
         };
         let mut result: AlternativeDistribution<Embedding> = forest
@@ -158,12 +171,12 @@ impl Parse<'_> {
         let mut above: Vec<BTreeMap<Above, u128>> = vec![BTreeMap::new(); forest.nodes.len()];
         // Each item's ways to be surrounded, by its Embedding and by the head
         // word its suffix holds when the head comes after its dot.
-        let mut item_above: Vec<BTreeMap<(Embedding, Option<HeadWord>), u128>> =
+        let mut item_above: Vec<BTreeMap<(Embedding, HeadLeaf), u128>> =
             vec![BTreeMap::new(); forest.items.len()];
         for &root in &forest.roots {
             above[root].insert(
                 Above {
-                    steps: Vec::new(),
+                    steps: Embedding::default(),
                     pending: None,
                 },
                 1,
@@ -176,7 +189,7 @@ impl Parse<'_> {
                         forest.nodes[node].families.iter().enumerate()
                     {
                         for (label, &ways) in &above[node] {
-                            let steps = complete(label, production);
+                            let steps = complete(label, production, depth, &wrapper);
                             result[node][index].accumulate(steps.clone(), ways);
                             item_above[item].accumulate((steps, None), ways);
                         }
@@ -192,7 +205,7 @@ impl Parse<'_> {
                     for &(previous, child) in &it.families {
                         for ((steps, suffix_head), &ways) in &surrounding {
                             if let Some(p) = previous {
-                                let suffix: Map<Option<HeadWord>> = match head {
+                                let suffix: Map<HeadLeaf> = match head {
                                     Some(h) if h == at => child_heads(child),
                                     Some(h) if h > at => {
                                         BTreeMap::from([(*suffix_head, child_inside(child))])
@@ -212,7 +225,7 @@ impl Parse<'_> {
                                 above[c].accumulate(label, mul(ways, item_inside(previous)));
                                 continue;
                             }
-                            let governor_heads: Map<Option<HeadWord>> = match head {
+                            let governor_heads: Map<HeadLeaf> = match head {
                                 Some(h) if h < at => {
                                     let p = previous
                                         .expect("a child after the head has a previous item");
@@ -225,9 +238,10 @@ impl Parse<'_> {
                                 let label = Above {
                                     steps: steps.clone(),
                                     pending: Some(Pending {
+                                        child: at,
                                         function,
                                         governor: production,
-                                        governor_head,
+                                        governor_head: self.leaf_word(governor_head),
                                     }),
                                 };
                                 above[c].accumulate(label, mul(ways, n));
@@ -240,28 +254,19 @@ impl Parse<'_> {
         Ok(result)
     }
 
-    /// The inside distribution of head words.
-    fn head_inside(&self, order: &[Vertex]) -> Inside<Option<HeadWord>> {
+    /// The inside distribution of head leaves.
+    fn head_inside(&self, order: &[Vertex]) -> Inside<HeadLeaf> {
         let grammar = self.grammar;
-        self.inside(
-            order,
-            None,
-            |leaf| self.leaf_head(leaf),
-            |production, at, before, child| {
-                if grammar.head_index(production) == Some(at) { *child } else { *before }
-            },
-        )
+        self.inside(order, None, head_leaf, |production, at, before, child| {
+            if grammar.head_index(production) == Some(at) { *child } else { *before }
+        })
     }
 
-    /// The head word a leaf child is: a word's lexeme and form.
-    fn leaf_head(&self, child: ChildRef) -> Option<HeadWord> {
-        match child {
-            ChildRef::Leaf(leaf) => match &self.forest.leaves[leaf].reading {
-                LexicalReading::Word(value) => Some((value.lexeme, value.form)),
-                LexicalReading::FlavorWord { .. } | LexicalReading::Numeral { .. } => None,
-            },
-            ChildRef::Punct => None,
-            ChildRef::Node(_) => unreachable!("a node child is no leaf"),
+    /// The head word a head leaf is: a word's lexeme and form.
+    fn leaf_word(&self, leaf: HeadLeaf) -> Option<HeadWord> {
+        match &self.forest.leaves[leaf?].reading {
+            LexicalReading::Word(value) => Some((value.lexeme, value.form)),
+            LexicalReading::FlavorWord { .. } | LexicalReading::Numeral { .. } => None,
         }
     }
 
@@ -336,22 +341,45 @@ impl Parse<'_> {
     }
 }
 
+/// The head leaf a leaf or punctuation child is.
+fn head_leaf(child: ChildRef) -> HeadLeaf {
+    match child {
+        ChildRef::Leaf(leaf) => Some(leaf),
+        ChildRef::Punct => None,
+        ChildRef::Node(_) => unreachable!("a node child is no leaf"),
+    }
+}
+
 /// A node's Embedding once its alternative is `production`: the pending
-/// step, if any, completed and pushed in front, keeping the nearest
-/// [`EMBEDDING_DEPTH`].
-fn complete(label: &Above, production: usize) -> Embedding {
+/// step, if any, completed and pushed in front, keeping the steps up to the
+/// `depth`th that is no wrapper.
+fn complete(
+    label: &Above,
+    production: usize,
+    depth: usize,
+    wrapper: &impl Fn(&EmbeddingStep) -> bool,
+) -> Embedding {
     let Some(pending) = &label.pending else {
         return label.steps.clone();
     };
-    std::iter::once(EmbeddingStep {
+    let mut steps = vec![EmbeddingStep {
         projection: production,
+        child: pending.child,
         function: pending.function,
         governor: pending.governor,
         governor_head: pending.governor_head,
-    })
-    .chain(label.steps.iter().cloned())
-    .take(EMBEDDING_DEPTH)
-    .collect()
+    }];
+    let mut counted = usize::from(!wrapper(&steps[0]));
+    let mut truncated = label.steps.truncated;
+    for step in &label.steps.steps {
+        if counted == depth {
+            truncated = true;
+            break;
+        }
+        counted += usize::from(!wrapper(step));
+        steps.push(step.clone());
+    }
+    Embedding { steps, truncated }
 }
 
 fn total<K>(map: &Map<K>) -> u128 {

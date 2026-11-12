@@ -62,7 +62,10 @@ still a point of choice.
 Of a Constituent in one Derivation: the dependent functions it stands under,
 nearest first, each the function the top of a head line bears in its
 governor, as *die* in *If a creature would die* stands as the Complement of
-*would*, itself in the Complement of *if*.
+*would*, itself in the Complement of *if*. It is kept to a fixed number of
+steps that are no wrapper (a step such as a conjunct's or a passive
+auxiliary's Complement, kept but not counted), and says when steps above
+were cut.
 
 **Preference**:
 A ranking over admitted Readings. It orders them and never adds or removes

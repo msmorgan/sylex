@@ -321,6 +321,9 @@ pub(crate) struct Production {
     /// It is a serial tail of a coordination (*…, [B, and C]*): its `first`
     /// conjunct is a middle one, after the initial conjunct.
     pub tail: bool,
+    /// It builds the part of a frame's phrase before an interleaved
+    /// dependent, which only its `/interleaved` Production takes.
+    pub interleaved_prefix: bool,
     /// A polysyndetic tail child that must repeat the mother's coordinator.
     pub chained: Option<usize>,
     /// The preposition of the Preposition Phrase Complement it extracts.
@@ -577,6 +580,7 @@ pub(crate) fn resolve(
         whole_coordination: Vec::new(),
         delimits: false,
         tail: false,
+        interleaved_prefix: false,
         chained: None,
         gap_preposition: None,
         fills_preposition: None,
