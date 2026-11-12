@@ -6,7 +6,8 @@
 // `ADR` is `docs/decisions/english.md`.
 root Document
 
-// A keyword mention may omit parameters; a Keyword Line supplies them.
+// Whether a keyword phrase carries a Keyword Parameter (*protection from
+// red*) or none (*flying*; a Keyword Mention, *with flashback*).
 feature KeywordForm = Bare | Parametric
 // `SetOff` kinds follow an em dash: a set-off cost ends in its own period,
 // a set-off ability runs to the end of the line (OSG §3, Periods).
@@ -682,11 +683,12 @@ CardTypeModifier: TypeModifier -> Class(CardType) where head.Number = Singular
 SupertypeModifier: TypeModifier -> Class(Supertype)
 NegativeTypeModifier: TypeModifier -> prefix:Lex(Affix) TypeModifier
 IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal where head.Number = Singular
-// A keyword with an em-dash ability never premodifies (OSG §14, Keyword
-// abilities); one ending in its Cost does so only without it (*a disturb
-// cost*).
+// A keyword premodifies only without its Keyword Parameters (*a disturb
+// cost*), never with them (*[protection from each of the exiled card's]
+// card types*, Mirror Golem). `=`, so a keyword coordination, which leaves
+// KeywordForm unvalued, passes (*an eternalize or embalm ability*).
 KeywordPremodifier: BareNominal -> modifier:KeywordPhrase BareNominal
-    where modifier.FinalParameter != SetOffAbility | Cost
+    where modifier.KeywordForm = Bare
 // Quoted wording mentioned as a term: a keyword or cited-word premodifier
 // (*all "bands with other" abilities*, *a "left" pile*), a cited word
 // (*choose "left" or "right."*) or a singular nominal (*the "legend rule"*,
@@ -694,7 +696,7 @@ KeywordPremodifier: BareNominal -> modifier:KeywordPhrase BareNominal
 // ability's (*have "bands with other legendary creatures."*), never a
 // term's.
 QuotedKeywordPremodifier: BareNominal -> modifier:"KeywordPhrase" BareNominal
-    where modifier.FinalParameter != SetOffAbility | Cost
+    where modifier.KeywordForm = Bare
 QuotedMentionPremodifier: BareNominal -> modifier:"Mention" BareNominal
 QuotedMention: Mention -> "Mention"
 QuotedNominal: BareNominal -> "BareNominal" where head.Number = Singular
@@ -815,7 +817,7 @@ ChapterModalHeader: Document -> chapters:Chapters '—':Free ModalHeader
 
 CompleteKeywordPhrase: KeywordPhrase -> KeywordParameters
 CompleteKeywordItem: KeywordLineItem -> KeywordParameters
-BareKeywordMention: KeywordPhrase -> Class(ParameterizedKeyword)
+BareKeywordMention: KeywordPhrase -> Class(ParameterizedKeyword) where $.KeywordForm = Bare
 // A granted ability quoted whole, its period inside the closing mark (*has
 // "{T}: Add {G}."*; [CR#113.1a]).
 QuotedAbility: QuotedAbility -> "Ability"
@@ -1194,10 +1196,11 @@ MeasureNounPhrase: MeasureNounPhrase -> Measure
 WordPartCoordination: BareNominal -> CompoundCoordination
 // A counter's first base is its name [CR#122.1]: a keyword, or a slash
 // measure for a +X/+Y counter [CR#122.1a,122.1b]. It is `modifier`: it
-// modifies the head noun the conjuncts share, which it never heads.
+// modifies the head noun the conjuncts share, which it never heads. A
+// keyword base is bare, as a KeywordPremodifier is.
 KeywordBase: CompoundConjunct -> modifier:KeywordPhrase
     where $.CompoundPart = Base,
-          modifier.FinalParameter != SetOffAbility | Cost
+          modifier.KeywordForm = Bare
 MeasureBase: CompoundConjunct -> modifier:Measure where $.CompoundPart = Base
 WholeCompound: CompoundConjunct -> Class(SharedHeadCompound) where $.CompoundPart = Whole
 // *Gets twice -X/-X*.

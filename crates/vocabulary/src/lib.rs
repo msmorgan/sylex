@@ -711,10 +711,6 @@ impl Sources {
                         .unwrap()
                         .parameters
                 };
-                lexeme.properties.features.insert(
-                    "KeywordForm".into(),
-                    if parameters.is_empty() { "Bare" } else { "Parametric" }.into(),
-                );
                 if !parameters.is_empty() && parameters.iter().all(|p| !p.is_empty()) {
                     lexeme
                         .properties
@@ -854,22 +850,34 @@ impl Sources {
             }
             vec![parts]
         };
+        let patterns = |parameters: &[Vec<KeywordParameter>]| -> Vec<Vec<ParameterPart>> {
+            if parameters.is_empty() {
+                vec![vec![ParameterPart::Head]]
+            } else {
+                parameters.iter().flat_map(|p| convert(p)).collect()
+            }
+        };
+        // A pattern with any part besides its head carries a Keyword
+        // Parameter; a bound stem is its Keyword Quality.
+        let with_form = |mut parts: Vec<ParameterPart>| {
+            let parametric = parts
+                .iter()
+                .any(|part| !matches!(part, ParameterPart::Head | ParameterPart::Feature(..)));
+            let form = if parametric { "Parametric" } else { "Bare" };
+            parts.push(ParameterPart::Feature("KeywordForm".into(), form.into()));
+            parts
+        };
         for ability in &self.keyword_abilities {
             for (lemma, parameters) in std::iter::once((&ability.lemma, &ability.parameters))
                 .chain(ability.variants.iter().map(|v| (&v.lemma, &v.parameters)))
             {
-                let patterns = if parameters.is_empty() {
-                    vec![vec![ParameterPart::Head]]
-                } else {
-                    parameters.iter().flat_map(|p| convert(p)).collect()
-                };
-                frames
-                    .parameters
-                    .insert(format!("keyword:{lemma}").as_str().into(), patterns);
+                frames.parameters.insert(
+                    format!("keyword:{lemma}").as_str().into(),
+                    patterns(parameters).into_iter().map(with_form).collect(),
+                );
             }
             if let Some(bound) = &ability.bound {
-                let patterns =
-                    frames.parameters[format!("keyword:{}", ability.lemma).as_str()].clone();
+                let patterns = patterns(&ability.parameters);
                 let stems: std::collections::BTreeSet<_> = bound
                     .stems
                     .iter()
@@ -887,7 +895,7 @@ impl Sources {
                                 SlotKind::Quality,
                             ),
                         );
-                        parts
+                        with_form(parts)
                     })
                     .collect();
                 frames.parameters.insert(
