@@ -478,6 +478,12 @@ pub(crate) struct Production {
     /// The first `uncoordinated` child it declares, over which Reading
     /// Normal Form distributes a coordination of that child.
     pub distributed: Option<usize>,
+    /// A frame-headed Production's id as binding built it: its phrase, its
+    /// Valence Alternation and what its id adds after the frame name.
+    pub frame_variant: Option<crate::compile::FrameVariant>,
+    /// The Frame Slot it extracts, as its id numbers it (`/gapN`), which a
+    /// derived phrase keeps.
+    pub gap_slot: Option<usize>,
     /// Combinations of (child, feature, value) conditions that may not all
     /// hold: each exclusion is the run of `joint_conditions` up to its end
     /// index.
@@ -785,6 +791,8 @@ pub(crate) fn resolve(
     Ok(Production {
         slots,
         distributed: None,
+        frame_variant: None,
+        gap_slot: None,
         joint_exclusions: Vec::new(),
         joint_conditions: Vec::new(),
         resolutions: Vec::new(),

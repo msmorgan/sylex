@@ -350,24 +350,21 @@ impl CompiledGrammar {
     /// (empty for the frame's own phrase).
     ///
     /// # Panics
-    /// When the id of a frame-headed Production does not contain its
-    /// frame's name.
+    /// Never for a bound grammar, which gives every frame-headed Production
+    /// its frame variant (`Production::frame_variant`).
     #[must_use]
     pub fn production_frame(&self, production: usize) -> Option<(&Frame, String, &str)> {
         let production = &self.productions[production];
         let frame = &self.frames[production.frame?];
-        let label = frame_label(frame);
-        let (_, variant) = production
-            .id
-            .as_str()
-            .split_once(&label)
-            .unwrap_or_else(|| {
-                panic!(
-                    "frame-headed Production `{}` does not name its frame `{label}`",
-                    production.id
-                )
-            });
-        Some((frame, label, variant.trim_start_matches('/')))
+        let variant = production
+            .frame_variant
+            .as_ref()
+            .expect("binding gives every frame Production its frame variant");
+        Some((
+            frame,
+            frame_label(frame),
+            variant.variant.trim_start_matches('/'),
+        ))
     }
 }
 
@@ -559,6 +556,13 @@ struct Draft {
     /// Whether a Valence schema's `central` Adjunct derives a variant of
     /// this phrase, and which heads that variant takes.
     central_site: CentralSite,
+    /// A frame phrase's id as built (`Production::frame_variant`).
+    frame_variant: Option<FrameVariant>,
+    /// The Frame Slot it extracts, as its id numbers it
+    /// (`Production::gap_slot`).
+    gap_slot: Option<usize>,
+    /// It postposes its Object (`SchemaDecl::Valence::heavy_shift`).
+    shifted_object: bool,
 }
 
 /// What a Valence schema declares its derived phrases carry, beyond their
@@ -670,7 +674,30 @@ impl Draft {
             remnant: crate::step::RemnantRole::None,
             parallel: false,
             central_site: CentralSite::None,
+            frame_variant: None,
+            gap_slot: None,
+            shifted_object: false,
         }
+    }
+
+    /// Appends `/segment` to its id, and to its frame variant where it has
+    /// one, so that the two agree.
+    fn extend_id(&mut self, segment: &str) {
+        self.id = Ident::new(&format!("{}/{segment}", self.id));
+        if let Some(frame_variant) = &mut self.frame_variant {
+            frame_variant.variant.push('/');
+            frame_variant.variant.push_str(segment);
+        }
+    }
+
+    /// Whether it is a derived phrase of a frame: a passive, an Adjectival
+    /// Passive, or a phrase with a Gap where a Frame Slot was.
+    fn derived(&self) -> bool {
+        self.gap_slot.is_some()
+            || self
+                .frame_variant
+                .as_ref()
+                .is_some_and(|v| v.alternation != Alternation::Active)
     }
 
     fn child(&mut self, name: &str, symbol: Symbol, gap: GapRule) -> usize {
@@ -1158,6 +1185,14 @@ impl<'a> Binder<'a> {
                 ))
             })?;
         Ok(u16::try_from(index).expect("feature domains are small"))
+    }
+
+    /// A frame phrase's draft, its id built from `variant`.
+    fn framed(&self, variant: FrameVariant, frame: usize, lhs: usize, cost: u32) -> Draft {
+        let mut draft = Draft::new(variant.id(&self.out.frames[frame]), lhs, cost);
+        draft.frame = Some(frame);
+        draft.frame_variant = Some(variant);
+        draft
     }
 
     /// Restricts child `child`, a derived unlike Frame Slot, to coordinations
@@ -2129,6 +2164,18 @@ impl<'a> Binder<'a> {
         .map_err(|e| invalid(format!("production `{}`: {e}", draft.id)))?;
         gate_slots(&mut production, &mut draft)
             .map_err(|e| invalid(format!("production `{}`: {e}", draft.id)))?;
+        match (draft.frame, &draft.frame_variant) {
+            (Some(frame), Some(variant)) if variant.id(&self.out.frames[frame]) == draft.id.as_str() => {}
+            (None, None) => {}
+            _ => {
+                return Err(invalid(format!(
+                    "production `{}`: its frame and the frame variant it was built as disagree",
+                    draft.id
+                )));
+            }
+        }
+        production.frame_variant = draft.frame_variant.take();
+        production.gap_slot = draft.gap_slot;
         let conditions: usize = draft.joint_exclusions.iter().map(Vec::len).sum();
         if conditions > crate::step::MAX_JOINT_CONDITIONS {
             return Err(invalid(format!(
@@ -2856,7 +2903,7 @@ impl<'a> Binder<'a> {
             }
         };
         let mut binary = draft.clone();
-        binary.id = Ident::new(&format!("{}/coordinated", draft.id));
+        binary.extend_id("coordinated");
         binary.child(
             "coordinator",
             Symbol::Leaf(coordinator.clone()),
@@ -2871,7 +2918,7 @@ impl<'a> Binder<'a> {
             host: None,
         };
         let mut serial = draft.clone();
-        serial.id = Ident::new(&format!("{}/serial", draft.id));
+        serial.extend_id("serial");
         serial.child(
             "",
             Symbol::Punct(',', Binding::Suffix, None),
@@ -2954,7 +3001,11 @@ impl<'a> Binder<'a> {
             if head != LexicalCategory::Verb && frame.family == FrameFamily::Intransitive {
                 continue;
             }
-            let name = frame_name(phrase, frame);
+            let active = FrameVariant {
+                phrase: Ident::new(phrase),
+                alternation: Alternation::Active,
+                variant: String::new(),
+            };
             let slots: Vec<&SlotFill> = frame.slots.iter().map(|s| &s.fill).collect();
             // A verb's NP-like Complements are extracted; a noun's single
             // *of*-like Preposition Phrase Complement is shared by Right Node
@@ -2964,7 +3015,7 @@ impl<'a> Binder<'a> {
             // Active, with every NP slot optionally extracted.
             let mut family = self.valence_family(
                 lhs,
-                &name,
+                &active,
                 index,
                 cost,
                 &slots,
@@ -3021,7 +3072,7 @@ impl<'a> Binder<'a> {
                     let tag = if agent { "passive+by" } else { "passive" };
                     drafts.extend(self.valence_family(
                         lhs,
-                        &format!("{name}/{tag}"),
+                        &active.derive(Alternation::Passive { by: agent }, tag),
                         index,
                         cost,
                         &rest,
@@ -3036,7 +3087,7 @@ impl<'a> Binder<'a> {
                     && slots.len() == 1
                 {
                     drafts.extend(
-                        self.adjectival_passive(adjectival, &name, index, cost, equations, &by_pp)?,
+                        self.adjectival_passive(adjectival, &active, index, cost, equations, &by_pp)?,
                     );
                 }
             }
@@ -3044,7 +3095,9 @@ impl<'a> Binder<'a> {
                 && frame.family == FrameFamily::Prepositional
                 && let [fill @ SlotFill::PP(..)] = slots.as_slice()
             {
-                drafts.extend(self.prepositional_passive(lhs, &name, index, cost, fill, passive)?);
+                drafts.extend(self.prepositional_passive(
+                    lhs, &active, index, cost, fill, passive,
+                )?);
             }
         }
         Ok(drafts)
@@ -3057,7 +3110,7 @@ impl<'a> Binder<'a> {
     fn prepositional_passive(
         &self,
         lhs: usize,
-        name: &str,
+        active: &FrameVariant,
         frame: usize,
         cost: u32,
         fill: &SlotFill,
@@ -3068,8 +3121,8 @@ impl<'a> Binder<'a> {
         let mut drafts = Vec::new();
         for agent in [false, true] {
             let tag = if agent { "passive+by" } else { "passive" };
-            let mut draft = Draft::new(format!("{name}/{tag}"), lhs, cost);
-            draft.frame = Some(frame);
+            let variant = active.derive(Alternation::Passive { by: agent }, tag);
+            let mut draft = self.framed(variant, frame, lhs, cost);
             draft.child("head", Symbol::Leaf(Test::Frame(frame)), GapRule::Closed);
             let child = draft.child(
                 relation_name(relation),
@@ -3172,6 +3225,7 @@ impl<'a> Binder<'a> {
                     GapRule::Closed,
                 );
                 stranded.introduces = if amount { Gap::Amount } else { Gap::NP };
+                stranded.gap_slot = Some(0);
                 // It names the Slot Kind of the Complement it strands.
                 if let Some(f) = complement_kind {
                     let kind = self.kind_value(f, frame.complement.kind())?;
@@ -3202,7 +3256,7 @@ impl<'a> Binder<'a> {
         let fill = &self.out.preposition_frames[frame].complement;
         let fault = |why: String| self.plural_fault(frame, &why);
         let mut coordinated = draft.clone();
-        coordinated.id = Ident::new(&format!("{}/coordinated", draft.id));
+        coordinated.extend_id("coordinated");
         coordinated.whole_coordination.push((child, true));
         match fill.kind() {
             SlotKind::KeywordPhrase
@@ -3232,7 +3286,7 @@ impl<'a> Binder<'a> {
             )));
         }
         let mut plural = draft.clone();
-        plural.id = Ident::new(&format!("{}/number", draft.id));
+        plural.extend_id("number");
         plural.whole_coordination.push((child, false));
         let value = self.value(number, "Plural")?;
         plural
@@ -3291,7 +3345,7 @@ impl<'a> Binder<'a> {
     fn adjectival_passive(
         &self,
         category: &str,
-        name: &str,
+        active: &FrameVariant,
         frame: usize,
         cost: u32,
         equations: &[Equation],
@@ -3301,8 +3355,8 @@ impl<'a> Binder<'a> {
         let mut drafts = Vec::new();
         for agent in [false, true] {
             let tag = if agent { "adjectival+by" } else { "adjectival" };
-            let mut draft = Draft::new(format!("{name}/{tag}"), lhs, cost);
-            draft.frame = Some(frame);
+            let variant = active.derive(Alternation::Adjectival { by: agent }, tag);
+            let mut draft = self.framed(variant, frame, lhs, cost);
             draft.child("head", Symbol::Leaf(Test::Frame(frame)), GapRule::Closed);
             if agent {
                 draft.internalised =
@@ -3323,7 +3377,7 @@ impl<'a> Binder<'a> {
     fn valence_family(
         &self,
         lhs: usize,
-        name: &str,
+        variant: &FrameVariant,
         frame: usize,
         cost: u32,
         slots: &[&SlotFill],
@@ -3368,12 +3422,11 @@ impl<'a> Binder<'a> {
             if gap.is_some() && gap == agent_slot {
                 continue;
             }
-            let id = match gap {
-                None => name.to_owned(),
-                Some(i) => format!("{name}/gap{i}"),
-            };
-            let mut draft = Draft::new(id, lhs, cost);
-            draft.frame = Some(frame);
+            let mut draft = self.framed(variant.clone(), frame, lhs, cost);
+            if let Some(i) = gap {
+                draft.extend_id(&format!("gap{i}"));
+                draft.gap_slot = Some(i);
+            }
             // A reduced auxiliary clitic (*'s*, *'re*, *'ve*) never stands
             // immediately before a Gap (CGEL, Ch. 18 §6.2.1, p. 1615): an
             // extracting head is a free word.
@@ -3458,7 +3511,7 @@ impl<'a> Binder<'a> {
                     continue;
                 }
                 let mut reordered = draft.clone();
-                reordered.id = Ident::new(&format!("{}/internalised-before{before}", draft.id));
+                reordered.extend_id(&format!("internalised-before{before}"));
                 let child = reordered.children.remove(agent);
                 reordered.children.insert(before, child);
                 remap_draft(&mut reordered, |i| {
@@ -3482,7 +3535,7 @@ impl<'a> Binder<'a> {
     fn interleaved_dependent(
         &self,
         base: &Draft,
-        id: &str,
+        segment: &str,
         category: usize,
         adjunct: usize,
         function: &str,
@@ -3495,7 +3548,7 @@ impl<'a> Binder<'a> {
             prepositions: None,
         };
         let mut prefix = base.clone();
-        prefix.id = Ident::new(id);
+        prefix.extend_id(segment);
         prefix.interleaved_prefix = true;
         let a = prefix.child(function, symbol(adjunct, Some(host)), GapRule::Closed);
         prefix.host_check = Some((0, a, host));
@@ -3513,7 +3566,7 @@ impl<'a> Binder<'a> {
                 .equations
                 .push((Path::Mother(feature), Target::Path(Path::Child(a, feature))));
         }
-        let mut more = Draft::new(format!("{id}/more"), category, 2);
+        let mut more = Draft::new(format!("{}/more", prefix.id), category, 2);
         more.child("head", symbol(category, None), GapRule::Transparent);
         more.child(function, symbol(adjunct, Some(host)), GapRule::Closed);
         more.host_check = Some((0, 1, host));
@@ -3574,7 +3627,8 @@ impl<'a> Binder<'a> {
                     .all(|i| pp(&draft.children[i]) || draft.predicative == Some(i))
             {
                 let mut shifted = draft.clone();
-                shifted.id = Ident::new(&format!("{}/shifted-object", shifted.id));
+                shifted.extend_id("shifted-object");
+                shifted.shifted_object = true;
                 let object = shifted.children.remove(1);
                 shifted.children.push(object);
                 // The postposed Object follows any Gap.
@@ -3616,8 +3670,7 @@ impl<'a> Binder<'a> {
                         prepositions: Some(_),
                         ..
                     }
-                ) || (draft.id.ends_with("/shifted-object")
-                    && draft.children[split].name == "object"))
+                ) || (draft.shifted_object && draft.children[split].name == "object"))
                 {
                     continue;
                 }
@@ -3663,13 +3716,13 @@ impl<'a> Binder<'a> {
                 for (adjunct, suffix) in std::iter::once((adjunct, ""))
                     .chain(before_internalised.map(|c| (c, "/internalised")))
                 {
-                    let id = format!("{}/prefix{split}{suffix}", draft.id);
-                    out.extend(
-                        self.interleaved_dependent(&base, &id, category, adjunct, function, host)?,
-                    );
+                    let segment = format!("prefix{split}{suffix}");
+                    out.extend(self.interleaved_dependent(
+                        &base, &segment, category, adjunct, function, host,
+                    )?);
                 }
                 let mut suffix = draft.clone();
-                suffix.id = Ident::new(&format!("{}/interleaved{split}", draft.id));
+                suffix.extend_id(&format!("interleaved{split}"));
                 suffix.children.drain(..split);
                 suffix.children.insert(
                     0,
@@ -4805,7 +4858,7 @@ fn postposed_modifier(draft: &Draft, postposed: usize) -> Option<Draft> {
         return None;
     }
     let mut postposing = draft.clone();
-    postposing.id = Ident::new(&format!("{}/postposed", draft.id));
+    postposing.extend_id("postposed");
     postposing.child(
         "modifier",
         Symbol::Cat {
@@ -4882,11 +4935,10 @@ const CLUSTER_ADJUNCTS: usize = 2;
 /// Slots move into the Cluster; those on the head and the mother stay with the
 /// head.
 fn complement_clusters(draft: &Draft, categories: &ClusterCategories) -> Vec<Draft> {
-    let derived = ["/gap", "/passive", "/adjectival"];
     let Some(frame) = draft.frame else {
         return Vec::new();
     };
-    if derived.iter().any(|d| draft.id.contains(d)) || draft.children[0].name != "head" {
+    if draft.derived() || draft.children[0].name != "head" {
         return Vec::new();
     }
     if draft.children.len() < 2 {
@@ -4986,7 +5038,9 @@ fn complement_clusters(draft: &Draft, categories: &ClusterCategories) -> Vec<Dra
     if out.is_empty() {
         return out;
     }
-    let mut whole = Draft::new(format!("{}/clusters", draft.id), draft.lhs, draft.cost);
+    let mut whole = Draft::new(draft.id.as_str(), draft.lhs, draft.cost);
+    whole.frame_variant.clone_from(&draft.frame_variant);
+    whole.extend_id("clusters");
     whole.child("head", draft.children[0].symbol.clone(), GapRule::Closed);
     let at = whole.child("clusters", symbol(categories.coordination), GapRule::Closed);
     for (path, target) in &draft.equations {
@@ -5040,11 +5094,9 @@ fn adjunct_clusters(draft: &Draft, frame: usize, categories: &ClusterCategories)
         draft.cluster = Some(frame);
         out.push(draft);
     }
-    let mut whole = Draft::new(
-        format!("{}/adjunct-clusters", draft.id),
-        draft.lhs,
-        draft.cost,
-    );
+    let mut whole = Draft::new(draft.id.as_str(), draft.lhs, draft.cost);
+    whole.frame_variant.clone_from(&draft.frame_variant);
+    whole.extend_id("adjunct-clusters");
     whole.child("head", draft.children[0].symbol.clone(), GapRule::Closed);
     let at = whole.child("clusters", symbol(coordination, None), GapRule::Closed);
     whole.equations.extend(draft.equations.iter().cloned());
@@ -5070,7 +5122,6 @@ fn adjunct_clusters(draft: &Draft, frame: usize, categories: &ClusterCategories)
 /// phrase shares with the remnants after it (`RemnantRole::SharesHead`).
 fn phrase_remnants(draft: &mut Draft, remnants: &[(usize, usize)]) -> Vec<Draft> {
     use crate::step::Elided;
-    let derived = ["/gap", "/passive", "/adjectival"];
     let index = |i: usize| u16::try_from(i).expect("frame index fits");
     let elided = match (draft.frame, draft.children.first().map(|c| &c.symbol)) {
         (Some(frame), _) => Elided::Frame(index(frame)),
@@ -5080,7 +5131,7 @@ fn phrase_remnants(draft: &mut Draft, remnants: &[(usize, usize)]) -> Vec<Draft>
         _ => return Vec::new(),
     };
     if draft.children.len() < 2
-        || derived.iter().any(|d| draft.id.contains(d))
+        || draft.derived()
         || draft.children[0].name != "head"
     {
         return Vec::new();
@@ -5243,6 +5294,53 @@ fn adjunct_production_id(schema: &SchemaDecl) -> String {
         delimiter.map_or(String::new(), |c| format!("/{c}")),
         if *nonfinal { "/nonfinal" } else { "" }
     )
+}
+
+/// A frame Production's id as binding builds it, structurally: the Valence
+/// phrase whose frame name (`frame_name`) begins it, the Valence Alternation
+/// it derives, and what its id adds after the frame name.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct FrameVariant {
+    /// The Valence schema's phrase, as its frame names spell it.
+    pub phrase: Ident,
+    pub alternation: Alternation,
+    /// What the id adds after the frame's name, each part after a slash:
+    /// empty for the frame's own phrase, `/passive+by`, `/passive/gap1`.
+    pub variant: String,
+}
+
+/// The Valence Alternation a frame Production derives.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Alternation {
+    Active,
+    /// A verbal or prepositional passive, `by` with its Internalised
+    /// Complement.
+    Passive { by: bool },
+    /// An Adjectival Passive, `by` with its Internalised Complement.
+    Adjectival { by: bool },
+}
+
+impl Alternation {
+    /// Whether it has an Internalised Complement: a passive with *by*.
+    pub(crate) fn by(self) -> bool {
+        matches!(self, Self::Passive { by: true } | Self::Adjectival { by: true })
+    }
+}
+
+impl FrameVariant {
+    /// This frame Production's id, for its frame.
+    pub(crate) fn id(&self, frame: &Frame) -> String {
+        format!("{}{}", frame_name(&self.phrase, frame), self.variant)
+    }
+
+    /// The alternation `tag` names, derived from this variant.
+    fn derive(&self, alternation: Alternation, tag: &str) -> Self {
+        Self {
+            phrase: self.phrase,
+            alternation,
+            variant: format!("{}/{tag}", self.variant),
+        }
+    }
 }
 
 pub(crate) fn frame_name(phrase: &str, frame: &Frame) -> String {
@@ -5524,7 +5622,7 @@ fn central_adjuncts(
             )));
         }
         let mut variant = draft.clone();
-        variant.id = Ident::new(&format!("{}/central", draft.id));
+        variant.extend_id("central");
         variant.central_site = CentralSite::None;
         variant.children[0].symbol = match (&draft.children[0].symbol, draft.central_site) {
             (symbol, CentralSite::AnyHead) => symbol.clone(),

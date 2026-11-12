@@ -39,7 +39,6 @@ use dpsi::Ident;
 use sylex_lexicon::LexicalReading;
 
 use crate::compile::CompiledGrammar;
-use crate::compile::frame_name;
 use crate::frames::FrameSlot;
 use crate::frames::SlotFill;
 use crate::frames::SlotRelation;
@@ -91,16 +90,35 @@ impl NormalForms {
             .iter()
             .map(|base| Ident::new(&format!("Coordination:{base}")))
             .collect();
+        // Every frame Production, by the phrase, frame and variant it was
+        // built as.
+        let built: BTreeMap<(Ident, usize, &str), usize> = grammar
+            .productions
+            .iter()
+            .enumerate()
+            .filter_map(|(index, production)| {
+                let variant = production.frame_variant.as_ref()?;
+                let frame = production.frame?;
+                Some(((variant.phrase, frame, variant.variant.as_str()), index))
+            })
+            .collect();
         let links = grammar
             .productions
             .iter()
             .map(|production| {
-                let frame = &grammar.frames[production.frame?];
-                let phrase = grammar.categories[production.lhs];
+                let frame_index = production.frame?;
                 let variant = production
-                    .id
-                    .as_str()
-                    .strip_prefix(&frame_name(&phrase, frame))?;
+                    .frame_variant
+                    .as_ref()
+                    .expect("binding gives every frame Production its frame variant");
+                // Same-head complement priority re-applies only to a phrase
+                // reported under its Valence phrase's own name: not to an
+                // Adjectival Passive, of another Category, nor to a phrase of
+                // a Category reported under its parent's name.
+                if grammar.categories[production.lhs] != variant.phrase {
+                    return None;
+                }
+                let frame = &grammar.frames[frame_index];
                 let longer = grammar
                     .frames
                     .iter()
@@ -116,13 +134,13 @@ impl NormalForms {
                                 })
                             )
                     })
-                    .map(|(index, longer)| {
-                        let id = format!("{}{variant}", frame_name(&phrase, longer));
-                        (index, grammar.production_index(Ident::new(&id)))
+                    .map(|(index, _)| {
+                        let key = (variant.phrase, index, variant.variant.as_str());
+                        (index, built.get(&key).copied())
                     })
                     .collect();
                 Some(FrameLink {
-                    passive_by: variant.contains("+by"),
+                    passive_by: variant.alternation.by(),
                     longer,
                 })
             })
