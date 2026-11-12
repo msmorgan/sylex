@@ -87,15 +87,37 @@ impl GameState {
     }
 
     /// The nth announced target register's live members, in announce order.
-    /// Departed (illegal) targets are
-    /// excluded ([CR#608.2b] partial fizzle; mirrors `StatePredicate::Targets`
-    /// ignoring a gone target), so a wholly-departed slot reads empty and its
-    /// verb no-ops. An out-of-range index reads empty (never-crash).
+    /// Illegal targets are excluded: a resolving entry's targets judged
+    /// illegal read as no object (`GameState::resolving_targets`), and a
+    /// departed one names nothing [CR#608.2b]. A slot whose targets are all
+    /// illegal reads empty and its verb no-ops. An out-of-range index reads
+    /// empty (never-crash).
     fn live_target_slot(&self, frame: &ExecutionFrame, n: usize) -> Vec<ObjectId> {
         self.activation_target_objects(frame.activation, n)
             .into_iter()
             .filter(|&target| self.objects.get(target).is_some())
             .collect()
+    }
+
+    /// A register's object group by position, the positional twin of
+    /// `eval_selection_set`'s `Reg` read: a member that names no object (an
+    /// illegal or departed target, [CR#608.2b]) stays in its place as `None`
+    /// instead of dropping out. A divided effect splits over these positions,
+    /// so an illegal target's share is not dealt to the others [CR#115.7f].
+    pub(crate) fn register_positions(
+        &self,
+        frame: &ExecutionFrame,
+        reference: sylex_core::RefId,
+    ) -> Vec<Option<ObjectId>> {
+        match self.activation_object_positions(frame.activation, reference) {
+            Some(positions) => positions,
+            None if reference.0 >= 6 => self
+                .activation_target_objects(frame.activation, (reference.0 - 6) as usize)
+                .into_iter()
+                .map(|target| self.objects.get(target).map(|_| target))
+                .collect(),
+            None => Vec::new(),
+        }
     }
 
     /// [CR#707.10d]'s could-target set for the stack entry `spell` names —

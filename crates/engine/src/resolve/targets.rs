@@ -1,6 +1,7 @@
 //! Target-set legality: spec bounds, distinctness, and resolution-time
 //! re-checks ([CR#608.2b]).
 
+use slotmap::Key;
 use sylex_core::Count;
 use sylex_core::TargetSpec;
 use sylex_core::Uint;
@@ -10,33 +11,61 @@ use crate::stack::StackEntry;
 use crate::stack::StackObject;
 use crate::state::GameState;
 
+/// A stack entry's targets as judged when it resolves [CR#608.2b,608.3b]:
+/// per slot, in announce order, each target that is still legal for its own
+/// slot, or [`ObjectId::null`] (no object) where it is illegal. Legality is
+/// per slot, so one object chosen for two slots can be illegal for one and
+/// legal for the other (Plague Spores, [CR#608.2b]).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct ResolvingTargets {
+    pub(crate) slots: Vec<Vec<ObjectId>>,
+}
+
+impl ResolvingTargets {
+    /// [CR#608.2b]: an entry whose every target is illegal doesn't resolve.
+    /// An entry that chose no target (every slot "up to" and left empty)
+    /// has no target to be illegal, so it resolves.
+    #[must_use]
+    pub(crate) fn resolves(&self) -> bool {
+        let mut chosen = self.slots.iter().flatten().peekable();
+        chosen.peek().is_none() || chosen.any(|target| !target.is_null())
+    }
+
+    /// [CR#608.3b]: whether any target is illegal. A permanent spell with
+    /// an illegal target doesn't resolve.
+    #[must_use]
+    pub(crate) fn any_illegal(&self) -> bool {
+        self.slots.iter().flatten().any(Key::is_null)
+    }
+}
+
 impl GameState {
-    /// [CR#608.2b]: for each chosen target, it still matches its `TargetSpec`'s
-    /// filter. Returns `true` if all chosen targets are still legal (or there
-    /// are no targets). Stage 2: single target, so "all legal" == "the one
-    /// target legal". A spell's specs derive from its `Spell` ability; an
+    /// [CR#608.2b]: judge each chosen target against its own slot's
+    /// `TargetSpec` filter and the `Cant(Target)` rows, as the entry
+    /// resolves. A spell's specs derive from its `Spell` ability; an
     /// activated ability's ride the carried text ([CR#602.2b]).
     ///
-    /// **Partial fizzle** ([CR#608.2b]): the entry fizzles iff EVERY target
-    /// across all slots is now illegal; a single surviving legal target keeps
-    /// it resolving (the illegal targets are then excluded from the reads).
     /// Counts are NOT re-checked — they lock at announce ([CR#601.2c]).
-    /// Distinct is re-asserted on the final set as defense in depth
-    /// ([CR#115.7e]); retarget validation should never let a violation reach
-    /// here.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a `Distinct` slot shares an object with a sibling slot: the
+    /// announce and retarget validators refuse such a set ([CR#115.7e]), so
+    /// one on the stack is an engine defect.
     #[must_use]
-    pub(crate) fn targets_still_legal(&self, entry: &StackEntry) -> bool {
+    pub(crate) fn resolving_targets(&self, entry: &StackEntry) -> ResolvingTargets {
         let specs: Vec<TargetSpec> = match &entry.object {
-            StackObject::Spell(o) => {
-                let effect = self
-                    .spell_effect(*o)
-                    .expect("a spell stack entry has a Spell ability");
-                crate::cast::announced_target_specs(
+            StackObject::Spell(o) => match self.spell_effect(*o) {
+                Some(effect) => crate::cast::announced_target_specs(
                     &effect,
                     &self.spell_targets(*o),
                     entry.chosen_modes.as_ref(),
-                )
-            }
+                ),
+                // A spell without a Spell ability (a creature spell) has no
+                // target slot; the slot-count assertion below catches an
+                // entry that says otherwise.
+                None => Vec::new(),
+            },
             // The carried text is authoritative — never re-derive from the
             // (possibly gone, possibly changed) source.
             StackObject::Activated { ability, .. } => crate::cast::announced_target_specs(
@@ -61,10 +90,12 @@ impl GameState {
                 }
             }
         };
-        debug_assert_eq!(
+        assert_eq!(
             specs.len(),
             entry.targets.len(),
-            "announce fills one chosen SET per TargetSpec slot",
+            "engine invariant violated: announce fills one chosen set per TargetSpec slot \
+             (stack entry {:?})",
+            entry.id,
         );
         // [CR#608.2b] re-checks the same Cant(Target) rows the announce
         // evaluated — a hexproof granted after announce fizzles the spell.
@@ -76,32 +107,39 @@ impl GameState {
         // same carrier the announce path used (Mentor's lesser-power recheck,
         // [CR#702.134a,608.2b]).
         let carrier = Some(self.objects.obj(entry.id).source);
-        // Whole-set scan: every target across every slot is judged; the entry
-        // survives iff at least one is still legal (partial fizzle,
-        // [CR#608.2b]). An entry that chose zero targets (all min-0 slots) has
-        // no target to be illegal, so it resolves ([CR#608.2b] fizzles only
-        // when targets exist and are ALL illegal).
-        let mut any_target = false;
-        let mut any_legal = false;
-        for (spec, slot) in specs.iter().zip(&entry.targets) {
-            let predicate = target_spec_predicate(spec);
-            for &chosen in slot {
-                any_target = true;
-                // A target that no longer exists (reminted on zone change) is
-                // trivially illegal — the filter can't be satisfied.
-                let legal = self.objects.get(chosen).is_some()
-                    && crate::target::matches_region_with_activation(
-                        self,
-                        chosen,
-                        predicate,
-                        carrier,
-                        entry.activation,
-                    )
-                    && crate::legal::target_forbidden_by(self, &rows, entry.id, chosen).is_none();
-                any_legal |= legal;
-            }
-        }
-        (!any_target || any_legal) && target_set_distinct_ok(&specs, &entry.targets)
+        assert!(
+            target_set_distinct_ok(&specs, &entry.targets),
+            "engine invariant violated: stack entry {:?} carries a Distinct slot overlapping \
+             a sibling ({:?}); announce and retarget validation refuse that set [CR#115.7e]",
+            entry.id,
+            entry.targets,
+        );
+        let slots = specs
+            .iter()
+            .zip(&entry.targets)
+            .map(|(spec, slot)| {
+                let predicate = target_spec_predicate(spec);
+                slot.iter()
+                    .map(|&chosen| {
+                        // A target that no longer exists (reminted on a zone
+                        // change) is illegal: it is no longer in the zone it
+                        // was in when it was targeted [CR#608.2b].
+                        let legal = self.objects.get(chosen).is_some()
+                            && crate::target::matches_region_with_activation(
+                                self,
+                                chosen,
+                                predicate,
+                                carrier,
+                                entry.activation,
+                            )
+                            && crate::legal::target_forbidden_by(self, &rows, entry.id, chosen)
+                                .is_none();
+                        if legal { chosen } else { ObjectId::null() }
+                    })
+                    .collect()
+            })
+            .collect();
+        ResolvingTargets { slots }
     }
 }
 
@@ -110,11 +148,11 @@ impl GameState {
 /// co-target [`TargetSpec::Distinct`] wrapper ([CR#115.7e]) to its inner
 /// `Target`, exactly as the render-side twin (`fragment::target_spec_filter`)
 /// does: distinctness is a SET constraint enforced at the three set-level sites
-/// ([`validate_target_set`] on announce/retarget, [`Self::targets_still_legal`]
+/// ([`validate_target_set`] on announce/retarget, [`GameState::resolving_targets`]
 /// on the [CR#608.2b] re-check), never a per-object filter.
 ///
 /// This is the single authoritative site for TargetSpec→Predicate extraction;
-/// both `cast::legal_targets` (announce time) and `targets_still_legal`
+/// both `cast::legal_targets` (announce time) and `resolving_targets`
 /// (resolution time) funnel through here so they stay in sync.
 pub(crate) fn target_spec_predicate(
     spec: &TargetSpec,
@@ -222,10 +260,10 @@ pub(crate) fn announced_prefix_len(specs: &[TargetSpec]) -> usize {
 /// [`TargetSpec::Distinct`] slot's chosen set is disjoint from the union of its
 /// named sibling slots' sets. Malformed semantic input — a sibling index out of
 /// range or naming the slot itself — is treated as a violation (`false`), so
-/// the spec is unsatisfiable and fizzles rather than panicking. Shared by
-/// [`validate_target_set`] and the resolution re-check so both read the same
-/// rule. Departed targets can only SHRINK a set, never create an overlap, so a
-/// set valid at announce stays valid here.
+/// the spec is unsatisfiable and the set is refused rather than panicking.
+/// Shared by [`validate_target_set`] and the resolution re-check, which
+/// asserts it: the stored set never changes after validation, so a set valid
+/// at announce or retarget stays valid there.
 pub(crate) fn target_set_distinct_ok(specs: &[TargetSpec], chosen: &[Vec<ObjectId>]) -> bool {
     for (i, spec) in specs.iter().enumerate() {
         for &sib in distinct_siblings(spec) {

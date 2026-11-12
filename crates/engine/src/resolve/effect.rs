@@ -942,13 +942,29 @@ impl GameState {
                 self.schedule_front(items);
             }
             Instruction::Distribute(divide) => {
-                let group = self.iteration_selection(&divide.over, frame);
+                // [CR#608.2b,115.7f]: the division is over every announced
+                // recipient; an illegal target keeps its share, and that
+                // share is not dealt (Arc Lightning ruling: "the original
+                // division of damage still applies but no damage is dealt to
+                // the illegal targets"). The even split stands in for the
+                // announced division [CR#601.2d].
+                let group = match &divide.over {
+                    sylex_core::Selection::Reg(reference) => {
+                        self.register_positions(frame, *reference)
+                    }
+                    over => self
+                        .iteration_selection(over, frame)
+                        .into_iter()
+                        .map(Some)
+                        .collect(),
+                };
                 let total = self.eval_count(&divide.amount, frame);
                 let shares = split_evenly(total, group.len());
                 let items =
                     group
                         .into_iter()
                         .zip(shares)
+                        .filter_map(|(object, share)| object.map(|object| (object, share)))
                         .flat_map(|(object, share)| {
                             let mut next = frame.clone();
                             next.activation =

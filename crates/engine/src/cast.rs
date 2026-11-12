@@ -3324,8 +3324,9 @@ mod tests {
             paid_costs: Vec::new(),
             copy: false,
         });
-        assert!(
-            state.targets_still_legal(&state.stack[0]),
+        assert_eq!(
+            state.resolving_targets(&state.stack[0]).slots,
+            vec![vec![p0_object], vec![p1_object]],
             "both announced player targets begin legal"
         );
 

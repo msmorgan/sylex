@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use slotmap::Key;
 use sylex_core::Param;
 use sylex_core::Provenance;
 use sylex_core::RefId;
@@ -828,6 +829,42 @@ impl crate::state::GameState {
         }
     }
 
+    /// The object group a register holds, by position: each member's live
+    /// object, or `None` where it names no object — an announced target
+    /// judged illegal as its entry resolves (`activation_restrict_targets`)
+    /// or one that has departed [CR#608.2b]. `None` overall when the register
+    /// holds no object group. A divided effect reads this so an illegal
+    /// target keeps its place in the division [CR#115.7f].
+    pub(crate) fn activation_object_positions(
+        &self,
+        activation: ActivationId,
+        reference: RefId,
+    ) -> Option<Vec<Option<ObjectId>>> {
+        let activations = self.activations.borrow();
+        let record = activations.get(&activation)?;
+        let is_instruction_product = record.params.get(reference.0 as usize).is_none();
+        let live = |object| {
+            if self.objects.get(object).is_some() {
+                Some(object)
+            } else if is_instruction_product {
+                let moved = self.chase_moved(object);
+                self.objects.get(moved).map(|_| moved)
+            } else {
+                None
+            }
+        };
+        match record.values.get(reference.0 as usize)? {
+            Value::Objects(objects) | Value::Pile(objects) => Some(
+                objects
+                    .iter()
+                    .map(|product| product.current.and_then(live))
+                    .collect(),
+            ),
+            Value::Object(product) => Some(vec![product.current.and_then(live)]),
+            Value::Unavailable | Value::Number(_) | Value::Symbol(_) => None,
+        }
+    }
+
     pub(crate) fn activation_number(
         &self,
         activation: ActivationId,
@@ -952,6 +989,62 @@ impl crate::state::GameState {
                     .and_then(|_| packed.get(index as usize))
                     .cloned()
                     .map_or(Value::Unavailable, Value::Objects);
+            }
+        }
+    }
+
+    /// [CR#608.2b]: as an entry resolves, each announced target judged
+    /// illegal reads as no object: no current identity and no last known
+    /// information, since "if part of the effect requires information about
+    /// an illegal target, it fails to determine any such information".
+    /// `resolving` is the announced target set with each illegal target
+    /// replaced by [`ObjectId::null`] (`resolve::ResolvingTargets`). The
+    /// legal targets keep the products their announcement stored.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `activation` holds no record, or if a slot's stored products
+    /// don't line up one for one with `resolving` — the announce stored them
+    /// from the same set, so a mismatch is an engine defect.
+    pub(crate) fn activation_restrict_targets(
+        &self,
+        activation: ActivationId,
+        resolving: &[Vec<ObjectId>],
+    ) {
+        let mut activations = self.activations.borrow_mut();
+        let record = activations
+            .get_mut(&activation)
+            .expect("a resolving entry's stored activation exists");
+        record.context.targets = resolving.to_vec();
+        for (param, value) in record.params.iter().zip(&mut record.values) {
+            let Provenance::AnnouncedTarget(index) = param.provenance else {
+                continue;
+            };
+            // A parameter naming a slot the entry never announced stayed
+            // `Unavailable` at announce (`activation_set_targets`).
+            let (slot, products) = match (resolving.get(index as usize), value) {
+                (None, Value::Unavailable) => continue,
+                (Some(slot), Value::Objects(products)) => (slot, products),
+                (slot, value) => panic!(
+                    "engine invariant violated: announced target slot {index} ({slot:?}) holds \
+                     {value:?}, not the products its announcement stored"
+                ),
+            };
+            assert_eq!(
+                products.len(),
+                slot.len(),
+                "engine invariant violated: announced target slot {index} stores {} products \
+                 for {} targets",
+                products.len(),
+                slot.len(),
+            );
+            for (product, target) in products.iter_mut().zip(slot) {
+                if target.is_null() {
+                    *product = ReferenceProduct {
+                        current: None,
+                        lki: None,
+                    };
+                }
             }
         }
     }

@@ -17,6 +17,7 @@ use crate::event::Occurrence;
 use crate::event::ZoneChange;
 use crate::object::ObjectId;
 use crate::stack::ExecutionFrame;
+use crate::stack::StackEntry;
 use crate::stack::StackObject;
 use crate::state::GameState;
 
@@ -27,6 +28,7 @@ mod player_action;
 mod query;
 pub(crate) use query::search_is_bare_quantity;
 mod targets;
+use targets::ResolvingTargets;
 
 // The mill apply re-derives its top-slice group off the stored body facet.
 pub(crate) use action::composite_body_group;
@@ -92,10 +94,6 @@ impl GameState {
     /// # Panics
     ///
     /// Panics if no entry has that id — engine invariant, not caller input.
-    #[expect(
-        clippy::too_many_lines,
-        reason = "single resolution dispatch kept as one match over stack-entry kinds; splitting would scatter the cohesive per-kind arms"
-    )]
     pub(crate) fn resolve_object(&mut self, id: ObjectId) {
         let entry = self
             .stack
@@ -127,104 +125,26 @@ impl GameState {
                         GameEvent::AbilityResolved(spell),
                     ))]);
                 } else if self.is_permanent_spell(spell) {
-                    // [CR#608.3]: a permanent spell enters the battlefield.
-                    // Host resolution by entry context (spec §4, [CR#608.3c]):
-                    // a permanent SPELL that enters
-                    // attached (the Enchant `AsEnters`)
-                    // attaches to its resolving spell's CHOSEN
-                    // TARGET — the Aura's enchant target —
-                    // not an arbitrary candidate.
-                    // Carry that host in the `EnterStatus`;
-                    // `apply_zone_will_change` prefers it
-                    // over the candidate-set fallback (`.or`).
-                    // The Aura's enchant target is slot 0's single member.
-                    let enters = if self.enters_attached_self(self.objects.obj(spell).source)
-                        && let Some(&host) = entry.targets.first().and_then(|slot| slot.first())
-                    {
-                        Some(crate::event::EnterStatus {
-                            attach_to: Some(host),
-                            ..crate::event::EnterStatus::default()
-                        })
+                    // [CR#608.3b]: a permanent spell with an illegal target
+                    // doesn't resolve. A bestowed Aura or mutating creature
+                    // spell would instead resolve as a creature spell; the
+                    // engine models neither bestow nor mutate, so no such
+                    // spell reaches here.
+                    let exit = if self.resolving_targets(&entry).any_illegal() {
+                        failed_resolution_exit(&entry)
                     } else {
-                        None
+                        self.permanent_spell_entry(&entry, spell)
                     };
-                    self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
-                        GameEvent::ZoneChange(ZoneChange {
-                            snapshot: None,
-                            object: spell,
-                            from: Some(Zone::Stack),
-                            to: Zone::Battlefield,
-                            enters,
-                            position: None,
-                            face: None,
-                            cause: None,
-                        }),
-                    ))]);
-                } else if self.targets_still_legal(&entry) {
-                    // Instant/sorcery with all targets still legal: run its
-                    // effect.
-                    let effect = self
-                        .spell_effect(spell)
-                        .expect("an instant/sorcery has a Spell ability");
-                    let frame = self.resolution_region_frame(
-                        &effect,
-                        entry.activation,
-                        spell,
-                        entry.controller,
-                        &entry.targets,
-                        entry.x,
-                        None,
-                    );
-                    let leave = if entry.copy {
-                        // [CR#707.10a]: a copy leaves the stack by CEASING to exist
-                        // — no zone move, no card. Same shape as a triggered
-                        // ability vanishing ([CR#608.2n]).
-                        GameEvent::AbilityResolved(spell)
-                    } else {
-                        GameEvent::ZoneChange(ZoneChange {
-                            snapshot: None,
-                            object: spell,
-                            from: Some(Zone::Stack),
-                            to: Zone::Graveyard,
-                            enters: None,
-                            position: None,
-                            face: None,
-                            cause: None,
-                        })
-                    };
-                    let mut items = crate::cast::announced_effect_items(
-                        self,
-                        &effect,
-                        &frame,
-                        entry.chosen_modes.as_ref(),
-                        &entry.targets,
-                    );
-                    items.push(WorkItem::Emit(Occurrence::single(leave)));
-                    self.schedule_front(items);
-                } else if entry.copy {
-                    // [CR#707.10a]: a copy leaves the stack by CEASING to exist
-                    // — no zone move, no card. Same shape as a triggered
-                    // ability vanishing ([CR#608.2n]).
-                    self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
-                        GameEvent::AbilityCountered(AbilityCountered {
-                            id: spell,
-                            cause: Cause::counter(Agency::StateBasedAction, None),
-                        }),
-                    ))]);
+                    self.schedule_front(vec![WorkItem::Emit(Occurrence::single(exit))]);
                 } else {
-                    // [CR#608.2b]: all targets illegal — the spell fizzles.
-                    self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
-                        GameEvent::ZoneChange(ZoneChange {
-                            snapshot: None,
-                            object: spell,
-                            from: Some(Zone::Stack),
-                            to: Zone::Graveyard,
-                            enters: None,
-                            position: None,
-                            face: None,
-                            cause: Some(Cause::counter(Agency::StateBasedAction, None)),
-                        }),
-                    ))]);
+                    let resolving = self.resolving_targets(&entry);
+                    if resolving.resolves() {
+                        self.resolve_spell_effect(&entry, spell, &resolving);
+                    } else {
+                        self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
+                            failed_resolution_exit(&entry),
+                        ))]);
+                    }
                 }
             }
             // [CR#608.2n]: a triggered ability resolves its effect, then vanishes
@@ -303,26 +223,22 @@ impl GameState {
                     self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
                         GameEvent::AbilityResolved(entry.id),
                     ))]);
-                } else if self.targets_still_legal(&entry) {
-                    let mut items = crate::cast::announced_effect_items(
-                        self,
-                        &t.effect,
-                        &frame,
-                        entry.chosen_modes.as_ref(),
-                        &entry.targets,
-                    );
-                    items.push(WorkItem::Emit(Occurrence::single(
-                        GameEvent::AbilityResolved(entry.id),
-                    )));
-                    self.schedule_front(items);
                 } else {
-                    // [CR#608.2b]: every target illegal — fizzle, vanish.
-                    self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
-                        GameEvent::AbilityCountered(AbilityCountered {
-                            id: entry.id,
-                            cause: Cause::counter(Agency::StateBasedAction, None),
-                        }),
-                    ))]);
+                    // [CR#608.2b] follows the intervening-if recheck.
+                    let resolving = self.resolving_targets(&entry);
+                    let items = if resolving.resolves() {
+                        let mut items =
+                            self.resolving_effect_items(&entry, &t.effect, &frame, &resolving);
+                        items.push(WorkItem::Emit(Occurrence::single(
+                            GameEvent::AbilityResolved(entry.id),
+                        )));
+                        items
+                    } else {
+                        vec![WorkItem::Emit(Occurrence::single(failed_resolution_exit(
+                            &entry,
+                        )))]
+                    };
+                    self.schedule_front(items);
                 }
             }
             // [CR#602.2a]: an activated ability resolves its carried text,
@@ -332,7 +248,8 @@ impl GameState {
                 ability,
                 bindings,
             } => {
-                if self.targets_still_legal(&entry) {
+                let resolving = self.resolving_targets(&entry);
+                let items = if resolving.resolves() {
                     let frame = self.resolution_region_frame(
                         &ability.effect,
                         entry.activation,
@@ -342,28 +259,114 @@ impl GameState {
                         entry.x,
                         Some(bindings),
                     );
-                    let mut items = crate::cast::announced_effect_items(
-                        self,
-                        &ability.effect,
-                        &frame,
-                        entry.chosen_modes.as_ref(),
-                        &entry.targets,
-                    );
+                    let mut items =
+                        self.resolving_effect_items(&entry, &ability.effect, &frame, &resolving);
                     items.push(WorkItem::Emit(Occurrence::single(
                         GameEvent::AbilityResolved(entry.id),
                     )));
-                    self.schedule_front(items);
+                    items
                 } else {
-                    // [CR#608.2b]: every target illegal — fizzle, vanish.
-                    self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
-                        GameEvent::AbilityCountered(AbilityCountered {
-                            id: entry.id,
-                            cause: Cause::counter(Agency::StateBasedAction, None),
-                        }),
-                    ))]);
-                }
+                    vec![WorkItem::Emit(Occurrence::single(failed_resolution_exit(
+                        &entry,
+                    )))]
+                };
+                self.schedule_front(items);
             }
         }
+    }
+
+    /// [CR#608.3]: the event that puts a resolving permanent spell onto the
+    /// battlefield.
+    fn permanent_spell_entry(&self, entry: &StackEntry, spell: ObjectId) -> GameEvent {
+        // Host resolution by entry context (spec §4, [CR#608.3c]): a
+        // permanent SPELL that enters attached (the Enchant `AsEnters`)
+        // attaches to its resolving spell's CHOSEN TARGET — the Aura's
+        // enchant target — not an arbitrary candidate. Carry that host in
+        // the `EnterStatus`; `apply_zone_will_change` prefers it over the
+        // candidate-set fallback (`.or`). The Aura's enchant target is slot
+        // 0's single member.
+        let enters = if self.enters_attached_self(self.objects.obj(spell).source)
+            && let Some(&host) = entry.targets.first().and_then(|slot| slot.first())
+        {
+            Some(crate::event::EnterStatus {
+                attach_to: Some(host),
+                ..crate::event::EnterStatus::default()
+            })
+        } else {
+            None
+        };
+        GameEvent::ZoneChange(ZoneChange {
+            snapshot: None,
+            object: spell,
+            from: Some(Zone::Stack),
+            to: Zone::Battlefield,
+            enters,
+            position: None,
+            face: None,
+            cause: None,
+        })
+    }
+
+    /// An instant or sorcery that resolves: its effect, then its move to its
+    /// owner's graveyard ([CR#608.2n]).
+    fn resolve_spell_effect(
+        &mut self,
+        entry: &StackEntry,
+        spell: ObjectId,
+        resolving: &ResolvingTargets,
+    ) {
+        let effect = self
+            .spell_effect(spell)
+            .expect("an instant/sorcery has a Spell ability");
+        let frame = self.resolution_region_frame(
+            &effect,
+            entry.activation,
+            spell,
+            entry.controller,
+            &entry.targets,
+            entry.x,
+            None,
+        );
+        let leave = if entry.copy {
+            // [CR#707.10a]: a copy leaves the stack by CEASING to exist — no
+            // zone move, no card. Same shape as a triggered ability vanishing
+            // ([CR#608.2n]).
+            GameEvent::AbilityResolved(spell)
+        } else {
+            GameEvent::ZoneChange(ZoneChange {
+                snapshot: None,
+                object: spell,
+                from: Some(Zone::Stack),
+                to: Zone::Graveyard,
+                enters: None,
+                position: None,
+                face: None,
+                cause: None,
+            })
+        };
+        let mut items = self.resolving_effect_items(entry, &effect, &frame, resolving);
+        items.push(WorkItem::Emit(Occurrence::single(leave)));
+        self.schedule_front(items);
+    }
+
+    /// The effect work of an entry that resolves [CR#608.2b]: only its legal
+    /// targets are affected or read, and each illegal one reads as no object
+    /// in `frame`'s activation and in every mode's target scope.
+    fn resolving_effect_items(
+        &mut self,
+        entry: &StackEntry,
+        effect: &sylex_core::Region,
+        frame: &ExecutionFrame,
+        resolving: &ResolvingTargets,
+    ) -> Vec<WorkItem> {
+        self.activation_restrict_targets(frame.activation, &resolving.slots);
+        crate::cast::announced_effect_items(
+            self,
+            effect,
+            frame,
+            entry.chosen_modes.as_ref(),
+            &resolving.slots,
+        )
     }
 
     /// Follow the resolution-scoped move record ([CR#400.7j]) to the id the
@@ -459,6 +462,32 @@ pub(crate) fn spell_ability_in(abilities: &[Ability]) -> Option<Arc<sylex_core::
             _ => None,
         })
     })
+}
+
+/// The event that removes `entry` from the stack when it doesn't resolve
+/// [CR#608.2b,608.3b]: a spell card goes to its owner's graveyard, while an
+/// ability or a spell copy leaves no card behind ([CR#707.10a]).
+fn failed_resolution_exit(entry: &StackEntry) -> GameEvent {
+    let cause = Cause::counter(Agency::StateBasedAction, None);
+    match &entry.object {
+        StackObject::Spell(spell) if !entry.copy => GameEvent::ZoneChange(ZoneChange {
+            snapshot: None,
+            object: *spell,
+            from: Some(Zone::Stack),
+            to: Zone::Graveyard,
+            enters: None,
+            position: None,
+            face: None,
+            cause: Some(cause),
+        }),
+        StackObject::Spell(id) => GameEvent::AbilityCountered(AbilityCountered { id: *id, cause }),
+        StackObject::Triggered { .. } | StackObject::Activated { .. } => {
+            GameEvent::AbilityCountered(AbilityCountered {
+                id: entry.id,
+                cause,
+            })
+        }
+    }
 }
 
 /// One event → `Single`; several → a simultaneous `Batch`.

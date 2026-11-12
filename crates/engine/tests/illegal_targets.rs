@@ -1,6 +1,14 @@
-//! Resolution against announced targets, driven through the public API with
-//! real cards.
+//! Resolution against targets that became illegal after announcement
+//! ([CR#608.2b,608.3b]), driven through the public API with real cards.
+//!
+//! Each test casts a spell for player 0, lets player 1 respond while the spell
+//! is on the stack, and reads the result once the stack is empty. The
+//! response that makes a target illegal is a real card, Ranger's Guile
+//! (hexproof) or Keeper of Kookus (protection from red), spelled in semantic
+//! RON and lowered through the production `Plugin::card_from_str` path, since
+//! neither card is in the canon plugin.
 
+use std::collections::VecDeque;
 use std::path::Path;
 use std::sync::Arc;
 
@@ -10,6 +18,7 @@ use sylex_core::PhaseStep;
 use sylex_core::Zone;
 use sylex_engine::Action;
 use sylex_engine::ChooseTargets;
+use sylex_engine::DamageDealt;
 use sylex_engine::Decision;
 use sylex_engine::DecisionPointKind;
 use sylex_engine::GameConfig;
@@ -78,6 +87,26 @@ const RANGERS_GUILE: &str = r#"Normal(
             ),
         )),
     ],
+)"#;
+
+/// Keeper of Kookus: "{R}: Keeper of Kookus gains protection from red until
+/// end of turn."
+const KEEPER_OF_KOOKUS: &str = r#"Normal(
+    name: "Keeper of Kookus",
+    mana_cost: [Red],
+    types: [Creature],
+    subtypes: [Goblin],
+    abilities: [
+        Activated(
+            cost: [Mana([Red])],
+            effect: Continuously(
+                effect: Modify(This, GainAbility(Keyword(Protection(ColorIs(Red))))),
+                duration: FixedUntil(EndOfTurn),
+            ),
+        ),
+    ],
+    power: 1,
+    toughness: 1,
 )"#;
 
 /// A two-player game with the builtin rules as data (lethal damage, the Aura
@@ -170,6 +199,33 @@ fn sorted(mut ids: Vec<ObjectId>) -> Vec<ObjectId> {
     ids
 }
 
+fn count_named(state: &GameState, ids: &[ObjectId], name: &str) -> usize {
+    ids.iter().filter(|&&o| is_card(state, o, name)).count()
+}
+
+/// Every event the trace applied, batch members included.
+fn applied(trace: &[Progress]) -> Vec<&GameEvent> {
+    trace
+        .iter()
+        .flat_map(|progress| match progress {
+            Progress::Applied(Occurrence::Single(event)) => vec![event],
+            Progress::Applied(Occurrence::Batch(events)) => events.iter().collect(),
+            _ => Vec::new(),
+        })
+        .collect()
+}
+
+/// The damage events the trace applied to `target`.
+fn damage_to(trace: &[Progress], target: ObjectId) -> Vec<DamageDealt> {
+    applied(trace)
+        .into_iter()
+        .filter_map(|event| match event {
+            GameEvent::DamageDealt(damage) if damage.target == target => Some(damage.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
 // --- driving -----------------------------------------------------------------
 
 fn step_to_stop(state: &mut GameState) -> (Vec<Progress>, StepOutcome) {
@@ -240,6 +296,54 @@ fn float(state: &mut GameState, pools: &[(PlayerId, Color, u32)]) {
     state.agenda.push_front(WorkItem::OpenPriority);
 }
 
+/// Player 0 casts `spell` with `targets`; at player 1's first priority with
+/// that spell on the stack, player 1 takes `response` and gives it
+/// `response_targets` when it targets. Runs until the stack is empty again
+/// and returns the trace and the candidate sets player 0's target prompt
+/// offered.
+fn cast_against_response(
+    state: &mut GameState,
+    spell: ObjectId,
+    targets: Vec<Vec<ObjectId>>,
+    response: &Action,
+    response_targets: Option<Vec<Vec<ObjectId>>>,
+) -> (Vec<Progress>, Vec<Vec<ObjectId>>) {
+    let mut picks: VecDeque<_> = std::iter::once(targets).chain(response_targets).collect();
+    let mut offered = None;
+    let mut responded = false;
+    let mut answer = |state: &GameState, pending: &DecisionPointKind| match pending {
+        DecisionPointKind::ChooseTargets(ChooseTargets { legal, .. }) => {
+            offered.get_or_insert_with(|| legal.clone());
+            Some(Decision::Targets(
+                picks.pop_front().expect("a target set for every prompt"),
+            ))
+        }
+        DecisionPointKind::Priority(Priority { player, .. })
+            if *player == PlayerId(1) && !responded && !state.stack.is_empty() =>
+        {
+            responded = true;
+            Some(Decision::Act(response.clone()))
+        }
+        _ => None,
+    };
+    let (_, stop) = step_to_stop(state);
+    assert!(
+        matches!(
+            stop,
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(Priority { player, .. }))
+                if player == PlayerId(0)
+        ),
+        "player 0 holds priority before casting, got {stop:?}"
+    );
+    state
+        .submit_decision(Decision::Act(Action::CastSpell { object: spell }))
+        .expect("the spell is castable");
+    let trace = drive(state, |s, _| s.stack.is_empty(), &mut answer);
+    assert!(responded, "player 1 responded while the spell was on the stack");
+    assert!(picks.is_empty(), "every target prompt was answered");
+    (trace, offered.expect("player 0's spell asked for targets"))
+}
+
 /// Runs to player 0's precombat main phase.
 fn to_main(state: &mut GameState) {
     drive(
@@ -250,6 +354,154 @@ fn to_main(state: &mut GameState) {
 }
 
 // --- tests -------------------------------------------------------------------
+
+/// [CR#608.2b]: Pounce's opposing target gained hexproof, so it is illegal,
+/// while player 0's own creature is still legal and Pounce resolves. Fight is
+/// all or nothing: "if one or both creatures are illegal targets for a
+/// resolving spell or ability that instructs them to fight, neither of them
+/// fights or deals damage" [CR#701.14b]. Neither creature deals or is dealt
+/// damage.
+#[test]
+fn pounce_whose_opposing_target_gained_hexproof_makes_no_fight() {
+    let pounce = card("Pounce");
+    let bears = card("Grizzly Bears");
+    let forest = basic("Forest");
+    let guile = fixture(RANGERS_GUILE);
+    let mut state = game(
+        deck(&[(&pounce, 2), (&bears, 2), (&forest, 6)]),
+        deck(&[(&guile, 2), (&bears, 2), (&forest, 6)]),
+    );
+    to_main(&mut state);
+    let mine = onto_battlefield(&mut state, PlayerId(0), "Grizzly Bears");
+    let theirs = onto_battlefield(&mut state, PlayerId(1), "Grizzly Bears");
+    let spell = into_hand(&mut state, PlayerId(0), "Pounce");
+    let response = into_hand(&mut state, PlayerId(1), "Ranger's Guile");
+    float(
+        &mut state,
+        &[(PlayerId(0), Color::Green, 2), (PlayerId(1), Color::Green, 1)],
+    );
+
+    let (trace, _) = cast_against_response(
+        &mut state,
+        spell,
+        vec![vec![mine], vec![theirs]],
+        &Action::CastSpell { object: response },
+        Some(vec![vec![theirs]]),
+    );
+
+    assert!(
+        damage_to(&trace, mine).is_empty() && damage_to(&trace, theirs).is_empty(),
+        "no fight: neither creature deals or is dealt damage"
+    );
+    assert!(
+        state.zones.battlefield.contains(&mine) && state.zones.battlefield.contains(&theirs),
+        "both creatures are still on the battlefield"
+    );
+    assert_eq!(state.objects.obj(mine).total_damage(), 0);
+    assert_eq!(state.objects.obj(theirs).total_damage(), 0);
+    assert_eq!(
+        count_named(&state, &state.zones.graveyards[0], "Pounce"),
+        1,
+        "Pounce resolved and went to its owner's graveyard"
+    );
+}
+
+/// [CR#608.2b,115.7f]: Arc Lightning divides its 3 damage between two
+/// creatures, 2 to the first and 1 to the second (the engine's even split
+/// stands in for the announced division). The second gains hexproof before
+/// Arc Lightning resolves, so it is an illegal target and is dealt nothing,
+/// and the first is still dealt only its 2 (Arc Lightning ruling: "the
+/// original division of damage still applies but no damage is dealt to the
+/// illegal targets").
+#[test]
+fn arc_lightning_does_not_damage_a_target_that_gained_hexproof() {
+    let arc = card("Arc Lightning");
+    let bears = card("Grizzly Bears");
+    let mountain = basic("Mountain");
+    let forest = basic("Forest");
+    let guile = fixture(RANGERS_GUILE);
+    let mut state = game(
+        deck(&[(&arc, 2), (&mountain, 8)]),
+        deck(&[(&guile, 2), (&bears, 3), (&forest, 5)]),
+    );
+    to_main(&mut state);
+    let hit = onto_battlefield(&mut state, PlayerId(1), "Grizzly Bears");
+    let shielded = onto_battlefield(&mut state, PlayerId(1), "Grizzly Bears");
+    let spell = into_hand(&mut state, PlayerId(0), "Arc Lightning");
+    let response = into_hand(&mut state, PlayerId(1), "Ranger's Guile");
+    float(
+        &mut state,
+        &[(PlayerId(0), Color::Red, 3), (PlayerId(1), Color::Green, 1)],
+    );
+
+    let (trace, _) = cast_against_response(
+        &mut state,
+        spell,
+        vec![vec![hit, shielded]],
+        &Action::CastSpell { object: response },
+        Some(vec![vec![shielded]]),
+    );
+
+    assert!(
+        damage_to(&trace, shielded).is_empty(),
+        "the creature that gained hexproof is an illegal target and is dealt no damage"
+    );
+    assert_eq!(
+        damage_to(&trace, hit).iter().map(|d| d.amount).collect::<Vec<_>>(),
+        [2],
+        "the still-legal creature is dealt only its own share of the division"
+    );
+    assert!(state.zones.battlefield.contains(&shielded));
+    assert_eq!(state.objects.obj(shielded).total_damage(), 0);
+}
+
+/// [CR#608.2b]: the same with protection from red. Keeper of Kookus gains
+/// protection from red in response and is dealt no damage; the other target
+/// is. Protection also prevents the damage [CR#702.16e], so this outcome
+/// holds even where an illegal target is wrongly affected; the hexproof test
+/// above is the one that tells the two apart.
+#[test]
+fn arc_lightning_does_not_damage_a_target_that_gained_protection_from_red() {
+    let arc = card("Arc Lightning");
+    let bears = card("Grizzly Bears");
+    let mountain = basic("Mountain");
+    let keeper = fixture(KEEPER_OF_KOOKUS);
+    let mut state = game(
+        deck(&[(&arc, 2), (&mountain, 8)]),
+        deck(&[(&keeper, 2), (&bears, 2), (&mountain, 6)]),
+    );
+    to_main(&mut state);
+    let hit = onto_battlefield(&mut state, PlayerId(1), "Grizzly Bears");
+    let shielded = onto_battlefield(&mut state, PlayerId(1), "Keeper of Kookus");
+    let spell = into_hand(&mut state, PlayerId(0), "Arc Lightning");
+    float(
+        &mut state,
+        &[(PlayerId(0), Color::Red, 3), (PlayerId(1), Color::Red, 1)],
+    );
+
+    let (trace, _) = cast_against_response(
+        &mut state,
+        spell,
+        vec![vec![hit, shielded]],
+        &Action::ActivateAbility {
+            object: shielded,
+            ability: 0,
+        },
+        None,
+    );
+
+    assert!(
+        damage_to(&trace, shielded).is_empty(),
+        "Keeper of Kookus has protection from red and is dealt no damage"
+    );
+    assert_eq!(
+        damage_to(&trace, hit).iter().map(|d| d.amount).collect::<Vec<_>>(),
+        [2],
+        "the still-legal creature is dealt only its own share of the division"
+    );
+    assert!(state.zones.battlefield.contains(&shielded));
+    assert_eq!(state.objects.obj(shielded).total_damage(), 0);
+}
 
 /// A board for the Aura tests: a creature on each side of the battlefield,
 /// plus Grizzly Bears cards in player 1's hand and player 0's graveyard that
@@ -301,8 +553,51 @@ fn assert_creatures_on_the_battlefield(board: &AuraBoard, offered: &[Vec<ObjectI
     );
 }
 
-/// An Aura spell targets [CR#303.4a]: Pacifism announces its enchant target,
-/// and on resolution enters attached to it [CR#608.3c].
+/// [CR#608.3b]: Pacifism's target gained hexproof before Pacifism resolved.
+/// An Aura spell with an illegal target doesn't resolve: it goes to its
+/// owner's graveyard without entering the battlefield.
+#[test]
+fn pacifism_with_an_illegal_target_goes_to_the_graveyard_without_entering() {
+    let mut board = aura_board();
+    let theirs = board.theirs;
+    let state = &mut board.state;
+    let spell = into_hand(state, PlayerId(0), "Pacifism");
+    let response = into_hand(state, PlayerId(1), "Ranger's Guile");
+    float(
+        state,
+        &[(PlayerId(0), Color::White, 2), (PlayerId(1), Color::Green, 1)],
+    );
+
+    let (trace, offered) = cast_against_response(
+        state,
+        spell,
+        vec![vec![theirs]],
+        &Action::CastSpell { object: response },
+        Some(vec![vec![theirs]]),
+    );
+
+    assert_eq!(
+        count_named(state, &state.zones.battlefield, "Pacifism"),
+        0,
+        "Pacifism never entered the battlefield"
+    );
+    assert_eq!(
+        count_named(state, &state.zones.graveyards[0], "Pacifism"),
+        1,
+        "Pacifism went to its owner's graveyard"
+    );
+    assert!(
+        !applied(&trace).iter().any(|event| matches!(
+            event,
+            GameEvent::ZoneChange(change) if change.to == Zone::Battlefield
+        )),
+        "nothing entered the battlefield"
+    );
+    assert_creatures_on_the_battlefield(&board, &offered);
+}
+
+/// The control for the test above: an Aura spell targets [CR#303.4a], and
+/// Pacifism whose target stays legal enters attached to it [CR#608.3c].
 #[test]
 fn pacifism_with_a_legal_target_enters_attached_to_it() {
     let mut board = aura_board();

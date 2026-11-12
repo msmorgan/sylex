@@ -16,7 +16,7 @@ list: a different or shorter list, so the read panics or finds the wrong ability
 
 These sites index the list raw and panic on a mismatch:
 
-- `resolve/targets.rs`, `targets_still_legal`
+- `resolve/targets.rs`, `resolving_targets`
 - `trigger.rs`, `trigger_targets` and `enter_trigger_activation`
 - `cast.rs`, the `StackObject::Triggered` arm of the stack-object target getter
 
