@@ -30,3 +30,21 @@
 # The Targeting Marker determines its nominal above every postmodifier; no postmodifier attaches above it.
 +NounPhrase target creature you control => Nominal "creature you control"; DeterminerPhrase "target" as Determiner of creature; !Nominal "target creature"; readings 1
 +NounPhrase up to one target artifact or enchantment that player controls => Nominal "artifact or enchantment that player controls"; !Nominal "target artifact or enchantment"
+# Each printed order of outer determiner and adjective over the Targeting Marker: the adjective
+# modifies the Marker inside the outer determiner, with one tree.
+# from: Nimbleclaw Adept
++NounPhrase two other target permanents => DeterminerPhrase "two other target" as Determiner of permanent; DeterminerPhrase "other target" head det:target; AdjectivePhrase "other"; readings 1
+# from: Ballroom Brawlers
++NounPhrase up to one other target creature you control => DeterminerPhrase "up to one other target" as Determiner of creature; PrepositionPhrase "up to one" as Determiner of target; DeterminerPhrase "other target" head det:target; readings 1
+# from: Spectral Adversary
++NounPhrase up to that many other target artifacts, creatures, and/or enchantments => DeterminerPhrase "up to that many other target"; PrepositionPhrase "up to that many" as Determiner of target; DeterminerPhrase "other target" head det:target; readings 1
+# from: Cloudspire Skycycle
++NounPhrase one or two other target Vehicles and/or creatures you control => DeterminerPhrase "one or two other target"; DeterminerPhrase "one or two"; DeterminerPhrase "other target" head det:target
+# from: Incremental Blight
++NounPhrase a third target creature => DeterminerPhrase "a third target" as Determiner of creature; DeterminerPhrase "third target" head det:target; readings 1
+# from: Dwarven Song
++NounPhrase One or more target creatures => DeterminerPhrase "One or more target" as Determiner of creature; DeterminerPhrase "One or more"; DeterminerPhrase "target" head det:target
+# from: Gaze of Pain
++NounPhrase a target creature => DeterminerPhrase "a target" as Determiner of creature; DeterminerPhrase "target" head det:target; readings 1
+# from: Guardian of Faith
++NounPhrase any number of other target creatures you control => DeterminerPhrase "other target" head det:target as Determiner of creature; AdjectivePhrase "other"
