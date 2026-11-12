@@ -2249,13 +2249,16 @@ BarePrepositionalNominal: BareNominalComplement -> PrepositionalNominal
 // A superlative over a bare count singular nominal after *tied for*
 // (*tied for lowest life total*, Loxodon Peacekeeper). CGEL requires a
 // determiner with a count singular head, the superlative only making it
-// definite (13§6.3.4:1169); Oracle's *tied for* drops it.
+// definite (13§6.3.4:1169); Oracle's *tied for* drops it. The head carries
+// Count itself: a noun that is also non-count drops the article as a bare
+// non-count Noun Phrase (BareMass; *(the) greatest need*, 13§6.3.4:1168),
+// the same analysis (*tied for greatest power*, Desecrator Hag; ADR §8).
 SuperlativeBareNominal: BareNominalComplement -> modifier:AdjectivePhrase BareNominal
     where modifier.Grade := Superlative,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative,
           head.Number = Singular,
-          head.Countability = Count
+          head.Countability := Count
 // *Tied for fewest* (Goblin Game). CGEL makes *the* obligatory with a fused
 // determiner-head (*the most we can hope for*; 13§6.3.4:1168); Oracle's
 // *tied for* drops it.
