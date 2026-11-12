@@ -24,12 +24,15 @@ grammar's terms, with exact counts, and a way to narrow a forest by them.
   the options are disjoint and sum to it. A fork whose context is not every Derivation is
   conditional, and says so.
 - A word's **head line** runs from its leaf up through each mother of which it is the head-line
-  child: the `head` child; in a coordination that has no `head`, the child that carries its
-  coordinator, so a coordination is identified by its coordinator leaf; in any other
-  Production, its first child besides punctuation (a relative clause's relative word, an
-  Adjunct's `filler`, a Linked Coordination's first conjunct). Each Production names at most one,
-  so every Constituent is on exactly one word's head line. The top of a head line is the word's
-  maximal projection.
+  child (`CompiledGrammar::head_line_child`): in a Linked Conjunct (a coordination schema's
+  `link` Category), its linking connective; else the `head` child; else the child that carries
+  a coordination schema's coordinator, so a coordination is identified by its coordinator leaf
+  and a Linked Coordination by its connective; else the only child besides punctuation; else a
+  closed-class marker, by child name (`coordinator`, then `marker`); else the first child that
+  bears no dependent function (`not`'s `filler`, not the `modifier` *not*); else the first
+  child. The `head` itself, which features and `head_word` follow, is unchanged. Each Production
+  names at most one head-line child, so every Constituent is on exactly one word's head line.
+  The top of a head line is the word's maximal projection.
 - Three kinds of fork:
   - lexical: which lexical alternative the leaf starting at the word is (its end, Lexeme, Word
     Form and features);
