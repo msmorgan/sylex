@@ -261,12 +261,12 @@ FROM verb_phrase_tokens GROUP BY context ORDER BY some_units DESC;
 
 ```
 context                   some_units  every_units
-effect clause                  45182        43552
-other                          15508        14007
+effect clause                  45182        43571
+other                          15507        14007
 trigger clause                 13668        13406
-relative clause                11511        11203
+relative clause                11509        11203
 deontic                         7199         5221
-participial postmodifier        1960         1243
+participial postmodifier        1959         1244
 would clause                    1084          919
 ```
 
@@ -307,7 +307,7 @@ Nominal           or                           2        4958           1006
 VerbPhrase        and                          2        4242           1146
 Clause            Clause#LinkedClause          2        2485            459
 Clause            and                          2        2411           1215
-NounPhrase        and                          2        2362            563
+NounPhrase        and                          2        2359            564
 DeterminerPhrase  or                           2        1969           1709
 ```
 

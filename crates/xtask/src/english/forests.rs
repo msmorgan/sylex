@@ -1158,10 +1158,12 @@ mod tests {
                 "discarded",
                 "participial postmodifier",
             ),
+            // `GerundParticipialConjunct`: *target creature [blocking] or
+            // [being blocked by this creature]*.
             (
-                "Roil's Retribution",
-                "block",
-                "blocking creatures",
+                "Sworn Defender",
+                "be",
+                "being blocked by this creature",
                 "participial postmodifier",
             ),
             ("Road of Return", "choose", "Choose one", "other"),
