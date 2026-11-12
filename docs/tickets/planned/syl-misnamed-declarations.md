@@ -6,7 +6,7 @@ needs: [syl-argument-naming, syl-single-face-card-call]
 
 ## Why
 
-Seven declarations are named or spelled for one use, or read poorly for what they build:
+Eight declarations are named or spelled for one use, or read poorly for what they build:
 
 - `modifiesPrecedingAction` (`primitives/timing/`) is a `Duration` spelled "It can't be
   regenerated", though it is any rider that modifies the action before it [CR#608.2c].
@@ -17,9 +17,14 @@ Seven declarations are named or spelled for one use, or read poorly for what the
 - `actor(np)` (`primitives/noun/actor.syl`), the active `Subject` constructor, is named for the
   Actor, but its noun phrase is the clause's Subject, a Referent that pronouns and demonstratives
   read, and not the Actor (`semantics.md` §2.1, §4.2); an effect can be one
-  (`doesnt(actor(thisEffect), remove(thisAura))`, *Black Ward*). It is renamed `subject(np)`. The
-  noun-phrase word `actor` (`primitives/pronoun/actor.syl`), which reads the Actor, keeps its
-  name.
+  (`doesnt(actor(thisEffect), remove(thisAura))`, *Black Ward*). It is renamed `subject(np)`.
+- `actor` at `NounPhrase` (`primitives/pronoun/actor.syl`) is described as the performer ("whoever
+  performs this action"), as are the glossary entry **Actor** and `semantics.md` §2.1 and §2.3,
+  but it means the subject of the clause: `die`, `enter` and `leave` read the thing that dies,
+  enters or leaves through it. It is renamed `subject`, beside `subject(np)` at `Subject`, a
+  different sort (`syl.md` §3). 48 calls in 39 files use it: 43 in 34 `plugins/builtin/` files and
+  one in each of 5 canon cards. The expansion tests (`crates/xtask/src/dsl_expand/tests.rs`) name
+  it by one constant, `SUBJECT_WORD`.
 - `and` at `TriggerCondition` (`primitives/triggerCondition/and.syl`) is named for the printed
   coordinator, but it means that the ability triggers when any of its conditions is met
   [CR#603.1b,603.2]. The primitive is renamed `or`, for its meaning, and spelled with the "or"
@@ -47,6 +52,10 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
   reports the counts it compared. The glossary entry **Subject**
   (`docs/contexts/game-model/CONTEXT.md`), `syl.md` §2 and `semantics.md` §4.2, §4.6 and §4.7
   name `subject(…)`.
+- The subject word at `NounPhrase` is `subject`, `SUBJECT_WORD` names it, and no `actor` call at
+  `NounPhrase` is left in `plugins/`. Its doc comment, the glossary entry **Actor**
+  (`docs/contexts/game-model/CONTEXT.md`) and the sentences of `semantics.md` §2.1 and §2.3 that
+  describe it as the performer say it means the subject of the clause.
 - The trigger-condition primitive is `or`, the printed "and" is the Template `and` over it, and
   no Template `or` exists at `TriggerCondition`; each of the 7 callers is checked against its
   card's Oracle text, so the 6 that print "and" call `and` and *Tenuous Truce* calls `or`.
@@ -59,6 +68,7 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 `plugins/builtin/primitives/timing/{modifiesPrecedingAction,thisObject}.syl`,
 `plugins/builtin/primitives/period/thisObject.syl`,
 `plugins/builtin/templates/pronoun/splitOverPermanent.syl`, `plugins/builtin/primitives/noun/actor.syl`,
+`plugins/builtin/primitives/pronoun/actor.syl`, `crates/xtask/src/dsl_expand/tests.rs`,
 `plugins/builtin/primitives/static/doesnt.syl`,
 `plugins/builtin/primitives/triggerCondition/and.syl`,
 `plugins/builtin/templates/triggerCondition/or.syl`,
