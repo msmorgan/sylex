@@ -3051,13 +3051,14 @@ impl<'a> Binder<'a> {
         Ok(drafts)
     }
 
-    /// A plural-Complement frame's phrases (`PrepositionFrame::plural_complement`):
-    /// one whose Complement is itself a coordination and, for a Noun Phrase
-    /// Complement, one whose Complement is not and requires the lexicon
-    /// mapping's Plural, a `Require` that an open Number passes. A keyword
-    /// phrase, slash measure, name or unlike coordination has no Number of
-    /// its own, so only a coordination of it is plural; a frame of any other
-    /// kind, or a Noun Phrase Category without Number, is a load error.
+    /// A plural-Complement frame's phrases
+    /// (`PrepositionFrame::plural_complement`): one whose Complement is
+    /// itself a coordination and, for a Noun Phrase Complement, one whose
+    /// Complement is not and requires the lexicon mapping's Plural, a
+    /// `Require` that an open Number passes. A keyword phrase, slash
+    /// measure, name or unlike coordination has no Number of its own, so
+    /// only a coordination of it is plural; a frame of any other kind, or a
+    /// Noun Phrase Category without Number, is a load error.
     fn plural_complement(
         &self,
         draft: &Draft,
