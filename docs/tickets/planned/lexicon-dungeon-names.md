@@ -61,7 +61,7 @@ a dungeon is *Acererak the Archlich*. Every other in-scope "Undercity" is part o
 ## Not in scope
 
 - Modeling dungeons, their rooms or venturing.
-- The expansion names in `cited_names.ron`: `english-names-read-from-text`.
+- The expansion names in `cited_names.ron`: `english-set-names-read-from-text`.
 
 ## Pointers
 

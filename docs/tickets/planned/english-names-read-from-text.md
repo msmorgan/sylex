@@ -1,19 +1,17 @@
 ---
-needs: [lexicon-dungeon-names]
+needs: []
 ---
 
-# Names a card's text introduces or cites are read from the text
+# Names a card's text introduces are read from the text
 
 ## Why
 
-`crates/vocabulary/catalogs/introduced_names.ron` (102 names on 125 faces) and the expansion
-entries of `cited_names.ron` (3 names on 3 cards) record facts about individual cards before
-parsing: each name, and the cards on which it stands. A card's text sets the name of a token it
-creates [CR#111.4], so the name is a string read from that text (*Rinoa Heartilly*'s "create
-Angelo, a legendary 1/1 green and white Dog creature token"). The same holds for an expansion the
-text cites (*Golgothian Sylex*'s "originally printed in the Antiquities expansion"). Both lists go.
+`crates/vocabulary/catalogs/introduced_names.ron` (102 names on 125 faces) records facts about
+individual cards before parsing: each name, and the cards on which it stands. A card's text sets
+the name of a token it creates [CR#111.4], so the name is a string read from that text (*Rinoa
+Heartilly*'s "create Angelo, a legendary 1/1 green and white Dog creature token"). The list goes.
 
-The lists also miss names. Nine in-scope cards create "a tapped Planet land token named New
+The list also misses names. Nine in-scope cards create "a tapped Planet land token named New
 Planet" (*Genesis Effect*, *Artificial Anomaly*, ...). "New Planet" is not listed, and each line's
 only Reading today reads "named New Planet" as a participle premodifying the nominal "New Planet"
 (adjective *new* and subtype *Planet*).
@@ -21,7 +19,7 @@ only Reading today reads "named New Planet" as a participle premodifying the nom
 Evidence (gitignored), all from `data/mtgjson/AllPrintings.sqlite` (in-scope faces, reminder
 text removed): `docs/evidence/names-read-from-text/`.
 
-Every listed name is introduced or cited by one of these constructions (`classify.txt`):
+Every listed name is introduced by one of these constructions (`classify.txt`):
 
 | Construction | Names | Example |
 |---|---|---|
@@ -30,7 +28,6 @@ Every listed name is introduced or cited by one of these constructions (`classif
 | `becomes / is / she's … named NAME` (a permanent the text changes) | 7 | *The Curse of Fenric* (Fenric), *Princess Yue* (Moon) |
 | `except its name is NAME` | 1 | *Mishra, Eminent One* (Mishra's Warform) |
 | `create a NAME token`, NAME a card's name [CR#111.11] | 4 | *Disa the Restless* (Tarmogoyf) |
-| `originally printed in the NAME expansion` | 3 | *City in a Bottle* (Arabian Nights) |
 
 *The Eleventh Hour*'s "create a token that's a copy of target creature, except it's a legendary
 Alien named Prisoner Zero" is counted in the `… token(s) … named NAME` row.
@@ -50,23 +47,24 @@ A listed name is also used after its introduction, outside the position that int
   Warrior*'s "attached to Stangg Twin"). *Rinoa Heartilly*'s second line opens with "Angelo
   Cannon —", a Flavor Word, which is not a use of the name.
 
-Today the lexicon loads each listed name as a card-scoped Catalog Lexeme (`introduced_name:`,
-`cited_name:`). `Lexicon::stands_in` admits it only on its listed cards, and the grammar reads it
-through `Name -> Lex(Catalog)` wherever a Name stands (`ProperName`, `NamePremodifier`,
-`ProperPossessor`, `NameAsComplement`). With both lists emptied, 134 of the 299 distinct lines on
-these cards lose every Reading (`parse-lists.txt` against `parse-nolists.txt`).
+Today the lexicon loads each listed name as a card-scoped Catalog Lexeme (`introduced_name:`).
+`Lexicon::stands_in` admits it only on its listed cards, and the grammar reads it through
+`Name -> Lex(Catalog)` wherever a Name stands (`ProperName`, `NamePremodifier`, `ProperPossessor`,
+`NameAsComplement`). (With `introduced_names.ron` and `cited_names.ron` both emptied, 134 of the
+299 distinct lines in `inputs.bin` lose every Reading: `parse-lists.txt` against
+`parse-nolists.txt`.)
 
 What a read name needs was measured by emulation. `longest.py` reads, at each position that
 introduces a name (after *named*, the Object of `create … , a … token`, after `except its name
-is`, before `expansion`), the longest run of words that starts with a capital. The run continues
-over capitalized words, over lowercase *of*, *the* and *to*, and over ", " when a capital or
-*the* follows. It stops before *and*. Three refusals keep card names out: a run that a card name
-spells is refused, a run that is a proper prefix of a card name printed at that position is
-refused, and ", " does not continue a run after a part that a card name spells. Over every
-in-scope face this rule finds exactly the 98 listed names other than the four card names of
-`create a NAME token`, on exactly their listed faces, plus the 3 expansions and New Planet, and
-nothing else (`longest_pool.ron`; the emulation also reads after *completed*, which finds only
-Tomb of Annihilation, a dungeon name).
+is`), the longest run of words that starts with a capital. The run continues over capitalized
+words, over lowercase *of*, *the* and *to*, and over ", " when a capital or *the* follows. It stops
+before *and*. Three refusals keep card names out: a run that a card name spells is refused, a run
+that is a proper prefix of a card name printed at that position is refused, and ", " does not
+continue a run after a part that a card name spells. Over every in-scope face this rule finds
+exactly the 98 listed names other than the four card names of `create a NAME token`, on exactly
+their listed faces, plus New Planet, and nothing else (`longest_pool.ron`; the emulation also reads
+before *expansion* and after *completed*, which `english-set-names-read-from-text` and
+`lexicon-dungeon-names` own separately).
 
 The refusals are each grounded in a real card:
 
@@ -96,17 +94,15 @@ in the middle of a sentence at several positions. And it is used again after its
 ## Design
 
 - A name a card's text introduces (the name of a token it creates [CR#111.4], or of a permanent
-  or copy it changes) and an expansion name the text cites are strings read from the text. No
-  catalog lists them, and nothing keyed by card holds them.
-- A name is read where the text introduces or cites it: the complement of *named*, the
-  Object of *create* before a token-description Supplement, the complement of `its name is` in a
-  copy's exception, and the premodifier of the noun *expansion*. These are the in-scope
-  positions of the table.
+  or copy it changes) is a string read from the text. No catalog lists it, and nothing keyed by
+  card holds it.
+- A name is read where the text introduces it: the complement of *named*, the Object of *create*
+  before a token-description Supplement, and the complement of `its name is` in a copy's exception.
+  These are the in-scope positions of the table.
 - A read name is a Proper Name, unmarked for Number (`lexicon.md` §6). Its genitive is formed as a
   card name's is (*Beau's power*).
-- `introduced_names.ron`, `cited_names.ron`, the `IntroducedName` schema type, the
-  `cited_names` loader path and the `introduced_name:` and `cited_name:` Lexemes are deleted.
-  `ScopedName` stays for `vote_options.ron`.
+- `introduced_names.ron`, the `IntroducedName` schema type, its loader path and the
+  `introduced_name:` Lexemes are deleted.
 
 ## Open questions
 
@@ -116,9 +112,9 @@ in the middle of a sentence at several positions. And it is used again after its
   stays free of grammar (`lexicon.md` §2), and the license lives where the position is defined.
   This needs new productions for the `create NAME, a … token` Supplement and for `its name is`,
   because today both go through the general `NounPhraseSupplement` and `ProperName`.
-  (b) Analysis proposes a run only after fixed context words (*named*, *create*, `its name is`,
-  `the … expansion`), which is what `longest.py` emulates. This needs no grammar change, but
-  analysis has to know English words and their order, which `lexicon.md` §2 keeps out of it.
+  (b) Analysis proposes a run only after fixed context words (*named*, *create*, `its name is`),
+  which is what `longest.py` emulates. This needs no grammar change, but analysis has to know
+  English words and their order, which `lexicon.md` §2 keeps out of it.
   Recommendation: (a). Confidence: medium.
 - **Where a read name ends.** (a) One run per start, the longest the shape rule above allows,
   with its three refusals. This reproduces the lists exactly over the pool. (b) Every end of the
@@ -154,9 +150,8 @@ in the middle of a sentence at several positions. And it is used again after its
 
 ## Done when
 
-- `introduced_names.ron` and `cited_names.ron` are deleted, with their loader paths, the
-  `IntroducedName` schema type and their README rows. No card-scoped Catalog remains for these
-  names.
+- `introduced_names.ron` is deleted, with its loader path, the `IntroducedName` schema type and its
+  README row. No card-scoped Catalog remains for introduced names.
 - Every line in `docs/evidence/names-read-from-text/inputs.bin` has the same derivation count as
   in `parse-lists.txt`. The exceptions are the nine New Planet lines, which have a Reading with
   "New Planet" as the complement of *named*.
@@ -180,7 +175,7 @@ in the middle of a sentence at several positions. And it is used again after its
   (`admission_refuses_an_introduced_name_off_the_cards_that_introduce_it`).
   Admission still refuses a read name off its licensing position or scope.
 - `docs/decisions/lexicon.md` and the glossary state the design:
-  - §2's "The one open slot is the Flavor Word" names read names as the second open slot.
+  - §2's "The one open slot is the Flavor Word" names read names among the open slots.
   - §6's "A name a card gives an object, or a vote option, spelled like another card's name is
     listed as that card's Introduced Name or vote option (*create a Tarmogoyf token*, …)" no
     longer says such a name is listed. §6's list of positions that opt in to `OtherCardName()`
@@ -189,9 +184,9 @@ in the middle of a sentence at several positions. And it is used again after its
     spells: a token name or Introduced Name always" no longer refers to a listed Introduced
     Name.
   - The glossary's Introduced Name drops "It is in scope only on that card" and the *Tarmogoyf*
-    example. Flavor Word drops "the one open lexical slot". Card Scope drops "an Introduced
-    Name … only where it holds one of its cards". Proper Name drops "a cited name".
-  - `crates/vocabulary/README.md` no longer lists the two catalogs as hand-curated.
+    example. Flavor Word is no longer "the one open lexical slot". Card Scope drops "an Introduced
+    Name … only where it holds one of its cards".
+  - `crates/vocabulary/README.md` no longer lists `introduced_names.ron`.
 - `cargo xtask english strata --check` passes, and the census changes only on the New Planet
   units. `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_lexicon`,
   `sylex_vocabulary`, `sylex_syntax`, `sylex_english` and `xtask`.
@@ -199,7 +194,8 @@ in the middle of a sentence at several positions. And it is used again after its
 ## Not in scope
 
 - `vote_options.ron`, also a card-scoped list, which has no ruling; `anchor_words.ron` is
-  `english-anchor-words-read-from-text`.
+  `english-anchor-words-read-from-text`; the expansion entries of `cited_names.ron` are
+  `english-set-names-read-from-text`.
 - The participle premodifier that misreads "named New Planet" today
   (`Premodification:BareNominal/Verb/attach`).
 
@@ -210,7 +206,7 @@ in the middle of a sentence at several positions. And it is used again after its
 - `crates/english/grammar/english.fug`: `Name`, `NameComplement`, `NamedParameter`,
   `ProperName`, `NamePremodifier`, `ProperPossessor`, `OtherCardNameComplement`,
   `NounPhraseSupplement`, `FlavorLabelledAbility`.
-- `crates/vocabulary/src/lib.rs` (`introduced_names`, `scoped_name_catalogs`),
+- `crates/vocabulary/src/lib.rs` (`introduced_names`),
   `crates/vocabulary/src/schema.rs`, `crates/english/src/profile.rs` (`introduced_name` skeleton
   class), `crates/syntax/src/reading.rs` (admission's `stands_in`).
 - `docs/decisions/lexicon.md` §2, §6; `docs/contexts/oracle-english/CONTEXT.md`.
