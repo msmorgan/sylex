@@ -33,6 +33,7 @@ use sylex_core::Subtype;
 use sylex_core::Supertype;
 use sylex_core::Type;
 use sylex_core::TypeDef;
+use sylex_core::Uint;
 use sylex_core::Zone;
 
 use crate::object::ObjectId;
@@ -103,6 +104,18 @@ pub struct ContinuousEffect {
 /// concept and holds only characteristics.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Characteristics {
+    /// The name on the face the object presents ([CR#712.6c,712.6d]). No
+    /// implemented layer changes it; layer 1 (copy, face-down) is the
+    /// `base_values` seam.
+    pub name: Arc<str>,
+    /// The mana value ([CR#202.3]), from [`crate::derive::mana_value_of`]:
+    /// a back-up nonmodal double-faced permanent counts its front face's cost
+    /// ([CR#712.6d]). No implemented layer changes it.
+    pub mana_value: Uint,
+    /// The printed loyalty on the face the object presents
+    /// ([CR#209.1,306.5a]), never its loyalty counters; `None` when that face
+    /// has none. No implemented layer changes it.
+    pub loyalty: Option<Int>,
     pub power: Option<Int>,
     pub toughness: Option<Int>,
     pub colors: Arc<Vec<Color>>,
@@ -215,6 +228,9 @@ impl LayeredView {
             id,
             DerivedObject {
                 characteristics: Characteristics {
+                    name: Arc::from(""),
+                    mana_value: 0,
+                    loyalty: None,
                     power: None,
                     toughness: None,
                     colors: Arc::new(Vec::new()),
@@ -316,6 +332,9 @@ fn base_values(state: &GameState, id: ObjectId) -> DerivedObject {
     let cache = instance.face_cache(obj.side);
     DerivedObject {
         characteristics: Characteristics {
+            name: Arc::clone(&face.characteristics.name),
+            mana_value: crate::derive::mana_value_of(state, id),
+            loyalty: crate::derive::loyalty_of(state, id),
             power: base_stat(face.characteristics.power.as_ref()),
             toughness: base_stat(face.characteristics.toughness.as_ref()),
             colors: Arc::clone(&cache.colors),
@@ -2675,6 +2694,9 @@ mod tests {
         // A derived object whose card_types are the expanded Creature TypeDef
         // matches Type(Creature) by name.
         let chars = super::Characteristics {
+            name: Arc::from("Grizzly Bears"),
+            mana_value: 2,
+            loyalty: None,
             power: None,
             toughness: None,
             colors: Arc::new(vec![]),

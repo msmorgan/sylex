@@ -47,6 +47,60 @@ pub fn face_of(state: &GameState, id: ObjectId) -> &CardFace {
     }
 }
 
+/// The mana value of the card-backed object `id` ([CR#202.3]). A nonmodal
+/// double-faced permanent showing its back computes it from its front face's
+/// mana cost ([CR#202.3b,712.6d]); every other object from the face it
+/// presents. `X` counts as 0 ([CR#202.3e]); the on-stack announced X is not
+/// wired.
+///
+/// # Panics
+///
+/// Panics on a player proxy, a stale id, or a back-up object whose card is
+/// not double-faced.
+#[must_use]
+pub(crate) fn mana_value_of(state: &GameState, id: ObjectId) -> Uint {
+    let obj = state.objects.obj(id);
+    let costed = match obj.side {
+        crate::object::Side::Front => face_of(state, id),
+        crate::object::Side::Back => match state
+            .cards
+            .get(obj.card_id().expect("card-backed object"))
+            .def
+            .as_ref()
+        {
+            Card::DoubleFaced {
+                layout: sylex_card::DoubleFacedLayout::Transforming,
+                front,
+                ..
+            } => front,
+            Card::DoubleFaced {
+                layout: sylex_card::DoubleFacedLayout::ModalDfc,
+                back,
+                ..
+            } => back,
+            other @ (Card::Normal(_)
+            | Card::Split { .. }
+            | Card::Flip { .. }
+            | Card::Adventurer { .. }) => {
+                panic!("object {id:?} shows its back, but its card has no back face: {other:?}")
+            }
+        },
+    };
+    costed.characteristics.mana_cost.mana_value()
+}
+
+/// The printed loyalty ([CR#209.1,306.5a]) on the face the card-backed object
+/// `id` presents, `None` when that face has none. This is the loyalty
+/// characteristic, never the loyalty counter count.
+///
+/// # Panics
+///
+/// Panics on a player proxy or a stale id.
+#[must_use]
+pub(crate) fn loyalty_of(state: &GameState, id: ObjectId) -> Option<sylex_core::Int> {
+    crate::layer::base_stat(face_of(state, id).characteristics.loyalty.as_ref())
+}
+
 /// A face's INTRINSIC printed abilities only (`face.abilities`) — NOT
 /// type/subtype conferrals. Type/subtype conferral is re-derived from the
 /// object's CURRENT characteristics each layer pass by
@@ -682,5 +736,84 @@ mod tests {
              duplicated by the section-3 skip-count"
         );
         assert_eq!(captures.len(), derived.len());
+    }
+
+    /// [CR#712.6c,712.6d,202.3b]: a transformed Delver of Secrets derives the
+    /// name Insectile Aberration, and its mana value is still computed from
+    /// the front face's {U}.
+    #[test]
+    fn transformed_permanent_derives_its_back_name_and_front_mana_value() {
+        use crate::object::Side;
+
+        let canon = sylex_plugin_v1::plugin::Plugin::load_with_sibling_prelude(
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
+        )
+        .unwrap();
+        let delver = Arc::new(canon.card("Delver of Secrets").unwrap().core);
+        let mut state = game();
+        let card_id = state.cards.push(delver, PlayerId(0));
+        let id = state.objects.mint(
+            ObjectSource::Card(card_id),
+            PlayerId(0),
+            Some(Zone::Battlefield),
+        );
+        state.zones.battlefield.push(id);
+
+        let view = state.layers();
+        assert_eq!(&*view.get(id).name, "Delver of Secrets");
+        assert_eq!(view.get(id).mana_value, 1);
+
+        state.objects.obj_mut(id).side = Side::Back;
+        let view = state.layers();
+        assert_eq!(&*view.get(id).name, "Insectile Aberration");
+        assert_eq!(
+            view.get(id).mana_value,
+            1,
+            "a back-up nonmodal DFC takes its mana value from the front's {{U}}"
+        );
+    }
+
+    /// [CR#712.6d,306.5a]: the loyalty characteristic derives from the face
+    /// the permanent presents. A minimal repro of Jace, Vryn's Prodigy // Jace,
+    /// Telepath Unbound: a creature front with no loyalty, a planeswalker back
+    /// with printed loyalty 5.
+    #[test]
+    fn back_up_planeswalker_derives_its_back_loyalty() {
+        use sylex_card::DoubleFacedLayout;
+        use sylex_core::StatValue;
+        use sylex_core::Type;
+
+        use crate::object::Side;
+
+        let front = CardFace::from(Characteristics {
+            name: "Jace, Vryn's Prodigy".into(),
+            types: vec![Type::Creature.def()],
+            power: Some(StatValue::Number(0)),
+            toughness: Some(StatValue::Number(2)),
+            ..Characteristics::default()
+        });
+        let back = CardFace::from(Characteristics {
+            name: "Jace, Telepath Unbound".into(),
+            types: vec![Type::Planeswalker.def()],
+            loyalty: Some(StatValue::Number(5)),
+            ..Characteristics::default()
+        });
+        let card = Card::DoubleFaced {
+            layout: DoubleFacedLayout::Transforming,
+            front,
+            back,
+        };
+        let mut state = game();
+        let card_id = state.cards.push(Arc::new(card), PlayerId(0));
+        let id = state.objects.mint(
+            ObjectSource::Card(card_id),
+            PlayerId(0),
+            Some(Zone::Battlefield),
+        );
+        state.zones.battlefield.push(id);
+
+        assert_eq!(state.layers().get(id).loyalty, None);
+        state.objects.obj_mut(id).side = Side::Back;
+        assert_eq!(state.layers().get(id).loyalty, Some(5));
     }
 }
