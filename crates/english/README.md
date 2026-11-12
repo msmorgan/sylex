@@ -41,8 +41,13 @@ lexemes of that lexicon and that none of its own names spells a catalog item.
   ([`docs/decisions/english.md`](../../docs/decisions/english.md) §6), remove
   it, run the census, and compare with the census that has it: the spurious
   Readings and units the forest gains without it, and the largest units'
-  growth. A new gate states that result in its comment in
-  [`grammar/english.fug`](grammar/english.fug).
+  growth. The comparison is reported with the change that adds or retires
+  the gate and is not kept; the gate's comment in
+  [`grammar/english.fug`](grammar/english.fug) names one real card and the
+  spurious structure the gate prevents on it, as the Preposition Phrase
+  valence's `closed_complement` comment does. This holds for every gate
+  labeled "admission gate" in the grammar, and for any other gate when a
+  change adds, retires or edits it.
 
 ## Seed proof
 

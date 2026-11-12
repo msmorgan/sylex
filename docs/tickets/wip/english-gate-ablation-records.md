@@ -20,22 +20,18 @@ label.
 
 ## Design
 
-- A gate's ablation result is not recorded in `english.fug`: a census comparison per gate would
-  undo the grammar's short comments. The comment keeps the "admission gate (ADR §6)" label.
-
-## Open questions
-
-- Where does a gate's ablation record live: a checked-in ledger under `crates/english/` keyed by
-  declaration name, or nowhere durable (the ablation is run and reported when a gate is added or
-  retired, and the README rule drops its sentence about the comment)?
-- Does the rule apply to gates already in the grammar, and if so to every `Exclude` and
-  `Require` that §6 defines as a gate or only to the labeled ones?
+- A gate's ablation is not kept. The gate's comment in `english.fug` names one real card and the
+  spurious structure the gate prevents on it, as the Preposition Phrase valence's
+  `closed_complement` comment does; the measured census comparison is reported with the change
+  that adds or retires the gate.
+- The rule applies to the labeled gates now, and to any other gate when a change adds, retires or
+  edits it.
 
 ## Done when
 
 - The README rule states where the record lives, and the ADR §6 text agrees with it.
-- Each gate labeled "admission gate" in `english.fug` has its ablation recorded where the rule
-  says, or the label is removed because the declaration is not a gate.
+- Each gate labeled "admission gate" in `english.fug` names a card and the spurious structure it
+  prevents, or the label is removed because the declaration is not a gate.
 - The census before and after shows no change in Readings (the records change no behavior).
 
 ## Pointers

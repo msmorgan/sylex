@@ -208,14 +208,19 @@ Packed Forest, without building trees.
 
 ## 6. Admission gates
 
-An admission gate is an `Exclude` or `Require` equation, or a Category that
-restates some Productions in order to omit others. A gate earns its place by
-what it prevents on real card text: spurious Readings and forest growth. That
-effect is measured by ablation, removing the gate and comparing the census
-([`crates/english/README.md`](../../crates/english/README.md), "Working
-rules"). That English never builds a form is not by itself a justification,
-and the style guide is evidence about the register, never a gate's
-justification. A form that is only dispreferred is ranked (§5), not gated.
+An admission gate is an `Exclude`, `Require` or `Carry` equation, a schema
+flag that refuses a structure (as the Preposition Phrase valence's
+`closed_complement` does), or a Category that restates some Productions in
+order to omit others.
+An equation on the mother that only values a feature is not a gate. A gate
+earns its place by what it prevents on real card text: spurious Readings and
+forest growth. That effect is measured by ablation, removing the gate and
+comparing the census ([`crates/english/README.md`](../../crates/english/README.md),
+"Working rules"). The gate's comment names one real card and the spurious
+structure the gate prevents on it, as that rule says. That English never
+builds a form is not by itself a justification, and the style guide is
+evidence about the register, never a gate's justification. A form that is
+only dispreferred is ranked (§5), not gated.
 Why: a gate with no effect on real cards refuses only forms no card prints,
 which only grows the grammar (§3), while a gate whose removal multiplies
 Readings on real cards keeps the forest one the layers above can work over.
