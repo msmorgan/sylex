@@ -16,21 +16,19 @@ in `CliticSubjectPredicate` (*each of those creatures're*); and `complement.Case
 appears to refuse *each of them connive*. `AnyPartitive` handles *any of* with a plural oblique
 by leaving Number unvalued.
 
-## Open questions
+## Design
 
-- Is the plural an agreement error for an Editorial Correction, attested agreement admitted by
-  a Production that says so without the CGEL reference, or an unvalued Number as in
-  `AnyPartitive`?
-- If it stays a Production, how is it limited to Subjects other than by a Case value?
+- *Each of X target creatures you control connive* (Change of Plans) is an agreement error in the
+  text: it reads through an Editorial Correction to *connives*, and `SynesisDistributivePartitive`
+  is deleted, so fused *each* with a plural oblique agrees in the singular only.
 
 ## Done when
 
 - CGEL pp. 501–507 is re-read and whether it covers plural agreement with *each of* is recorded.
-- Whether `CliticSubjectPredicate` admits the Production as a clitic host, and whether *each of
-  them* with a plural verb has a Reading, are confirmed by parse.
-- No Production sets `Case` as a position tag; the comment states what is admitted and why.
-- Change of Plans keeps a correct Reading (or reads through an Editorial Correction), and the
-  census shows no Reading lost on the supported corpus.
+- `SynesisDistributivePartitive` is deleted, and no *each of* Subject has a Reading with a
+  plural verb or as a clitic host through a `Case` value.
+- Change of Plans reads through an Editorial Correction, and the census shows no other verdict
+  change on the supported corpus.
 
 ## Not in scope
 
