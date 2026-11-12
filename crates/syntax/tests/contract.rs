@@ -450,9 +450,11 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
 
 /// Obligations 3 and 4, discharged by construction: no Category is nullable.
 /// A Production with an empty right-hand side is a load error, the engine
-/// has no literal symbol (punctuation is one character), and every lexical
-/// alternative spans at least one character. So there is no empty-span
-/// Derivation to complete, predict, duplicate or keep as a leaf.
+/// has no literal symbol, and every lexical alternative spans at least one
+/// character. A written mark is one character, but a period may be unwritten
+/// and match with zero width, so a Production made only of periods is a load
+/// error too. So there is no empty-span Derivation to complete, predict,
+/// duplicate or keep as a leaf.
 #[test]
 fn no_category_is_nullable() {
     let lexicon =
@@ -460,6 +462,19 @@ fn no_category_is_nullable() {
     let empty = WORD.replace("Numeral: Word -> word:Lex(Numeral)", "Numeral: Word ->");
     match bind(&empty, &lexicon, NO_FRAMES) {
         Err(LoadError::Invalid(message)) => assert!(message.contains("empty right-hand side")),
+        other => panic!("{other:?}"),
+    }
+    let periods = WORD.replace(
+        "Numeral: Word -> word:Lex(Numeral)",
+        "Numeral: Word -> '.' '.'",
+    );
+    match bind(&periods, &lexicon, NO_FRAMES) {
+        Err(LoadError::Invalid(message)) => {
+            assert!(
+                message.contains("`Numeral`: every child is a period"),
+                "{message}"
+            );
+        }
         other => panic!("{other:?}"),
     }
     let grammar = bind(WORD, &lexicon, NO_FRAMES).unwrap();
@@ -841,10 +856,6 @@ fn closed_child_with_a_gap_yields_no_mother() {
     }
 }
 
-/// Obligation 9: a unary cycle hides no finite sibling Derivation. `A` and
-/// `B` each derive the word and each other; every tree in which no
-/// Constituent contains itself is a Reading, whichever Constituent the
-/// forest reaches first.
 /// A Production introduces a Gap with `$.Gap = ..` (a subject
 /// Gap), and a transparent child with a required Gap raises exactly that Gap
 /// to its mother.
@@ -887,6 +898,10 @@ fn authored_productions_introduce_and_raise_gaps() {
     assert_eq!(raised.derivation_count(), 0);
 }
 
+/// Obligation 9: a unary cycle hides no finite sibling Derivation. `A` and
+/// `B` each derive the word and each other; every tree in which no
+/// Constituent contains itself is a Reading, whichever Constituent the
+/// forest reaches first.
 #[test]
 fn unary_cycle_hides_no_finite_sibling() {
     let lexicon = Lexicon::new([noun("card")]).unwrap();

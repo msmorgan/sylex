@@ -1038,6 +1038,7 @@ impl<'a> Binder<'a> {
         self.auxiliaries()?;
         self.edge_lines()?;
         self.report_holders();
+        self.no_empty_constituent()?;
         for (name, declaration) in &self.grammar.categories {
             if let Some(category) = &declaration.category {
                 self.category(category)?;
@@ -1048,6 +1049,30 @@ impl<'a> Binder<'a> {
         self.out.cluster_shapes = cluster_shapes(&self.out.frames);
         self.out.prediction = crate::prediction::Prediction::compile(&self.out);
         Ok(self.out)
+    }
+
+    /// Refuses a Production made only of periods. A lexical alternative spans
+    /// at least one char and a written mark is one char, but a period may be
+    /// unwritten and match with zero width (a quotation's own final period,
+    /// or one after a word ending in terminal punctuation; `run`). Such a
+    /// Production could build a Constituent spanning nothing, as an empty
+    /// right-hand side would; every other Production has a child spanning at
+    /// least one char, so no Constituent is empty.
+    fn no_empty_constituent(&self) -> Result<(), LoadError> {
+        for production in &self.out.productions {
+            if production
+                .rhs
+                .iter()
+                .all(|s| matches!(s, Symbol::Punct('.', ..)))
+            {
+                return Err(invalid(format!(
+                    "production `{}`: every child is a period, which may be unwritten, so it \
+                     can build a Constituent that spans nothing",
+                    production.id
+                )));
+            }
+        }
+        Ok(())
     }
 
     /// Marks the auxiliary Verb Phrases, structurally: an uncoordinated

@@ -441,6 +441,13 @@ impl CompiledGrammar {
         let mut by_start: Vec<Vec<usize>> = vec![Vec::new(); n + 1];
         let atomic = self.atomic_spans(analyzed);
         for found in &analyzed.matches {
+            // No Constituent spans nothing: see
+            // `Binder::no_empty_constituent` for the other half.
+            assert!(
+                found.start < found.end,
+                "lexical analysis matched an empty span at char {}",
+                found.start
+            );
             // Inside a multiword noun, only an ordinary word of a term whose
             // words may stand apart reaches the chart.
             let word = matches!(found.reading, LexicalReading::Word(_));
