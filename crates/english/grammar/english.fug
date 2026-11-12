@@ -1616,17 +1616,6 @@ DistributivePartitive: PartitiveHead ->
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// Plural agreement by synesis (*Each of X target creatures you control
-// connive*; CGEL 5§18.2:504).
-SynesisDistributivePartitive: PartitiveHead ->
-    quantifier:Word(Each) complement:Selected(PrepositionPhrase, Of) { cost: 3 }
-    where complement.Number = Plural,
-          complement.Case := Plain,
-          $.Number = Plural,
-          $.NounKind = Ordinary,
-          $.Determination = Overt,
-          $.Case = Nominative,
-          $.Person = Third
 // *Any* with a plural oblique leaves the Noun Phrase's Number open.
 AnyPartitive: PartitiveHead -> Word(Any) complement:Selected(PrepositionPhrase, Of)
     where complement.Number = Plural,

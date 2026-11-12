@@ -32,3 +32,8 @@ card: Azlask, the Swelling Scourge
 oracle: Scions and Spawns you control
 corrected: Scions and Spawn you control
 evidence: Ungrammatical Oracle text: Spawn has the zero plural. Hand of Emrakul, from Rise of the Eldrazi, the set that introduced the type, reads "sacrifice four Eldrazi Spawn", kept through every Oracle rewording, and no other in-scope Oracle text writes "Spawns". The printed card (M3C) has the same "Spawns", so the ground is grammar, not a printed-card disagreement.
+
+card: Change of Plans
+oracle: Each of X target creatures you control connive.
+corrected: Each of X target creatures you control connives.
+evidence: Ungrammatical Oracle text: fused distributive "each" heads the Subject, so the verb is singular; "connive" agrees with the nearer plural "creatures" instead. CGEL gives "each" singular agreement: it selects "a singular head" (Ch. 5 §7.4, p. 378), its fused-head partitive takes a singular verb ("Each (of them) was cut in two", p. 379 [23i]), and as a quantifier in a Subject it "enforce[s] singularity on the whole clause" (§19.3, p. 515 n. 75). The fused determiner-heads CGEL lets take a plural verb are "any", "none", "either" and "neither" (§18.3(f), p. 507), not "each". Every other "each of" Subject in the supported corpus whose verb shows Number, 40 of them, has a singular verb. The printed card (NCC 24) has the same "connive", so the ground is grammar, not a printed-card disagreement.

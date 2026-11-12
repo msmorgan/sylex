@@ -4,7 +4,8 @@
 + <card=Erebos's Intervention> • Exile up to twice X target cards from graveyards. => DeterminerPhrase "up to twice X target" as Determiner of card; PrepositionPhrase "up to twice X"
 + <card=Stabwhisker the Odious> At the beginning of each opponent's upkeep, that player loses 1 life for each card fewer than three in their hand. => DeterminerPhrase "fewer than three" as Modifier of card
 + <card=Keeper of the Beasts> {G}, {T}: Choose target opponent who controls more creatures than you do as you activate this ability. => NounPhrase "more creatures than you do" as Object of control; Clause "you do" || NounPhrase "more creatures than you do as you activate this ability" as Object of control
-+ <card=Change of Plans> Each of X target creatures you control connive. => NounPhrase "Each of X target creatures you control" as Subject of connive; readings 1
++ <card=Change of Plans> Each of X target creatures you control connives. => NounPhrase "Each of X target creatures you control" as Subject of connive; readings 1
+* <card=Change of Plans> Each of X target creatures you control connive.
 +NounPhrase at least one creature => readings 1
 +NounPhrase exactly one creature => readings 1
 +NounPhrase twice X life => readings 1
