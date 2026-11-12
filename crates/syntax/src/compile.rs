@@ -1374,11 +1374,21 @@ impl<'a> Binder<'a> {
                     }
                 }
                 Equation::Require(path, _) if path.ends_with(".Gap") => {}
-                Equation::Require(path, value) => {
-                    for path in self.paths(draft, path)? {
+                Equation::Require(text, value) => {
+                    for path in self.paths(draft, text)? {
                         let feature = match path {
                             Path::Mother(f) | Path::Child(_, f) => f,
                         };
+                        // A child leaves a privative feature unvalued or
+                        // carries its one value, and a Require passes both:
+                        // as a test it never fails.
+                        if matches!(path, Path::Child(..)) && self.out.values[feature].len() == 1 {
+                            return Err(invalid(format!(
+                                "`{text} = {value}` in `{}`: the privative feature never \
+                                 fails a Require; write `{text} := {value}`",
+                                draft.id
+                            )));
+                        }
                         let value = self.value(feature, value)?;
                         draft.equations.push((path, Target::Value(value)));
                     }

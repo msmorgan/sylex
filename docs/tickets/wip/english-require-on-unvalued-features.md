@@ -29,10 +29,11 @@ admit everything they were written to exclude:
   which the `DeterminativeDistribution` comment calls an admission gate, may be standing in for
   the missing requirement.
 
-## Open questions
+## Design
 
-- Should the `.fug` compiler reject, or warn on, `=` against a constant for a privative feature
-  or one a coordination leaves unshared, or leave it to authors?
+- The `.fug` compiler refuses, as a load error, `child.F = Value` on a child's privative feature
+  (one with a single value), since it can never fail; `$.F = Value` on the mother stays legal, an
+  author writes `:=` to require the value, and there is no broader check.
 
 ## Done when
 

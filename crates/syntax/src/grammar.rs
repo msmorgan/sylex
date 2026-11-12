@@ -275,6 +275,9 @@ pub enum SymbolDecl {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum Equation {
     Agree(Ident, Ident),
+    /// Values a path, which a child that leaves the feature unvalued passes.
+    /// On a child's privative feature (one value) it never fails, and the
+    /// grammar is refused at load: a test writes `Carry`.
     Require(Ident, Ident),
     /// Excludes a value on a child without requiring an inapplicable feature.
     Exclude(Ident, Ident),

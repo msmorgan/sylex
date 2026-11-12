@@ -345,6 +345,29 @@ fn load_errors() {
         1,
     );
     assert!(load_error(&agreeing).contains("values differ"));
+    // A child's privative feature is unvalued or its one value, and a Require
+    // passes both: it is written `:=`. On the mother, `=` values it.
+    let privative = |equation: &str| {
+        swap("feature Number = ", "feature Fronted = Occupied\n    feature Number = ")
+            .replacen("category Nominal [Number]", "category Nominal [Number, Fronted]", 1)
+            .replacen(
+                "Noun: Nominal -> Lex(Noun)",
+                &format!("Noun: Nominal -> Lex(Noun)\n    Fronting: Nominal -> det:Word(This) Nominal where {equation}"),
+                1,
+            )
+    };
+    let message = load_error(&privative("head.Fronted = Occupied"));
+    assert!(
+        message.contains("Fronting") && message.contains("head.Fronted := Occupied"),
+        "{message}"
+    );
+    bind(&privative("head.Fronted := Occupied"), &lexicon()).unwrap();
+    bind(&privative("$.Fronted = Occupied"), &lexicon()).unwrap();
+    let coordinated = format!(
+        "{}    word And = \"c:and\"\n    coordination Nominal {{ coordinators: And }} where last.Fronted = Occupied\n",
+        privative("$.Fronted = Occupied")
+    );
+    assert!(load_error(&coordinated).contains("last.Fronted := Occupied"));
     // An unlike slot's Category is coordinated over one unlike feature.
     let unlike = |coordinations: &str| {
         format!(

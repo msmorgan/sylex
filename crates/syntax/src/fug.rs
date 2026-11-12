@@ -52,7 +52,10 @@
 //! equation is `path = Value` (require), `path = path` (agree),
 //! `path := Value` (carry), `path != A | B` (exclude each), or
 //! `!(path = A & path = B)` (exclude together), where a path is `$.Feature`
-//! or `child.Feature`; `=` is written only in equations. Props are
+//! or `child.Feature`; `=` is written only in equations. A child that leaves
+//! a feature unvalued passes `child.F = Value`; a test that the child carries
+//! the value writes `:=`, and `child.F = Value` on a privative feature (one
+//! value) is a load error, since it never fails. Props are
 //! `key: value` or a bare `key` flag; a pair in a prop list is `A -> B`.
 
 use std::fmt::Display;
