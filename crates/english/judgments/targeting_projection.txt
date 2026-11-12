@@ -24,7 +24,7 @@
 +NounPhrase target creature => DeterminerPhrase "target" head det:target as Determiner of creature; readings 1
 +NounPhrase target player's graveyard => NounPhrase "target player" head player; DeterminerPhrase "target" head det:target as Determiner of player; readings 1
 +NounPhrase other target creatures => DeterminerPhrase "other target" head det:target as Determiner of creature; AdjectivePhrase "other"; readings 1
-+NounPhrase one or two target creatures => DeterminerPhrase "one or two target" as Determiner of creature; DeterminerPhrase "one or two"
++NounPhrase one or two target creatures => DeterminerPhrase "one or two target" as Determiner of creature; DeterminerPhrase "one or two"; readings 1
 # An adjective that needs an overt determiner is an ordinary premodifier, not a Targeting Marker.
 +NounPhrase the only creature you control => AdjectivePhrase "only" head adj:only as Modifier of creature; DeterminerPhrase "the" as Determiner of creature; !DeterminerPhrase "only"; readings 1
 # The Targeting Marker determines its nominal above every postmodifier; no postmodifier attaches above it.
@@ -43,7 +43,7 @@
 # from: Incremental Blight
 +NounPhrase a third target creature => DeterminerPhrase "a third target" as Determiner of creature; DeterminerPhrase "third target" head det:target; readings 1
 # from: Dwarven Song
-+NounPhrase One or more target creatures => DeterminerPhrase "One or more target" as Determiner of creature; DeterminerPhrase "One or more"; DeterminerPhrase "target" head det:target
++NounPhrase One or more target creatures => DeterminerPhrase "One or more target" as Determiner of creature; DeterminerPhrase "One or more"; DeterminerPhrase "target" head det:target; readings 1
 # from: Gaze of Pain
 +NounPhrase a target creature => DeterminerPhrase "a target" as Determiner of creature; DeterminerPhrase "target" head det:target; readings 1
 # from: Guardian of Faith
