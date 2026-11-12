@@ -2109,12 +2109,14 @@ mod tests {
     /// [CR#704.5h]: the deathtouch clause reads the DEAL-TIME abilities
     /// captured on the object's damage marks — false with no marks, false for
     /// a plain (non-deathtouch) mark, true once a deathtouch-sourced mark
-    /// exists. Re-spelled from the retired `Is(Source, …)` reference form
-    /// ([CR#120.1] — a damage source is a relation, not a referent); same
-    /// subject, same asserted outcomes. Both surviving core spellings of that
-    /// relation are pinned side by side: the `DealtDamageBy` condition the
-    /// lethal-damage SBA authors, and the `WasDealtDamageBy` state predicate
-    /// that carries the same query into filters and target constraints.
+    /// exists, and false again once state-based actions have been checked
+    /// since it was dealt. Re-spelled from the retired `Is(Source, …)`
+    /// reference form ([CR#120.1] — a damage source is a relation, not a
+    /// referent); same subject, same asserted outcomes. Both surviving core
+    /// spellings of that relation are pinned side by side: the
+    /// `DealtDamageBy` condition the lethal-damage SBA authors, and the
+    /// `WasDealtDamageBy` state predicate that carries the same query into
+    /// filters and target constraints.
     #[test]
     fn dealt_damage_by_deathtouch_reads_deal_time_marks() {
         use sylex_core::Ability;
@@ -2172,6 +2174,17 @@ mod tests {
         assert!(
             state.condition_holds(&as_predicate, &frame),
             "the predicate spelling agrees: a deathtouch-sourced mark → condition holds"
+        );
+        // [CR#704.5h]: once state-based actions have been checked, the damage
+        // was dealt before the last check and no longer satisfies either.
+        state.objects.obj_mut(bear).mark_damage_checked();
+        assert!(
+            !state.condition_holds(&cond, &frame),
+            "a deathtouch mark dealt before the last check does not satisfy the condition"
+        );
+        assert!(
+            !state.condition_holds(&as_predicate, &frame),
+            "the predicate spelling agrees: a checked mark does not satisfy it"
         );
     }
 
@@ -2300,6 +2313,91 @@ mod tests {
                 .iter()
                 .any(|e| matches!(e, GameEvent::Act(Act { verb, on, .. }) if verb.as_str() == "Destroy" && on.as_slice() == [bear])),
             "a source that dealt deathtouch damage then left still destroys the target; got {actions:?}"
+        );
+    }
+
+    /// Puts the canon card `name` onto the battlefield under `owner`'s
+    /// control.
+    fn canon_on_field(
+        state: &mut GameState,
+        name: &str,
+        owner: PlayerId,
+    ) -> crate::object::ObjectId {
+        let card = Arc::new(canon().card(name).unwrap().core);
+        let card_id = state.cards.push(card, owner);
+        let id = state
+            .objects
+            .mint(ObjectSource::Card(card_id), owner, Some(Zone::Battlefield));
+        state.zones.battlefield.push(id);
+        id
+    }
+
+    /// Runs the scheduled work until the agenda drains or a decision
+    /// surfaces.
+    fn run_agenda(state: &mut GameState) {
+        while state.pending.is_none() && !state.agenda.is_empty() {
+            let _ = state.step();
+        }
+        assert!(state.pending.is_none(), "no decision expected");
+    }
+
+    /// [CR#704.5h,702.12b,120.6]: deathtouch destroys a creature dealt damage
+    /// by a deathtouch source "since the last time state-based actions were
+    /// checked". Darksteel Myr, a 1/2 under Glorious Anthem, is dealt 1
+    /// damage by Typhoid Rats while indestructible and survives that check.
+    /// Humility then takes its indestructible (a 2/2 now: base 1/1, +1/+1);
+    /// the damage stays marked, but it was dealt before the last check, and
+    /// 1 is below its toughness, so the Myr survives the next check too.
+    #[test]
+    fn deathtouch_damage_counts_only_until_the_next_check() {
+        use crate::agenda::WorkItem;
+        use crate::combat::has_keyword_named;
+
+        let (mut state, myr) = myr_on_field();
+        state.sba_rules = builtin().sba_rules;
+        state.agenda.clear();
+        canon_on_field(&mut state, "Glorious Anthem", PlayerId(0));
+        let rats = canon_on_field(&mut state, "Typhoid Rats", PlayerId(1));
+
+        state.schedule_front(vec![
+            WorkItem::Emit(Occurrence::single(GameEvent::DamageDealt(DamageDealt {
+                source: rats,
+                target: myr,
+                amount: 1,
+                combat: false,
+            }))),
+            WorkItem::CheckSbas,
+        ]);
+        run_agenda(&mut state);
+        assert!(
+            state.zones.battlefield.contains(&myr),
+            "indestructible: the deathtouch destroy does nothing ([CR#702.12b])"
+        );
+        assert_eq!(state.objects.obj(myr).total_damage(), 1);
+
+        canon_on_field(&mut state, "Humility", PlayerId(0));
+        let view = state.layers();
+        assert!(
+            !has_keyword_named(&view, myr, "Indestructible"),
+            "Humility took the Myr's indestructible"
+        );
+        assert_eq!(
+            view.toughness(myr),
+            Some(2),
+            "base 1/1 under Humility, +1/+1"
+        );
+        drop(view);
+        state.schedule_front(vec![WorkItem::CheckSbas]);
+        run_agenda(&mut state);
+        assert!(
+            state.zones.battlefield.contains(&myr),
+            "the deathtouch damage was dealt before the last check, so [CR#704.5h] no \
+             longer applies, and 1 damage is not lethal to a 2/2 ([CR#704.5g])"
+        );
+        assert_eq!(
+            state.objects.obj(myr).total_damage(),
+            1,
+            "the damage stays marked ([CR#120.6])"
         );
     }
 

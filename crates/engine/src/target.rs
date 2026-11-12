@@ -152,15 +152,11 @@ where
 }
 
 /// Whether a damage mark's captured DEAL-TIME abilities satisfy `filter`
-/// ([CR#120.3,702.2c]). The mark stores abilities, not an object, so only the
+/// ([CR#120.3,702.2e]). The mark stores abilities, not an object, so only the
 /// combinators and `Has(name)` can be answered — every other atom would need
 /// the live source, which the deal-time reading deliberately does not consult.
-/// Shared by both core spellings of the relation: the `WasDealtDamageBy` state
-/// predicate below and `Condition::DealtDamageBy`'s evaluator.
-pub(crate) fn source_abilities_match(
-    filter: &Predicate,
-    abilities: &[sylex_core::Ability],
-) -> bool {
+/// Read by [`dealt_damage_by_since_check`].
+fn source_abilities_match(filter: &Predicate, abilities: &[sylex_core::Ability]) -> bool {
     use sylex_core::CharacteristicPredicate;
     if let Some(result) = walk_combinators(filter, |f| source_abilities_match(f, abilities)) {
         return result;
@@ -171,6 +167,23 @@ pub(crate) fn source_abilities_match(
             .any(|a| crate::layer::ability_is_named(a, &name.0)),
         _ => false,
     }
+}
+
+/// [CR#704.5h,702.2e]: whether `object` has been dealt damage by a source
+/// matching `filter` since the last state-based-action check. Existential over
+/// the object's damage marks not yet checked, read against each mark's
+/// DEAL-TIME abilities: the source may since have lost the ability or left the
+/// battlefield, so the live source is never consulted. Shared by both core
+/// spellings of the relation, the `WasDealtDamageBy` state predicate and
+/// `Condition::DealtDamageBy`.
+pub(crate) fn dealt_damage_by_since_check(
+    object: &crate::object::GameObject,
+    filter: &Predicate,
+) -> bool {
+    object
+        .damage
+        .iter()
+        .any(|mark| !mark.checked && source_abilities_match(filter, &mark.source_abilities))
 }
 
 /// Whether the live object `id` matches `filter`. `watcher` is the carrier of
@@ -592,18 +605,12 @@ pub(crate) fn matches_with_activation(
         // `DamagedBy`/`ExiledBy`), not a convenient-wrong default: fizzles to
         // `false`.
         Predicate::State(StatePredicate::WasPutFrom(_)) => false,
-        // [CR#120.3,702.2c]: was `id` dealt damage by a source matching
-        // `inner`? Existential over the object's marked damage, read against
-        // each mark's DEAL-TIME abilities — the source may since have lost
-        // the ability or left the battlefield, so the live source is never
-        // consulted ([CR#704.5h]'s deathtouch clause is the first consumer).
-        Predicate::State(StatePredicate::WasDealtDamageBy(inner)) => {
-            state.objects.get(id).is_some_and(|obj| {
-                obj.damage
-                    .iter()
-                    .any(|mark| source_abilities_match(inner, &mark.source_abilities))
-            })
-        }
+        // [CR#704.5h]: was `id` dealt damage by a source matching `inner`
+        // since the last state-based-action check?
+        Predicate::State(StatePredicate::WasDealtDamageBy(inner)) => state
+            .objects
+            .get(id)
+            .is_some_and(|obj| dealt_damage_by_since_check(obj, inner)),
         // ----- Seams: backed by subsystems not yet built -----
         // [CR#702.33d..702.33e]: the paid-cost linkage has no announce
         // record yet (engine-alt-costs).

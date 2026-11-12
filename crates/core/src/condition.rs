@@ -49,9 +49,10 @@ pub enum Condition {
     Exists(Predicate),
     /// A referenced object matches a predicate ([CR#603.4], "if it is a …").
     Matches(Reference, Predicate),
-    /// The referenced object has marked damage from at least one source whose
+    /// The referenced object has been dealt damage, since the last time
+    /// state-based actions were checked, by at least one source whose
     /// deal-time abilities match the predicate ([CR#704.5h]). The query reads
-    /// stored damage history; it does not resolve the source as an object.
+    /// stored damage marks; it does not resolve the source as an object.
     DealtDamageBy(Reference, Predicate),
     /// The referenced attachment is LEGALLY attached ([CR#701.3b,303.4d]): it
     /// has a host AND that (attachment, host) pair passes the attachment

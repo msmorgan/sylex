@@ -86,16 +86,14 @@ impl GameState {
                 }
             }
 
-            // [CR#704.5h]: existentially query the referenced object's marked
-            // damage records. The predicate sees each source's DEAL-TIME
-            // abilities, so a source that has since left or lost deathtouch
-            // still satisfies the history read.
+            // [CR#704.5h]: existentially query the referenced object's damage
+            // marks dealt since the last state-based-action check. The
+            // predicate sees each source's DEAL-TIME abilities, so a source
+            // that has since left or lost deathtouch still satisfies the read.
             Condition::DealtDamageBy(reference, filter) => {
                 let subject = self.eval_reference(reference, frame);
                 self.objects.get(subject).is_some_and(|object| {
-                    object.damage.iter().any(|mark| {
-                        crate::target::source_abilities_match(filter, &mark.source_abilities)
-                    })
+                    crate::target::dealt_damage_by_since_check(object, filter)
                 })
             }
 

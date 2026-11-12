@@ -1727,13 +1727,15 @@ impl GameState {
             return Progress::SbasChecked { actions: 0 };
         }
         let actions = sba::sweep(self);
-        // [CR#704.5h]: deathtouch provenance now rides the damage mark itself,
-        // so a creature that regenerates (or otherwise has its damage removed)
-        // loses the deathtouch clause with the marks — no separate per-check
-        // window to close. The mark persists exactly as long as the damage
-        // does ([CR#514.2] cleanup / [CR#701.19a] heal), like lethal marked
-        // damage, and the `EmitSbaBatch` state-change guard keeps an
-        // indestructible creature's persistent destroy from looping.
+        // [CR#704.5h]: the deathtouch clause reads damage dealt "since the
+        // last time state-based actions were checked", and this sweep was that
+        // check: every damage mark now predates it. The marks themselves stay
+        // until cleanup or regeneration ([CR#120.6]) and keep counting toward
+        // lethal damage ([CR#704.5g]). Damage is marked only on the
+        // battlefield.
+        for id in self.zones.battlefield.clone() {
+            self.objects.obj_mut(id).mark_damage_checked();
+        }
         self.close_gated_draw_windows();
         let count = Uint::try_from(actions.len()).expect("action count fits in Uint");
         if count > 0 {

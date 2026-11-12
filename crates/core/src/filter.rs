@@ -216,11 +216,13 @@ pub enum StatePredicate {
     /// `And([InZone(Graveyard), WasPutFrom(Library)])` ([CR#701.17a]);
     /// "discarded" = `WasPutFrom(Hand)` ([CR#701.9a]).
     WasPutFrom(Zone),
-    /// The candidate was dealt damage by a source matching the inner
-    /// predicate — an EXISTENTIAL over the candidate's marked damage
-    /// ([CR#120.3]), read against each mark's DEAL-TIME abilities: the source
-    /// may since have lost the ability or left the battlefield, so the mark
-    /// carries what it had when it dealt the damage ([CR#702.2c]).
+    /// The candidate has been dealt damage by a source matching the inner
+    /// predicate since the last time state-based actions were checked
+    /// ([CR#704.5h]) — an EXISTENTIAL over the candidate's damage marks
+    /// ([CR#120.3]) dealt in that window, read against each mark's DEAL-TIME
+    /// abilities: the source may since have lost the ability or left the
+    /// battlefield, so the mark carries what it had when it dealt the damage
+    /// ([CR#702.2e]).
     ///
     /// [CR#120.1] settles why this is a predicate of the DAMAGED object and
     /// not a reference: "an object that deals damage is the source of that

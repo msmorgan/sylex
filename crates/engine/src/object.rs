@@ -269,6 +269,11 @@ pub struct DamageMark {
     pub source_abilities: Vec<Ability>,
     /// How much damage this instance marked.
     pub amount: Uint,
+    /// [CR#704.5h]: state-based actions have been checked since this damage
+    /// was dealt. The deathtouch clause reads only marks not yet checked; the
+    /// lethal-damage total ([CR#704.5g]) reads every mark, which stays until
+    /// cleanup even if the permanent stops being a creature ([CR#120.6]).
+    pub checked: bool,
 }
 
 /// An addressable Entity in the game — an object ([CR#109]) or, through a
@@ -372,7 +377,16 @@ impl GameObject {
             source,
             source_abilities,
             amount,
+            checked: false,
         });
+    }
+
+    /// [CR#704.5h]: a state-based-action check has happened — every mark now
+    /// predates the last check.
+    pub(crate) fn mark_damage_checked(&mut self) {
+        for mark in &mut self.damage {
+            mark.checked = true;
+        }
     }
 
     /// Remove all marked damage ([CR#514.2] cleanup, [CR#701.19a]
