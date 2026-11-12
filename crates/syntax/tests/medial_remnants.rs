@@ -93,3 +93,40 @@ fn the_elided_head_declares_the_remnants_frame() {
     // remnant elides.
     assert_eq!(count("Have card, card, and be card."), 0);
 }
+
+#[test]
+fn a_joint_exclusion_on_a_slot_moves_into_the_remnant() {
+    // *is enchanted, [equipped], and has a counter on it* ([31ii]), with a
+    // Predicative Slot that refuses a plural count Noun Phrase: the remnant
+    // that fills the Slot refuses it too.
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        feature Number = Singular | Plural
+        feature Countability = Count | Mass
+        category NounPhrase [Number, Countability]
+        category Predicative [Number, Countability]
+        category PredicativeRemnant
+        category Sentence
+        category VerbPhrase [VerbForm]
+        class Coordinator = ["c:and"]
+        slot NP = NounPhrase
+        slot Pred = Predicative where !(slot.Number = Plural & slot.Countability = Count)
+        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Noun: NounPhrase -> Lex(Noun)
+        NominalPredicative: Predicative -> NounPhrase
+        valence VerbPhrase { head: Verb, remnants: [Pred -> PredicativeRemnant] }
+        coordination VerbPhrase { coordinators: Coordinator, remnant: PredicativeRemnant }
+    "#;
+    let lexicon = lexicon();
+    let grammar = CompiledGrammar::bind(
+        &Grammar::from_fug_str(source).unwrap(),
+        &lexicon,
+        &FrameCatalog::from_ron_str(FRAMES).unwrap(),
+    )
+    .unwrap();
+    let count = |text: &str| grammar.parse(&lexicon, text).readings().count();
+    assert_eq!(count("Be card, card, and have card."), 1);
+    assert_eq!(count("Be cards and have card."), 0);
+    assert_eq!(count("Be card, cards, and have card."), 0);
+}

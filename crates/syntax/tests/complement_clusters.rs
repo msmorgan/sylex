@@ -296,3 +296,52 @@ fn the_initial_cluster_is_no_remnant() {
         0
     );
 }
+
+#[test]
+fn a_joint_exclusion_on_a_slot_moves_into_the_cluster() {
+    // *put [one of them into your hand] and [the rest into your graveyard]*,
+    // with an Object Slot that refuses a plural count Noun Phrase: the Cluster
+    // that fills the Slot refuses it too.
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        feature Number = Singular | Plural
+        feature Countability = Count | Mass
+        category Adjunct
+        category Cluster
+        category Clusters : Cluster
+        category NounPhrase [Number, Countability]
+        category PrepositionPhrase
+        category Sentence
+        category VerbPhrase [VerbForm]
+        class Coordinator = ["c:and"]
+        slot NP = NounPhrase where !(slot.Number = Plural & slot.Countability = Count)
+        slot PP = PrepositionPhrase
+        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Noun: NounPhrase -> Lex(Noun)
+        PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
+        valence VerbPhrase {
+            head: Verb,
+            clusters: {
+                cluster: Cluster,
+                coordination: Clusters,
+                adjunct: Adjunct,
+            },
+        }
+        valence PrepositionPhrase { head: Preposition }
+        adjunct PrepositionPhrase { host: VerbPhrase, side: After, host_kind: Predicate }
+        coordination Clusters { coordinators: Coordinator, conjunct: Cluster }
+    "#;
+    let lexicon = lexicon();
+    let grammar = CompiledGrammar::bind(
+        &Grammar::from_fug_str(source).unwrap(),
+        &lexicon,
+        &FrameCatalog::from_ron_str(FRAMES).unwrap(),
+    )
+    .unwrap();
+    let count = |text: &str| grammar.parse(&lexicon, text).readings().count();
+    assert_eq!(count("Give card to player and card to player."), 1);
+    assert_eq!(count("Give cards to player."), 0);
+    assert_eq!(count("Give card to player and cards to player."), 0);
+    assert_eq!(count("Give cards to player and card to player."), 0);
+}

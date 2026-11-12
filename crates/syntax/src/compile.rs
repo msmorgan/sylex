@@ -5025,6 +5025,17 @@ fn complement_clusters(draft: &Draft, categories: &ClusterCategories) -> Vec<Dra
                     .map(|&(i, f, v)| (i - 1, f, v)),
             );
         }
+        cluster.joint_exclusions.extend(
+            draft
+                .joint_exclusions
+                .iter()
+                .filter(|joint| {
+                    joint
+                        .iter()
+                        .all(|(i, ..)| *i > 0 && (remnant.is_none() || *i > 1))
+                })
+                .map(|joint| joint.iter().map(|&(i, f, v)| (i - 1, f, v)).collect()),
+        );
         cluster.weights.extend(
             draft
                 .weights
@@ -5058,6 +5069,13 @@ fn complement_clusters(draft: &Draft, categories: &ClusterCategories) -> Vec<Dra
     ] {
         list.extend(original.iter().filter(|(i, ..)| *i == 0).copied());
     }
+    whole.joint_exclusions.extend(
+        draft
+            .joint_exclusions
+            .iter()
+            .filter(|joint| joint.iter().all(|(i, ..)| *i == 0))
+            .cloned(),
+    );
     whole
         .weights
         .extend(draft.weights.iter().filter(|(i, _)| *i == 0).copied());
@@ -5106,6 +5124,9 @@ fn adjunct_clusters(draft: &Draft, frame: usize, categories: &ClusterCategories)
     ] {
         list.extend(original.iter().copied());
     }
+    whole
+        .joint_exclusions
+        .extend(draft.joint_exclusions.iter().cloned());
     whole.weights.extend(draft.weights.iter().copied());
     whole.frame = Some(frame);
     whole.clusters = Some((at, frame));
@@ -5184,6 +5205,13 @@ fn phrase_remnants(draft: &mut Draft, remnants: &[(usize, usize)]) -> Vec<Draft>
                     .map(|&(i, f, v)| (i - 1, f, v)),
             );
         }
+        remnant.joint_exclusions.extend(
+            draft
+                .joint_exclusions
+                .iter()
+                .filter(|joint| joint.iter().all(|(i, ..)| *i > 0))
+                .map(|joint| joint.iter().map(|&(i, f, v)| (i - 1, f, v)).collect()),
+        );
         remnant.weights.extend(
             draft
                 .weights
