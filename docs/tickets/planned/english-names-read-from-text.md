@@ -198,7 +198,8 @@ in the middle of a sentence at several positions. And it is used again after its
 
 ## Not in scope
 
-- `vote_options.ron` and `anchor_words.ron`, also card-scoped lists, which have no ruling.
+- `vote_options.ron`, also a card-scoped list, which has no ruling; `anchor_words.ron` is
+  `english-anchor-words-read-from-text`.
 - The participle premodifier that misreads "named New Planet" today
   (`Premodification:BareNominal/Verb/attach`).
 
