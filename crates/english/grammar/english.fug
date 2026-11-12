@@ -2393,14 +2393,19 @@ FreeChoiceQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal
 // *Any number of target creatures*: number-transparent *number* heads the
 // Noun Phrase, whose Number and NounKind are its oblique's (CGEL
 // 5§3.3:349–350). Countability is unshared too: the transparent
-// quantificational noun is non-count (5§3.3:349).
+// quantificational noun is non-count (5§3.3:349). The oblique carries
+// `Plural`: a bare Nominal *of* Complement has no ObliqueNumber and fails
+// it, which keeps Fire Covenant's *any number of target creatures* from
+// *any number of [target]*, *target* a singular noun and *creatures* a
+// separate Object. TemporalQuantity and DeterminedTemporalQuantity carry it
+// for the same reason.
 TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal {
     unshared: [Number, NounKind, Countability],
 }
     where determiner.DeterminativeDistribution = FreeChoice,
           head.NounDistribution = Quantity,
           head.ComplementKind = PP,
-          head.ObliqueNumber = Plural,
+          head.ObliqueNumber := Plural,
           $.Number = head.ObliqueNumber,
           $.NounKind = head.ObliqueNounKind,
           $.Determination = Overt,
@@ -2431,7 +2436,7 @@ TemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase Nominal {
 }
     where determiner.DeterminativeDistribution = FreeChoice,
           head.ComplementKind = PP,
-          head.ObliqueNumber = Plural,
+          head.ObliqueNumber := Plural,
           head.ObliqueNounKind := Temporal,
           $.Number = head.ObliqueNumber,
           $.NounKind = Temporal,
@@ -2446,7 +2451,7 @@ DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase No
     where determiner.DeterminativeDistribution != FreeChoice,
           head.NounDistribution = Quantity,
           head.ComplementKind = PP,
-          head.ObliqueNumber = Plural,
+          head.ObliqueNumber := Plural,
           head.ObliqueNounKind := Temporal,
           determiner.Number = head.Number,
           $.Number = head.ObliqueNumber,

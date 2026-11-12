@@ -11,3 +11,5 @@
 +NounPhrase any number of cards of that type => NounPhrase "cards of that type"; PrepositionPhrase "of that type" as Modifier of card || Nominal "number of cards"; PrepositionPhrase "of that type" as Modifier of number
 # A transparent quantity takes a plural oblique (*target Equipment* is plural here).
 + <card=Super-Soldier Serum> Whenever enchanted creature attacks or blocks, attach any number of target Equipment you control to it. => NounPhrase "any number of target Equipment you control"; Nominal "Equipment you control" || Nominal "number of target Equipment you control"; readings 2
+# A bare singular noun is no transparent quantity's oblique: never *any number of [target]* with *creatures* a separate Object.
++ <card=Fire Covenant> Fire Covenant deals X damage divided as you choose among any number of target creatures. => NounPhrase "any number of target creatures"; !NounPhrase "any number of target"
