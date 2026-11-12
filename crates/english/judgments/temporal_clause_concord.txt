@@ -1,0 +1,94 @@
+# A temporal clause locates its host's situation at the time of its own (CGEL,
+# Ch. 8 §6, p. 700), so the two share a time sphere: past (a preterite) or
+# non-past (a present, an imperative). A modal's preterite, ambiguous between
+# past time and modal remoteness (Ch. 3 §2.4, p. 107), a plain form and a
+# participle fix no time, and agree with either (§7, pp. 159–162). A conditional clause is independent of its host in time (Ch. 8
+# §14.1.2, p. 743), and a Nominal has no time.
+
+# A past temporal clause under a past host.
++ <card=Soulgorger Orgg> When this creature leaves the battlefield, you gain life equal to the life you lost when it entered. => PrepositionPhrase "when it entered" as Adjunct of lose; !PrepositionPhrase "when it entered" as Adjunct of gain
+
+# A past temporal clause under a present-tense host.
+# from: Underworld Dreams
+* Whenever an opponent drew a card, this enchantment deals 1 damage to that player.
++ <card=Kykar, Zephyr Awakener> Whenever you cast a noncreature spell, choose one — => readings 1
+
+# Under a present-tense modal host.
+# from: Consecrated Sphinx
+* Whenever an opponent drew a card, you may draw two cards.
+
+# from: Lore Seeker
+* After you drafted this card, you may add a booster pack to the draft.
+
+# Under an imperative host, before it and after its verb.
+# from: Kavu Predator
+* Whenever an opponent gained life, put that many +1/+1 counters on this creature.
+# from: Banisher Priest
+* When this creature enters, exile target creature an opponent controls until this creature left the battlefield.
+# from: Banisher Priest
+* Exile target creature an opponent controls until this creature left the battlefield.
+
+# Under a host inside a present-tense modal's Complement.
+# from: Angel of Sanctions
+* When this creature enters, you may exile target nonland permanent an opponent controls until this creature left the battlefield.
+
+# Under a host inside a present-tense passive auxiliary's Complement.
+# from: Market Gnome
+* When this creature is exiled from the battlefield while you were activating a craft ability, you gain 1 life and draw a card.
+# A non-past one under a past passive auxiliary's host.
+# from: Market Gnome
+* When this creature was exiled from the battlefield while you're activating a craft ability, you gained 1 life and drew a card.
+
+# Under a coordinated host one of whose conjuncts is present.
+# from: Merciless Harlequin
+* When this creature entered, you draw a card and you lost 1 life.
+# Over a coordination of imperative Clauses.
+# from: Goatnapper
+* When this creature enters, untap target Goat and gain control of it until this creature left the battlefield.
+
+# A non-past temporal clause under a past host, before it and after its verb.
+# from: Soulgorger Orgg
+* When this creature enters, you lost all but 1 life.
+# from: Soulgorger Orgg
+*NounPhrase the life you lost when it enters
+
+# A temporal clause under a modal preterite, and a modal preterite inside a
+# temporal clause.
++ <card=Laboratory Maniac> If you would draw a card while your library has no cards in it, you win the game instead. => PrepositionPhrase "while your library has no cards in it" as Adjunct of will
+# from: Laboratory Maniac
++ When you would draw a card while your library has no cards in it, you win the game instead. => PrepositionPhrase "When you would draw a card while your library has no cards in it" as Adjunct of win
+
+# A coordinated temporal clause one of whose conjuncts is past, under a
+# present-tense host.
+* <card=Ral, Storm Conduit> Whenever you cast or copied an instant or sorcery spell, Ral deals 1 damage to target opponent or planeswalker.
+# from: Up the Beanstalk
+* When this enchantment entered and whenever you cast a spell with mana value 5 or greater, draw a card.
+
+# A past temporal clause set off after a present-tense Clause.
+# from: Stern Marshal
+* Activate only during your turn, before attackers were declared.
+
+# Under an existential host.
+# from: Wail of the Forgotten
+* If there are eight or more permanent cards in your graveyard when this spell was cast, choose one or more instead.
+
+# Ending a Complement Cluster, and an Adjunct Cluster, under a present-tense
+# host.
+# from: Multiclass Baldric
+* Equipped creature has lifelink while you control a Cleric and deathtouch while you controlled a Rogue.
+# from: Semester's End
+* Each of them enters with an additional +1/+1 counter on it while it's a creature and an additional loyalty counter on it while it was a planeswalker.
+
+# Coordinated with another Predicate Adjunct under an imperative host.
+# from: Squee's Revenge
+* Flip a coin that many times or until you lost a flip, whichever comes first.
+
+# A past conditional clause under an imperative host.
++ <card=Hixus, Prison Warden> Whenever a creature deals combat damage to you, if Hixus entered this turn, exile that creature until Hixus leaves the battlefield. => PrepositionPhrase "if Hixus entered this turn" as Adjunct of exile
+
+# A past temporal clause modifying a Nominal.
++NounPhrase <card=Soul Burn> the player's life total before the damage was dealt => PrepositionPhrase "before the damage was dealt" as Modifier of "life total"
++ <card=Sengir, the Dark Baron> Whenever another player loses the game, you gain life equal to that player's life total as the turn began. => PrepositionPhrase "as the turn began" as Modifier of "life total"; !PrepositionPhrase "as the turn began" as Adjunct of gain
+
+# A past temporal clause under a participle, which has no time of its own.
++ <card=Minion of the Wastes> Minion of the Wastes's power and toughness are each equal to the life paid as it entered. => PrepositionPhrase "as it entered" as Adjunct of pay; !PrepositionPhrase "as it entered" as Adjunct of be

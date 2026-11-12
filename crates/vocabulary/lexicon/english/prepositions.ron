@@ -11,14 +11,15 @@
 // *on top of*. A Pred complement is CGEL's preposition + adjective idiom:
 // *at random*, *in common* (p. 626).
 //
-// A FiniteClause complement is a finite Clause of either tense. Oracle states
-// a repeated trigger event, a state or an endpoint in the simple present
-// (*whenever you cast a spell*; oracle-style-guide §1, "Voice and tense"), and
-// a condition on past events in the preterite (*if an opponent cast a spell
-// this turn*, *the life you lost when it entered*). A preterite Complement of
-// *whenever* is well-formed English too, so the syncretic *cast* there has a
-// preterite Reading beside the present one, and semantics chooses
-// (docs/decisions/english.md §4).
+// A FiniteClause complement is a finite Clause of either tense, independent
+// of its host in time: a conditional clause (*if an opponent cast a spell
+// this turn*; CGEL Ch. 8 §14.1.2, p. 743). A TemporalClause complement
+// locates its host's situation at the time of its own (*when*, *whenever*,
+// *until*, *before*, *after*, *while*, *as*; Ch. 8 §6, p. 700), so on a
+// Predicate host the two share a time sphere (the grammar's `TimeGiving`):
+// the syncretic *cast* of *Whenever you cast a spell, draw a card* is present
+// only, and in *you gain life equal to the life you lost when it entered*,
+// *when it entered* modifies *lost*, never *gain*.
 [
     // *a creature card directly above it*
     (lemma: "above", frames: [(complement: NP, hosts: Nominal)]),
@@ -29,7 +30,7 @@
     (lemma: "after", frames: [
         (complement: NP, hosts: NominalAndPredicate),
         (complement: Gerund, hosts: Predicate),
-        (complement: FiniteClause, hosts: Predicate),
+        (complement: TemporalClause, hosts: Predicate),
     ]),
     // *the greatest power among creatures you control*
     // *from among flying, first strike, and lifelink*; a slash measure names
@@ -54,11 +55,16 @@
         // ... from among Disenchant, ..., and Black Lotus*).
         (complement: Name, hosts: ComplementOnly, named_only: true),
     ]),
-    // *Activate only as a sorcery*; *as it enters*; *as part of casting a spell*
+    // *Activate only as a sorcery*; *as it enters*; *as part of casting a spell*;
+    // Nominal: *that player's life total as the turn began* (Sengir, the Dark
+    // Baron).
     (lemma: "as", frames: [
         (complement: NP, hosts: Predicate, relation: PredicativeComplement),
-        (complement: FiniteClause, hosts: Predicate),
+        (complement: TemporalClause, hosts: NominalAndPredicate),
         (complement: Nominal, hosts: Predicate),
+        // A comparative clause after equative *as*: *as many times as you
+        // choose* (CGEL Ch. 13 §2.1, p. 1108).
+        (complement: FiniteClause, hosts: ComplementOnly),
     ]),
     // Prepositional idiom licensing a content clause (CGEL p. 971).
     (lemma: "as long as", frames: [(complement: FiniteClause, hosts: Predicate)]),
@@ -80,7 +86,7 @@
     // *the player's life total before the damage was dealt* (Soul Burn).
     (lemma: "before", frames: [
         (complement: NP, hosts: Predicate),
-        (complement: FiniteClause, hosts: NominalAndPredicate),
+        (complement: TemporalClause, hosts: NominalAndPredicate),
     ]),
     // *the colors below* (Cryptic Spires); *reduce their speed below 1*
     (lemma: "below", frames: [
@@ -281,7 +287,7 @@
     (lemma: "until", frames: [
         (complement: NP, hosts: Predicate),
         (complement: Nominal, hosts: Predicate),
-        (complement: FiniteClause, hosts: Predicate),
+        (complement: TemporalClause, hosts: Predicate),
     ]),
     // *rounded up*; *up to two target creatures* is a determiner-function PP
     // (CGEL p. 357), not a modifier.
@@ -289,13 +295,13 @@
         (complement: Intransitive, hosts: ComplementOnly),
         (complement: PP(["to"]), hosts: ComplementOnly),
     ]),
-    (lemma: "when", frames: [(complement: FiniteClause, hosts: Predicate)]),
-    (lemma: "whenever", frames: [(complement: FiniteClause, hosts: Predicate)]),
+    (lemma: "when", frames: [(complement: TemporalClause, hosts: Predicate)]),
+    (lemma: "whenever", frames: [(complement: TemporalClause, hosts: Predicate)]),
     // *, where X is the number of ...* (CGEL p. 971)
     (lemma: "where", frames: [(complement: FiniteClause, hosts: Supplement)]),
     // *while you control*; *attacks while saddled*; *while scrying*
     (lemma: "while", frames: [
-        (complement: FiniteClause, hosts: Predicate),
+        (complement: TemporalClause, hosts: Predicate),
         (complement: VerblessClause, hosts: Predicate),
         (complement: Gerund, hosts: Predicate),
     ]),
