@@ -63,6 +63,8 @@ use sylex_vocabulary::LexicalEnvironment;
 /// - *Decimate*: more than one live root.
 /// - *Up the Beanstalk*: a node that packs two lexical readings of one word
 ///   ("cast", present and preterite) as its head.
+/// - [`LINKED`]: Linked Coordinations and the one explicit coordinator outside
+///   a coordination schema that the pool prints.
 const SAMPLE: &[&str] = &[
     "Crook of Condemnation",
     "Draugr Necromancer",
@@ -76,6 +78,42 @@ const SAMPLE: &[&str] = &[
     "The Eternal Wanderer",
     "Decimate",
     "Up the Beanstalk",
+    "Giant's Amulet",
+    "Topography Tracker",
+    "Burning Inquiry",
+    "Volatile Stormdrake",
+    "Anim Pakal, Thousandth Moon",
+    "Turtle Tracks",
+    "Moritte of the Frost",
+];
+
+/// Units whose Readings differ in what a dependent of a coordination with
+/// no coordinator leaf, or of one of its conjuncts, depends on; the forks
+/// separate every one of their Readings, since a Linked Coordination's head
+/// line ends in its connective and a coordinator written outside a schema is
+/// its Production's head-line child:
+/// - *Giant's Amulet*: "If you do, create …, then attach …", the condition over
+///   both conjuncts or the first;
+/// - *Topography Tracker*: "If …, instead it explores, then it explores again",
+///   *if* and *instead* each over both or the first;
+/// - *Burning Inquiry*: "draws three cards, then discards three cards at
+///   random", *at random* over both or the last;
+/// - *Volatile Stormdrake*: "you get {E}{E}{E}{E}, then sacrifice that creature
+///   unless you pay …", a fronted *if* and a trailing *unless*;
+/// - *Anim Pakal, Thousandth Moon*: a fronted *whenever* and a trailing
+///   *where*;
+/// - *Turtle Tracks*: a floated *each* over the coordination or its first
+///   conjunct;
+/// - *Moritte of the Frost*: "… and, if it's a creature, it enters with …", a
+///   `DelimitedFrontConjunct`, whose `coordinator` the grammar writes.
+const LINKED: &[&str] = &[
+    "Giant's Amulet",
+    "Topography Tracker",
+    "Burning Inquiry",
+    "Volatile Stormdrake",
+    "Anim Pakal, Thousandth Moon",
+    "Turtle Tracks",
+    "Moritte of the Frost",
 ];
 
 /// What one Reading answers for each word, by the word's start and the kind
@@ -646,6 +684,15 @@ fn forks_agree_with_enumerated_readings_on_real_units() {
             .any(|(face, _, m)| face == "Decimate" && m.roots > 1),
         "Decimate has more than one live root"
     );
+    for (face, text, m) in &measures {
+        if LINKED.contains(&face.as_str()) {
+            assert_eq!(
+                m.all_classes as u128, m.derivations,
+                "{face} | {text}: the answers do not separate its Readings: {:?}",
+                m.unseparated
+            );
+        }
+    }
 }
 
 #[test]
