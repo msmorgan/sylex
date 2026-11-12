@@ -35,8 +35,8 @@ the rows in its `needs:` are closed.
 | A keyword with a parameter as a noun's premodifier | `english-keyword-premodifier-bare` | Feature that does not mean what its comment says |
 | *Twice that many cards*; *target* over a quantity | `english-multiplied-degree-quantity` | Bracketing; determiner admitted over a quantity |
 
-These are not required for this ticket to close. Each rests on a single reading, or on two that
-disagree, and joins `needs:` if it is moved to `planned/`:
+These are not required for this ticket to close. Each rests on a single reading, on two that
+disagree, or on a spurious Reading left beside a correct one, and joins `needs:` if it is moved to `planned/`:
 
 | Construct | Ticket |
 |---|---|
@@ -54,6 +54,9 @@ disagree, and joins `needs:` if it is moved to `planned/`:
 | Features that carry several unrelated meanings | `english-features-as-tags` |
 | Modifiers made determinatives before a bare singular noun | `english-bare-singular-determinatives` |
 | Complement selection written as grammar classes | `english-frames-held-in-grammar` |
+| A bare keyword premodifying its own Keyword Parameter | `english-keyword-premodifies-own-parameter` |
+| A recipient coordinated with an amount of damage | `english-quantity-noun-phrase-in-recipient-coordination` |
+| The Noun Phrase multiplier Productions beside `Multiplier` | `english-multiplier-noun-phrase-productions` |
 
 ## Done when
 
