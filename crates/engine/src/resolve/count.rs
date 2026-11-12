@@ -1724,6 +1724,7 @@ mod tests {
                     ))),
                     token: sylex_core::Token {
                         name: None,
+                        mana_cost: sylex_core::ManaCost::default(),
                         color_indicator: vec![].into(),
                         supertypes: vec![].into(),
                         types: vec![Type::Creature.def()].into(),
@@ -1731,6 +1732,8 @@ mod tests {
                         abilities: vec![].into(),
                         power: Some(sylex_core::StatValue::Number(1)),
                         toughness: Some(sylex_core::StatValue::Number(1)),
+                        loyalty: None,
+                        defense: None,
                     }
                     .into(),
                     riders: vec![].into(),

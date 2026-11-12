@@ -111,6 +111,7 @@ fn treasure_token_parses() {
         token,
         Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -133,6 +134,8 @@ fn treasure_token_parses() {
             .into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         }
     );
 }
@@ -145,6 +148,7 @@ fn clue_token_parses() {
         token,
         Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -167,6 +171,8 @@ fn clue_token_parses() {
             .into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         }
     );
 }
@@ -179,6 +185,7 @@ fn food_token_parses() {
         token,
         Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -220,6 +227,8 @@ fn food_token_parses() {
             .into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         }
     );
 }
@@ -232,6 +241,7 @@ fn gold_token_parses() {
         token,
         Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -253,6 +263,8 @@ fn gold_token_parses() {
             .into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         }
     );
 }
@@ -280,6 +292,7 @@ fn blood_token_parses() {
         token,
         Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -287,6 +300,8 @@ fn blood_token_parses() {
             abilities: vec![Ability::activated(expected_ability)].into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         }
     );
 }
@@ -344,6 +359,7 @@ fn vibranium_token_parses() {
         token,
         Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -364,6 +380,8 @@ fn vibranium_token_parses() {
             .into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         }
     );
 }

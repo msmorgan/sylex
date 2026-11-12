@@ -329,6 +329,7 @@ fn created_nested_optional_mana_fixture() -> (
     )));
     let token = Token {
         name: Some("Nested created helper".into()),
+        mana_cost: sylex_core::ManaCost::default(),
         color_indicator: Arc::from([]),
         supertypes: Arc::from([]),
         types: vec![Type::Artifact.def()].into(),
@@ -336,6 +337,8 @@ fn created_nested_optional_mana_fixture() -> (
         abilities: vec![token_ability].into(),
         power: None,
         toughness: None,
+        loyalty: None,
+        defense: None,
     };
     let source_ability = Ability::Activated(Arc::new(activated_ability(
         Cost(vec![CostComponent::Tap].into()),

@@ -140,7 +140,7 @@ impl Cards {
         });
         let def = Arc::new(Card::Normal(CardFace::from(Characteristics {
             name,
-            mana_cost: sylex_core::ManaCost::default(),
+            mana_cost: token.mana_cost.clone(),
             color_indicator: token.color_indicator.to_vec(),
             supertypes: token.supertypes.to_vec(),
             types: token.types.to_vec(),
@@ -148,8 +148,8 @@ impl Cards {
             abilities: token.abilities.to_vec(),
             power: token.power.clone(),
             toughness: token.toughness.clone(),
-            loyalty: None,
-            defense: None,
+            loyalty: token.loyalty.clone(),
+            defense: token.defense.clone(),
         })));
         self.push_inner(def, owner, true, false)
     }
@@ -491,6 +491,7 @@ mod tests {
         let mut cards = Cards::default();
         let token = Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![Color::Red].into(),
             supertypes: vec![].into(),
             types: vec![Type::Creature.def()].into(),
@@ -498,6 +499,8 @@ mod tests {
             abilities: vec![].into(),
             power: Some(StatValue::Number(1)),
             toughness: Some(StatValue::Number(1)),
+            loyalty: None,
+            defense: None,
         };
         let id = cards.push_token(&token, PlayerId(0));
         let inst = cards.get(id);
@@ -517,6 +520,7 @@ mod tests {
         let mut cards = Cards::default();
         let token = Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Creature.def()].into(),
@@ -529,6 +533,8 @@ mod tests {
             abilities: vec![].into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         };
         let id = cards.push_token(&token, PlayerId(0));
         let Card::Normal(face) = cards.get(id).def.as_ref() else {
@@ -547,6 +553,7 @@ mod tests {
         let mut cards = Cards::default();
         let token = Token {
             name: Some("Grizzly Bears".into()),
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Creature.def()].into(),
@@ -559,6 +566,8 @@ mod tests {
             abilities: vec![].into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         };
         let id = cards.push_token(&token, PlayerId(0));
         let Card::Normal(face) = cards.get(id).def.as_ref() else {

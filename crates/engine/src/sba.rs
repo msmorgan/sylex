@@ -854,6 +854,7 @@ mod tests {
         let frame = state.frame(src, PlayerId(0));
         let token = Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -861,6 +862,8 @@ mod tests {
             abilities: vec![].into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         };
         state.run_effect(
             Instruction::act(Action::Create {

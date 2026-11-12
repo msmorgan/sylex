@@ -246,7 +246,7 @@ pub struct ManaEmptied {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TokenCreated {
     pub player: PlayerId,
-    pub token: Token,
+    pub token: std::sync::Arc<Token>,
     pub enters: Option<EnterStatus>,
 }
 

@@ -41,6 +41,7 @@ impl Lower for sylex_semantics_v1::Token {
     fn lower(self) -> <Self as Lower>::Target {
         sylex_core::Token {
             name: self.name.lower(),
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: self.color_indicator.lower(),
             supertypes: self.supertypes.lower(),
             types: self.types.lower(),
@@ -48,6 +49,8 @@ impl Lower for sylex_semantics_v1::Token {
             abilities: self.abilities.lower(),
             power: self.power.lower(),
             toughness: self.toughness.lower(),
+            loyalty: None,
+            defense: None,
         }
     }
 }
@@ -161,13 +164,16 @@ mod tests {
             .lower(),
             sylex_core::Token {
                 name: None,
+                mana_cost: _,
                 color_indicator: _,
                 supertypes: _,
                 types: _,
                 subtypes: _,
                 abilities: _,
                 power: None,
-                toughness: None
+                toughness: None,
+                loyalty: None,
+                defense: None
             }
         );
     }

@@ -4280,6 +4280,7 @@ mod tests {
 
         let goblin_token = Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![Color::Red].into(),
             supertypes: vec![].into(),
             types: vec![Type::Creature.def()].into(),
@@ -4287,6 +4288,8 @@ mod tests {
             abilities: vec![].into(),
             power: Some(StatValue::Number(1)),
             toughness: Some(StatValue::Number(1)),
+            loyalty: None,
+            defense: None,
         };
         Card::Normal(CardFace::from(Characteristics {
             name: "Rabblemaster".into(),

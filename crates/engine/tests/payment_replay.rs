@@ -251,6 +251,7 @@ fn suspending_barred_mana_source() -> Arc<Card> {
 fn token_creating_barred_mana_source() -> Arc<Card> {
     let token = Token {
         name: None,
+        mana_cost: sylex_core::ManaCost::default(),
         color_indicator: Arc::from([]),
         supertypes: Arc::from([]),
         types: vec![Type::Artifact.def()].into(),
@@ -258,6 +259,8 @@ fn token_creating_barred_mana_source() -> Arc<Card> {
         abilities: Arc::from([]),
         power: None,
         toughness: None,
+        loyalty: None,
+        defense: None,
     };
     Arc::new(Card::Normal(CardFace::from(Characteristics {
         name: "Token-creating barred source".into(),
@@ -338,6 +341,7 @@ fn token_creating_source_with_a_token_mana_ability() -> Arc<Card> {
     }));
     let token = Token {
         name: Some("Replay mana token".into()),
+        mana_cost: sylex_core::ManaCost::default(),
         color_indicator: Arc::from([]),
         supertypes: Arc::from([]),
         types: vec![Type::Artifact.def()].into(),
@@ -345,6 +349,8 @@ fn token_creating_source_with_a_token_mana_ability() -> Arc<Card> {
         abilities: vec![token_ability].into(),
         power: None,
         toughness: None,
+        loyalty: None,
+        defense: None,
     };
     Arc::new(Card::Normal(CardFace::from(Characteristics {
         name: "Created-source producer".into(),
@@ -405,6 +411,7 @@ fn fulfillment_created_mana_source_replacements() -> (Arc<Card>, Arc<Card>) {
     }));
     let token = Token {
         name: Some("Fulfillment-created helper".into()),
+        mana_cost: sylex_core::ManaCost::default(),
         color_indicator: Arc::from([]),
         supertypes: Arc::from([]),
         types: vec![Type::Artifact.def()].into(),
@@ -412,6 +419,8 @@ fn fulfillment_created_mana_source_replacements() -> (Arc<Card>, Arc<Card>) {
         abilities: vec![token_ability].into(),
         power: None,
         toughness: None,
+        loyalty: None,
+        defense: None,
     };
     let creator_replacement = Replacement::Instead {
         would: EventFilter::LifeLost {
@@ -471,6 +480,7 @@ fn fulfillment_created_mana_source_replacements() -> (Arc<Card>, Arc<Card>) {
 fn token_creating_then_choosing_barred_mana_source() -> Arc<Card> {
     let token = Token {
         name: Some("Same-record choice token".into()),
+        mana_cost: sylex_core::ManaCost::default(),
         color_indicator: Arc::from([]),
         supertypes: Arc::from([]),
         types: vec![Type::Artifact.def()].into(),
@@ -478,6 +488,8 @@ fn token_creating_then_choosing_barred_mana_source() -> Arc<Card> {
         abilities: Arc::from([]),
         power: None,
         toughness: None,
+        loyalty: None,
+        defense: None,
     };
     Arc::new(Card::Normal(CardFace::from(Characteristics {
         name: "Same-record choice source".into(),
@@ -539,6 +551,7 @@ fn token_creating_then_choosing_barred_mana_source() -> Arc<Card> {
 fn token_revealing_reversible_mana_source() -> Arc<Card> {
     let token = Token {
         name: Some("Observed transient token".into()),
+        mana_cost: sylex_core::ManaCost::default(),
         color_indicator: Arc::from([]),
         supertypes: Arc::from([]),
         types: vec![Type::Artifact.def()].into(),
@@ -546,6 +559,8 @@ fn token_revealing_reversible_mana_source() -> Arc<Card> {
         abilities: Arc::from([]),
         power: None,
         toughness: None,
+        loyalty: None,
+        defense: None,
     };
     Arc::new(Card::Normal(CardFace::from(Characteristics {
         name: "Transient token source".into(),
@@ -2602,6 +2617,7 @@ fn decline_retains_a_library_move_from_an_in_flight_fulfillment() {
 fn decline_replays_a_retained_fulfillment_that_creates_then_remints_a_token() {
     let token = Token {
         name: Some("Transient replay token".into()),
+        mana_cost: sylex_core::ManaCost::default(),
         color_indicator: Arc::from([]),
         supertypes: Arc::from([]),
         types: vec![Type::Artifact.def()].into(),
@@ -2609,6 +2625,8 @@ fn decline_replays_a_retained_fulfillment_that_creates_then_remints_a_token() {
         abilities: Arc::from([]),
         power: None,
         toughness: None,
+        loyalty: None,
+        defense: None,
     };
     let token_on_battlefield = Predicate::And(
         vec![

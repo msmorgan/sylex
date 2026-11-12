@@ -40,6 +40,7 @@
 use sylex_core::Ability;
 use sylex_core::Characteristic;
 use sylex_core::CollectionOp;
+use sylex_core::Color;
 use sylex_core::CopiableValues;
 use sylex_core::CopyException;
 use sylex_core::CopySource;
@@ -123,6 +124,11 @@ pub fn copiable_values(state: &GameState, source: ObjectId) -> Option<CopiableVa
 /// `copiable_values`), in order. `AdditionalEffect` exceptions are NOT a
 /// characteristic change — they contribute nothing here; collect them via
 /// [`additional_riders`] instead.
+///
+/// # Panics
+///
+/// Panics when a color exception leaves the copy with a color that its mana
+/// cost and color indicator can't spell (see [`assert_color_spellable`]).
 #[must_use]
 pub fn apply_exceptions(base: CopiableValues, exceptions: &[CopyException]) -> CopiableValues {
     let mut result = base;
@@ -134,7 +140,60 @@ pub fn apply_exceptions(base: CopiableValues, exceptions: &[CopyException]) -> C
             CopyException::AdditionalEffect(_) => {}
         }
     }
+    assert_color_spellable(&result, exceptions);
     result
+}
+
+/// A copy's color is spelled as its mana cost's colors united with its color
+/// indicator's ([CR#202.2,202.2e]), and a `Colors` exception folds into the
+/// indicator alone. That spells the color the exception gives ([CR#707.9b])
+/// only while the copy's final mana cost has no color the exception set
+/// aside: after a `Set`, every color of the cost must be in the indicator;
+/// without one, no `Remove`d color may be in the cost. Embalm and Eternalize
+/// pass because their "it has no mana cost" leaves no cost colors. A copy
+/// that keeps a colored cost and sets or removes colors ("except it's a 1/1
+/// green Frog") fails here until a copy can carry a color apart from its cost
+/// (ticket `engine-copy-exception-color-override`).
+fn assert_color_spellable(result: &CopiableValues, exceptions: &[CopyException]) {
+    let cost_colors: Vec<Color> = result
+        .mana_cost
+        .iter()
+        .flat_map(crate::layer::symbol_colors)
+        .collect();
+    let mut set = false;
+    let mut removed: Vec<Color> = Vec::new();
+    for exception in exceptions {
+        let CopyException::Modify(m) = exception else {
+            continue;
+        };
+        for change in Modification::flatten(std::slice::from_ref(m)).iter() {
+            if let Modification::Colors(op) = change {
+                match op {
+                    CollectionOp::Set(_) => set = true,
+                    CollectionOp::Remove(c) => removed.push(*c),
+                    CollectionOp::Add(_) => {}
+                }
+            }
+        }
+    }
+    let unspellable: Vec<Color> = if set {
+        cost_colors
+            .into_iter()
+            .filter(|c| !result.color_indicator.contains(c))
+            .collect()
+    } else {
+        cost_colors
+            .into_iter()
+            .filter(|c| removed.contains(c))
+            .collect()
+    };
+    assert!(
+        unspellable.is_empty(),
+        "a copy exception sets or removes colors, but the copy keeps the mana cost {:?} whose \
+         colors {unspellable:?} the exception sets aside; a copy can't yet carry a color apart \
+         from its mana cost (ticket engine-copy-exception-color-override)",
+        result.mana_cost
+    );
 }
 
 /// The `AdditionalEffect` exceptions ("except it enters with N counters"),
@@ -277,11 +336,10 @@ pub(crate) fn enter_status_from_riders(
 /// empty `cv.name` (a faceless/nameless source) still falls back to `None`
 /// (synthesis) rather than minting a token literally named "".
 ///
-/// `Token` has no `mana_cost`/`loyalty`/`defense` slot (color rides
-/// `color_indicator` per [CR#202.2e]; a token this grammar mints is never a
-/// planeswalker/battle) — those
-/// `CopiableValues` fields are dropped here, not carried anywhere else.
-/// Every other field maps straight across.
+/// Every field maps straight across, mana cost, loyalty and defense among
+/// them: a copy acquires them as copiable values ([CR#707.2]), and the
+/// copying effect thereby specifies the token's mana cost ([CR#202.1b]), so
+/// the token's color and mana value derive from it ([CR#202.2,202.3]).
 ///
 /// Returns `None` when the copiable values would make the token an instant
 /// or sorcery card ([CR#111.5]: "if an effect would create a token that is a
@@ -303,6 +361,7 @@ pub fn token_from_copiable(cv: CopiableValues) -> Option<Token> {
     }
     Some(Token {
         name: (!cv.name.is_empty()).then_some(cv.name),
+        mana_cost: cv.mana_cost,
         color_indicator: cv.color_indicator.into(),
         supertypes: cv.supertypes.into(),
         types: cv.types.into(),
@@ -310,6 +369,8 @@ pub fn token_from_copiable(cv: CopiableValues) -> Option<Token> {
         abilities: cv.abilities.into(),
         power: cv.power,
         toughness: cv.toughness,
+        loyalty: cv.loyalty,
+        defense: cv.defense,
     })
 }
 
@@ -795,6 +856,72 @@ mod tests {
         assert_eq!(out.power, Some(StatValue::Number(2)), "P/T untouched");
     }
 
+    /// A token copy keeps the copied mana cost, loyalty and defense
+    /// ([CR#707.2]): Ajani Goldmane ({2}{W}{W}, loyalty 4) and Invasion of
+    /// Zendikar ({3}{G}, defense 3).
+    #[test]
+    fn token_from_copiable_carries_mana_cost_loyalty_and_defense() {
+        let ajani = token_from_copiable(CopiableValues {
+            name: "Ajani Goldmane".into(),
+            mana_cost: "{2}{W}{W}".parse().expect("test cost parses"),
+            types: vec![Type::Planeswalker.def()],
+            loyalty: Some(StatValue::Number(4)),
+            ..CopiableValues::default()
+        })
+        .expect("a planeswalker copy is a token");
+        assert_eq!(
+            ajani.mana_cost,
+            "{2}{W}{W}".parse().expect("test cost parses"),
+            "[CR#707.2]: mana cost copied"
+        );
+        assert_eq!(ajani.loyalty, Some(StatValue::Number(4)), "[CR#707.2]");
+        let invasion = token_from_copiable(CopiableValues {
+            name: "Invasion of Zendikar".into(),
+            mana_cost: "{3}{G}".parse().expect("test cost parses"),
+            types: vec![Type::Battle.def()],
+            defense: Some(StatValue::Number(3)),
+            ..CopiableValues::default()
+        })
+        .expect("a battle copy is a token");
+        assert_eq!(invasion.defense, Some(StatValue::Number(3)), "[CR#707.2]");
+    }
+
+    /// Croaking Counterpart's "except it's a 1/1 green Frog" on a copy of
+    /// Agate Instigator ({1}{R}) would make a green token whose kept cost is
+    /// red; the cost-plus-indicator color can't spell that, so the fold
+    /// crashes naming the ticket rather than minting a red-and-green token.
+    #[test]
+    #[should_panic(expected = "engine-copy-exception-color-override")]
+    fn color_set_on_a_kept_colored_cost_crashes() {
+        let base = CopiableValues {
+            mana_cost: "{1}{R}".parse().expect("test cost parses"),
+            ..base_bear()
+        };
+        let _ = apply_exceptions(
+            base,
+            &[CopyException::Modify(Modification::Colors(
+                CollectionOp::Set(vec![Color::Green].into()),
+            ))],
+        );
+    }
+
+    /// The same exception on a copy of Grizzly Bears ({1}{G}) is spellable:
+    /// the cost's green is the color the exception sets.
+    #[test]
+    fn color_set_matching_the_kept_cost_folds() {
+        let base = CopiableValues {
+            mana_cost: "{1}{G}".parse().expect("test cost parses"),
+            ..base_bear()
+        };
+        let out = apply_exceptions(
+            base,
+            &[CopyException::Modify(Modification::Colors(
+                CollectionOp::Set(vec![Color::Green].into()),
+            ))],
+        );
+        assert_eq!(out.color_indicator, vec![Color::Green]);
+    }
+
     #[test]
     fn card_types_add_builtin_gets_structural_typedef() {
         let out = apply_exceptions(
@@ -884,6 +1011,7 @@ mod tests {
         let mut state = bare_game();
         let token = Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Creature.def()].into(),
@@ -896,6 +1024,8 @@ mod tests {
             abilities: vec![].into(),
             power: Some(StatValue::Number(3)),
             toughness: Some(StatValue::Number(3)),
+            loyalty: None,
+            defense: None,
         };
         let id = mint_token(&mut state, &token);
         let values = copiable_values(&state, id).expect("token-backed object has copiable values");

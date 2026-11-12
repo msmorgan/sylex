@@ -823,12 +823,13 @@ impl GameState {
                         }
                     }
                 };
+                let token = std::sync::Arc::new(token);
                 let n = self.eval_count(qty, frame);
                 let events: Vec<GameEvent> = (0..n)
                     .map(|_| {
                         GameEvent::TokenCreated(TokenCreated {
                             player: actor,
-                            token: token.clone(),
+                            token: std::sync::Arc::clone(&token),
                             enters: enters.clone(),
                         })
                     })
@@ -1227,6 +1228,7 @@ mod tests {
         let frame = frame_src(&state, bear);
         let token = sylex_core::Token {
             name: Some("Test Token".into()),
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Creature.def()].into(),
@@ -1234,6 +1236,8 @@ mod tests {
             abilities: vec![].into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         };
         let before: std::collections::HashSet<ObjectId> =
             state.zones.battlefield.iter().copied().collect();
@@ -1586,6 +1590,7 @@ mod tests {
         let frame = frame_src(&state, src);
         let token = Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -1593,6 +1598,8 @@ mod tests {
             abilities: vec![].into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         };
         state.run_effect(
             Instruction::act(Action::Create {
@@ -2066,12 +2073,8 @@ mod tests {
         }
     }
 
-    /// The lone token minted onto the battlefield by the effect just run —
-    /// its resolved printed face, for the copy-characteristic assertions.
-    fn minted_copy_face<'a>(
-        state: &'a GameState,
-        exclude: &[ObjectId],
-    ) -> &'a sylex_card::CardFace {
+    /// The lone token minted onto the battlefield by the effect just run.
+    fn minted_copy(state: &GameState, exclude: &[ObjectId]) -> ObjectId {
         let &t = state
             .zones
             .battlefield
@@ -2082,13 +2085,38 @@ mod tests {
             crate::target::is_object_class(state, t, ObjectClass::Token),
             "[CR#111.1]: the copy is a token"
         );
+        t
+    }
+
+    /// The lone minted token's resolved printed face, for the
+    /// copy-characteristic assertions.
+    fn minted_copy_face<'a>(
+        state: &'a GameState,
+        exclude: &[ObjectId],
+    ) -> &'a sylex_card::CardFace {
+        let t = minted_copy(state, exclude);
         let card = state.objects.obj(t).card_id().expect("card-backed");
         crate::derive::face(&state.cards.get(card).def)
     }
 
+    /// Whether `id`'s mana value ([CR#202.3]) is `n`, read through the
+    /// engine's characteristic filter.
+    fn mana_value_is(state: &GameState, id: ObjectId, n: Uint) -> bool {
+        obj_matches(
+            state,
+            id,
+            &Predicate::Characteristic(sylex_core::CharacteristicPredicate::Stat(
+                sylex_core::Stat::ManaValue,
+                sylex_core::Cmp::Eq,
+                Count::Literal(n),
+            )),
+        )
+    }
+
     /// Eternalize ([CR#702.129a]): the macro's activated-ability effect mints a
-    /// token copy of the exiled card EXCEPT it's a 4/4 black Zombie — name
-    /// carried from the source, P/T 4/4, black, and a Zombie in addition to its
+    /// token copy of the exiled card EXCEPT it's a 4/4 black Zombie with no
+    /// mana cost — name carried from the source, P/T 4/4, black only (the
+    /// copied {1}{G} is gone), mana value 0, and a Zombie in addition to its
     /// other types ([CR#707.9d]).
     #[test]
     fn eternalize_macro_mints_a_4_4_black_zombie_copy() {
@@ -2113,9 +2141,20 @@ mod tests {
         );
         assert_eq!(face.characteristics.toughness, Some(StatValue::Number(4)));
         assert!(
-            face.characteristics.color_indicator.contains(&Color::Black),
-            "[CR#702.129a]: eternalize copy is black; got {:?}",
-            face.characteristics.color_indicator
+            face.characteristics.mana_cost.is_empty(),
+            "[CR#702.129a]: eternalize copy has no mana cost; got {:?}",
+            face.characteristics.mana_cost
+        );
+        let t = minted_copy(&state, &[src]);
+        assert_eq!(
+            *state.layers().get(t).colors,
+            vec![Color::Black],
+            "[CR#702.129a]: eternalize copy is black only, not also green from the \
+             copied {{1}}{{G}} cost"
+        );
+        assert!(
+            mana_value_is(&state, t, 0),
+            "[CR#202.3a]: no mana cost, so mana value 0"
         );
         assert!(
             face.characteristics
@@ -2128,8 +2167,9 @@ mod tests {
     }
 
     /// Embalm ([CR#702.128a]): the macro's activated-ability effect mints a
-    /// token copy EXCEPT it's a white Zombie — the source's printed P/T rides
-    /// through unchanged (no P/T exception), only color and subtype are set.
+    /// token copy EXCEPT it's a white Zombie with no mana cost — the source's
+    /// printed P/T rides through unchanged (no P/T exception). The copied
+    /// Grizzly Bears' {1}{G} is gone, so the token is white only, mana value 0.
     #[test]
     fn embalm_macro_mints_a_white_zombie_copy_retaining_pt() {
         use sylex_core::Color;
@@ -2153,9 +2193,20 @@ mod tests {
         );
         assert_eq!(face.characteristics.toughness, Some(StatValue::Number(2)));
         assert!(
-            face.characteristics.color_indicator.contains(&Color::White),
-            "[CR#702.128a]: embalm copy is white; got {:?}",
-            face.characteristics.color_indicator
+            face.characteristics.mana_cost.is_empty(),
+            "[CR#702.128a]: embalm copy has no mana cost; got {:?}",
+            face.characteristics.mana_cost
+        );
+        let t = minted_copy(&state, &[src]);
+        assert_eq!(
+            *state.layers().get(t).colors,
+            vec![Color::White],
+            "[CR#702.128a]: embalm copy is white only, not also green from the copied \
+             {{1}}{{G}} cost"
+        );
+        assert!(
+            mana_value_is(&state, t, 0),
+            "[CR#202.3a]: no mana cost, so mana value 0"
         );
         assert!(
             face.characteristics
@@ -2193,6 +2244,180 @@ mod tests {
         assert_eq!(face.characteristics.toughness, Some(StatValue::Number(1)));
     }
 
+    /// Offspring on Agate Instigator ({1}{R}, a 1/3 Lizard Rogue): the 1/1
+    /// token copy keeps the copied mana cost ([CR#707.2]), so it is red
+    /// ([CR#202.2]) with mana value 2 ([CR#202.3]). The fixture is the real
+    /// card's face without its abilities, which the copy's color and mana
+    /// value don't read.
+    #[test]
+    fn offspring_token_of_agate_instigator_is_red_with_mana_value_2() {
+        use sylex_card::CardFace;
+        use sylex_card::Characteristics;
+        use sylex_core::Color;
+        use sylex_core::StatValue;
+
+        let (mut state, bear) = bear_on_field();
+        let agate = mint_on_field(
+            &mut state,
+            Card::Normal(CardFace::from(Characteristics {
+                name: "Agate Instigator".into(),
+                mana_cost: "{1}{R}".parse().expect("test cost parses"),
+                types: vec![Type::Creature.def()],
+                subtypes: ["Lizard", "Rogue"]
+                    .map(|name| sylex_core::Subtype {
+                        name: name.into(),
+                        types: vec![Type::Creature].into(),
+                        confers: vec![].into(),
+                    })
+                    .to_vec(),
+                power: Some(StatValue::Number(1)),
+                toughness: Some(StatValue::Number(3)),
+                ..Characteristics::default()
+            })),
+        );
+        let effect = keyword_copy_effect("Offspring([Mana([Generic(1),Red])])");
+        let frame = frame_src(&state, agate);
+        run_test_region(&mut state, &effect, frame);
+        let _ = state.step();
+
+        let t = minted_copy(&state, &[bear, agate]);
+        let face = minted_copy_face(&state, &[bear, agate]);
+        assert_eq!(
+            face.characteristics.power,
+            Some(StatValue::Number(1)),
+            "[CR#702.175a]: offspring copy is 1/1"
+        );
+        assert_eq!(
+            face.characteristics.mana_cost,
+            "{1}{R}".parse().expect("test cost parses"),
+            "[CR#707.2]: the copy keeps the copied mana cost"
+        );
+        assert_eq!(
+            *state.layers().get(t).colors,
+            vec![Color::Red],
+            "[CR#202.2]: red from the copied {{1}}{{R}}"
+        );
+        assert!(
+            mana_value_is(&state, t, 2),
+            "[CR#202.3]: mana value 2 from the copied {{1}}{{R}}"
+        );
+    }
+
+    /// A token copy of Hydroid Krasis ({X}{G}{U}), as Cackling Counterpart
+    /// makes one: X is 0 in the copied cost off the stack, so the token's mana
+    /// value is 2 ([CR#202.3e]; Cackling Counterpart's ruling: "If the copied
+    /// creature has {X} in its mana cost, X is considered to be 0"), and it is
+    /// green and blue from that cost ([CR#202.2]). The fixture is the real
+    /// card's face without its abilities.
+    #[test]
+    fn token_copy_of_an_x_cost_creature_has_mana_value_with_x_as_0() {
+        use sylex_card::CardFace;
+        use sylex_card::Characteristics;
+        use sylex_core::Color;
+        use sylex_core::CopySource;
+        use sylex_core::CopySpec;
+        use sylex_core::StatValue;
+
+        let (mut state, bear) = bear_on_field();
+        let krasis = mint_on_field(
+            &mut state,
+            Card::Normal(CardFace::from(Characteristics {
+                name: "Hydroid Krasis".into(),
+                mana_cost: "{X}{G}{U}".parse().expect("test cost parses"),
+                types: vec![Type::Creature.def()],
+                power: Some(StatValue::Number(0)),
+                toughness: Some(StatValue::Number(0)),
+                ..Characteristics::default()
+            })),
+        );
+        let frame = frame_src_targets(&state, bear, vec![krasis]);
+        state.run_effect(
+            Instruction::act(Action::Create {
+                agent: Reference::Reg(sylex_core::RefId(1)),
+                count: Count::Literal(1),
+                token: sylex_core::TokenSpec::Copy(
+                    CopySpec {
+                        source: CopySource::Object(Reference::Reg(sylex_core::RefId(6))),
+                        exceptions: vec![],
+                    }
+                    .into(),
+                ),
+                riders: vec![].into(),
+            }),
+            &frame,
+        );
+        let _ = state.step();
+
+        let t = minted_copy(&state, &[bear, krasis]);
+        assert!(
+            mana_value_is(&state, t, 2),
+            "[CR#202.3e]: X is 0 in the copied {{X}}{{G}}{{U}}, so mana value 2"
+        );
+        assert_eq!(
+            *state.layers().get(t).colors,
+            vec![Color::Green, Color::Blue],
+            "[CR#202.2]: green and blue from the copied cost"
+        );
+    }
+
+    /// Mythos of Illuna's "Create a token that's a copy of target permanent"
+    /// aimed at Ajani Goldmane ({2}{W}{W}, loyalty 4): the token copies the
+    /// printed loyalty [CR#707.2], so the builtin planeswalker conferral
+    /// ([CR#306.5b]'s intrinsic enters-with-loyalty replacement) puts four
+    /// loyalty counters on it as it enters. The fixture is Ajani's face
+    /// without its loyalty abilities.
+    #[test]
+    fn token_copy_of_a_planeswalker_enters_with_the_copied_loyalty() {
+        use sylex_card::CardFace;
+        use sylex_card::Characteristics;
+        use sylex_core::CopySource;
+        use sylex_core::CopySpec;
+        use sylex_core::StatValue;
+
+        let mut state = game();
+        state.conferral_rules = builtin().conferral_rules;
+        let ajani = mint_on_field(
+            &mut state,
+            Card::Normal(CardFace::from(Characteristics {
+                name: "Ajani Goldmane".into(),
+                mana_cost: "{2}{W}{W}".parse().expect("test cost parses"),
+                types: vec![Type::Planeswalker.def()],
+                loyalty: Some(StatValue::Number(4)),
+                ..Characteristics::default()
+            })),
+        );
+        let frame = frame_src_targets(&state, ajani, vec![ajani]);
+        state.run_effect(
+            Instruction::act(Action::Create {
+                agent: Reference::Reg(sylex_core::RefId(1)),
+                count: Count::Literal(1),
+                token: sylex_core::TokenSpec::Copy(
+                    CopySpec {
+                        source: CopySource::Object(Reference::Reg(sylex_core::RefId(6))),
+                        exceptions: vec![],
+                    }
+                    .into(),
+                ),
+                riders: vec![].into(),
+            }),
+            &frame,
+        );
+        let _ = state.step();
+
+        let t = minted_copy(&state, &[ajani]);
+        assert_eq!(
+            state
+                .objects
+                .obj(t)
+                .counters
+                .get(&sylex_core::Ident::from("LoyaltyCounter"))
+                .copied(),
+            Some(4),
+            "[CR#306.5b,707.2]: the copy enters with loyalty counters equal to the copied \
+             loyalty 4"
+        );
+    }
+
     /// Populate ([CR#701.36a]): drives the FULL `Populate` macro expansion —
     /// `With(ChooseOne(creature-token-you-control), Create(1,
     /// Copy(Object(That))))` — end to end. Mints a real creature token,
@@ -2221,6 +2446,7 @@ mod tests {
                 count: Count::Literal(1),
                 token: Token {
                     name: None,
+                    mana_cost: sylex_core::ManaCost::default(),
                     color_indicator: vec![].into(),
                     supertypes: vec![].into(),
                     types: vec![Type::Creature.def()].into(),
@@ -2233,6 +2459,8 @@ mod tests {
                     abilities: vec![].into(),
                     power: Some(StatValue::Number(2)),
                     toughness: Some(StatValue::Number(2)),
+                    loyalty: None,
+                    defense: None,
                 }
                 .into(),
                 riders: vec![].into(),
@@ -2768,6 +2996,7 @@ mod tests {
 
         let plain_token = Token {
             name: None,
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: vec![].into(),
             supertypes: vec![].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -2775,6 +3004,8 @@ mod tests {
             abilities: vec![].into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         };
         state.run_effect(
             Instruction::act(Action::Create {

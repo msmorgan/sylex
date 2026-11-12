@@ -6,6 +6,7 @@ use serde::Serialize;
 
 use crate::Color;
 use crate::Ident;
+use crate::ManaCost;
 use crate::StatValue;
 use crate::Subtype;
 use crate::Supertype;
@@ -170,7 +171,6 @@ impl PredefinedToken {
         use crate::action::LifeOp;
         use crate::cost::CostComponent;
         use crate::effect::Instruction;
-        use crate::mana::ManaCost;
         use crate::mana::ManaSymbol;
         use crate::mana::SimpleManaSymbol;
         use crate::reference::Reference;
@@ -303,6 +303,7 @@ impl PredefinedToken {
 
         Token {
             name: None,
+            mana_cost: ManaCost::default(),
             color_indicator: [].into(),
             supertypes: [].into(),
             types: vec![Type::Artifact.def()].into(),
@@ -310,26 +311,36 @@ impl PredefinedToken {
             abilities: abilities.into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         }
     }
 }
 
 /// A token permanent definition ([CR#111]). The creating effect defines the
 /// token's characteristics ([CR#111.3] — functionally equivalent to printed
-/// values). Color rides a color indicator ([CR#202.2e]: a token has no mana
-/// cost, so its defined color is carried the same way `CardFace` carries a
-/// printed indicator). `name` is usually omitted — an unnamed token defaults
-/// to its subtypes plus "Token" at synthesis ([CR#111.4]) — except when the
-/// creating effect DOES specify a name, which a copy effect always does: a
-/// copy acquires the source's name as a copiable value ([CR#707.2]), so
-/// `token_from_copiable` (`sylex_engine::copy`) sets this explicitly
-/// rather than letting a copy token's name resynthesize from its subtypes.
+/// values). A token has no mana cost unless the effect that creates it says
+/// otherwise ([CR#202.1b]); a token that's a copy acquires the copied mana
+/// cost, loyalty and defense as copiable values ([CR#707.2]), so its color
+/// and mana value derive from that cost ([CR#202.2,202.3]). Any other color
+/// the effect defines rides a color indicator ([CR#202.2e]), the way
+/// `CardFace` carries a printed one. `name` is usually omitted — an unnamed
+/// token defaults to its subtypes plus "Token" at synthesis ([CR#111.4]) —
+/// except when the creating effect DOES specify a name, which a copy effect
+/// always does: a copy acquires the source's name as a copiable value
+/// ([CR#707.2]), so `token_from_copiable` (`sylex_engine::copy`) sets this
+/// explicitly rather than letting a copy token's name resynthesize from its
+/// subtypes.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub struct Token {
     /// An explicit name ([CR#111.3]/[CR#707.2]) — `None` synthesizes at
     /// [CR#111.4] (subtypes + "Token") the way an unnamed token always has.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub name: Option<Arc<str>>,
+    /// The token's mana cost: empty (no mana cost, [CR#202.1b]) unless the
+    /// creating effect specifies one, as a copy does ([CR#707.2]).
+    #[serde(default, skip_serializing_if = "ManaCost::is_empty")]
+    pub mana_cost: ManaCost,
     /// The colors the token's color indicator denotes; it is each of them
     /// ([CR#204.2]).
     #[serde(default, skip_serializing_if = "crate::slice_is_empty")]
@@ -345,4 +356,8 @@ pub struct Token {
     pub power: Option<StatValue>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub toughness: Option<StatValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub loyalty: Option<StatValue>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub defense: Option<StatValue>,
 }

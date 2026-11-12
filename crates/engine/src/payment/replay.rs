@@ -2263,6 +2263,7 @@ mod tests {
 
         let token = sylex_core::Token {
             name: Some("Mapped entrant".into()),
+            mana_cost: sylex_core::ManaCost::default(),
             color_indicator: Vec::new().into(),
             supertypes: Vec::new().into(),
             types: Vec::new().into(),
@@ -2270,7 +2271,10 @@ mod tests {
             abilities: Vec::new().into(),
             power: None,
             toughness: None,
+            loyalty: None,
+            defense: None,
         };
+        let token = std::sync::Arc::new(token);
         assert!(facts_equivalent_mapped(
             &GameEvent::TokenCreated(crate::event::TokenCreated {
                 player: PlayerId(0),
