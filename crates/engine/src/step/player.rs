@@ -152,19 +152,11 @@ impl EventApply for GotDesignation {
 }
 
 impl EventApply for ControlChanged {
-    // [CR#701.12b,613.1b]: a one-shot control TRANSITION — re-home
-    // the object (a control change is never a zone move; the object
-    // keeps its identity). The base controller moves; layer-2
-    // continuous control effects still override on top. This write is
-    // the one-shot path's base-field write, not a rules read. Whether
-    // the permanent is now summoning sick for a new controller
-    // ([CR#302.6]) is the control-change rule's call, the same one a
-    // continuous control change goes through.
-    fn apply(&self, g: &mut GameState) -> Option<GameEvent> {
-        if g.objects.get(self.object).is_some() {
-            g.objects.obj_mut(self.object).controller = self.to;
-            g.observe_control_changes();
-        }
+    // [CR#603.2e]: the record of a control change that already happened — a
+    // resolved gain-control's layer-2 effect ([CR#613.1b]) changed the
+    // derived controller as it was created (`GameState::gain_control`), so
+    // there is nothing left to apply.
+    fn apply(&self, _g: &mut GameState) -> Option<GameEvent> {
         None
     }
 }

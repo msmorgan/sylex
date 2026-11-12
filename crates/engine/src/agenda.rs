@@ -110,6 +110,15 @@ pub enum WorkItem {
         events: Vec<GameEvent>,
         commit: crate::state::OccurrenceCommit,
     },
+    /// [CR#611.2a,613.1b]: a resolving "gain control": `to` gains control of
+    /// `object` through a layer-2 effect created now
+    /// (`GameState::gain_control`), and a `ControlChanged` fact is recorded
+    /// when that changed its controller. Creating the effect is no event, so
+    /// it is its own work item rather than an `Emit`.
+    GainControl {
+        object: crate::object::ObjectId,
+        to: crate::player::PlayerId,
+    },
     /// Turn-structure transition plus that step's schedule.
     BeginStep(PhaseStep),
     /// [CR#704.3]: state-based actions, checked before anyone gets priority.

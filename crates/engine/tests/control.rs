@@ -3,14 +3,17 @@
 //! untapping [CR#502.3], summoning sickness [CR#302.6], triggered-ability
 //! control [CR#603.3a] and lifelink [CR#702.15b].
 //!
-//! The steal is a locked layer-2 `SetController` for the rest of the game:
-//! Control Magic's "You control enchanted creature" without the Aura, the
-//! same shape as each half of Avarice Totem's exchange.
+//! The steal is a locked layer-2 `SetController` for the rest of the game,
+//! timestamped when it is made: Control Magic's "You control enchanted
+//! creature" without the Aura, the same shape as each half of Avarice Totem's
+//! exchange. A resolved "gain control" (Wild Dogs) makes the same kind of
+//! effect with its own timestamp ([CR#611.2a,613.7b]).
 
 use std::path::Path;
 use std::sync::Arc;
 
 use sylex_card::Card;
+use sylex_core::Color;
 use sylex_core::Duration;
 use sylex_core::Modification;
 use sylex_core::PhaseStep;
@@ -22,6 +25,7 @@ use sylex_engine::Decision;
 use sylex_engine::DecisionPointKind;
 use sylex_engine::GameConfig;
 use sylex_engine::GameState;
+use sylex_engine::ManaProvenance;
 use sylex_engine::ObjectId;
 use sylex_engine::PlayerConfig;
 use sylex_engine::PlayerId;
@@ -29,6 +33,7 @@ use sylex_engine::ScopeResolved;
 use sylex_engine::StartingPlayer;
 use sylex_engine::StepOutcome;
 use sylex_engine::Timestamp;
+use sylex_engine::WorkItem;
 use sylex_plugin_v1::plugin::Plugin;
 
 const P0: PlayerId = PlayerId(0);
@@ -51,13 +56,42 @@ fn card(name: &str) -> Arc<Card> {
     Arc::new(card)
 }
 
+/// A hand-spelled semantic card derived from a real one, lowered through the
+/// production boundary (`Plugin::card_from_str`).
+fn fixture(source: &str) -> Arc<Card> {
+    Arc::new(
+        plugin("canon")
+            .card_from_str(source)
+            .unwrap_or_else(|error| panic!("fixture did not load: {error}\n{source}"))
+            .core,
+    )
+}
+
+/// Switcheroo: "Exchange control of two target creatures."
+const SWITCHEROO: &str = r#"Normal(
+    name: "Switcheroo",
+    mana_cost: [Generic(4), Blue],
+    types: [Sorcery],
+    abilities: [
+        Spell(effect: Targeted(
+            targets: [TargetOne(Creature), TargetOne(Creature)],
+            effect: ExchangeControl(Target(0), Target(1)),
+        )),
+    ],
+)"#;
+
 /// A two-player game, P0 first: P0's deck holds `p0_cards` and P1's
 /// `p1_cards`, each padded with Grizzly Bears to 30 cards so no library runs
 /// out. Builtin SBA and damage-result rules are wired so combat damage and
 /// the lethal-damage check behave as in a real game.
 fn game(p0_cards: &[&str], p1_cards: &[&str]) -> GameState {
-    let deck = |names: &[&str]| {
-        let mut deck: Vec<Arc<Card>> = names.iter().map(|n| card(n)).collect();
+    let cards = |names: &[&str]| names.iter().map(|n| card(n)).collect();
+    game_of(cards(p0_cards), cards(p1_cards))
+}
+
+/// [`game`] with the decks' cards given directly.
+fn game_of(p0_cards: Vec<Arc<Card>>, p1_cards: Vec<Arc<Card>>) -> GameState {
+    let deck = |mut deck: Vec<Arc<Card>>| {
         while deck.len() < 30 {
             deck.push(card("Grizzly Bears"));
         }
@@ -123,9 +157,10 @@ fn force_onto_battlefield(state: &mut GameState, player: PlayerId, name: &str) -
 /// `to` gains control of `id` for the rest of the game through a locked
 /// layer-2 `SetController` whose `You` is `to` ([CR#611.2c,613.1b]), plus
 /// any `also` changes (Act of Treason's haste grant, applied in layer 6
-/// [CR#613.6]).
-fn steal(state: &mut GameState, id: ObjectId, to: PlayerId, also: Vec<Modification>) {
-    steal_for(state, id, to, also, Duration::EndOfGame);
+/// [CR#613.6]). Returns the effect's timestamp, drawn from the game's clock
+/// [CR#613.7].
+fn steal(state: &mut GameState, id: ObjectId, to: PlayerId, also: Vec<Modification>) -> Timestamp {
+    steal_for(state, id, to, also, Duration::EndOfGame)
 }
 
 /// [`steal`] with a stated `duration` (Threaten's "until end of turn").
@@ -135,13 +170,14 @@ fn steal_for(
     to: PlayerId,
     also: Vec<Modification>,
     duration: Duration,
-) {
+) -> Timestamp {
     let mut changes = vec![Modification::SetController(
         Reference::controller_parameter(),
     )];
     changes.extend(also);
+    let timestamp = state.objects.next_timestamp();
     state.continuous.push(ContinuousEffect {
-        timestamp: Timestamp(1_000),
+        timestamp,
         controller: to,
         scope: ScopeResolved::Locked(vec![id]),
         changes,
@@ -150,6 +186,7 @@ fn steal_for(
         origin: None,
         is_cda: false,
     });
+    timestamp
 }
 
 /// Steps the game, answering every decision with the do-nothing choice
@@ -513,5 +550,207 @@ fn creature_returned_by_an_ended_steal_is_sick_for_its_owner() {
     assert!(
         activates(&priority_on_turn(&mut state, 3, upkeep, P0), pinger),
         "P0's turn 3 began with it under P0's control"
+    );
+}
+
+/// [CR#611.2a,613.7]: a resolved "gain control" is a layer-2 effect with its
+/// own timestamp, so it applies after an earlier control effect. P1's Control
+/// Magic holds P0's Wild Dogs ("At the beginning of your upkeep, if a player
+/// has more life than each other player, the player with the most life gains
+/// control of this creature."). At P1's upkeep P0 has the most life and gains
+/// control of the Dogs, though Control Magic still applies; P0 gained it on
+/// another player's turn, so it is summoning sick for P0 [CR#302.6].
+#[test]
+fn a_later_gain_control_overrides_control_magic() {
+    let mut state = game(&["Wild Dogs"], &[]);
+    let dogs = force_onto_battlefield(&mut state, P0, "Wild Dogs");
+    let _control_magic = steal(&mut state, dogs, P1, vec![]);
+    state.player_mut(P0).life = 25;
+
+    let _ = priority_on_turn(&mut state, 2, PhaseStep::PrecombatMain, P1);
+    assert_eq!(
+        state.layers().controller(dogs),
+        P0,
+        "the gain-control effect is later than Control Magic's and wins"
+    );
+    assert_eq!(
+        state.objects.obj(dogs).controller,
+        P0,
+        "the base controller stays the one it entered under ([CR#110.2])"
+    );
+    assert!(
+        state.objects.obj(dogs).summoning_sick,
+        "P0 has not controlled it since P0's most recent turn began"
+    );
+}
+
+/// [CR#611.2a]: gaining control of a permanent its new controller already
+/// controls still creates an effect that lasts until the end of the game.
+/// P1's Control Magic holds P0's Wild Dogs; at P1's upkeep P1 has the most
+/// life and gains control of the Dogs. When Control Magic's effect ends, P1's
+/// gain-control effect still applies and P1 keeps the Dogs. Control never
+/// changed, so the Dogs are not newly summoning sick [CR#302.6].
+#[test]
+fn gain_control_of_a_creature_already_controlled_outlasts_control_magic() {
+    let mut state = game(&["Wild Dogs"], &[]);
+    let dogs = force_onto_battlefield(&mut state, P0, "Wild Dogs");
+    let control_magic = steal(&mut state, dogs, P1, vec![]);
+    state.player_mut(P1).life = 30;
+
+    let _ = priority_on_turn(&mut state, 2, PhaseStep::PrecombatMain, P1);
+    assert_eq!(state.layers().controller(dogs), P1, "sanity: still P1's");
+    assert!(
+        !state.objects.obj(dogs).summoning_sick,
+        "P1 has controlled it continuously since P1's turn began"
+    );
+    state.continuous.retain(|e| e.timestamp != control_magic);
+    assert_eq!(
+        state.layers().controller(dogs),
+        P1,
+        "P1's own gain-control effect outlasts Control Magic's"
+    );
+}
+
+/// Moves the first `name` card `player` owns from their library into their
+/// hand.
+fn into_hand(state: &mut GameState, player: PlayerId, name: &str) -> ObjectId {
+    let p = player.index();
+    let i = state.zones.libraries[p]
+        .iter()
+        .position(|&o| face_name(state, o) == name)
+        .unwrap_or_else(|| panic!("no {name} in P{}'s library", player.0));
+    let obj = state.zones.libraries[p]
+        .remove(i)
+        .expect("index in library");
+    state.objects.obj_mut(obj).zone = Some(Zone::Hand);
+    state.zones.hands[p].push(obj);
+    obj
+}
+
+/// Floats `amount` `color` mana into `player`'s pool and reopens the priority
+/// window in flight so the pool shows in its legal actions.
+fn float(state: &mut GameState, player: PlayerId, color: Color, amount: u32) {
+    state
+        .player_mut(player)
+        .mana_pool
+        .add(color.into(), amount, ManaProvenance::default());
+    assert!(
+        matches!(state.pending, Some(DecisionPointKind::Priority(_))),
+        "float expects a priority window in flight"
+    );
+    state.pending = None;
+    state.agenda.push_front(WorkItem::OpenPriority);
+}
+
+/// Steps the game, answering each decision with `answer` first and the
+/// routine answer otherwise (pass, auto-pay), until `stop` accepts a decision,
+/// which it returns unanswered.
+fn drive_answering(
+    state: &mut GameState,
+    mut answer: impl FnMut(&GameState, &DecisionPointKind) -> Option<Decision>,
+    mut stop: impl FnMut(&GameState, &DecisionPointKind) -> bool,
+) -> DecisionPointKind {
+    for _ in 0..10_000 {
+        match state.step() {
+            StepOutcome::Progress(_) => {}
+            StepOutcome::NeedsDecision(decision) => {
+                if stop(state, &decision) {
+                    return decision;
+                }
+                let routine = match &decision {
+                    DecisionPointKind::Priority(_) => Some(Decision::Act(Action::Pass)),
+                    DecisionPointKind::PayMana(_) => Some(Decision::Pay(state.auto_pay_pending())),
+                    DecisionPointKind::Payment(_) => state.auto_payment_pending(),
+                    _ => None,
+                };
+                let chosen = answer(state, &decision)
+                    .or(routine)
+                    .unwrap_or_else(|| panic!("no answer for {decision:?}"));
+                state.submit_decision(chosen).unwrap();
+            }
+            StepOutcome::GameOver(outcome) => panic!("game ended while driving: {outcome:?}"),
+        }
+    }
+    panic!("drive_answering did not reach its stop");
+}
+
+/// [CR#603.3a,701.12b]: a triggered ability is controlled by the player who
+/// controlled its source when it triggered. P0 casts Switcheroo on P0's
+/// Grizzly Bears and P1's Footlight Fiend ("When this creature dies, it deals
+/// 1 damage to any target."), so P0 gains control of the Fiend through a
+/// resolved effect. P0 then bolts the Fiend, and its dies trigger is P0's.
+#[test]
+fn a_gained_creatures_dies_trigger_is_controlled_by_the_player_who_gained_it() {
+    let mut state = game_of(
+        vec![fixture(SWITCHEROO), card("Lightning Bolt")],
+        vec![card("Footlight Fiend")],
+    );
+    let bears = force_onto_battlefield(&mut state, P0, "Grizzly Bears");
+    let fiend = force_onto_battlefield(&mut state, P1, "Footlight Fiend");
+    let switcheroo = into_hand(&mut state, P0, "Switcheroo");
+    let bolt = into_hand(&mut state, P0, "Lightning Bolt");
+    let main = |s: &GameState, d: &DecisionPointKind| {
+        matches!(d, DecisionPointKind::Priority(p) if p.player == P0)
+            && s.turn.turn_number == 1
+            && s.turn.current == PhaseStep::PrecombatMain
+            && s.stack.is_empty()
+    };
+    let _ = drive_answering(&mut state, |_, _| None, main);
+
+    float(&mut state, P0, Color::Blue, 5);
+    let _ = drive_answering(&mut state, |_, _| None, main);
+    state
+        .submit_decision(Decision::Act(Action::CastSpell { object: switcheroo }))
+        .unwrap();
+    let _ = drive_answering(
+        &mut state,
+        |_, d| {
+            matches!(d, DecisionPointKind::ChooseTargets(_))
+                .then(|| Decision::Targets(vec![vec![bears], vec![fiend]]))
+        },
+        main,
+    );
+    assert_eq!(state.layers().controller(fiend), P0, "P0 gained the Fiend");
+
+    float(&mut state, P0, Color::Red, 1);
+    let _ = drive_answering(&mut state, |_, _| None, main);
+    state
+        .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
+        .unwrap();
+    let bolt_targeted = std::cell::Cell::new(false);
+    let prompt = drive_answering(
+        &mut state,
+        |_, d| match d {
+            DecisionPointKind::ChooseTargets(_) if !bolt_targeted.get() => {
+                bolt_targeted.set(true);
+                Some(Decision::Targets(vec![vec![fiend]]))
+            }
+            _ => None,
+        },
+        |_, d| bolt_targeted.get() && matches!(d, DecisionPointKind::ChooseTargets(_)),
+    );
+    let DecisionPointKind::ChooseTargets(prompt) = prompt else {
+        unreachable!("{prompt:?}")
+    };
+    assert_eq!(
+        prompt.player, P0,
+        "the dies trigger's controller, P0, chooses its target"
+    );
+    let p1 = state.player(P1).object;
+    state
+        .submit_decision(Decision::Targets(vec![vec![p1]]))
+        .unwrap();
+    let _ = drive_answering(
+        &mut state,
+        |_, _| None,
+        |s, d| matches!(d, DecisionPointKind::Priority(_)) && !s.stack.is_empty(),
+    );
+    let trigger = state
+        .stack
+        .last()
+        .expect("the dies trigger is on the stack");
+    assert_eq!(
+        trigger.controller, P0,
+        "the Fiend's dies trigger is controlled by the player who gained it"
     );
 }

@@ -133,6 +133,13 @@ pub enum Progress {
     /// [CR#511.3]: the End of Combat step's turn-based action ran — every
     /// creature was removed from combat (the combat-state registry cleared).
     CombatEnded,
+    /// [CR#611.2a,613.1b]: a resolving "gain control" created its layer-2
+    /// effect: `to` gains control of `object` (a `ControlChanged` fact is
+    /// scheduled when that changed its controller).
+    ControlGained {
+        object: crate::object::ObjectId,
+        to: PlayerId,
+    },
     /// A priority decision was surfaced for this player.
     PriorityOpened(PlayerId),
     /// [CR#601.2a,601.2b] / [CR#602.2a,602.2b]: a spell moved to the stack (or
@@ -213,8 +220,9 @@ impl GameState {
         if let Some(pending) = &self.pending {
             return StepOutcome::NeedsDecision(pending.clone());
         }
-        // [CR#302.6]: a control change since the last step, through either
-        // path, makes the permanent summoning sick before this step reads it.
+        // [CR#302.6]: a control change since the last step (a layer-2 effect
+        // beginning, ending or changing its affected set) makes the permanent
+        // summoning sick before this step reads it.
         self.observe_control_changes();
         let item = self
             .agenda
@@ -234,6 +242,14 @@ impl GameState {
             WorkItem::DeclareBlockers => self.declare_blockers(),
             WorkItem::AssignCombatDamage => self.assign_combat_damage(),
             WorkItem::EndOfCombat => self.end_of_combat(),
+            WorkItem::GainControl { object, to } => {
+                if let Some(fact) = self.gain_control(object, to) {
+                    self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
+                        GameEvent::ControlChanged(fact),
+                    ))]);
+                }
+                Progress::ControlGained { object, to }
+            }
             WorkItem::OpenPriority => self.open_priority(),
             WorkItem::BeginCast(object) => {
                 self.begin_cast(object);

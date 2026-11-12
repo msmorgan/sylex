@@ -3,8 +3,7 @@
 // `Continuously(EndOfGame, Modify(_, SetController(ControllerOf(_))))`
 // halves. Deliberately NOT the pre-existing `ExchangeControl` builtin macro
 // (`plugins/builtin/macros/effect/ExchangeControl.ron`): that one expands to
-// the one-shot `Action::GainControl`; this fixture exercises the
-// continuous-modification spelling.
+// `Action::GainControl`; this fixture exercises the `Continuously` spelling.
 //
 // The self-reference in the body ("this artifact") is a battlefield-context
 // type-noun, not the printed name — `ability::activated`'s `Ctx.subject`

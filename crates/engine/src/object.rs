@@ -280,6 +280,11 @@ pub struct DamageMark {
 pub struct GameObject {
     pub id: ObjectId,
     pub source: ObjectSource,
+    /// The base controller: the player under whose control the object entered
+    /// its zone: a permanent's by default ([CR#110.2]), a spell's by default
+    /// ([CR#112.2]).
+    /// Control changes are layer-2 effects ([CR#613.1b]) and never write it;
+    /// the rules read `GameState::controller_of`.
     pub controller: PlayerId,
     /// Layer-system ordering stamp ([CR#613.7]): assigned at mint / zone-entry
     /// ([CR#613.7d]) from the shared monotonic clock in [`ObjectStore`].
@@ -398,9 +403,9 @@ pub struct ObjectStore {
 
 impl ObjectStore {
     /// Draws the next timestamp from the shared monotonic clock and advances
-    /// it. Floating effects (a later task) use this same clock so that object
-    /// and effect timestamps are totally ordered ([CR#613.7]).
-    pub(crate) fn next_timestamp(&mut self) -> Timestamp {
+    /// it. Objects and resolved continuous effects use this same clock so
+    /// that their timestamps are totally ordered ([CR#613.7]).
+    pub fn next_timestamp(&mut self) -> Timestamp {
         let t = Timestamp(self.clock);
         self.clock += 1;
         t

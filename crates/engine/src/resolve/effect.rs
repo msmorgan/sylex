@@ -485,7 +485,13 @@ impl GameState {
                     origin: Option<Box<ExecutionFrame>>,
                 }
                 enum Member {
-                    Events(Vec<GameEvent>),
+                    /// An `Act` verb's events, plus the "gain control"
+                    /// effects it creates ([CR#611.2a]), each an object and
+                    /// its new controller.
+                    Act {
+                        events: Vec<GameEvent>,
+                        grants: Vec<(ObjectId, crate::player::PlayerId)>,
+                    },
                     Static(Box<PendingStatic>),
                 }
 
@@ -495,6 +501,7 @@ impl GameState {
                     match child {
                         Instruction::Act { action, .. } => {
                             let mut events = Vec::new();
+                            let mut grants = Vec::new();
                             for item in self.action_items(action, frame) {
                                 match item {
                                     WorkItem::Emit(crate::event::Occurrence::Single(e)) => {
@@ -502,6 +509,17 @@ impl GameState {
                                     }
                                     WorkItem::Emit(crate::event::Occurrence::Batch(es)) => {
                                         events.extend(es);
+                                    }
+                                    // [CR#701.12b]: a member giving a player
+                                    // control of a permanent that player
+                                    // already controls means both permanents
+                                    // share a controller, and the exchange
+                                    // does nothing.
+                                    WorkItem::GainControl { object, to } => {
+                                        if self.controller_of(object) == to {
+                                            void = true;
+                                        }
+                                        grants.push((object, to));
                                     }
                                     other => todo!(
                                         "engine seam: choice-bearing Simultaneously member, \
@@ -512,10 +530,10 @@ impl GameState {
                                     ),
                                 }
                             }
-                            if events.is_empty() {
+                            if events.is_empty() && grants.is_empty() {
                                 void = true;
                             }
-                            members.push(Member::Events(events));
+                            members.push(Member::Act { events, grants });
                         }
                         Instruction::Continuously(e) => {
                             let StaticSpec::Modify(r, change) = &*e.effect else {
@@ -603,11 +621,20 @@ impl GameState {
                 // Phase B (commit): timestamp allocation and row insertion
                 // mutate, so they wait until every member is known-nonempty
                 // ([CR#701.12a] — if the entire exchange can't be completed,
-                // no part of it occurs).
+                // no part of it occurs). A gain-control member creates its
+                // layer-2 effect here, and its `ControlChanged` fact joins
+                // the batch.
                 let mut events: Vec<GameEvent> = Vec::new();
                 for member in members {
                     match member {
-                        Member::Events(es) => events.extend(es),
+                        Member::Act { events: es, grants } => {
+                            events.extend(es);
+                            for (object, to) in grants {
+                                events.extend(
+                                    self.gain_control(object, to).map(GameEvent::ControlChanged),
+                                );
+                            }
+                        }
                         Member::Static(pending) => {
                             let PendingStatic {
                                 controller,
@@ -2789,15 +2816,42 @@ mod tests {
         assert_eq!(crate::sim::pending_player(&pending), PlayerId(1));
     }
 
+    /// Control Magic's effect ("You control enchanted creature.") without the
+    /// Aura: `to` controls `id` through a locked layer-2 `SetController`
+    /// timestamped now ([CR#613.1b,613.7]). Returns its timestamp, so a test
+    /// can end it as Control Magic leaving the battlefield would.
+    fn control_magic(
+        state: &mut GameState,
+        id: ObjectId,
+        to: PlayerId,
+    ) -> crate::object::Timestamp {
+        let timestamp = state.objects.next_timestamp();
+        state.continuous.push(crate::layer::ContinuousEffect {
+            timestamp,
+            controller: to,
+            scope: crate::layer::ScopeResolved::Locked(vec![id]),
+            changes: vec![sylex_core::Modification::SetController(
+                Reference::controller_parameter(),
+            )],
+            rows: vec![],
+            duration: sylex_core::Duration::EndOfGame,
+            origin: None,
+            is_cda: false,
+        });
+        timestamp
+    }
+
     /// The exchange-control card, through `Simultaneously`
     /// ([CR#701.12a..701.12b]): the `ExchangeControl` macro's two halves
-    /// read ONE pre-application snapshot, land as one `ControlChanged`
-    /// batch, and the two creatures swap controllers — each
-    /// summoning-sick for its new controller ([CR#302.6]).
+    /// read ONE pre-application snapshot and each creates a layer-2 effect
+    /// ([CR#611.2a,613.1b]); their two `ControlChanged` facts land as one
+    /// batch, and the two creatures swap controllers, each summoning-sick
+    /// for its new controller ([CR#302.6]). The base controllers stay the
+    /// ones the creatures entered under ([CR#110.2]).
     #[test]
     fn exchange_control_swaps_controllers_through_one_simultaneous_batch() {
         let (mut state, mine, other) = two_permanents_on_field();
-        // Re-home `other` to player 1 so the exchange crosses seats.
+        // `other` entered under player 1, so the exchange crosses seats.
         state.objects.obj_mut(other).controller = PlayerId(1);
 
         // Parsed through the SEMANTICS path (`semantics::Instruction` →
@@ -2810,6 +2864,7 @@ mod tests {
         schedule_lowered_effect(&mut state, semantic, 2, &frame);
         let _ = state.step();
 
+        assert_eq!(state.continuous.len(), 2, "one layer-2 effect per half");
         // ONE batch of two ControlChanged facts.
         let front = state.agenda.front().cloned();
         let Some(WorkItem::Emit(Occurrence::Batch(events))) = front else {
@@ -2820,20 +2875,29 @@ mod tests {
             events
                 .iter()
                 .all(|e| matches!(e, GameEvent::ControlChanged(ControlChanged { .. }))),
-            "the exchange is a batch of control transitions, got {events:?}"
+            "the exchange records a batch of control transitions, got {events:?}"
         );
 
         run_injected(&mut state);
+        let view = state.layers();
         assert_eq!(
-            state.objects.obj(mine).controller,
+            view.controller(mine),
             PlayerId(1),
             "player 1 gained control of player 0's creature"
         );
         assert_eq!(
-            state.objects.obj(other).controller,
+            view.controller(other),
             PlayerId(0),
             "player 0 gained control of player 1's creature — both halves read \
              the PRE-exchange controllers (one snapshot)"
+        );
+        assert_eq!(
+            (
+                state.objects.obj(mine).controller,
+                state.objects.obj(other).controller
+            ),
+            (PlayerId(0), PlayerId(1)),
+            "the base controllers are the ones they entered under"
         );
         assert!(
             state.objects.obj(mine).summoning_sick && state.objects.obj(other).summoning_sick,
@@ -2842,23 +2906,34 @@ mod tests {
     }
 
     /// [CR#701.12b]: exchanging control of two permanents the SAME player
-    /// controls does nothing — each half is a no-transition no-op, and the
-    /// all-or-nothing rule ([CR#701.12a]) voids the empty set.
+    /// controls does nothing. Player 1's Control Magic holds player 0's
+    /// `stolen`, and `theirs` entered under player 1; the exchange creates no
+    /// effect, so when Control Magic's effect ends `stolen` returns to
+    /// player 0.
     #[test]
     fn same_controller_exchange_does_nothing() {
-        let (mut state, mine, other) = two_permanents_on_field();
+        let (mut state, stolen, theirs) = two_permanents_on_field();
+        state.objects.obj_mut(theirs).controller = PlayerId(1);
+        let magic = control_magic(&mut state, stolen, PlayerId(1));
         // Parsed through the SEMANTICS path (`semantics::Instruction` →
         // `lower()`), the path production now takes.
         let semantic: sylex_semantics_v1::OneShotEffect = builtin()
             .macros
             .read_str(r"ExchangeControl(Target(0), Target(1))")
             .unwrap();
-        let frame = frame_src_targets(&state, mine, vec![mine, other]);
+        let frame = frame_src_targets(&state, stolen, vec![stolen, theirs]);
         schedule_lowered_effect(&mut state, semantic, 2, &frame);
         let _ = state.step();
         assert!(
             !state.agenda.iter().any(|w| matches!(w, WorkItem::Emit(_))),
-            "a same-controller exchange emits nothing ([CR#701.12b])"
+            "a same-controller exchange records nothing ([CR#701.12b])"
+        );
+        assert_eq!(state.continuous.len(), 1, "and creates no effect");
+        state.continuous.retain(|e| e.timestamp != magic);
+        assert_eq!(
+            state.layers().controller(stolen),
+            PlayerId(0),
+            "with Control Magic's effect gone, its owner controls it again"
         );
     }
 

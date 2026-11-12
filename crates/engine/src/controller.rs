@@ -1,11 +1,19 @@
 //! Who controls an object: the derived controller every rules-facing read
 //! uses, and the one rule a change of that controller goes through.
 //!
-//! `GameObject.controller` is the base controller: what the object entered
-//! under [CR#110.2], moved by a one-shot `ControlChanged`. A continuous
-//! control-changing effect applies in layer 2 [CR#613.1b] and changes only the
-//! layered view's controller, so the rules read that one.
+//! `GameObject.controller` is the base controller: the player the object
+//! entered under [CR#110.2], which nothing moves afterward. Every control
+//! change is a continuous control-changing effect, applied in layer 2
+//! [CR#613.1b], that changes only the layered view's controller, so the rules
+//! read that one.
 
+use sylex_core::Duration;
+use sylex_core::Modification;
+use sylex_core::Reference;
+
+use crate::event::ControlChanged;
+use crate::layer::ContinuousEffect;
+use crate::layer::ScopeResolved;
 use crate::object::ObjectId;
 use crate::object::ObjectSource;
 use crate::player::PlayerId;
@@ -45,19 +53,55 @@ impl GameState {
         }
     }
 
+    /// `to` gains control of `object` through a resolved spell or ability: a
+    /// continuous effect that lasts until the end of the game [CR#611.2a],
+    /// applied in layer 2 [CR#613.1b] to `object` alone [CR#611.2c], with a
+    /// timestamp drawn now [CR#613.7b]. It changes the derived controller
+    /// only; the base controller stays the one `object` entered under
+    /// [CR#110.2].
+    ///
+    /// The effect is created even when `to` already controls `object`: it
+    /// still applies once an earlier control effect ends. Returns the
+    /// `ControlChanged` fact only when the derived controller changed, since
+    /// nothing changed control otherwise [CR#603.2e].
+    pub(crate) fn gain_control(
+        &mut self,
+        object: ObjectId,
+        to: PlayerId,
+    ) -> Option<ControlChanged> {
+        let before = self.controller_of(object);
+        let timestamp = self.objects.next_timestamp();
+        self.continuous.push(ContinuousEffect {
+            timestamp,
+            // The new controller is resolved at creation and frozen as the
+            // effect's "you", the player a layer-2 `SetController(You)` reads.
+            controller: to,
+            scope: ScopeResolved::Locked(vec![object]),
+            changes: vec![Modification::SetController(
+                Reference::controller_parameter(),
+            )],
+            rows: vec![],
+            duration: Duration::EndOfGame,
+            origin: None,
+            is_cda: false,
+        });
+        self.observe_control_changes();
+        let after = self.controller_of(object);
+        (after != before).then_some(ControlChanged { object, to: after })
+    }
+
     /// [CR#302.6]: a permanent whose derived controller differs from the one
     /// last observed has changed control, so its new controller has not
     /// controlled it continuously since their most recent turn began: it is
-    /// summoning sick until that player's next turn begins. This is the one
-    /// rule both control-change paths go through: a one-shot `ControlChanged`
-    /// moves the base controller, a layer-2 continuous effect ([CR#613.1b])
-    /// moves only the derived one, and either way the derived controller is
-    /// what this compares.
+    /// summoning sick until that player's next turn begins. Every control
+    /// change goes through this rule: each is a layer-2 continuous effect
+    /// ([CR#613.1b]) beginning, ending or changing its affected set, and the
+    /// derived controller is what this compares.
     ///
     /// Runs where control can have changed: at the start of every step (so a
     /// continuous effect that began, ended or changed its affected set since
-    /// is seen before anything reads sickness or the turn begins) and inside
-    /// the `ControlChanged` apply.
+    /// is seen before anything reads sickness or the turn begins) and as a
+    /// resolved gain-control creates its effect (`gain_control`).
     pub(crate) fn observe_control_changes(&mut self) {
         let view = self.layers();
         let battlefield = self.zones.battlefield.clone();

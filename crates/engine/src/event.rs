@@ -570,10 +570,11 @@ pub struct BecameTarget {
     pub source: ObjectId,
 }
 
-/// An object changed controller — a becomes-delta, never a zone move
-/// (the object keeps its identity). Shaped, unbuilt: control-changing
-/// continuous effects are a layers seam (L2); its apply will re-home
-/// the object and fire `EventFilter::ControlChanged` patterns.
+/// A permanent's derived controller changed to `to` — a transition
+/// ([CR#603.2e]), never a zone move (the object keeps its identity). It
+/// records a change a layer-2 effect already made ([CR#613.1b]), so applying
+/// it changes nothing; it is history and fires `EventFilter::ControlChanged`
+/// patterns. A resolved gain-control records it (`GameState::gain_control`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ControlChanged {
     pub object: ObjectId,

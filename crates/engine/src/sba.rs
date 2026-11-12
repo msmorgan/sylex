@@ -366,11 +366,21 @@ fn run_sba_effect(
     match effect {
         Instruction::Act { action, .. } => {
             for item in state.action_items(action, frame) {
-                if let WorkItem::Emit(occ) = item {
-                    match occ {
+                match item {
+                    WorkItem::Emit(occ) => match occ {
                         Occurrence::Single(ev) => out.push(ev),
                         Occurrence::Batch(evs) => out.extend(evs),
-                    }
+                    },
+                    // A keyword action's past-fact watcher ([CR#616.1]),
+                    // planted beside a composite verb's window (a lethal-damage
+                    // `Destroy`). The sweep runs its events as one batch with
+                    // no watcher, so the past fact is not recorded.
+                    WorkItem::FinalizeAct { .. } => {}
+                    other => unreachable!(
+                        "state-based row lowered to {other:?}: a state-based action is only \
+                         events applied as one batch ([CR#704.3]); any other work item from a \
+                         row is a data or lowering defect"
+                    ),
                 }
             }
         }

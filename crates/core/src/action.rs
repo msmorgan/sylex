@@ -212,14 +212,14 @@ pub enum Action {
         #[serde(default, skip_serializing_if = "crate::slice_is_empty")]
         riders: Arc<[EnterRider]>,
     },
-    /// The patient object comes under the control of the referenced player
-    /// — a one-shot control TRANSITION ([CR#701.12b]; a control change is
-    /// never a zone change, [CR#613.1b]). A same-controller grant is a
-    /// no-op ("the exchange effect does nothing", [CR#701.12b]). The
-    /// exchange-family primitive: restricted to the exchange macros'
-    /// bodies — DURATION-bounded control effects
-    /// ("gain control until end of turn") are the continuous layer-2 form,
-    /// not this verb.
+    /// The referenced player gains control of the patient object: a
+    /// continuous control-changing effect ([CR#613.1b]) that lasts until the
+    /// end of the game ([CR#611.2a]) — a control change is never a zone
+    /// change. Gaining control of a permanent the player already controls
+    /// still creates the effect. Two of these under `Simultaneously` are an
+    /// exchange of control, which does nothing when both permanents share a
+    /// controller ([CR#701.12b]). A control effect with a stated duration
+    /// ("gain control until end of turn") is the `Continuously` form.
     GainControl(Reference, Reference),
     /// Add an extra phase of the given kind to the referenced player's turn,
     /// directly after the current phase ([CR#500.8]).

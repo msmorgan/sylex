@@ -17,7 +17,6 @@ use crate::event::AbilityCountered;
 use crate::event::Act;
 use crate::event::Attached;
 use crate::event::Cause;
-use crate::event::ControlChanged;
 use crate::event::CounterPlaced;
 use crate::event::CounterRemoved;
 use crate::event::DamageDealt;
@@ -438,29 +437,19 @@ impl GameState {
                 }
                 items
             }
-            // [CR#701.12b]: the patient comes under the referenced player's
-            // control — a TRANSITION ([CR#603.2e]): a same-controller grant
-            // emits nothing ("the exchange effect does nothing"), and a gone
-            // patient yields no events (the enclosing `Simultaneously` then
-            // voids the whole exchange, [CR#701.12a]). A gone reference
-            // inside `to` still trips the layer view loudly — the
+            // The referenced player gains control of the patient: a layer-2
+            // effect the `GainControl` work item creates [CR#611.2a,613.1b].
+            // A gone patient is not affected [CR#608.2b] and yields nothing
+            // (an enclosing exchange then does nothing, [CR#701.12a]). A gone
+            // reference inside `to` still trips the layer view loudly — the
             // illegal-target machinery upstream is the graceful path.
             Action::GainControl(what, to) => {
                 let object = self.eval_reference(what, frame);
                 if self.objects.get(object).is_none() {
                     return vec![];
                 }
-                let player = self.acting_player(to, frame);
-                // Already controlled (derived, [CR#613.1b]) by `player`: no
-                // transition happens. Lowering a resolved gain-control to a
-                // base-controller write ignores its timestamp against
-                // layer-2 effects; owner: engine-gain-control-layer-2-effect.
-                if self.controller_of(object) == player {
-                    return vec![];
-                }
-                vec![WorkItem::Emit(Occurrence::single(
-                    GameEvent::ControlChanged(ControlChanged { object, to: player }),
-                ))]
+                let to = self.acting_player(to, frame);
+                vec![WorkItem::GainControl { object, to }]
             }
             // [CR#701.14a]: each fighting creature deals damage equal to
             // its power to the other — a PRIMITIVE verb with native

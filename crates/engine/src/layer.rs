@@ -62,10 +62,12 @@ pub enum ScopeResolved {
 #[derive(Debug, Clone)]
 pub struct ContinuousEffect {
     pub timestamp: Timestamp,
-    /// The controller of the spell or ability that created the effect, the
-    /// player its "you" names ([CR#109.5]). Resolves the
-    /// `You` in a layer-2 `SetController(You)` ("you gain control of …"); for
-    /// effects with no controller-relative reference it is inert.
+    /// The player the effect's "you" names: the controller of the spell or
+    /// ability that created it ([CR#109.5]), except for a control change
+    /// whose new controller was resolved as the effect was created (a
+    /// resolved "gain control", or one half of an exchange), where it is that
+    /// new controller. Resolves the `You` in a layer-2 `SetController(You)`;
+    /// for effects with no controller-relative reference it is inert.
     pub controller: PlayerId,
     pub scope: ScopeResolved,
     pub changes: Vec<Modification>,

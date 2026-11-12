@@ -145,6 +145,9 @@ pub(super) fn run_injected(state: &mut GameState) {
                     // like the `Emit` it came from ([CR#616.1]).
                     | WorkItem::CommitReplaced { .. }
                     | WorkItem::RunEffect { .. }
+                    // A resolving gain-control creates its effect
+                    // ([CR#611.2a]).
+                    | WorkItem::GainControl { .. }
                     | WorkItem::Resolve(_)
                     | WorkItem::ChooseNoteNumber { .. }
                     | WorkItem::ChooseNoteCardName { .. }
