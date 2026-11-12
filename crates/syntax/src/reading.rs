@@ -277,8 +277,8 @@ impl Parse<'_> {
     }
 
     /// The Ranking Key a child adds where an item takes it after `previous`,
-    /// whose Derivation left `anchors`: its Right Association words
-    /// ([`CompiledGrammar::association_words`]).
+    /// whose Derivation left `anchors`: its Right Association words and its
+    /// Attachment Class ([`CompiledGrammar::attachment_key`]).
     fn edge_key(
         &self,
         item: usize,
@@ -969,9 +969,8 @@ impl CompiledGrammar {
     }
 
     /// One occurrence of a Production's own contribution to a Ranking Key: its
-    /// Production Cost. Right Association is added per child
-    /// ([`CompiledGrammar::association_words`]); the Attachment Class is not
-    /// computed yet, and is zero.
+    /// Production Cost. Right Association and the Attachment Class are added
+    /// per child ([`CompiledGrammar::attachment_key`]).
     pub(crate) fn production_key(&self, production: usize) -> RankingKey {
         RankingKey {
             production_cost: u64::from(self.productions[production].cost),
