@@ -9,10 +9,10 @@ use sylex_vocabulary::Sources;
 
 fn capitalized(lemma: &str) -> String {
     let mut chars = lemma.chars();
-    chars
+    let first = chars
         .next()
-        .map(|first| first.to_uppercase().chain(chars).collect())
-        .unwrap_or_default()
+        .unwrap_or_else(|| panic!("a label lemma is never empty"));
+    first.to_uppercase().chain(chars).collect()
 }
 
 fn flavor_labels(environment: &LexicalEnvironment, text: &str) -> Vec<String> {
