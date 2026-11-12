@@ -37,8 +37,6 @@ satisfy it before any tree is built, with the counts of `english-forest-counts-a
   Raising and postposed modifiers, and `has_antecedent` climbs to the Gap's binder. Whether the
   forest check restates these rules over the forest or applies them to a bounded enumeration of
   the pruned forest, with the pruning on Category, surface and head only.
-- `readings N` counts distinct Readings today (`located.len()`); the exact count is of
-  Derivations. Settled with the same open question of `english-forest-counts-and-forks`.
 
 ## Done when
 
@@ -49,6 +47,8 @@ satisfy it before any tree is built, with the counts of `english-forest-counts-a
   differential test run once in the landing.
 - A judgment on *Remove Enchantments*' line and one on *Maralen, Fae Ascendant*'s third line,
   each asserting its endorsed analysis, hold.
+- `readings N` compares N with the exact Derivation count, which equals the distinct Readings
+  (`english-forest-counts-and-forks` tests that on the pool).
 - `cargo xtask english strata --check` passes, and the landing reports any unit whose verdict
   changed, with the reason.
 - `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_english` and `xtask`.

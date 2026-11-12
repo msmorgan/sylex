@@ -1,5 +1,5 @@
 ---
-needs: [english-forest-counts-and-forks, english-parse-corpus-load]
+needs: [english-forest-counts-and-forks, english-forest-forks, english-parse-corpus-load]
 ---
 
 # `cargo xtask english forestwalk`: survey a unit's forest
@@ -9,8 +9,8 @@ needs: [english-forest-counts-and-forks, english-parse-corpus-load]
 `english parse` shows a unit's ambiguity as its best `--limit` Readings, each a full constituent
 table, so a unit with thousands of Readings (*Draugr Necromancer*, 3,312) cannot be read
 whole, and where its Readings differ must be found by comparing trees by eye.
-`english-forest-counts-and-forks` computes, without enumeration, what every Derivation shares
-and where they part. This command prints that, short enough to read.
+`english-forest-counts-and-forks` computes, without enumeration, what every Derivation shares,
+and `english-forest-forks` where they part. This command prints that, short enough to read.
 
 ## Design
 
@@ -45,7 +45,7 @@ and where they part. This command prints that, short enough to read.
   agree with `english parse`'s `Packed Forest derivations`.
 - A test pins the output shape on a real unit with a single Reading (no forks) and on one with
   an attachment fork, and checks that every fork's option counts sum as
-  `english-forest-counts-and-forks` states.
+  `english-forest-forks` states.
 - `cargo test -p xtask` and `cargo clippy -p xtask --tests -- -D warnings` pass.
 
 ## Not in scope

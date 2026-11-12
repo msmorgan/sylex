@@ -1,5 +1,5 @@
 ---
-needs: [english-forest-counts-and-forks, english-forestwalk-survey]
+needs: [english-forest-counts-and-forks, english-forest-forks, english-forestwalk-survey]
 ---
 
 # `forestwalk` narrowing: slice a forest by picked and excluded fork options
