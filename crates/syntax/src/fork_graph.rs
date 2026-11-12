@@ -82,6 +82,9 @@ pub(crate) struct Unit {
 #[derive(Debug, Clone)]
 struct GNode {
     original: usize,
+    /// The word its head line ends in: `None` where it ends in punctuation
+    /// or in no child.
+    word: Option<u32>,
     items: Vec<usize>,
 }
 
@@ -408,6 +411,7 @@ impl Down<'_, '_> {
         let n = self.graph.nodes.len();
         self.graph.nodes.push(GNode {
             original,
+            word: self.intern.heads[head as usize].word,
             items: Vec::new(),
         });
         self.node_copies.insert((original, head), n);
@@ -688,6 +692,25 @@ impl Graph {
             item_inside,
             item_outside,
         }
+    }
+
+    /// Each original node some Derivation uses, by the word its head line
+    /// ends in (`None`: punctuation or no child), with the Derivations that
+    /// use it so. A Derivation uses an original node at most once (the
+    /// forest has no unary cycle), so a node's copies partition its
+    /// Derivations.
+    pub(crate) fn head_lines(
+        &self,
+        counts: &GraphCounts,
+    ) -> std::collections::BTreeMap<(usize, Option<u32>), u128> {
+        let mut out = std::collections::BTreeMap::new();
+        for (n, node) in self.nodes.iter().enumerate() {
+            let used = mul(counts.node_inside[n], counts.node_outside[n]);
+            assert!(used > 0, "the split forest keeps a node no Derivation uses");
+            let slot = out.entry((node.original, node.word)).or_insert(0);
+            *slot = add(*slot, used);
+        }
+        out
     }
 
     /// Every edge with what it answers and the Derivations that use it.
@@ -1048,7 +1071,7 @@ struct Rebuild {
     item_ids: HashMap<(usize, bool), usize>,
     nodes: Vec<(usize, bool)>,
     items: Vec<(usize, bool)>,
-    old_nodes: Vec<usize>,
+    old_nodes: Vec<(usize, Option<u32>)>,
     old_items: Vec<usize>,
     queue: Vec<V>,
 }
@@ -1061,7 +1084,7 @@ impl Rebuild {
             item_ids: HashMap::new(),
             nodes: Vec::new(),
             items: Vec::new(),
-            old_nodes: old.nodes.iter().map(|n| n.original).collect(),
+            old_nodes: old.nodes.iter().map(|n| (n.original, n.word)).collect(),
             old_items: old.items.iter().map(|i| i.original).collect(),
             queue: Vec::new(),
         }
@@ -1072,8 +1095,10 @@ impl Rebuild {
             return n;
         }
         let n = self.graph.nodes.len();
+        let (original, word) = self.old_nodes[key.0];
         self.graph.nodes.push(GNode {
-            original: self.old_nodes[key.0],
+            original,
+            word,
             items: Vec::new(),
         });
         self.nodes.push(key);

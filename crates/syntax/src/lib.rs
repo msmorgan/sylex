@@ -47,6 +47,7 @@ pub use forks::ForkForest;
 pub use forks::ForkKind;
 pub use forks::ForkOption;
 pub use forks::ForkWord;
+pub use forks::HeadLineNode;
 pub use forks::NarrowError;
 pub use frames::FrameCatalog;
 pub use grammar::Grammar;

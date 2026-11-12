@@ -147,6 +147,20 @@ pub struct Fork {
     pub options: Vec<ForkOption>,
 }
 
+/// A Packed Forest node on one word's Head Line, in the Derivations of a
+/// [`ForkForest`] that use it so ([`ForkForest::head_lines`]).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct HeadLineNode {
+    /// The node of the Packed Forest ([`crate::PackedForest`]).
+    pub node: usize,
+    /// The word whose Head Line runs through it, an index into
+    /// [`ForkForest::words`]: `None` where the line ends in punctuation or
+    /// in no child.
+    pub word: Option<usize>,
+    /// The Derivations that use the node with that word.
+    pub derivations: u128,
+}
+
 /// A narrowing that names no answer of the forest.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum NarrowError {
@@ -293,6 +307,24 @@ impl ForkForest<'_> {
     #[must_use]
     pub fn words(&self) -> &[ForkWord] {
         &self.unit.words
+    }
+
+    /// Each Packed Forest node some Derivation uses, once per word its Head
+    /// Line runs from, by node and then word. One node can be on several
+    /// words' Head Lines across Derivations (a coordination node whose
+    /// alternatives take different coordinators); a node's rows partition
+    /// its Derivations, since no Derivation uses a node twice.
+    #[must_use]
+    pub fn head_lines(&self) -> Vec<HeadLineNode> {
+        self.graph
+            .head_lines(&self.graph.counts())
+            .into_iter()
+            .map(|((node, word), derivations)| HeadLineNode {
+                node,
+                word: word.map(|w| w as usize),
+                derivations,
+            })
+            .collect()
     }
 
     /// The number of nodes of the split forest.

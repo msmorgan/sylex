@@ -241,6 +241,7 @@ pub(crate) fn write(
         "alternative_embeddings",
         "conjuncts",
         "words",
+        "head_lines",
         "forks",
         "fork_aliases",
         "fork_options",

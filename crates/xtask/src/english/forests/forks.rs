@@ -1,6 +1,7 @@
 //! A unit's forks (`sylex_syntax::ForkForest::forks`) as rows of the
 //! `words`, `forks`, `fork_aliases`, `fork_options` and `fork_answers`
-//! tables.
+//! tables, and its nodes' Head Lines (`ForkForest::head_lines`) as rows of
+//! `head_lines`.
 
 use anyhow::Context;
 use anyhow::Result;
@@ -9,6 +10,7 @@ use sylex_syntax::Answer;
 use sylex_syntax::Dependency;
 use sylex_syntax::ForkKind;
 use sylex_syntax::ForkWord;
+use sylex_syntax::HeadLineNode;
 use sylex_syntax::Parse;
 
 use super::LeafRow;
@@ -18,6 +20,7 @@ use super::int;
 /// A unit's words and forks, with words and leaves by index.
 pub(super) struct ForkRows {
     words: Vec<ForkWord>,
+    head_lines: Vec<HeadLineNode>,
     forks: Vec<ForkRow>,
 }
 
@@ -136,7 +139,11 @@ pub(super) fn rows(parse: &Parse<'_>, leaves: &[LeafRow]) -> Result<ForkRows> {
             })
         })
         .collect::<Result<_>>()?;
-    Ok(ForkRows { words, forks })
+    Ok(ForkRows {
+        words,
+        head_lines: forest.head_lines(),
+        forks,
+    })
 }
 
 pub(super) fn write(tx: &rusqlite::Transaction<'_>, u_id: i64, rows: &ForkRows) -> Result<()> {
@@ -148,6 +155,16 @@ pub(super) fn write(tx: &rusqlite::Transaction<'_>, u_id: i64, rows: &ForkRows) 
             index(word.start),
             word.surface,
             index(word.occurrence),
+        ])?;
+    }
+    let mut head_line_insert =
+        tx.prepare_cached("INSERT INTO head_lines VALUES (?1, ?2, ?3, ?4)")?;
+    for line in &rows.head_lines {
+        head_line_insert.execute(params![
+            u_id,
+            index(line.node),
+            line.word.map(index),
+            int(line.derivations)?,
         ])?;
     }
     let mut fork_insert = tx.prepare_cached("INSERT INTO forks VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?;
@@ -378,8 +395,10 @@ mod tests {
     /// Enchantments*, 9,216 Derivations), frame Productions the dependency
     /// answers determine (*Auriok Salvagers*), a frame fork (*Citadel
     /// Gate*), a lexical fork (*Up the Beanstalk*), two leaves in one word
-    /// (*The Eternal Wanderer*) and conditional forks (*Turtles in Time*).
-    /// Each unit's stored forks equal what `ForkForest::forks` computes.
+    /// (*The Eternal Wanderer*), conditional forks (*Turtles in Time*) and
+    /// a node on two words' Head Lines (*Helga, Skittish Seer*). Each unit's
+    /// stored forks and Head Line rows equal what `ForkForest::forks` and
+    /// `ForkForest::head_lines` compute.
     #[test]
     fn the_stored_forks_equal_the_fork_forest_s() {
         let cards = [
@@ -391,6 +410,7 @@ mod tests {
             "Up the Beanstalk",
             "The Eternal Wanderer",
             "Turtles in Time",
+            "Helga, Skittish Seer",
         ];
         let (_dir, path, corpus) = super::super::tests::database(&cards);
         let db = Connection::open(&path).unwrap();
@@ -410,7 +430,27 @@ mod tests {
                 .lexicon
                 .analyze_source_scoped(&parsed, None, &face.scope());
             let parse = grammar.parse_analyzed(&analyzed);
-            let expected = parse.fork_forest().unwrap().forks();
+            let forest = parse.fork_forest().unwrap();
+            let expected = forest.forks();
+            let lines: Vec<HeadLineNode> = db
+                .prepare(
+                    "SELECT node, word, derivations FROM head_lines WHERE unit = ?1 ORDER BY \
+                     node, word",
+                )
+                .unwrap()
+                .query_map([index(unit)], |r| {
+                    Ok(HeadLineNode {
+                        node: at(r, 0),
+                        word: r
+                            .get::<_, Option<i64>>(1)?
+                            .map(|w| usize::try_from(w).unwrap()),
+                        derivations: u128::try_from(r.get::<_, i64>(2)?).unwrap(),
+                    })
+                })
+                .unwrap()
+                .map(Result::unwrap)
+                .collect();
+            assert_eq!(lines, forest.head_lines(), "{}", u.text);
             for fork in &expected {
                 *seen.entry(kind_name(fork.kind)).or_default() += 1;
                 if fork.conditional {
@@ -425,6 +465,35 @@ mod tests {
         for what in ["lexical", "dependency", "frame", "conditional", "aliased"] {
             assert!(seen.contains_key(what), "no {what} fork: {seen:?}");
         }
+        // Each node's Head Line rows partition its Derivations, and Helga's
+        // coordination of *creature spells with mana value 4 or greater or
+        // creature spells with {X}* is on either *or*'s Head Line.
+        for (what, sql) in [
+            (
+                "a node whose Head Line rows do not sum to its Derivations",
+                "SELECT count(*) FROM nodes n WHERE derivations != (SELECT sum(derivations) \
+                 FROM head_lines h WHERE h.unit = n.unit AND h.node = n.node)",
+            ),
+            (
+                "a Head Line row of no stored node",
+                "SELECT count(*) FROM head_lines h WHERE NOT EXISTS (SELECT 1 FROM nodes n \
+                 WHERE n.unit = h.unit AND n.node = h.node)",
+            ),
+        ] {
+            let n: i64 = db.query_row(sql, [], |r| r.get(0)).unwrap();
+            assert_eq!(n, 0, "{what}");
+        }
+        let two: i64 = db
+            .query_row(
+                "SELECT count(*) FROM (SELECT h.node FROM head_lines h JOIN units u USING (unit) \
+                 JOIN words w ON w.unit = h.unit AND w.word = h.word WHERE u.face_name = 'Helga, \
+                 Skittish Seer' AND w.surface = 'or' GROUP BY h.unit, h.node HAVING count(*) = \
+                 2)",
+                [],
+                |r| r.get(0),
+            )
+            .unwrap();
+        assert!(two > 0);
     }
 
     /// Wide and narrow attachments over a coordination on real units: a

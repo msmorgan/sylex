@@ -204,6 +204,23 @@ CREATE TABLE words (
     PRIMARY KEY (unit, word),
     UNIQUE (unit, surface, occurrence)
 ) WITHOUT ROWID;
+-- Each node some Derivation uses, once per word whose Head Line runs through
+-- it (`sylex_syntax::ForkForest::head_lines`): the word its head line ends
+-- in, `word` NULL where that line ends in punctuation or in no child. One
+-- node can be on several words' Head Lines across Derivations (a
+-- coordination node whose alternatives take different coordinators).
+-- `derivations` is the unit's Derivations that use the node with that word;
+-- a node's rows partition its Derivations.
+CREATE TABLE head_lines (
+    unit INTEGER NOT NULL,
+    node INTEGER NOT NULL,
+    word INTEGER,
+    derivations INTEGER NOT NULL,
+    UNIQUE (unit, node, word),
+    FOREIGN KEY (unit, node) REFERENCES nodes,
+    FOREIGN KEY (unit, word) REFERENCES words
+);
+CREATE INDEX head_lines_by_word ON head_lines (unit, word);
 -- A unit's forks (`sylex_syntax::ForkForest::forks`), in display order: where
 -- its Derivations differ, each a question about one word. `kind` is the
 -- question: `lexical` (which lexical alternative the leaf starting at the word
