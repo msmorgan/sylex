@@ -6,13 +6,13 @@ use crate::SurfaceStructure;
 /// The Onset of a declared spelling, from its first word, where its Lexeme
 /// declares none ([`crate::Lexeme::onset`]):
 ///
-/// - a word that begins with an ASCII letter: `Vowel` for *a*, *e*, *i*, *o*
-///   or *u*, else `Consonant`. Every word whose first sound is not its first
+/// - a word that begins with an ASCII letter: `Vowel` for *a*, *e*, *i*, *o* or
+///   *u*, else `Consonant`. Every word whose first sound is not its first
 ///   letter's (*hour*, *unity*, *X*) declares its Onset.
 /// - a numeral: the Onset of its spoken cardinal ([`numeral_onset`]: *2ˣ*).
-/// - a measured compound: the Onset of its measure's first component, a
-///   signed one spoken with its sign, *plus* or *minus* (*a +1/+1 counter*),
-///   and an unsigned one as its cardinal.
+/// - a measured compound: the Onset of its measure's first component, a signed
+///   one spoken with its sign, *plus* or *minus* (*a +1/+1 counter*), and an
+///   unsigned one as its cardinal.
 ///
 /// Any other spelling has no Onset, which no article agrees with.
 pub(crate) fn default_onset(surface: &str, structure: SurfaceStructure) -> Option<Onset> {

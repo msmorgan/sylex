@@ -40,11 +40,11 @@ macro_rules! domain {
 ///
 /// - `inflection`: the inflectional dimensions, which [`crate::morphology`]
 ///   checks per Word Form.
-/// - `agrees_with_next`: an Adjacency Agreement dimension of the word
-///   before, carried at its [`RightEdge`], that must equal a property of the
-///   word after, read at that word's [`LeftEdge`].
-/// - `agrees_with_previous`: the mirror image, carried at the [`LeftEdge`]
-///   and agreeing with a property at the previous word's [`RightEdge`].
+/// - `agrees_with_next`: an Adjacency Agreement dimension of the word before,
+///   carried at its [`RightEdge`], that must equal a property of the word
+///   after, read at that word's [`LeftEdge`].
+/// - `agrees_with_previous`: the mirror image, carried at the [`LeftEdge`] and
+///   agreeing with a property at the previous word's [`RightEdge`].
 /// - `selected`: a dimension that selects a form without agreeing with a
 ///   neighbor.
 ///
