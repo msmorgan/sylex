@@ -317,9 +317,9 @@ category DeterminerPhrase [
     Number, Countability, DeterminativeDistribution, NounKind, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution,
 ]
-// A determiner ending in the Targeting Marker; an outer determiner or
-// adjective gives it its Number (*two target creatures*, *other target
-// creatures*).
+// The Targeting Marker as an outer determiner's head, the word alone or
+// after an adjective (*two target creatures*, *a second target creature*);
+// the outer determiner gives it its Number.
 category TargetingMarker : DeterminerPhrase [
     Countability, DeterminativeDistribution, NounKind, ComplementKind, ObliqueNumber, ObliqueKind,
     ObliqueDetermination,
@@ -2526,13 +2526,30 @@ GenitiveModifiedQuantity: NounPhrase -> determiner:NounPhrase ModifiedQuantified
 Unmodified: Nominal -> BareNominal { transparent: [head] }
     where $.ConjunctNumber = $.Number,
           !(head.ComplementKind = Amount & head.ObliqueKind = PP)
-// The Targeting Marker alone (*target creature*); ModifiedTargetingMarker,
-// after an adjective (*other target creatures*); MarkedDeterminer, under an
-// outer determiner (*two target creatures*).
-BareTargetingMarker: TargetingMarker -> DeterminerPhrase
-    where head.DeterminativeDistribution := Targeting
-ModifiedTargetingMarker: DeterminerPhrase -> modifier:AdjectivePhrase TargetingMarker
-    where $.ComplementKind = Intransitive,
+// The Targeting Marker word alone is its determinative's own
+// DeterminerPhrase (*target creature*). BareTargetingMarker builds the word,
+// and ModifiedTargetingMarker the word after one adjective, as the head an
+// outer determiner takes (MarkedDeterminer, *two other target creatures*;
+// MarkedMaximum, *up to one other target creature*).
+// UndeterminedModifiedMarker is the word after one adjective with no outer
+// determiner (*any number of other target creatures*), its Number left to
+// its nominal. Each takes the word, never a DeterminerPhrase, so a
+// determined or modified Marker is no Marker again (not *two three target
+// creatures*, *other other target creatures*), and an adjective stays inside
+// the outer determiner, an external dependent (CGEL 5§2:330; not *other two
+// target creatures*).
+BareTargetingMarker: TargetingMarker -> Lex(Determinative)
+    where head.DeterminativeDistribution := Targeting,
+          $.ComplementKind = Intransitive
+ModifiedTargetingMarker: TargetingMarker -> modifier:AdjectivePhrase Lex(Determinative)
+    where head.DeterminativeDistribution := Targeting,
+          $.ComplementKind = Intransitive,
+          modifier.ComplementKind = Intransitive,
+          modifier.AdjectivePosition != Predicative
+UndeterminedModifiedMarker: DeterminerPhrase ->
+    modifier:AdjectivePhrase Lex(Determinative) { unshared: [Number] }
+    where head.DeterminativeDistribution := Targeting,
+          $.ComplementKind = Intransitive,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative
 MarkedDeterminer: DeterminerPhrase -> determiner:DeterminerPhrase TargetingMarker
