@@ -92,6 +92,9 @@ pub fn any_first_or_double_striker(state: &GameState) -> bool {
 /// - `blockers`: attacker → its *live* blockers (pruned as they leave combat).
 /// - `blocked`: the **sticky** "is a blocked creature" status ([CR#509.1h]) — a
 ///   creature stays blocked even after every blocker leaves combat.
+/// - `had_attackers`: whether any creature was declared as an attacker or put
+///   onto the battlefield attacking this combat ([CR#508.8]); removal from
+///   combat leaves it set.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct CombatState {
     attackers: Vec<ObjectId>,
@@ -101,6 +104,7 @@ pub struct CombatState {
     // attacker -> what it is attacking ([CR#508.1b]): the defending player's
     // proxy object or a planeswalker they control ([CR#506.3,508.1b]).
     attack_target: BTreeMap<ObjectId, ObjectId>,
+    had_attackers: bool,
 }
 
 impl CombatState {
@@ -122,6 +126,15 @@ impl CombatState {
     #[must_use]
     pub fn attackers(&self) -> &[ObjectId] {
         &self.attackers
+    }
+
+    /// [CR#508.8]: whether any creature was declared as an attacker or put
+    /// onto the battlefield attacking during this combat. A record of the
+    /// combat, not of its current attackers: a creature removed from combat
+    /// ([CR#506.4]) still counts.
+    #[must_use]
+    pub fn had_attackers(&self) -> bool {
+        self.had_attackers
     }
 
     /// The *live* blockers of `attacker` ([CR#510.1c] divides damage among
@@ -146,10 +159,12 @@ impl CombatState {
         self.attack_target.get(&attacker).copied()
     }
 
-    /// Declares `o` as an attacker attacking `target` ([CR#508.1b]). Records
+    /// Declares `o` as an attacker attacking `target` ([CR#508.1b]), or
+    /// records it as put onto the battlefield attacking ([CR#508.4]). Records
     /// the target either way; appends to the attacker list only once
     /// (idempotent on the attacker, though the target is refreshed).
     pub(crate) fn declare_attacker(&mut self, o: ObjectId, target: ObjectId) {
+        self.had_attackers = true;
         if !self.attackers.contains(&o) {
             self.attackers.push(o);
         }
@@ -204,6 +219,7 @@ impl CombatState {
         self.blockers.clear();
         self.blocked.clear();
         self.attack_target.clear();
+        self.had_attackers = false;
     }
 }
 

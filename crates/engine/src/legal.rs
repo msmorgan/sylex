@@ -521,9 +521,10 @@ pub fn legal_blockers(state: &GameState, player: PlayerId) -> Vec<ObjectId> {
     // surfacing it is a lie — prune it. Arrangement bounds (menace's `count`)
     // do NOT prune: `block_forbidden_by` consults only the point-wise rows, so
     // a lone menace-blocker — illegal alone but legal with a partner — stays
-    // surfaced. (With no declared attackers there is nothing to block, so the
-    // surfaced set is empty; the Declare Blockers step is reached only when an
-    // attacker exists, [CR#508.8].)
+    // surfaced. (With no creature attacking there is nothing to block, so the
+    // surfaced set is empty: the Declare Blockers step is skipped when no
+    // creature attacked this combat [CR#508.8], and it still begins when every
+    // attacker has since been removed from combat [CR#506.4].)
     let attackers = state.combat.attackers();
     let cant_rows = cant_block_rows(state, &view);
     state

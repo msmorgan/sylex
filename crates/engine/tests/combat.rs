@@ -2276,8 +2276,51 @@ fn no_first_strike_elides_first_combat_damage_step() {
     );
 }
 
-/// [CR#508.8]: with no attackers declared, the Declare Blockers step is skipped
-/// — no `DeclareBlockers` decision surfaces and play proceeds.
+/// Steps on to the End of Combat step, passing every priority and declaring no
+/// blocks. Returns the progress trace and the step current at each priority
+/// that was offered on the way.
+fn pass_to_end_of_combat(state: &mut GameState) -> (Vec<Progress>, Vec<PhaseStep>) {
+    let mut trace = Vec::new();
+    let mut priorities = Vec::new();
+    loop {
+        match state.step() {
+            StepOutcome::Progress(p) => {
+                let reached = p == Progress::Advanced(PhaseStep::Combat(CombatStep::EndOfCombat));
+                trace.push(p);
+                if reached {
+                    return (trace, priorities);
+                }
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                ..
+            })) => {
+                priorities.push(state.turn.current);
+                state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::DeclareBlockers(
+                sylex_engine::DeclareBlockers { .. },
+            )) => {
+                state.submit_decision(Decision::Blocks(vec![])).unwrap();
+            }
+            StepOutcome::NeedsDecision(other) => panic!("unexpected decision: {other:?}"),
+            StepOutcome::GameOver(o) => panic!("game ended early: {o:?}"),
+        }
+    }
+}
+
+/// Whether `trace` shows `step` beginning: its `Advanced` progress or its
+/// `StepBegan` fact.
+fn step_began(trace: &[Progress], step: PhaseStep) -> bool {
+    trace.iter().any(|p| {
+        *p == Progress::Advanced(step)
+            || matches!(p, Progress::Applied(Occurrence::Single(GameEvent::StepBegan(s))) if *s == step)
+    })
+}
+
+/// [CR#506.1,508.8]: with no creature declared as an attacker or put onto the
+/// battlefield attacking, the Declare Blockers and Combat Damage steps are
+/// skipped: combat goes from Declare Attackers to End of Combat, and neither
+/// skipped step begins or offers priority.
 #[test]
 fn declare_blockers_skipped_when_no_attackers() {
     let mut state = two_player_with("Grizzly Bears", 7, 20);
@@ -2291,16 +2334,89 @@ fn declare_blockers_skipped_when_no_attackers() {
     };
     state.submit_decision(Decision::Attackers(vec![])).unwrap();
 
-    // The next decision is NOT a DeclareBlockers — the step was skipped.
-    let (_trace, stop) = pass_to_stop(&mut state);
+    let (trace, priorities) = pass_to_end_of_combat(&mut state);
+    for skipped in [
+        CombatStep::DeclareBlockers,
+        CombatStep::FirstCombatDamage,
+        CombatStep::CombatDamage,
+    ] {
+        let skipped = PhaseStep::Combat(skipped);
+        assert!(
+            !step_began(&trace, skipped),
+            "{skipped:?} must not begin when nothing attacked ([CR#508.8]): {trace:?}"
+        );
+        assert!(
+            trace.contains(&Progress::Skipped(skipped)),
+            "{skipped:?} is passed over as skipped: {trace:?}"
+        );
+    }
     assert!(
-        !matches!(
+        priorities
+            .iter()
+            .all(|&s| s == PhaseStep::Combat(CombatStep::DeclareAttackers)),
+        "priority is offered only in Declare Attackers before End of Combat: {priorities:?}"
+    );
+}
+
+/// [CR#506.4,508.8]: the skip is a record of this combat, not a read of the
+/// current attackers. A declared attacker that leaves the battlefield during
+/// the Declare Attackers step is removed from combat, yet the Declare Blockers
+/// and Combat Damage steps still happen.
+#[test]
+fn an_attacker_removed_from_combat_does_not_skip_blockers() {
+    let mut state = two_player_with("Grizzly Bears", 7, 20);
+    let attacker = force_onto_battlefield(&mut state, PlayerId(0), "Grizzly Bears");
+    let (_trace, stop) = pass_to_stop(&mut state);
+    let StepOutcome::NeedsDecision(DecisionPointKind::DeclareAttackers(
+        sylex_engine::DeclareAttackers { .. },
+    )) = stop
+    else {
+        panic!("expected a DeclareAttackers decision, got {stop:?}");
+    };
+    state
+        .submit_decision(attack_player(&state, &[attacker]))
+        .unwrap();
+    // At the Declare Attackers step's first priority, the attacker is put into
+    // its owner's graveyard, which removes it from combat ([CR#506.4]).
+    let (_trace, stop) = step_to_stop(&mut state);
+    assert!(
+        matches!(
             stop,
-            StepOutcome::NeedsDecision(DecisionPointKind::DeclareBlockers(
-                sylex_engine::DeclareBlockers { .. }
-            ))
-        ),
-        "no blockers step when nothing attacked ([CR#508.8]): {stop:?}"
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(_))
+        ) && state.turn.current == PhaseStep::Combat(CombatStep::DeclareAttackers),
+        "expected priority in Declare Attackers, got {stop:?}"
+    );
+    state
+        .agenda
+        .push_front(WorkItem::Emit(Occurrence::single(GameEvent::ZoneChange(
+            ZoneChange {
+                object: attacker,
+                snapshot: None,
+                from: Some(Zone::Battlefield),
+                to: Zone::Graveyard,
+                enters: None,
+                position: None,
+                face: None,
+                cause: None,
+            },
+        ))));
+    state.pending = None;
+    state.turn.priority = None;
+    state.agenda.push_back(WorkItem::OpenPriority);
+    let (_trace, _stop) = step_to_stop(&mut state);
+    assert!(
+        state.combat.attackers().is_empty(),
+        "the attacker left combat"
+    );
+
+    let (trace, _priorities) = pass_to_end_of_combat(&mut state);
+    assert!(
+        step_began(&trace, PhaseStep::Combat(CombatStep::DeclareBlockers)),
+        "a creature was declared as an attacker, so Declare Blockers happens: {trace:?}"
+    );
+    assert!(
+        step_began(&trace, PhaseStep::Combat(CombatStep::CombatDamage)),
+        "and so does Combat Damage: {trace:?}"
     );
 }
 

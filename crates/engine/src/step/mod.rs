@@ -93,10 +93,12 @@ pub enum Progress {
     Applied(Occurrence),
     /// A new step began.
     Advanced(PhaseStep),
-    /// [CR#510.4]: a step the turn structure traverses was elided without
-    /// opening (no `StepBegan`, no turn-based action, no priority) — today only
-    /// the `FirstCombatDamage` step, skipped when no combat creature has first
-    /// or double strike. `BeginStep` of the successor was scheduled instead.
+    /// A step the turn structure traverses was elided without opening (no
+    /// `StepBegan`, no turn-based action, no priority): the Declare Blockers
+    /// and both combat-damage steps of a combat in which no creature attacked
+    /// ([CR#508.8]), and the `FirstCombatDamage` step when no combat creature
+    /// has first or double strike ([CR#510.4]). `BeginStep` of the successor
+    /// was scheduled instead.
     Skipped(PhaseStep),
     /// A [CR#704] sweep ran; `actions` lost-player events were scheduled.
     SbasChecked { actions: Uint },
@@ -1449,18 +1451,44 @@ impl GameState {
 
     /// The turn-structure transition: schedules the step's whole shape.
     fn begin_step(&mut self, s: PhaseStep) -> Progress {
-        // [CR#510.4]: the FirstCombatDamage step exists only when at least one
-        // attacking or blocking creature has first/double strike. When none
-        // does, elide it entirely — no StepBegan, no turn-based action, no
-        // priority window — and schedule the regular CombatDamage step
-        // directly. (`turn.current` is NOT advanced; the step never
-        // owns a turn.)
-        if s == PhaseStep::Combat(CombatStep::FirstCombatDamage)
-            && !crate::combat::any_first_or_double_striker(self)
-        {
-            self.schedule_front(vec![WorkItem::BeginStep(PhaseStep::Combat(
-                CombatStep::CombatDamage,
-            ))]);
+        // A skipped step is elided entirely — no StepBegan, no turn-based
+        // action, no priority window — and its successor is scheduled
+        // directly. (`turn.current` is NOT advanced; the step never begins.)
+        //
+        // [CR#506.1,508.8]: the Declare Blockers and Combat Damage steps are
+        // skipped when no creature was declared as an attacker or put onto the
+        // battlefield attacking during this combat — a record of the combat,
+        // not of its current attackers. [CR#510.4]: the FirstCombatDamage step
+        // exists only when at least one attacking or blocking creature has
+        // first/double strike.
+        let skipped = match s {
+            PhaseStep::Combat(
+                CombatStep::DeclareBlockers
+                | CombatStep::FirstCombatDamage
+                | CombatStep::CombatDamage,
+            ) if !self.combat.had_attackers() => true,
+            PhaseStep::Combat(CombatStep::FirstCombatDamage) => {
+                !crate::combat::any_first_or_double_striker(self)
+            }
+            // Declare Blockers and Combat Damage when a creature attacked this
+            // combat; every other step is never skipped here.
+            PhaseStep::Beginning(
+                BeginningStep::Untap | BeginningStep::Upkeep | BeginningStep::Draw,
+            )
+            | PhaseStep::PrecombatMain
+            | PhaseStep::Combat(
+                CombatStep::BeginningOfCombat
+                | CombatStep::DeclareAttackers
+                | CombatStep::DeclareBlockers
+                | CombatStep::CombatDamage
+                | CombatStep::EndOfCombat,
+            )
+            | PhaseStep::PostcombatMain
+            | PhaseStep::Ending(EndingStep::End | EndingStep::Cleanup) => false,
+        };
+        if skipped {
+            let next = successor(s).expect("a skipped combat step has a successor");
+            self.schedule_front(vec![WorkItem::BeginStep(next)]);
             return Progress::Skipped(s);
         }
         let mut items = Vec::new();
@@ -1582,29 +1610,19 @@ impl GameState {
             // [CR#508.1]: the active player declares attackers — surface the
             // decision as this step's turn-based action.
             PhaseStep::Combat(CombatStep::DeclareAttackers) => vec![WorkItem::DeclareAttackers],
-            // [CR#509.1]: the defending player declares blockers — but only when
-            // there is something to block. [CR#508.8]: with no creatures
-            // attacking, the Declare Blockers step is skipped (like
-            // `check_hand_size` skipping the trivial discard).
-            PhaseStep::Combat(CombatStep::DeclareBlockers)
-                if !self.combat.attackers().is_empty() =>
-            {
-                vec![WorkItem::DeclareBlockers]
-            }
-            PhaseStep::Combat(CombatStep::DeclareBlockers) => vec![],
-            // [CR#510.1,510.4]: assign + deal combat damage — but only when
-            // something is attacking. With no attackers there is no damage to
-            // assign ([CR#508.8] already skipped blockers); skip the step's work
-            // like the empty Declare Blockers case. Both combat-damage steps
-            // surface the same turn-based action; `assign_combat_damage` filters
-            // sources by which step is current (first/double strikers in the
-            // first step, normal + double strikers in the regular one).
-            PhaseStep::Combat(CombatStep::FirstCombatDamage | CombatStep::CombatDamage)
-                if !self.combat.attackers().is_empty() =>
-            {
+            // [CR#509.1]: the defending player declares blockers. The step
+            // begins only when a creature attacked this combat
+            // (`begin_step`, [CR#508.8]); if every attacker has since left
+            // combat, the decision surfaces with nothing to block.
+            PhaseStep::Combat(CombatStep::DeclareBlockers) => vec![WorkItem::DeclareBlockers],
+            // [CR#510.1,510.4]: assign + deal combat damage. Both combat-damage
+            // steps surface the same turn-based action; `assign_combat_damage`
+            // filters sources by which step is current (first/double strikers
+            // in the first step, normal + double strikers in the regular one),
+            // and assigns nothing when no attacker remains in combat.
+            PhaseStep::Combat(CombatStep::FirstCombatDamage | CombatStep::CombatDamage) => {
                 vec![WorkItem::AssignCombatDamage]
             }
-            PhaseStep::Combat(CombatStep::FirstCombatDamage | CombatStep::CombatDamage) => vec![],
             // [CR#511.1]: the End of Combat step has NO turn-based actions — the
             // removal-from-combat ([CR#511.3]) happens as the step *ends*, after
             // its priority window, scheduled from `end_of_step_items` (so an
@@ -2148,8 +2166,8 @@ impl GameState {
     /// [CR#509.1a]: surfaces the Declare Blockers decision for the defending
     /// player — the non-active player in this two-player engine ([CR#506.2]
     /// defines the nonactive player as the defending player). Reached only when
-    /// an attacker exists (the `turn_based_actions` guard skips the trivial
-    /// case, [CR#508.8]); submission front-schedules the `Blocked` batch
+    /// a creature attacked this combat (`begin_step` skips the step otherwise,
+    /// [CR#508.8]); submission front-schedules the `Blocked` batch
     /// ahead of the already-queued step tail, mirroring
     /// `declare_attackers`.
     fn declare_blockers(&mut self) -> Progress {
