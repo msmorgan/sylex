@@ -36,6 +36,7 @@ use crate::lexeme::Lexemes;
 use crate::projection::NUMBER;
 use crate::projection::Projection;
 use crate::step::Extension;
+use crate::step::FeatureValue;
 use crate::step::Gap;
 use crate::step::GapRule;
 use crate::step::Production;
@@ -142,9 +143,10 @@ pub struct CompiledGrammar {
     /// The projected features' values (`crate::projection`); additional
     /// properties are grammar-declared.
     pub(crate) projection: Projection,
-    /// The grammar's `high_attachment` declarations: `(Category, feature,
-    /// value)`.
-    pub(crate) high_attachment: Vec<(Ident, Ident, Ident)>,
+    /// The grammar's `high_attachment` declarations, for each Category of
+    /// the declared name that carries the feature: the Category, the offset
+    /// of the feature in its `Summary::values`, and the value.
+    pub(crate) high_attachment: Vec<(usize, usize, FeatureValue)>,
     pub(crate) prediction: crate::prediction::Prediction,
     report: LoadReport,
 }
@@ -1039,7 +1041,7 @@ impl<'a> Binder<'a> {
                 unextended_prepositions: BTreeSet::new(),
                 unadjoined_categories: BTreeSet::new(),
                 projection,
-                high_attachment: grammar.high_attachment.clone(),
+                high_attachment: Vec::new(),
                 prediction: crate::prediction::Prediction::default(),
                 report,
             },
@@ -1247,6 +1249,7 @@ impl<'a> Binder<'a> {
                 self.out.categories[id].clone_from(category);
             }
         }
+        self.high_attachment()?;
         for production in &mut self.out.productions {
             let link = self.out.link_categories.contains(&production.lhs);
             production.seal(link, &self.out.unadjoined_categories);
@@ -1254,6 +1257,33 @@ impl<'a> Binder<'a> {
         self.out.cluster_shapes = cluster_shapes(&self.out.frames);
         self.out.prediction = crate::prediction::Prediction::compile(&self.out);
         Ok(self.out)
+    }
+
+    /// Resolves the `high_attachment` declarations against every Category
+    /// reported under the declared name that carries the feature
+    /// (`CompiledGrammar::high_attachment`).
+    fn high_attachment(&mut self) -> Result<(), LoadError> {
+        for (declared, feature, value) in &self.grammar.high_attachment {
+            let f = self.feature(feature)?;
+            let value = FeatureValue::new(self.value(f, value)?);
+            let before = self.out.high_attachment.len();
+            for (category, name) in self.out.categories.iter().enumerate() {
+                if let (true, Some(offset)) = (
+                    name == declared,
+                    self.out.category_features[category]
+                        .iter()
+                        .position(|&carried| carried == f),
+                ) {
+                    self.out.high_attachment.push((category, offset, value));
+                }
+            }
+            if self.out.high_attachment.len() == before {
+                return Err(invalid(format!(
+                    "high attachment: no Category `{declared}` carries `{feature}`"
+                )));
+            }
+        }
+        Ok(())
     }
 
     /// Refuses a Production whose first child is a period. A lexical

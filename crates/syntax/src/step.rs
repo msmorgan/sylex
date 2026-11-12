@@ -53,7 +53,7 @@ impl std::hash::Hash for FeatureValue {
 impl FeatureValue {
     pub(crate) const UNSET: Self = Self(u8::MAX);
 
-    fn new(value: u16) -> Self {
+    pub(crate) fn new(value: u16) -> Self {
         let value = u8::try_from(value).expect("validated feature domain");
         assert_ne!(value, u8::MAX, "validated feature domain");
         Self(value)

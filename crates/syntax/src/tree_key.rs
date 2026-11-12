@@ -165,11 +165,20 @@ impl CompiledGrammar {
         })
     }
 
-    /// Whether a Reading attaches high by its Attachment Class.
+    /// Whether a Reading attaches high by its Attachment Class: a
+    /// `high_attachment` declaration names its Category, and it carries the
+    /// declared value.
     fn is_high_attachment(&self, reading: &Reading) -> bool {
         reading.node().is_some_and(|node| {
-            self.category_id(node.category.as_str())
-                .is_some_and(|category| self.attaches_high(&node.features, category))
+            self.high_attachment
+                .iter()
+                .any(|&(category, offset, value)| {
+                    let feature = self.category_features[category][offset];
+                    let value = value.get().expect("a declared value");
+                    self.categories[category] == node.category
+                        && node.features.get(&self.features[feature])
+                            == Some(&self.values[feature][usize::from(value)])
+                })
         })
     }
 

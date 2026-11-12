@@ -333,10 +333,7 @@ impl Parse<'_> {
     /// grammar's `high_attachment` declarations.
     fn high_attachment(&self, node: usize) -> bool {
         let packed = &self.forest.nodes[node];
-        self.grammar.attaches_high(
-            &self.grammar.feature_map(packed.category, &packed.summary),
-            packed.category,
-        )
+        self.grammar.attaches_high(packed.category, &packed.summary)
     }
 
     /// The [`Anchors`] a Derivation leaves once `item` takes `child` after a
@@ -538,9 +535,10 @@ impl<'a, 'g> Enumeration<'a, 'g> {
                 ChildRef::Punct => None,
             };
             let high = if let ChildRef::Node(n) = child {
-                let grammar = self.parse.grammar;
-                let category = self.parse.forest.nodes[n].category;
-                grammar.attaches_high(self.features(n), category)
+                let packed = &self.parse.forest.nodes[n];
+                self.parse
+                    .grammar
+                    .attaches_high(packed.category, &packed.summary)
             } else {
                 false
             };
@@ -874,15 +872,15 @@ fn least(a: Tier, b: Tier) -> Tier {
 }
 
 impl CompiledGrammar {
-    /// Whether a Constituent of `category` with these features attaches high
+    /// Whether a Constituent of `category` with this Summary attaches high
     /// by its Attachment Class: the grammar declares its Category with a
     /// value it carries in `high_attachment` (a Preposition Phrase whose
     /// Complement has a distributive determinative, *for each …*).
-    pub(crate) fn attaches_high(&self, features: &BTreeMap<Ident, Ident>, category: usize) -> bool {
+    pub(crate) fn attaches_high(&self, category: usize, summary: &Summary) -> bool {
         self.high_attachment
             .iter()
-            .any(|(declared, feature, value)| {
-                self.categories[category] == *declared && features.get(feature) == Some(value)
+            .any(|&(declared, offset, value)| {
+                declared == category && summary.values[offset] == value
             })
     }
 
