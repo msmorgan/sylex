@@ -203,6 +203,29 @@ pub fn check(parse: &Parse<'_>, enumerate: u128) -> Result<(), String> {
             ));
         }
     }
+    // Every node, reached or not: a node the roots do not reach is in no
+    // Derivation, and only a node in every Derivation of a unit that has one
+    // is settled.
+    for node in 0..parse.forest.metrics().completed_nodes {
+        let vertex = Use::Node(node);
+        let containing = if uses.contains(&vertex) {
+            counts.node(node)
+        } else if counts.node(node) == 0 {
+            0
+        } else {
+            return Err(format!(
+                "{vertex:?}: unreached, counted {}",
+                counts.node(node)
+            ));
+        };
+        let settled = total > 0 && containing == total;
+        if counts.settled(node) != settled {
+            return Err(format!(
+                "{vertex:?}: settled {}, in {containing} of {total} Derivations",
+                counts.settled(node)
+            ));
+        }
+    }
     if total <= enumerate {
         let all = derivations(parse);
         if all.len() as u128 != total {

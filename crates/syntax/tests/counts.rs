@@ -73,6 +73,18 @@ fn counts_agree_with_recounts_and_enumeration() {
     }
 }
 
+/// Without its period a word list has no root and no Derivation, though its
+/// Phrases are in the forest: no node is settled.
+#[test]
+fn nothing_is_settled_without_a_derivation() {
+    let grammar = bind(BRACKETS);
+    let parse = grammar.parse(&lexicon(), "Card card");
+    let counts = parse.counts().unwrap();
+    assert_eq!(counts.total(), 0);
+    assert!(parse.forest.metrics().completed_nodes > 0);
+    forest_oracle::check(&parse, u128::MAX).unwrap();
+}
+
 /// In *card card card* both groupings share the whole Phrase, which is
 /// settled though it has two alternatives; each inner Pair is in one. A
 /// Phrase after the first word spans the space before it.
