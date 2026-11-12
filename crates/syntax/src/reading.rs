@@ -1566,9 +1566,11 @@ pub struct Constituent {
     pub head: Option<LexemeId>,
     pub gap: Gap,
     /// The other functions it bears, each with the preorder index of the
-    /// phrase it bears it in: a Noun Phrase shared by Right Node Raising
-    /// fills each conjunct's Gap (*draw and discard [cards]*), and a
-    /// Modifier postposed out of an Object modifies that Object.
+    /// phrase it bears it in: a dependent of a Complement Cluster bears its
+    /// function in the phrase whose head the Clusters share, a Complement
+    /// shared by Right Node Raising fills each conjunct's Gap (*draw and
+    /// discard [cards]*, *be and become [legendary]*), and a Modifier
+    /// postposed out of an Object modifies that Object.
     pub also: Vec<(Ident, usize)>,
 }
 
