@@ -444,6 +444,21 @@ impl Down<'_, '_> {
         let line = grammar.head_line_child(production);
         let governor = self.intern.heads[head as usize].word;
         for &(previous, child) in &item.families {
+            // The child's heads this copy admits: only its own head on the
+            // head-line child. A family with none is no Derivation, and makes
+            // no copy of its previous item or child.
+            let heads: Vec<u32> = match child {
+                ChildRef::Node(c) => self.node_heads[c].clone(),
+                ChildRef::Leaf(l) => vec![self.leaf_head(l)],
+                ChildRef::Punct => vec![self.headless],
+            };
+            let heads: Vec<u32> = heads
+                .into_iter()
+                .filter(|&child_head| line != Some(at) || child_head == head)
+                .collect();
+            if heads.is_empty() {
+                continue;
+            }
             let previous = match previous {
                 None => None,
                 Some(p) => {
@@ -456,27 +471,17 @@ impl Down<'_, '_> {
                     Some(self.item(p, head))
                 }
             };
-            let mut choices: Vec<(GChild, u32)> = Vec::new();
-            match child {
-                ChildRef::Node(c) => {
-                    for &child_head in &self.node_heads[c] {
-                        if line != Some(at) || child_head == head {
-                            choices.push((GChild::Node(self.node(c, child_head)), child_head));
-                        }
-                    }
-                }
-                ChildRef::Leaf(l) => {
-                    let leaf_head = self.leaf_head(l);
-                    if line != Some(at) || leaf_head == head {
-                        choices.push((GChild::Leaf(l), leaf_head));
-                    }
-                }
-                ChildRef::Punct => {
-                    if line != Some(at) || self.headless == head {
-                        choices.push((GChild::Punct, self.headless));
-                    }
-                }
-            }
+            let choices: Vec<(GChild, u32)> = heads
+                .into_iter()
+                .map(|child_head| {
+                    let copy = match child {
+                        ChildRef::Node(c) => GChild::Node(self.node(c, child_head)),
+                        ChildRef::Leaf(l) => GChild::Leaf(l),
+                        ChildRef::Punct => GChild::Punct,
+                    };
+                    (copy, child_head)
+                })
+                .collect();
             for (child, child_head) in choices {
                 let lexical = match child {
                     GChild::Leaf(l) => Some((
