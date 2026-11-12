@@ -30,51 +30,47 @@ the meld result's name is the one fact the name does not carry.
 
 ## Design
 
-- Two ways to give `english parse` a card. By name alone: the tool reads that card's record and
-  parses its text, with the scope derived from that record. As text with a stated name: nothing
-  is looked up, and the name is an input like the text. A judgment entry is the second.
-- `CardScopes` is deleted. `Judge` takes no scopes; an entry's scope is computed from the entry.
-- The whole card's name leaves `corpus::own_names`.
-
-## Open questions
-
-- How a meld result's name is in scope where an entry states only the card's name:
-  - the grammar admits Another Card's Name as the complement of *into* under *meld*, a fourth
-    position beside *named*, *Partner with* and *from among*; no scope then holds a meld
-    result, `own_names` reads no `all_parts`, and the Own Name entry of
-    `oracle-english/CONTEXT.md` and `lexicon.md` §6 lose their meld clause;
-  - the entry states it (`<card=Gisela, the Broken Blade; meld=Brisela, Voice of Nightmares>`),
-    and the census keeps reading `all_parts`;
-  - the ten entries stay as they are and the scope keeps a lookup for meld cards alone.
-- Whether a stated name that is no card-name Lexeme is an error naming the entry, or is read as
-  given (its own name is then a Vocabulary Gap, since the lexicon holds no Lexeme for it).
-- How the two ways are spelled: `<card=NAME> text` stays the stated-name form in entries and on
-  the command line; the by-name form is new (`english parse --card NAME [--line N]`, or it
-  belongs to `english-forestwalk-survey`'s unit address and `parse` gets none).
-- Whether `LexicalEnvironment::load`'s own read of the corpus is removed here or in its own
-  ticket. It computes each legendary permanent's Shortened Name by checking the rule's candidate
-  (`shortening::short_name`, a function of name and type line) against that face's text, and
-  stores the result as a form of the card name's Lexeme. Until it goes, a `parse` call still
-  reads the card JSON once.
+- The snapshot is read once per process. `sylex_upstream::scryfall::oracle_cards` holds the
+  parsed records for the process's life, and `Corpus::load` and `AttestedShortenings::load` both
+  read them from there. A call that names no card still reads the snapshot once, for the
+  Shortened Names.
+- A meld result's name is Another Card's Name on both cards of its pair, and the grammar admits
+  it as the complement of *into* under *meld*, a fourth position beside *named*, *Partner with*
+  and *from among*. No Card Scope holds a meld result; `corpus::own_names` reads no `all_parts`.
+- `CardScopes` is deleted. An entry's scope is `CardScope::own_names` of the name it states; the
+  census derives each face's scope from the record in hand. The whole card's name (`A // B`)
+  leaves `own_names`.
+- A stated name that is no card-name Lexeme is refused with an error naming the entry.
+- `english parse --card NAME TEXT...` parses each text as if the card were so named, and fetches
+  nothing. `english parse --card NAME` with no text reads that card's record and parses its own
+  units: for each face so named, a `Face:` header with the face's name and its card's, then the
+  type line as `TypeLine` and each rules-text line, in order. `english parse TEXT...` reads with
+  no card. An input in judgment entry syntax still states its own card with `<card=NAME>`;
+  giving both `--card` and `<card=…>` is an error.
 
 ## Done when
 
-- `english parse` reads no card JSON for an entry that states its text; `judgment.rs` holds no
-  map from card to scope, and `tests/judgments.rs` and `tests/ranking_keys.rs` load no corpus.
+- `judgment.rs` holds no map from card to scope; `tests/judgments.rs` and
+  `tests/ranking_keys.rs` load no corpus; one `english parse` call reads the snapshot once.
+- `docs/decisions/lexicon.md` §6, the Own Name and Another Card's Name entries of
+  `oracle-english/CONTEXT.md`, the judgments README and the meld entries of
+  `name_lexeme_scope.txt` and `comma_scope.txt` state the meld analysis above.
+- The pool census changes on no unit but the meld lines.
 - Tests on real cards: *Jace, Cunning Castaway* (*Jace draws two cards.*), a double-faced card's
-  back face (*Insectile Aberration*), a meld card as the first open question settles, and a
-  line with no card.
+  back face (*Insectile Aberration*), a meld card (*Gisela, the Broken Blade*), a line with no
+  card, and an unknown name refused.
 - `english parse` prints the same output before and after for the sample in
-  `docs/evidence/english-parse-corpus-load/`, and the census verdict counts do not change.
+  `docs/evidence/english-parse-corpus-load/`, apart from the meld lines.
 - The landing reports the wall time of one `parse` call with and without a card, before and
   after.
-- `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_english` and `xtask`.
+- `cargo test` and `cargo clippy --tests -- -D warnings` pass for every crate changed.
 
 ## Not in scope
 
 - The card-scoped catalogs (`introduced_names.ron`, `cited_names.ron`, `vote_options.ron`,
   `anchor_words.ron`) and the card-name list: names a card's own text introduces, listed with
   their cards in advance.
+- Text parsed as if the card had a name the lexicon does not list: `english-hypothetical-names`.
 
 ## Pointers
 
