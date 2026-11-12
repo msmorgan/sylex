@@ -1,13 +1,10 @@
 //! The replacement-effect registry ([CR#614]). Gathers replacements watching an
 //! event intent and applies them per [CR#616.1] with lineage ([CR#614.5]).
 //!
-//! Task 1: the `replacement_watches` matcher — does a replacement's `would`
-//! (a core `EventFilter`) watch a given live `GameEvent` intent, and who/what
-//! does the intent affect.
-//!
-//! Later tasks (2–10) add: `CantHappen` variant + cant pass, shields registry,
-//! `replace_event` loop, `ChooseReplacement` decision, regeneration,
-//! umbra/totem armor, genericity proof, and Skip step elision.
+//! It holds the `replacement_watches` matcher (does a replacement's `would`,
+//! a core `EventFilter`, watch a live `GameEvent` intent, and who or what the
+//! intent affects), the can't-happen pass, the floating shields, the
+//! replacement loop and the `ChooseReplacement` decision that suspends it.
 
 use std::sync::Arc;
 
@@ -212,7 +209,7 @@ fn object_source_of(state: &GameState, id: ObjectId) -> ObjectSource {
     state.objects.obj(id).source
 }
 
-// ── Floating-replacement registry types (Task 3) ─────────────────────────────
+// ── Floating-replacement registry types ──────────────────────────────────────
 
 /// Stable identity for a floating replacement instance (a regeneration shield
 /// or other "the next time … instead" effect). Used as the lineage key so the
@@ -521,7 +518,7 @@ pub(crate) fn gather_applicable(state: &GameState, e: &GameEvent) -> Vec<Applica
 
 /// Whether replacement `r` (with watcher `source`) watches intent `e` — its
 /// `would` (Instead/Also) matches per `replacement_watches`. Returns `false`
-/// for `Skip` (handled by the step-elision pass, Task 9) and `Expanded`.
+/// for `Skip` (handled by the step-elision pass in `begin_step`).
 fn replacement_would(
     state: &GameState,
     r: &Replacement,
@@ -539,7 +536,7 @@ fn replacement_would(
         Replacement::Skip { .. } => {
             state.remove_activation_family(frame.activation);
             false
-        } /* handled in begin_step, Task 9
+        } /* handled in begin_step
            * Provenance is erased at `lower` (`sylex_lowering_v1`), so no
            * loaded value reaches here wrapped. The arm survives only because
            * the variant does; `core-demacro` deletes both. */
@@ -802,8 +799,8 @@ fn apply_one(
                     Some(e)
                 }
                 Replacement::Skip { .. } => {
-                    // Skip is handled by the step-elision pass (Task 9), not
-                    // here.
+                    // Skip is handled by the step-elision pass in `begin_step`,
+                    // not here.
                     Some(e)
                 } /* Provenance is erased at `lower` (`sylex_lowering_v1`), so
                    * no loaded value reaches here wrapped. The arm survives only
@@ -936,7 +933,7 @@ pub(crate) fn affected_player(state: &GameState, e: &GameEvent) -> PlayerId {
         // elsewhere (hand/library/graveyard/exile) it has no controller at
         // all, so the request falls back to its OWNER instead
         // ([CR#108.4,108.4a]) — a discarded card's owner orders madness vs.
-        // Leyline of the Void (Task 10). `GameObject::controller` is not
+        // Leyline of the Void. `GameObject::controller` is not
         // safe to read blindly off the battlefield/stack: the zone-change
         // pipeline (`step.rs::apply_zone_will_change`) keeps it equal to
         // the owner there, but that is a behavioral guarantee of one code
@@ -1938,7 +1935,7 @@ mod tests {
     /// player here (a value that would win if `affected_player` naively read
     /// `.controller`) while `owner` is the other player — proving the fix
     /// reads owner off the battlefield/stack rather than trusting
-    /// `controller`. Load-bearing for madness-vs-Leyline ordering (Task 10):
+    /// `controller`. Load-bearing for madness-vs-Leyline ordering:
     /// the discarded card's owner must pick the replacement order.
     #[test]
     fn choose_replacement_chooser_falls_back_to_hand_owner() {
