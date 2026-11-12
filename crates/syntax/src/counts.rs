@@ -6,27 +6,23 @@
 //! surround it. Their product is the number of the unit's Derivations that
 //! use it, because no node, item or edge occurs twice in one Derivation:
 //!
-//! - No Constituent spans nothing. The compiler refuses a Production made only
-//!   of periods (`Binder::no_empty_constituent`; a period may be unwritten and
-//!   match with zero width), and the chart asserts that every lexical
+//! - No Constituent spans nothing. A period may be unwritten and match with
+//!   zero width; the compiler refuses a Production whose first child is one
+//!   (`Binder::no_zero_width_start`), and the chart asserts that every lexical
 //!   alternative spans at least one char. So two occurrences of one node would
 //!   have the same nonempty span and could not be disjoint.
-//! - The forest has no unary cycle, so nested occurrences cannot happen either.
-//!   A grammar may contain a cycle of span-preserving Productions, so
-//!   [`Parse::counts`] checks the forest it is given and returns a
-//!   [`ForestCycle`] naming the cycle rather than a wrong count. No forest of
-//!   the pool has one (measured over its 94,335 units). The English grammar's
-//!   one span-preserving self-loop over a Category, `RelativeAdjunctGap`
-//!   (`SubjectInitialClause -> SubjectInitialClause`), cannot close: a
-//!   Production that introduces a Gap refuses a child that already has one.
-//!
-//! An item occurs once per occurrence of the node it completes into or of the
-//! item it is the previous part of, and an edge once per occurrence of its
-//! item, by the same argument.
+//! - No partial Production past its first child spans nothing, by the same
+//!   refusal: its first child spans at least one char. So two occurrences of
+//!   one such item would have the same nonempty span too, and an edge occurs
+//!   once per occurrence of its item.
+//! - The forest has no unary cycle, so nested occurrences of a node or item
+//!   cannot happen either. A grammar may contain a cycle of span-preserving
+//!   Productions, closed or kept open only by features, so [`Parse::counts`]
+//!   checks the forest it is given and returns a [`ForestCycle`] naming the
+//!   cycle rather than a wrong count.
 //!
 //! The counts are of Derivations. Two Derivations that build the same tree
-//! would be one Reading (`docs/decisions/english.md` §8); the English tests
-//! check that the two counts agree on every Corpus Unit.
+//! would be one Reading.
 
 use crate::chart::ChildRef;
 use crate::chart::PackedForest;

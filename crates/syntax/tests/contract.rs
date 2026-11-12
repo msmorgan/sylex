@@ -452,9 +452,10 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
 /// A Production with an empty right-hand side is a load error, the engine
 /// has no literal symbol, and every lexical alternative spans at least one
 /// character. A written mark is one character, but a period may be unwritten
-/// and match with zero width, so a Production made only of periods is a load
-/// error too. So there is no empty-span Derivation to complete, predict,
-/// duplicate or keep as a leaf.
+/// and match with zero width, so a Production whose first child is a period
+/// is a load error too: no Constituent, nor any partial Production past its
+/// first child, spans nothing. So there is no empty-span Derivation to
+/// complete, predict, duplicate or keep as a leaf.
 #[test]
 fn no_category_is_nullable() {
     let lexicon =
@@ -464,18 +465,18 @@ fn no_category_is_nullable() {
         Err(LoadError::Invalid(message)) => assert!(message.contains("empty right-hand side")),
         other => panic!("{other:?}"),
     }
-    let periods = WORD.replace(
-        "Numeral: Word -> word:Lex(Numeral)",
-        "Numeral: Word -> '.' '.'",
-    );
-    match bind(&periods, &lexicon, NO_FRAMES) {
-        Err(LoadError::Invalid(message)) => {
-            assert!(
-                message.contains("`Numeral`: every child is a period"),
+    for rhs in ["'.' '.'", "'.' word:Lex(Numeral)"] {
+        let periods = WORD.replace(
+            "Numeral: Word -> word:Lex(Numeral)",
+            &format!("Numeral: Word -> {rhs}"),
+        );
+        match bind(&periods, &lexicon, NO_FRAMES) {
+            Err(LoadError::Invalid(message)) => assert!(
+                message.contains("`Numeral`: its first child is a period"),
                 "{message}"
-            );
+            ),
+            other => panic!("{rhs}: {other:?}"),
         }
-        other => panic!("{other:?}"),
     }
     let grammar = bind(WORD, &lexicon, NO_FRAMES).unwrap();
     let parse = grammar.parse(&lexicon, "");

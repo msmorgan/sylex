@@ -3,6 +3,12 @@
 //! forest's Derivations, and each unit's Derivations against its distinct
 //! Readings, a difference being two trees of one analysis
 //! (`docs/decisions/english.md` §8).
+//!
+//! No forest of the pool has a unary cycle (all 94,335 Corpus Units pass the
+//! pool run). The grammar's one span-preserving self-loop over a Category,
+//! `RelativeAdjunctGap` (`SubjectInitialClause -> SubjectInitialClause`),
+//! cannot close: a Production that introduces a Gap refuses a child that
+//! already has one.
 
 #[path = "../../syntax/tests/support/forest_oracle.rs"]
 mod forest_oracle;

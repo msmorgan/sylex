@@ -442,7 +442,7 @@ impl CompiledGrammar {
         let atomic = self.atomic_spans(analyzed);
         for found in &analyzed.matches {
             // No Constituent spans nothing: see
-            // `Binder::no_empty_constituent` for the other half.
+            // `Binder::no_zero_width_start` for the other half.
             assert!(
                 found.start < found.end,
                 "lexical analysis matched an empty span at char {}",

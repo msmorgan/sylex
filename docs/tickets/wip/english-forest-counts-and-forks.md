@@ -28,9 +28,10 @@ ticket (`english-forest-forks`), the pool database and the judge's limit build o
   two differ is an `english.md` §8 defect (two trees of one analysis), caught by a test.
 - The counts rest on every node, item and edge occurring at most once in a Derivation, which
   needs two premises:
-  - No Constituent spans nothing. The compiler refuses a Production made only of periods (a
-    period may be unwritten and match with zero width), and the chart asserts that every
-    lexical alternative spans at least one char.
+  - Nothing spans nothing: no Constituent, and no partial Production past its first child. The
+    compiler refuses a Production whose first child is a period (a period may be unwritten and
+    match with zero width), and the chart asserts that every lexical alternative spans at least
+    one char.
   - The forest has no unary cycle. Grammars may contain one: the outside pass checks the unit's
     reachable forest and fails with an error naming the cycle's Categories, spans and
     Productions, never a wrong count. No pool forest has one. The grammar's one Category-level
