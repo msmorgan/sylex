@@ -40,6 +40,7 @@ use sylex_engine::StackObject;
 use sylex_engine::StartingPlayer;
 use sylex_engine::StepOutcome;
 use sylex_engine::TriggerFired;
+use sylex_engine::WorkItem;
 use sylex_engine::ZoneChange;
 use sylex_plugin_v1::plugin::Plugin;
 
@@ -4439,6 +4440,239 @@ fn resolved_permanent_copy_vanishes_without_entering_battlefield() {
         "no graveyard entry for the copy — it left no card behind"
     );
     assert_eq!(state.zones.graveyards[1], [] as [sylex_engine::ObjectId; 0]);
+}
+
+/// Astral Steel ({2}{W} Instant): "Target creature gets +1/+2 until end of
+/// turn. Storm". Not in the canon plugin, so spelled here and lowered through
+/// the production `Plugin::card_from_str` path.
+const ASTRAL_STEEL: &str = r#"Normal(
+    name: "Astral Steel",
+    mana_cost: [Generic(2), White],
+    types: [Instant],
+    abilities: [
+        Spell(effect: Targeted(
+            targets: [TargetOne(Creature)],
+            effect: Continuously(
+                effect: Modify(Target(0), PowerAndToughnessUp(1, 2)),
+                duration: FixedUntil(EndOfTurn),
+            ),
+        )),
+        Keyword(Storm),
+    ],
+)"#;
+
+/// Archive Dragon ({4}{U}{U} Creature — Dragon Wizard, 4/6): "Flying. Ward {2}.
+/// When this creature enters, scry 2." Not in the canon plugin, so spelled
+/// here and lowered through the production `Plugin::card_from_str` path. The
+/// canon prelude declares neither creature type, so the subtypes are left
+/// out; nothing here reads them.
+const ARCHIVE_DRAGON: &str = r#"Normal(
+    name: "Archive Dragon",
+    mana_cost: [Generic(4), Blue, Blue],
+    types: [Creature],
+    abilities: [
+        Keyword(Flying),
+        Keyword(Ward(cost: [Mana([Generic(2)])])),
+        Triggered(event: ThisEnters, effect: Scry(2)),
+    ],
+    power: 4,
+    toughness: 6,
+)"#;
+
+/// A canon-prelude card spelled in semantic RON.
+fn fixture(source: &str) -> Arc<Card> {
+    Arc::new(
+        canon()
+            .card_from_str(source)
+            .unwrap_or_else(|error| panic!("fixture did not load: {error}\n{source}"))
+            .core,
+    )
+}
+
+/// Derived from Lithoform Engine's "{3}, {T}: Copy target instant or sorcery
+/// spell you control. You may choose new targets for the copy." The engine
+/// builds only the copy path that keeps the original's targets
+/// (`CopyRetarget::AsIs`), which is the choice of leaving every target
+/// unchanged [CR#707.10c]; the card's other two abilities are left out.
+const LITHOFORM_COPIER: &str = r#"Normal(
+    name: "Lithoform Copier",
+    mana_cost: [Generic(4)],
+    types: [Artifact],
+    abilities: [
+        Activated(
+            cost: [Mana([Generic(3)]), Tap],
+            effect: Targeted(
+                targets: [TargetOne(And([Kind(Spell), Or([Type(Instant), Type(Sorcery)]), ControlledBy(Ref(You))]))],
+                effect: CopySpell(controller: You, spec: (source: Object(Target(0))), retarget: AsIs),
+            ),
+        ),
+    ],
+)"#;
+
+/// [CR#707.10,707.10c,702.21a]: a copy of a spell is put onto the stack with
+/// the original's targets, so each becomes the target of that spell, and
+/// ward triggers for the copy too (the Dormant Gomazoa and Angelic Cub
+/// rulings). P0 casts Astral Steel at P1's Archive Dragon and pays the ward
+/// toll, then copies the Steel with the Lithoform Engine-derived copier: the
+/// copy's target triggers ward again, and with P0's pool empty the copy is
+/// countered.
+///
+/// A storm copy would be the natural real-card case, but the engine's storm
+/// trigger never fires: storm functions on the stack [CR#702.40a], and the
+/// trigger scan has no stack watchers
+/// (`engine-spell-abilities-function-on-the-stack`).
+#[test]
+fn spell_copy_targeting_a_ward_creature_triggers_ward() {
+    let steel = fixture(ASTRAL_STEEL);
+    let copier = fixture(LITHOFORM_COPIER);
+    let dragon = fixture(ARCHIVE_DRAGON);
+    let mut p0 = vec![Arc::clone(&steel); 3];
+    p0.extend(vec![Arc::clone(&copier); 3]);
+    let p1 = vec![Arc::clone(&dragon); 6];
+    let canon = canon();
+    let mut state = GameState::new(GameConfig {
+        players: vec![PlayerConfig { deck: p0 }, PlayerConfig { deck: p1 }],
+        seed: 1,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: builtin().sba_rules,
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: canon.counters.clone(),
+        subtypes: canon.subtypes.clone(),
+        types: canon.types.clone(),
+    });
+    let dragon = force_into_play(&mut state, PlayerId(1), "Archive Dragon");
+    let dragon_source = state.objects.obj(dragon).source;
+    let copier = force_into_play(&mut state, PlayerId(0), "Lithoform Copier");
+
+    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+    // {2}{W} for Astral Steel, {2} for the original's ward toll, {3} for the
+    // copier: nothing is left for the copy's toll.
+    state
+        .player_mut(PlayerId(0))
+        .mana_pool
+        .add(Color::White.into(), 8, ManaProvenance::default());
+    // Reopen the priority window so its legal list sees the pool.
+    state.pending = None;
+    state.agenda.push_front(WorkItem::OpenPriority);
+    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+
+    let steel = force_into_hand(&mut state, PlayerId(0), "Astral Steel");
+    state
+        .submit_decision(Decision::Act(Action::CastSpell { object: steel }))
+        .unwrap();
+    let (_, stop) = step_to_stop(&mut state);
+    let StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(ChooseTargets { .. })) = stop
+    else {
+        panic!("expected ChooseTargets for Astral Steel, got {stop:?}");
+    };
+    state
+        .submit_decision(Decision::Targets(vec![vec![dragon]]))
+        .unwrap();
+
+    // Drain the stack: pay each ward toll the pool covers (the original's),
+    // decline the copy's; copy the Steel once its first ward toll is paid.
+    let mut activated = false;
+    let mut trace = Vec::new();
+    loop {
+        let (t, stop) = step_to_stop(&mut state);
+        trace.extend(t);
+        match stop {
+            StepOutcome::NeedsDecision(DecisionPointKind::YesNo(_)) => {
+                let pay = !state.player(PlayerId(0)).mana_pool.is_empty();
+                state.submit_decision(Decision::Answer(pay)).unwrap();
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::PayMana(_)) => {
+                let pay = state.auto_pay_pending();
+                state.submit_decision(Decision::Pay(pay)).unwrap();
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::Payment(_)) => {
+                let decision = state
+                    .auto_payment_pending()
+                    .expect("a Payment prompt has an automatic runner answer");
+                state.submit_decision(decision).unwrap();
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(_)) => {
+                state
+                    .submit_decision(Decision::Targets(vec![vec![steel]]))
+                    .unwrap();
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
+                player,
+                legal,
+            })) => {
+                if state.stack.is_empty() {
+                    break;
+                }
+                let only_steel = state.stack.len() == 1 && state.stack[0].id == steel;
+                if !activated && player == PlayerId(0) && only_steel {
+                    activated = true;
+                    let activate = legal
+                        .iter()
+                        .find(|a| {
+                            matches!(a, Action::ActivateAbility { object, .. } if *object == copier)
+                        })
+                        .cloned()
+                        .expect("the copier's ability is offered");
+                    state.submit_decision(Decision::Act(activate)).unwrap();
+                } else {
+                    state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+                }
+            }
+            other => panic!("unexpected stop while draining the stack: {other:?}"),
+        }
+    }
+
+    let events: Vec<&GameEvent> = trace
+        .iter()
+        .flat_map(|p| match p {
+            Progress::Applied(Occurrence::Single(e)) => vec![e],
+            Progress::Applied(Occurrence::Batch(es)) => es.iter().collect(),
+            _ => Vec::new(),
+        })
+        .collect();
+    let copy = events
+        .iter()
+        .find_map(|e| match e {
+            GameEvent::Copied(Copied {
+                original,
+                copy: Some(copy),
+                ..
+            }) if *original == steel => Some(*copy),
+            _ => None,
+        })
+        .unwrap_or_else(|| panic!("the copier copied Astral Steel: {events:#?}"));
+    assert!(
+        events.iter().any(|e| matches!(
+            e,
+            GameEvent::BecameTarget(BecameTarget { target, source })
+                if *target == dragon && *source == copy
+        )),
+        "the Dragon became the target of the copy ([CR#707.10c])"
+    );
+    let ward_sources: Vec<Option<ObjectId>> = events
+        .iter()
+        .filter_map(|e| match e {
+            GameEvent::TriggerFired(TriggerFired {
+                source, bindings, ..
+            }) if *source == dragon_source => Some(bindings.that_object.as_ref().map(|s| s.object)),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(
+        ward_sources,
+        vec![Some(steel), Some(copy)],
+        "ward triggered once for the original and once for its copy ([CR#702.21a])"
+    );
+    // P0 declined the copy's toll, so ward countered it: only the original's
+    // +1/+2 applies.
+    assert_eq!(
+        state.layers().toughness(dragon),
+        Some(8),
+        "6 + 2: the original resolved and the countered copy did not"
+    );
+    assert_eq!(state.layers().power(dragon), Some(5));
 }
 
 // --- Retarget (Task 5, [CR#707.10c,115.7d])

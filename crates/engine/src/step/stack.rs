@@ -5,12 +5,15 @@
 use sylex_core::Uint;
 use sylex_core::Zone;
 
+use crate::agenda::WorkItem;
 use crate::event::AbilityActivated;
 use crate::event::AbilityCountered;
 use crate::event::AbilityUsed;
+use crate::event::BecameTarget;
 use crate::event::Copied;
 use crate::event::GameEvent;
 use crate::event::ManaAbilityActivated;
+use crate::event::Occurrence;
 use crate::object::ObjectId;
 use crate::stack::StackEntry;
 use crate::stack::StackObject;
@@ -67,7 +70,37 @@ impl EventApply for Copied {
             paid_costs: entry.paid_costs.clone(),
             copy: true,
         };
+        // [CR#707.10,707.10c]: the copy is put onto the stack with its final
+        // targets, so each of them becomes the target of that spell or ability
+        // now, as at announcement [CR#601.2c]: ward [CR#702.21a] and every
+        // other "becomes the target" trigger sees it. One fact per distinct
+        // target, as one simultaneous occurrence after the `Copied` fact. A
+        // copy path that lets its controller choose new targets settles them
+        // before this apply, so the facts name every final target, changed or
+        // not. Whether a target left unchanged becomes the target again is a
+        // question only when an object already on the stack has its targets
+        // changed [CR#115.7]; a copy is a new object.
+        let mut became: Vec<GameEvent> = Vec::new();
+        for &target in copied.targets.iter().flatten() {
+            let dup = became.iter().any(
+                |e| matches!(e, GameEvent::BecameTarget(BecameTarget { target: t, .. }) if *t == target),
+            );
+            if !dup {
+                became.push(GameEvent::BecameTarget(BecameTarget {
+                    target,
+                    source: new,
+                }));
+            }
+        }
         g.stack.push(copied);
+        if !became.is_empty() {
+            let occ = if became.len() == 1 {
+                Occurrence::Single(became.pop().expect("len 1"))
+            } else {
+                Occurrence::Batch(became)
+            };
+            g.schedule_front(vec![WorkItem::Emit(occ)]);
+        }
         // The minted id rides the recorded event so history (and any
         // reader of the occurrence) can see what got created.
         Some(GameEvent::Copied(Copied {

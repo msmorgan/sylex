@@ -561,9 +561,9 @@ pub struct GotDesignation {
     pub name: sylex_core::Ident,
 }
 
-/// An object became the target of the spell/ability `source` at
-/// announce ([CR#601.2c]; ward is the family exemplar [CR#702.21a]).
-/// Shaped, unbuilt: the announce flow emits it.
+/// An object became the target of the spell/ability `source`: as `source` is
+/// announced [CR#601.2c], or as `source`, a copy, is put onto the stack with
+/// that target [CR#707.10c]. Ward is the family exemplar [CR#702.21a].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BecameTarget {
     pub target: ObjectId,
