@@ -18,11 +18,15 @@ and the lexicon a preposition *outside* with an NP frame. The lexicon comment gi
 other motive: *search your library and/or outside the game* (Invasion of Arcavios, Turtles
 Forever), read as Nominals coordinated under *your*.
 
-## Open questions
+## Design
 
-- For the two *search ... library and/or outside the game* cards: a coordination of unlike
-  categories (Noun Phrase and Preposition Phrase) under *search*, or keep a noun for those two
-  cards with a comment that names them?
+- *From outside the game* is *from* with a Preposition Phrase Complement headed by *outside*.
+- In Invasion of Arcavios and Turtles Forever, *outside the game* is an ordinary count noun, a
+  Nominal conjunct beside zone nouns under their determiner; its lexicon comment names those two
+  cards.
+- The five FixedFrame declarations, the `FixedFrame` distribution, *from*'s `FixedFrameNP` frame
+  and their Rust mirrors (`crates/syntax/src/frames.rs`, `crates/vocabulary/src/schema.rs`,
+  `crates/vocabulary/src/build.rs`) are deleted.
 
 ## Done when
 
