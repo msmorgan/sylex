@@ -413,7 +413,9 @@ category AdjunctCoordination : PredicateAdjunct [ComplementKind] { function }
 category Adverbial { function }
 // The Adjunct function before a selected Complement or shifted Object.
 category Interleaved { function }
-// The Adjunct function before a passive's Internalised Complement only.
+// The Adjunct function before a passive's Internalised Complement only, the
+// *by* phrase (CGEL 4§3.2.1:241); an admission gate (ADR §6), see
+// InterleavedManner.
 category InternalisedInterleaved { function }
 // The Adjunct function in central position between *be* or a copula and
 // its Complement (*is still on top of your library*, *become no longer
@@ -1199,10 +1201,13 @@ PositionAdjunct: PredicateAdjunct -> filler:PositionPhrase where $.ComplementKin
 InterleavedRelative: InterleavedModifier -> RelativeClause { cost: 0 }
 InterleavedPreposition: Interleaved -> PrepositionPhrase { cost: 0 }
 InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
-// *Weren't chosen this way by any player*: before the Internalised
-// Complement only, never a core Complement. Oracle sets *this way* right
-// after the verb it restricts (OSG §5, This way, that much, and linked
-// events).
+// A manner Noun Phrase before a passive's Internalised Complement (*weren't
+// chosen this way by any player*, Raiding Party). Before any later
+// Complement, *this way* would also attach to the higher verb wherever an
+// Object ends in a participle or relative clause: an Adjunct of *put*
+// before *into your hand* instead of *revealed*'s (*Put all creature cards
+// revealed this way into your hand*, Beast Hunt). The gate also refuses
+// *deals 3 damage this way to any target*.
 InterleavedManner: InternalisedInterleaved -> NounPhrase { cost: 0 } where head.NounKind := Manner
 // An end adverb before a later Complement (*divided evenly among*);
 // InterleavedSupplement, a comma-set participial one (*deals half X damage,

@@ -16,18 +16,17 @@ every goal or source Preposition Phrase on the non-core side too, so the distinc
 (*by* only) is narrower than any CGEL class. The gate also appears to refuse grammatical text
 such as *deals 3 damage this way to any target*.
 
-## Open questions
+## Design
 
-- Fold `InterleavedManner` into `Interleaved` and delete the Category and the hook, letting
-  Right Association rank the attachments, or keep it with a comment that names Raiding Party
-  and the Readings it prevents?
+- The gate stays: without it, *this way* also attaches to the higher verb before that verb's
+  Preposition Phrase Complement wherever an Object ends in a participle or relative clause.
 
 ## Done when
 
 - The gate is ablated (manner Noun Phrase allowed before any later Complement) and the
   spurious Readings and unit growth on the supported corpus are recorded.
-- The construct follows the owner's ruling; if kept, its comment states the ablation result
-  and names the card, with no style-guide ground.
+- The construct follows the owner's ruling; if kept, its comment names Raiding Party and the
+  structure the gate prevents on a named card, with no style-guide ground.
 - Raiding Party keeps a correct Reading, and the census shows no Reading lost on the supported
   corpus.
 
