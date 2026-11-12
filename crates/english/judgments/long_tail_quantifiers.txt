@@ -11,7 +11,7 @@
 + <card=All Hallow's Eve> If there are no more scream counters on it, put it into your graveyard. => DeterminerPhrase "no more"; readings 1
 +NounPhrase no fewer cards => DeterminerPhrase "no fewer" as Determiner of card; readings 1
 *NounPhrase no more counter
-# A superlative determinative fused with its head, its article unexpressed (CGEL, Ch. 13 §6.3.4, pp. 1168-1169).
+# A superlative determinative fused with its head after *tied for*: Oracle drops the *the* CGEL makes obligatory with a fused determiner-head (Ch. 13 §6.3.4, p. 1168).
 + <card=Goblin Game> If two or more players are tied for fewest, each loses half their life, rounded up. => Nominal "fewest" as Complement of for
 # A card's flavor word labels a modal header as it labels an ability.
 + <card=Hawkeye, Master Marksman> Trick Arrows — Whenever Hawkeye becomes tapped, you may pay {1} up to three times. When you do, choose up to that many — => DeterminerPhrase "that many"

@@ -238,8 +238,8 @@ less*, *at least 7 life more than ...*). A postpositive Adjective Phrase with a
 Complement follows its noun (*damage equal to its power*, *turns other than
 yours*). *Plus* and *minus* head Preposition Phrases on a quantity (*2 plus the
 number of ...*, *X plus 3 life*, *that many plus one*), and *N times X*
-multiplies an amount. A superlative that is no degree word fuses with its head,
-its article unexpressed (*tied for fewest*); *no* modifies a comparative
+multiplies an amount. After *tied for*, Oracle drops the article a superlative requires
+(*tied for fewest*, *tied for lowest life total*); *no* modifies a comparative
 determinative with no *than* Complement (*no more scream counters*); *all*
 precedes a fused cardinal (*if you've done all four*). A multiplying adverb
 (*twice that many*) modifies a Noun Phrase or a measure, never a temporal Noun

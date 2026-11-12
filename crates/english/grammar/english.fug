@@ -558,9 +558,12 @@ class PartitiveQuantifier = [
 // 5§9.2:413). *All* floats after a personal pronoun only (FloatedAll).
 class FloatingQuantifier = ["det:each", "det:both"]
 class SuperlativeQuantifier = ["det:most", "det:least", "det:fewest"]
-// The superlative that fuses with its head (*tied for fewest*). Never
-// *most* or *least*: they also modify an adjective (*most common*), which
-// fusing would leave a depictive Adjunct.
+// The superlative determinative that fuses with its head, printed only
+// after *tied for* (*tied for fewest*, Goblin Game). Never *most* or
+// *least*: fused, they
+// give *tied for most common* (Sulam Djinn) a second tree, *tied for [most]*
+// with *common* a DepictiveAdjective Adjunct, and *at least* an *at*
+// Preposition Phrase over a fused *least*.
 class CountSuperlativeQuantifier = ["det:fewest"]
 // They stand alone as a fused determiner-head (*replacing all instances of
 // one color word with another*; CGEL 5§9.1:410). Fused *each* is an
@@ -2243,18 +2246,26 @@ QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier Quan
 BarePrepositionalNominal: BareNominalComplement -> PrepositionalNominal
     where head.Number = Singular,
           head.Countability = Count
-// A superlative lets the article go unexpressed in a bare nominal
-// Complement (*tied for lowest life total*; CGEL 13§6.3.4:1168–1169).
+// A superlative over a bare count singular nominal after *tied for*
+// (*tied for lowest life total*, Loxodon Peacekeeper). CGEL requires a
+// determiner with a count singular head, the superlative only making it
+// definite (13§6.3.4:1169); Oracle's *tied for* drops it.
 SuperlativeBareNominal: BareNominalComplement -> modifier:AdjectivePhrase BareNominal
     where modifier.Grade := Superlative,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative,
           head.Number = Singular,
           head.Countability = Count
-// *Tied for fewest*.
+// *Tied for fewest* (Goblin Game). CGEL makes *the* obligatory with a fused
+// determiner-head (*the most we can hope for*; 13§6.3.4:1168); Oracle's
+// *tied for* drops it.
 SuperlativeQuantifierFusedHead: BareNominalComplement -> Class(CountSuperlativeQuantifier)
-// *Tied for most common*: the superlative fuses with its head (CGEL
-// 5§9.3(b):416).
+// *Tied for most common* (Sulam Djinn, Zanam Djinn), *tied for greatest*:
+// the superlative fuses with its head (CGEL 5§9.3(b):416), where CGEL's
+// fused superlatives all have a determiner and Oracle's *tied for* has
+// none. CGEL's nearest description is the preposition + adjective idiom
+// (*at last*, *in brief*), which for want of *the* it does not analyze as a
+// fused head (7§3.2(c):626).
 SuperlativeFusedHead: BareNominalComplement -> modifier:AdjectivePhrase
     where modifier.Grade := Superlative,
           modifier.ComplementKind = Intransitive,

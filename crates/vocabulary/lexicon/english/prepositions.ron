@@ -113,8 +113,11 @@
         (complement: Gerund, hosts: Predicate),
         (complement: KeywordPhrase, hosts: Predicate),
         (complement: PP(["as long as"]), hosts: Predicate),
-        // Selected only, a bare superlative nominal or fused head: *tied for
-        // lowest life total*, *tied for most common* (CGEL, Ch. 13 §6.3.4,
+        // Selected only, a bare superlative nominal or fused head after
+        // *tied*: *tied for lowest life total* (Loxodon Peacekeeper), *tied
+        // for most common* (Sulam Djinn), *tied for fewest* (Goblin Game).
+        // Oracle drops the article that CGEL requires with a count singular
+        // head and with a fused determiner-head (Ch. 13 §6.3.4,
         // pp. 1168–1169).
         (complement: Nominal, hosts: ComplementOnly),
         // A cited word, selected by a head that names it: *do the same for

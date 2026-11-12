@@ -16,13 +16,13 @@
 + <card=Mathemagics> Target player draws 2ˣ cards. => NounPhrase "2ˣ cards" as Object of draw
 # A precision modifier of a definite Noun Phrase (CGEL, Ch. 5 §13, p. 437).
 + <card=Scrying Glass> {3}, {T}: Choose a number greater than 0 and a color. Target opponent reveals their hand. If that opponent reveals exactly the chosen number of cards of the chosen color, you draw a card. => NounPhrase "exactly the chosen number of cards of the chosen color" as Object of reveal
-# A bare superlative nominal after *tied for* (CGEL, Ch. 13 §6.3.4).
+# A bare superlative nominal after *tied for*: Oracle drops the determiner CGEL requires with a count singular head (Ch. 13 §6.3.4, p. 1169).
 + <card=Loxodon Peacekeeper> At the beginning of your upkeep, the player with the lowest life total gains control of this creature. If two or more players are tied for lowest life total, you choose one of them, and that player gains control of this creature. => PrepositionPhrase "for lowest life total" as Complement of tied
 + <card=Celestial Convergence> At the beginning of your upkeep, remove an omen counter from this enchantment. If there are no omen counters on this enchantment, the player with the highest life total wins the game. If two or more players are tied for highest life total, the game is a draw. => PrepositionPhrase "for highest life total" as Complement of tied
-# The unexpressed article needs a superlative, never a coordination of plain adjectives.
+# After *tied for*, the article-less nominal needs a superlative, never a coordination of plain adjectives.
 # from: Loxodon Peacekeeper
 * If two or more players are tied for red or green life total, you choose one of them.
-# A superlative fused with its head, its article unexpressed (CGEL, Ch. 5 §9.3(b), p. 416; Ch. 13 §6.3.4), synthetic or analytic; *for* takes no Adjective Phrase Complement.
+# A superlative fused with its head (CGEL, Ch. 5 §9.3(b), p. 416), synthetic or analytic, with no article after *tied for*; *for* takes no Adjective Phrase Complement. CGEL's nearest description is the preposition + adjective idiom (Ch. 7 §3.2(c), p. 626).
 + <card=Psychic Battle> If two or more cards are tied for greatest, the target or targets remain unchanged. => Nominal "greatest" as Complement of for; !AdjectivePhrase "greatest" as Complement of for
 # from: Sulam Djinn
 + Green is tied for most common. => Nominal "most common" as Complement of for; AdjectivePhrase "most common"; readings 1
