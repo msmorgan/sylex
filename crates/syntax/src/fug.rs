@@ -22,6 +22,7 @@
 //! slot NP = ComplementNounPhrase where slot.Case != Nominative
 //! slot AmountOrNP = AmountOrNounPhrase { unlike: [NP, Amount] }  // derived where a head selects two
 //! high_attachment PrepositionPhrase where $.DeterminativeDistribution = Distributive
+//! dependents Timed = [PrepositionPhrase, BareInf] where $.F = dependent.F  // every such dependent
 //! correlative Both = And
 //! idiomatic_coordinate And = IdiomaticCoordinate
 //! Name: Lhs -> rhs... { props } where eq, ...  // a Production
@@ -1178,6 +1179,30 @@ impl Builder {
                     .high_attachment
                     .push((name, Ident::from(feature), *value));
                 false
+            }
+            Some("dependents") => {
+                let value = item.value()?;
+                let ValueKind::List(members) = value.kind else {
+                    return fail(
+                        value.at,
+                        "dependents are `dependents Name = [Category, ...] where ...`",
+                    );
+                };
+                let categories = members
+                    .into_iter()
+                    .map(Value::ident)
+                    .collect::<Result<Vec<_>, _>>()?;
+                let equations = item.equations()?;
+                if categories.is_empty() || equations.is_empty() {
+                    return fail(at, "dependents name a Category and an equation");
+                }
+                let duplicate = grammar.dependents.iter().any(|d| d.name == name);
+                grammar.dependents.push(crate::grammar::DependentsDecl {
+                    name,
+                    categories,
+                    equations,
+                });
+                duplicate
             }
             Some("correlative") => {
                 grammar.correlatives.push((name, item.value()?.ident()?));

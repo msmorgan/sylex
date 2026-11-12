@@ -331,7 +331,7 @@ impl ChildRole {
 
     /// Whether it is in its mother's head line: the head, or a conjunct of
     /// a coordination.
-    fn in_head_line(self) -> bool {
+    pub(crate) fn in_head_line(self) -> bool {
         matches!(self, Self::Head | Self::First | Self::Last | Self::Rest)
     }
 }

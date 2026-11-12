@@ -40,6 +40,9 @@ pub struct Grammar {
     /// phrase, over the child `slot`: what fills the slot as a Complement
     /// (a Noun Phrase Complement is never nominative).
     pub slot_equations: BTreeMap<SlotKind, Vec<Equation>>,
+    /// Equations stated once for every dependent of some Categories
+    /// (`dependents Name = [Category, ...] where ...`).
+    pub dependents: Vec<DependentsDecl>,
     /// `(Category, feature, value)`: a dependent of that Category carrying
     /// that value attaches high by its Attachment Class, as a comma-set
     /// Supplement does (`docs/decisions/english.md` §5): it counts its
@@ -151,6 +154,9 @@ pub struct CategoryDecl {
 ///   phrase ends in (`Summary::final_adjunct`), and a Complement Cluster's
 ///   Adjuncts (`Summary::bare`, `Summary::nominal_unhosted`).
 /// - `supplement`: reversed Right Association (`reading.rs`).
+/// - `dependent`: what a `dependents` declaration calls each dependent it
+///   applies to (`compile.rs`, `dependents`); no Production names a child
+///   so.
 /// - `object`, `shared`: the Reading functions of postposed Modifiers
 ///   (`object`) and of Right Node Raising (`shared`) (`reading.rs`, `locate`).
 /// - The dependent functions `subject`, `object`, `indirect_object`,
@@ -315,6 +321,22 @@ pub enum Equation {
     /// child carries its listed value. In a Coordination schema it is over
     /// `first` and `last`, the last conjunct and the one before it.
     ExcludeTogether(Vec<(Ident, Ident)>),
+}
+
+/// Equations the grammar states once over every dependent of the listed
+/// Categories, wherever one stands: in an authored Production, one a Schema
+/// makes, or one the engine derives from either (an interleaved dependent, a
+/// Complement Cluster, a remnant). A dependent is a child of a listed Category
+/// off the head line, named neither `head` nor `first`, `last` or `rest`; the
+/// equations call it `dependent`, and may name the Production's `head` and
+/// its mother `$`. Each equation applies to each dependent of a Production
+/// where every path it names resolves: the mother or the named child carries
+/// the feature. One that applies to no Production is a load error.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DependentsDecl {
+    pub name: Ident,
+    pub categories: Vec<Ident>,
+    pub equations: Vec<Equation>,
 }
 
 /// The Categories of a Valence schema's Complement Clusters: right

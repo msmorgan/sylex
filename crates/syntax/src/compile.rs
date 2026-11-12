@@ -449,6 +449,9 @@ struct Binder<'a> {
     /// The engine-owned serial tail Categories, each with the Category of
     /// its coordination schema.
     tail_bases: BTreeMap<Ident, Ident>,
+    /// Of each `dependents` declaration's equations, whether it has applied
+    /// to some Production.
+    dependents_applied: Vec<Vec<bool>>,
 }
 
 /// One child of a Production under construction.
@@ -1086,6 +1089,11 @@ impl<'a> Binder<'a> {
             valuers: BTreeMap::new(),
             links: BTreeSet::new(),
             tail_bases,
+            dependents_applied: grammar
+                .dependents
+                .iter()
+                .map(|decl| vec![false; decl.equations.len()])
+                .collect(),
         })
     }
 
@@ -1265,6 +1273,11 @@ impl<'a> Binder<'a> {
             let slot = u8::try_from(slot).expect("at most 256 unlike slots");
             self.unlike_mask(slot, kinds)?;
         }
+        for decl in &self.grammar.dependents {
+            for category in &decl.categories {
+                self.category(category)?;
+            }
+        }
         for declaration in &self.grammar.productions {
             let draft = self.authored(declaration)?;
             self.add(draft)?;
@@ -1272,6 +1285,15 @@ impl<'a> Binder<'a> {
         for schema in &self.grammar.schemas {
             for draft in self.schema(schema)? {
                 self.add(draft)?;
+            }
+        }
+        for (decl, applied) in self.grammar.dependents.iter().zip(&self.dependents_applied) {
+            if let Some(unused) = applied.iter().position(|applied| !applied) {
+                return Err(invalid(format!(
+                    "dependents `{}`: equation {} applies to no Production",
+                    decl.name,
+                    unused + 1
+                )));
             }
         }
         for declaration in &self.grammar.productions {
@@ -2115,6 +2137,7 @@ impl<'a> Binder<'a> {
 
     /// Resolves a draft's equations into variables and adds it.
     fn add(&mut self, mut draft: Draft) -> Result<(), LoadError> {
+        self.dependents(&mut draft)?;
         self.record_holders(&draft);
         if let Some(head) = draft.children.iter().position(|c| c.name == "head") {
             for &feature in &self.out.category_features[draft.lhs] {
@@ -2263,6 +2286,79 @@ impl<'a> Binder<'a> {
         self.out.by_lhs[production.lhs].push(index);
         self.out.productions.push(production);
         Ok(())
+    }
+
+    /// Adds the grammar's `dependents` equations to each child of a listed
+    /// Category off the head line, the child they call `dependent`
+    /// (`grammar::DependentsDecl`): each equation whose every path resolves.
+    fn dependents(&mut self, draft: &mut Draft) -> Result<(), LoadError> {
+        let grammar = self.grammar;
+        for (index, decl) in grammar.dependents.iter().enumerate() {
+            for child in 0..draft.children.len() {
+                let Symbol::Cat { category, .. } = draft.children[child].symbol else {
+                    continue;
+                };
+                if crate::step::ChildRole::of(&draft.children[child].name).in_head_line()
+                    || !decl.categories.contains(&self.out.categories[category])
+                {
+                    continue;
+                }
+                if draft.children.iter().any(|c| c.name == "dependent") {
+                    return Err(invalid(format!(
+                        "production `{}`: a child named `dependent`, which `dependents {}` \
+                         names",
+                        draft.id, decl.name
+                    )));
+                }
+                let name =
+                    std::mem::replace(&mut draft.children[child].name, Ident::new("dependent"));
+                let mut result = Ok(());
+                for (at, equation) in decl.equations.iter().enumerate() {
+                    result = self.resolves(draft, equation).and_then(|resolves| {
+                        if resolves {
+                            self.dependents_applied[index][at] = true;
+                            self.equations(draft, std::slice::from_ref(equation))
+                        } else {
+                            Ok(())
+                        }
+                    });
+                    if result.is_err() {
+                        break;
+                    }
+                }
+                draft.children[child].name = name;
+                result?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Whether every path an equation names resolves: the mother, or a
+    /// child of the name, carries the feature.
+    fn resolves(&self, draft: &Draft, equation: &Equation) -> Result<bool, LoadError> {
+        let paths: Vec<&Ident> = match equation {
+            Equation::Agree(a, b) => vec![a, b],
+            Equation::Require(a, _) | Equation::Exclude(a, _) | Equation::Carry(a, _) => vec![a],
+            Equation::ExcludeTogether(list) => list.iter().map(|(path, _)| path).collect(),
+        };
+        for path in paths {
+            let (owner, feature) = path
+                .split_once('.')
+                .ok_or_else(|| invalid(format!("path `{path}` is not `owner.Feature`")))?;
+            let feature = self.feature(feature)?;
+            let resolves = if owner == "$" {
+                self.out.category_features[draft.lhs].contains(&feature)
+            } else {
+                draft
+                    .children
+                    .iter()
+                    .any(|c| c.name == owner && self.carries(&c.symbol, feature))
+            };
+            if !resolves {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 
     /// A Valence schema's declared derivations, validated: a `passive` or
