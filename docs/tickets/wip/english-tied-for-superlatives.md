@@ -19,13 +19,13 @@ The other two cite nothing on the article. `CountSuperlativeQuantifier` leaves o
 *tied for most* and *tied for least* unparsed. *For*'s frame that selects `BareNominalComplement`
 also serves bare nominals such as *until end of turn*.
 
-## Open questions
+## Design
 
-- Treat *tied for* plus a bare superlative as a fixed frame stated as such, give article-less
-  superlatives their own slot in *for*'s frame (separate from bare relational nominals), or
-  something else?
-- Admit *most* and *least* fused after *tied for* and leave *tied for most common* to Right
-  Association, or keep them out with the second tree stated as the reason?
+- `SuperlativeBareNominal`, `SuperlativeQuantifierFusedHead` and `SuperlativeFusedHead` stay,
+  and so does the `slot Nominal` they share with bare nominals: the forms the shared slot
+  additionally admits (*until fewest*, *tied for end of turn*) are printed on no card.
+- *Most* and *least* are not fused after *tied for*: fused, they leave *common* a depictive
+  Adjunct (*tied for [most] [common]*, Sulam Djinn).
 
 ## Done when
 
@@ -35,7 +35,7 @@ also serves bare nominals such as *until end of turn*.
 - No comment cites a page for a claim the page does not make, and `CountSuperlativeQuantifier`'s
   comment states the second tree it prevents, or the class is gone.
 - Goblin Game, Sulam Djinn and Zanam Djinn keep a correct Reading, and the census shows no
-  Reading lost on the supported corpus.
+  verdict change on the supported corpus; Desecrator Hag's second tree of one analysis goes.
 
 ## Not in scope
 
