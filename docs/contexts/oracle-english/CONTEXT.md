@@ -58,6 +58,12 @@ Of a Constituent in a Packed Forest: used by every Derivation of the
 expression. A settled Constituent with several alternative Derivations is
 still a point of choice.
 
+**Settled Spine**:
+Of a Packed Forest: its settled Constituents from the root down, as far as
+every Derivation builds them alike. It stops at a settled Constituent with
+several alternative Derivations, and at one whose children differ between
+Derivations; a settled Constituent below such a stop is not on it.
+
 **Embedding**:
 Of a Constituent in one Derivation: the dependent functions it stands under,
 nearest first, each the function the top of a head line bears in its

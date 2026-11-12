@@ -49,7 +49,7 @@ prints that, short enough to read.
   `--card`, and computes a unit's Card Scope from its face's name (`corpus::own_names`,
   `Judgment::scope`).
 - On *Draugr Necromancer*'s second line, *Maralen, Fae Ascendant*'s third and *Remove
-  Enchantments*' only line the survey is at most a few tens of lines, and the counts it prints
+  Enchantments*' only line the survey is tens of lines, and the counts it prints
   agree with `english parse`'s `Packed Forest derivations`.
 - A test pins the output shape on a real unit with a single Reading (no forks) and on one with
   a dependency fork.
