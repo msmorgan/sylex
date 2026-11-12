@@ -170,6 +170,10 @@ pub struct FormOverride {
 /// A verb with its full paradigm and active Subcategorization Frames.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "independent declarations of the verb's class and paradigm"
+)]
 pub struct VerbEntry {
     pub lemma: String,
     /// The third-person singular present.
@@ -198,6 +202,12 @@ pub struct VerbEntry {
     /// A negative form of an auxiliary (*can't*, *doesn't*).
     #[serde(default)]
     pub negative: bool,
+    /// A modal auxiliary (*can*, *may*, *must*, *will* and their negative
+    /// forms). Its preterite is ambiguous between past time and modal
+    /// remoteness (CGEL, Ch. 3 §2.4, p. 107), so it fixes no time and has no
+    /// tense (`sylex_lexicon::LexicalProperties::modal`).
+    #[serde(default)]
+    pub modal: bool,
     /// The verb whose forms these are: a contracted auxiliary (CGEL, Ch. 18
     /// §6.2, pp. 1614–1616) or a negative inflectional form (CGEL, Ch. 9 §2.1,
     /// p. 799) is named by that verb's lemma (*'re* and *aren't* are forms of

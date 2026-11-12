@@ -7,7 +7,12 @@ use crate::Person;
 use crate::Tense;
 use crate::WordForm;
 
-pub(crate) fn applicable(category: Category, form: WordForm, features: &FeatureBundle) -> bool {
+pub(crate) fn applicable(
+    category: Category,
+    modal: bool,
+    form: WordForm,
+    features: &FeatureBundle,
+) -> bool {
     // Each non-inflectional dimension belongs to one Category's invariant
     // form.
     if features
@@ -62,16 +67,44 @@ pub(crate) fn applicable(category: Category, form: WordForm, features: &FeatureB
                 && features.tense.is_none()
                 && features.case.is_none()
         }
-        // A finite form spelled alike in both numbers may leave number unmarked.
-        WordForm::Present | WordForm::Preterite => {
-            category == Category::Verb
-                && features.finiteness == Some(Finiteness::Finite)
-                && features.person.is_some()
-                && features.case.is_none()
-                && features.tense
-                    == Some(if form == WordForm::Present { Tense::Present } else { Tense::Past })
+        // A finite form spelled alike in both numbers may leave number
+        // unmarked.
+        WordForm::Present => finite(category, features) && features.tense == Some(Tense::Present),
+        // A preterite is past tense, except a modal's, which has none
+        // (`LexicalProperties::modal`).
+        WordForm::Preterite => {
+            finite(category, features) && features.tense == (!modal).then_some(Tense::Past)
         }
     }
+}
+
+/// What makes a Lexeme's modality inconsistent with its forms: only a verb
+/// is a modal, and a preterite has no tense exactly when its verb is one
+/// (`LexicalProperties::modal`).
+pub(crate) fn modal_defect(lexeme: &Lexeme) -> Option<&'static str> {
+    let modal = lexeme.properties.modal;
+    if modal && lexeme.category != Category::Verb {
+        return Some("a modal that is not a verb");
+    }
+    lexeme
+        .forms
+        .iter()
+        .find(|slot| slot.form == WordForm::Preterite && slot.features.tense.is_none() != modal)
+        .map(|_| {
+            if modal {
+                "a modal's preterite with a tense"
+            } else {
+                "a preterite without a tense on a verb that is not a modal"
+            }
+        })
+}
+
+/// A primary verb form's bundle, whatever its tense.
+fn finite(category: Category, features: &FeatureBundle) -> bool {
+    category == Category::Verb
+        && features.finiteness == Some(Finiteness::Finite)
+        && features.person.is_some()
+        && features.case.is_none()
 }
 
 /// The regular spelling of a Word Form of `lexeme`, from its lemma.

@@ -158,7 +158,8 @@
     subordinators: ["that", "to", "whether"],
     // Negative auxiliaries are named by their plain-person present form. The
     // modals have no -s form: their third singular is spelled like the rest
-    // of the present.
+    // of the present. A modal's preterite (*could*, *might*, *would*) has no
+    // tense (`modal`).
     auxiliaries: [
         (lemma: "be", third_singular: "is", preterite: "were", past_participle: "been",
             gerund: "being", irrealis: "were",
@@ -176,8 +177,8 @@
                 (form: Preterite, person: Third, number: Singular, surface: "wasn't"),
             ],
             finite_only: true, negative: true, frames: [Copular, Prepositional(["in", "on", "under", "outside", "among", "after"])]),
-        (lemma: "can", third_singular: "can", preterite: "could", finite_only: true, frames: [Catenative(BareInf)]),
-        (lemma: "can't", form_of: Some("can"), third_singular: "can't", preterite: "couldn't", finite_only: true, negative: true,
+        (lemma: "can", modal: true, third_singular: "can", preterite: "could", finite_only: true, frames: [Catenative(BareInf)]),
+        (lemma: "can't", modal: true, form_of: Some("can"), third_singular: "can't", preterite: "couldn't", finite_only: true, negative: true,
             frames: [Catenative(BareInf)]),
         (lemma: "don't", form_of: Some("do"), third_singular: "doesn't", preterite: "didn't", finite_only: true,
             negative: true, frames: [Catenative(BareInf), Intransitive]),
@@ -204,9 +205,9 @@
                 (form: Present, person: Third, number: Plural, surface: "'re"),
             ],
             frames: [Copular, Prepositional(["in", "on", "under", "outside", "among", "after"])]),
-        (lemma: "may", third_singular: "may", preterite: "might", finite_only: true, frames: [Catenative(BareInf)]),
-        (lemma: "must", third_singular: "must", finite_only: true, frames: [Catenative(BareInf)]),
-        (lemma: "will", third_singular: "will", preterite: "would", finite_only: true, frames: [Catenative(BareInf)]),
+        (lemma: "may", modal: true, third_singular: "may", preterite: "might", finite_only: true, frames: [Catenative(BareInf)]),
+        (lemma: "must", modal: true, third_singular: "must", finite_only: true, frames: [Catenative(BareInf)]),
+        (lemma: "will", modal: true, third_singular: "will", preterite: "would", finite_only: true, frames: [Catenative(BareInf)]),
     ],
     // *non* joins its host solid or with a hyphen, as the host selects
     // (*nonland*, *non-Vampire*).

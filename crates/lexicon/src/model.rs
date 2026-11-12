@@ -30,6 +30,13 @@ pub struct LexicalProperties {
     /// ([`crate::Category::hosts_prefix`]).
     #[serde(default)]
     pub prefix_hyphenation: Option<crate::Hyphenation>,
+    /// A modal auxiliary (*can*, *may*, *will*). Its preterite (*could*,
+    /// *might*, *would*) is ambiguous between past time and modal
+    /// remoteness, remoteness being much the more common (CGEL, Ch. 3 §2.4,
+    /// p. 107), so the form fixes no time: it, and only it, has no tense.
+    /// Only a verb is a modal.
+    #[serde(default)]
+    pub modal: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]

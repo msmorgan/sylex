@@ -126,3 +126,53 @@ fn combat_role_determinatives_retain_verbal_homographs() {
         assert!(!analyzed.matches.iter().any(|m| matches!(&m.reading, LexicalReading::Word(v) if env.lexicon.lexemes()[&v.lexeme].category == Category::Determinative)), "{text}");
     }
 }
+
+#[test]
+fn a_modal_preterite_has_no_tense() {
+    use sylex_lexicon::Tense;
+    use sylex_lexicon::WordForm;
+    // *If you would draw a card while your library has no cards in it*
+    // (Laboratory Maniac). Another primary form keeps its tense.
+    let environment = LexicalEnvironment::load().unwrap();
+    let tenses = |text: &str, lexeme: &str| -> Vec<Option<Tense>> {
+        environment
+            .lexicon
+            .analyze(text)
+            .matches
+            .iter()
+            .filter_map(|m| match &m.reading {
+                LexicalReading::Word(value)
+                    if value.lexeme.as_str() == lexeme
+                        && matches!(value.form, WordForm::Present | WordForm::Preterite) =>
+                {
+                    Some(value.features.tense)
+                }
+                _ => None,
+            })
+            .collect()
+    };
+    for (text, lexeme) in [
+        ("would", "verb:will"),
+        ("could", "verb:can"),
+        ("couldn't", "verb:can't"),
+        ("might", "verb:may"),
+    ] {
+        let found = tenses(text, lexeme);
+        assert!(
+            !found.is_empty() && found.iter().all(Option::is_none),
+            "{text}: {found:?}"
+        );
+    }
+    for (text, lexeme, tense) in [
+        ("will", "verb:will", Tense::Present),
+        ("must", "verb:must", Tense::Present),
+        ("was", "verb:be", Tense::Past),
+        ("didn't", "verb:don't", Tense::Past),
+    ] {
+        let found = tenses(text, lexeme);
+        assert!(
+            !found.is_empty() && found.iter().all(|t| *t == Some(tense)),
+            "{text}: {found:?}"
+        );
+    }
+}

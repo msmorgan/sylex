@@ -247,6 +247,9 @@ impl Lexicon {
                     ));
                 }
             };
+            if let Some(defect) = morphology::modal_defect(&lexeme) {
+                return Err(error(defect));
+            }
             let plurals: BTreeSet<String> = lexeme
                 .forms
                 .iter()
@@ -257,8 +260,12 @@ impl Lexicon {
                 if !slots.insert((declaration.form, &declaration.features)) {
                     return Err(error("duplicate inflection slot"));
                 }
-                if !morphology::applicable(lexeme.category, declaration.form, &declaration.features)
-                {
+                if !morphology::applicable(
+                    lexeme.category,
+                    lexeme.properties.modal,
+                    declaration.form,
+                    &declaration.features,
+                ) {
                     return Err(error("inapplicable form or feature bundle"));
                 }
                 if let Some(reason) = missing_explicit_spelling(declaration) {

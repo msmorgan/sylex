@@ -1368,3 +1368,48 @@ fn independent_genitive_requires_pronoun_genitive_features_and_explicit_spelling
         assert!(Lexicon::new([invalid]).is_err());
     }
 }
+
+#[test]
+fn only_a_modal_preterite_has_no_tense() {
+    // *If you would draw a card while your library has no cards in it*
+    // (Laboratory Maniac): the modal's preterite fixes no time.
+    let modal = |modal: bool, strip: &[WordForm]| {
+        let mut will = verb("v:will", "will");
+        will.properties.modal = modal;
+        will.forms
+            .retain(|slot| matches!(slot.form, WordForm::Present | WordForm::Preterite));
+        override_form(&mut will, WordForm::Preterite, "would");
+        for slot in &mut will.forms {
+            if strip.contains(&slot.form) {
+                slot.features.tense = None;
+            }
+        }
+        Lexicon::new([will])
+    };
+    let lexicon = modal(true, &[WordForm::Preterite]).unwrap();
+    let would = complete(&lexicon, "would");
+    assert!(!would.is_empty());
+    assert!(would.iter().all(|reading| matches!(
+        reading,
+        LexicalReading::Word(value)
+            if value.form == WordForm::Preterite && value.features.tense.is_none()
+    )));
+    // A non-modal's preterite without a tense, a modal's with one, and a
+    // present without one are each refused.
+    let refused = |result: Result<Lexicon, LexicalError>, defect: &str| {
+        let error = result.unwrap_err().to_string();
+        assert!(error.contains(defect), "{error}");
+    };
+    refused(
+        modal(false, &[WordForm::Preterite]),
+        "a preterite without a tense on a verb that is not a modal",
+    );
+    refused(modal(true, &[]), "a modal's preterite with a tense");
+    refused(
+        modal(true, &[WordForm::Preterite, WordForm::Present]),
+        "inapplicable form or feature bundle",
+    );
+    let mut cat = invariant("n:cat", "cat", Category::Noun);
+    cat.properties.modal = true;
+    refused(Lexicon::new([cat]), "a modal that is not a verb");
+}

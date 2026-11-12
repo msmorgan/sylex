@@ -246,6 +246,17 @@ impl Builder {
                 return Err(invalid(&format!("no {:?} slot to spell", slot.form)));
             }
         }
+        if entry.modal {
+            if !auxiliary {
+                return Err(invalid("only an auxiliary is a modal"));
+            }
+            lexeme.properties.modal = true;
+            for slot in &mut lexeme.forms {
+                if slot.form == WordForm::Preterite {
+                    slot.features.tense = None;
+                }
+            }
+        }
         lexeme.merge_number_neutral_forms();
         if auxiliary {
             lexeme
