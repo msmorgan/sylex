@@ -27,7 +27,7 @@ Readings wanted, and from there to the assertions a judgment needs.
   valid when an edit elsewhere in the text adds the surface again (`ForkWord`), and a word copied
   from the survey's output is already a valid selector word.
 - Selectors stay separate from the `=>` assertion syntax of judgments.
-- Slicing works on forests of any size and does not depend on `READING_LIMIT`.
+- Slicing works on a forest of any size: it enumerates no Readings.
 
 ## Open questions
 
@@ -37,10 +37,11 @@ Readings wanted, and from there to the assertions a judgment needs.
   lexical answer's Lexeme, Word Form and features; a frame answer's Productions.
 
 - The isolating assertions must exclude every other Reading of the unit, which on a large forest
-  cannot be enumerated. Options: count, for each candidate assertion, the Readings that satisfy
-  it on the forest, which is the forest-level assertion check `english-judge-reading-limit`
-  builds (this ticket then needs it); or compute the cover by enumeration only when the unit is
-  small enough, and refuse otherwise.
+  cannot be enumerated. The judge has no forest-level assertion check: it enumerates every
+  Reading of a unit, and every pool unit enumerates (the largest has 9,216 Derivations). Options:
+  build that check here, counting on the forest the Readings that satisfy each candidate
+  assertion; compute the cover by enumeration as the judge does, once slicing has reached
+  `--limit`; or enumerate only when the unit is small enough, and refuse otherwise.
 - Whether the command also writes the sliced forest of one unit in `english-forest-database`'s
   schema, for grammar forensics. If so, this ticket needs that one.
 
