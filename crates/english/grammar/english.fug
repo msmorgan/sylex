@@ -3337,6 +3337,8 @@ coordination NounPhrase {
           last.DeterminativeDistribution := Distributive
 // *And/or*: plural with a plural last conjunct, either Number with a
 // singular one (*you and/or at least one permanent you control becomes*).
+// A last conjunct with no Number (a card name) is the next schema's alone,
+// which leaves Number open: one tree per analysis (ADR §8).
 coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
@@ -3344,7 +3346,7 @@ coordination NounPhrase {
     resolve: [Determination -> Bare],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
-          last.Number = Plural,
+          last.Number := Plural,
           $.Number = Plural
 coordination NounPhrase {
     coordinators: AndOr,
