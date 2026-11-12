@@ -22,10 +22,14 @@ use crate::grammar::variant;
 use crate::step::MAX_FEATURES;
 
 /// Lexical features the engine projects onto leaves, by grammar feature name.
-pub(crate) const PROJECTED: [&str; 8] = [
+/// A verb form's tense is two features, each carried or not: a present
+/// carries `NonPastTime`, a preterite `PastTime`, and a form with no tense
+/// neither.
+pub(crate) const PROJECTED: [&str; 9] = [
     "Number",
     "Person",
-    "Tense",
+    "PastTime",
+    "NonPastTime",
     "VerbForm",
     "Case",
     "Inflection",
@@ -36,15 +40,16 @@ pub(crate) const PROJECTED: [&str; 8] = [
 /// The index in [`PROJECTED`] of a numeral's or noun's Number.
 pub(crate) const NUMBER: usize = 0;
 const PERSON: usize = 1;
-const TENSE: usize = 2;
-const VERB_FORM: usize = 3;
-const CASE: usize = 4;
+const PAST_TIME: usize = 2;
+const NON_PAST_TIME: usize = 3;
+const VERB_FORM: usize = 4;
+const CASE: usize = 5;
 /// The index in [`PROJECTED`] of a word's inflectional Word Form.
-pub(crate) const INFLECTION: usize = 5;
+pub(crate) const INFLECTION: usize = 6;
 /// The index in [`PROJECTED`] of a noun's Countability.
-const COUNTABILITY: usize = 6;
+const COUNTABILITY: usize = 7;
 /// The index in [`PROJECTED`] of a numeral's Sign.
-const SIGN: usize = 7;
+const SIGN: usize = 8;
 
 /// Every lexical value the engine projects onto a grammar feature of this
 /// name, whatever the lexicon licenses: a grammar that declares the feature
@@ -54,7 +59,8 @@ pub(crate) fn projected_values(feature: &str) -> &'static [&'static str] {
         "Number" => &["Singular", "Plural"],
         "Sign" => &["Negative", "Zero", "Positive"],
         "Person" => &["Second", "Third"],
-        "Tense" => &["Present", "Past"],
+        "PastTime" => &["Past"],
+        "NonPastTime" => &["NonPast"],
         "VerbForm" => &["Plain", "Finite", "GerundParticiple", "PastParticiple"],
         "Case" => &["Nominative", "Accusative", "Genitive"],
         "Countability" => &["Count", "Mass"],
@@ -136,10 +142,12 @@ fn value_index(at: usize) -> u16 {
 pub(crate) struct Projection {
     /// Each projected feature's id, by its index in [`PROJECTED`], where the
     /// grammar declares it.
-    pub ids: [Option<usize>; 8],
+    pub ids: [Option<usize>; 9],
     number: Table<Number>,
     person: Table<Person>,
-    tense: Table<Tense>,
+    /// A preterite's `PastTime` and a present's `NonPastTime`.
+    past_time: Option<(usize, u16)>,
+    non_past_time: Option<(usize, u16)>,
     case: Table<Case>,
     /// `VerbForm` by the Word Form that projects it.
     verb_form: Table<WordForm>,
@@ -202,6 +210,14 @@ impl Projection {
             Some(id) => Some((id, [named(NUMBER, "Singular")?, named(NUMBER, "Plural")?])),
             None => None,
         };
+        let past_time = match ids[PAST_TIME] {
+            Some(id) => Some((id, named(PAST_TIME, "Past")?)),
+            None => None,
+        };
+        let non_past_time = match ids[NON_PAST_TIME] {
+            Some(id) => Some((id, named(NON_PAST_TIME, "NonPast")?)),
+            None => None,
+        };
         let sign = match ids[SIGN] {
             Some(id) => Some((
                 id,
@@ -216,7 +232,8 @@ impl Projection {
         Ok(Self {
             number: Table::read(ids[NUMBER], values),
             person: Table::read(ids[PERSON], values),
-            tense: Table::read(ids[TENSE], values),
+            past_time,
+            non_past_time,
             case: Table::read(ids[CASE], values),
             verb_form,
             inflection: Table::read(ids[INFLECTION], values),
@@ -265,10 +282,17 @@ impl Projection {
             }
             _ => None,
         };
+        // A form with no tense, a modal's preterite among them, has no time.
+        let (past_time, non_past_time) = match bundle.tense {
+            Some(Tense::Past) => (Some(Ok(self.past_time)), None),
+            Some(Tense::Present) => (None, Some(Ok(self.non_past_time))),
+            None => (None, None),
+        };
         let projected = [
             (NUMBER, bundle.number.map(|n| self.number.project(n))),
             (PERSON, bundle.person.map(|p| self.person.project(p))),
-            (TENSE, bundle.tense.map(|t| self.tense.project(t))),
+            (PAST_TIME, past_time),
+            (NON_PAST_TIME, non_past_time),
             (
                 VERB_FORM,
                 verb_form(value.form).map(|_| self.verb_form.project(value.form)),
