@@ -587,6 +587,19 @@ impl GameState {
                                     frame.controller(self),
                                 ),
                             };
+                            // [CR#701.12b]: as for a gain-control `Act`
+                            // member, giving a player control of a permanent
+                            // that player already controls means both
+                            // permanents share a controller, and the exchange
+                            // does nothing.
+                            if !ids.is_empty()
+                                && changes
+                                    .iter()
+                                    .any(|c| matches!(c, Modification::SetController(_)))
+                                && self.controller_of(subject) == controller
+                            {
+                                void = true;
+                            }
                             let origin = match &e.duration {
                                 sylex_core::Duration::UntilEvent(_)
                                 | sylex_core::Duration::ForAsLongAs(_) => {
@@ -2989,32 +3002,34 @@ mod tests {
     }
 
     /// [CR#701.12b]: exchanging control of two permanents the SAME player
-    /// controls does nothing. Unlike the `Action::GainControl`-based
-    /// `same_controller_exchange_does_nothing` above, a `Continuously` member
-    /// mints a static row rather than an event, so there is no "empty batch"
-    /// to test — the two rows each set the controller to the value it
-    /// already holds, which is an observably inert no-op ([CR#701.12b]) even
-    /// though the rows themselves exist.
+    /// controls does nothing, in the continuous spelling too. Player 1's
+    /// Control Magic holds player 0's totem, and `theirs` entered under
+    /// player 1; the exchange creates no effect, so when Control Magic's
+    /// effect ends the totem returns to player 0.
     #[test]
-    fn avarice_totem_same_controller_exchange_is_a_no_op() {
-        let (mut state, mine, other) = two_permanents_on_field();
+    fn avarice_totem_same_controller_exchange_does_nothing() {
+        let (mut state, totem, theirs) = two_permanents_on_field();
+        state.objects.obj_mut(theirs).controller = PlayerId(1);
+        let magic = control_magic(&mut state, totem, PlayerId(1));
 
         let effect = avarice_totem_body(
             &Reference::Reg(sylex_core::RefId(0)),
             &Reference::Reg(sylex_core::RefId(6)),
         );
-        let frame = frame_src_targets(&state, mine, vec![other]);
+        let frame = frame_src_targets(&state, totem, vec![theirs]);
         state.run_effect(effect, &frame);
 
+        assert_eq!(state.continuous.len(), 1, "the exchange creates no effect");
+        state.continuous.retain(|e| e.timestamp != magic);
         assert_eq!(
-            state.layers().controller(mine),
+            state.layers().controller(totem),
             PlayerId(0),
-            "control does not change when both permanents share a controller"
+            "with Control Magic's effect gone, its owner controls it again"
         );
         assert_eq!(
-            state.layers().controller(other),
-            PlayerId(0),
-            "control does not change when both permanents share a controller"
+            state.layers().controller(theirs),
+            PlayerId(1),
+            "the other permanent stays with player 1"
         );
     }
 
