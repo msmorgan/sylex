@@ -1,5 +1,5 @@
 ---
-needs: [english-require-on-unvalued-features, english-object-coordination-exclusions, english-outside-the-game-frame, english-fused-each-partitive, english-specifying-clause, english-tied-for-superlatives, english-synesis-each-partitive, english-renamed-children-head-agreement, english-interleaved-manner-gate, english-single-card-productions, english-cgel-citation-corrections, english-gate-ablation-records, english-targeting-marker-recursion, english-among-plural-complement, english-participle-coordination-inflection, english-quantity-bracketing]
+needs: [english-require-on-unvalued-features, english-object-coordination-exclusions, english-outside-the-game-frame, english-fused-each-partitive, english-specifying-clause, english-tied-for-superlatives, english-synesis-each-partitive, english-renamed-children-head-agreement, english-interleaved-manner-gate, english-single-card-productions, english-cgel-citation-corrections, english-gate-ablation-records, english-targeting-marker-recursion, english-among-plural-complement, english-participle-coordination-inflection, english-quantity-bracketing, english-keyword-premodifier-bare, english-multiplied-degree-quantity]
 ---
 
 # Epic: every construct in the English grammar is the right mechanism, honestly described
@@ -32,6 +32,8 @@ the rows in its `needs:` are closed.
 | *Among* with a singular Complement | `english-among-plural-complement` | Frame admits more than English |
 | `ParticipialAttribute`'s test on a coordination with no Inflection | `english-participle-coordination-inflection` | Gate that admits everything |
 | *Any one color* and *half X damage* built twice; `MultipliedAmount` | `english-quantity-bracketing` | Second tree of one analysis |
+| A keyword with a parameter as a noun's premodifier | `english-keyword-premodifier-bare` | Feature that does not mean what its comment says |
+| *Twice that many cards*; *target* over a quantity | `english-multiplied-degree-quantity` | Bracketing; determiner admitted over a quantity |
 
 These are not required for this ticket to close. Each rests on a single reading, or on two that
 disagree, and joins `needs:` if it is moved to `planned/`:
