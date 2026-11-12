@@ -2254,9 +2254,13 @@ AttributedNominal: BareNominal -> modifier:Attributes BareNominal
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
     where head.Determination != Overt
 QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier QuantifiedNominal
+// A bare count singular nominal that a preposition's frame selects (*until
+// end of turn*). The head carries Count itself: a noun that is also
+// non-count is the bare non-count Noun Phrase's alone (BareMass; *in Time*,
+// Turtles in Time), one tree per analysis.
 BarePrepositionalNominal: BareNominalComplement -> PrepositionalNominal
     where head.Number = Singular,
-          head.Countability = Count
+          head.Countability := Count
 // A superlative over a bare count singular nominal after *tied for*
 // (*tied for lowest life total*, Loxodon Peacekeeper). CGEL requires a
 // determiner with a count singular head, the superlative only making it
