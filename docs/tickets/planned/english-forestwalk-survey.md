@@ -19,6 +19,18 @@ prints that, short enough to read.
   `english parse` gives it: `--card NAME` fetches that card's own units from the supported
   corpus, and text, alone or with `--as-card NAME`, is read as stated with nothing fetched
   (judgment entry syntax included: `<card=…>`, Category prefix).
+- With `--card NAME`, exactly one of `--line N` (1-based, a rules-text line) and `--type-line`
+  picks the unit, as `english parse` labels it (`FACE line N`, `FACE type line`). `NAME` is a
+  face's name, or the whole card's when the card has one face. Card name and `Unit::index` alone
+  would not do: a face's type line and its first rules-text line both have index 0, and a
+  double-faced card's faces share its card name.
+- Each of these is an error that names the way out: neither flag or both (it lists the face's
+  units as `parse` labels them); a line the face lacks; a `NAME` matching faces of more than one
+  name (it lists the face names); either flag with stated text.
+- A face name two cards share (*Lightning Bolt*, also a face of *Emeritus of Conflict //
+  Lightning Bolt*) picks one unit when the faces' picked units have the same text, since the
+  survey reads only the text and the face's name; when they differ it is an error that shows
+  both.
 - Output: the settled spine (the settled nodes from the root, single-child pass-through chains
   folded into one line), then every fork in the order `ForkForest::forks` gives, named as it
   names it (kind, leaf surface and occurrence, aliases, whether conditional), with its options
@@ -29,15 +41,6 @@ prints that, short enough to read.
 - An option may show the best Ranking Key among its Readings as information, labeled so that it
   does not read as a recommendation (`docs/decisions/english.md` §5). Options are never ordered
   or marked by it.
-
-## Open questions
-
-- How one unit of a fetched card is picked. `english parse --card NAME` reads every unit of
-  every face so named and labels each `FACE type line` or `FACE line N` (1-based). A face's type
-  line and its first rules-text line both have index 0 (`Unit::index`, `Face::units` in
-  `corpus.rs`), and a double-faced card's faces share its card name, so card and index alone
-  are ambiguous. Options: face name plus a 1-based line number with the type line addressed
-  apart, as `parse` labels them; the kind and index as `Unit` stores them; or the unit's text.
 
 ## Done when
 
