@@ -10,7 +10,8 @@ needs: [english-forest-counts-and-forks, english-forest-forks, english-parse-cor
 table, so a unit with thousands of Readings (*Draugr Necromancer*, 3,312) cannot be read
 whole, and where its Readings differ must be found by comparing trees by eye.
 `english-forest-counts-and-forks` computes, without enumeration, what every Derivation shares,
-and `english-forest-forks` where they part. This command prints that, short enough to read.
+and `english-forest-forks` where they part (`sylex_syntax::ForkForest::forks`). This command
+prints that, short enough to read.
 
 ## Design
 
@@ -19,8 +20,9 @@ and `english-forest-forks` where they part. This command prints that, short enou
   corpus, and text, alone or with `--as-card NAME`, is read as stated with nothing fetched
   (judgment entry syntax included: `<card=…>`, Category prefix).
 - Output: the settled spine (the settled nodes from the root, single-child pass-through chains
-  folded into one line), then every unresolved fork with its anchor `wN`, its options and each
-  option's exact count; tens of lines for a unit of thousands of Readings.
+  folded into one line), then every fork in the order `ForkForest::forks` gives, named as it
+  names it (kind, leaf surface and occurrence, aliases, whether conditional), with its options
+  and each option's exact count; tens of lines for a unit of thousands of Readings.
 - An option may show the best Ranking Key among its Readings as information, labeled so that it
   does not read as a recommendation (`docs/decisions/english.md` §5). Options are never ordered
   or marked by it.
@@ -44,8 +46,7 @@ and `english-forest-forks` where they part. This command prints that, short enou
   Enchantments*' only line the survey is at most a few tens of lines, and the counts it prints
   agree with `english parse`'s `Packed Forest derivations`.
 - A test pins the output shape on a real unit with a single Reading (no forks) and on one with
-  an attachment fork, and checks that every fork's option counts sum as
-  `english-forest-forks` states.
+  a dependency fork.
 - `cargo test -p xtask` and `cargo clippy -p xtask --tests -- -D warnings` pass.
 
 ## Not in scope
