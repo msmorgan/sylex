@@ -227,11 +227,14 @@ impl Parse<'_> {
             });
         }
         Ok(match &leaf.reading {
-            LexicalReading::Word(v) => self
-                .grammar
-                .lexeme(&v.lexeme)
-                .map_or(Binding::Free, |l| self.grammar.facts(l).binding),
-            _ => Binding::Free,
+            LexicalReading::Word(v) => {
+                let lexeme = self
+                    .grammar
+                    .lexeme(&v.lexeme)
+                    .expect("a forest leaf's Lexeme is declared by the grammar's lexicon");
+                self.grammar.facts(lexeme).binding
+            }
+            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => Binding::Free,
         })
     }
 

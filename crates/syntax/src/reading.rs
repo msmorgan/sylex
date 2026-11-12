@@ -1469,10 +1469,13 @@ impl CompiledGrammar {
             Reading::Leaf(value) => {
                 let text = lexicon.realize(value).map_err(|_| AdmissionError::Leaf)?;
                 let binding = match value {
-                    LexicalReading::Word(v) => self
-                        .lexeme(&v.lexeme)
-                        .map_or(Binding::Free, |l| self.facts(l).binding),
-                    _ => Binding::Free,
+                    LexicalReading::Word(v) => {
+                        let lexeme = self.lexeme(&v.lexeme).ok_or(AdmissionError::Leaf)?;
+                        self.facts(lexeme).binding
+                    }
+                    LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
+                        Binding::Free
+                    }
                 };
                 out.push((text, binding, AtomKind::Word));
             }
