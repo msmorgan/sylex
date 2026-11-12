@@ -14,7 +14,6 @@ use sylex_core::Ability;
 use sylex_core::CharacteristicPredicate;
 use sylex_core::Count;
 use sylex_core::EventFilter;
-use sylex_core::Ident;
 use sylex_core::Predicate;
 use sylex_core::Reference;
 use sylex_core::StatePredicate;
@@ -401,50 +400,51 @@ impl GameState {
                     },
                 )
             }
-            // "a creature" — check the snapshot's printed card types.
-            Predicate::Characteristic(CharacteristicPredicate::Type(ty)) => {
-                snapshot_has_type(self, snapshot, ty.name())
-            }
+            // [CR#603.10a,608.2h]: every characteristic leaf reads the
+            // snapshot's captured characteristics — the object as it last
+            // existed in the zone it left, continuous effects included.
+            Predicate::Characteristic(CharacteristicPredicate::Type(ty)) => snapshot
+                .characteristics
+                .as_ref()
+                .is_some_and(|c| c.card_types.iter().any(|t| t.name == ty.name())),
 
             // "on the battlefield" (the `Permanent` macro and friends): the
             // snapshot is the object as it last existed in the zone it left
             // ([CR#603.10a]), so it matches the zone the event removed it from.
             Predicate::State(StatePredicate::InZone(zone)) => snapshot.left == *zone,
 
-            // Characteristics read the PRINTED face (no layer view over a gone
-            // object; LKI-derived characteristics are not captured — see the
-            // snapshot-stat seam note). A player-proxy snapshot has no face.
-            Predicate::Characteristic(CharacteristicPredicate::Named(n)) => {
-                snapshot_face(self, snapshot)
-                    .is_some_and(|f| &*f.characteristics.name == n.as_str())
-            }
+            Predicate::Characteristic(CharacteristicPredicate::Named(n)) => snapshot
+                .characteristics
+                .as_ref()
+                .is_some_and(|c| &*c.name == n.as_str()),
             Predicate::Characteristic(CharacteristicPredicate::NamedReg(reference)) => self
                 .activation_symbol(activation, *reference)
                 .is_some_and(|expected| {
-                    snapshot_face(self, snapshot)
-                        .is_some_and(|f| f.characteristics.name.as_ref() == expected)
+                    snapshot
+                        .characteristics
+                        .as_ref()
+                        .is_some_and(|c| c.name.as_ref() == expected)
                 }),
-            Predicate::Characteristic(CharacteristicPredicate::Supertype(s)) => {
-                snapshot_face(self, snapshot)
-                    .is_some_and(|f| f.characteristics.supertypes.contains(s))
-            }
-            Predicate::Characteristic(CharacteristicPredicate::ColorIs(c)) => {
-                snapshot_face(self, snapshot)
-                    .is_some_and(|f| crate::layer::base_colors(f).contains(c))
-            }
-            Predicate::Characteristic(CharacteristicPredicate::Multicolored) => {
-                snapshot_face(self, snapshot)
-                    .is_some_and(|f| crate::layer::base_colors(f).len() >= 2)
-            }
-            Predicate::Characteristic(CharacteristicPredicate::Colorless) => {
-                snapshot_face(self, snapshot)
-                    .is_some_and(|f| crate::layer::base_colors(f).is_empty())
-            }
-            // [CR#208,202.3]: the PRINTED stat. (LKI-derived P/T — a pumped
-            // creature that died "with power 3" — is a capture seam: the
-            // snapshot stores no P/T, so this reads the printed face for now.)
+            Predicate::Characteristic(CharacteristicPredicate::Supertype(s)) => snapshot
+                .characteristics
+                .as_ref()
+                .is_some_and(|c| c.supertypes.contains(s)),
+            Predicate::Characteristic(CharacteristicPredicate::ColorIs(color)) => snapshot
+                .characteristics
+                .as_ref()
+                .is_some_and(|c| c.colors.contains(color)),
+            Predicate::Characteristic(CharacteristicPredicate::Multicolored) => snapshot
+                .characteristics
+                .as_ref()
+                .is_some_and(|c| c.colors.len() >= 2),
+            Predicate::Characteristic(CharacteristicPredicate::Colorless) => snapshot
+                .characteristics
+                .as_ref()
+                .is_some_and(|c| c.colors.is_empty()),
+            // [CR#208,202.3]: the captured stat — a pumped creature that died
+            // reports its pumped power.
             Predicate::Characteristic(CharacteristicPredicate::Stat(stat, cmp, count)) => {
-                crate::target::stat_satisfies(snapshot_stat(self, snapshot, *stat), *cmp, count)
+                crate::target::stat_satisfies(snapshot_stat(snapshot, *stat), *cmp, count)
             }
 
             // [CR#122.1]: counters are captured on the snapshot, so "had a
@@ -1022,8 +1022,10 @@ impl GameState {
         }
 
         // [CR#603.3a]: a triggered ability is controlled by its source's
-        // controller as it triggered — the derived one ([CR#613.1b]).
-        let view = self.layers();
+        // controller as it triggered — the derived one ([CR#613.1b]), which a
+        // live watcher's `This` snapshot carries. One layer pass, derived by
+        // the first live watcher, serves them all.
+        let mut view = None;
         for watcher in watchers {
             // [CR#113.6,113.6b]: the zone this watcher currently functions in —
             // its live zone, or the battlefield for a just-left object (its
@@ -1042,11 +1044,12 @@ impl GameState {
             let (source, controller, this) = match watcher {
                 Watcher::Live(id) => {
                     let o = self.objects.obj(id);
-                    (
-                        o.source,
-                        view.controller(id),
-                        LkiSnapshot::capture(self, id),
-                    )
+                    let this = LkiSnapshot::capture_in(
+                        self,
+                        view.get_or_insert_with(|| self.layers()),
+                        id,
+                    );
+                    (o.source, this.controller, this)
                 }
                 Watcher::Leaving(s) => (s.source, s.controller, s.clone()),
             };
@@ -1577,47 +1580,21 @@ fn contains_one_or_more(pattern: &EventFilter) -> bool {
     }
 }
 
-/// The printed face behind a snapshot, or `None` for a player-proxy snapshot
-/// (no card spine).
-fn snapshot_face<'a>(
-    state: &'a GameState,
-    snapshot: &LkiSnapshot,
-) -> Option<&'a sylex_card::CardFace> {
-    match snapshot.source {
-        ObjectSource::Card(card_id) => Some(crate::derive::face(&state.cards.get(card_id).def)),
-        ObjectSource::Player(_) => None,
-    }
-}
-
-/// Whether the snapshot's card has the named type in its printed face
-/// (matched by name against the expanded `TypeDef`s).
-fn snapshot_has_type(state: &GameState, snapshot: &LkiSnapshot, ty: Ident) -> bool {
-    snapshot_face(state, snapshot)
-        .is_some_and(|f| f.characteristics.types.iter().any(|t| t.name == ty))
-}
-
-/// The PRINTED value of `stat` for a snapshot, or `None` when the face lacks it
-/// (a land has no power) or the subject is a player proxy. The snapshot stores
-/// no derived P/T, so this is the printed face — an LKI-stat capture seam.
-fn snapshot_stat(
-    state: &GameState,
-    snapshot: &LkiSnapshot,
-    stat: sylex_core::Stat,
-) -> Option<sylex_core::Int> {
-    let face = snapshot_face(state, snapshot)?;
+/// The captured value of `stat` for a snapshot, or `None` when the object had
+/// none (a land has no power, an ability on the stack with no card behind it
+/// has no characteristics).
+fn snapshot_stat(snapshot: &LkiSnapshot, stat: sylex_core::Stat) -> Option<sylex_core::Int> {
+    let c = snapshot.characteristics.as_ref()?;
     match stat {
-        sylex_core::Stat::Power => crate::layer::base_stat(face.characteristics.power.as_ref()),
-        sylex_core::Stat::Toughness => {
-            crate::layer::base_stat(face.characteristics.toughness.as_ref())
+        sylex_core::Stat::Power => c.power,
+        sylex_core::Stat::Toughness => c.toughness,
+        sylex_core::Stat::ManaValue => {
+            Some(sylex_core::Int::try_from(c.mana_value).expect("mana value fits Int"))
         }
-        sylex_core::Stat::ManaValue => Some(
-            sylex_core::Int::try_from(face.characteristics.mana_cost.mana_value())
-                .expect("mana value fits Int"),
-        ),
-        // [CR#209.1,306.5a]: loyalty is the PRINTED loyalty characteristic off
-        // the snapshot's face — never the counter count (current loyalty is
-        // `CounterCount(This, LoyaltyCounter)`), mirroring the P/T arms above.
-        sylex_core::Stat::Loyalty => crate::layer::base_stat(face.characteristics.loyalty.as_ref()),
+        // [CR#209.1,306.5a]: loyalty is the printed loyalty characteristic —
+        // never the counter count (current loyalty is `CounterCount(This,
+        // LoyaltyCounter)`), mirroring the P/T arms above.
+        sylex_core::Stat::Loyalty => c.loyalty,
         sylex_core::Stat::Defense => Some(
             sylex_core::Int::try_from(
                 snapshot
@@ -2001,14 +1978,8 @@ mod tests {
 
         // Entering event (hand → battlefield).
         let snapshot = LkiSnapshot {
-            object: bear,
-            source: state.objects.obj(bear).source,
-            controller: PlayerId(0),
-            tapped: false,
-            damage: 0,
-            counters: std::collections::HashMap::new(),
-            attached_to: None,
             left: Zone::Hand,
+            ..LkiSnapshot::capture(&state, bear)
         };
         let enter_event = GameEvent::ZoneChange(ZoneChange {
             object: bear,
@@ -2044,20 +2015,13 @@ mod tests {
         let land = *state.zones.hands[1]
             .first()
             .expect("player 1 has cards in hand");
-        let land_source = state.objects.obj(land).source;
 
         // Simulate a non-creature leaving the battlefield (battlefield →
         // graveyard). The zone constraints DO match Dies, so the *filter* must
         // do the rejecting — the land lacks the Creature type.
         let snapshot = LkiSnapshot {
-            object: land,
-            source: land_source,
-            controller: PlayerId(1),
-            tapped: false,
-            damage: 0,
-            counters: std::collections::HashMap::new(),
-            attached_to: None,
             left: Zone::Battlefield,
+            ..LkiSnapshot::capture(&state, land)
         };
         let event = GameEvent::ZoneChange(ZoneChange {
             object: land,
@@ -2213,16 +2177,10 @@ mod tests {
 
         // Build a past-form ZoneChange snapshot for the ETB creature entering.
         let enters_snapshot = LkiSnapshot {
-            object: etb_obj,
-            source: etb_source,
-            controller: PlayerId(0),
-            tapped: false,
-            damage: 0,
-            counters: std::collections::HashMap::new(),
-            attached_to: None,
             // For an enter, the snapshot's `left` represents what zone it came
             // from — Hand in this case.
             left: Zone::Hand,
+            ..LkiSnapshot::capture(&state, etb_obj)
         };
         let enters_event = GameEvent::ZoneChange(ZoneChange {
             object: etb_obj,
@@ -5441,9 +5399,9 @@ mod tests {
         Predicate::Characteristic(c)
     }
 
-    /// `Named` over a snapshot reads the printed face name ([CR#201]).
+    /// `Named` over a snapshot reads its captured name ([CR#201]).
     #[test]
-    fn snapshot_named_matches_printed_name() {
+    fn snapshot_named_matches_its_name() {
         let (state, snap, w) = bear_snapshot();
         assert!(state.filter_matches_snapshot(
             &snap_cf(CharacteristicPredicate::Named("Grizzly Bears".into())),
@@ -5457,9 +5415,9 @@ mod tests {
         ));
     }
 
-    /// Color / supertype over a snapshot read the printed face.
+    /// Color / supertype over a snapshot read its captured characteristics.
     #[test]
-    fn snapshot_color_and_supertype_read_printed_face() {
+    fn snapshot_color_and_supertype_read_captured_characteristics() {
         use sylex_core::Color;
         use sylex_core::Supertype;
         let (state, snap, w) = bear_snapshot();
@@ -5491,18 +5449,182 @@ mod tests {
         ));
     }
 
-    /// `Stat` over a snapshot reads the printed power/toughness/mana value.
+    /// [CR#608.2h]: `Stat` over a snapshot reads the stats the object had as
+    /// it last existed — a Grizzly Bears pumped by Glorious Anthem ("Creatures
+    /// you control get +1/+1") reports 3/3, never its printed 2/2.
     #[test]
-    fn snapshot_stat_reads_printed_stats() {
+    fn snapshot_stat_reads_derived_stats() {
         use sylex_core::Cmp;
         use sylex_core::Count;
         use sylex_core::Stat;
-        let (state, snap, w) = bear_snapshot();
+        let (mut state, bear) = bear_on_field();
+        put_bf(
+            &mut state,
+            Arc::new(canon().card("Glorious Anthem").unwrap().core),
+            PlayerId(0),
+        );
+        let snap = LkiSnapshot::capture(&state, bear);
+        let w = state.objects.obj(bear).source;
         let f = |s, c, n| snap_cf(CharacteristicPredicate::Stat(s, c, Count::Literal(n)));
-        assert!(state.filter_matches_snapshot(&f(Stat::Power, Cmp::Eq, 2), &snap, w));
-        assert!(state.filter_matches_snapshot(&f(Stat::Toughness, Cmp::AtLeast, 2), &snap, w));
+        assert!(state.filter_matches_snapshot(&f(Stat::Power, Cmp::Eq, 3), &snap, w));
+        assert!(state.filter_matches_snapshot(&f(Stat::Toughness, Cmp::AtLeast, 3), &snap, w));
         assert!(state.filter_matches_snapshot(&f(Stat::ManaValue, Cmp::Eq, 2), &snap, w));
-        assert!(!state.filter_matches_snapshot(&f(Stat::Power, Cmp::Greater, 2), &snap, w));
+        assert!(
+            !state.filter_matches_snapshot(&f(Stat::Power, Cmp::Eq, 2), &snap, w),
+            "the printed power is not what the pumped creature last had"
+        );
+        assert!(!state.filter_matches_snapshot(&f(Stat::Power, Cmp::Greater, 3), &snap, w));
+    }
+
+    /// Destroy `objects` simultaneously through the event pipeline (one
+    /// `Act(Destroy)` batch) and return the past-form `ZoneChange` facts it
+    /// committed. Their dies-triggers are left noted on the agenda front.
+    fn destroy_all(state: &mut GameState, objects: &[ObjectId]) -> Vec<GameEvent> {
+        let destroy = |object| {
+            GameEvent::Act(crate::event::Act {
+                verb: sylex_core::VerbName::from("Destroy"),
+                who: None,
+                on: vec![object],
+                from: Some(Zone::Battlefield),
+                to: Some(Zone::Graveyard),
+                cause: Some(crate::event::Cause::destroy(
+                    sylex_core::Agency::EffectInstruction,
+                    None,
+                )),
+                committed: false,
+                contents: None,
+                batch: None,
+                inherited: std::collections::HashSet::new(),
+                contained: false,
+            })
+        };
+        state.schedule_front(vec![WorkItem::Emit(Occurrence::Batch(
+            objects.iter().map(|&o| destroy(o)).collect(),
+        ))]);
+        let crate::step::StepOutcome::Progress(crate::step::Progress::Applied(_)) = state.step()
+        else {
+            panic!("expected the Act(Destroy) batch to apply");
+        };
+        let crate::step::StepOutcome::Progress(crate::step::Progress::Applied(Occurrence::Batch(
+            facts,
+        ))) = state.step()
+        else {
+            panic!("expected the committed ZoneChange batch");
+        };
+        facts
+    }
+
+    /// The snapshot a past-form `ZoneChange` fact carries for `object`.
+    fn departed(facts: &[GameEvent], object: ObjectId) -> &LkiSnapshot {
+        facts
+            .iter()
+            .find_map(|e| match e {
+                GameEvent::ZoneChange(ZoneChange {
+                    object: o,
+                    snapshot: Some(snapshot),
+                    ..
+                }) if *o == object => Some(snapshot.as_ref()),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("no committed move of {object:?} in {facts:?}"))
+    }
+
+    fn agenda_fired(state: &GameState, source: ObjectSource) -> usize {
+        count_fired(&state.agenda.iter().cloned().collect::<Vec<_>>(), source)
+    }
+
+    /// [CR#603.10a,608.2h]: a Forest animated by Animate Land ("Until end of
+    /// turn, target land becomes a 3/3 creature that's still a land") is a
+    /// creature as it last existed on the battlefield, so its death triggers
+    /// Moonlit Wake's "whenever a creature dies". A Forest that was never
+    /// animated does not.
+    #[test]
+    fn animated_land_dying_triggers_creature_dies() {
+        use sylex_core::Modification;
+        use sylex_core::NumericOp;
+        use sylex_core::Type;
+
+        let mut state = empty_two_player_game();
+        let wake = put_bf(
+            &mut state,
+            Arc::new(canon().card("Moonlit Wake").unwrap().core),
+            PlayerId(0),
+        );
+        let wake_source = state.objects.obj(wake).source;
+        let forest = Arc::new(builtin().card("Forest").unwrap().core);
+        let animated = put_bf(&mut state, Arc::clone(&forest), PlayerId(0));
+        let plain = put_bf(&mut state, forest, PlayerId(0));
+        state.continuous.push(crate::layer::ContinuousEffect {
+            timestamp: crate::object::Timestamp(1_000),
+            controller: PlayerId(0),
+            scope: crate::layer::ScopeResolved::Locked(vec![animated]),
+            changes: vec![
+                Modification::CardTypes(sylex_core::CollectionOp::Add(Type::Creature.name())),
+                Modification::Power(NumericOp::Set(sylex_core::StatValue::Number(3))),
+                Modification::Toughness(NumericOp::Set(sylex_core::StatValue::Number(3))),
+            ],
+            duration: sylex_core::Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
+            rows: vec![],
+            origin: None,
+            is_cda: false,
+        });
+
+        let facts = destroy_all(&mut state, &[animated]);
+        let snapshot = departed(&facts, animated)
+            .characteristics
+            .as_ref()
+            .expect("a card-backed object");
+        assert!(snapshot.has_type(Type::Creature));
+        assert!(snapshot.has_type(Type::Land));
+        assert_eq!(snapshot.power, Some(3));
+        assert_eq!(
+            agenda_fired(&state, wake_source),
+            1,
+            "the animated land died as a creature"
+        );
+
+        state.agenda.clear();
+        let facts = destroy_all(&mut state, &[plain]);
+        assert!(
+            !departed(&facts, plain)
+                .characteristics
+                .as_ref()
+                .is_some_and(|c| c.has_type(Type::Creature))
+        );
+        assert_eq!(
+            agenda_fired(&state, wake_source),
+            0,
+            "a land that was never a creature does not die as one"
+        );
+    }
+
+    /// [CR#613.1b,608.2h]: a Grizzly Bears stolen by Act of Treason's layer-2
+    /// effect ("Gain control of target creature until end of turn") dies under
+    /// its thief's control, so its snapshot's controller is the thief, not
+    /// its owner.
+    #[test]
+    fn stolen_creature_snapshot_names_the_thief() {
+        let (mut state, bear) = bear_on_field();
+        state.continuous.push(crate::layer::ContinuousEffect {
+            timestamp: crate::object::Timestamp(1_000),
+            controller: PlayerId(1),
+            scope: crate::layer::ScopeResolved::Locked(vec![bear]),
+            changes: vec![sylex_core::Modification::SetController(Reference::Reg(
+                sylex_core::RefId(1),
+            ))],
+            duration: sylex_core::Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
+            rows: vec![],
+            origin: None,
+            is_cda: false,
+        });
+        assert_eq!(
+            state.objects.obj(bear).controller,
+            PlayerId(0),
+            "the base controller is still the owner"
+        );
+
+        let facts = destroy_all(&mut state, &[bear]);
+        assert_eq!(departed(&facts, bear).controller, PlayerId(1));
     }
 
     /// `Status(Tapped)`/`Status(Untapped)` read the snapshot's tap flag.
@@ -5920,7 +6042,7 @@ mod tests {
     /// drawing player is the moved card's controller (the `snapshot`).
     #[test]
     fn performed_matches_draw_matches_drawn_zone_change() {
-        let (mut state, bear) = bear_on_field();
+        let (state, bear) = bear_on_field();
         let watcher_source = state.objects.obj(bear).source;
         let pattern = EventFilter::Drawn {
             who: Predicate::Ref(Reference::Reg(sylex_core::RefId(1))),
@@ -5943,16 +6065,9 @@ mod tests {
                 }),
             })
         };
-        let you_card = state.objects.mint(
-            ObjectSource::Player(PlayerId(0)),
-            PlayerId(0),
-            Some(Zone::Hand),
-        );
-        let opp_card = state.objects.mint(
-            ObjectSource::Player(PlayerId(1)),
-            PlayerId(1),
-            Some(Zone::Hand),
-        );
+        // A card in each player's hand stands in for the card just drawn.
+        let you_card = state.zones.hands[0][0];
+        let opp_card = state.zones.hands[1][0];
         let you_draw = draw_fact(&state, you_card);
         let opp_draw = draw_fact(&state, opp_card);
         assert!(

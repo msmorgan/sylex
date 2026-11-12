@@ -19,6 +19,41 @@ use crate::stack::ExecutionFrame;
 use crate::state::GameState;
 
 impl GameState {
+    /// A departed object's LAST KNOWN value for `stat` ([CR#608.2h,113.7a]):
+    /// the snapshot's captured characteristics, continuous effects included,
+    /// read the way the live `StatOf` arm reads a present object.
+    ///
+    /// # Panics
+    ///
+    /// Panics on a power or toughness read of an object that had none.
+    fn last_known_stat(snapshot: &crate::lki::LkiSnapshot, stat: sylex_core::Stat) -> Uint {
+        let c = snapshot.characteristics.as_ref();
+        let value = match stat {
+            sylex_core::Stat::Power => c
+                .and_then(|c| c.power)
+                .expect("StatOf(Power) on a departed object that had a power"),
+            sylex_core::Stat::Toughness => c
+                .and_then(|c| c.toughness)
+                .expect("StatOf(Toughness) on a departed object that had a toughness"),
+            // [CR#202.3a]: an object with no mana cost — an ability on the
+            // stack with no card behind it — has mana value 0.
+            sylex_core::Stat::ManaValue => sylex_core::Int::try_from(c.map_or(0, |c| c.mana_value))
+                .expect("mana value fits Int"),
+            // [CR#209.1,306.5a]: the printed loyalty characteristic, never
+            // the loyalty counters; none reads 0, as the live arm does.
+            sylex_core::Stat::Loyalty => c.and_then(|c| c.loyalty).unwrap_or(0),
+            sylex_core::Stat::Defense => sylex_core::Int::try_from(
+                snapshot
+                    .counters
+                    .get("DefenseCounter")
+                    .copied()
+                    .unwrap_or(0),
+            )
+            .expect("defense fits Int"),
+        };
+        Uint::try_from(value.max(0)).expect("clamped stat fits Uint")
+    }
+
     /// Evaluate a `Count` to a concrete number.
     ///
     /// # Panics
@@ -26,45 +61,6 @@ impl GameState {
     /// Panics on a `Count` not wired for Stage 3, on a `StatOf` whose object
     /// lacks the stat, and on a `ThatMuch` with no amount fixed in this
     /// resolution.
-    /// A departed object's LAST KNOWN value for `stat` ([CR#608.2h,113.7a]).
-    ///
-    /// The snapshot keeps the object's card spine and its counters, so a
-    /// printed power/toughness plus the counter adjustment is what remains
-    /// knowable about it; continuous effects that were applying when it left
-    /// are not recorded, which is the same degradation the snapshot already
-    /// documents for its other fields.
-    fn last_known_stat(&self, snapshot: &crate::lki::LkiSnapshot, stat: sylex_core::Stat) -> Uint {
-        let crate::object::ObjectSource::Card(card) = snapshot.source else {
-            return 0;
-        };
-        let face = crate::derive::face(&self.cards.get(card).def);
-        let counter = |name: &str| {
-            sylex_core::Int::try_from(snapshot.counters.get(name).copied().unwrap_or(0))
-                .unwrap_or(sylex_core::Int::MAX)
-        };
-        let value = match stat {
-            sylex_core::Stat::Power => {
-                crate::layer::base_stat(face.characteristics.power.as_ref()).unwrap_or(0)
-                    + counter("P1P1Counter")
-                    - counter("M1M1Counter")
-            }
-            sylex_core::Stat::Toughness => {
-                crate::layer::base_stat(face.characteristics.toughness.as_ref()).unwrap_or(0)
-                    + counter("P1P1Counter")
-                    - counter("M1M1Counter")
-            }
-            sylex_core::Stat::ManaValue => {
-                sylex_core::Int::try_from(face.characteristics.mana_cost.mana_value())
-                    .expect("mana value fits Int")
-            }
-            sylex_core::Stat::Loyalty => {
-                crate::layer::base_stat(face.characteristics.loyalty.as_ref()).unwrap_or(0)
-            }
-            sylex_core::Stat::Defense => counter("DefenseCounter"),
-        };
-        Uint::try_from(value.max(0)).expect("clamped stat fits Uint")
-    }
-
     #[expect(
         clippy::too_many_lines,
         reason = "one arm per Count kind — the value language's full surface"
@@ -168,7 +164,7 @@ impl GameState {
                     return product
                         .lki
                         .as_ref()
-                        .map_or(0, |snapshot| self.last_known_stat(snapshot, *stat));
+                        .map_or(0, |snapshot| Self::last_known_stat(snapshot, *stat));
                 };
                 let value = match stat {
                     sylex_core::Stat::Power => self
@@ -842,14 +838,27 @@ mod tests {
              refinement is a separate count)"
         );
 
+        // A card-backed object of p's in `zone`: a Forest stands in for the
+        // drawn card and the played land.
+        let forest_in = |state: &mut GameState, zone| {
+            let card = state.cards.push(
+                Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+                    sylex_card::Characteristics {
+                        name: "Forest".into(),
+                        ..sylex_card::Characteristics::default()
+                    },
+                ))),
+                p,
+            );
+            state.objects.mint(ObjectSource::Card(card), p, Some(zone))
+        };
+
         // Two draws by p this turn → EventCount(Drawn, by: Ref(You)) = 2. A
         // draw's SUCCESS fact is the committed Library → Hand move tagged
         // `cause: Draw` ([CR#121.2] — one fact per card), which projects to
         // `FactKind::Drawn`.
         for _ in 0..2 {
-            let drawn = state
-                .objects
-                .mint(ObjectSource::Player(p), p, Some(Zone::Hand));
+            let drawn = forest_in(&mut state, Zone::Hand);
             state.record_history_fact(
                 1,
                 None,
@@ -886,9 +895,7 @@ mod tests {
         // One land played by p (a Play-caused battlefield entry).
         // `lands_played_this_turn` is the direct helper; EventCount(Play,
         // by: Ref(You)) is the generic equivalent.
-        let land = state
-            .objects
-            .mint(ObjectSource::Player(p), p, Some(Zone::Battlefield));
+        let land = forest_in(&mut state, Zone::Battlefield);
         state.record_history_fact(
             1,
             None,

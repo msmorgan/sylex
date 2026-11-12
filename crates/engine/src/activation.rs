@@ -1346,6 +1346,8 @@ fn freeze_value(value: &mut Value, object: ObjectId, snapshot: &LkiSnapshot) {
 }
 
 fn pack_objects(state: &crate::state::GameState, objects: &[ObjectId]) -> Vec<ReferenceProduct> {
+    // One layer pass, derived by the first zoned object, serves them all.
+    let mut view = None;
     objects
         .iter()
         .copied()
@@ -1355,7 +1357,13 @@ fn pack_objects(state: &crate::state::GameState, objects: &[ObjectId]) -> Vec<Re
                 .objects
                 .get(object)
                 .filter(|object| object.zone.is_some())
-                .map(|_| LkiSnapshot::capture(state, object)),
+                .map(|_| {
+                    LkiSnapshot::capture_in(
+                        state,
+                        view.get_or_insert_with(|| state.layers()),
+                        object,
+                    )
+                }),
         })
         .collect()
 }
@@ -1435,8 +1443,17 @@ mod tests {
     fn a_departed_candidate_binds_its_snapshot_where_its_stale_id_names_nothing() {
         let mut state = bare_game();
         let source = state.player(PlayerId(0)).object;
+        let bears = state.cards.push(
+            std::sync::Arc::new(sylex_card::Card::Normal(sylex_card::CardFace::from(
+                sylex_card::Characteristics {
+                    name: "Grizzly Bears".into(),
+                    ..sylex_card::Characteristics::default()
+                },
+            ))),
+            PlayerId(0),
+        );
         let candidate = state.objects.mint(
-            ObjectSource::Player(PlayerId(0)),
+            ObjectSource::Card(bears),
             PlayerId(0),
             Some(sylex_core::Zone::Battlefield),
         );

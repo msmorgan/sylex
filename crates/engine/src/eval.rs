@@ -68,6 +68,7 @@ use crate::event::TriggerFired;
 use crate::event::TurnBegan;
 use crate::event::Unattached;
 use crate::event::ZoneChange;
+use crate::layer::LayeredView;
 use crate::lki::LkiSnapshot;
 use crate::object::ObjectId;
 use crate::object::ObjectSource;
@@ -168,12 +169,16 @@ impl Part<'_> {
 
     /// Re-borrow as an owned-lifetime part, snapshotting live card objects —
     /// the per-fact LKI capture ([CR#603.10a]) run at history-record time.
-    fn into_lki(self, state: &GameState) -> Part<'static> {
+    /// `view` is the fact's one layer pass, derived by the first participant
+    /// that needs it.
+    fn into_lki(self, state: &GameState, view: &mut Option<LayeredView>) -> Part<'static> {
         match self {
             Part::Obj(id) => match state.objects.get(id).map(|o| o.source) {
-                Some(ObjectSource::Card(_)) => {
-                    Part::Gone(Cow::Owned(LkiSnapshot::capture(state, id)))
-                }
+                Some(ObjectSource::Card(_)) => Part::Gone(Cow::Owned(LkiSnapshot::capture_in(
+                    state,
+                    view.get_or_insert_with(|| state.layers()),
+                    id,
+                ))),
                 Some(ObjectSource::Player(p)) => Part::Player(p),
                 // Already gone with nothing to capture (e.g. the directly
                 // recorded `AbilityUsed` of a sacrificed source): keep the id
@@ -703,17 +708,18 @@ impl<'a> FactView<'a> {
     /// matching reads the participant as it was — never the live store
     /// through a stale id.
     pub(crate) fn into_lki(self, state: &GameState) -> FactView<'static> {
+        let mut view = None;
         FactView {
             kind: self.kind,
-            object: self.object.map(|p| p.into_lki(state)),
+            object: self.object.map(|p| p.into_lki(state, &mut view)),
             subjects: self
                 .subjects
                 .into_iter()
-                .map(|p| p.into_lki(state))
+                .map(|p| p.into_lki(state, &mut view))
                 .collect(),
-            patient: self.patient.map(|p| p.into_lki(state)),
+            patient: self.patient.map(|p| p.into_lki(state, &mut view)),
             actor: self.actor,
-            source: self.source.map(|p| p.into_lki(state)),
+            source: self.source.map(|p| p.into_lki(state, &mut view)),
             from: self.from,
             to: self.to,
             cause: self.cause.map(|c| Cow::Owned(c.into_owned())),

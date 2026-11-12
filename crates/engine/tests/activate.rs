@@ -2649,6 +2649,38 @@ fn sacrifice_cost_is_paid_at_activation_and_its_product_is_read_at_resolution() 
 /// event-object slot, and never by re-deriving an anaphor at resolution.
 #[test]
 fn fling_reads_the_sacrificed_creature_as_its_paid_product() {
+    let (mut state, bear) = fling_game(&[]);
+    let power = state.layers().power(bear).expect("the bear has a power");
+    assert_eq!(power, 2, "an unpumped Grizzly Bears");
+    let damage = cast_and_resolve_fling(&mut state, bear);
+    assert_eq!(
+        damage, power,
+        "Fling dealt damage equal to the sacrificed creature's power"
+    );
+}
+
+/// [CR#608.2h]: Fling uses "the sacrificed creature's power as it last existed
+/// on the battlefield" (its ruling). Under Glorious Anthem ("Creatures you
+/// control get +1/+1") the Grizzly Bears last had power 3, and Fling deals 3,
+/// not its printed 2.
+#[test]
+fn fling_deals_the_sacrificed_creatures_pumped_power() {
+    let (mut state, bear) = fling_game(&["Glorious Anthem"]);
+    assert_eq!(
+        state.layers().power(bear),
+        Some(3),
+        "the Anthem pumps the bear"
+    );
+    assert_eq!(
+        cast_and_resolve_fling(&mut state, bear),
+        3,
+        "Fling dealt the pumped power"
+    );
+}
+
+/// A game where P0 holds Fling and controls two Mountains, a Grizzly Bears and
+/// each permanent named in `also`. Returns the state and the bear.
+fn fling_game(also: &[&str]) -> (GameState, ObjectId) {
     const FLING: &str = "Fling";
     let canon = canon();
     let fling = Arc::new(canon.card(FLING).unwrap().core);
@@ -2658,6 +2690,10 @@ fn fling_reads_the_sacrificed_creature_as_its_paid_product() {
     let mut deck0 = vec![Arc::clone(&fling); 4];
     deck0.extend(vec![Arc::clone(&bears); 4]);
     deck0.extend(vec![Arc::clone(&mountain); 6]);
+    deck0.extend(
+        also.iter()
+            .map(|name| Arc::new(canon.card(name).unwrap().core)),
+    );
     let build = |seed: u64| {
         GameState::new(GameConfig {
             players: vec![
@@ -2685,15 +2721,23 @@ fn fling_reads_the_sacrificed_creature_as_its_paid_product() {
         .expect("a seed with Fling in P0's opening hand");
     force_into_play(&mut state, PlayerId(0), "Mountain");
     force_into_play(&mut state, PlayerId(0), "Mountain");
+    for name in also {
+        force_into_play(&mut state, PlayerId(0), name);
+    }
     let bear = force_into_play(&mut state, PlayerId(0), BEARS);
-    let spell = find_in_hand(&state, PlayerId(0), FLING);
-    let power = state.layers().power(bear).expect("the bear has a power");
+    (state, bear)
+}
+
+/// Cast Fling at P1, sacrificing `bear` (the only creature) as its additional
+/// cost, resolve it, and return the damage P1 took.
+fn cast_and_resolve_fling(state: &mut GameState, bear: ObjectId) -> sylex_core::Int {
+    let spell = find_in_hand(state, PlayerId(0), "Fling");
     let opponent = state.player(PlayerId(1)).object;
     let life_before = state.player(PlayerId(1)).life;
 
-    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
-    float_mana(&mut state, PlayerId(0), 2);
-    let legal = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+    let _ = run_to_priority(state, PlayerId(0), PhaseStep::PrecombatMain);
+    float_mana(state, PlayerId(0), 2);
+    let legal = run_to_priority(state, PlayerId(0), PhaseStep::PrecombatMain);
     let cast = legal
         .iter()
         .find(|a| matches!(a, Action::CastSpell { object } if *object == spell))
@@ -2705,7 +2749,7 @@ fn fling_reads_the_sacrificed_creature_as_its_paid_product() {
     // paid ([CR#601.2h]) — the deterministic payer takes the only creature.
     let mut targeted = false;
     loop {
-        let (_, stop) = step_to_stop(&mut state);
+        let (_, stop) = step_to_stop(state);
         match stop {
             StepOutcome::NeedsDecision(DecisionPointKind::ChooseTargets(_)) => {
                 state
@@ -2744,11 +2788,7 @@ fn fling_reads_the_sacrificed_creature_as_its_paid_product() {
 
     // Resolution reads the paid product's last-known power ([CR#608.2h]).
     state.submit_decision(Decision::Act(Action::Pass)).unwrap();
-    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+    let _ = run_to_priority(state, PlayerId(0), PhaseStep::PrecombatMain);
     assert!(state.stack.is_empty(), "Fling resolved");
-    assert_eq!(
-        state.player(PlayerId(1)).life,
-        life_before - power,
-        "Fling dealt damage equal to the sacrificed creature's power"
-    );
+    life_before - state.player(PlayerId(1)).life
 }

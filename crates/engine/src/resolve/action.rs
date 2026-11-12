@@ -4564,13 +4564,9 @@ mod tests {
     #[test]
     fn counter_ability_ceases() {
         let (mut state, bear) = bear_on_field();
-        // Mint a token id for the ability.
-        let ability_id = state.objects.mint(
-            ObjectSource::Player(PlayerId(0)),
-            PlayerId(0),
-            Some(Zone::Stack),
-        );
+        // Mint the ability's stack id from its source, as announcing does.
         let source = ObjectSource::Card(state.objects.obj(bear).card_id().unwrap());
+        let ability_id = state.objects.mint(source, PlayerId(0), Some(Zone::Stack));
         state.stack.push(StackEntry {
             activation: crate::ActivationId::NONE,
             paid_costs: Vec::new(),
