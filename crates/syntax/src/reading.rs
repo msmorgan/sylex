@@ -1391,20 +1391,19 @@ impl CompiledGrammar {
 
     /// The names of a node's children, in order: the grammatical function
     /// each bears in it.
+    ///
+    /// # Panics
+    /// When no Production has the node's id.
     #[must_use]
     pub fn child_names(&self, node: &ReadingNode) -> Vec<Ident> {
-        self.by_id
-            .get(&node.production)
-            .map_or_else(Vec::new, |&p| {
-                let production = &self.productions[p];
-                production
-                    .rhs
-                    .iter()
-                    .zip(&production.names)
-                    .filter(|(symbol, _)| !matches!(symbol, Symbol::Punct(..)))
-                    .map(|(_, name)| *name)
-                    .collect()
-            })
+        let production = &self.productions[self.by_id[&node.production]];
+        production
+            .rhs
+            .iter()
+            .zip(&production.names)
+            .filter(|(symbol, _)| !matches!(symbol, Symbol::Punct(..)))
+            .map(|(_, name)| *name)
+            .collect()
     }
 
     /// The lexeme reached by following `head` children down from `reading`.
