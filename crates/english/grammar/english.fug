@@ -2537,7 +2537,8 @@ Unmodified: Nominal -> BareNominal { transparent: [head] }
 // determined or modified Marker is no Marker again (not *two three target
 // creatures*, *other other target creatures*), and an adjective stays inside
 // the outer determiner, an external dependent (CGEL 5§2:330; not *other two
-// target creatures*).
+// target creatures*). The outer determiner ends in no Marker (not *target
+// target creature*, *two target target creatures*).
 BareTargetingMarker: TargetingMarker -> Lex(Determinative)
     where head.DeterminativeDistribution := Targeting,
           $.ComplementKind = Intransitive
@@ -2554,6 +2555,7 @@ UndeterminedModifiedMarker: DeterminerPhrase ->
           modifier.AdjectivePosition != Predicative
 MarkedDeterminer: DeterminerPhrase -> determiner:DeterminerPhrase TargetingMarker
     where determiner.ComplementKind != PP,
+          determiner.DeterminativeDistribution != Targeting,
           $.Number = determiner.Number
 MarkedMaximum: DeterminerPhrase -> determiner:Selected(PrepositionPhrase, Up) TargetingMarker {
     uncoordinated: [determiner],
@@ -3517,11 +3519,16 @@ coordination AmountOrNounPhrase {
 coordination MeasureNounPhrase { coordinators: Coordinator }
 coordination Amount { coordinators: Coordinator, proximate: [QuantityNumber, Sign] }
 coordination SymbolCosts { coordinators: Coordinator }
-// It determines as its last conjunct does (*one or more cards*).
+// It determines as its last conjunct does (*one or more cards*). No
+// conjunct ends in the Targeting Marker: the determiners coordinate under
+// the one Marker (*[one or two] target creatures*, not *one or [two
+// target]*).
 coordination DeterminerPhrase {
     coordinators: Coordinator,
     proximate: [Number, Countability, DeterminativeDistribution, NounKind],
 }
+    where first.DeterminativeDistribution != Targeting,
+          last.DeterminativeDistribution != Targeting
 // Numbers alone are an Amount coordination (*X is 2 or 3*), never also
 // a fused quantity over them (ADR §8).
 coordination FusedQuantity {
