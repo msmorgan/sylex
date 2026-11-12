@@ -860,9 +860,14 @@ impl Sources {
         // A pattern with any part besides its head carries a Keyword
         // Parameter; a bound stem is its Keyword Quality.
         let with_form = |mut parts: Vec<ParameterPart>| {
-            let parametric = parts
-                .iter()
-                .any(|part| !matches!(part, ParameterPart::Head | ParameterPart::Feature(..)));
+            let parametric = parts.iter().any(|part| match part {
+                ParameterPart::Head | ParameterPart::Feature(..) => false,
+                ParameterPart::Slot(_)
+                | ParameterPart::Word(_)
+                | ParameterPart::Words(_)
+                | ParameterPart::ModifiedWords(..)
+                | ParameterPart::Mark(..) => true,
+            });
             let form = if parametric { "Parametric" } else { "Bare" };
             parts.push(ParameterPart::Feature("KeywordForm".into(), form.into()));
             parts

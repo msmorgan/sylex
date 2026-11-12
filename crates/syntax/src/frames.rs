@@ -505,7 +505,8 @@ pub enum ParameterPart {
     ModifiedWords(Vec<LexemeId>, SlotKind, SlotKind),
     Mark(char, sylex_lexicon::Binding),
     /// A value the pattern gives a feature of its phrase, as no word: the
-    /// kind of a keyword form's final Keyword Parameter.
+    /// kind of a keyword form's final Keyword Parameter, or whether the form
+    /// carries a Keyword Parameter at all.
     Feature(Ident, Ident),
 }
 

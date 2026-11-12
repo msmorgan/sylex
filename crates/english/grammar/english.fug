@@ -694,7 +694,7 @@ KeywordPremodifier: BareNominal -> modifier:KeywordPhrase BareNominal
 // (*choose "left" or "right."*) or a singular nominal (*the "legend rule"*,
 // [CR#704.5j]), with no period of its own. A quoted plural is a granted
 // ability's (*have "bands with other legendary creatures."*), never a
-// term's.
+// term's. A quoted keyword premodifier is bare, as a KeywordPremodifier is.
 QuotedKeywordPremodifier: BareNominal -> modifier:"KeywordPhrase" BareNominal
     where modifier.KeywordForm = Bare
 QuotedMentionPremodifier: BareNominal -> modifier:"Mention" BareNominal
