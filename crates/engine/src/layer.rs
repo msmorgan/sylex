@@ -243,9 +243,9 @@ pub(crate) fn base_stat(v: Option<&sylex_core::StatValue>) -> Option<Int> {
     }
 }
 
-/// A face's base colors ([CR#202.2]): the colored mana symbols in the cost,
-/// falling back to the color indicator for objects with no mana cost.
-/// Computed once per card at setup (`Cards::push`) and cached.
+/// A face's base colors: the colors of the mana symbols in its mana cost
+/// [CR#202.2] together with each color its color indicator denotes
+/// [CR#202.2e]. Computed once per card at setup (`Cards::push`) and cached.
 pub(crate) fn base_colors(face: &sylex_card::CardFace) -> Vec<Color> {
     let mut colors: Vec<Color> = Vec::new();
     for c in face
@@ -253,13 +253,11 @@ pub(crate) fn base_colors(face: &sylex_card::CardFace) -> Vec<Color> {
         .mana_cost
         .iter()
         .flat_map(symbol_colors)
+        .chain(face.characteristics.color_indicator.iter().copied())
     {
         if !colors.contains(&c) {
             colors.push(c);
         }
-    }
-    if colors.is_empty() {
-        colors.clone_from(&face.characteristics.color_indicator);
     }
     colors
 }
@@ -1814,13 +1812,7 @@ fn distinct_keys_derived(
             .collect(),
         Ch::Name => vec![face.characteristics.name.to_string()],
         Ch::ManaCost => vec![format!("{}", face.characteristics.mana_cost.mana_value())],
-        Ch::Colors => {
-            let mut colors: Vec<sylex_core::Color> = face.characteristics.color_indicator.clone();
-            for sym in face.characteristics.mana_cost.iter() {
-                colors.extend(symbol_colors(sym));
-            }
-            colors.iter().map(|c| format!("{c:?}")).collect()
-        }
+        Ch::Colors => base_colors(face).iter().map(|c| format!("{c:?}")).collect(),
         Ch::Power => working
             .get(&id)
             .and_then(|d| d.characteristics.power)
@@ -4084,6 +4076,69 @@ mod tests {
             view.power(c),
             Some(3),
             "C is granted (by B's middle static) the self-pump → 3/3"
+        );
+    }
+
+    /// A layer-time distinct color count over one object counts each color
+    /// once, however many of its pips the mana cost repeats [CR#202.2]:
+    /// Benalish Marshal ({W}{W}{W}) has one color, not three.
+    #[test]
+    fn singleton_color_count_counts_a_repeated_pip_once() {
+        use sylex_card::Card;
+        use sylex_card::CardFace;
+        use sylex_card::Characteristics;
+        let mut state = game();
+        let card = Card::Normal(CardFace::from(Characteristics {
+            name: "Benalish Marshal".into(),
+            mana_cost: "{W}{W}{W}".parse().expect("test cost parses"),
+            types: vec![Type::Creature.def()],
+            power: Some(StatValue::Number(3)),
+            toughness: Some(StatValue::Number(3)),
+            ..Characteristics::default()
+        }));
+        let card_id = state.cards.push(Arc::new(card), PlayerId(0));
+        let id = state.objects.mint(
+            ObjectSource::Card(card_id),
+            PlayerId(0),
+            Some(Zone::Battlefield),
+        );
+        state.zones.battlefield.push(id);
+        let working = super::base_map(&state);
+        let colors = Count::CountDistinct(
+            sylex_core::Characteristic::Colors,
+            Countable::Singleton(Arc::new(Reference::Reg(sylex_core::RefId(0)))),
+        );
+        assert_eq!(
+            super::eval_count(
+                &colors,
+                &state,
+                &working,
+                Some(ObjectSource::Card(card_id)),
+                PlayerId(0)
+            ),
+            1,
+            "[CR#202.2]: {{W}}{{W}}{{W}} makes it white, one color"
+        );
+    }
+
+    /// An object is the colors of its mana cost [CR#202.2] and also each color
+    /// its color indicator denotes [CR#202.2e]: the indicator adds to the
+    /// cost's colors rather than standing in only for a colorless cost. A
+    /// minimal repro derived from Pact of Negation (a blue color indicator on
+    /// a {0} cost), its cost made {1}{R}.
+    #[test]
+    fn base_colors_unites_mana_cost_and_color_indicator() {
+        let face = sylex_card::CardFace::from(sylex_card::Characteristics {
+            name: "Pact of Negation".into(),
+            mana_cost: "{1}{R}".parse().expect("test cost parses"),
+            color_indicator: vec![sylex_core::Color::Blue],
+            types: vec![Type::Instant.def()],
+            ..sylex_card::Characteristics::default()
+        });
+        assert_eq!(
+            super::base_colors(&face),
+            vec![sylex_core::Color::Red, sylex_core::Color::Blue],
+            "[CR#202.2,202.2e]: red from the cost and blue from the indicator"
         );
     }
 }

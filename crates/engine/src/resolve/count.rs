@@ -604,14 +604,10 @@ impl GameState {
                 .collect(),
             Ch::Name => vec![face.characteristics.name.to_string()],
             Ch::ManaCost => vec![format!("{}", face.characteristics.mana_cost.mana_value())],
-            Ch::Colors => {
-                let mut colors: Vec<sylex_core::Color> =
-                    face.characteristics.color_indicator.clone();
-                for sym in face.characteristics.mana_cost.iter() {
-                    colors.extend(crate::layer::symbol_colors(sym));
-                }
-                colors.iter().map(|c| format!("{c:?}")).collect()
-            }
+            Ch::Colors => crate::layer::base_colors(face)
+                .iter()
+                .map(|c| format!("{c:?}"))
+                .collect(),
             Ch::Power => self
                 .layers()
                 .power(id)
