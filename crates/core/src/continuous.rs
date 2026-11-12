@@ -172,6 +172,40 @@ pub enum Modification {
 }
 
 impl Modification {
+    /// Whether this change is one a characteristic-defining ability can make
+    /// ([CR#604.3a] criterion 1): it defines colors, subtypes, power or
+    /// toughness. Power and toughness are defined by setting them
+    /// ([CR#208.2a]); raising or lowering them modifies a value defined
+    /// elsewhere.
+    #[must_use]
+    pub fn defines_characteristic(&self) -> bool {
+        match self {
+            Modification::Power(op) | Modification::Toughness(op) => match op {
+                NumericOp::Set(_) => true,
+                NumericOp::Up(_) | NumericOp::Down(_) => false,
+            },
+            Modification::Colors(_)
+            | Modification::Subtypes(_)
+            | Modification::AllCreatureTypes => true,
+            // A bundle defines something only if it holds a change.
+            Modification::Several(changes) => {
+                !changes.is_empty() && changes.iter().all(Modification::defines_characteristic)
+            }
+            Modification::SwitchPowerToughness
+            | Modification::CardTypes(_)
+            | Modification::Supertypes(_)
+            | Modification::GainAbility(_)
+            | Modification::LoseAbility(_)
+            | Modification::LoseAllAbilities
+            | Modification::CantHaveAbility(_)
+            | Modification::SetController(_)
+            | Modification::SetText(_)
+            | Modification::BaseLoyalty(_)
+            | Modification::BaseDefense(_)
+            | Modification::BecomeBasicLandType(_) => false,
+        }
+    }
+
     /// Recursively splice every `Several` into the parent list. `Several` is a
     /// semantic grouping artifact; the engine consumes a flat,
     /// layer-spanning `changes` list ([CR#613.6]).
@@ -262,6 +296,27 @@ pub enum StaticSpec {
     /// single-object `Modify` with [`Each`](StaticSpec::Each) over a
     /// [`crate::Selection`].
     Modify(Reference, Modification),
+    /// A characteristic-defining ability ([CR#604.3]): `change` defines
+    /// characteristics of the object the ability is on, information that
+    /// would normally be printed elsewhere on it. It names no affected object
+    /// because such an ability directly affects no other object, and it is
+    /// only ever the whole body of a static ability, never under
+    /// [`Conditionally`](StaticSpec::Conditionally) or
+    /// [`Each`](StaticSpec::Each), because it never sets its values only if
+    /// certain conditions are met ([CR#604.3a] criteria 3 and 5). `change`
+    /// changes only colors, subtypes, or power and toughness, and sets power
+    /// and toughness rather than raising or lowering them ([CR#604.3a]
+    /// criterion 1); [`validate_static`](crate::validate_static) refuses
+    /// anything else.
+    ///
+    /// The mark records what the text says. Whether an object's instance of
+    /// the ability is characteristic-defining also turns on how the object
+    /// came to have it ([CR#604.3a] criteria 2 and 4): printed on the card,
+    /// granted to a token by the effect that created it, or acquired through a
+    /// copy or text-changing effect, and never granted by another effect or by
+    /// the object to itself. The engine decides that part; an instance that
+    /// fails it is an ordinary static changing its own object.
+    CharacteristicDefining(Modification),
     /// "[object] becomes a copy of [source]" ([CR#707.4]) — a CONTINUOUS
     /// layer-1a copy effect: the object stays on the battlefield (no
     /// leaves-/enters-the-battlefield triggers fire, [CR#707.4]) and keeps

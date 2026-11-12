@@ -531,6 +531,16 @@ pub enum ValidationError {
         declared: crate::Domain,
         subject: crate::Domain,
     },
+    /// A characteristic-defining static makes no change, or one no
+    /// characteristic-defining ability makes: one that isn't to colors,
+    /// subtypes, or set power or toughness ([CR#604.3a] criterion 1).
+    CharacteristicDefiningChange(crate::Modification),
+    /// A characteristic-defining static sits under another static form, a
+    /// condition or a distribution. A characteristic-defining ability is the
+    /// whole of its static ability: it never sets its values only if certain
+    /// conditions are met and directly affects no other object ([CR#604.3a]
+    /// criteria 3 and 5).
+    NestedCharacteristicDefining,
     /// Serialization failed while walking the core grammar.
     Walk(String),
 }
@@ -591,6 +601,16 @@ impl fmt::Display for ValidationError {
                 "a predicate whose subject is a {subject:?} cannot appear in a region whose \
                  candidate domain is {declared:?}"
             ),
+            Self::CharacteristicDefiningChange(change) => write!(
+                f,
+                "a characteristic-defining static defines only colors, subtypes, power or \
+                 toughness, found {change:?}"
+            ),
+            Self::NestedCharacteristicDefining => write!(
+                f,
+                "a characteristic-defining static is the whole body of its static ability, \
+                 found one nested under another static form"
+            ),
             Self::Walk(message) => write!(f, "could not validate region: {message}"),
         }
     }
@@ -632,6 +652,14 @@ pub fn validate(region: &Region<Block>) -> Result<(), ValidationError> {
 pub fn validate_static(region: &Region<crate::StaticSpec>) -> Result<(), ValidationError> {
     validate_params(region, None)?;
     let mut definitions = Definitions::new(&region.params);
+    if let crate::StaticSpec::CharacteristicDefining(change) = &region.body {
+        if !change.defines_characteristic() {
+            return Err(ValidationError::CharacteristicDefiningChange(
+                change.clone(),
+            ));
+        }
+        return region.body.serialize(definitions.walker());
+    }
     validate_static_effect(&region.body, &mut definitions)
 }
 
@@ -681,6 +709,10 @@ fn validate_static_effect(
             validate_static_effect(body, definitions)
         }
         crate::StaticSpec::Deontic(deontic) => validate_deontic(deontic, definitions),
+        // `validate_static` takes one at the top of a static ability.
+        crate::StaticSpec::CharacteristicDefining(_) => {
+            Err(ValidationError::NestedCharacteristicDefining)
+        }
         crate::StaticSpec::ConditionallyDo { when, then } => {
             when.serialize(definitions.walker())?;
             validate_condition_regions(when, &definitions.params)?;
@@ -2770,6 +2802,87 @@ mod tests {
                 expected: Kind::Pile,
                 found: Kind::Entity,
             })
+        );
+    }
+
+    /// Tarmogoyf's "its power is equal to … and its toughness is equal to
+    /// that number plus 1" sets its own power and toughness: a
+    /// characteristic-defining static ([CR#604.3a] criterion 1).
+    fn tarmogoyf_definition() -> crate::Modification {
+        use crate::Modification;
+        use crate::NumericOp;
+        use crate::StatValue;
+        let count = crate::Count::CountDistinct(
+            crate::Characteristic::Types,
+            crate::Countable::Objects(Arc::new(Region::candidate(crate::Predicate::State(
+                crate::StatePredicate::InZone(crate::Zone::Graveyard),
+            )))),
+        );
+        Modification::Several(Arc::from([
+            Modification::Power(NumericOp::Set(StatValue::Count(count.clone()))),
+            Modification::Toughness(NumericOp::Set(StatValue::Count(crate::Count::Plus(
+                Arc::new(count),
+                Arc::new(crate::Count::Literal(1)),
+            )))),
+        ]))
+    }
+
+    fn static_region(body: crate::StaticSpec) -> Region<crate::StaticSpec> {
+        Region::new(event_region_params(), body)
+    }
+
+    #[test]
+    fn characteristic_defining_static_validates() {
+        assert_eq!(
+            validate_static(&static_region(crate::StaticSpec::CharacteristicDefining(
+                tarmogoyf_definition()
+            ))),
+            Ok(())
+        );
+    }
+
+    /// Raising power modifies a value defined elsewhere; it defines nothing
+    /// ([CR#604.3a] criterion 1).
+    #[test]
+    fn characteristic_defining_static_refuses_a_modifying_change() {
+        let raise = crate::Modification::Power(crate::NumericOp::Up(crate::Count::Literal(1)));
+        assert_eq!(
+            validate_static(&static_region(crate::StaticSpec::CharacteristicDefining(
+                raise.clone()
+            ))),
+            Err(ValidationError::CharacteristicDefiningChange(raise))
+        );
+    }
+
+    /// A characteristic-defining static that bundles no change defines nothing
+    /// ([CR#604.3a] criterion 1).
+    #[test]
+    fn characteristic_defining_static_refuses_an_empty_bundle() {
+        let nothing = crate::Modification::Several(Arc::from([]));
+        assert_eq!(
+            validate_static(&static_region(crate::StaticSpec::CharacteristicDefining(
+                nothing.clone()
+            ))),
+            Err(ValidationError::CharacteristicDefiningChange(nothing))
+        );
+    }
+
+    /// A characteristic-defining ability never sets its values only if certain
+    /// conditions are met ([CR#604.3a] criterion 5).
+    #[test]
+    fn characteristic_defining_static_refuses_a_condition() {
+        let conditional = crate::StaticSpec::Conditionally(
+            crate::Condition::Matches(
+                crate::Reference::Reg(RefId(0)),
+                crate::Predicate::State(crate::StatePredicate::Attacking),
+            ),
+            Arc::new(crate::StaticSpec::CharacteristicDefining(
+                tarmogoyf_definition(),
+            )),
+        );
+        assert_eq!(
+            validate_static(&static_region(conditional)),
+            Err(ValidationError::NestedCharacteristicDefining)
         );
     }
 }
