@@ -10,6 +10,7 @@
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
+use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
@@ -198,7 +199,7 @@ pub(crate) fn write(
             let tx = db.transaction()?;
             write_grammar(&tx, grammar)?;
             let mut lexemes = BTreeSet::new();
-            let mut embeddings: BTreeMap<Embedding, i64> = BTreeMap::new();
+            let mut embeddings: HashMap<Embedding, i64> = HashMap::new();
             let mut summary = Summary::default();
             let mut inserts = Inserts::prepare(&tx)?;
             while let Some((unit, rows)) = units.next()? {
@@ -572,7 +573,7 @@ fn write_unit(
     unit: usize,
     rows: &UnitRows,
     lexemes: &mut BTreeSet<LexemeId>,
-    embeddings: &mut BTreeMap<Embedding, i64>,
+    embeddings: &mut HashMap<Embedding, i64>,
     summary: &mut Summary,
 ) -> Result<()> {
     let u = &corpus.units[unit];
@@ -772,14 +773,17 @@ fn write_leaves(
 
 fn write_embeddings(
     tx: &rusqlite::Transaction<'_>,
-    embeddings: &BTreeMap<Embedding, i64>,
+    embeddings: &HashMap<Embedding, i64>,
     reader: &context::Reader<'_>,
     lexemes: &mut BTreeSet<LexemeId>,
 ) -> Result<()> {
     let mut embedding_insert = tx.prepare("INSERT INTO embeddings VALUES (?1, ?2, ?3, ?4)")?;
     let mut step_insert =
         tx.prepare("INSERT INTO embedding_steps VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)")?;
-    for (embedding, &id) in embeddings {
+    // In id order, so each table grows at its end.
+    let mut in_order: Vec<(&Embedding, i64)> = embeddings.iter().map(|(e, &id)| (e, id)).collect();
+    in_order.sort_unstable_by_key(|&(_, id)| id);
+    for (embedding, id) in in_order {
         embedding_insert.execute(params![
             id,
             index(embedding.steps.len()),

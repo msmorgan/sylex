@@ -77,7 +77,7 @@ pub enum Case {
     Genitive,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum WordForm {
     Invariant,
     /// The independent Genitive cell of a personal Pronoun paradigm.
