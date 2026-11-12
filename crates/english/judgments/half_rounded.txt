@@ -17,3 +17,6 @@
 +NounPhrase half your life
 +Clause You lose half your life, rounded up => VerbPhrase "rounded up"
 +Clause Pay half your life, rounded up => NounPhrase "half your life" as Object of pay; VerbPhrase "rounded up"
+# The fraction with a number forms one number that determines the nominal
++ <card=Banshee> {X}, {T}: This creature deals half X damage, rounded down, to any target, and half X damage, rounded up, to you. => DeterminerPhrase "half X" as Determiner of damage; DeterminerPhrase "half X"#2 as Determiner of damage; !NounPhrase "X damage"; readings 1
++ <card=The Goose Mother> When The Goose Mother enters, create half X Food tokens, rounded up. => DeterminerPhrase "half X" as Determiner of token; !NounPhrase "X Food tokens"; readings 1

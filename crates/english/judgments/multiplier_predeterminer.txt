@@ -10,3 +10,4 @@
 + Copy that spell twice.
 + Double target player's life total.
 + Target creature gains double strike until end of turn.
++ <card=Crackle with Power> Crackle with Power deals five times X damage to each of up to X targets. => DeterminerPhrase "five times X" as Determiner of damage; !NounPhrase "X damage"; readings 1

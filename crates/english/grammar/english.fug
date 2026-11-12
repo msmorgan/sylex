@@ -1521,9 +1521,11 @@ ModifiedQuantity: ModifiedQuantifiedNominal -> modifier:AdjectivePhrase Quantifi
 // Free-choice *any* with a cardinal is the determinative phrase *any one*
 // (SingularQuantifier), so excluding `FreeChoice` is a gate (ADR §6, §8):
 // without it *add three mana of any one color* (Lotus Vale) is also *any
-// [one color]*, a second tree of FreeChoiceDetermined's.
+// [one color]*, a second tree of FreeChoiceDetermined's. A multiplier with a
+// number is MultiplierDeterminer's (*[half X] damage*, Banshee), never *half
+// [X damage]*.
 DeterminedQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNominal
-    where determiner.DeterminativeDistribution != FreeChoice,
+    where determiner.DeterminativeDistribution != FreeChoice | Multiplier,
           determiner.Number = head.QuantityNumber,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
@@ -1852,10 +1854,18 @@ MultipliedDeterminer: NumericalDeterminer ->
     factor:Numeral(Cardinal) multiplier:BareNominal NumericalDeterminer
     where multiplier.NounDistribution = Serial,
           multiplier.Number = Plural
-// *three times this creature's power*.
+// A multiplier determinative and a number form one number (*draw [half X]
+// cards*, Hydroid Krasis).
+MultiplierDeterminer: NumericalDeterminer -> multiplier:DeterminerPhrase NumericalDeterminer
+    where multiplier.DeterminativeDistribution := Multiplier
+// *three times this creature's power*. A numerically determined head is
+// excluded: *five times X damage* (Crackle with Power) is
+// MultipliedDeterminer's *[five times X] damage*, never *five times [X
+// damage]*.
 MultipliedNounPhrase: NounPhrase -> factor:Numeral(Cardinal) multiplier:BareNominal NounPhrase
     where multiplier.NounDistribution = Serial,
           multiplier.Number = Plural,
+          head.DeterminativeDistribution != Numerical,
           head.Determination = Overt
 MultipliedAmount: Amount -> factor:Numeral(Cardinal) multiplier:BareNominal Amount
     where multiplier.Number = Plural
@@ -1886,9 +1896,12 @@ DegreeArithmetic: DeterminerPhrase ->
     DeterminerPhrase modifier:Selected(PrepositionPhrase, Plus, Minus) { heavy: [head] }
     where head.ComplementKind = Intransitive,
           modifier.DeterminativeDistribution != Distributive
-// *Half their life*, *double that damage*.
+// *Half their life*, *double that damage*. A numerically determined head
+// is excluded: *half X damage* (Banshee) is MultiplierDeterminer's *[half X]
+// damage*, never *half [X damage]*.
 MultiplierPredetermination: NounPhrase -> determiner:DeterminerPhrase NounPhrase
     where determiner.DeterminativeDistribution = Multiplier,
+          head.DeterminativeDistribution != Numerical,
           head.Determination = Overt
 AdverbAdverbial: Adverbial -> AdverbPhrase where head.AdjunctPosition = End
 FrequencyAdverbial: Adverbial -> TemporalNounPhrase
