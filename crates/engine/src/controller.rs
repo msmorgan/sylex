@@ -25,11 +25,11 @@ impl GameState {
     /// reads reach `controller_of` from inside it and so see the base one, a
     /// stolen permanent's owner included:
     /// - the frameless matcher (`target::matches_with`), which a layer
-    ///   condition delegates player proxies to: its `ControlledBy`,
-    ///   `Controls` and `ControllerOf` reads, and the carrier frame its
-    ///   `Where` arm and count resolution build;
-    /// - `controller_of_source`, the carrier's `You` when that matcher
-    ///   resolves a controller register (its `Ref(Reg)` arm and
+    ///   condition delegates player proxies to: its `ControlledBy`, `Controls`
+    ///   and `ControllerOf` reads, and the carrier frame its `Where` arm and
+    ///   count resolution build;
+    /// - `controller_of_source`, the carrier's `You` when that matcher resolves
+    ///   a controller register (its `Ref(Reg)` arm and
     ///   `resolve_carrier_register`).
     ///
     /// # Panics

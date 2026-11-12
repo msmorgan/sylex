@@ -148,8 +148,9 @@ impl GameState {
 /// co-target [`TargetSpec::Distinct`] wrapper ([CR#115.7e]) to its inner
 /// `Target`, exactly as the render-side twin (`fragment::target_spec_filter`)
 /// does: distinctness is a SET constraint enforced at the three set-level sites
-/// ([`validate_target_set`] on announce/retarget, [`GameState::resolving_targets`]
-/// on the [CR#608.2b] re-check), never a per-object filter.
+/// ([`validate_target_set`] on announce/retarget,
+/// [`GameState::resolving_targets`] on the [CR#608.2b] re-check), never a
+/// per-object filter.
 ///
 /// This is the single authoritative site for TargetSpec→Predicate extraction;
 /// both `cast::legal_targets` (announce time) and `resolving_targets`

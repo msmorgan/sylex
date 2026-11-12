@@ -28,10 +28,9 @@ mod player_action;
 mod query;
 pub(crate) use query::search_is_bare_quantity;
 mod targets;
-use targets::ResolvingTargets;
-
 // The mill apply re-derives its top-slice group off the stored body facet.
 pub(crate) use action::composite_body_group;
+use targets::ResolvingTargets;
 // Target-set machinery moved to `targets`; external callers keep the old
 // `crate::resolve::…` paths.
 pub(crate) use targets::announce_satisfiable;

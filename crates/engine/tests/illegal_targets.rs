@@ -360,7 +360,10 @@ fn cast_against_response(
         .submit_decision(Decision::Act(Action::CastSpell { object: spell }))
         .expect("the spell is castable");
     let trace = drive(state, |s, _| s.stack.is_empty(), &mut answer);
-    assert!(responded, "player 1 responded while the spell was on the stack");
+    assert!(
+        responded,
+        "player 1 responded while the spell was on the stack"
+    );
     assert!(picks.is_empty(), "every target prompt was answered");
     (trace, offered.expect("player 0's spell asked for targets"))
 }
@@ -399,7 +402,10 @@ fn pounce_whose_opposing_target_gained_hexproof_makes_no_fight() {
     let response = into_hand(&mut state, PlayerId(1), "Ranger's Guile");
     float(
         &mut state,
-        &[(PlayerId(0), Color::Green, 2), (PlayerId(1), Color::Green, 1)],
+        &[
+            (PlayerId(0), Color::Green, 2),
+            (PlayerId(1), Color::Green, 1),
+        ],
     );
 
     let (trace, _) = cast_against_response(
@@ -468,7 +474,10 @@ fn arc_lightning_does_not_damage_a_target_that_gained_hexproof() {
         "the creature that gained hexproof is an illegal target and is dealt no damage"
     );
     assert_eq!(
-        damage_to(&trace, hit).iter().map(|d| d.amount).collect::<Vec<_>>(),
+        damage_to(&trace, hit)
+            .iter()
+            .map(|d| d.amount)
+            .collect::<Vec<_>>(),
         [2],
         "the still-legal creature is dealt only its own share of the division"
     );
@@ -516,7 +525,10 @@ fn arc_lightning_does_not_damage_a_target_that_gained_protection_from_red() {
         "Keeper of Kookus has protection from red and is dealt no damage"
     );
     assert_eq!(
-        damage_to(&trace, hit).iter().map(|d| d.amount).collect::<Vec<_>>(),
+        damage_to(&trace, hit)
+            .iter()
+            .map(|d| d.amount)
+            .collect::<Vec<_>>(),
         [2],
         "the still-legal creature is dealt only its own share of the division"
     );
@@ -586,7 +598,10 @@ fn pacifism_with_an_illegal_target_goes_to_the_graveyard_without_entering() {
     let response = into_hand(state, PlayerId(1), "Ranger's Guile");
     float(
         state,
-        &[(PlayerId(0), Color::White, 2), (PlayerId(1), Color::Green, 1)],
+        &[
+            (PlayerId(0), Color::White, 2),
+            (PlayerId(1), Color::Green, 1),
+        ],
     );
 
     let (trace, offered) = cast_against_response(
@@ -760,7 +775,10 @@ fn a_spell_whose_only_target_became_illegal_is_not_countered() {
         1,
         "the Bolt went to its owner's graveyard"
     );
-    assert!(damage_to(&trace, theirs).is_empty(), "the Bolt dealt no damage");
+    assert!(
+        damage_to(&trace, theirs).is_empty(),
+        "the Bolt dealt no damage"
+    );
     let watcher_source = state.objects.obj(watcher).source;
     assert!(
         !applied(&trace).iter().any(|event| matches!(
@@ -809,7 +827,10 @@ fn a_countered_spell_fires_the_countered_spell_trigger() {
         Some(vec![vec![spell]]),
     );
 
-    assert!(damage_to(&trace, theirs).is_empty(), "the Bolt was countered");
+    assert!(
+        damage_to(&trace, theirs).is_empty(),
+        "the Bolt was countered"
+    );
     let watcher_source = state.objects.obj(watcher).source;
     assert!(
         applied(&trace).iter().any(|event| matches!(
