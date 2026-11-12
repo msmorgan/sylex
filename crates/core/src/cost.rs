@@ -207,7 +207,7 @@ fn runnable_copy_spec_is_bound(spec: &crate::CopySpec) -> bool {
             crate::CopyException::Modify(modification) => {
                 runnable_modification_is_bound(modification)
             }
-            crate::CopyException::Retain(_) => true,
+            crate::CopyException::Retain(_) | crate::CopyException::NoManaCost => true,
             crate::CopyException::AdditionalEffect(rider) => runnable_enter_rider_is_bound(rider),
         })
 }

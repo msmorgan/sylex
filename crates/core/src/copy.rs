@@ -67,6 +67,10 @@ pub enum CopyException {
     /// additional effect, NOT a characteristic modification; reuses
     /// `EnterRider`.
     AdditionalEffect(EnterRider),
+    /// "except it has no mana cost" ([CR#707.9b]): the copy's mana cost is
+    /// none, so its mana value is 0 [CR#202.3a] and its mana cost gives it no
+    /// color [CR#202.2]. Embalm and Eternalize [CR#702.128a,702.129a].
+    NoManaCost,
 }
 
 /// The copiable characteristics of an object ([CR#707.2]) — a card face's
@@ -132,6 +136,7 @@ mod tests {
                     "P1P1Counter".into(),
                     Count::Literal(2),
                 )),
+                CopyException::NoManaCost,
             ],
         };
         assert_eq!(

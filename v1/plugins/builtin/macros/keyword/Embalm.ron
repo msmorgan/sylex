@@ -1,7 +1,7 @@
 // [CR#113.6,602.5d,702.128a]: Embalm functions from the graveyard at sorcery
 // speed. `Splice(Param(0))` keeps the supplied cost before exile-self in the
-// flat cost list. The copy exceptions make the token white and add Zombie
-// ([CR#707.1,707.9]).
+// flat cost list. The copy exceptions make the token white, give it no mana
+// cost and add Zombie ([CR#707.1,707.9]).
 (
     name: "Embalm",
     template: "embalm ${0}",
@@ -16,6 +16,7 @@
             effect: Create(agent: You, count: 1, token: Copy(source: SelfCard, exceptions: [
                 Modify(Colors(Set([White]))),
                 Modify(Subtypes(Add(Zombie))),
+                NoManaCost,
             ])),
         )],
     ),

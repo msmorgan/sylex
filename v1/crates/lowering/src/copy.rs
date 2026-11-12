@@ -31,6 +31,7 @@ impl Lower for sylex_semantics_v1::CopyException {
             Self::Modify(f0) => sylex_core::CopyException::Modify(f0.lower()),
             Self::Retain(f0) => sylex_core::CopyException::Retain(f0.lower()),
             Self::AdditionalEffect(f0) => sylex_core::CopyException::AdditionalEffect(f0.lower()),
+            Self::NoManaCost => sylex_core::CopyException::NoManaCost,
         }
     }
 }
@@ -123,6 +124,14 @@ mod tests {
         assert_matches!(
             sylex_semantics_v1::CopyException::AdditionalEffect(minimal_enter_rider()).lower(),
             sylex_core::CopyException::AdditionalEffect(sylex_core::EnterRider::Tapped)
+        );
+    }
+
+    #[test]
+    fn lowers_copy_exception_no_mana_cost() {
+        assert_matches!(
+            sylex_semantics_v1::CopyException::NoManaCost.lower(),
+            sylex_core::CopyException::NoManaCost
         );
     }
 

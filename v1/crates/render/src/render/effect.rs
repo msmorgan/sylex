@@ -2399,6 +2399,7 @@ fn copy_exception_clauses(exceptions: &[CopyException]) -> Vec<String> {
             },
             CopyException::Retain(c) => clauses.push(copy_retain_clause(*c)),
             CopyException::AdditionalEffect(r) => clauses.push(copy_additional_effect_clause(r)),
+            CopyException::NoManaCost => clauses.push("it has no mana cost".to_string()),
         }
     }
     clauses

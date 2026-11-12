@@ -46,6 +46,7 @@ use sylex_core::CopySource;
 use sylex_core::EnterRider;
 use sylex_core::Ident;
 use sylex_core::Int;
+use sylex_core::ManaCost;
 use sylex_core::Modification;
 use sylex_core::NumericOp;
 use sylex_core::Reference;
@@ -129,6 +130,7 @@ pub fn apply_exceptions(base: CopiableValues, exceptions: &[CopyException]) -> C
         match exception {
             CopyException::Modify(m) => apply_modification(&mut result, m),
             CopyException::Retain(ch) => retain_characteristic(&mut result, *ch),
+            CopyException::NoManaCost => result.mana_cost = ManaCost::default(),
             CopyException::AdditionalEffect(_) => {}
         }
     }
@@ -774,6 +776,23 @@ mod tests {
             out.abilities.is_empty(),
             "Retain still drops the source's defining ability [CR#707.9d]"
         );
+    }
+
+    /// Embalm's "it has no mana cost" ([CR#702.128a,707.9b]) clears the
+    /// copied mana cost; the rest of the copiable values ride through.
+    #[test]
+    fn no_mana_cost_clears_the_copied_cost() {
+        let base = CopiableValues {
+            mana_cost: "{1}{G}".parse().expect("test cost parses"),
+            ..base_bear()
+        };
+        let out = apply_exceptions(base, &[CopyException::NoManaCost]);
+        assert!(
+            out.mana_cost.is_empty(),
+            "[CR#707.9b]: the copy has no mana cost; got {:?}",
+            out.mana_cost
+        );
+        assert_eq!(out.power, Some(StatValue::Number(2)), "P/T untouched");
     }
 
     #[test]

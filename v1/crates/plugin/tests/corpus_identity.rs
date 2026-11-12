@@ -469,7 +469,7 @@ impl CoreAbilitySubterms for sylex_core::CopyException {
         match self {
             Self::Modify(m) => m.push_abilities(out),
             Self::AdditionalEffect(rider) => rider.push_abilities(out),
-            Self::Retain(_) => {}
+            Self::Retain(_) | Self::NoManaCost => {}
         }
     }
 }
