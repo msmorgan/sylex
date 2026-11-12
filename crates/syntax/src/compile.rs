@@ -5176,14 +5176,7 @@ pub(crate) fn frame_label(frame: &Frame) -> String {
         .slots
         .iter()
         .map(|slot| match &slot.fill {
-            SlotFill::PP(list, complement) => format!(
-                "PP[{}{}]",
-                list.iter()
-                    .map(ToString::to_string)
-                    .collect::<Vec<_>>()
-                    .join("|"),
-                complement.map_or_else(String::new, |kind| format!(":{kind:?}"))
-            ),
+            SlotFill::PP(list, complement) => pp_label(list, *complement),
             SlotFill::Unlike(unlike) => unlike_label(unlike),
             fill => format!("{:?}", fill.kind()),
         })
@@ -5315,9 +5308,25 @@ fn unlike_label(unlike: &UnlikeFill) -> String {
     format!("{}[{}]", unlike.name, kinds.join("|"))
 }
 
+/// A Preposition Phrase fill as a Production id shows it: its prepositions
+/// and, where it selects one, the kind of Complement they take, as in
+/// `PP[prep:of]` or `PP[prep:for:Mention]`.
+fn pp_label(prepositions: &[LexemeId], complement: Option<SlotKind>) -> String {
+    format!(
+        "PP[{}{}]",
+        prepositions
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join("|"),
+        complement.map_or_else(String::new, |kind| format!(":{kind:?}"))
+    )
+}
+
 /// A preposition frame's Complement as its Production id shows it.
 fn complement_label(fill: &SlotFill) -> String {
     match fill {
+        SlotFill::PP(prepositions, complement) => pp_label(prepositions, *complement),
         SlotFill::Unlike(unlike) => unlike_label(unlike),
         fill => format!("{fill:?}"),
     }
