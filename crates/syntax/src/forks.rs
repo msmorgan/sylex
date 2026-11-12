@@ -59,9 +59,9 @@ pub enum ForkKind {
 /// One answer to a fork's question, named by its grammatical content.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Answer {
-    /// The leaf's end (in chars) and lexical reading.
+    /// The leaf's lexical reading (its Lexeme, Word Form and features),
+    /// which also fixes how far it reaches.
     Lexical {
-        end: usize,
         reading: LexicalReading,
     },
     Dependency(Dependency),
@@ -84,6 +84,40 @@ pub enum Dependency {
         /// The governor's Category.
         governor_category: Ident,
     },
+}
+
+impl Answer {
+    /// Whether two answers have one name: the same content, a governor
+    /// named by its surface and occurrence ([`ForkWord::names`]).
+    #[must_use]
+    pub fn names(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Lexical { reading: a }, Self::Lexical { reading: b }) => a == b,
+            (Self::Frame(a), Self::Frame(b)) => a == b,
+            (Self::Dependency(Dependency::Root), Self::Dependency(Dependency::Root)) => true,
+            (
+                Self::Dependency(Dependency::Dependent {
+                    governor: mine,
+                    function: my_function,
+                    governor_category: my_category,
+                }),
+                Self::Dependency(Dependency::Dependent {
+                    governor: theirs,
+                    function: their_function,
+                    governor_category: their_category,
+                }),
+            ) => {
+                my_function == their_function
+                    && my_category == their_category
+                    && match (mine, theirs) {
+                        (Some(mine), Some(theirs)) => mine.names(theirs),
+                        (None, None) => true,
+                        _ => false,
+                    }
+            }
+            _ => false,
+        }
+    }
 }
 
 /// One option of a fork.
@@ -116,12 +150,8 @@ pub struct Fork {
 /// A narrowing that names no answer of the forest.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum NarrowError {
-    #[error("no word `{surface}` #{occurrence} starts at char {start}")]
-    NoWord {
-        surface: String,
-        occurrence: usize,
-        start: usize,
-    },
+    #[error("no word `{surface}` #{occurrence}")]
+    NoWord { surface: String, occurrence: usize },
     #[error(
         "no Derivation answers {answer:?} to the {kind:?} question at `{surface}` #{occurrence}"
     )]
@@ -206,6 +236,10 @@ fn candidates(graph: &Graph) -> (u128, BTreeMap<Key, Candidate>) {
         slot.1.push(edge);
     };
     for (edge, facts, n) in graph.edges(&counts) {
+        assert!(
+            n > 0,
+            "the split forest keeps an edge no Derivation uses: {edge:?}"
+        );
         if let Some((word, leaf)) = facts.lexical {
             note(
                 Key {
@@ -419,11 +453,10 @@ impl ForkForest<'_> {
             .unit
             .words
             .iter()
-            .position(|w| w == word)
+            .position(|w| w.names(word))
             .ok_or_else(|| NarrowError::NoWord {
                 surface: word.surface.clone(),
                 occurrence: word.occurrence,
-                start: word.start,
             })?;
         let key = Key {
             word: u32::try_from(index).expect("words fit u32"),
@@ -440,7 +473,7 @@ impl ForkForest<'_> {
         let value = *candidate
             .options
             .keys()
-            .find(|&&v| self.answer(v) == *answer)
+            .find(|&&v| self.answer(v).names(answer))
             .ok_or_else(no_answer)?;
         Ok((value, candidate))
     }
@@ -456,7 +489,6 @@ impl ForkForest<'_> {
             Value::Leaf(leaf) => {
                 let leaf = &self.parse.forest.leaves[leaf as usize];
                 Answer::Lexical {
-                    end: leaf.end,
                     reading: leaf.reading.clone(),
                 }
             }

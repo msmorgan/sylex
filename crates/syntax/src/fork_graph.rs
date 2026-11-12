@@ -28,13 +28,23 @@ use crate::counts::Vertex;
 
 /// A word of the unit: the start of a leaf some Derivation uses, named by the
 /// surface of the shortest such leaf and that surface's 1-based occurrence
-/// among the unit's words.
+/// among the unit's words. The name is its identity ([`ForkWord::names`]),
+/// which an edit elsewhere in the text leaves valid; its start orders words
+/// for display.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct ForkWord {
-    /// Its start, in chars of the analyzed text.
+    /// Its start, in chars of the analyzed text: display order only.
     pub start: usize,
     pub surface: String,
     pub occurrence: usize,
+}
+
+impl ForkWord {
+    /// Whether two words have one name: the same surface and occurrence.
+    #[must_use]
+    pub fn names(&self, other: &Self) -> bool {
+        self.surface == other.surface && self.occurrence == other.occurrence
+    }
 }
 
 /// What a word's maximal projection depends on, by interned word indices.
@@ -225,11 +235,11 @@ pub(crate) fn split(parse: &Parse<'_>) -> Result<(Unit, Graph), ForestCycle> {
     let mut shortest: std::collections::BTreeMap<usize, usize> = std::collections::BTreeMap::new();
     for &l in &used {
         let leaf = &forest.leaves[l];
+        // A lexical answer is named by its reading alone.
         assert!(
-            seen.insert((leaf.start, leaf.end, leaf.reading.clone())),
-            "two leaves at chars {}..{} have one lexical reading",
-            leaf.start,
-            leaf.end
+            seen.insert((leaf.start, leaf.reading.clone())),
+            "two leaves starting at char {} have one lexical reading",
+            leaf.start
         );
         let end = shortest.entry(leaf.start).or_insert(leaf.end);
         *end = (*end).min(leaf.end);
@@ -683,7 +693,7 @@ impl Graph {
         roots.chain(families)
     }
 
-    /// The Derivations that use headless of `edges`.
+    /// The Derivations that use none of `edges`.
     pub(crate) fn exclude(&self, edges: &HashSet<Edge>) -> Graph {
         // Bottom up: which copies still have a Derivation.
         let order = self.order();
@@ -758,7 +768,7 @@ impl Graph {
     /// # Panics
     /// When some Derivation uses two of `edges`.
     pub(crate) fn restrict(&self, edges: &HashSet<Edge>) -> Graph {
-        // Bottom up: each copy's Derivations that use headless of `edges`, and
+        // Bottom up: each copy's Derivations that use none of `edges`, and
         // those that use one.
         let order = self.order();
         let mut node_inside = vec![[0u128; 2]; self.nodes.len()];
