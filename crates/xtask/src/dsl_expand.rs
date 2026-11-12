@@ -84,14 +84,14 @@ pub fn run(args: &ExpandArgs) -> anyhow::Result<()> {
             let bundles = bundles(Vec::new())?;
             let checked = check(&bundles)?;
             let expander = Expander::new(&checked);
-            let decl = checked
-                .decls
-                .iter()
-                .find(|decl| {
-                    decl.kind.word == "card"
-                        && card_name(&bundles, decl).is_some_and(|stem| stem == *name)
-                })
-                .ok_or_else(|| anyhow!("no card file is named `{name}`"))?;
+            let mut found = None;
+            for decl in checked.decls.iter().filter(|decl| decl.kind.word == "card") {
+                if card_name(&bundles, decl)? == *name {
+                    found = Some(decl);
+                    break;
+                }
+            }
+            let decl = found.ok_or_else(|| anyhow!("no card file is named `{name}`"))?;
             println!("{}", expander.card(decl)?);
         }
         What::Term { term, at, params } => {
@@ -113,11 +113,16 @@ pub fn run(args: &ExpandArgs) -> anyhow::Result<()> {
 }
 
 /// The file name a card's declaration is read from, without `.syl`.
-fn card_name(bundles: &[Arc<Bundle>], decl: &Decl<'_>) -> Option<String> {
+fn card_name(bundles: &[Arc<Bundle>], decl: &Decl<'_>) -> anyhow::Result<String> {
     let file = bundles
         .iter()
-        .find_map(|bundle| bundle.file(decl.declaration.span.file))?;
-    Some(file.path.file_stem()?.to_string_lossy().into_owned())
+        .find_map(|bundle| bundle.file(decl.declaration.span.file))
+        .ok_or_else(|| anyhow!("a card's declaration lies in no loaded bundle's file"))?;
+    let stem = file
+        .path
+        .file_stem()
+        .ok_or_else(|| anyhow!("card file `{}` has no name", file.path.display()))?;
+    Ok(stem.to_string_lossy().into_owned())
 }
 
 /// A `template` declaration's source: `body` at `sort`, reading `params`.

@@ -14,6 +14,7 @@ use sylex_syl::Shape;
 use sylex_syl::Value;
 use sylex_syl::ValueKind;
 
+use super::Deed;
 use super::Expander;
 use super::Node;
 use super::Role;
@@ -96,8 +97,13 @@ fn destroy_contains_die_with_its_subject_bound() {
 fn definitions_reached(checked: &Checked<'_>, value: &Value, out: &mut Vec<String>) {
     match &value.kind {
         ValueKind::Call(call) => {
-            if let Some(sort) = checked.resolutions.call(call) {
-                let word = call.head.ident.as_str();
+            let word = call.head.ident.as_str();
+            let resolved = checked.resolutions.call(call);
+            assert!(
+                resolved.is_some() || (word == "none" && call.is_bare()),
+                "`{word}` was never resolved, and only a bare `none` is not"
+            );
+            if let Some(sort) = resolved {
                 let signature = &checked.registry[&(word.to_owned(), sort.clone())];
                 let decl = &checked.decls[signature.decl];
                 if !signature.secondary {
@@ -126,6 +132,31 @@ fn definitions_reached(checked: &Checked<'_>, value: &Value, out: &mut Vec<Strin
         }
         ValueKind::String(_) | ValueKind::Integer(_) | ValueKind::Parameter(_) => {}
     }
+}
+
+/// The Deed an `action` declaration states, read from its `deed` and
+/// `ofAbility` fields here rather than through [`Expander::deed`]: a label
+/// written as a string, `none`, the keyword ability `ofAbility` names, or the
+/// action's own name when it writes neither.
+fn stated_deed(decl: &crate::dsl_check::Decl<'_>) -> Option<Deed> {
+    let name = decl.name.clone().unwrap();
+    let block = decl.block().unwrap();
+    let mut stated = Some(Deed::Label(name.clone()));
+    for field in block.nodes() {
+        match (field.name.ident.as_str(), &field.value.kind) {
+            ("deed", ValueKind::String(label)) => stated = Some(Deed::Label(label.clone())),
+            ("deed", ValueKind::Call(call)) if call.is_bare() && call.head.ident == "none" => {
+                stated = None;
+            }
+            ("ofAbility", ValueKind::Call(call)) if call.is_bare() => {
+                stated = Some(Deed::OfAbility(call.head.ident.as_str().to_owned()));
+            }
+            ("deed" | "ofAbility", _) => panic!("`{name}` states its Deed unreadably"),
+            ("lexical" | "spelling" | "body" | "permanent", _) => {}
+            (other, _) => panic!("`{name}` writes a field `{other}` no action has"),
+        }
+    }
+    stated
 }
 
 fn marks(node: &Node) -> Vec<&Node> {
@@ -185,7 +216,7 @@ fn a_definition_call_is_one_mark_with_its_deed() {
         for (action, _) in &actions {
             let expansion = expander.term(&probe_name(action), "Action").unwrap();
             let decl = expander.declaration(action, "Action").unwrap();
-            let stated = Expander::deed(decl).unwrap();
+            let stated = stated_deed(decl);
             let Node::Mark {
                 definition,
                 deed,
@@ -212,6 +243,9 @@ fn a_definition_call_is_one_mark_with_its_deed() {
                     "`{action}` expands to {own} marks of its own:\n{expansion}"
                 ));
             }
+            // A Template that ignored a parameter whose argument calls a
+            // Definition would drop that mark and fail this check on a correct
+            // expansion; no Template does today, so a failure here is real.
             let mut reached = Vec::new();
             definitions_reached(checked, decl.field("body").unwrap(), &mut reached);
             for inner in reached {
@@ -227,6 +261,95 @@ fn a_definition_call_is_one_mark_with_its_deed() {
         }
         assert!(failures.is_empty(), "{}", failures.join("\n\n"));
     });
+}
+
+/// The Deeds the ticket names, pinned: a Definition's mark carries the Deed
+/// its declaration states, possibly none.
+#[test]
+fn named_deeds_are_carried_as_stated() {
+    let label = |label: &str| Some(Deed::Label(label.to_owned()));
+    let expected = [
+        ("destroy", label("destroy")),
+        ("regenerate", None),
+        ("regeneration", label("regenerate")),
+        ("devour", Some(Deed::OfAbility("devour".to_owned()))),
+        ("sacrifice", label("sacrifice")),
+        ("exileFaceDown", label("exile")),
+    ];
+    let probes = expected
+        .iter()
+        .map(|(action, _)| {
+            probe(
+                &format!("probeDeed_{action}"),
+                &[("x", "NounPhrase")],
+                "Action",
+                &format!("{action}($x)"),
+            )
+        })
+        .collect();
+    with_probes(probes, |_, expander| {
+        for (action, deed) in expected {
+            let expansion = expander
+                .term(&format!("probeDeed_{action}"), "Action")
+                .unwrap();
+            let Node::Mark {
+                definition,
+                deed: carried,
+                ..
+            } = &expansion
+            else {
+                panic!("`{action}` expands to no mark:\n{expansion}");
+            };
+            assert_eq!(definition, action);
+            assert_eq!(*carried, deed, "{expansion}");
+        }
+    });
+}
+
+/// A call that omits a defaulted argument expands with the declared default:
+/// `enter`'s `from` is `anywhere`.
+#[test]
+fn an_omitted_argument_takes_its_default() {
+    with_probes(
+        vec![probe("probeEnter", &[], "Action", "enter")],
+        |_, expander| {
+            let expansion = expander.term("probeEnter", "Action").unwrap();
+            let Node::Call { word, args, .. } = &expansion else {
+                panic!("enter expands to no call:\n{expansion}");
+            };
+            assert_eq!(word, "move");
+            let anywhere = Node::Call {
+                constructor: "AnyLocation".to_owned(),
+                word: "anywhere".to_owned(),
+                sort: "Location".to_owned(),
+                args: Vec::new(),
+            };
+            assert_eq!(args[1], anywhere, "{expansion}");
+        },
+    );
+}
+
+/// An integer at `Amount` goes through its coercion: *Abrupt Decay*'s "mana
+/// value 3 or less" holds `Literal(3)`.
+#[test]
+fn an_integer_at_amount_is_coerced() {
+    let bundles = bundles(Vec::new()).unwrap();
+    let checked = check(&bundles).unwrap();
+    let decl = checked
+        .decls
+        .iter()
+        .find(|decl| {
+            decl.kind.word == "card" && super::card_name(&bundles, decl).unwrap() == "Abrupt Decay"
+        })
+        .unwrap();
+    let card = Expander::new(&checked).card(decl).unwrap();
+    let literal = Node::Call {
+        constructor: "Literal".to_owned(),
+        word: "lit".to_owned(),
+        sort: "Amount".to_owned(),
+        args: vec![Node::Integer(3)],
+    };
+    assert!(card.descendants().contains(&&literal), "{card}");
 }
 
 /// An observation of something occurring expands to a tree with no
