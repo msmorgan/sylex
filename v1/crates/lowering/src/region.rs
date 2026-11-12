@@ -285,8 +285,7 @@ fn declare_linked(context: &mut Context, ability: u32) {
     let cells = PLAN.with(|slot| {
         slot.borrow()
             .as_ref()
-            .map(|plan| plan.declared(ability))
-            .unwrap_or_default()
+            .map_or_default(|plan| plan.declared(ability))
     });
     for (cell, kind) in cells {
         let reference = push_param(&mut context.params, kind, Provenance::Linked(cell));

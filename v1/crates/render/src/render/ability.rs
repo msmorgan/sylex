@@ -1062,8 +1062,7 @@ fn deed_agent_noun(by: &DeedAgent) -> String {
     let control = by
         .stack_object
         .as_ref()
-        .map(control_qualifier)
-        .unwrap_or_default();
+        .map_or_default(control_qualifier);
     format!("spells and abilities{control}")
 }
 

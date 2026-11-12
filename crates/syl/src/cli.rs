@@ -148,7 +148,6 @@ fn boolean(flag: &str, value: Option<&str>) -> Result<bool, String> {
 
 /// Runs the command line `args` (without the program name). Without paths it
 /// formats `default_paths`, and fails if there are none.
-#[must_use]
 pub fn main(args: impl IntoIterator<Item = String>, default_paths: &[PathBuf]) -> ExitCode {
     match run(args, default_paths) {
         Ok(()) => ExitCode::SUCCESS,
