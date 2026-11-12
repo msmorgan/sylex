@@ -126,7 +126,7 @@ feature CentralPosition = Occupied
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
-// A degree determinative (*that many*, *that much*) and what it determines,
+// A degree determinative (*that many*, *as much*) and what it determines,
 // which a multiplier joins as a quantity, never as a Noun Phrase.
 feature QuantityKind = Degree
 // In a Word-Part Coordination, a Compound Noun's first base alone, or the
@@ -1301,7 +1301,8 @@ DegreeDeterminer: DeterminerPhrase -> modifier:Word(That) Class(DegreeQuantifier
 // *As much*, *as many* (CGEL 13§4.3:1130). Degree *as* modifies the
 // determinative, never a Noun Phrase.
 EquativeDeterminer: DeterminerPhrase -> modifier:Word(DegreeAs) Class(DegreeQuantifier)
-    where $.ComplementKind = Intransitive
+    where $.ComplementKind = Intransitive,
+          $.QuantityKind = Degree
 // A modified degree determinative as a fused head (*that many*, *tied for
 // the most*); a coordination fuses only as a FusedQuantity. Count only:
 // never *that much*.
@@ -1332,7 +1333,7 @@ FusedQuantityCoordination: FusedNounPhrase -> FusedQuantity
           $.Case = Plain,
           $.Person = Third
 // A focusing or multiplying adverb modifies a Noun Phrase (*only one
-// target*, *twice X life*); a bounding one, its quantity (*at least one
+// target*, *twice its power*); a bounding one, its quantity (*at least one
 // creature*). A focusing modifier precedes a determined Noun Phrase
 // (*exactly those colors*; CGEL 6§7.3.1:587); numerical determination is
 // AdverbModifiedDeterminerPhrase's.
@@ -1350,7 +1351,7 @@ AdverbModifiedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Phrasal
 // *Twice its power*. A head determined by a number or degree determinative
 // is excluded: *twice X damage* (Stonesplitter Bolt) is MultipliedNumber's
-// *[twice X] damage*, and *twice that many cards* (Doubling Season)
+// *[twice X] damage*, and *twice that many cards* (Bruvac the Grandiloquent)
 // MultipliedDegree's *[twice that many] cards*.
 AdverbMultipliedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Multiplying,

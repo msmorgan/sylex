@@ -13,3 +13,6 @@
 + <card=Crackle with Power> Crackle with Power deals five times X damage to each of up to X targets. => DeterminerPhrase "five times X" as Determiner of damage; !NounPhrase "X damage"; readings 1
 + <card=Stonesplitter Bolt> Stonesplitter Bolt deals X damage to target creature or planeswalker. If this spell was bargained, it deals twice X damage to that permanent instead. => DeterminerPhrase "twice X" as Determiner of damage; !NounPhrase "X damage"#2
 + <card=Doubling Season> If an effect would put one or more counters on a permanent you control, it puts twice that many of those counters on that permanent instead. => DeterminerPhrase "twice that many"; NounPhrase "twice that many of those counters" as Object of put; !NounPhrase "that many of those counters"; readings 1
++ <card=Ochre Jelly> The token enters with half that many +1/+1 counters on it, rounded down. => DeterminerPhrase "half that many"; !NounPhrase "that many +1/+1 counters"
++ <card=Ojer Taq, Deepest Foundation> If one or more creature tokens would be created under your control, three times that many of those tokens are created instead. => DeterminerPhrase "three times that many"; !NounPhrase "that many of those tokens"
++ <card=Fangorn, Tree Shepherd> Whenever one or more Treefolk you control attack, add twice that much {G}. => DeterminerPhrase "twice that much"; !NounPhrase "that much {G}"

@@ -9,7 +9,7 @@ Two defects in the quantity Productions:
 
 - A multiplier with a numeral or variable forms the quantity (*[half X] damage*, *[twice X]
   damage*, *[three times X] cards*), but with a degree determiner it still takes the whole
-  Noun Phrase: *twice [that many cards]* (Doubling Season), *twice [that much {G}]* (Fangorn,
+  Noun Phrase: *twice [that many cards]* (Bruvac the Grandiloquent), *twice [that much {G}]* (Fangorn,
   Tree Shepherd), *half [that many +1/+1 counters]* (Ochre Jelly), *three times [that many of
   those tokens]* (Ojer Taq, Deepest Foundation). *That many* and *that much* are built by
   `DegreeDeterminer`, which the multiplier Productions do not take as the number.
@@ -27,7 +27,7 @@ Two defects in the quantity Productions:
 ## Done when
 
 - Each of the four phrases above has one tree, with the multiplier and the degree determiner
-  one constituent, on every supported-corpus unit that prints the form; *twice that damage*,
+  one constituent, on every supported-corpus unit that prints the form; *twice its power*,
   *double that damage* and *half their life*, where a Noun Phrase follows the multiplier, keep
   their Readings.
 - `DeterminedQuantity` takes no Targeting determiner, and Eternal Flame keeps its Readings
@@ -40,8 +40,8 @@ Two defects in the quantity Productions:
 
 ## Pointers
 
-- `crates/english/grammar/english.fug`: `DegreeDeterminer`, `MultiplierDeterminer`,
-  `MultipliedDeterminer`, `AdverbMultipliedDeterminer`, `MultiplierPredetermination`,
+- `crates/english/grammar/english.fug`: `DegreeDeterminer`, `Multiplier`,
+  `MultipliedNumber`, `MultipliedDegree`, `MultiplierPredetermination`,
   `MultipliedNounPhrase`, `AdverbMultipliedNounPhrase`, `DeterminedQuantity`,
   `QuantifiedNominalPremodifier`.
 - `docs/tickets/done/english-quantity-bracketing.md`.
