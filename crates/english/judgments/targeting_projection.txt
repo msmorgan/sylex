@@ -51,3 +51,4 @@
 # a mass determinative is no determiner of a count noun through the Marker (CGEL 5§3.1:339, ∗*so much priest*)
 # from: Dead Ringers
 * <card=Dead Ringers> Destroy much target nonblack creature.
++ <card=Eternal Flame> Eternal Flame deals X damage to target opponent or planeswalker and half X damage, rounded up, to you, where X is the number of Mountains you control. => !Nominal "opponent or planeswalker and half X damage"; ComplementCluster "half X damage, rounded up, to you"

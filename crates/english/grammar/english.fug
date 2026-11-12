@@ -1539,9 +1539,12 @@ ModifiedQuantity: ModifiedQuantifiedNominal -> modifier:AdjectivePhrase Quantifi
 // without it *add three mana of any one color* (Lotus Vale) is also *any
 // [one color]*, a second tree of FreeChoiceDetermined's. A multiplier with a
 // number is MultipliedNumber's (*[half X] damage*, Banshee), never *half
-// [X damage]*.
+// [X damage]*. The Targeting Marker determines a nominal, never a quantity,
+// and excluding it is a gate: without it *deals X damage to target
+// opponent or planeswalker and half X damage* (Eternal Flame) is also
+// *target* over *[opponent or planeswalker and half] X damage*.
 DeterminedQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNominal
-    where determiner.DeterminativeDistribution != FreeChoice | Multiplier,
+    where determiner.DeterminativeDistribution != FreeChoice | Multiplier | Targeting,
           determiner.Number = head.QuantityNumber,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
