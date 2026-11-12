@@ -24,8 +24,9 @@ start, and is built for trigger watchers, not for a per-object `Matches(This, â€
 layer gather.
 
 A layer-2 control change ([CR#613.1b]) also starts the window. It writes no `ControlChanged`
-event, so the query needs a fact for the derived Controller changing, which
-`engine-derived-controller-reads` introduces when it corrects the bool.
+event. `GameState::observe_control_changes` (`crates/engine/src/controller.rs`) detects every
+change of the derived Controller, one-shot or layer-2, and is the rule that sets the bool today,
+but it records no history fact; the query needs one.
 
 The conferral condition is evaluated per creature per layer pass, so the history read must be
 cheap: this waits for `engine-history-tallies-cache`.
@@ -46,7 +47,8 @@ cheap: this waits for `engine-history-tallies-cache`.
 
 ## Pointers
 
-- `crates/engine/src/object.rs` (`summoning_sick`), `crates/engine/src/target.rs`
+- `crates/engine/src/object.rs` (`summoning_sick`, `observed_controller`),
+  `crates/engine/src/controller.rs` (`observe_control_changes`), `crates/engine/src/target.rs`
   (`StatePredicate::SummoningSick` arm), `crates/engine/src/trigger.rs` (snapshot arm).
 - `rg summoning_sick crates/engine/src crates/tui/src` for the write sites.
 - `crates/core/src/temporal.rs` (`Lookback`), `crates/core/src/condition.rs` (`Happened`),
