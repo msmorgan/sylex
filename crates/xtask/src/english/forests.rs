@@ -110,7 +110,8 @@ struct NodeRow {
 #[derive(Clone, Copy)]
 enum Coordinator {
     Lexeme(LexemeId),
-    /// A Linked Coordination's link: the Category of its linked conjunct.
+    /// A Linked Coordination's identity: the name of its serial tail
+    /// Category.
     Link(LexemeId),
 }
 

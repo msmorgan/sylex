@@ -295,8 +295,9 @@ Abuna's Chant        2  deal   TransitiveWithPP(NP,PP[prep:to])
 Acolyte's Reward     0  deal   TransitiveWithPP(NP,PP[prep:to])
 ```
 
-Coordinations by Category, coordinator (a Linked Coordination's link
-Category where it has none) and conjunct count:
+Coordinations by Category, coordinator (where it has none, a Linked
+Coordination's identity: the name of its serial tail Category) and conjunct
+count:
 
 ```sql
 SELECT category, coalesce(coordinator_lemma, link) AS coordinator, conjuncts,

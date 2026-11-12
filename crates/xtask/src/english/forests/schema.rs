@@ -51,7 +51,8 @@ CREATE TABLE units (
 -- that text without the space. `features` is
 -- a JSON object of bound features; `gap` NULL is no Gap. A coordination has
 -- its `coordinator` lexeme, or, for a Linked Coordination (which has none),
--- the `link` Category its linked conjunct is built as. `settled`: used by
+-- its identity `link`: the name of its serial tail Category
+-- (`Clause#LinkedClause`, `VerbPhrase#LinkedVerbPhrase`). `settled`: used by
 -- every Derivation. `root`: spans the whole unit as the grammar's root.
 CREATE TABLE nodes (
     unit INTEGER NOT NULL REFERENCES units,
