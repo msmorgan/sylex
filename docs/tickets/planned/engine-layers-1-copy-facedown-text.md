@@ -21,6 +21,10 @@ cannot carry the term rewrites the `.syl` `textChange` primitive names [CR#612.1
 - An object entering "as a copy" is a copy as it enters, and the copied text's enters-replacements
   and enters triggers apply [CR#707.5]. Tests with Clone: it enters as a copy of a chosen
   creature, or as itself (0/0) when its controller declines.
+- `gather` treats a characteristic-defining static an object has through a copy or text-changing
+  effect as characteristic-defining, as it does a printed one [CR#604.3a,613.4a]. Test: Clone
+  entered as a copy of Tarmogoyf, after a Godhead of Awe entered, is 1/1: its copied definition
+  applies in layer 7a, before Godhead of Awe's 7b set.
 - A face-down permanent derives the characteristics [CR#708.2a] lists, as its copiable values.
 - Core carries a text change as a term rewrite in place of `SetText(String)`, and a layer-3
   text-changing effect rewrites the affected object's text (test with Sleight of Mind, Mind Bend
@@ -29,7 +33,8 @@ cannot carry the term rewrites the `.syl` `textChange` primitive names [CR#612.1
 ## Pointers
 
 - `crates/engine/src/layer.rs`: `base_values` (its layer-1 seam doc comment), `layer_of`,
-  the `SetText` arm of `apply_static`.
+  the `SetText` arm of `apply_static`, and `gather`'s `is_cda` (the first, printed gather is
+  what makes a marked static characteristic-defining).
 - `crates/engine/src/copy.rs`: copiable values, `apply_exceptions`, `has_unbuilt_enter_rider`.
 - `crates/engine/src/resolve/action.rs`, `crates/engine/src/resolve/player_action.rs`: where
   `AsCopy` riders fizzle.
