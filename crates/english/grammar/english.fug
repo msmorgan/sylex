@@ -1823,11 +1823,8 @@ ModifiedComparativeDeterminer: DeterminerPhrase ->
           $.ObliqueDetermination = complement.Determination
 // *No more scream counters*: no *than* Complement.
 DegreeModifiedComparativeDeterminer: DeterminerPhrase ->
-    modifier:Word(No) quantifier:Class(ComparativeQuantifier)
-    where $.Number = quantifier.Number,
-          $.Countability = quantifier.Countability,
-          $.DeterminativeDistribution = quantifier.DeterminativeDistribution,
-          $.ComplementKind = Intransitive
+    modifier:Word(No) Class(ComparativeQuantifier)
+    where $.ComplementKind = Intransitive
 // *Plus* and *minus* phrases modify a quantity (*2 plus the number of ...*,
 // *that many plus one*).
 AmountArithmetic: Amount -> Amount modifier:Selected(PrepositionPhrase, Plus, Minus)
@@ -2308,43 +2305,39 @@ Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [he
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
 // A distributive determiner over an *and*-coordination of singular nominals
-// is singular (*each creature and planeswalker you control gets ...*; CGEL
-// 5§18.4:508). `nominal`, not `head`, keeps it out of head agreement: the
-// Noun Phrase takes Number from its determiner while the coordination is
-// plural, and Countability, Determination and NounKind are set here. It
-// forgoes the head lexeme in Readings and the head line.
-DistributiveCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase nominal:Nominal {
-    transparent: [nominal],
+// is singular (*each creature and planeswalker you control gets ...*), as a
+// coordination of Noun Phrases each with *each* is (CGEL 5§18.4:508). Number
+// is unshared: the Noun Phrase takes its determiner's, while the
+// coordination is plural.
+DistributiveCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
+    transparent: [head],
+    unshared: [Number],
 }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.DeterminativeDistribution = Distributive,
-          nominal.ConjunctNumber := Singular,
-          nominal.Number = Plural,
+          head.ConjunctNumber := Singular,
+          head.Number = Plural,
           $.Number = determiner.Number,
-          determiner.Countability = nominal.Countability,
-          $.NounKind = nominal.NounKind,
-          $.Countability = nominal.Countability,
+          determiner.Countability = head.Countability,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
 // A singular determiner over an *and*-coordination of singular nominals,
 // with joint reference: one entity each conjunct describes (*is also a
-// Cleric, Rogue, Warrior, and Wizard*; CGEL 5§18.4:507–508). `nominal`, as
-// in DistributiveCoordinationDetermined: the Noun Phrase is singular, the
-// coordination plural.
-JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase nominal:Nominal {
-    transparent: [nominal],
+// Cleric, Rogue, Warrior, and Wizard*; CGEL 5§18.4:507–508). Number is
+// unshared: the Noun Phrase is singular, the coordination plural.
+JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
+    transparent: [head],
+    unshared: [Number],
 }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.Number := Singular,
           determiner.DeterminativeDistribution != Distributive | Independent | FreeChoice,
           determiner.ComplementKind != PP,
-          nominal.ConjunctNumber := Singular,
-          nominal.Number = Plural,
+          head.ConjunctNumber := Singular,
+          head.Number = Plural,
           $.Number = Singular,
-          determiner.Countability = nominal.Countability,
-          $.NounKind = nominal.NounKind,
-          $.Countability = nominal.Countability,
+          determiner.Countability = head.Countability,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -2391,16 +2384,19 @@ FreeChoiceQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal
           $.Person = Third,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
-// `quantity`, not `head`, keeps it out of head agreement: Number and
-// NounKind are the oblique's (CGEL 5§3.3:349–351). It forgoes the head
-// lexeme in Readings and the head line.
-TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase quantity:Nominal
+// *Any number of target creatures*: number-transparent *number* heads the
+// Noun Phrase, whose Number and NounKind are its oblique's (CGEL
+// 5§3.3:349–350). Countability is unshared too: the transparent
+// quantificational noun is non-count (5§3.3:349).
+TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal {
+    unshared: [Number, NounKind, Countability],
+}
     where determiner.DeterminativeDistribution = FreeChoice,
-          quantity.NounDistribution = Quantity,
-          quantity.ComplementKind = PP,
-          quantity.ObliqueNumber = Plural,
-          $.Number = quantity.ObliqueNumber,
-          $.NounKind = quantity.ObliqueNounKind,
+          head.NounDistribution = Quantity,
+          head.ComplementKind = PP,
+          head.ObliqueNumber = Plural,
+          $.Number = head.ObliqueNumber,
+          $.NounKind = head.ObliqueNounKind,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -2422,29 +2418,32 @@ TargetedNounPhrase: TargetedNounPhrase -> determiner:DeterminerPhrase Nominal
           head.Number = Plural,
           head.Determination = Overt,
           determiner.Countability = head.Countability
-// *Pay {1}{G} any number of times*. `quantity`, not `head`, as in
-// TransparentQuantity: Number is the oblique's, and the head lexeme and
-// head line are forgone.
-TemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase quantity:Nominal
+// *Pay {1}{G} any number of times*: as TransparentQuantity, with NounKind
+// `Temporal` from the oblique.
+TemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase Nominal {
+    unshared: [Number, NounKind, Countability],
+}
     where determiner.DeterminativeDistribution = FreeChoice,
-          quantity.ComplementKind = PP,
-          quantity.ObliqueNumber = Plural,
-          quantity.ObliqueNounKind := Temporal,
-          $.Number = quantity.ObliqueNumber,
+          head.ComplementKind = PP,
+          head.ObliqueNumber = Plural,
+          head.ObliqueNounKind := Temporal,
+          $.Number = head.ObliqueNumber,
           $.NounKind = Temporal,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
 // A quantified *number of times*, postmodifiers included (CGEL 8§9:715 n.
-// 19).
-DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase quantity:Nominal
+// 19); Number, NounKind and Countability as in TemporalQuantity.
+DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase Nominal {
+    unshared: [Number, NounKind, Countability],
+}
     where determiner.DeterminativeDistribution != FreeChoice,
-          quantity.NounDistribution = Quantity,
-          quantity.ComplementKind = PP,
-          quantity.ObliqueNumber = Plural,
-          quantity.ObliqueNounKind := Temporal,
-          determiner.Number = quantity.Number,
-          $.Number = quantity.ObliqueNumber,
+          head.NounDistribution = Quantity,
+          head.ComplementKind = PP,
+          head.ObliqueNumber = Plural,
+          head.ObliqueNounKind := Temporal,
+          determiner.Number = head.Number,
+          $.Number = head.ObliqueNumber,
           $.NounKind = Temporal,
           $.Determination = Overt,
           $.Case = Plain,
@@ -2466,11 +2465,15 @@ Pronoun: NounPhrase -> Lex(Pronoun)
           head.Case != Genitive,
           head.PronounKind != Existential | Relative,
           head.Inflection = Invariant
-IndependentGenitive: NounPhrase -> pronoun:Lex(Pronoun)
+// *Other than yours*: the independent genitive pronoun is a fused
+// subject-determiner-head (CGEL 5§16.3:471). The Noun Phrase's Number is the
+// understood head's, not the pronoun's (5§16.3:468), and its Person and Case
+// are its own.
+IndependentGenitive: NounPhrase -> Lex(Pronoun) { unshared: [Number, Person, Case] }
     where $.NounKind = Ordinary,
           $.Determination = Bare,
           $.Case = Plain,
-          pronoun.Inflection = IndependentGenitive,
+          head.Inflection = IndependentGenitive,
           $.Person = Third
 PossessiveDeterminer: DeterminerPhrase -> possessor:Lex(Pronoun)
     where $.DeterminativeDistribution = Dependent,
