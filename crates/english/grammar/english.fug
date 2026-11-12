@@ -1338,8 +1338,12 @@ BoundingNounPhrase: NounPhrase -> modifier:AdverbPhrase determiner:DeterminerPhr
           $.Person = Third
 AdverbModifiedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Phrasal
+// *Twice its power*. A numerically determined head is excluded: *twice X
+// damage* (Stonesplitter Bolt) is AdverbMultipliedDeterminer's *[twice X]
+// damage*, never *twice [X damage]*.
 AdverbMultipliedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
-    where modifier.AdjunctPosition = Multiplying
+    where modifier.AdjunctPosition = Multiplying,
+          head.DeterminativeDistribution != Numerical
 // *Both* floated after a plural Object (*put two cards from your hand both
 // on top of your library or both on the bottom of your library*, Dream
 // Cache), where the second *both* is the second Cluster's own Object. A
@@ -1858,6 +1862,10 @@ MultipliedDeterminer: NumericalDeterminer ->
 // cards*, Hydroid Krasis).
 MultiplierDeterminer: NumericalDeterminer -> multiplier:DeterminerPhrase NumericalDeterminer
     where multiplier.DeterminativeDistribution := Multiplier
+// A multiplying adverb and a number form one number (*[twice X] damage*,
+// Stonesplitter Bolt).
+AdverbMultipliedDeterminer: NumericalDeterminer -> modifier:AdverbPhrase NumericalDeterminer
+    where modifier.AdjunctPosition := Multiplying
 // *three times this creature's power*. A numerically determined head is
 // excluded: *five times X damage* (Crackle with Power) is
 // MultipliedDeterminer's *[five times X] damage*, never *five times [X

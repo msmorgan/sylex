@@ -11,3 +11,4 @@
 + Double target player's life total.
 + Target creature gains double strike until end of turn.
 + <card=Crackle with Power> Crackle with Power deals five times X damage to each of up to X targets. => DeterminerPhrase "five times X" as Determiner of damage; !NounPhrase "X damage"; readings 1
++ <card=Stonesplitter Bolt> Stonesplitter Bolt deals X damage to target creature or planeswalker. If this spell was bargained, it deals twice X damage to that permanent instead. => DeterminerPhrase "twice X" as Determiner of damage; !NounPhrase "X damage"#2
