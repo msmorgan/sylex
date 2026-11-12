@@ -15,9 +15,6 @@ use sylex_syntax::Parse;
 use sylex_syntax::Reading;
 use sylex_vocabulary::card_name_id;
 
-/// More Readings than this and an entry is not evaluated tree by tree.
-pub const READING_LIMIT: u128 = 4096;
-
 /// A grammatical function, as CGEL names it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Function {
@@ -506,9 +503,6 @@ impl Judge<'_> {
         }
         if count == 0 {
             return Outcome::Fails("no Reading".to_owned());
-        }
-        if count > READING_LIMIT {
-            return Outcome::Fails(format!("{count} derivations, over the reading limit"));
         }
         if let Err(fault) = parse.verify_realization(self.lexicon) {
             return Outcome::Fails(format!("round-trip law 1: {fault}"));

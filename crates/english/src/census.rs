@@ -6,9 +6,8 @@
 //! whole Packed Forest ([`sylex_syntax::Parse::verify_realization`]).
 //! Law 2 follows for these parser-produced Readings from law 1 under the same
 //! parse context and lexical environment, so no per-Reading pass is needed.
-//! A unit with a judgment is checked against it up to
-//! [`judgment::READING_LIMIT`]. A unit is
-//! known-wrong-only when it has a judgment none of its Readings satisfies.
+//! A unit is known-wrong-only when it has a judgment none of its Readings
+//! satisfies; every Reading is considered, so no verdict depends on rank.
 //!
 //! A line of a cleave face with square brackets is read as its two texts
 //! ([`crate::cleave`]), each judged as a unit of its own: it is read when
@@ -33,7 +32,6 @@ use crate::cleave::CleaveText;
 use crate::corpus::Corpus;
 use crate::corpus::UnitKind;
 use crate::corpus::split_lines;
-use crate::judgment;
 use crate::judgment::Judge;
 use crate::judgment::Judgment;
 use crate::judgment::Located;
@@ -294,8 +292,7 @@ fn judge_parse(
             grammar,
             lexicon: &env.lexicon,
         };
-        let limit = usize::try_from(judgment::READING_LIMIT).unwrap_or(usize::MAX);
-        let endorsed = parse.best_readings(limit).any(|reading| {
+        let endorsed = parse.readings().any(|reading| {
             grammar
                 .constituents(&reading, &env.lexicon)
                 .is_ok_and(|(text, constituents)| {

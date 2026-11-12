@@ -23,9 +23,6 @@ fn forest_keys_equal_tree_keys_over_the_judgment_set() {
             let parse = judge
                 .parse(entry)
                 .unwrap_or_else(|why| panic!("{}: {why}", entry.location));
-            if parse.derivation_count() > sylex_english::judgment::READING_LIMIT {
-                continue;
-            }
             for (key, reading) in parse.best_ranked(usize::MAX) {
                 checked += 1;
                 if grammar.ranking_key(&reading, &env.lexicon) != Ok(key) {

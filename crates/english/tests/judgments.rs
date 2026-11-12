@@ -190,6 +190,35 @@ fn false_judgments_fail() {
     }
 }
 
+/// *Remove Enchantments* (9,216 Derivations) and *Maralen, Fae Ascendant*
+/// (5,955) are evaluated like any unit: their entries hold, and a false
+/// assertion on them fails on the assertion, not on their size.
+#[test]
+fn units_of_thousands_of_derivations_are_evaluated() {
+    let (env, grammar) = environment();
+    let judge = Judge {
+        grammar,
+        lexicon: &env.lexicon,
+    };
+    let (_, entries) = files()
+        .into_iter()
+        .find(|(file, _)| file == "large_forests.txt")
+        .unwrap();
+    assert_eq!(entries.len(), 2);
+    for entry in &entries {
+        let derivations = judge.parse(entry).unwrap().derivation_count();
+        assert!(derivations > 4096, "{}: {derivations}", entry.text);
+        assert_eq!(judge.evaluate(entry), Outcome::Holds, "{}", entry.text);
+        let mut false_entry = entry.clone();
+        false_entry.groups = vec![vec![false_entry.groups[0][0].clone()]];
+        false_entry.groups[0][0].surface = "not a surface of the unit".to_owned();
+        let Outcome::Fails(why) = judge.evaluate(&false_entry) else {
+            panic!("a false assertion held: {}", entry.text);
+        };
+        assert!(why.starts_with("no Reading satisfies"), "{why}");
+    }
+}
+
 #[test]
 fn every_word_a_judgment_names_is_declared() {
     let (env, _) = environment();

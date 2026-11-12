@@ -119,7 +119,7 @@ in the test suite. The census materializes Readings only for judgments.
 
 Each unit's count is reported two ways. `derivations` is the size of its Packed
 Forest, the number of trees: the census's no-Reading verdict and the judgment
-evaluator's 4096-derivation limit use it, and `total_derivations` sums it. It
+evaluator's no-Reading checks use it, and `total_derivations` sums it. It
 multiplies, so a unit of several sentences, each a little ambiguous, can count
 in the thousands. The unit is therefore also split into its **Segments**
 (`OUTER_CATEGORIES`; the walk is `segments::segments`): the walk descends from the root through the line, its
@@ -198,7 +198,7 @@ The command prints the profiled Stratum and Syntactic Families, vocabulary gaps,
 the Packed Forest's total derivation count, the Segments with their
 Derivations, and the Surplus. Explicit `+`/`*` entries and
 inputs with assertions also print the judgment Outcome. Outcomes use the full
-judgment evaluator, including its round-trip checks and 4096-derivation limit;
+judgment evaluator, including its round-trip checks;
 `--limit` only limits the display, not assertion evaluation.
 
 Up to eight cheapest admitted Readings are shown by default. `--limit 0` prints
