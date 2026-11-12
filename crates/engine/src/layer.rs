@@ -1114,11 +1114,12 @@ fn captured_objects(value: &crate::activation::Value) -> Vec<ObjectId> {
 /// ability, or `Player(controller)` for a spell-built floating effect), anchors
 /// `Ref(This)`/`Ref(You)` in the filter: without it those refs hit the
 /// frameless-targeting `todo!` in `target::matches` the moment a layer rebuild
-/// touches a tribal-lord scope (`And([…, Not(Ref(This)), ControlledBy(Ref(You))])`).
-/// The live trigger lane (`filter_matches_live`) threads its watcher the same
-/// way. Its activation is the region enclosing the filter's own (`params`),
-/// whose registers a `Capture` parameter of the filter reads: inside an `Each`
-/// body, the object being modified (see [`static_reference_matches`]).
+/// touches a tribal-lord scope (`And([…, Not(Ref(This)),
+/// ControlledBy(Ref(You))])`). The live trigger lane (`filter_matches_live`)
+/// threads its watcher the same way. Its activation is the region enclosing the
+/// filter's own (`params`), whose registers a `Capture` parameter of the filter
+/// reads: inside an `Each` body, the object being modified (see
+/// [`static_reference_matches`]).
 fn matches_derived(
     state: &GameState,
     working: &BTreeMap<ObjectId, DerivedObject>,
