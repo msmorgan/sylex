@@ -884,6 +884,93 @@ pub enum Audience {
 }
 
 impl GameEvent {
+    /// The live object this event, as it applies, moves out of its zone
+    /// itself, mirroring the apply dispatch: a future-form `ZoneChange`'s
+    /// object, or the one subject of a passed single-move verb (destroy, a
+    /// bound discard) still in the zone it moves from ([CR#701]). An
+    /// occurrence snapshots these before any member applies, so each leaves
+    /// with the last known information of the moment before the whole event
+    /// ([CR#603.10]; for a state-based batch, [CR#704.8]). A verb that picks
+    /// its subjects as its body runs (mill's top slice, a chosen discard) or
+    /// that moves nothing (a reorder, a fight, a draw, a stale subject) names
+    /// none; a card such a body moves is snapshotted as it moves.
+    pub(crate) fn mover(&self, state: &crate::state::GameState) -> Option<ObjectId> {
+        match self {
+            GameEvent::ZoneChange(ZoneChange {
+                snapshot: None,
+                object,
+                ..
+            }) => state
+                .objects
+                .get(*object)
+                .filter(|o| o.zone.is_some())
+                .map(|_| *object),
+            GameEvent::Act(Act {
+                committed: false,
+                batch: None,
+                contents: None,
+                to: Some(_),
+                from,
+                on,
+                ..
+            }) => match on.as_slice() {
+                &[object] => state
+                    .objects
+                    .get(object)
+                    .filter(|o| o.zone.is_some() && o.zone == *from)
+                    .map(|_| object),
+                [] | [_, _, ..] => None,
+            },
+            // A past-form move, a committed verb or a reorder verb, and every
+            // event that moves no object out of its zone.
+            GameEvent::ZoneChange(ZoneChange {
+                snapshot: Some(_), ..
+            })
+            | GameEvent::Act(Act { .. })
+            | GameEvent::TurnBegan(_)
+            | GameEvent::StepBegan(_)
+            | GameEvent::Untapped(..)
+            | GameEvent::Transformed(_)
+            | GameEvent::DrewFromEmpty(_)
+            | GameEvent::Tapped(_)
+            | GameEvent::ManaAdded(_)
+            | GameEvent::ManaEmptied(_)
+            | GameEvent::TokenCreated(_)
+            | GameEvent::EmblemCreated(_)
+            | GameEvent::TokenCeased(_)
+            | GameEvent::PlayerLost(_)
+            | GameEvent::PlayerWon(_)
+            | GameEvent::SpellCast(_)
+            | GameEvent::Copied(_)
+            | GameEvent::AbilityActivated(_)
+            | GameEvent::ManaAbilityActivated(_)
+            | GameEvent::ManaProduced(_)
+            | GameEvent::TappedForMana(_)
+            | GameEvent::DamageDealt(_)
+            | GameEvent::LifeLost(_)
+            | GameEvent::LifeGained(_)
+            | GameEvent::Attacking(_)
+            | GameEvent::Blocked(_)
+            | GameEvent::CoinFlipped(_)
+            | GameEvent::DieRolled(_)
+            | GameEvent::CounterPlaced(_)
+            | GameEvent::CounterRemoved(_)
+            | GameEvent::TriggerFired(_)
+            | GameEvent::AbilityUsed(_)
+            | GameEvent::AbilityCountered(_)
+            | GameEvent::AbilityResolved(_)
+            | GameEvent::Revealed(_)
+            | GameEvent::DesignationChanged(_)
+            | GameEvent::GotDesignation(_)
+            | GameEvent::Shuffled(_)
+            | GameEvent::BecameTarget(_)
+            | GameEvent::ControlChanged(_)
+            | GameEvent::Attached(_)
+            | GameEvent::Unattached(_)
+            | GameEvent::DamageRemoved(_) => None,
+        }
+    }
+
     /// The event's audience, DERIVED from kind + payload (the
     /// schema-from-kind pattern — no stored field to drift). Coarse first
     /// pass: a move between two hidden zones discloses the card's identity

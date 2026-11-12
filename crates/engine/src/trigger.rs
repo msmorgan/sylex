@@ -5627,6 +5627,32 @@ mod tests {
         assert_eq!(departed(&facts, bear).controller, PlayerId(1));
     }
 
+    /// [CR#603.10], engine law 7: members of one simultaneous batch leave as
+    /// the batch found them. Glorious Anthem and the Grizzly Bears it pumps
+    /// are destroyed together, the Anthem's member first; the bear still
+    /// last existed as a 3/3.
+    #[test]
+    fn simultaneous_departures_snapshot_before_the_batch() {
+        let (mut state, bear) = bear_on_field();
+        let anthem = put_bf(
+            &mut state,
+            Arc::new(canon().card("Glorious Anthem").unwrap().core),
+            PlayerId(0),
+        );
+        let facts = destroy_all(&mut state, &[anthem, bear]);
+        assert_eq!(
+            departed(&facts, bear)
+                .characteristics
+                .as_ref()
+                .and_then(|c| c.power),
+            Some(3)
+        );
+        assert!(
+            state.lki_frame.is_empty(),
+            "the occurrence's snapshots lapse with it"
+        );
+    }
+
     /// `Status(Tapped)`/`Status(Untapped)` read the snapshot's tap flag.
     #[test]
     fn snapshot_status_reads_tap_flag() {

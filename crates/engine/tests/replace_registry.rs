@@ -1256,6 +1256,136 @@ fn suspended_state_based_batch_commits_once_then_checks_again() {
     );
 }
 
+/// Akroma's Vengeance ("Destroy all artifacts, creatures, and enchantments.")
+/// resolves over, in member order, Glorious Anthem ("Creatures you control get
+/// +1/+1"), a Drudge Skeletons holding two regeneration shields and a Grizzly
+/// Bears. The skeleton's destruction needs a shield choice [CR#616.1], so the
+/// occurrence suspends after the Anthem's member and before the bears'. The
+/// destruction is still one event, and the bears died as they last existed
+/// immediately before it [CR#603.10,603.10a]: a 3/3, with the Anthem's bonus.
+#[test]
+fn a_member_after_a_suspension_snapshots_the_state_before_the_whole_event() {
+    let canon = Plugin::load_with_sibling_prelude(
+        Path::new(env!("CARGO_MANIFEST_DIR")).join("../../v1/plugins/canon"),
+    )
+    .unwrap();
+    let anthem = Arc::new(canon.card("Glorious Anthem").unwrap().core);
+    let bears = Arc::new(canon.card("Grizzly Bears").unwrap().core);
+    let skeleton = Arc::new(Card::Normal(CardFace::from(Characteristics {
+        name: "Drudge Skeletons".into(),
+        types: vec![Type::Creature.def()],
+        power: Some(StatValue::Number(1)),
+        toughness: Some(StatValue::Number(1)),
+        ..Characteristics::default()
+    })));
+    let vengeance = lowered(
+        "Normal(name: \"Akroma's Vengeance\", mana_cost: [Generic(4), White, White], \
+         types: [Sorcery], abilities: [\
+             Spell(effect: Each(\
+                 binder: Existing(SelectAll(Or([Type(Artifact), Type(Creature), Type(Enchantment)]))), \
+                 effect: Destroy(It))),\
+         ])",
+    );
+    let mut state = GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig {
+                deck: vec![anthem, skeleton, bears, vengeance],
+            },
+            PlayerConfig { deck: vec![] },
+        ],
+        seed: 7,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    });
+    // Battlefield order is member order.
+    take_from_hand(
+        &mut state,
+        PlayerId(0),
+        "Glorious Anthem",
+        Zone::Battlefield,
+    );
+    let (skeleton, _) = take_from_hand(
+        &mut state,
+        PlayerId(0),
+        "Drudge Skeletons",
+        Zone::Battlefield,
+    );
+    let (bears, _) = take_from_hand(&mut state, PlayerId(0), "Grizzly Bears", Zone::Battlefield);
+    for _ in 0..2 {
+        resolve_region_and_drive(
+            &mut state,
+            regenerate_effect(Reference::Reg(sylex_core::RefId(0))),
+            skeleton,
+        );
+    }
+    assert_eq!(state.shields.len(), 2, "two shields on the skeleton");
+    state.agenda.clear();
+    state.pending = None;
+
+    let (spell, _) = take_from_hand(&mut state, PlayerId(0), "Akroma's Vengeance", Zone::Stack);
+    state.stack.push(sylex_engine::StackEntry {
+        id: spell,
+        activation: sylex_engine::ActivationId::NONE,
+        object: sylex_engine::StackObject::Spell(spell),
+        controller: PlayerId(0),
+        targets: Vec::new(),
+        chosen_modes: Arc::from([]),
+        x: None,
+        paid_costs: Vec::new(),
+        copy: false,
+    });
+    state.agenda.push_front(WorkItem::Resolve(spell));
+
+    let mut choosers = Vec::new();
+    let mut occurred = Vec::new();
+    for _ in 0..200 {
+        match state.step() {
+            StepOutcome::Progress(sylex_engine::Progress::Applied(occurrence)) => {
+                occurred.push(occurrence);
+            }
+            StepOutcome::Progress(_) => {}
+            StepOutcome::NeedsDecision(choice) => {
+                choose_a_shield(&mut state, choice, &mut choosers);
+            }
+            StepOutcome::GameOver(outcome) => panic!("the game ended: {outcome:?}"),
+        }
+        if state.agenda.is_empty() && state.pending.is_none() {
+            break;
+        }
+    }
+    assert_eq!(
+        choosers,
+        [PlayerId(0)],
+        "the shield choice suspended the event"
+    );
+    let died = occurred
+        .iter()
+        .flat_map(|occurrence| match occurrence {
+            sylex_engine::Occurrence::Single(e) => std::slice::from_ref(e),
+            sylex_engine::Occurrence::Batch(es) => es.as_slice(),
+        })
+        .find_map(|e| match e {
+            sylex_engine::GameEvent::ZoneChange(sylex_engine::ZoneChange {
+                object,
+                snapshot: Some(snapshot),
+                ..
+            }) if *object == bears => Some(snapshot),
+            _ => None,
+        })
+        .expect("the bears died");
+    assert_eq!(
+        died.characteristics.as_ref().and_then(|c| c.power),
+        Some(3),
+        "the bears last existed under the Anthem"
+    );
+}
+
 /// Three Urza's Armors ("If a source would deal damage to you, prevent 1 of
 /// that damage.") and 5 damage dealt to their controller. All three apply,
 /// so the player chooses one [CR#616.1]; it leaves 4 damage that the other

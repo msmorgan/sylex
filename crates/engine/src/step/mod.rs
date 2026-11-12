@@ -515,8 +515,14 @@ impl GameState {
         face: Option<sylex_core::Face>,
         cause: Option<crate::event::Cause>,
     ) {
-        // 1. Snapshot while the object is still live in `from`.
-        let snapshot = crate::lki::LkiSnapshot::capture(self, object);
+        // 1. Snapshot while the object is still live in `from`: the committing
+        //    occurrence's snapshot when a member moves it ([CR#603.10]), else
+        //    the object as it is now (a card a verb's body picked as it
+        //    applied).
+        let snapshot = match self.lki_frame.remove(&object) {
+            Some(snapshot) => snapshot,
+            None => crate::lki::LkiSnapshot::capture(self, object),
+        };
         self.activation_departed(object, &snapshot);
 
         // 2. (replace stage — other-object and destination-rewriting
@@ -879,6 +885,17 @@ impl GameState {
         events: Vec<GameEvent>,
         commit: OccurrenceCommit,
     ) -> Occurrence {
+        // [CR#603.10]: the event is this commit — every replacement choice
+        // before it was a decision, not a change to the game — so the state
+        // immediately prior to it is the state now. Snapshot every object a
+        // member moves before any member applies, so each leaves as the whole
+        // event found it, never as the members applied before it left it
+        // (engine law 7; for a state-based batch, [CR#704.8]).
+        debug_assert!(
+            self.lki_frame.is_empty(),
+            "commits never nest — apply schedules, it does not recurse"
+        );
+        self.lki_frame = self.simultaneous_lki(&events);
         let occurred = match commit {
             OccurrenceCommit::Single => {
                 let mut events = events.into_iter();
@@ -911,6 +928,8 @@ impl GameState {
                 Occurrence::Batch(facts)
             }
         };
+        // The occurrence's snapshots lapse with it.
+        self.lki_frame.clear();
         self.record_history(&occurred);
         self.check_game_end();
         if self.outcome.is_none() {
@@ -950,6 +969,26 @@ impl GameState {
             self.agenda.insert(at, WorkItem::CheckSbas);
         }
         occurred
+    }
+
+    /// The last known information of every object a member of an occurrence
+    /// moves itself ([`GameEvent::mover`]), all captured against one layer
+    /// pass of the state before any member applies ([CR#603.10]; for a
+    /// state-based batch, [CR#704.8]). Derives no layers when nothing moves.
+    fn simultaneous_lki(
+        &self,
+        events: &[GameEvent],
+    ) -> std::collections::HashMap<ObjectId, crate::lki::LkiSnapshot> {
+        let movers: Vec<ObjectId> = events.iter().filter_map(|e| e.mover(self)).collect();
+        if movers.is_empty() {
+            std::collections::HashMap::new()
+        } else {
+            let view = self.layers();
+            movers
+                .into_iter()
+                .map(|id| (id, crate::lki::LkiSnapshot::capture_in(self, &view, id)))
+                .collect()
+        }
     }
 
     /// Whether the event's current-only recipient still exists immediately

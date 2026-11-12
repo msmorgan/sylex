@@ -728,6 +728,55 @@ mod tests {
         }
     }
 
+    /// [CR#704.8]: the rule's own example, on a Grizzly Bears. With one +1/+1
+    /// counter and three -1/-1 counters its toughness is 0, so one sweep both
+    /// annihilates a counter of each kind and puts it into the graveyard. It
+    /// left with the counters it had before that sweep, the +1/+1 counter
+    /// included (so Young Wolf's undying would not return it).
+    #[test]
+    fn sba_departure_keeps_the_counters_from_before_the_sweep() {
+        let (mut state, bear) = bear_on_field();
+        state.sba_rules = builtin().sba_rules;
+        state.counter_decls = builtin().counters;
+        state
+            .objects
+            .obj_mut(bear)
+            .counters
+            .insert("P1P1Counter".into(), 1);
+        state
+            .objects
+            .obj_mut(bear)
+            .counters
+            .insert("M1M1Counter".into(), 3);
+        let actions = sba::sweep(&state);
+        assert!(
+            actions
+                .iter()
+                .any(|e| matches!(e, GameEvent::CounterRemoved(CounterRemoved { .. }))),
+            "the sweep annihilates counters; got {actions:?}"
+        );
+        state.schedule_front(vec![WorkItem::Emit(Occurrence::Batch(actions))]);
+        let _ = state.step();
+        let StepOutcome::Progress(crate::step::Progress::Applied(Occurrence::Batch(facts))) =
+            state.step()
+        else {
+            panic!("expected the committed ZoneChange batch");
+        };
+        let snapshot = facts
+            .iter()
+            .find_map(|e| match e {
+                GameEvent::ZoneChange(ZoneChange {
+                    object,
+                    snapshot: Some(snapshot),
+                    ..
+                }) if *object == bear => Some(snapshot),
+                _ => None,
+            })
+            .unwrap_or_else(|| panic!("the bear left; got {facts:?}"));
+        assert_eq!(snapshot.counters.get("P1P1Counter").copied(), Some(1));
+        assert_eq!(snapshot.counters.get("M1M1Counter").copied(), Some(3));
+    }
+
     /// [CR#704.5q]: a permanent with only one of the two kinds is untouched —
     /// no annihilation.
     #[test]

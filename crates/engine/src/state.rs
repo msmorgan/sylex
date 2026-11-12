@@ -528,6 +528,15 @@ pub struct GameImage {
     /// every evolution stage ([CR#603.2c]; a destroy-all's
     /// dies-facts are one occurrence).
     pub(crate) evolving_batch: Option<Vec<GameEvent>>,
+    /// Last known information for the occurrence `commit_occurrence` is
+    /// committing, captured before any of its members applies: one snapshot
+    /// per object a member moves itself. A move during that commit takes its
+    /// object's snapshot from here, so every member of a simultaneous event
+    /// leaves as the whole event found it ([CR#603.10]; for a state-based
+    /// batch, [CR#704.8]; engine law 7), not as the members applied before it
+    /// left it. Empty at rest.
+    pub(crate) lki_frame:
+        std::collections::HashMap<crate::object::ObjectId, crate::lki::LkiSnapshot>,
     /// [CR#401.4]: the armed post-pick arrange collector. `Some` while an
     /// `Each`/`MoveGroup` whose body repositions cards into ordered library
     /// positions is resolving; each landing records here, and the
@@ -727,6 +736,7 @@ impl GameState {
             next_batch: 0,
             next_payment: 0,
             evolving_batch: None,
+            lki_frame: std::collections::HashMap::new(),
             arrange_scope: None,
             control_stack: Vec::new(),
             resolving_mana_actions: Vec::new(),
