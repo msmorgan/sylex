@@ -53,6 +53,11 @@ as one item.
 The shared representation of all Readings of an expression, each Constituent
 occurring once per Category, span and grammatical summary.
 
+**Settled**:
+Of a Constituent in a Packed Forest: used by every Derivation of the
+expression. A settled Constituent with several alternative Derivations is
+still a point of choice.
+
 **Preference**:
 A ranking over admitted Readings. It orders them and never adds or removes
 one.

@@ -9,6 +9,7 @@
 
 mod chart;
 mod compile;
+mod counts;
 pub mod frames;
 pub mod fug;
 pub mod grammar;
@@ -28,6 +29,8 @@ pub use chart::PackedForest;
 pub use chart::Parse;
 pub use compile::CompiledGrammar;
 pub use compile::LoadReport;
+pub use counts::Counts;
+pub use counts::ForestCycle;
 pub use frames::FrameCatalog;
 pub use grammar::Grammar;
 pub use laws::RealizationFault;
