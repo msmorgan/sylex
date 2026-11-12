@@ -229,7 +229,7 @@ impl<T> Drop for Ordered<'_, T> {
 }
 
 /// A panic's message.
-fn message(panic: &(dyn Any + Send)) -> String {
+pub(super) fn message(panic: &(dyn Any + Send)) -> String {
     if let Some(s) = panic.downcast_ref::<&str>() {
         (*s).to_owned()
     } else if let Some(s) = panic.downcast_ref::<String>() {

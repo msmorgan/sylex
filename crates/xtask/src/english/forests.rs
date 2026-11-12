@@ -14,6 +14,7 @@ use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
+use std::sync::mpsc;
 use std::time::Instant;
 
 use anyhow::Context;
@@ -165,6 +166,9 @@ impl std::fmt::Display for Summary {
 /// which bounds the parsed units held in memory at once.
 const WINDOW: usize = 256;
 
+/// How many written units may wait to be freed off the writer thread.
+const FREEING: usize = 64;
+
 /// Writes the database for `corpus` to `path`, replacing it.
 pub(crate) fn write(
     path: &Path,
@@ -202,18 +206,42 @@ pub(crate) fn write(
             let mut embeddings: HashMap<Embedding, i64> = HashMap::new();
             let mut summary = Summary::default();
             let mut inserts = Inserts::prepare(&tx)?;
-            while let Some((unit, rows)) = units.next()? {
-                write_unit(
-                    &mut inserts,
-                    corpus,
-                    unit,
-                    &rows,
-                    &mut lexemes,
-                    &mut embeddings,
-                    &mut summary,
-                )
-                .with_context(|| describe(corpus, unit))?;
-            }
+            // A unit's rows are freed on a thread of their own once written,
+            // which keeps the writer, the run's bottleneck, from freeing them.
+            // The channel is bounded, so at most `FREEING` written units (and
+            // the one being freed) wait to be freed; the freeing thread waits
+            // only for units, so a full channel holds the writer only until
+            // it frees one.
+            std::thread::scope(|scope| -> Result<()> {
+                let (to_free, freeing) = mpsc::sync_channel::<UnitRows>(FREEING);
+                let freer = scope.spawn(move || freeing.into_iter().for_each(drop));
+                let written = (|| -> Result<()> {
+                    while let Some((unit, rows)) = units.next()? {
+                        write_unit(
+                            &mut inserts,
+                            corpus,
+                            unit,
+                            &rows,
+                            &mut lexemes,
+                            &mut embeddings,
+                            &mut summary,
+                        )
+                        .with_context(|| describe(corpus, unit))?;
+                        to_free
+                            .send(rows)
+                            .map_err(|_| anyhow::anyhow!("the thread freeing rows stopped"))?;
+                    }
+                    Ok(())
+                })();
+                drop(to_free);
+                freer.join().map_err(|panic| {
+                    anyhow::anyhow!(
+                        "the thread freeing rows panicked: {}",
+                        pipeline::message(panic.as_ref())
+                    )
+                })?;
+                written
+            })?;
             drop(inserts);
             write_embeddings(&tx, &embeddings, &reader, &mut lexemes)?;
             write_lexemes(&tx, &lexemes, env)?;
