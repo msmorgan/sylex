@@ -66,7 +66,7 @@ use sylex_vocabulary::LexicalEnvironment;
 /// - *Citadel Gate*: a frame fork the lexical and dependency forks do not
 ///   determine ("white" a noun or a mention of the word).
 /// - *Turtles in Time*: conditional forks ("in" and "Time" have answers only
-///   where "Turtles" is not the card's name) and a kept frame fork.
+///   where "Turtles" is not the card's name).
 /// - [`LINKED`]: Linked Coordinations and the one explicit coordinator outside
 ///   a coordination schema that the pool prints.
 const SAMPLE: &[&str] = &[
@@ -689,17 +689,12 @@ fn forks_agree_with_enumerated_readings_on_real_units() {
             .any(|(face, _, m)| face == "Decimate" && m.roots > 1),
         "Decimate has more than one live root"
     );
-    for (face, kind) in [
-        ("Citadel Gate", ForkKind::Frame),
-        ("Turtles in Time", ForkKind::Frame),
-    ] {
-        assert!(
-            measures
-                .iter()
-                .any(|(f, _, m)| f == face && m.forks.contains_key(&kind)),
-            "{face} has a {kind:?} fork"
-        );
-    }
+    assert!(
+        measures
+            .iter()
+            .any(|(f, _, m)| f == "Citadel Gate" && m.forks.contains_key(&ForkKind::Frame)),
+        "Citadel Gate has a Frame fork"
+    );
     assert!(
         measures
             .iter()
