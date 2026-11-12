@@ -35,6 +35,7 @@ use crate::lexeme::Lexeme;
 use crate::lexeme::Lexemes;
 use crate::projection::NUMBER;
 use crate::projection::Projection;
+use crate::step::ChildRole;
 use crate::step::Extension;
 use crate::step::Gap;
 use crate::step::GapRule;
@@ -283,10 +284,7 @@ impl CompiledGrammar {
     /// The index of a Production's `head` child, the one a head word is
     /// followed through ([`Self::head_word`]).
     pub(crate) fn head_index(&self, production: usize) -> Option<usize> {
-        self.productions[production]
-            .names
-            .iter()
-            .position(|name| *name == "head")
+        self.productions[production].head
     }
 
     /// The child a Production's head line runs through, by its index among
@@ -307,7 +305,7 @@ impl CompiledGrammar {
     ///    grammar outside a coordination schema), else a `marker` (a relative
     ///    or interrogative clause's).
     /// 6. Its first child besides punctuation that does not bear a dependent
-    ///    function ([`DEPENDENT_FUNCTIONS`]): `not`'s `filler`, not the
+    ///    function ([`ChildRole::is_dependent`]): `not`'s `filler`, not the
     ///    `modifier` *not*.
     /// 7. Its first child besides punctuation.
     ///
@@ -326,7 +324,7 @@ impl CompiledGrammar {
             .filter(|(_, symbol)| !matches!(symbol, Symbol::Punct(..)))
             .map(|(at, _)| at)
             .collect();
-        let named = |name: &str| children.iter().copied().find(|&at| p.names[at] == name);
+        let named = |role: ChildRole| children.iter().copied().find(|&at| p.roles[at] == role);
         if self.link_categories.contains(&p.lhs) {
             return children.iter().copied().find(|&at| Some(at) != head);
         }
@@ -336,13 +334,13 @@ impl CompiledGrammar {
         };
         head.or(p.coordinator)
             .or(only)
-            .or_else(|| named("coordinator"))
-            .or_else(|| named("marker"))
+            .or_else(|| named(ChildRole::Coordinator))
+            .or_else(|| named(ChildRole::Marker))
             .or_else(|| {
                 children
                     .iter()
                     .copied()
-                    .find(|&at| !DEPENDENT_FUNCTIONS.contains(&p.names[at].as_str()))
+                    .find(|&at| !p.roles[at].is_dependent())
             })
             .or_else(|| children.first().copied())
     }
@@ -5546,18 +5544,3 @@ fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
     }
     draft.predicative = draft.predicative.map(&map);
 }
-
-/// The child names that bear a dependent function in their mother (CGEL's
-/// functions, as the grammar names them): a head line does not run through
-/// one while its Production has another child.
-pub(crate) const DEPENDENT_FUNCTIONS: [&str; 9] = [
-    "subject",
-    "object",
-    "indirect_object",
-    "complement",
-    "predicative_complement",
-    "adjunct",
-    "modifier",
-    "determiner",
-    "supplement",
-];

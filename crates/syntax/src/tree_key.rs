@@ -14,6 +14,7 @@ use crate::reading::Constituent;
 use crate::reading::RankingKey;
 use crate::reading::Reading;
 use crate::reading::join;
+use crate::step::ChildRole;
 use crate::step::Symbol;
 
 /// What computing a Reading's key from its tree reads: its realized text
@@ -89,7 +90,7 @@ impl CompiledGrammar {
             indices.push(child.node().map(|_| *at));
             key = key + self.key_of(child, context, at)?;
         }
-        let names = self.child_names(node);
+        let roles = self.child_roles(node);
         let positions: Vec<usize> = self.productions[production]
             .rhs
             .iter()
@@ -97,11 +98,11 @@ impl CompiledGrammar {
             .filter(|(_, symbol)| !matches!(symbol, Symbol::Punct(..)))
             .map(|(i, _)| i)
             .collect();
-        let first = names
+        let first = roles
             .iter()
-            .position(|name| name.as_str() == "first")
+            .position(|&role| role == ChildRole::First)
             .and_then(|i| Some((indices[i]?, &node.children[i])));
-        let head = match names.iter().position(|name| name.as_str() == "head") {
+        let head = match roles.iter().position(|&role| role == ChildRole::Head) {
             Some(i) => match &node.children[i] {
                 Reading::Node(_) => indices[i].map(|index| context.words(index)),
                 leaf @ Reading::Leaf(_) => Some(self.leaf_words(leaf, context.lexicon)?),

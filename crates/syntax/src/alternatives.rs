@@ -27,6 +27,7 @@ use crate::chart::ChildRef;
 use crate::chart::Parse;
 use crate::counts::ForestCycle;
 use crate::counts::Vertex;
+use crate::step::ChildRole;
 
 /// A head word: the lexeme and Word Form of the leaf reached by following
 /// `head` children down, as [`crate::CompiledGrammar::head_word`] follows
@@ -122,10 +123,9 @@ impl Parse<'_> {
             self.children_first()?,
             0,
             |_| 0,
-            |production, at, before, child| match grammar.productions[production].names[at].as_str()
-            {
-                "first" | "last" | "coordinate" => before + 1,
-                "rest" => before + child,
+            |production, at, before, child| match grammar.productions[production].roles[at] {
+                ChildRole::First | ChildRole::Last | ChildRole::Coordinate => before + 1,
+                ChildRole::Rest => before + child,
                 _ => *before,
             },
         );

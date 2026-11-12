@@ -22,6 +22,7 @@ use crate::chart::QUOTATION_MARK;
 use crate::chart::quotation_mark;
 use crate::compile::CompiledGrammar;
 use crate::frames::Frame;
+use crate::step::ChildRole;
 use crate::step::ChildView;
 use crate::step::Gap;
 use crate::step::Summary;
@@ -342,17 +343,21 @@ impl Parse<'_> {
     /// the first conjunct, whose words a later child's key reads.
     fn anchors(&self, item: usize, mut anchors: Anchors, child: ChildRef) -> Anchors {
         let it = &self.forest.items[item];
-        let names = &self.grammar.productions[it.production].names;
+        let roles = &self.grammar.productions[it.production].roles;
         let at = it.dot - 1;
-        let later = |read: &[&str]| names[at + 1..].iter().any(|n| read.contains(&n.as_str()));
+        let later = |read: &[ChildRole]| roles[at + 1..].iter().any(|r| read.contains(r));
         let extent = || match child {
             ChildRef::Node(n) => Some((self.forest.nodes[n].start, self.forest.nodes[n].end)),
             ChildRef::Leaf(l) => Some((self.forest.leaves[l].start, self.forest.leaves[l].end)),
             ChildRef::Punct => None,
         };
-        match names[at].as_str() {
-            "head" if later(&["adjunct", "modifier", "supplement"]) => anchors.head = extent(),
-            "first" if later(&["last"]) => anchors.first = extent(),
+        match roles[at] {
+            ChildRole::Head
+                if later(&[ChildRole::Adjunct, ChildRole::Modifier, ChildRole::Supplement]) =>
+            {
+                anchors.head = extent();
+            }
+            ChildRole::First if later(&[ChildRole::Last]) => anchors.first = extent(),
             _ => {}
         }
         anchors
@@ -920,24 +925,26 @@ impl CompiledGrammar {
         first: impl FnOnce() -> Option<(u64, bool)>,
         before: impl FnOnce() -> u64,
     ) -> RankingKey {
-        let names = &self.productions[production].names;
+        let roles = &self.productions[production].roles;
         let signed = |words: u64| i64::try_from(words).unwrap_or(i64::MAX);
-        let after_head = || names[..index].iter().any(|name| name.as_str() == "head");
+        let after_head = || roles[..index].contains(&ChildRole::Head);
         let mut key = RankingKey::default();
-        match names[index].as_str() {
-            "head" if !child.coordination => {
-                let dependents = names[index + 1..]
+        match roles[index] {
+            ChildRole::Head if !child.coordination => {
+                let dependents = roles[index + 1..]
                     .iter()
-                    .filter(|name| matches!(name.as_str(), "adjunct" | "modifier"))
+                    .filter(|role| role.is_unselected())
                     .count();
                 key.right_association_words = signed(child.words)
                     .saturating_mul(i64::try_from(dependents).unwrap_or(i64::MAX));
             }
-            name @ ("adjunct" | "modifier" | "supplement") if after_head() => {
+            role @ (ChildRole::Adjunct | ChildRole::Modifier | ChildRole::Supplement)
+                if after_head() =>
+            {
                 if let Some(head_words) = head() {
                     let host = signed(head_words);
                     let between = signed(before().saturating_sub(head_words));
-                    key.right_association_words = if name == "supplement" {
+                    key.right_association_words = if role == ChildRole::Supplement {
                         -host - between
                     } else if child.high_attachment {
                         // The head added the host for it, unless the host is
@@ -948,7 +955,7 @@ impl CompiledGrammar {
                     };
                 }
             }
-            "last" => {
+            ChildRole::Last => {
                 if let Some((first_words, first_head_final)) = first() {
                     key.right_association_words = (signed(first_words) - signed(child.words)).abs();
                     key.attachment_class = u64::from(first_head_final && !child.head_final);
@@ -956,12 +963,9 @@ impl CompiledGrammar {
             }
             _ => {}
         }
-        let dependent = |name: &Ident| matches!(name.as_str(), "adjunct" | "modifier");
-        if dependent(&names[index])
-            && names[..index].iter().any(dependent)
-            && names[index + 1..]
-                .iter()
-                .any(|name| name.as_str() == "head")
+        if roles[index].is_unselected()
+            && roles[..index].iter().any(|role| role.is_unselected())
+            && roles[index + 1..].contains(&ChildRole::Head)
         {
             key.attachment_class += 1;
         }
@@ -1287,28 +1291,29 @@ impl CompiledGrammar {
         // The head of a function Category bears its function in its phrase.
         let wraps = self.function_categories.contains(&node.category);
         let names = self.child_names(node);
+        let roles = self.child_roles(node);
         let raising = self
             .by_id
             .get(&node.production)
             .is_some_and(|&p| self.productions[p].requires_coordination.is_some());
         let mut sites = Vec::new();
         let mut object = None;
-        for (child, name) in node.children.iter().zip(names) {
+        for ((child, name), role) in node.children.iter().zip(names).zip(roles) {
             let start = out.len();
-            if name == "object" {
+            if role == ChildRole::Object {
                 object = Some(start);
             }
             // A Modifier after its phrase's Object is postposed out of it
             // (*put a number of counters on it [equal to …]*, *choose a card
             // at random [that …]*; CGEL, Ch. 12 §4, p. 1066): it modifies
             // the Object too.
-            let postposed = object.filter(|_| name == "modifier");
-            if raising && name == "head" {
+            let postposed = object.filter(|_| role == ChildRole::Modifier);
+            if raising && role == ChildRole::Head {
                 let mut at = start;
                 let gap = child.node().map_or(Gap::None, |c| c.gap);
                 Self::gap_sites(child, gap, &mut at, &mut sites);
             }
-            if wraps && name == "head" {
+            if wraps && role == ChildRole::Head {
                 self.locate(child, parent, function, pass(&name), out);
             } else {
                 self.locate(child, Some(index), Some(name), pass(&name), out);
@@ -1321,7 +1326,7 @@ impl CompiledGrammar {
                     }
                 }
             }
-            if raising && name == "shared" {
+            if raising && role == ChildRole::Shared {
                 // A function Category's head bears the shared function too
                 // (*be and become [legendary]*).
                 let (parent, function) = (out[start].parent, out[start].function);
@@ -1402,6 +1407,22 @@ impl CompiledGrammar {
             .zip(&production.names)
             .filter(|(symbol, _)| !matches!(symbol, Symbol::Punct(..)))
             .map(|(_, name)| *name)
+            .collect()
+    }
+
+    /// The role each of a node's children bears in it, in order
+    /// ([`Self::child_names`]).
+    ///
+    /// # Panics
+    /// When no Production has the node's id.
+    pub(crate) fn child_roles(&self, node: &ReadingNode) -> Vec<ChildRole> {
+        let production = &self.productions[self.by_id[&node.production]];
+        production
+            .rhs
+            .iter()
+            .zip(&production.roles)
+            .filter(|(symbol, _)| !matches!(symbol, Symbol::Punct(..)))
+            .map(|(_, role)| *role)
             .collect()
     }
 

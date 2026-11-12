@@ -105,9 +105,10 @@ pub struct CategoryDecl {
 ///
 /// # Reserved child names (the contract)
 ///
-/// A child's name is its grammatical function (`Production::names`), and the
-/// engine keys behaviour on the names below. Any other name is inert. A
-/// Production that names its semantic head something else forgoes every
+/// A child's name is its grammatical function (`Production::names`). Binding
+/// resolves each name to the role the engine keys behaviour on
+/// (`step.rs`, `ChildRole`), from the names below; any other name is inert.
+/// A Production that names its semantic head something else forgoes every
 /// `head` item, so renaming a head to dodge implicit agreement also loses its
 /// head lexeme in Readings and its place in the head line: comment each such
 /// rename in the grammar.
@@ -116,11 +117,13 @@ pub struct CategoryDecl {
 ///   - implicit agreement with the mother on every feature both carry
 ///     (`compile.rs`, `add`; see `Equation`);
 ///   - Preposition and extension inheritance (`step.rs`, `resolve`);
-///   - the head line (`step.rs`, `Production::head_line`), shared with `first`,
-///     `last` and `rest`;
+///   - the head line (`step.rs`, `Production::head_line`, and
+///     `CompiledGrammar::head_line_child`), shared with `first`, `last` and
+///     `rest`;
 ///   - the Reading head lexeme (`reading.rs`, `head_word`);
 ///   - the Linked Coordination it is headed by (`step.rs`, `Summary::link`);
-///   - the host words counted for Right Association (`reading.rs`);
+///   - the host words counted for Right Association (`reading.rs`,
+///     `attachment_key` and `anchors`);
 ///   - wrapping by a function Category (`reading.rs`, `locate`);
 ///   - comma scope: a dependent set off before the head by a comma, which
 ///     contains no unclosed delimiting comma (`step.rs`,
@@ -128,16 +131,32 @@ pub struct CategoryDecl {
 ///     head (`step.rs`, `comma_scope_excludes`).
 /// - `first`, `last`, `rest`:
 ///   - the head line;
-///   - conjunct balance and the coordination Attachment Class (`reading.rs`);
+///   - `first` is the lexical head of a Production with no `head`
+///     (`step.rs`, `Production::lexical_head`);
+///   - conjunct balance and the coordination Attachment Class (`reading.rs`,
+///     `attachment_key` and `anchors`);
 ///   - the fronted-scope rule, which `first` keys on only outside a serial tail
-///     (`step.rs`, `comma_scope_excludes`, `Production::tail`).
+///     (`step.rs`, `comma_scope_excludes`, `Production::tail`);
+///   - the conjunct count (`alternatives.rs`, `alternative_conjuncts`):
+///     `first` and `last` are one conjunct each, `rest` its tail's.
+/// - `coordinate`: an idiomatic coordinate (*and so on*), one conjunct in the
+///   conjunct count.
+/// - `coordinator`, `marker`: in a Production with neither a `head` nor a
+///   coordination schema's coordinator, the head line runs through a
+///   `coordinator`, else a `marker` (`CompiledGrammar::head_line_child`).
 /// - `adjunct`, `modifier`: unselected dependents, counted for Right
 ///   Association and the preposed-dependent Attachment Class (`reading.rs`).
 ///   `adjunct` also marks the post-verbal Adjunct host that an auxiliary Verb
-///   Phrase never is (`step.rs`, `post_adjunct_host`).
+///   Phrase never is (`step.rs`, `post_adjunct_host`), the trailing Adjunct a
+///   phrase ends in (`Summary::final_adjunct`), and a Complement Cluster's
+///   Adjuncts (`Summary::bare`, `Summary::nominal_unhosted`).
 /// - `supplement`: reversed Right Association (`reading.rs`).
 /// - `object`, `shared`: the Reading functions of postposed Modifiers
 ///   (`object`) and of Right Node Raising (`shared`) (`reading.rs`, `locate`).
+/// - The dependent functions `subject`, `object`, `indirect_object`,
+///   `complement`, `predicative_complement`, `adjunct`, `modifier`,
+///   `determiner` and `supplement`: a head line does not run through one while
+///   its Production has another child (`ChildRole::is_dependent`).
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ProductionDecl {

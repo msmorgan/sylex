@@ -253,6 +253,89 @@ impl Unlike {
     }
 }
 
+/// A child's grammatical function as the engine keys on it: its name,
+/// resolved at bind time (the reserved child names of
+/// [`crate::grammar::ProductionDecl`]). Any other name is inert.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ChildRole {
+    Head,
+    First,
+    Last,
+    Rest,
+    /// An idiomatic coordinate (*and so on*), counted as a conjunct.
+    Coordinate,
+    Adjunct,
+    Modifier,
+    Supplement,
+    Object,
+    /// The shared child of Right Node Raising.
+    Shared,
+    Coordinator,
+    Marker,
+    Subject,
+    IndirectObject,
+    Complement,
+    PredicativeComplement,
+    Determiner,
+    /// Any other name, and punctuation's empty one.
+    Inert,
+}
+
+impl ChildRole {
+    /// The role a child's name gives it.
+    pub(crate) fn of(name: &str) -> Self {
+        match name {
+            "head" => Self::Head,
+            "first" => Self::First,
+            "last" => Self::Last,
+            "rest" => Self::Rest,
+            "coordinate" => Self::Coordinate,
+            "adjunct" => Self::Adjunct,
+            "modifier" => Self::Modifier,
+            "supplement" => Self::Supplement,
+            "object" => Self::Object,
+            "shared" => Self::Shared,
+            "coordinator" => Self::Coordinator,
+            "marker" => Self::Marker,
+            "subject" => Self::Subject,
+            "indirect_object" => Self::IndirectObject,
+            "complement" => Self::Complement,
+            "predicative_complement" => Self::PredicativeComplement,
+            "determiner" => Self::Determiner,
+            _ => Self::Inert,
+        }
+    }
+
+    /// Whether it bears a dependent function in its mother (CGEL's
+    /// functions, as the grammar names them): a head line does not run
+    /// through one while its Production has another child.
+    pub(crate) fn is_dependent(self) -> bool {
+        matches!(
+            self,
+            Self::Subject
+                | Self::Object
+                | Self::IndirectObject
+                | Self::Complement
+                | Self::PredicativeComplement
+                | Self::Adjunct
+                | Self::Modifier
+                | Self::Determiner
+                | Self::Supplement
+        )
+    }
+
+    /// Whether it is an unselected dependent: an Adjunct or a Modifier.
+    pub(crate) fn is_unselected(self) -> bool {
+        matches!(self, Self::Adjunct | Self::Modifier)
+    }
+
+    /// Whether it is in its mother's head line: the head, or a conjunct of
+    /// a coordination.
+    fn in_head_line(self) -> bool {
+        matches!(self, Self::Head | Self::First | Self::Last | Self::Rest)
+    }
+}
+
 /// A compiled Production.
 #[derive(Debug, Clone)]
 #[expect(
@@ -299,6 +382,8 @@ pub(crate) struct Production {
     pub rhs: Vec<Symbol>,
     /// The name of each child: its grammatical function in the mother.
     pub names: Vec<Ident>,
+    /// The role each child's name gives it.
+    pub roles: Vec<ChildRole>,
     pub gaps: Vec<GapRule>,
     pub cost: u32,
     /// (feature, variable) bindings of each child.
@@ -574,12 +659,10 @@ pub(crate) fn resolve(
             }
         }
     }
-    let head = children.iter().position(|(name, ..)| name == "head");
-    let lexical_head = head.or_else(|| children.iter().position(|(name, ..)| name == "first"));
-    let head_line = children
-        .iter()
-        .map(|(name, ..)| matches!(name.as_str(), "head" | "first" | "last" | "rest"))
-        .collect();
+    let roles: Vec<ChildRole> = children.iter().map(|(name, ..)| ChildRole::of(name)).collect();
+    let head = roles.iter().position(|&role| role == ChildRole::Head);
+    let lexical_head = head.or_else(|| roles.iter().position(|&role| role == ChildRole::First));
+    let head_line = roles.iter().map(|role| role.in_head_line()).collect();
     let edge_line = (0..children.len()).map(|i| head == Some(i)).collect();
     let names = children.iter().map(|(name, ..)| *name).collect();
     let (rhs, gaps) = children.into_iter().map(|(_, s, g)| (s, g)).unzip();
@@ -631,6 +714,7 @@ pub(crate) fn resolve(
         lhs,
         rhs,
         names,
+        roles,
         gaps,
         cost,
         child_vars,
@@ -1308,7 +1392,7 @@ impl Production {
                 }
                 next.final_adjunct = if self.edge_line[position] {
                     summary.final_adjunct
-                } else if self.names[position] == "adjunct"
+                } else if self.roles[position] == ChildRole::Adjunct
                     && self.coordinator.is_none()
                     && self.head.is_some_and(|head| head < position)
                     && !matches!(self.rhs[position - 1], Symbol::Punct(..))
@@ -1812,7 +1896,7 @@ impl Production {
         let first_conjunct = self.coordinator.is_some()
             && !self.delimits
             && !self.tail
-            && self.names[position] == "first";
+            && self.roles[position] == ChildRole::First;
         match summary.fronted {
             Fronting::None => false,
             Fronting::Wide => first_conjunct || (position == 0 && self.hosts_comma_set_dependent()),
@@ -1846,10 +1930,12 @@ impl Production {
             && self.coordinator.is_none()
             && self.rhs.len() > 1
             && matches!(self.rhs[0], Symbol::Cat { category, .. } if category == self.lhs)
-            && self.names[1..]
+            && self.roles[1..]
                 .iter()
                 .zip(&self.rhs[1..])
-                .all(|(name, symbol)| matches!(symbol, Symbol::Punct(..)) || name == "adjunct")
+                .all(|(&role, symbol)| {
+                    matches!(symbol, Symbol::Punct(..)) || role == ChildRole::Adjunct
+                })
     }
 
     /// Whether child `position`'s slot admits the phrase: a selected `PP`
@@ -2065,7 +2151,7 @@ impl Production {
                     || (self.hosts_comma_set_dependent() && position == self.rhs.len() - 1);
                 if summary.nominal_unhosted
                     && (self.rhs.len() == 1
-                        || (self.cluster.is_some() && self.names[position] == "adjunct"))
+                        || (self.cluster.is_some() && self.roles[position] == ChildRole::Adjunct))
                 {
                     next.forced = true;
                 }
@@ -2253,9 +2339,9 @@ impl Production {
             bare: if self.cluster.is_some() {
                 Bare::cluster(
                     self.rhs.len(),
-                    self.names
+                    self.roles
                         .iter()
-                        .filter(|n| n.as_str() == "adjunct")
+                        .filter(|&&role| role == ChildRole::Adjunct)
                         .count(),
                     state.forced,
                 )
