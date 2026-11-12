@@ -363,4 +363,108 @@ JOIN categories c ON c.category = n.category
 JOIN alternatives a ON a.unit = j.unit AND a.node = j.node AND a.alternative = j.alternative
 JOIN productions p ON p.production = a.production
 LEFT JOIN lexemes l ON l.lexeme = n.coordinator;
+
+-- Each coordination node (one with a coordinator or a link that is no tail)
+-- with the word its Head Line ends in, once per such word its alternatives
+-- reach: the leaf it takes as its `coordinator`, in its own items or in those
+-- of the tails it continues in through its last child; for a Linked
+-- Coordination, which has none, the first word of its linked conjunct (the
+-- last child that is no tail), which is the conjunct's connective.
+CREATE VIEW coordination_heads AS
+WITH RECURSIVE
+spine (unit, coordination, node) AS (
+    SELECT n.unit, n.node, n.node FROM nodes n
+    WHERE (n.coordinator IS NOT NULL OR n.link IS NOT NULL)
+        AND NOT EXISTS (SELECT 1 FROM alternatives a JOIN productions p USING (production)
+            WHERE a.unit = n.unit AND a.node = n.node AND p.tail)
+    UNION
+    SELECT s.unit, s.coordination, f.child_node
+    FROM spine s
+    JOIN alternatives a ON a.unit = s.unit AND a.node = s.node
+    JOIN families f ON f.unit = a.unit AND f.item = a.item
+    JOIN alternatives k ON k.unit = f.unit AND k.node = f.child_node
+    JOIN productions p ON p.production = k.production AND p.tail
+),
+chain (unit, coordination, item) AS (
+    SELECT s.unit, s.coordination, a.item
+    FROM spine s JOIN alternatives a ON a.unit = s.unit AND a.node = s.node
+    UNION
+    SELECT c.unit, c.coordination, f.previous
+    FROM chain c JOIN families f ON f.unit = c.unit AND f.item = c.item
+    WHERE f.previous IS NOT NULL
+)
+SELECT c.unit, c.coordination, w.word
+FROM chain c
+JOIN items i ON i.unit = c.unit AND i.item = c.item
+JOIN productions p ON p.production = i.production
+JOIN families f ON f.unit = c.unit AND f.item = c.item
+JOIN leaves l ON l.unit = f.unit AND l.leaf = f.child_leaf
+JOIN words w ON w.unit = l.unit AND w.start = l.start
+WHERE json_extract(p.functions, '$[' || (i.dot - 1) || ']') = 'coordinator'
+UNION
+SELECT s.unit, s.coordination,
+    (SELECT w.word FROM words w WHERE w.unit = k.unit AND w.start >= k.start
+        ORDER BY w.start LIMIT 1)
+FROM spine s
+JOIN nodes n ON n.unit = s.unit AND n.node = s.coordination AND n.link IS NOT NULL
+JOIN alternatives a ON a.unit = s.unit AND a.node = s.node
+JOIN families f ON f.unit = a.unit AND f.item = a.item
+JOIN nodes k ON k.unit = f.unit AND k.node = f.child_node
+WHERE NOT EXISTS (SELECT 1 FROM alternatives ka JOIN productions kp USING (production)
+    WHERE ka.unit = k.unit AND ka.node = k.node AND kp.tail);
+
+-- Every fork whose options are a wide and a narrow attachment over a
+-- coordination: a dependency question (`question` 0, the fork's own, or an
+-- alias) and two of its options in which the `dependent` word's maximal
+-- projection bears one `function` to governors of one Category, where
+-- - in the `wide` option the governor's head-line word is the head word of a
+--   coordination (`coordination_heads`, its `coordinator`): the dependent
+--   attaches above the whole coordination;
+-- - in the `narrow` option the governor's head-line word lies inside that
+--   coordination's span, between its head word and the dependent: the
+--   dependent attaches inside the conjunct next to it;
+-- - the coordination's Category is the governors' (a private Category read as
+--   the one it copies: its name up to `#`) and its span does not hold the
+--   dependent's word;
+-- - the function is no part of a coordination (`first`, `last`, `rest`,
+--   `coordinate`, `coordinator`, `correlative`): a conjunct that two
+--   coordinations contend for is a bracketing, not an attachment.
+-- One row per (fork, question, wide option, narrow option), with each
+-- option's Derivations (`fork_options`); a fork may have several such pairs.
+CREATE VIEW wide_narrow_attachments AS
+WITH questions (unit, fork, question, kind, word) AS (
+    SELECT unit, fork, 0, kind, word FROM forks
+    UNION ALL
+    SELECT unit, fork, alias, kind, word FROM fork_aliases
+)
+SELECT DISTINCT q.unit, q.fork, q.question, q.word AS dependent,
+    d.surface AS dependent_surface, wa.function, wa.governor_category,
+    wa.option AS wide, wa.governor AS coordinator, cw.surface AS coordinator_surface,
+    wo.derivations AS wide_derivations,
+    na.option AS narrow, na.governor AS narrow_governor, nw.surface AS narrow_governor_surface,
+    no.derivations AS narrow_derivations
+FROM questions q
+JOIN words d ON d.unit = q.unit AND d.word = q.word
+JOIN fork_answers wa
+    ON wa.unit = q.unit AND wa.fork = q.fork AND wa.question = q.question
+    AND wa.dependency = 'dependent'
+JOIN fork_answers na
+    ON na.unit = q.unit AND na.fork = q.fork AND na.question = q.question
+    AND na.option <> wa.option AND na.function = wa.function
+    AND na.governor_category = wa.governor_category
+JOIN fork_options wo ON wo.unit = wa.unit AND wo.fork = wa.fork AND wo.option = wa.option
+JOIN fork_options no ON no.unit = na.unit AND no.fork = na.fork AND no.option = na.option
+JOIN words cw ON cw.unit = wa.unit AND cw.word = wa.governor
+JOIN words nw ON nw.unit = na.unit AND nw.word = na.governor
+JOIN coordination_heads h ON h.unit = q.unit AND h.word = wa.governor
+JOIN nodes c ON c.unit = h.unit AND c.node = h.coordination
+JOIN categories cc ON cc.category = c.category
+WHERE q.kind = 'dependency'
+    AND wa.function NOT IN ('first', 'last', 'rest', 'coordinate', 'coordinator', 'correlative')
+    AND substr(cc.name, 1, instr(cc.name || '#', '#') - 1)
+        = substr(wa.governor_category, 1, instr(wa.governor_category || '#', '#') - 1)
+    AND NOT (c.start <= d.start AND d.start < c.end)
+    AND c.start <= nw.start AND nw.start < c.end
+    AND (cw.start < nw.start AND nw.start < d.start
+        OR d.start < nw.start AND nw.start < cw.start);
 ";

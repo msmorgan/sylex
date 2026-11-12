@@ -193,8 +193,8 @@ Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
   (kind, word, context, conditional), `fork_aliases`, `fork_options` (with
   their Derivations) and `fork_answers` (each option's answer to the fork's
   question and to each alias's);
-- views `verb_phrases`, `verb_phrase_spans`, `verb_phrase_tokens` and
-  `coordinations`.
+- views `verb_phrases`, `verb_phrase_spans`, `verb_phrase_tokens`,
+  `coordinations`, `coordination_heads` and `wide_narrow_attachments`.
 
 Every `derivations` column is exact. A fact holds in some Derivation where it
 has a row, and in every Derivation where the Derivations that have it equal
@@ -313,6 +313,51 @@ Clause            Clause#LinkedClause          2        2485            459
 Clause            and                          2        2411           1215
 NounPhrase        and                          2        2359            564
 DeterminerPhrase  or                           2        1969           1709
+```
+
+Forks whose options are a wide and a narrow attachment over a coordination
+(`wide_narrow_attachments`): the dependent bears one function to governors of
+one Category, in one option the coordination's (whose Head Line ends in its
+coordinator, or a Linked Coordination's connective), in the other a word
+inside the conjunct next to it, as *until end of turn* modifies *gets +2/+2
+and gains trample* or *gains trample*. 4,004 forks in 3,326 units, by
+function and governor Category:
+
+```sql
+SELECT function, governor_category, count(DISTINCT unit || ':' || fork) AS forks,
+  count(DISTINCT unit) AS units
+FROM wide_narrow_attachments GROUP BY 1, 2 ORDER BY forks DESC LIMIT 6;
+```
+
+```
+function    governor_category  forks  units
+modifier    Nominal             1635   1361
+adjunct     VerbPhrase          1461   1229
+adjunct     Clause               793    715
+supplement  Clause                96     94
+modifier    PrepositionPhrase     54     54
+modifier    NounPhrase            15     14
+```
+
+Units where the two options are every Derivation:
+
+```sql
+SELECT u.face_name, a.dependent_surface AS dependent, a.coordinator_surface AS wide,
+  a.narrow_governor_surface AS narrow, a.wide_derivations, a.narrow_derivations,
+  u.derivations
+FROM wide_narrow_attachments a JOIN units u USING (unit)
+WHERE u.derivations = a.wide_derivations + a.narrow_derivations
+ORDER BY u.face_name, u.line LIMIT 6;
+```
+
+```
+face_name                      dependent  wide  narrow       wide_derivations  narrow_derivations  derivations
+Abandon Reason                 until      and   gain                        1                   1            2
+Aberrant                       controls   or    enchantment                 1                   1            2
+Aberrant Mind Sorcerer         When       then  choose                      5                   5           10
+Abeyance                       Until      and   can't                       1                   1            2
+Abomination, Irradiated Brute  control    or    Villain                     1                   1            2
+Absorb Essence                 until      and   gains                       1                   1            2
 ```
 
 The census faces with no Vintage `Legal` or `Restricted` printing in mtgjson

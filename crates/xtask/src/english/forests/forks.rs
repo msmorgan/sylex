@@ -421,4 +421,57 @@ mod tests {
             assert!(seen.contains_key(what), "no {what} fork: {seen:?}");
         }
     }
+
+    /// Wide and narrow attachments over a coordination on real units: a
+    /// relative clause over *creature or planeswalker* or on *planeswalker*
+    /// (*Iroas's Blessing*), *until end of turn* over *gets … and gains …* or
+    /// on *gains* (*Bull's Strength*), a trigger over a Linked Coordination
+    /// (*look …, then put …*) or on its first conjunct (*Sage Owl*), and
+    /// premodifiers over a serial coordination or on its first conjunct
+    /// (*Sands of Time*). *Crook of Condemnation*'s one dependency fork has
+    /// no coordination.
+    #[test]
+    fn wide_and_narrow_attachments_over_a_coordination() {
+        let (_dir, path, _) = super::super::tests::database(&[
+            "Iroas's Blessing",
+            "Bull's Strength",
+            "Sage Owl",
+            "Sands of Time",
+            "Crook of Condemnation",
+        ]);
+        let db = Connection::open(&path).unwrap();
+        let rows: Vec<String> = db
+            .prepare(
+                "SELECT DISTINCT u.face_name, a.dependent_surface, a.function, \
+                 a.governor_category, a.coordinator_surface, a.narrow_governor_surface, \
+                 a.wide_derivations, a.narrow_derivations, u.derivations FROM \
+                 wide_narrow_attachments a JOIN units u USING (unit) ORDER BY 1, 2",
+            )
+            .unwrap()
+            .query_map([], |r| {
+                Ok((0..9)
+                    .map(|i| match r.get::<_, rusqlite::types::Value>(i).unwrap() {
+                        rusqlite::types::Value::Text(s) => s,
+                        rusqlite::types::Value::Integer(n) => n.to_string(),
+                        other => panic!("{other:?}"),
+                    })
+                    .collect::<Vec<_>>()
+                    .join(" | "))
+            })
+            .unwrap()
+            .map(Result::unwrap)
+            .collect();
+        assert_eq!(
+            rows,
+            [
+                "Bull's Strength | until | adjunct | VerbPhrase | and | gains | 1 | 1 | 2",
+                "Iroas's Blessing | controls | modifier | Nominal | or | planeswalker | 1 | 1 | 2",
+                "Sage Owl | When | adjunct | Clause | then | look | 2 | 2 | 4",
+                "Sands of Time | control | modifier | Nominal | and | land | 60 | 40 | 100",
+                "Sands of Time | simultaneously | adjunct | VerbPhrase | and | untaps | 50 | 50 | 100",
+                "Sands of Time | tapped | modifier | Nominal | and | artifact | 60 | 40 | 100",
+                "Sands of Time | untapped | modifier | Nominal | and | artifact | 60 | 40 | 100",
+            ]
+        );
+    }
 }
