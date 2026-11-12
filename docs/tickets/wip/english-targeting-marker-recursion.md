@@ -6,8 +6,8 @@ needs: []
 ## Why
 
 *Exile two three target creatures.* has a Reading, as do *two three four target creatures*,
-*up to two three target creatures*, *two other three target creatures* and *target target
-creature*. `BareTargetingMarker` takes any `DeterminerPhrase` whose
+*up to two three target creatures* and *two other three target creatures*.
+`BareTargetingMarker` takes any `DeterminerPhrase` whose
 `DeterminativeDistribution` is `Targeting` as a `TargetingMarker`, and `MarkedDeterminer`,
 `ModifiedTargetingMarker` and `MarkedMaximum` each build a `DeterminerPhrase` that keeps the
 Marker's `Targeting` value. Their result is therefore a Targeting Marker once more, and a
@@ -20,8 +20,8 @@ of these is an ungrammatical Reading (`docs/decisions/english.md` §8).
 
 - `BareTargetingMarker` admits the Targeting Marker word alone, or the three Productions that
   determine or modify a Marker no longer yield one; the comment matches the equations.
-- *Exile two three target creatures.*, *Exile target target creature.* and *Exile up to two
-  three target creatures.* have no Reading, each pinned by a negative judgment.
+- *Exile two three target creatures.* and *Exile up to two three target creatures.* have no
+  Reading.
 - It is recorded, from the corpus, which orders of outer determiner and adjective over the
   Marker cards print (*two other target creatures*, *up to two other target creatures*), and
   each printed order keeps its Reading with one tree.
@@ -29,6 +29,9 @@ of these is an ungrammatical Reading (`docs/decisions/english.md` §8).
 
 ## Not in scope
 
+- *Exile target target creature.*, where the outer determiner is the Marker word itself and no
+  determined Marker: no card prints it, and refusing it takes a gate that prevents nothing on
+  card text (`docs/decisions/english.md` §6).
 - The Marker's Number under *any number of*: `english-targeting-marker-number`.
 
 ## Pointers

@@ -19,6 +19,10 @@ only *target creatures*, a form no card prints. In the other, the Targeting Mark
 one non-English functional marker, and these declarations cleanly capture its bare-singular
 default and its behavior under outer determiners and *any number of*.
 
+`TargetedNounPhrase` also takes any singular `Targeting` DeterminerPhrase as the Marker alone,
+so a determined Marker reads there: *Exile any number of another target creatures.* and *Exile
+any number of a target creatures.* each have a Reading.
+
 ## Open questions
 
 - Make *target* number-neutral and delete the three declarations, or keep them with a comment
@@ -30,6 +34,8 @@ default and its behavior under outer determiners and *any number of*.
   corpus are recorded.
 - The Targeting Marker follows the owner's ruling, and no comment cites number transparency for
   more than the whole Noun Phrase's Number.
+- Under *any number of*, only the Marker word, alone or after an adjective, determines the
+  oblique: *Exile any number of another target creatures.* has no Reading.
 - Every *any number of target* unit keeps a correct Reading, and the census shows no Reading
   lost on the supported corpus.
 
