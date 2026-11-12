@@ -5,3 +5,5 @@
 + <card=Defensive Formation> You can divide that creature's combat damage as you choose among any of the creatures blocking it. => PrepositionPhrase "among any of the creatures blocking it"
 # from: Forked Bolt
 * <card=Forked Bolt> Forked Bolt deals 2 damage divided as you choose among one target.
+# fused *the other* is singular, so it is no Complement of *among*
++ <card=Plargg and Nassari> At the beginning of your upkeep, each player exiles cards from the top of their library until they exile a nonland card. An opponent chooses a nonland card exiled this way. You may cast up to two spells from among the other cards exiled this way without paying their mana costs. => PrepositionPhrase "among the other cards exiled this way" as Complement of from; !NounPhrase "the other" as Complement of among

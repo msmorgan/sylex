@@ -11,3 +11,5 @@
 # from: Zur's Weirding
 +NounPhrase any other player => AdjectivePhrase "other" as Modifier of player
 *NounPhrase other card
+# uninflected fused *other* is singular, so *all other* is no Noun Phrase
++ <card=Ixidron> As this creature enters, turn all other nontoken creatures face down. => NounPhrase "all other nontoken creatures" as Object of turn; !NounPhrase "all other"

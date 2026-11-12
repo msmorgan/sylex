@@ -2101,12 +2101,18 @@ FusedOrdinalHead: NounPhrase -> determiner:DeterminerPhrase Numeral(Ordinal)
           $.Countability = Count,
           $.Determination = Overt,
           $.Person = Third
+// Uninflected pro-nominal *other* is singular, its plural *others* (CGEL
+// 5§10.2:429–430), and its determiner agrees: *among [the other]* is no
+// Complement, so *cards exiled ...* is no relative clause on *spells from
+// among the other* (Plargg and Nassari).
 FusedAdjectiveHead: NounPhrase -> determiner:DeterminerPhrase Class(FusedHeadAdjective)
     where $.Case = Plain,
           $.Person = Third,
           $.Determination = Overt,
           $.Countability = Count,
           determiner.Countability = $.Countability,
+          $.Number = Singular,
+          determiner.Number = $.Number,
           $.NounKind = Ordinary
 // Anaphoric *the same* (*do the same for ...*; CGEL 17:1545); its head
 // stays an adjective.
