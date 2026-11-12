@@ -18,11 +18,8 @@ use std::time::Duration;
 use std::time::Instant;
 
 use rayon::prelude::*;
-use sylex_english::cleave::BracketKeywords;
-use sylex_english::cleave::CleaveText;
 use sylex_english::corpus::Corpus;
 use sylex_english::corpus::Face;
-use sylex_english::corpus::split_lines;
 use sylex_syntax::CompiledGrammar;
 use sylex_vocabulary::LexicalEnvironment;
 
@@ -52,23 +49,11 @@ const SAMPLE: &[&str] = &[
 /// Every text the census parses for a unit (`census::run`): the unit's, or
 /// a cleave line's uncleaved and cleaved texts.
 fn texts<'c>(corpus: &'c Corpus, env: &LexicalEnvironment) -> Vec<(&'c Face, String)> {
-    let brackets = BracketKeywords::new(&env.lexicon);
-    let cleave: Vec<bool> = corpus
-        .faces
-        .iter()
-        .map(|face| {
-            face.oracle_text
-                .as_deref()
-                .is_some_and(|text| brackets.mark(&split_lines(text)))
-        })
-        .collect();
+    let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
     let mut out = Vec::new();
-    for unit in &corpus.units {
+    for (unit, cleave) in corpus.units.iter().zip(cleaves) {
         let face = &corpus.faces[unit.face];
-        match cleave[unit.face]
-            .then(|| CleaveText::split(&unit.text))
-            .flatten()
-        {
+        match cleave {
             Some(split) => {
                 out.push((face, split.uncleaved));
                 out.push((face, split.cleaved));

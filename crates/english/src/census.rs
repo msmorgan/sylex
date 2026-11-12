@@ -165,22 +165,14 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
             map.entry(e.text.as_str()).or_insert_with(Vec::new).push(e);
             map
         });
-    let bracket_keywords = crate::cleave::BracketKeywords::new(&env.lexicon);
-    let cleave_faces: Vec<bool> = corpus
-        .faces
-        .iter()
-        .map(|face| {
-            face.oracle_text
-                .as_deref()
-                .is_some_and(|text| bracket_keywords.mark(&split_lines(text)))
-        })
-        .collect();
+    let cleaves = cleave_texts(corpus, &env.lexicon);
     let grammar = grammar.as_ref().ok();
     let profiler = Profiler::new(env);
     let units = corpus
         .units
         .par_iter()
-        .map(|unit| {
+        .zip(&cleaves)
+        .map(|(unit, cleave)| {
             let face = &corpus.faces[unit.face];
             let scope = face.scope();
             let analyzed = env.lexicon.analyze_source_scoped(&unit.text, None, &scope);
@@ -198,9 +190,6 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
                     .copied()
                     .collect()
             };
-            let cleave = cleave_faces[unit.face]
-                .then(|| CleaveText::split(&unit.text))
-                .flatten();
             let (verdict, derivations, segments, cheapest_tier) = match grammar {
                 None => (Verdict::Unread(Unread::Unbound), 0, None, 0),
                 Some((grammar, frame)) => {
@@ -210,7 +199,7 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
                     };
                     match cleave {
                         None => judge(&unit.text, &analyzed),
-                        Some(cleave) => judge_cleave(&cleave, |text| {
+                        Some(cleave) => judge_cleave(cleave, |text| {
                             let analyzed = env.lexicon.analyze_source_scoped(text, None, &scope);
                             judge(text, &analyzed)
                         }),
@@ -236,6 +225,34 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
         })
         .collect();
     summarize(corpus.faces.len(), bind_error, units)
+}
+
+/// The [`CleaveText`] of each unit of `corpus`, in unit order: of each line
+/// of a face whose bracketed text a cleave keyword marks
+/// ([`crate::cleave::BracketKeywords`]) that splits at its brackets, and
+/// `None` for every other unit. The census reads such a line as its
+/// Uncleaved Text, and then its Cleaved Text.
+#[must_use]
+pub fn cleave_texts(corpus: &Corpus, lexicon: &sylex_lexicon::Lexicon) -> Vec<Option<CleaveText>> {
+    let bracket_keywords = crate::cleave::BracketKeywords::new(lexicon);
+    let cleave_faces: Vec<bool> = corpus
+        .faces
+        .iter()
+        .map(|face| {
+            face.oracle_text
+                .as_deref()
+                .is_some_and(|text| bracket_keywords.mark(&split_lines(text)))
+        })
+        .collect();
+    corpus
+        .units
+        .iter()
+        .map(|unit| {
+            cleave_faces[unit.face]
+                .then(|| CleaveText::split(&unit.text))
+                .flatten()
+        })
+        .collect()
 }
 
 /// Judges a bracketed line of a cleave face as its Uncleaved Text, then, if
