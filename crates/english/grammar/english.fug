@@ -67,9 +67,11 @@ feature NounDistribution = Ordinary | Quantity | DirectMeasure | HeadOnly | Seri
 // the one noun that is a Manner Adjunct without a preposition (*do it this
 // way*; CGEL 8§2.1:671).
 feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity
-// Only *type*: a noun whose values are cited names, the variable of a
-// specifying copular clause (*the new creature type can't be Wall*; CGEL
-// 4§5.5:266-269).
+// Only *type*, for Artificial Evolution's *the new creature type can't be
+// Wall* (SpecifyingClause). It is a word flag, not a class CGEL has: CGEL
+// puts no lexical condition on a specifying clause's variable. Without it
+// the specifying Productions also read *All Mountains are Plains*
+// (Conversion) and *Urza's Power-Plant* (Urza's Tower).
 feature Variable = Cited
 // The NounKind of a head's *of* oblique.
 feature ObliqueNounKind = Ordinary | Temporal | Manner | Numeric | Quantity
@@ -929,9 +931,14 @@ SubjectPredicate: Clause -> subject:NounPhrase Free(VerbPhrase) { transparent: [
           head.VerbForm = Finite,
           subject.Case != Accusative | Genitive,
           $.ClauseMarking = Unmarked
-// *The new creature type can't be Wall*: only a Subject headed by a
-// `Variable` noun takes a subtype name as its value, never a Noun Phrase
-// after any copular verb.
+// A specifying copular clause, whose value is a subtype name (CGEL
+// 4§5.5:266-269), for Artificial Evolution's *the new creature type can't
+// be Wall*; a `Variable` Subject keeps them off other cards. Both are flat
+// clauses, not built on the Verb Phrase, so no adjunct, coordination of
+// values or other auxiliary reaches them. The value is not a `Mention`
+// Predicative of the copula: that gives every bare color word, *day* or
+// *night*, and plural-syncretic subtype after a copula a cited-word twin
+// (*All Mountains are Plains*, Conversion).
 SpecifyingClause: Clause -> subject:NounPhrase Class(BeVerb) value:Class(Subtype)
     where subject.Variable := Cited,
           value.Number = Singular,

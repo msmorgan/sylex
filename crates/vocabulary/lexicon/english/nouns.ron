@@ -162,8 +162,9 @@
     (lemma: "top", distribution: HeadOnly, frames: [Complement(PP(["of"])), Intransitive]),
     (lemma: "toughness", countability: [Count, Mass], frames: [Complement(PP(["of"])), Complement(Amount)]),
     (lemma: "turn", kind: Temporal),
-    // The variable of a specifying clause whose values are cited names (*the
-    // new creature type can't be Wall*; CGEL, Ch. 4 §5.5, pp. 266-269).
+    // For Artificial Evolution's *the new creature type can't be Wall*
+    // (`SpecifyingClause`); CGEL puts no lexical condition on a specifying
+    // clause's variable.
     (lemma: "type", variable: true),
     // "for the same value", "double the value of X".
     (lemma: "value", frames: [Complement(PP(["of"]))]),

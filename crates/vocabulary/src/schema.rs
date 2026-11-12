@@ -251,10 +251,10 @@ pub struct NounEntry {
     pub plural: Option<String>,
     #[serde(default)]
     pub frames: Vec<FrameSpec>,
-    /// The noun names a variable whose values are cited names, so that a
-    /// specifying copular clause with it as the head of its Subject names
-    /// the value (*the new creature type can't be Wall*; CGEL, Ch. 4 §5.5,
-    /// pp. 266-269). `type` has it.
+    /// The noun may head the Subject of the grammar's specifying clauses,
+    /// which exist for Artificial Evolution (*the new creature type can't be
+    /// Wall*). `type` has it. It is a word flag: CGEL puts no lexical
+    /// condition on a specifying clause's variable.
     #[serde(default)]
     pub variable: bool,
     /// How a prefix joins the noun, where it is not solid, the default
