@@ -132,7 +132,7 @@ impl Parse<'_> {
         let order = self.children_first()?;
         let mut node_inside = vec![0u128; forest.nodes.len()];
         let mut item_inside = vec![0u128; forest.items.len()];
-        for &vertex in &order {
+        for &vertex in order {
             match vertex {
                 Vertex::Node(node) => {
                     node_inside[node] = forest.nodes[node]
@@ -197,8 +197,16 @@ impl Parse<'_> {
     }
 
     /// The nodes and items the roots reach, each after everything it
-    /// derives from, by an iterative depth-first search.
-    pub(crate) fn children_first(&self) -> Result<Vec<Vertex>, ForestCycle> {
+    /// derives from; walked once per Parse.
+    pub(crate) fn children_first(&self) -> Result<&[Vertex], ForestCycle> {
+        self.children_first
+            .get_or_init(|| self.walk_children_first())
+            .as_deref()
+            .map_err(Clone::clone)
+    }
+
+    /// [`Self::children_first`], by an iterative depth-first search.
+    fn walk_children_first(&self) -> Result<Vec<Vertex>, ForestCycle> {
         #[derive(Clone, Copy, PartialEq)]
         enum Mark {
             New,

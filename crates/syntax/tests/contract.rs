@@ -481,7 +481,7 @@ fn no_category_is_nullable() {
     let grammar = bind(WORD, &lexicon, NO_FRAMES).unwrap();
     let parse = grammar.parse(&lexicon, "");
     assert_eq!(parse.derivation_count(), 0);
-    assert_eq!(parse.forest.metrics().completed_nodes, 0);
+    assert_eq!(parse.forest().metrics().completed_nodes, 0);
     for text in ["", " ", "One one hundred.", "one,  one"] {
         assert!(
             lexicon
@@ -530,7 +530,7 @@ fn homograph_choices_do_not_multiply_the_chart() {
         let [one, three] = [0, 1].map(|i| {
             let grammar = bind(LIST, &lexicons[i], NO_FRAMES).unwrap();
             let parse = grammar.parse(&lexicons[i], &text);
-            (parse.forest.metrics(), parse.derivation_count())
+            (parse.forest().metrics(), parse.derivation_count())
         });
         assert_eq!(one.1, 1);
         assert_eq!(three.1, 3u128.pow(u32::try_from(n).unwrap()));
@@ -574,7 +574,7 @@ fn distinct_summaries_stay_distinct_under_shared_prefixes() {
             2u128.pow(u32::try_from(n).unwrap())
         );
         assert_eq!(goats.derivation_count(), 1);
-        let (s, g) = (sheep.forest.metrics(), goats.forest.metrics());
+        let (s, g) = (sheep.forest().metrics(), goats.forest().metrics());
         // One more `Item` per word, and one more completed `Item` item per
         // word; every `Seq` prefix is shared by both.
         assert_eq!(s.completed_nodes, g.completed_nodes + n, "n = {n}");
@@ -818,7 +818,7 @@ fn gap_survives_packing_until_its_governor() {
     assert_eq!(readings(&grammar, &lexicon, text).len(), 1);
     let analyzed = lexicon.analyze("you see");
     let parse = grammar.parse_category(&analyzed, "Clause").unwrap();
-    assert!(parse.forest.metrics().completed_nodes > 0);
+    assert!(parse.forest().metrics().completed_nodes > 0);
     assert_eq!(parse.derivation_count(), 0);
     assert_eq!(readings(&grammar, &lexicon, "See."), BTreeSet::new());
 }

@@ -60,7 +60,7 @@ fn trees(
         return trees.clone();
     }
     let mut out = Vec::new();
-    let alternatives: Vec<(usize, usize)> = parse.forest.node_alternatives(node).collect();
+    let alternatives: Vec<(usize, usize)> = parse.forest().node_alternatives(node).collect();
     for (alternative, (production, item)) in alternatives.into_iter().enumerate() {
         for children in sequences(parse, item, memo) {
             out.push(Rc::new(Tree {
@@ -82,7 +82,7 @@ fn sequences(
     memo: &mut BTreeMap<usize, Vec<Rc<Tree>>>,
 ) -> Vec<Vec<Child>> {
     let mut out = Vec::new();
-    let families: Vec<_> = parse.forest.item_families(item).collect();
+    let families: Vec<_> = parse.forest().item_families(item).collect();
     for (previous, child) in families {
         let befores = previous.map_or_else(|| vec![Vec::new()], |p| sequences(parse, p, memo));
         let heres: Vec<Child> = match child {
@@ -140,7 +140,7 @@ impl Walk<'_, '_> {
 
     /// A head leaf's word.
     fn word(&self, leaf: HeadLeaf) -> Option<HeadWord> {
-        match self.parse.forest.leaf_reading(leaf?) {
+        match self.parse.forest().leaf_reading(leaf?) {
             LexicalReading::Word(word) => Some((word.lexeme, word.form)),
             _ => None,
         }
@@ -261,7 +261,7 @@ fn alternatives_distributions_agree_with_enumerated_derivations_on_real_units() 
             parse: &parse,
             found: Found::default(),
         };
-        let roots: Vec<usize> = parse.forest.roots().to_vec();
+        let roots: Vec<usize> = parse.forest().roots().to_vec();
         for root in roots {
             for tree in trees(&parse, root, &mut memo) {
                 walk.visit(&tree, &[], None);
@@ -285,9 +285,9 @@ fn alternatives_distributions_agree_with_enumerated_derivations_on_real_units() 
         let found = walk.found;
         let name = format!("{} | {text}", face.name);
         let mut computed = Found::default();
-        for node in (0..parse.forest.node_count()).filter(|&n| counts.node(n) > 0) {
+        for node in (0..parse.forest().node_count()).filter(|&n| counts.node(n) > 0) {
             let outside = counts.node_outside(node);
-            for (a, (_, item)) in parse.forest.node_alternatives(node).enumerate() {
+            for (a, (_, item)) in parse.forest().node_alternatives(node).enumerate() {
                 for (&head, &n) in &heads[node][a] {
                     computed.heads.insert((node, a, head), n * outside);
                 }

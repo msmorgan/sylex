@@ -75,7 +75,8 @@ pub type AlternativeDistribution<K> = Vec<Vec<BTreeMap<K, u128>>>;
 type Map<K> = BTreeMap<K, u128>;
 
 /// The inside distribution of every node and item.
-struct Inside<K> {
+#[derive(Debug)]
+pub(crate) struct Inside<K> {
     nodes: Vec<Map<K>>,
     items: Vec<Map<K>>,
 }
@@ -105,8 +106,7 @@ impl Parse<'_> {
     /// # Errors
     /// A [`ForestCycle`] when the reachable forest has a unary cycle.
     pub fn alternative_heads(&self) -> Result<AlternativeDistribution<HeadLeaf>, ForestCycle> {
-        let inside = self.head_inside(&self.children_first()?);
-        Ok(self.per_alternative(&inside))
+        Ok(self.per_alternative(self.head_inside()?))
     }
 
     /// The conjunct count of each alternative, split over its own
@@ -119,7 +119,7 @@ impl Parse<'_> {
     pub fn alternative_conjuncts(&self) -> Result<AlternativeDistribution<usize>, ForestCycle> {
         let grammar = self.grammar;
         let inside = self.inside(
-            &self.children_first()?,
+            self.children_first()?,
             0,
             |_| 0,
             |production, at, before, child| match grammar.productions[production].names[at].as_str()
@@ -149,7 +149,7 @@ impl Parse<'_> {
         wrapper: impl Fn(&EmbeddingStep) -> bool,
     ) -> Result<AlternativeDistribution<Embedding>, ForestCycle> {
         let order = self.children_first()?;
-        let heads = self.head_inside(&order);
+        let heads = self.head_inside()?;
         let forest = &self.forest;
         let grammar = self.grammar;
         let item_inside = |item: Option<usize>| item.map_or(1, |i| total(&heads.items[i]));
@@ -254,12 +254,15 @@ impl Parse<'_> {
         Ok(result)
     }
 
-    /// The inside distribution of head leaves.
-    fn head_inside(&self, order: &[Vertex]) -> Inside<HeadLeaf> {
+    /// The inside distribution of head leaves; settled once per Parse.
+    fn head_inside(&self) -> Result<&Inside<HeadLeaf>, ForestCycle> {
+        let order = self.children_first()?;
         let grammar = self.grammar;
-        self.inside(order, None, head_leaf, |production, at, before, child| {
-            if grammar.head_index(production) == Some(at) { *child } else { *before }
-        })
+        Ok(self.head_inside.get_or_init(|| {
+            self.inside(order, None, head_leaf, |production, at, before, child| {
+                if grammar.head_index(production) == Some(at) { *child } else { *before }
+            })
+        }))
     }
 
     /// The head word a head leaf is: a word's lexeme and form.

@@ -511,7 +511,7 @@ fn chart_and_forest_sizes() {
         "Put into your hand or exile the card.",
     ] {
         let parse = s.grammar.parse(&s.lexicon, text);
-        let m = parse.forest.metrics();
+        let m = parse.forest().metrics();
         println!(
             "{text:<75} {:>6} {:>6} {:>6} {:>4}",
             m.chart_items,

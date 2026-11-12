@@ -240,7 +240,7 @@ pub(crate) fn split(parse: &Parse<'_>) -> Result<(Unit, Graph), ForestCycle> {
 
     // The words: the starts of the leaves the roots reach.
     let mut used = BTreeSet::new();
-    for &vertex in &order {
+    for &vertex in order {
         if let Vertex::Item(i) = vertex {
             for &(_, child) in &forest.items[i].families {
                 if let ChildRef::Leaf(l) = child {
@@ -297,7 +297,7 @@ pub(crate) fn split(parse: &Parse<'_>) -> Result<(Unit, Graph), ForestCycle> {
             frames: 0,
         })
     };
-    for &vertex in &order {
+    for &vertex in order {
         match vertex {
             Vertex::Item(i) => {
                 let item = &forest.items[i];

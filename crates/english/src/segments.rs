@@ -128,7 +128,7 @@ pub fn segments(parse: &Parse<'_>, frame: &SegmentFrame) -> Segmentation {
         return Segmentation::Segments(Vec::new());
     }
     let walk = Walk { parse, frame };
-    let forest = &parse.forest;
+    let forest = parse.forest();
     let mut reached = Reached::default();
     let mut memo: ForestMemo<Segmentations, Segmentations> = ForestMemo::default();
     let mut all = Segmentations::new();
@@ -205,7 +205,7 @@ impl Walk<'_, '_> {
         reached: &mut Reached,
         memo: &mut ForestMemo<Segmentations, Segmentations>,
     ) -> Segmentations {
-        let forest = &self.parse.forest;
+        let forest = self.parse.forest();
         if !self.frame.outer.contains(&forest.node_category(node)) {
             reached.nodes.insert(node);
             let span = forest.node_span(node);
@@ -234,7 +234,7 @@ impl Walk<'_, '_> {
         if let Some(known) = memo.items.get(&item) {
             return known.clone();
         }
-        let forest = &self.parse.forest;
+        let forest = self.parse.forest();
         let mark = memo.nodes.mark();
         let mut out = Segmentations::new();
         for (previous, child) in forest.item_families(item) {

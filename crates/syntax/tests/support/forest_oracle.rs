@@ -25,7 +25,7 @@ pub enum Use {
 
 /// Every node, item and edge the roots reach.
 pub fn reachable(parse: &Parse<'_>) -> Vec<Use> {
-    let forest = &parse.forest;
+    let forest = parse.forest();
     let mut seen = BTreeSet::new();
     let mut stack: Vec<Use> = forest.roots().iter().map(|&r| Use::Node(r)).collect();
     while let Some(vertex) = stack.pop() {
@@ -80,7 +80,7 @@ pub fn recount_without(parse: &Parse<'_>, removed: Use) -> u128 {
             if let Some(&c) = self.nodes.get(&n) {
                 return c;
             }
-            let items: Vec<usize> = self.parse.forest.node_items(n).collect();
+            let items: Vec<usize> = self.parse.forest().node_items(n).collect();
             let mut total = 0;
             for (k, item) in items.into_iter().enumerate() {
                 if self.removed != Use::NodeFamily(n, k) {
@@ -97,7 +97,7 @@ pub fn recount_without(parse: &Parse<'_>, removed: Use) -> u128 {
             if let Some(&c) = self.items.get(&i) {
                 return c;
             }
-            let families: Vec<_> = self.parse.forest.item_families(i).collect();
+            let families: Vec<_> = self.parse.forest().item_families(i).collect();
             let mut total = 0;
             for (k, (previous, child)) in families.into_iter().enumerate() {
                 if self.removed == Use::ItemFamily(i, k) {
@@ -120,7 +120,12 @@ pub fn recount_without(parse: &Parse<'_>, removed: Use) -> u128 {
         nodes: HashMap::new(),
         items: HashMap::new(),
     };
-    parse.forest.roots().iter().map(|&r| recount.node(r)).sum()
+    parse
+        .forest()
+        .roots()
+        .iter()
+        .map(|&r| recount.node(r))
+        .sum()
 }
 
 /// Every Derivation of the forest as the list of its uses, in no order.
@@ -130,7 +135,7 @@ pub fn derivations(parse: &Parse<'_>) -> Vec<Vec<Use>> {
             return d.clone();
         }
         let mut out = Vec::new();
-        let items: Vec<usize> = parse.forest.node_items(n).collect();
+        let items: Vec<usize> = parse.forest().node_items(n).collect();
         for (k, i) in items.into_iter().enumerate() {
             for mut d in item(parse, i, memo) {
                 d.push(Use::Node(n));
@@ -146,7 +151,7 @@ pub fn derivations(parse: &Parse<'_>) -> Vec<Vec<Use>> {
             return d.clone();
         }
         let mut out = Vec::new();
-        let families: Vec<_> = parse.forest.item_families(i).collect();
+        let families: Vec<_> = parse.forest().item_families(i).collect();
         for (k, (previous, child)) in families.into_iter().enumerate() {
             let befores = previous.map_or_else(|| vec![Vec::new()], |p| item(parse, p, memo));
             let heres = match child {
@@ -173,7 +178,7 @@ pub fn derivations(parse: &Parse<'_>) -> Vec<Vec<Use>> {
     }
     let mut memo = Memo::default();
     parse
-        .forest
+        .forest()
         .roots()
         .iter()
         .flat_map(|&r| node(parse, r, &mut memo))
@@ -206,7 +211,7 @@ pub fn check(parse: &Parse<'_>, enumerate: u128) -> Result<(), String> {
     // Every node, reached or not: a node the roots do not reach is in no
     // Derivation, and only a node in every Derivation of a unit that has one
     // is settled.
-    for node in 0..parse.forest.metrics().completed_nodes {
+    for node in 0..parse.forest().metrics().completed_nodes {
         let vertex = Use::Node(node);
         let containing = if uses.contains(&vertex) {
             counts.node(node)

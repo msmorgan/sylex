@@ -50,7 +50,7 @@ const ENUMERATED: u128 = 2_000;
 /// The spine computed from the Packed Forest's own counts.
 fn counted_spine(parse: &Parse<'_>, counts: &Counts<'_>) -> SettledSpine {
     let live: Vec<usize> = parse
-        .forest
+        .forest()
         .roots()
         .iter()
         .copied()
@@ -63,7 +63,7 @@ fn counted_spine(parse: &Parse<'_>, counts: &Counts<'_>) -> SettledSpine {
 }
 
 fn counted_node(parse: &Parse<'_>, counts: &Counts<'_>, node: usize) -> SettledNode {
-    let forest = &parse.forest;
+    let forest = parse.forest();
     let grammar = parse.grammar();
     assert!(counts.settled(node), "the walk reached an unsettled node");
     let alternatives: Vec<(usize, usize)> = forest

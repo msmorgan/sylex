@@ -81,7 +81,7 @@ fn nothing_is_settled_without_a_derivation() {
     let parse = grammar.parse(&lexicon(), "Card card");
     let counts = parse.counts().unwrap();
     assert_eq!(counts.total(), 0);
-    assert!(parse.forest.metrics().completed_nodes > 0);
+    assert!(parse.forest().metrics().completed_nodes > 0);
     forest_oracle::check(&parse, u128::MAX).unwrap();
 }
 
@@ -93,7 +93,7 @@ fn a_node_in_every_derivation_is_settled() {
     let grammar = bind(BRACKETS);
     let parse = grammar.parse(&lexicon(), "Card card card.");
     let counts = parse.counts().unwrap();
-    let forest = &parse.forest;
+    let forest = parse.forest();
     let phrase = grammar.category_id("Phrase").unwrap();
     let mut by_span = Vec::new();
     for node in 0..forest.metrics().completed_nodes {

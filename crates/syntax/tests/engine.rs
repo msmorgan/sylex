@@ -117,7 +117,7 @@ fn pp_chain_packs_catalan_many_trees_in_a_small_forest() {
     // analysis this toy grammar endorses.
     assert_eq!(parse.derivation_count(), 14);
     assert_eq!(readings(&grammar, &lexicon, text).len(), 14);
-    let metrics = parse.forest.metrics();
+    let metrics = parse.forest().metrics();
     println!("{text} {metrics:?}");
     assert!(metrics.completed_nodes < 40, "{metrics:?}");
 }
@@ -140,8 +140,12 @@ fn terminal_initial_productions_are_predicted_only_where_they_scan() {
         readings(&grammar, &lexicon, text)
     );
     assert_eq!(
-        bracketed.parse(&lexicon, text).forest.metrics().chart_items,
-        grammar.parse(&lexicon, text).forest.metrics().chart_items
+        bracketed
+            .parse(&lexicon, text)
+            .forest()
+            .metrics()
+            .chart_items,
+        grammar.parse(&lexicon, text).forest().metrics().chart_items
     );
     assert_eq!(
         readings(&bracketed, &lexicon, "See (the man) on (the hill).").len(),
@@ -554,7 +558,7 @@ fn best_readings_do_not_enumerate_every_attachment() {
         );
         assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
     }
-    println!("{:?}", parse.forest.metrics());
+    println!("{:?}", parse.forest().metrics());
 }
 
 #[test]
@@ -686,8 +690,8 @@ fn left_corner_filter_skips_unreachable_recursive_categories() {
         readings(&grammar, &lexicon, text)
     );
     assert_eq!(
-        extended.parse(&lexicon, text).forest.metrics(),
-        grammar.parse(&lexicon, text).forest.metrics()
+        extended.parse(&lexicon, text).forest().metrics(),
+        grammar.parse(&lexicon, text).forest().metrics()
     );
     let text = "See (the man).";
     assert_ne!(readings(&extended, &lexicon, text), [] as [Reading; 0]);

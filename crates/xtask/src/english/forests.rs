@@ -315,7 +315,7 @@ fn unit_rows(
     let conjuncts = parse.alternative_conjuncts()?;
     let embeddings = parse.alternative_embeddings(context::DEPTH, |step| reader.wrapper(step))?;
     exclusive(&parse, &counts)?;
-    let forest = &parse.forest;
+    let forest = parse.forest();
     let tokens = parse.tokens();
     // A Constituent's span begins where it was predicted, before the space
     // that precedes its first word.
@@ -447,7 +447,7 @@ fn product(a: u128, b: u128) -> Result<u128> {
 /// outer one's item through children of the same span, or through `head`
 /// children; any path down the forest is part of some Derivation.
 fn exclusive(parse: &sylex_syntax::Parse<'_>, counts: &sylex_syntax::Counts<'_>) -> Result<()> {
-    let forest = &parse.forest;
+    let forest = parse.forest();
     let grammar = parse.grammar();
     // A verb phrase: a frame-headed Production other than an interleaved
     // prefix, which is the head of its `/interleaved` Production and part of
@@ -498,7 +498,7 @@ fn descendants(
     item: usize,
     follow: &dyn Fn(usize, &str) -> bool,
 ) -> BTreeSet<usize> {
-    let forest = &parse.forest;
+    let forest = parse.forest();
     let grammar = parse.grammar();
     let mut items = vec![item];
     let mut seen_items = BTreeSet::new();

@@ -3,6 +3,7 @@
 use std::hash::BuildHasher;
 use std::hash::BuildHasherDefault;
 use std::ops::Range;
+use std::sync::OnceLock;
 
 use hashbrown::HashTable;
 use hashbrown::hash_table::Entry;
@@ -11,7 +12,11 @@ use sylex_lexicon::AnalyzedText;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
 
+use crate::alternatives::HeadLeaf;
+use crate::alternatives::Inside;
 use crate::compile::CompiledGrammar;
+use crate::counts::ForestCycle;
+use crate::counts::Vertex;
 use crate::hash::ChartHasher;
 use crate::reading::glues_after;
 use crate::step::ChildView;
@@ -225,14 +230,31 @@ pub struct Parse<'g> {
     pub(crate) tokens: Vec<char>,
     /// The analyzed text as written.
     pub(crate) source: String,
-    pub forest: PackedForest,
+    /// Immutable once parsed: the walks below are memoized over it.
+    pub(crate) forest: PackedForest,
     /// Words no declared lexeme spells, as char ranges.
     pub vocabulary_gaps: Vec<Range<usize>>,
     /// The card names the text was analyzed in the scope of.
     pub(crate) scope: sylex_lexicon::CardScope,
+    /// The reachable forest, children first ([`Parse::children_first`]).
+    pub(crate) children_first: OnceLock<Result<Vec<Vertex>, ForestCycle>>,
+    /// The head leaves of every node and item ([`Parse::head_inside`]).
+    pub(crate) head_inside: OnceLock<Inside<HeadLeaf>>,
 }
 
+// Its memoized walks keep a Parse shareable across threads.
+const _: fn() = || {
+    fn shareable<T: Send + Sync>() {}
+    shareable::<Parse<'static>>();
+};
+
 impl<'g> Parse<'g> {
+    /// Every Derivation of the text.
+    #[must_use]
+    pub fn forest(&self) -> &PackedForest {
+        &self.forest
+    }
+
     /// The analyzed text, as chars, in logical order (a period or comma
     /// written inside a closing quotation mark follows it).
     #[must_use]
@@ -941,6 +963,8 @@ impl CompiledGrammar {
             forest,
             vocabulary_gaps: analyzed.unknown_words(),
             scope: analyzed.scope.clone(),
+            children_first: OnceLock::new(),
+            head_inside: OnceLock::new(),
         }
     }
 }

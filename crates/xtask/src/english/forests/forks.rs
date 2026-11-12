@@ -333,7 +333,7 @@ mod tests {
             let frames: Option<String> = r.get(7).unwrap();
             let answer = match (leaf, dependency.as_deref(), frames) {
                 (Some(leaf), None, None) => Answer::Lexical {
-                    reading: parse.forest.leaf_reading(leaf).clone(),
+                    reading: parse.forest().leaf_reading(leaf).clone(),
                 },
                 (None, Some("root"), None) => Answer::Dependency(Dependency::Root),
                 (None, Some("dependent"), None) => Answer::Dependency(Dependency::Dependent {

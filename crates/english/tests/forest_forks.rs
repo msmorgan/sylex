@@ -445,10 +445,10 @@ fn check(
             "the split forest's Readings are not the forest's".to_owned(),
         ));
     }
-    let leaves = (0..parse.forest.metrics().leaves)
+    let leaves = (0..parse.forest().metrics().leaves)
         .map(|l| {
-            let span = parse.forest.leaf_span(l);
-            (span.start, span.end, parse.forest.leaf_reading(l).clone())
+            let span = parse.forest().leaf_span(l);
+            (span.start, span.end, parse.forest().leaf_reading(l).clone())
         })
         .collect();
     let oracle = Oracle {
@@ -544,16 +544,16 @@ fn check(
     };
     let counts = parse.counts().map_err(|e| name(e.to_string()))?;
     let live = (
-        (0..parse.forest.node_count())
+        (0..parse.forest().node_count())
             .filter(|&n| counts.node(n) > 0)
             .count(),
-        (0..parse.forest.item_count())
+        (0..parse.forest().item_count())
             .filter(|&i| counts.item(i) > 0)
             .count(),
     );
     let mut measure = Measure {
         derivations: total,
-        roots: parse.forest.roots().len(),
+        roots: parse.forest().roots().len(),
         conditional: forks.iter().filter(|f| f.conditional).count(),
         fork_count: forks.len(),
         left: narrowed.total(),
