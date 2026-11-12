@@ -336,6 +336,73 @@ impl ChildRole {
     }
 }
 
+/// One child position of a Production: the gates a child there must pass
+/// that depend on nothing but the child, which [`Production::accept`] checks
+/// before it copies and propagates its State, and, for a Category child,
+/// where its Category carries each feature.
+#[derive(Debug, Clone, Default)]
+#[expect(clippy::struct_excessive_bools, reason = "independent gates of one child")]
+pub(crate) struct ChildSlot {
+    /// For a Category child, the offset in its `Summary::values` of each
+    /// feature its Category carries, by feature id.
+    offsets: Vec<Option<u8>>,
+    /// (feature, value) the child may not carry.
+    pub exclusions: Vec<(usize, u16)>,
+    /// (feature, value) the child must carry, not merely admit.
+    pub carried: Vec<(usize, u16)>,
+    /// It must be light or heavy, or end in a dependent.
+    pub weight: Option<Weight>,
+    /// It may not be a coordination.
+    pub uncoordinated: bool,
+    /// It must be a coordination.
+    pub coordinated: bool,
+    /// Its `Summary::whole_coordination` must be this: a phrase that is
+    /// itself a coordination, or one that is not.
+    pub whole_coordination: Option<bool>,
+    /// It may not be, nor be headed by, a Linked Coordination
+    /// (`Summary::link`).
+    pub unlinked: bool,
+    /// It is a conjunct of its coordination other than the last: the only
+    /// position a `Summary::nonfinal` phrase may fill.
+    pub nonfinal_conjunct: bool,
+    /// A derived unlike Frame Slot: the mask of values outside which the
+    /// coordination filling it has no conjunct's value of its `unlike`
+    /// feature (`Grammar::unlike_slots`).
+    pub unlike_mask: Option<u64>,
+    /// An `unextended` child: the prepositions of a Preposition Phrase it
+    /// may not end in (`ProductionDecl::unextended`).
+    pub unextended: Option<std::collections::BTreeSet<Lexeme>>,
+    /// An `unadjoined` child: the Categories of a trailing Adjunct it may
+    /// not end in (`ProductionDecl::unadjoined`).
+    pub unadjoined: Option<Vec<u16>>,
+}
+
+impl ChildSlot {
+    fn new(grammar: &CompiledGrammar, symbol: &Symbol) -> Self {
+        let offsets = match symbol {
+            Symbol::Cat { category, .. } => {
+                let mut offsets = vec![None; grammar.features.len()];
+                for (offset, &feature) in grammar.category_features[*category].iter().enumerate() {
+                    offsets[feature] = Some(u8::try_from(offset).expect("validated Category size"));
+                }
+                offsets
+            }
+            Symbol::Leaf(_) | Symbol::Punct(..) => Vec::new(),
+        };
+        Self {
+            offsets,
+            ..Self::default()
+        }
+    }
+
+    /// A feature's value on a Constituent of `summary` in this Category
+    /// slot.
+    fn node_value(&self, summary: &Summary, feature: usize) -> Option<u16> {
+        let offset = self.offsets[feature]?;
+        summary.values[usize::from(offset)].get()
+    }
+}
+
 /// A compiled Production.
 #[derive(Debug, Clone)]
 #[expect(
@@ -343,7 +410,12 @@ impl ChildRole {
     reason = "independent production facts"
 )]
 pub(crate) struct Production {
-    pub exclusions: Vec<(usize, usize, u16)>,
+    /// Each child's slot, by its position: its local admission gates and
+    /// where its Category carries each feature.
+    pub slots: Vec<ChildSlot>,
+    /// The first `uncoordinated` child it declares, over which Reading
+    /// Normal Form distributes a coordination of that child.
+    pub distributed: Option<usize>,
     /// Combinations of (child, feature, value) conditions that may not all
     /// hold: each exclusion is the run of `joint_conditions` up to its end
     /// index.
@@ -359,18 +431,8 @@ pub(crate) struct Production {
     /// The child that carries the last conjunct's value, as its own feature
     /// or (`true`) as a serial tail's recorded last value.
     pub resolution_last: Option<(usize, bool)>,
-    /// (child, feature, value) a child must carry, not merely admit.
-    pub carried: Vec<(usize, usize, u16)>,
-    /// Children that must be light or heavy, or end in a dependent.
-    pub weights: Vec<(usize, Weight)>,
     /// Children in the head line: the head, or a conjunct of a coordination.
     pub head_line: Vec<bool>,
-    /// The `unextended` child, and the prepositions of a Preposition Phrase
-    /// it may not end in (`ProductionDecl::unextended`).
-    pub unextended: Option<(usize, std::collections::BTreeSet<Lexeme>)>,
-    /// The `unadjoined` child, and the Categories of a trailing Adjunct it
-    /// may not end in (`ProductionDecl::unadjoined`).
-    pub unadjoined: Option<(usize, Vec<u16>)>,
     /// Children through which the phrase ends in what they end in
     /// (`Summary::final_adjunct`): the head, and a last Complement of the
     /// Production's own Category after it (a modal's bare infinitival). A
@@ -409,16 +471,6 @@ pub(crate) struct Production {
     pub requires_coordination: Option<usize>,
     /// The coordinator a correlative coordination's serial tail must end with.
     pub paired_coordinator: Option<Lexeme>,
-    /// Children that may not be a coordination.
-    pub uncoordinated: Vec<usize>,
-    /// Children that must be a coordination.
-    pub coordinated: Vec<usize>,
-    /// Children whose `Summary::whole_coordination` must be the given
-    /// value: a phrase that is itself a coordination, or one that is not.
-    pub whole_coordination: Vec<(usize, bool)>,
-    /// Children that may not be, nor be headed by, a Linked Coordination
-    /// (`Summary::link`).
-    pub unlinked: Vec<usize>,
     /// It is a coordination delimited before its coordinator.
     pub delimits: bool,
     /// It is a serial tail of a coordination (*…, [B, and C]*): its `first`
@@ -440,10 +492,6 @@ pub(crate) struct Production {
     /// feature value. Its Summary gathers their values
     /// (`Summary::unlike_values`); the whole requires two or more.
     pub unlike: Option<Unlike>,
-    /// Derived unlike Frame Slot children: (child, mask of values). The
-    /// coordination filling the slot has no conjunct whose value of its
-    /// `unlike` feature is outside the mask (`Grammar::unlike_slots`).
-    pub unlike_slots: Vec<(usize, u64)>,
     /// An auxiliary Verb Phrase's Complement: the child of an uncoordinated
     /// Production after its head, last, and of a function Category aliasing
     /// the Production's own Category, the participial Verb Phrase Complement
@@ -458,9 +506,6 @@ pub(crate) struct Production {
     /// Its phrase is only a conjunct of a coordination other than the last
     /// (`Summary::nonfinal`).
     pub nonfinal: bool,
-    /// The children that are conjuncts of its coordination other than the
-    /// last: the only positions a `Summary::nonfinal` phrase may fill.
-    pub nonfinal_conjuncts: Vec<usize>,
     /// The child whose `Summary::head_forms` the mother takes: its head, or
     /// the first conjunct of a coordination.
     pub lexical_head: Option<usize>,
@@ -665,31 +710,28 @@ pub(crate) fn resolve(
     let head_line = roles.iter().map(|role| role.in_head_line()).collect();
     let edge_line = (0..children.len()).map(|i| head == Some(i)).collect();
     let names = children.iter().map(|(name, ..)| *name).collect();
+    let slots = children
+        .iter()
+        .map(|(_, symbol, _)| ChildSlot::new(grammar, symbol))
+        .collect();
     let (rhs, gaps) = children.into_iter().map(|(_, s, g)| (s, g)).unzip();
     if introduces != Gap::None && grammar.category_gap[lhs] & introduces.bit() == 0 {
         return Err("introduces a gap on a category that cannot contain one".to_owned());
     }
     Ok(Production {
-        exclusions: Vec::new(),
+        slots,
+        distributed: None,
         joint_exclusions: Vec::new(),
         joint_conditions: Vec::new(),
         resolutions: Vec::new(),
         resolution_nonlast: Vec::new(),
         resolution_last: None,
-        carried: Vec::new(),
-        weights: Vec::new(),
         edge_line,
         head_line,
-        unextended: None,
-        unadjoined: None,
         adjunct_slot: None,
         adjunct_unfit: Vec::new(),
         predicative: None,
         paired_coordinator: None,
-        uncoordinated: Vec::new(),
-        unlinked: Vec::new(),
-        coordinated: Vec::new(),
-        whole_coordination: Vec::new(),
         delimits: false,
         tail: false,
         interleaved_prefix: false,
@@ -698,12 +740,10 @@ pub(crate) fn resolve(
         fills_preposition: None,
         foreign_coordinators: Vec::new(),
         unlike: None,
-        unlike_slots: Vec::new(),
         auxiliary: None,
         omission: Omission::None,
         unclosed: false,
         nonfinal: false,
-        nonfinal_conjuncts: Vec::new(),
         lexical_head,
         link: None,
         cluster: None,
@@ -1283,29 +1323,12 @@ impl Production {
                 next.adjunct_extension = extension.filter(|_| {
                     !self.adjunct_unfit.iter().any(|&(k, feature, value)| {
                         Some(k) == kind
-                            && self.node_value(grammar, position, summary, feature) == Some(value)
+                            && self.slots[position].node_value(summary, feature) == Some(value)
                     })
                 });
             }
         }
         Some(())
-    }
-
-    /// A feature's value on child `position`, a Constituent of `summary`.
-    fn node_value(
-        &self,
-        grammar: &CompiledGrammar,
-        position: usize,
-        summary: &Summary,
-        feature: usize,
-    ) -> Option<u16> {
-        let Symbol::Cat { category, .. } = &self.rhs[position] else {
-            return None;
-        };
-        let index = grammar.category_features[*category]
-            .iter()
-            .position(|f| *f == feature)?;
-        summary.values[index].get()
     }
 
     /// Whether the last non-punctuation child is in the head line.
@@ -1336,25 +1359,16 @@ impl Production {
     }
 
     /// The preposition of the Preposition Phrase dependent the phrase so far
-    /// ends in, or `None` if child `position` is an `unextended` child that
-    /// ends in one its Production closes.
+    /// ends in.
     fn track_final_preposition(
         &self,
         grammar: &CompiledGrammar,
         next: &mut State,
         position: usize,
         child: &ChildView<'_>,
-    ) -> Option<()> {
+    ) {
         match child {
             ChildView::Node(summary) => {
-                if let Some((at, closed)) = &self.unextended
-                    && *at == position
-                    && summary
-                        .final_preposition
-                        .is_some_and(|p| closed.contains(&p))
-                {
-                    return None;
-                }
                 next.final_preposition = if self.head_line[position] {
                     summary.final_preposition
                 } else {
@@ -1367,29 +1381,21 @@ impl Production {
             ChildView::Leaf(..) => next.final_preposition = None,
             ChildView::Punct => {}
         }
-        Some(())
     }
 
-    /// The Category of the trailing Adjunct the phrase so far ends in, or
-    /// `None` if child `position` is an `unadjoined` child that ends in one
-    /// its Production closes. A trailing Adjunct is the last child, named
-    /// `adjunct`, of a Production whose head precedes it with no comma
-    /// between: an unselected post-head dependent, not one set off.
+    /// The Category of the trailing Adjunct the phrase so far ends in. A
+    /// trailing Adjunct is the last child, named `adjunct`, of a Production
+    /// whose head precedes it with no comma between: an unselected post-head
+    /// dependent, not one set off.
     fn track_final_adjunct(
         &self,
         grammar: &CompiledGrammar,
         next: &mut State,
         position: usize,
         child: &ChildView<'_>,
-    ) -> Option<()> {
+    ) {
         match child {
             ChildView::Node(summary) => {
-                if let Some((at, closed)) = &self.unadjoined
-                    && *at == position
-                    && summary.final_adjunct.is_some_and(|c| closed.contains(&c))
-                {
-                    return None;
-                }
                 next.final_adjunct = if self.edge_line[position] {
                     summary.final_adjunct
                 } else if self.roles[position] == ChildRole::Adjunct
@@ -1408,7 +1414,6 @@ impl Production {
             ChildView::Leaf(..) => next.final_adjunct = None,
             ChildView::Punct => {}
         }
-        Some(())
     }
 
     /// The omitted Complement forms of the ellipsis site the phrase so far
@@ -1639,21 +1644,25 @@ impl Production {
         Some(())
     }
 
-    /// The lexical leaves child `position` adds, counted to two, or `None` if
-    /// it is not the weight the Production requires.
-    fn weigh(&self, position: usize, child: &ChildView<'_>) -> Option<u8> {
-        let leaves = match child {
+    /// The lexical leaves a child adds, counted to two.
+    fn leaves(child: &ChildView<'_>) -> u8 {
+        match child {
             ChildView::Node(summary) => summary.leaves,
             ChildView::Leaf(..) => 1,
             ChildView::Punct => 0,
-        };
-        match self.weights.iter().find(|(at, _)| *at == position) {
-            Some((_, Weight::Light)) if leaves != 1 => None,
-            Some((_, Weight::Heavy)) if leaves < 2 => None,
-            Some((_, Weight::Postposable)) if !matches!(child, ChildView::Node(s) if !s.head_final || s.head_coordination) => {
-                None
+        }
+    }
+
+    /// Whether a child is the weight its slot requires.
+    fn weighs(weight: Option<Weight>, child: &ChildView<'_>) -> bool {
+        let leaves = Self::leaves(child);
+        match weight {
+            Some(Weight::Light) => leaves == 1,
+            Some(Weight::Heavy) => leaves >= 2,
+            Some(Weight::Postposable) => {
+                matches!(child, ChildView::Node(s) if !s.head_final || s.head_coordination)
             }
-            _ => Some(leaves),
+            None => true,
         }
     }
 
@@ -1760,14 +1769,14 @@ impl Production {
         Some(())
     }
 
-    /// Whether child `position`, a derived unlike Frame Slot, admits the
+    /// Whether a slot that is a derived unlike Frame Slot admits the
     /// coordination: none of its conjuncts' values of the unlike feature is
     /// outside the slot's mask, and every conjunct has one
-    /// (`Production::unlike_slots`; the mask never holds
+    /// (`ChildSlot::unlike_mask`; the mask never holds
     /// [`UNVALUED_CONJUNCT`]).
-    fn unlike_slot_admits(&self, position: usize, summary: &Summary) -> bool {
-        self.unlike_slots.iter().all(|&(at, mask)| {
-            at != position || (summary.unlike_values != 0 && summary.unlike_values & !mask == 0)
+    fn unlike_slot_admits(slot: &ChildSlot, summary: &Summary) -> bool {
+        slot.unlike_mask.is_none_or(|mask| {
+            summary.unlike_values != 0 && summary.unlike_values & !mask == 0
         })
     }
 
@@ -1973,26 +1982,89 @@ impl Production {
         }
     }
 
-    /// Records the Linked Coordination that child `position`, the head, is
-    /// or is headed by (`Summary::link`), or `None` if the child may not be
-    /// one: an `unlinked` child, or a Conjunct of a Linked Coordination of the
-    /// same identity.
-    fn track_link(&self, next: &mut State, position: usize, summary: &Summary) -> Option<()> {
-        if self.head == Some(position) {
-            next.headed_link = summary.link;
-        }
+    /// Whether child `position` may be, or be headed by, the Linked
+    /// Coordination it is (`Summary::link`): not an `unlinked` child, nor a
+    /// Conjunct of a Linked Coordination of the same identity.
+    fn link_admits(&self, slot: &ChildSlot, position: usize, summary: &Summary) -> bool {
         let same_chain = self.link == summary.link && self.distinct_coordinator.contains(&position);
-        if summary.link.is_some() && (self.unlinked.contains(&position) || same_chain) {
-            return None;
-        }
-        Some(())
+        summary.link.is_none() || !(slot.unlinked || same_chain)
     }
 
-    /// Adds child `position` to `state`, or `None` if it does not fit.
-    #[expect(
-        clippy::too_many_lines,
-        reason = "one admission gate per Summary field"
-    )]
+    /// A feature's value on a child in `slot`.
+    fn child_value(slot: &ChildSlot, child: &ChildView<'_>, feature: usize) -> Option<u16> {
+        match child {
+            ChildView::Node(summary) => slot.node_value(summary, feature),
+            ChildView::Leaf(leaf, _) => leaf.features[feature],
+            ChildView::Punct => None,
+        }
+    }
+
+    /// Whether child `position` passes the gates of its slot, which depend
+    /// on the child alone, not on the children before it.
+    fn admits(&self, grammar: &CompiledGrammar, position: usize, child: &ChildView<'_>) -> bool {
+        let slot = &self.slots[position];
+        if !Self::weighs(slot.weight, child)
+            || slot
+                .exclusions
+                .iter()
+                .any(|&(feature, value)| Self::child_value(slot, child, feature) == Some(value))
+            || slot
+                .carried
+                .iter()
+                .any(|&(feature, value)| Self::child_value(slot, child, feature) != Some(value))
+        {
+            return false;
+        }
+        let ChildView::Node(summary) = child else {
+            return true;
+        };
+        // A free child does not begin with an atom glued to the one before.
+        let free = matches!(
+            self.rhs[position],
+            Symbol::Cat {
+                binding: Some(sylex_lexicon::Binding::Free),
+                ..
+            }
+        );
+        let foreign = summary.coordinator.is_some_and(|c| self.foreign_coordinator(c));
+        let unpaired = self
+            .paired_coordinator
+            .is_some_and(|p| summary.coordinator != Some(CoordinatorId::Lexeme(p)));
+        let closed_preposition = slot.unextended.as_ref().is_some_and(|closed| {
+            summary
+                .final_preposition
+                .is_some_and(|p| closed.contains(&p))
+        });
+        let closed_adjunct = slot
+            .unadjoined
+            .as_ref()
+            .is_some_and(|closed| summary.final_adjunct.is_some_and(|c| closed.contains(&c)));
+        let rejected = (free && summary.first_glues)
+            || closed_preposition
+            || closed_adjunct
+            || !self.slot_admits(grammar, position, summary)
+            || !Self::unlike_slot_admits(slot, summary)
+            || (summary.nonfinal && !slot.nonfinal_conjunct)
+            || (slot.uncoordinated && summary.coordinated)
+            || !self.link_admits(slot, position, summary)
+            || (slot.coordinated && !summary.coordinated)
+            || slot
+                .whole_coordination
+                .is_some_and(|whole| whole != summary.whole_coordination)
+            // A comma that no bracket closes stays inside every phrase that
+            // contains it, to the end of its sentence.
+            || (summary.internal_comma && self.set_off_before_head(position))
+            || self.comma_scope_excludes(position, summary)
+            || (summary.auxiliary && self.post_adjunct_host(position))
+            || (self.requires_coordination == Some(position)
+                && (summary.coordinator.is_none() || !summary.gap_right_edge))
+            || (self.coordinator == Some(position) && (foreign || unpaired));
+        !rejected
+    }
+
+    /// Adds child `position` to `state`, or `None` if it does not fit. The
+    /// gates of its slot ([`Self::admits`]) are checked before the State is
+    /// copied.
     pub fn accept(
         &self,
         grammar: &CompiledGrammar,
@@ -2000,21 +2072,13 @@ impl Production {
         position: usize,
         child: &ChildView<'_>,
     ) -> Option<State> {
+        if !self.admits(grammar, position, child) {
+            return None;
+        }
+        let slot = &self.slots[position];
         let mut next = *state;
         if state.gap.is_some_and(|gap| gap != Gap::None) {
             next.gap_right_edge = false;
-        }
-        // A free child does not begin with an atom glued to the one before.
-        if let (
-            Symbol::Cat {
-                binding: Some(sylex_lexicon::Binding::Free),
-                ..
-            },
-            ChildView::Node(summary),
-        ) = (&self.rhs[position], child)
-            && summary.first_glues
-        {
-            return None;
         }
         if state.unclosed && !matches!(self.rhs[position], Symbol::Punct('.', ..)) {
             return None;
@@ -2059,32 +2123,15 @@ impl Production {
         next.last_edge = last_edge.or(state.last_edge);
         next.unwritten_period =
             matches!(child, ChildView::Node(summary) if summary.unwritten_period);
-        next.leaves = (next.leaves + self.weigh(position, child)?).min(2);
+        next.leaves = (next.leaves + Self::leaves(child)).min(2);
         self.track_head_final(&mut next, position, child);
-        self.track_final_preposition(grammar, &mut next, position, child)?;
-        self.track_final_adjunct(grammar, &mut next, position, child)?;
+        self.track_final_preposition(grammar, &mut next, position, child);
+        self.track_final_adjunct(grammar, &mut next, position, child);
         self.track_omitted_complement(grammar, &mut next, position, child)?;
         self.track_ellipsis(&mut next, position, child)?;
         self.track_cluster(grammar, &mut next, position, child)?;
         self.track_remnant(grammar, &mut next, position, child)?;
-        let lookup = |feature: usize| -> Option<u16> {
-            match child {
-                ChildView::Node(summary) => self.node_value(grammar, position, summary, feature),
-                ChildView::Leaf(leaf, _) => leaf.features[feature],
-                ChildView::Punct => None,
-            }
-        };
-        if self
-            .exclusions
-            .iter()
-            .any(|&(at, feature, value)| at == position && lookup(feature) == Some(value))
-            || self
-                .carried
-                .iter()
-                .any(|&(at, feature, value)| at == position && lookup(feature) != Some(value))
-        {
-            return None;
-        }
+        let lookup = |feature: usize| Self::child_value(slot, child, feature);
         self.unlike_conjuncts(&mut next, position, child, &lookup)?;
         self.joint_exclusion(&mut next, position, &lookup)?;
         self.resolve(&mut next, position, child, &lookup);
@@ -2098,12 +2145,6 @@ impl Production {
         }
         match child {
             ChildView::Node(summary) => {
-                if !self.slot_admits(grammar, position, summary)
-                    || !self.unlike_slot_admits(position, summary)
-                    || (summary.nonfinal && !self.nonfinal_conjuncts.contains(&position))
-                {
-                    return None;
-                }
                 if summary.gap != Gap::None {
                     next.gap_right_edge = summary.gap_right_edge;
                     if matches!(self.gaps[position], GapRule::Shared) {
@@ -2122,31 +2163,13 @@ impl Production {
                 {
                     return None;
                 }
-                if self.uncoordinated.contains(&position) && summary.coordinated {
-                    return None;
-                }
-                self.track_link(&mut next, position, summary)?;
-                if self.coordinated.contains(&position) && !summary.coordinated {
-                    return None;
-                }
-                if self
-                    .whole_coordination
-                    .iter()
-                    .any(|&(child, whole)| child == position && whole != summary.whole_coordination)
-                {
-                    return None;
+                if self.head == Some(position) {
+                    next.headed_link = summary.link;
                 }
                 if self.post_adjunct_host(position) {
                     next.coordinated_head = summary.coordinated;
                 }
-                // A comma that no bracket closes stays inside every phrase
-                // that contains it, to the end of its sentence.
-                if summary.internal_comma {
-                    if self.set_off_before_head(position) {
-                        return None;
-                    }
-                    next.internal_comma = true;
-                }
+                next.internal_comma |= summary.internal_comma;
                 next.open_comma = summary.open_comma
                     || (self.hosts_comma_set_dependent() && position == self.rhs.len() - 1);
                 if summary.nominal_unhosted
@@ -2154,17 +2177,6 @@ impl Production {
                         || (self.cluster.is_some() && self.roles[position] == ChildRole::Adjunct))
                 {
                     next.forced = true;
-                }
-                if self.comma_scope_excludes(position, summary) {
-                    return None;
-                }
-                if summary.auxiliary && self.post_adjunct_host(position) {
-                    return None;
-                }
-                if self.requires_coordination == Some(position)
-                    && (summary.coordinator.is_none() || !summary.gap_right_edge)
-                {
-                    return None;
                 }
                 if self.distinct_coordinator.contains(&position)
                     && let Some(c) = summary.coordinator
@@ -2178,20 +2190,7 @@ impl Production {
                 if self.chained == Some(position) && summary.coordinator != next.coordinator {
                     return None;
                 }
-                if self.coordinator == Some(position)
-                    && summary
-                        .coordinator
-                        .is_some_and(|c| self.foreign_coordinator(c))
-                {
-                    return None;
-                }
                 if self.coordinator == Some(position) {
-                    if self
-                        .paired_coordinator
-                        .is_some_and(|p| summary.coordinator != Some(CoordinatorId::Lexeme(p)))
-                    {
-                        return None;
-                    }
                     next.coordinator = summary.coordinator;
                 }
                 self.priority(grammar, &mut next, position, summary)?;

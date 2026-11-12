@@ -1372,7 +1372,7 @@ impl<'a> Binder<'a> {
         self.out
             .unextended_prepositions
             .extend(closed.iter().copied());
-        self.out.productions[index].unextended = Some((at, closed));
+        self.out.productions[index].slots[at].unextended = Some(closed);
         Ok(())
     }
 
@@ -1407,7 +1407,7 @@ impl<'a> Binder<'a> {
         self.out
             .unadjoined_categories
             .extend(closed.iter().copied());
-        self.out.productions[index].unadjoined = Some((at, closed));
+        self.out.productions[index].slots[at].unadjoined = Some(closed);
         Ok(())
     }
 
@@ -2088,13 +2088,11 @@ impl<'a> Binder<'a> {
             &self.out,
             draft.id,
             draft.lhs,
-            draft
-                .children
+            std::mem::take(&mut draft.children)
                 .into_iter()
                 .map(|c| (c.name, c.symbol, c.gap))
                 .collect(),
-            draft
-                .equations
+            std::mem::take(&mut draft.equations)
                 .into_iter()
                 .map(|(path, target)| {
                     let key = |p: Path| match p {
@@ -2116,11 +2114,12 @@ impl<'a> Binder<'a> {
             draft.frame,
             draft.host_check,
             draft.coordinator,
-            draft.distinct_coordinator,
+            std::mem::take(&mut draft.distinct_coordinator),
             draft.requires_coordination,
         )
         .map_err(|e| invalid(format!("production `{}`: {e}", draft.id)))?;
-        production.exclusions = draft.exclusions;
+        gate_slots(&mut production, &mut draft)
+            .map_err(|e| invalid(format!("production `{}`: {e}", draft.id)))?;
         let conditions: usize = draft.joint_exclusions.iter().map(Vec::len).sum();
         if conditions > crate::step::MAX_JOINT_CONDITIONS {
             return Err(invalid(format!(
@@ -2165,16 +2164,10 @@ impl<'a> Binder<'a> {
         }
         production.resolution_nonlast = draft.resolution_nonlast;
         production.resolution_last = draft.resolution_last;
-        production.carried = draft.carried;
-        production.weights = draft.weights;
         production.adjunct_slot = draft.adjunct_slot;
         production.adjunct_unfit = draft.adjunct_unfit;
         production.predicative = draft.predicative;
         production.paired_coordinator = draft.paired_coordinator;
-        production.uncoordinated = draft.uncoordinated;
-        production.unlinked = draft.unlinked;
-        production.coordinated = draft.coordinated;
-        production.whole_coordination = draft.whole_coordination;
         production.delimits = draft.delimits;
         production.tail = draft.tail;
         production.interleaved_prefix = draft.interleaved_prefix;
@@ -2185,7 +2178,6 @@ impl<'a> Binder<'a> {
             .foreign_coordinators
             .clone_from(&draft.foreign_coordinators);
         production.unlike = draft.unlike;
-        production.unlike_slots.clone_from(&draft.unlike_slots);
         production.omission = if let Some(forms) = draft.elliptical {
             crate::step::Omission::Ellipsis(forms)
         } else if draft.omits_complement {
@@ -2196,7 +2188,6 @@ impl<'a> Binder<'a> {
         production.link = draft.link;
         production.unclosed = draft.unclosed;
         production.nonfinal = draft.nonfinal;
-        production.nonfinal_conjuncts = draft.nonfinal_conjuncts;
         production.cluster = draft
             .cluster
             .map(|frame| u16::try_from(frame).expect("frame index fits"));
@@ -5157,6 +5148,51 @@ fn equation_path(equation: &Equation) -> &str {
         | Equation::Agree(p, _) => p,
         Equation::ExcludeTogether(conditions) => conditions.first().map_or("", |(p, _)| p),
     }
+}
+
+/// Gathers a draft's per-child admission gates into its Production's
+/// child slots.
+fn gate_slots(production: &mut Production, draft: &mut Draft) -> Result<(), String> {
+    for (at, feature, value) in std::mem::take(&mut draft.exclusions) {
+        production.slots[at].exclusions.push((feature, value));
+    }
+    for (at, feature, value) in std::mem::take(&mut draft.carried) {
+        production.slots[at].carried.push((feature, value));
+    }
+    for (at, weight) in std::mem::take(&mut draft.weights) {
+        let slot = &mut production.slots[at];
+        if slot.weight.is_some_and(|w| w != weight) {
+            return Err(format!("child {at} has two weights"));
+        }
+        slot.weight = Some(weight);
+    }
+    production.distributed = draft.uncoordinated.first().copied();
+    for at in std::mem::take(&mut draft.uncoordinated) {
+        production.slots[at].uncoordinated = true;
+    }
+    for at in std::mem::take(&mut draft.unlinked) {
+        production.slots[at].unlinked = true;
+    }
+    for at in std::mem::take(&mut draft.coordinated) {
+        production.slots[at].coordinated = true;
+    }
+    for (at, whole) in std::mem::take(&mut draft.whole_coordination) {
+        let slot = &mut production.slots[at];
+        if slot.whole_coordination.is_some_and(|w| w != whole) {
+            return Err(format!(
+                "child {at} must both be and not be a whole coordination"
+            ));
+        }
+        slot.whole_coordination = Some(whole);
+    }
+    for at in std::mem::take(&mut draft.nonfinal_conjuncts) {
+        production.slots[at].nonfinal_conjunct = true;
+    }
+    for &(at, mask) in &draft.unlike_slots {
+        let slot = &mut production.slots[at];
+        slot.unlike_mask = Some(slot.unlike_mask.unwrap_or(mask) & mask);
+    }
+    Ok(())
 }
 
 /// The engine-owned serial tail Category of a coordination schema: by its

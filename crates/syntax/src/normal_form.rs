@@ -90,7 +90,7 @@ impl CompiledGrammar {
                 .count()
         };
         if let Some(p) = production
-            && let Some(&at) = p.uncoordinated.first()
+            && let Some(at) = p.distributed
             && let at = child(p, at)
             && let Some(Reading::Node(coordination)) = children.get(at)
             && coordination.production.starts_with("Coordination:")
