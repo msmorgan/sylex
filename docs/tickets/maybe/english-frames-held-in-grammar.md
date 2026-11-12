@@ -22,6 +22,18 @@ promises for frames does not reach them: same-head complement priority cannot ap
 ...*, and the lists drift from the lexicon (the existential list has `After`, which *be* does
 not select).
 
+The half of same-head complement priority by which a bare head with its Complement omitted takes
+the following Preposition Phrase its frame selects is limited to a non-verbal `valence` Schema's
+`Bare` Production, whose leaf records its lexeme's frames; a hand-written Production over a
+`Class` leaf, such as `FusedQuantifierNominalPhrase`, gets none even when the word has a frame.
+An *of* frame on *each* alone also makes `ExceptiveFusedHead`, `ComparativeFusedHead` and
+`ComplementedPartitive` accept *each of X*, since nothing carries the oblique's preposition.
+With priority on fused *each*, the *of*-phrase half of the `NonNumericComplement` ban becomes
+redundant, but the ban stays until fused *each* before a Nominal it could determine (*cast for
+each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
+`DegreeArithmetic` exclusion become removable; `NominalPredicative`'s exclusion does not (fused
+*each* as the Predicative of *power and toughness are each equal to ...*).
+
 ## Open questions
 
 - Should the frame engine gain these two capabilities so the three selections move to the
@@ -33,12 +45,12 @@ not select).
   mother's Number from its Complement, or the capability that already does it is named.
 - The selections follow the owner's ruling: declared as frames with the classes and word list
   gone, or kept with each class's comment saying why it is not a frame.
+- Where the partitive selection moves to the lexicon, `QuantityPartitiveOfEach` and the
+  `DegreeArithmetic` exclusion are deleted or kept with an ablation that justifies each.
 - The census shows no Reading lost on the supported corpus.
 
 ## Not in scope
 
-- The gates around fused *each* that complement priority would replace:
-  `english-fused-each-partitive`.
 - Collapsing the comparative Productions: `english-comparative-productions`.
 - The existential Productions' other defects: `english-single-card-productions`.
 
