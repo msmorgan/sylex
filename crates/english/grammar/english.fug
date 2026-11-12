@@ -126,6 +126,9 @@ feature CentralPosition = Occupied
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
+// A degree determinative (*that many*, *that much*) and what it determines,
+// which a multiplier joins as a quantity, never as a Noun Phrase.
+feature QuantityKind = Degree
 // In a Word-Part Coordination, a Compound Noun's first base alone, or the
 // last Conjunct's `Whole` noun (CGEL 15§3.1(g):1325).
 feature CompoundPart = Base | Whole
@@ -218,6 +221,7 @@ category ExistentialPredicate : VerbPhrase [Number, Person, VerbForm, Inflection
 category DisplacedSubject : NounPhrase [Number, Case] { gap }
 category FusedNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
+    QuantityKind,
 ] { gap }
 // A symbol sequence as a Noun Phrase, which a Preposition Phrase may
 // postmodify (*{X} in its mana cost*).
@@ -226,6 +230,7 @@ category SymbolHead : NounPhrase [Number, Person, Case, Determination, NounKind,
 // cards that has suspend*); it carries its determinative's distribution.
 category PartitiveHead : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
+    QuantityKind,
 ] { gap }
 // A slash measure as a Noun Phrase (*gets +2/+2*), only where a head
 // selects one or beside keyword phrases naming counter kinds; never a
@@ -241,7 +246,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 // its last conjunct's (NominalPredicative).
 category NounPhrase [
     Variable, Number, Person, Case, Determination, NounKind, Countability,
-    DeterminativeDistribution, FirstConjunctNumber, NounDistribution,
+    DeterminativeDistribution, FirstConjunctNumber, NounDistribution, QuantityKind,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
 // (*three times*; 8§9:713–716).
@@ -316,8 +321,9 @@ category FusedQuantity : DeterminerPhrase [Number, Countability]
 // A determinative's Complement has a Number of its own (*all but one*).
 category DeterminerPhrase [
     Number, Countability, DeterminativeDistribution, NounKind, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution,
+    ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution, QuantityKind,
 ]
+category Multiplier
 // The Targeting Marker as an outer determiner's head, the word alone or
 // after an adjective (*two target creatures*, *a second target creature*);
 // the outer determiner gives it its Number.
@@ -1290,7 +1296,8 @@ PhrasalAdverb: AdverbPhrase -> Class(PhrasalAdverb) where $.AdjunctPosition = Ph
 MultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb) where $.AdjunctPosition = Multiplying
 BoundingAdverb: AdverbPhrase -> Class(BoundingAdverb) where $.AdjunctPosition = Bounding
 DegreeDeterminer: DeterminerPhrase -> modifier:Word(That) Class(DegreeQuantifier)
-    where $.ComplementKind = Intransitive
+    where $.ComplementKind = Intransitive,
+          $.QuantityKind = Degree
 // *As much*, *as many* (CGEL 13§4.3:1130). Degree *as* modifies the
 // determinative, never a Noun Phrase.
 EquativeDeterminer: DeterminerPhrase -> modifier:Word(DegreeAs) Class(DegreeQuantifier)
@@ -1341,12 +1348,14 @@ BoundingNounPhrase: NounPhrase -> modifier:AdverbPhrase determiner:DeterminerPhr
           $.Person = Third
 AdverbModifiedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Phrasal
-// *Twice its power*. A numerically determined head is excluded: *twice X
-// damage* (Stonesplitter Bolt) is AdverbMultipliedDeterminer's *[twice X]
-// damage*, never *twice [X damage]*.
+// *Twice its power*. A head determined by a number or degree determinative
+// is excluded: *twice X damage* (Stonesplitter Bolt) is MultipliedNumber's
+// *[twice X] damage*, and *twice that many cards* (Doubling Season)
+// MultipliedDegree's *[twice that many] cards*.
 AdverbMultipliedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Multiplying,
-          head.DeterminativeDistribution != Numerical
+          head.DeterminativeDistribution != Numerical,
+          head.QuantityKind != Degree
 // *Both* floated after a plural Object (*put two cards from your hand both
 // on top of your library or both on the bottom of your library*, Dream
 // Cache), where the second *both* is the second Cluster's own Object. A
@@ -1529,7 +1538,7 @@ ModifiedQuantity: ModifiedQuantifiedNominal -> modifier:AdjectivePhrase Quantifi
 // (SingularQuantifier), so excluding `FreeChoice` is a gate (ADR §6, §8):
 // without it *add three mana of any one color* (Lotus Vale) is also *any
 // [one color]*, a second tree of FreeChoiceDetermined's. A multiplier with a
-// number is MultiplierDeterminer's (*[half X] damage*, Banshee), never *half
+// number is MultipliedNumber's (*[half X] damage*, Banshee), never *half
 // [X damage]*.
 DeterminedQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNominal
     where determiner.DeterminativeDistribution != FreeChoice | Multiplier,
@@ -1856,27 +1865,32 @@ ArithmeticDeterminer: NumericalDeterminer ->
     where modifier.ComplementKind = NP,
           modifier.Determination = Bare,
           modifier.Case != Genitive
-// *Three times X cards*.
-MultipliedDeterminer: NumericalDeterminer ->
-    factor:Numeral(Cardinal) multiplier:BareNominal NumericalDeterminer
-    where multiplier.NounDistribution = Serial,
-          multiplier.Number = Plural
-// A multiplier determinative and a number form one number (*draw [half X]
-// cards*, Hydroid Krasis).
-MultiplierDeterminer: NumericalDeterminer -> multiplier:DeterminerPhrase NumericalDeterminer
-    where multiplier.DeterminativeDistribution := Multiplier
-// A multiplying adverb and a number form one number (*[twice X] damage*,
-// Stonesplitter Bolt).
-AdverbMultipliedDeterminer: NumericalDeterminer -> modifier:AdverbPhrase NumericalDeterminer
-    where modifier.AdjunctPosition := Multiplying
-// *three times this creature's power*. A numerically determined head is
-// excluded: *five times X damage* (Crackle with Power) is
-// MultipliedDeterminer's *[five times X] damage*, never *five times [X
-// damage]*.
+// A fraction or multiplier before the quantity it multiplies: a multiplier
+// determinative (*half*), a multiplying adverb (*twice*) or a cardinal and
+// a serial noun (*three times*).
+DeterminativeMultiplier: Multiplier -> DeterminerPhrase
+    where head.DeterminativeDistribution := Multiplier
+AdverbMultiplier: Multiplier -> AdverbPhrase where head.AdjunctPosition := Multiplying
+SerialMultiplier: Multiplier -> factor:Numeral(Cardinal) BareNominal
+    where head.NounDistribution = Serial,
+          head.Number = Plural
+// A multiplier and a number form one number (*draw [half X] cards*, Hydroid
+// Krasis; *[twice X] damage*, Stonesplitter Bolt; *[three times X] cards*).
+MultipliedNumber: NumericalDeterminer -> multiplier:Multiplier NumericalDeterminer
+// A multiplier and a degree determinative form one degree determinative
+// (*create [twice that many] of those tokens*, Doubling Season).
+MultipliedDegree: DeterminerPhrase -> multiplier:Multiplier DeterminerPhrase
+    where head.QuantityKind := Degree
+// *three times this creature's power*. A head determined by a number or
+// degree determinative is excluded: *five times X damage* (Crackle with
+// Power) is MultipliedNumber's *[five times X] damage*, and *three times
+// that many of those tokens* (Ojer Taq, Deepest Foundation) MultipliedDegree's
+// *[three times that many] of those tokens*.
 MultipliedNounPhrase: NounPhrase -> factor:Numeral(Cardinal) multiplier:BareNominal NounPhrase
     where multiplier.NounDistribution = Serial,
           multiplier.Number = Plural,
           head.DeterminativeDistribution != Numerical,
+          head.QuantityKind != Degree,
           head.Determination = Overt
 MultipliedAmount: Amount -> factor:Numeral(Cardinal) multiplier:BareNominal Amount
     where multiplier.NounDistribution = Serial,
@@ -1908,12 +1922,14 @@ DegreeArithmetic: DeterminerPhrase ->
     DeterminerPhrase modifier:Selected(PrepositionPhrase, Plus, Minus) { heavy: [head] }
     where head.ComplementKind = Intransitive,
           modifier.DeterminativeDistribution != Distributive
-// *Half their life*, *double that damage*. A numerically determined head
-// is excluded: *half X damage* (Banshee) is MultiplierDeterminer's *[half X]
-// damage*, never *half [X damage]*.
+// *Half their life*, *double that damage*. A head determined by a number or
+// degree determinative is excluded: *half X damage* (Banshee) is
+// MultipliedNumber's *[half X] damage*, and *half that many +1/+1 counters*
+// (Ochre Jelly) MultipliedDegree's *[half that many] +1/+1 counters*.
 MultiplierPredetermination: NounPhrase -> determiner:DeterminerPhrase NounPhrase
     where determiner.DeterminativeDistribution = Multiplier,
           head.DeterminativeDistribution != Numerical,
+          head.QuantityKind != Degree,
           head.Determination = Overt
 AdverbAdverbial: Adverbial -> AdverbPhrase where head.AdjunctPosition = End
 FrequencyAdverbial: Adverbial -> TemporalNounPhrase
@@ -2348,6 +2364,7 @@ ProperName: NounPhrase -> Name
 // head *number* beside TransparentQuantity's.
 Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [head] }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
+          $.QuantityKind = determiner.QuantityKind,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third,
