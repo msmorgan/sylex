@@ -35,7 +35,6 @@ use crate::lexeme::Lexeme;
 use crate::lexeme::Lexemes;
 use crate::projection::NUMBER;
 use crate::projection::Projection;
-use crate::step::ChildRole;
 use crate::step::Extension;
 use crate::step::Gap;
 use crate::step::GapRule;
@@ -305,7 +304,7 @@ impl CompiledGrammar {
     ///    grammar outside a coordination schema), else a `marker` (a relative
     ///    or interrogative clause's).
     /// 6. Its first child besides punctuation that does not bear a dependent
-    ///    function ([`ChildRole::is_dependent`]): `not`'s `filler`, not the
+    ///    function (`ChildRole::is_dependent`): `not`'s `filler`, not the
     ///    `modifier` *not*.
     /// 7. Its first child besides punctuation.
     ///
@@ -315,34 +314,7 @@ impl CompiledGrammar {
     /// Production of punctuation alone.
     #[must_use]
     pub fn head_line_child(&self, production: usize) -> Option<usize> {
-        let p = &self.productions[production];
-        let head = self.head_index(production);
-        let children: Vec<usize> = p
-            .rhs
-            .iter()
-            .enumerate()
-            .filter(|(_, symbol)| !matches!(symbol, Symbol::Punct(..)))
-            .map(|(at, _)| at)
-            .collect();
-        let named = |role: ChildRole| children.iter().copied().find(|&at| p.roles[at] == role);
-        if self.link_categories.contains(&p.lhs) {
-            return children.iter().copied().find(|&at| Some(at) != head);
-        }
-        let only = match children.as_slice() {
-            [only] => Some(*only),
-            _ => None,
-        };
-        head.or(p.coordinator)
-            .or(only)
-            .or_else(|| named(ChildRole::Coordinator))
-            .or_else(|| named(ChildRole::Marker))
-            .or_else(|| {
-                children
-                    .iter()
-                    .copied()
-                    .find(|&at| !p.roles[at].is_dependent())
-            })
-            .or_else(|| children.first().copied())
+        self.productions[production].shape.head_line_child
     }
 
     /// Whether a Production is one of a head line's frame Productions: it
@@ -350,14 +322,7 @@ impl CompiledGrammar {
     /// mention, a quoted ability, a Category's other name).
     #[must_use]
     pub fn is_frame_production(&self, production: usize) -> bool {
-        let production = &self.productions[production];
-        production.frame.is_some()
-            || production
-                .rhs
-                .iter()
-                .filter(|symbol| !matches!(symbol, Symbol::Punct(..)))
-                .count()
-                == 1
+        self.productions[production].shape.frame_production
     }
 
     /// The index of a Production, by its stable id.
@@ -1281,6 +1246,10 @@ impl<'a> Binder<'a> {
                 let id = self.category(name)?;
                 self.out.categories[id].clone_from(category);
             }
+        }
+        for production in &mut self.out.productions {
+            let link = self.out.link_categories.contains(&production.lhs);
+            production.seal(link, &self.out.unadjoined_categories);
         }
         self.out.cluster_shapes = cluster_shapes(&self.out.frames);
         self.out.prediction = crate::prediction::Prediction::compile(&self.out);

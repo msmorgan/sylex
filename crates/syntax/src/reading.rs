@@ -22,6 +22,7 @@ use crate::chart::QUOTATION_MARK;
 use crate::chart::quotation_mark;
 use crate::compile::CompiledGrammar;
 use crate::frames::Frame;
+use crate::step::Anchor;
 use crate::step::ChildRole;
 use crate::step::ChildView;
 use crate::step::Gap;
@@ -343,22 +344,15 @@ impl Parse<'_> {
     /// the first conjunct, whose words a later child's key reads.
     fn anchors(&self, item: usize, mut anchors: Anchors, child: ChildRef) -> Anchors {
         let it = &self.forest.items[item];
-        let roles = &self.grammar.productions[it.production].roles;
-        let at = it.dot - 1;
-        let later = |read: &[ChildRole]| roles[at + 1..].iter().any(|r| read.contains(r));
         let extent = || match child {
             ChildRef::Node(n) => Some((self.forest.nodes[n].start, self.forest.nodes[n].end)),
             ChildRef::Leaf(l) => Some((self.forest.leaves[l].start, self.forest.leaves[l].end)),
             ChildRef::Punct => None,
         };
-        match roles[at] {
-            ChildRole::Head
-                if later(&[ChildRole::Adjunct, ChildRole::Modifier, ChildRole::Supplement]) =>
-            {
-                anchors.head = extent();
-            }
-            ChildRole::First if later(&[ChildRole::Last]) => anchors.first = extent(),
-            _ => {}
+        match self.grammar.productions[it.production].slots[it.dot - 1].anchor {
+            Some(Anchor::Head) => anchors.head = extent(),
+            Some(Anchor::First) => anchors.first = extent(),
+            None => {}
         }
         anchors
     }
@@ -925,21 +919,17 @@ impl CompiledGrammar {
         first: impl FnOnce() -> Option<(u64, bool)>,
         before: impl FnOnce() -> u64,
     ) -> RankingKey {
-        let roles = &self.productions[production].roles;
+        let p = &self.productions[production];
+        let attachment = p.slots[index].attachment;
         let signed = |words: u64| i64::try_from(words).unwrap_or(i64::MAX);
-        let after_head = || roles[..index].contains(&ChildRole::Head);
         let mut key = RankingKey::default();
-        match roles[index] {
+        match p.roles[index] {
             ChildRole::Head if !child.coordination => {
-                let dependents = roles[index + 1..]
-                    .iter()
-                    .filter(|role| role.is_unselected())
-                    .count();
                 key.right_association_words = signed(child.words)
-                    .saturating_mul(i64::try_from(dependents).unwrap_or(i64::MAX));
+                    .saturating_mul(i64::from(attachment.dependents_after));
             }
             role @ (ChildRole::Adjunct | ChildRole::Modifier | ChildRole::Supplement)
-                if after_head() =>
+                if attachment.after_head =>
             {
                 if let Some(head_words) = head() {
                     let host = signed(head_words);
@@ -963,10 +953,7 @@ impl CompiledGrammar {
             }
             _ => {}
         }
-        if roles[index].is_unselected()
-            && roles[..index].iter().any(|role| role.is_unselected())
-            && roles[index + 1..].contains(&ChildRole::Head)
-        {
+        if attachment.preposed_after_dependent {
             key.attachment_class += 1;
         }
         key

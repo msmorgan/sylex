@@ -375,6 +375,68 @@ pub(crate) struct ChildSlot {
     /// An `unadjoined` child: the Categories of a trailing Adjunct it may
     /// not end in (`ProductionDecl::unadjoined`).
     pub unadjoined: Option<Vec<u16>>,
+    /// It is set off before the head by a comma: a fronted dependent
+    /// (*When …, …*), which ends at that comma.
+    set_off_before_head: bool,
+    /// Off the edge line, the Category of the trailing Adjunct the phrase
+    /// ends in when it ends in this child, if a Summary's `final_adjunct`
+    /// records it (`Production::track_final_adjunct`).
+    trailing_adjunct: Option<u16>,
+    /// The extent a Derivation keeps of it for a later child's Ranking Key
+    /// (`Parse::anchors`).
+    pub anchor: Option<Anchor>,
+    /// What it adds to the Ranking Key (`CompiledGrammar::attachment_key`).
+    pub attachment: AttachmentRole,
+}
+
+/// A child whose extent a later child's Ranking Key reads (`Anchors`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Anchor {
+    /// The head, which unselected dependents or a Supplement follow.
+    Head,
+    /// The first conjunct, which a last one follows.
+    First,
+}
+
+/// A child position's part in the Ranking Key, by its role and its
+/// siblings' (`CompiledGrammar::attachment_key`).
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub(crate) struct AttachmentRole {
+    /// For the head, the unselected dependents (`adjunct`, `modifier`) after
+    /// it, each of which it is the host of.
+    pub dependents_after: u32,
+    /// A head precedes it.
+    pub after_head: bool,
+    /// It is an unselected dependent before its head, after another one:
+    /// it belongs inside the dependent before it.
+    pub preposed_after_dependent: bool,
+}
+
+/// A Production's static structural facts, precomputed once binding has
+/// settled it ([`Production::seal`]).
+#[derive(Debug, Clone, Copy, Default)]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "independent facts of one Production"
+)]
+pub(crate) struct Shape {
+    /// `CompiledGrammar::head_line_child`.
+    pub head_line_child: Option<usize>,
+    /// `CompiledGrammar::is_frame_production`.
+    pub frame_production: bool,
+    /// It begins with a fronted dependent of its head, which is its last
+    /// child: one set off by a comma (*When …, …*) or a preposed Adjunct
+    /// without one (*instead put …*) (`Summary::fronted`).
+    pub fronts: bool,
+    /// It hosts a comma-set post-dependent: its head comes first, followed
+    /// by a comma.
+    pub hosts_comma_set_dependent: bool,
+    /// Its first child is the head of a Production of its own Category whose
+    /// every later child is an Adjunct: a post-verbal Adjunct's host, which
+    /// an auxiliary Verb Phrase never is (`Summary::auxiliary`).
+    pub post_adjunct_host: bool,
+    /// Its last non-punctuation child is in the head line.
+    pub ends_in_head_line: bool,
 }
 
 impl ChildSlot {
@@ -527,6 +589,8 @@ pub(crate) struct Production {
     /// A coordination whose later conjuncts have its initial conjunct's
     /// lexical head, overt or elided (`SchemaDecl::Coordination::parallel`).
     pub parallel: bool,
+    /// Its static structural facts.
+    pub shape: Shape,
     /// The State before any child, its variables bound to their constants.
     start: State,
 }
@@ -750,6 +814,7 @@ pub(crate) fn resolve(
         clusters: None,
         remnant: RemnantRole::None,
         parallel: false,
+        shape: Shape::default(),
         id,
         lhs,
         rhs,
@@ -1331,14 +1396,6 @@ impl Production {
         Some(())
     }
 
-    /// Whether the last non-punctuation child is in the head line.
-    fn ends_in_head_line(&self) -> bool {
-        self.rhs
-            .iter()
-            .rposition(|symbol| !matches!(symbol, Symbol::Punct(..)))
-            .is_some_and(|position| self.head_line[position])
-    }
-
     /// Tracks whether the last head-line child so far ends in its head: a
     /// head-line child sets it (a leaf to true, a phrase to its own
     /// `head_final`), and every other child, punctuation and a coordinator
@@ -1389,7 +1446,6 @@ impl Production {
     /// dependent, not one set off.
     fn track_final_adjunct(
         &self,
-        grammar: &CompiledGrammar,
         next: &mut State,
         position: usize,
         child: &ChildView<'_>,
@@ -1398,17 +1454,8 @@ impl Production {
             ChildView::Node(summary) => {
                 next.final_adjunct = if self.edge_line[position] {
                     summary.final_adjunct
-                } else if self.roles[position] == ChildRole::Adjunct
-                    && self.coordinator.is_none()
-                    && self.head.is_some_and(|head| head < position)
-                    && !matches!(self.rhs[position - 1], Symbol::Punct(..))
-                    && let Symbol::Cat { category, .. } = self.rhs[position]
-                {
-                    u16::try_from(category)
-                        .ok()
-                        .filter(|c| grammar.unadjoined_categories.contains(c))
                 } else {
-                    None
+                    self.slots[position].trailing_adjunct
                 };
             }
             ChildView::Leaf(..) => next.final_adjunct = None,
@@ -1878,17 +1925,10 @@ impl Production {
         }
     }
 
-    /// Whether the Production begins with a fronted dependent of its head,
-    /// which is its last child: one set off by a comma (*When …, …*) or a
-    /// preposed Adjunct without one (*instead put …*) (`Summary::fronted`).
+    /// Whether the Production begins with a fronted dependent of its head
+    /// (`Shape::fronts`).
     pub(crate) fn fronts(&self) -> bool {
-        self.coordinator.is_none()
-            && self.head == Some(self.rhs.len() - 1)
-            && ((self.rhs.len() > 2
-                && matches!(self.rhs[self.rhs.len() - 2], Symbol::Punct(',', ..)))
-                || self
-                    .host_check
-                    .is_some_and(|(host, adjunct, _)| adjunct < host))
+        self.shape.fronts
     }
 
     /// Whether a fronted dependent's scope rules this child out: a fronted
@@ -1913,38 +1953,115 @@ impl Production {
         }
     }
 
-    /// Whether the Production hosts a comma-set post-dependent: its head
-    /// comes first, followed by a comma.
+    /// Whether the Production hosts a comma-set post-dependent
+    /// (`Shape::hosts_comma_set_dependent`).
     pub(crate) fn hosts_comma_set_dependent(&self) -> bool {
-        self.head == Some(0) && self.rhs.len() > 2 && matches!(self.rhs[1], Symbol::Punct(',', ..))
+        self.shape.hosts_comma_set_dependent
     }
 
-    /// Whether child `position` is set off before the head by a comma: a
-    /// fronted dependent (*When …, …*), which ends at that comma.
+    /// Whether child `position` is set off before the head by a comma.
     fn set_off_before_head(&self, position: usize) -> bool {
-        self.head.is_some_and(|head| {
-            position < head
-                && self.rhs[position + 1..head]
-                    .iter()
-                    .any(|symbol| matches!(symbol, Symbol::Punct(',', ..)))
-        })
+        self.slots[position].set_off_before_head
     }
 
-    /// Whether child `position` is the head of a Production of its own
-    /// Category whose every later child is an Adjunct: a post-verbal Adjunct's
-    /// host, which an auxiliary Verb Phrase never is (`Summary::auxiliary`).
+    /// Whether child `position` is a post-verbal Adjunct's host
+    /// (`Shape::post_adjunct_host`).
     pub(crate) fn post_adjunct_host(&self, position: usize) -> bool {
-        position == 0
-            && self.head == Some(0)
-            && self.coordinator.is_none()
-            && self.rhs.len() > 1
-            && matches!(self.rhs[0], Symbol::Cat { category, .. } if category == self.lhs)
-            && self.roles[1..]
-                .iter()
-                .zip(&self.rhs[1..])
-                .all(|(&role, symbol)| {
-                    matches!(symbol, Symbol::Punct(..)) || role == ChildRole::Adjunct
+        position == 0 && self.shape.post_adjunct_host
+    }
+
+    /// Precomputes the Production's static structural and Ranking Key
+    /// facts, once binding has settled it: `link` says it forms a Linked
+    /// Conjunct, and `unadjoined` holds the Categories a Summary's
+    /// `final_adjunct` records.
+    pub(crate) fn seal(&mut self, link: bool, unadjoined: &std::collections::BTreeSet<u16>) {
+        let count = self.rhs.len();
+        let punct = |at: usize| matches!(self.rhs[at], Symbol::Punct(..));
+        let comma = |at: usize| matches!(self.rhs[at], Symbol::Punct(',', ..));
+        let children: Vec<usize> = (0..count).filter(|&at| !punct(at)).collect();
+        let roles = &self.roles;
+        let named = |role: ChildRole| children.iter().copied().find(|&at| roles[at] == role);
+        let only = match children.as_slice() {
+            [only] => Some(*only),
+            _ => None,
+        };
+        let head_line_child = if link {
+            children.iter().copied().find(|&at| Some(at) != self.head)
+        } else {
+            self.head
+                .or(self.coordinator)
+                .or(only)
+                .or_else(|| named(ChildRole::Coordinator))
+                .or_else(|| named(ChildRole::Marker))
+                .or_else(|| {
+                    children
+                        .iter()
+                        .copied()
+                        .find(|&at| !roles[at].is_dependent())
                 })
+                .or_else(|| children.first().copied())
+        };
+        let shape = Shape {
+            head_line_child,
+            frame_production: self.frame.is_some() || children.len() == 1,
+            fronts: self.coordinator.is_none()
+                && self.head == Some(count - 1)
+                && ((count > 2 && comma(count - 2))
+                    || self
+                        .host_check
+                        .is_some_and(|(host, adjunct, _)| adjunct < host)),
+            hosts_comma_set_dependent: self.head == Some(0) && count > 2 && comma(1),
+            post_adjunct_host: self.head == Some(0)
+                && self.coordinator.is_none()
+                && count > 1
+                && matches!(self.rhs[0], Symbol::Cat { category, .. } if category == self.lhs)
+                && (1..count).all(|at| punct(at) || roles[at] == ChildRole::Adjunct),
+            ends_in_head_line: children.last().is_some_and(|&at| self.head_line[at]),
+        };
+        let mut slots = std::mem::take(&mut self.slots);
+        for (at, slot) in slots.iter_mut().enumerate() {
+            let role = roles[at];
+            let (before, after) = (&roles[..at], &roles[at + 1..]);
+            slot.set_off_before_head = self
+                .head
+                .is_some_and(|head| at < head && (at + 1..head).any(comma));
+            slot.trailing_adjunct = if role == ChildRole::Adjunct
+                && self.coordinator.is_none()
+                && self.head.is_some_and(|head| head < at)
+                && !punct(at - 1)
+                && let Symbol::Cat { category, .. } = self.rhs[at]
+            {
+                u16::try_from(category)
+                    .ok()
+                    .filter(|c| unadjoined.contains(c))
+            } else {
+                None
+            };
+            slot.anchor = match role {
+                ChildRole::Head
+                    if after.iter().any(|r| {
+                        matches!(
+                            r,
+                            ChildRole::Adjunct | ChildRole::Modifier | ChildRole::Supplement
+                        )
+                    }) =>
+                {
+                    Some(Anchor::Head)
+                }
+                ChildRole::First if after.contains(&ChildRole::Last) => Some(Anchor::First),
+                _ => None,
+            };
+            slot.attachment = AttachmentRole {
+                dependents_after: u32::try_from(after.iter().filter(|r| r.is_unselected()).count())
+                    .expect("a Production has few children"),
+                after_head: before.contains(&ChildRole::Head),
+                preposed_after_dependent: role.is_unselected()
+                    && before.iter().any(|r| r.is_unselected())
+                    && after.contains(&ChildRole::Head),
+            };
+        }
+        self.slots = slots;
+        self.shape = shape;
     }
 
     /// Whether child `position`'s slot admits the phrase: a selected `PP`
@@ -2126,7 +2243,7 @@ impl Production {
         next.leaves = (next.leaves + Self::leaves(child)).min(2);
         self.track_head_final(&mut next, position, child);
         self.track_final_preposition(grammar, &mut next, position, child);
-        self.track_final_adjunct(grammar, &mut next, position, child);
+        self.track_final_adjunct(&mut next, position, child);
         self.track_omitted_complement(grammar, &mut next, position, child)?;
         self.track_ellipsis(&mut next, position, child)?;
         self.track_cluster(grammar, &mut next, position, child)?;
@@ -2271,7 +2388,7 @@ impl Production {
                 _ => None,
             },
             leaves: state.leaves,
-            head_final: state.head_final && self.ends_in_head_line(),
+            head_final: state.head_final && self.shape.ends_in_head_line,
             final_preposition: state.final_preposition,
             final_adjunct: state.final_adjunct,
             ellipsis: match self.omission {
