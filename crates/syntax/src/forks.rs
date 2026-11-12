@@ -167,9 +167,9 @@ pub enum NarrowError {
 /// are read ([`Parse::fork_forest`]).
 #[derive(Debug, Clone)]
 pub struct ForkForest<'p> {
-    parse: &'p Parse<'p>,
-    unit: Rc<Unit>,
-    graph: Graph,
+    pub(crate) parse: &'p Parse<'p>,
+    pub(crate) unit: Rc<Unit>,
+    pub(crate) graph: Graph,
 }
 
 impl<'p> Parse<'p> {

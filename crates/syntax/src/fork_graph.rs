@@ -138,8 +138,22 @@ enum V {
 pub(crate) struct GraphCounts {
     pub total: u128,
     node_inside: Vec<u128>,
+    node_outside: Vec<u128>,
     item_inside: Vec<u128>,
     item_outside: Vec<u128>,
+}
+
+/// The Derivations of a split forest by the Packed Forest's own vertices
+/// and edges, each summed over its copies: a Derivation uses at most one
+/// copy of a Packed Forest node, item or family ([`crate::counts`]). Only
+/// what some Derivation uses is a key.
+pub(crate) struct PackedCounts {
+    /// Each root node's Derivations.
+    pub roots: HashMap<usize, u128>,
+    /// Each (node, completed item) alternative's Derivations.
+    pub alternatives: HashMap<(usize, usize), u128>,
+    /// Each (item, previous item, child) family's Derivations.
+    pub families: HashMap<(usize, Option<usize>, ChildRef), u128>,
 }
 
 /// A node's head: its head line's word and frame Productions (interned).
@@ -670,6 +684,7 @@ impl Graph {
         GraphCounts {
             total,
             node_inside,
+            node_outside,
             item_inside,
             item_outside,
         }
@@ -696,6 +711,46 @@ impl Graph {
             (Edge::Family(f), family.facts, count)
         });
         roots.chain(families)
+    }
+
+    /// The Derivations by the Packed Forest's own vertices and edges.
+    pub(crate) fn packed_counts(&self, counts: &GraphCounts) -> PackedCounts {
+        let mut roots = HashMap::new();
+        for root in &self.roots {
+            let slot = roots.entry(self.nodes[root.node].original).or_insert(0);
+            *slot = add(*slot, counts.node_inside[root.node]);
+        }
+        let mut alternatives = HashMap::new();
+        for (n, node) in self.nodes.iter().enumerate() {
+            for &i in &node.items {
+                let slot = alternatives
+                    .entry((node.original, self.items[i].original))
+                    .or_insert(0);
+                *slot = add(*slot, mul(counts.node_outside[n], counts.item_inside[i]));
+            }
+        }
+        let mut families = HashMap::new();
+        for (edge, _, n) in self.edges(counts) {
+            let Edge::Family(f) = edge else { continue };
+            let family = &self.families[f];
+            let child = match family.child {
+                GChild::Node(c) => ChildRef::Node(self.nodes[c].original),
+                GChild::Leaf(l) => ChildRef::Leaf(l),
+                GChild::Punct => ChildRef::Punct,
+            };
+            let key = (
+                self.items[family.item].original,
+                family.previous.map(|p| self.items[p].original),
+                child,
+            );
+            let slot = families.entry(key).or_insert(0);
+            *slot = add(*slot, n);
+        }
+        PackedCounts {
+            roots,
+            alternatives,
+            families,
+        }
     }
 
     /// The Derivations that use none of `edges`.

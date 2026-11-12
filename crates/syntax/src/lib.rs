@@ -21,6 +21,7 @@ mod laws;
 mod normal_form;
 mod prediction;
 mod reading;
+mod settled_spine;
 mod step;
 #[cfg(feature = "tree-ranking-key")]
 mod tree_key;
@@ -55,6 +56,10 @@ pub use reading::Constituent;
 pub use reading::RankingKey;
 pub use reading::Reading;
 pub use reading::ReadingNode;
+pub use settled_spine::SettledChild;
+pub use settled_spine::SettledNode;
+pub use settled_spine::SettledRest;
+pub use settled_spine::SettledSpine;
 pub use step::Gap;
 
 /// Why a grammar or frame catalog cannot be loaded or bound.
