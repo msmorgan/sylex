@@ -795,6 +795,13 @@ impl GameState {
                     // lands a resolved becomes-a-copy FIZZLES — installs nothing — per the
                     // never-panic contract, matching the early-return fizzles above (473/555).
                     StaticSpec::BecomesCopy(..) => return,
+                    // A characteristic-defining ability is a static ability
+                    // of the object it defines [CR#604.3]; a resolved effect
+                    // never is one.
+                    StaticSpec::CharacteristicDefining(_) => panic!(
+                        "Continuously(CharacteristicDefining(..)): lowering emitted a \
+                         characteristic-defining static as a resolved effect [CR#604.3]"
+                    ),
                     other => {
                         todo!(
                             "engine seam: Continuously({other:?}) — granted static-row kind unbuilt; owner: engine-granted-static-rows"

@@ -2743,11 +2743,10 @@ mod tests {
         );
     }
 
-    /// A Tarmogoyf-shaped P/T CDA ([CR#604.3]): `Modify(This,
-    /// Several([Power(Set(CountOf(creatures))), Toughness(Set(CountOf(
-    /// creatures)))]))` — mirrors `layer.rs`'s `creature_count_cda` test
-    /// fixture, rebuilt here since that helper is private to `layer.rs`'s
-    /// own test module.
+    /// A Tarmogoyf-shaped P/T CDA ([CR#604.3]): a characteristic-defining
+    /// static setting power and toughness to the number of creatures —
+    /// mirrors `layer.rs`'s `creature_count_cda` test fixture, rebuilt here
+    /// since that helper is private to `layer.rs`'s own test module.
     fn tarmogoyf_shaped_cda() -> sylex_core::Ability {
         use sylex_core::Ability;
         use sylex_core::Countable;
@@ -2758,16 +2757,13 @@ mod tests {
         let count = Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
             Predicate::creature(),
         ))));
-        Ability::r#static(StaticSpec::Modify(
-            Reference::Reg(sylex_core::RefId(0)),
-            Modification::Several(
-                vec![
-                    Modification::Power(NumericOp::Set(StatValue::Count(count.clone()))),
-                    Modification::Toughness(NumericOp::Set(StatValue::Count(count))),
-                ]
-                .into(),
-            ),
-        ))
+        Ability::r#static(StaticSpec::CharacteristicDefining(Modification::Several(
+            vec![
+                Modification::Power(NumericOp::Set(StatValue::Count(count.clone()))),
+                Modification::Toughness(NumericOp::Set(StatValue::Count(count))),
+            ]
+            .into(),
+        )))
     }
 
     /// [CR#707.9d] (CDA behavioral proof, deferred from Task 2): a token

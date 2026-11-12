@@ -1843,3 +1843,438 @@ fn scrapyard_mongrel_with_artifacts_only_in_library_and_hand() {
     one_in_hand_one_in_library(&mut state, "Darksteel Relic");
     assert!(!mongrel_pumped(&state.layers(), mongrel));
 }
+
+// ---------------------------------------------------------------------------
+// Characteristic-defining abilities ([CR#604.3,613.3,613.4a])
+// ---------------------------------------------------------------------------
+
+/// A characteristic-defining static making `change` to the object it is on.
+fn cda_static(change: sylex_core::Modification) -> sylex_core::Ability {
+    sylex_core::Ability::r#static(sylex_core::StaticSpec::CharacteristicDefining(change))
+}
+
+/// A creature card whose power and toughness are each `*`, defined by its
+/// `abilities` [CR#208.2a].
+fn star_creature(
+    name: &str,
+    mana_cost: Vec<sylex_core::ManaSymbol>,
+    subtype: &str,
+    abilities: Vec<sylex_core::Ability>,
+) -> Arc<Card> {
+    use sylex_core::StatValue;
+    Arc::new(Card::Normal(sylex_card::CardFace::from(
+        sylex_card::Characteristics {
+            name: name.into(),
+            mana_cost: Arc::<[sylex_core::ManaSymbol]>::from(mana_cost).into(),
+            types: vec![sylex_core::Type::Creature.def()],
+            subtypes: vec![sylex_core::Subtype {
+                name: subtype.into(),
+                types: Vec::new().into(),
+                confers: Vec::new().into(),
+            }],
+            power: Some(StatValue::DefinedByAbility),
+            toughness: Some(StatValue::DefinedByAbility),
+            abilities,
+            ..sylex_card::Characteristics::default()
+        },
+    )))
+}
+
+/// `{generic}` followed by `green` green pips.
+fn green_cost(generic: u32, green: usize) -> Vec<sylex_core::ManaSymbol> {
+    let mut cost = vec![sylex_core::ManaSymbol::Simple(
+        sylex_core::SimpleManaSymbol::Generic(generic),
+    )];
+    cost.extend(std::iter::repeat_n(
+        sylex_core::ManaSymbol::from(Color::Green),
+        green,
+    ));
+    cost
+}
+
+/// Tarmogoyf ({1}{G} Creature — Lhurgoyf, */1+*): "Tarmogoyf's power is equal
+/// to the number of card types among cards in all graveyards and its
+/// toughness is equal to that number plus 1."
+fn tarmogoyf() -> Arc<Card> {
+    use sylex_core::Characteristic;
+    use sylex_core::Count;
+    use sylex_core::Countable;
+    use sylex_core::Modification;
+    use sylex_core::NumericOp;
+    use sylex_core::Predicate;
+    use sylex_core::StatValue;
+    use sylex_core::StatePredicate;
+    let card_types_in_graveyards = Count::CountDistinct(
+        Characteristic::Types,
+        Countable::Objects(Arc::new(sylex_core::Region::candidate(Predicate::State(
+            StatePredicate::InZone(Zone::Graveyard),
+        )))),
+    );
+    star_creature(
+        "Tarmogoyf",
+        green_cost(1, 1),
+        "Lhurgoyf",
+        vec![cda_static(Modification::Several(
+            vec![
+                Modification::Power(NumericOp::Set(StatValue::Count(
+                    card_types_in_graveyards.clone(),
+                ))),
+                Modification::Toughness(NumericOp::Set(StatValue::Count(Count::Plus(
+                    Arc::new(card_types_in_graveyards),
+                    Arc::new(Count::Literal(1)),
+                )))),
+            ]
+            .into(),
+        ))],
+    )
+}
+
+/// Maro ({2}{G}{G} Creature — Elemental, */*): "Maro's power and toughness are
+/// each equal to the number of cards in your hand."
+fn maro() -> Arc<Card> {
+    use sylex_core::Count;
+    use sylex_core::Countable;
+    use sylex_core::Modification;
+    use sylex_core::NumericOp;
+    use sylex_core::Predicate;
+    use sylex_core::Reference;
+    use sylex_core::RelationPredicate;
+    use sylex_core::StatValue;
+    use sylex_core::StatePredicate;
+    let cards_in_your_hand =
+        Count::CountOf(Countable::Objects(static_candidate_filter(Predicate::And(
+            vec![
+                Predicate::State(StatePredicate::InZone(Zone::Hand)),
+                Predicate::Relation(RelationPredicate::Owner(Arc::new(Predicate::Ref(
+                    Reference::Reg(sylex_core::RefId(2)),
+                )))),
+            ]
+            .into(),
+        ))));
+    star_creature(
+        "Maro",
+        green_cost(2, 2),
+        "Elemental",
+        vec![cda_static(Modification::Several(
+            vec![
+                Modification::Power(NumericOp::Set(StatValue::Count(cards_in_your_hand.clone()))),
+                Modification::Toughness(NumericOp::Set(StatValue::Count(cards_in_your_hand))),
+            ]
+            .into(),
+        ))],
+    )
+}
+
+/// Godhead of Awe ({W/U}{W/U}{W/U}{W/U}{W/U} Creature — Spirit Avatar, 4/4):
+/// "Flying. Other creatures have base power and toughness 1/1." Its flying is
+/// left off: these tests read only power and toughness.
+fn godhead_of_awe() -> Arc<Card> {
+    use sylex_core::Modification;
+    use sylex_core::NumericOp;
+    use sylex_core::Predicate;
+    use sylex_core::Reference;
+    use sylex_core::StatValue;
+    use sylex_core::Type;
+    let other_creatures = Predicate::And(
+        vec![
+            Predicate::r#type(Type::Creature),
+            Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                1,
+            ))))),
+        ]
+        .into(),
+    );
+    let hybrid = sylex_core::ManaSymbol::Hybrid(
+        sylex_core::SimpleManaSymbol::from(Color::White),
+        Color::Blue,
+    );
+    fixture(
+        "Godhead of Awe",
+        vec![hybrid; 5],
+        &[Type::Creature],
+        &["Spirit", "Avatar"],
+        Some((4, 4)),
+        vec![each_static(
+            other_creatures,
+            vec![
+                Modification::Power(NumericOp::Set(StatValue::Number(1))),
+                Modification::Toughness(NumericOp::Set(StatValue::Number(1))),
+            ],
+        )],
+    )
+}
+
+/// Transguild Courier ({4} Artifact Creature — Golem, 3/3): "Transguild
+/// Courier is all colors."
+fn transguild_courier() -> Arc<Card> {
+    use sylex_core::CollectionOp;
+    use sylex_core::Modification;
+    use sylex_core::Type;
+    fixture(
+        "Transguild Courier",
+        vec![sylex_core::ManaSymbol::Simple(
+            sylex_core::SimpleManaSymbol::Generic(4),
+        )],
+        &[Type::Artifact, Type::Creature],
+        &["Golem"],
+        Some((3, 3)),
+        vec![cda_static(Modification::Colors(CollectionOp::Set(
+            ALL_COLORS.into(),
+        )))],
+    )
+}
+
+const ALL_COLORS: [Color; 5] = [
+    Color::White,
+    Color::Blue,
+    Color::Black,
+    Color::Red,
+    Color::Green,
+];
+
+/// Put the first card named `name` in P0's hand or library into P0's
+/// graveyard.
+fn force_into_graveyard(state: &mut GameState, name: &str) -> ObjectId {
+    let id = force_onto_battlefield(state, PlayerId(0), name);
+    state.zones.battlefield.retain(|&o| o != id);
+    state.objects.obj_mut(id).zone = Some(Zone::Graveyard);
+    state.zones.graveyards[0].push(id);
+    id
+}
+
+/// A game with Tarmogoyf in P0's deck beside `others`, a creature card and an
+/// instant card in P0's graveyard (two card types), and the cards named in
+/// `order` entered in that order.
+fn goyf_game(others: Vec<Arc<Card>>, order: &[&str]) -> (GameState, Vec<ObjectId>) {
+    let mut deck = vec![tarmogoyf(), card("Lightning Bolt")];
+    deck.extend(others);
+    let mut state = game_with_p0_deck(deck);
+    force_into_graveyard(&mut state, "Grizzly Bears");
+    force_into_graveyard(&mut state, "Lightning Bolt");
+    let ids = enter_in_order(&mut state, order);
+    (state, ids)
+}
+
+/// Two card types among cards in graveyards make Tarmogoyf 2/3 [CR#604.3].
+#[test]
+fn tarmogoyf_counts_card_types_in_graveyards() {
+    let (state, ids) = goyf_game(vec![], &["Tarmogoyf"]);
+    let view = state.layers();
+    assert_eq!(
+        (view.power(ids[0]), view.toughness(ids[0])),
+        (Some(2), Some(3))
+    );
+}
+
+/// Glorious Anthem's +1/+1 applies in layer 7c, after Tarmogoyf's own
+/// definition in layer 7a [CR#613.4a,613.4c]: 3/4.
+#[test]
+fn tarmogoyf_under_glorious_anthem_is_its_count_plus_one() {
+    let (state, ids) = goyf_game(
+        vec![card("Glorious Anthem")],
+        &["Glorious Anthem", "Tarmogoyf"],
+    );
+    let goyf = ids[1];
+    let view = state.layers();
+    assert_eq!((view.power(goyf), view.toughness(goyf)), (Some(3), Some(4)));
+}
+
+/// Turn to Frog ({1}{U} Instant): "Until end of turn, target creature loses
+/// all abilities and becomes a blue Frog with base power and toughness 1/1."
+/// Tarmogoyf loses its defining ability in layer 6, so nothing defines its
+/// power and toughness in layer 7a, and Turn to Frog sets 1/1 in layer 7b
+/// [CR#613.1f,613.4a,613.4b].
+#[test]
+fn tarmogoyf_hit_by_turn_to_frog_is_1_1() {
+    use sylex_core::CollectionOp;
+    use sylex_core::Duration;
+    use sylex_core::Modification;
+    use sylex_core::NumericOp;
+    use sylex_core::StatValue;
+    use sylex_engine::ContinuousEffect;
+    use sylex_engine::ScopeResolved;
+
+    let (mut state, ids) = goyf_game(vec![], &["Tarmogoyf"]);
+    let goyf = ids[0];
+    state.continuous.push(ContinuousEffect {
+        timestamp: sylex_engine::Timestamp(20_000),
+        controller: PlayerId(1),
+        scope: ScopeResolved::Locked(vec![goyf]),
+        changes: vec![
+            Modification::LoseAllAbilities,
+            Modification::Colors(CollectionOp::Set([Color::Blue].into())),
+            Modification::Subtypes(CollectionOp::Set(
+                [sylex_core::SubtypeRef::named("Frog".into())].into(),
+            )),
+            Modification::Power(NumericOp::Set(StatValue::Number(1))),
+            Modification::Toughness(NumericOp::Set(StatValue::Number(1))),
+        ],
+        duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
+        rows: vec![],
+        origin: None,
+        is_cda: false,
+    });
+    let view = state.layers();
+    assert!(
+        view.get(goyf).abilities.is_empty(),
+        "Tarmogoyf has no abilities"
+    );
+    assert_eq!((view.power(goyf), view.toughness(goyf)), (Some(1), Some(1)));
+}
+
+/// Godhead of Awe entered before Tarmogoyf, yet its "base power and toughness
+/// 1/1" applies in layer 7b, after Tarmogoyf's definition in layer 7a
+/// [CR#613.4a,613.4b]: Tarmogoyf is 1/1. Godhead of Awe's 2009-10-01 ruling:
+/// its ability "overwrites other effects that set a creature's power and
+/// toughness to specific values only if those effects existed before the
+/// Godhead entered"; a characteristic-defining ability is not such an effect.
+#[test]
+fn godhead_of_awe_entered_earlier_still_overwrites_tarmogoyf() {
+    let (state, ids) = goyf_game(vec![godhead_of_awe()], &["Godhead of Awe", "Tarmogoyf"]);
+    let [godhead, goyf] = ids[..] else { unreachable!() };
+    let view = state.layers();
+    assert_eq!((view.power(goyf), view.toughness(goyf)), (Some(1), Some(1)));
+    assert_eq!(
+        (view.power(godhead), view.toughness(godhead)),
+        (Some(4), Some(4)),
+        "Godhead of Awe affects only other creatures"
+    );
+}
+
+/// A game with Maro, Glorious Anthem and Godhead of Awe in P0's deck, the
+/// cards named in `order` entered in that order, and the number of cards then
+/// left in P0's hand.
+fn maro_game(order: &[&str]) -> (GameState, Vec<ObjectId>, i32) {
+    let mut state = game_with_p0_deck(vec![maro(), card("Glorious Anthem"), godhead_of_awe()]);
+    let ids = enter_in_order(&mut state, order);
+    let hand = i32::try_from(state.zones.hands[0].len()).expect("hand size fits i32");
+    assert!(
+        hand >= 2,
+        "P0 holds at least two cards, so Maro's count is not 1"
+    );
+    (state, ids, hand)
+}
+
+/// Maro counts the cards in its controller's hand [CR#604.3], and Glorious
+/// Anthem's +1/+1 applies after it [CR#613.4a,613.4c].
+#[test]
+fn maro_under_glorious_anthem_is_its_hand_plus_one() {
+    let (state, ids, hand) = maro_game(&["Glorious Anthem", "Maro"]);
+    let maro = ids[1];
+    let view = state.layers();
+    assert_eq!(
+        (view.power(maro), view.toughness(maro)),
+        (Some(hand + 1), Some(hand + 1))
+    );
+}
+
+/// Godhead of Awe entered before Maro, yet sets 1/1 in layer 7b after Maro's
+/// definition in layer 7a; Glorious Anthem then adds +1/+1 in layer 7c
+/// [CR#613.4a..613.4c].
+#[test]
+fn godhead_of_awe_entered_earlier_still_overwrites_maro() {
+    let (state, ids, _) = maro_game(&["Godhead of Awe", "Glorious Anthem", "Maro"]);
+    let maro = ids[2];
+    let view = state.layers();
+    assert_eq!((view.power(maro), view.toughness(maro)), (Some(2), Some(2)));
+}
+
+/// Darkest Hour entered before Transguild Courier, yet the Courier's "is all
+/// colors" applies first within layer 5 [CR#613.3], so Darkest Hour's "all
+/// creatures are black" then leaves it black only.
+#[test]
+fn transguild_courier_color_definition_applies_first_in_layer_5() {
+    let mut state = game_with_p0_deck(vec![card("Darkest Hour"), transguild_courier()]);
+    let ids = enter_in_order(&mut state, &["Darkest Hour", "Transguild Courier"]);
+    let courier = ids[1];
+    assert_eq!(
+        state.layers().get(courier).colors.as_slice(),
+        [Color::Black]
+    );
+}
+
+/// With no other color effect, Transguild Courier is all colors [CR#604.3].
+#[test]
+fn transguild_courier_is_all_colors() {
+    let mut state = game_with_p0_deck(vec![transguild_courier()]);
+    let ids = enter_in_order(&mut state, &["Transguild Courier"]);
+    assert_eq!(state.layers().get(ids[0]).colors.as_slice(), ALL_COLORS);
+}
+
+/// Myth Realized ({W} Enchantment). Its abilities are left off: the test
+/// applies its "{W}: Until end of turn, this enchantment becomes a Monk Avatar
+/// creature in addition to its other types and gains 'This creature's power
+/// and toughness are each equal to the number of lore counters on it.'"
+/// directly.
+fn myth_realized() -> Arc<Card> {
+    fixture(
+        "Myth Realized",
+        vec![sylex_core::ManaSymbol::from(Color::White)],
+        &[sylex_core::Type::Enchantment],
+        &[],
+        None,
+        vec![],
+    )
+}
+
+/// An ability an object grants itself is not characteristic-defining
+/// [CR#604.3a]: Myth Realized's gained "power and toughness are each equal to
+/// the number of lore counters on it" sets them in layer 7b in timestamp
+/// order, after Godhead of Awe, which entered first [CR#613.4b,613.7].
+/// Myth Realized's 2015-02-25 ruling: activating the ability "will override
+/// any effects that set its power or toughness to a specific value".
+#[test]
+fn myth_realized_gained_definition_is_not_characteristic_defining() {
+    use sylex_core::Ability;
+    use sylex_core::CollectionOp;
+    use sylex_core::Count;
+    use sylex_core::Duration;
+    use sylex_core::Modification;
+    use sylex_core::NumericOp;
+    use sylex_core::Reference;
+    use sylex_core::StatValue;
+    use sylex_core::StaticSpec;
+    use sylex_engine::ContinuousEffect;
+    use sylex_engine::ScopeResolved;
+
+    let mut state = game_with_p0_deck(vec![godhead_of_awe(), myth_realized()]);
+    let ids = enter_in_order(&mut state, &["Godhead of Awe", "Myth Realized"]);
+    let myth = ids[1];
+    state
+        .objects
+        .obj_mut(myth)
+        .counters
+        .insert("LoreCounter".into(), 3);
+    let lore_counters = Count::CounterCount(
+        Arc::new(Reference::Reg(sylex_core::RefId(0))),
+        sylex_core::CounterRef("LoreCounter".into()),
+    );
+    let gained = Ability::r#static(StaticSpec::CharacteristicDefining(Modification::Several(
+        vec![
+            Modification::Power(NumericOp::Set(StatValue::Count(lore_counters.clone()))),
+            Modification::Toughness(NumericOp::Set(StatValue::Count(lore_counters))),
+        ]
+        .into(),
+    )));
+    state.continuous.push(ContinuousEffect {
+        timestamp: sylex_engine::Timestamp(20_000),
+        controller: PlayerId(0),
+        scope: ScopeResolved::Locked(vec![myth]),
+        changes: vec![
+            Modification::CardTypes(CollectionOp::Add(sylex_core::Type::Creature.name())),
+            Modification::Subtypes(CollectionOp::Add(sylex_core::SubtypeRef::named(
+                "Monk".into(),
+            ))),
+            Modification::Subtypes(CollectionOp::Add(sylex_core::SubtypeRef::named(
+                "Avatar".into(),
+            ))),
+            Modification::GainAbility(Arc::new(gained)),
+        ],
+        duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
+        rows: vec![],
+        origin: None,
+        is_cda: false,
+    });
+    let view = state.layers();
+    assert_eq!((view.power(myth), view.toughness(myth)), (Some(3), Some(3)));
+}

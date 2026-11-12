@@ -29,13 +29,11 @@
 //!
 //! The [CR#707.9d] "drop the source's characteristic-defining ability"
 //! clause is a PARTIAL implementation, covering the Power/Toughness axes
-//! only, via a SHAPE heuristic (`defines_pt`) rather than a formal CDA flag —
-//! the engine has none today (`ContinuousEffect::is_cda` is plumbed but never
-//! set to `true` anywhere; see `layer.rs`'s `creature_count_cda` test
-//! comment: "0 cards use it"). The other seven `Characteristic` axes
-//! (`Retain` only — `Modify` has no analogous defining-ability concept for
-//! them) are a documented no-op below. Generalizing the drop to those axes is
-//! not implemented.
+//! only (`defines_pt`, which reads core's
+//! [`StaticSpec::CharacteristicDefining`] mark). The other seven
+//! `Characteristic` axes (`Retain` only — `Modify` has no analogous
+//! defining-ability concept for them) are a documented no-op below.
+//! Generalizing the drop to those axes is not implemented.
 
 use sylex_core::Ability;
 use sylex_core::Characteristic;
@@ -50,7 +48,6 @@ use sylex_core::Int;
 use sylex_core::ManaCost;
 use sylex_core::Modification;
 use sylex_core::NumericOp;
-use sylex_core::Reference;
 use sylex_core::StatValue;
 use sylex_core::StaticSpec;
 use sylex_core::SubtypeRef;
@@ -433,7 +430,7 @@ fn apply_modification(result: &mut CopiableValues, m: &Modification) {
 }
 
 /// Which P/T axis a `Modify`/`Retain` targets — the two axes
-/// [`defines_pt`]'s CDA-drop heuristic covers.
+/// [`defines_pt`]'s CDA drop covers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum PtAxis {
     Power,
@@ -581,36 +578,21 @@ fn minimal_subtype(name: &Ident) -> sylex_core::Subtype {
 /// Whether `ability` is the P/T-DEFINING characteristic-defining ability
 /// ([CR#604.3]) for `axis` — dropped by a copy exception that PROVIDES that
 /// axis's value ([CR#707.9d]), so the copy doesn't ALSO carry an ability
-/// that re-derives a value it isn't using.
-///
-/// HEURISTIC, not a formal signal: the engine has no working CDA flag today
-/// — `ContinuousEffect::is_cda` is plumbed through the layer pipeline but
-/// never set to `true` anywhere (`layer.rs`'s `creature_count_cda` test:
-/// "The 7a/CDA layer distinction is deferred (0 cards use it...)"). This
-/// instead recognizes the SHAPE a P/T CDA takes on a card today — a
-/// `This`-scoped static `Modify` whose op (directly, or bundled in a
-/// `Several`, the Tarmogoyf pattern: `Modify(This, Several([Power(Set(...)),
-/// Toughness(Set(...))]))`) `Set`s the axis. It does NOT look inside
-/// `Conditionally` or `Each`: neither shape is a P/T-defining CDA. Covers only
-/// Power/Toughness; see `retain_characteristic` for the other axes.
-/// Follow-up: `engine-copy-cda-generalize`.
+/// that re-derives a value it isn't using. A characteristic-defining static
+/// carries core's [`StaticSpec::CharacteristicDefining`] mark; it defines the
+/// axis when its change (directly, or bundled in a `Several`, the Tarmogoyf
+/// pattern) `Set`s it. Covers only Power/Toughness; see
+/// `retain_characteristic` for the other axes. Follow-up:
+/// `engine-copy-cda-generalize`.
 fn defines_pt(ability: &Ability, axis: PtAxis) -> bool {
     match ability {
-        Ability::Static(effect) => static_defines_pt(effect, axis),
+        Ability::Static(effect) => match &effect.body {
+            StaticSpec::CharacteristicDefining(change) => modification_defines_pt(change, axis),
+            _ => false,
+        },
         Ability::Activated(_) | Ability::Triggered(_) | Ability::Spell(_) | Ability::Keyword(_) => {
             false
         }
-    }
-}
-
-fn static_defines_pt(region: &sylex_core::Region<StaticSpec>, axis: PtAxis) -> bool {
-    match &region.body {
-        StaticSpec::Modify(Reference::Reg(reference), modification)
-            if region.provenance_of(*reference) == Some(&sylex_core::Provenance::Source) =>
-        {
-            modification_defines_pt(modification, axis)
-        }
-        _ => false,
     }
 }
 
@@ -726,30 +708,27 @@ mod tests {
         );
     }
 
-    /// A Tarmogoyf-shaped P/T CDA (`Modify(This, Several([Power(Set(...)),
-    /// Toughness(Set(...))]))`) is dropped when a `Modify` exception
-    /// overrides power — the CDA would otherwise ride along on the copy and
-    /// try to re-derive a value it no longer supplies [CR#707.9d].
+    /// A Tarmogoyf-shaped P/T CDA (a `CharacteristicDefining` static setting
+    /// power and toughness) is dropped when a `Modify` exception overrides
+    /// power — the CDA would otherwise ride along on the copy and try to
+    /// re-derive a value it no longer supplies [CR#707.9d].
     #[test]
     fn modify_set_power_drops_pt_defining_cda() {
-        let cda = Ability::r#static(StaticSpec::Modify(
-            Reference::Reg(sylex_core::RefId(0)),
-            Modification::Several(
-                vec![
-                    Modification::Power(NumericOp::Set(StatValue::Count(Count::CountOf(
-                        sylex_core::Countable::Objects(Arc::new(sylex_core::Region::candidate(
-                            sylex_core::Predicate::creature(),
-                        ))),
-                    )))),
-                    Modification::Toughness(NumericOp::Set(StatValue::Count(Count::CountOf(
-                        sylex_core::Countable::Objects(Arc::new(sylex_core::Region::candidate(
-                            sylex_core::Predicate::creature(),
-                        ))),
-                    )))),
-                ]
-                .into(),
-            ),
-        ));
+        let cda = Ability::r#static(StaticSpec::CharacteristicDefining(Modification::Several(
+            vec![
+                Modification::Power(NumericOp::Set(StatValue::Count(Count::CountOf(
+                    sylex_core::Countable::Objects(Arc::new(sylex_core::Region::candidate(
+                        sylex_core::Predicate::creature(),
+                    ))),
+                )))),
+                Modification::Toughness(NumericOp::Set(StatValue::Count(Count::CountOf(
+                    sylex_core::Countable::Objects(Arc::new(sylex_core::Region::candidate(
+                        sylex_core::Predicate::creature(),
+                    ))),
+                )))),
+            ]
+            .into(),
+        )));
         let base = CopiableValues {
             name: "Tarmogoyf".into(),
             power: Some(StatValue::DefinedByAbility),
@@ -780,10 +759,9 @@ mod tests {
     /// [CR#208.2a] reads that as 0, worse than doing nothing.
     #[test]
     fn modify_set_power_non_literal_count_is_true_noop() {
-        let cda = Ability::r#static(StaticSpec::Modify(
-            Reference::Reg(sylex_core::RefId(0)),
-            Modification::Power(NumericOp::Set(StatValue::Number(0))),
-        ));
+        let cda = Ability::r#static(StaticSpec::CharacteristicDefining(Modification::Power(
+            NumericOp::Set(StatValue::Number(0)),
+        )));
         let base = CopiableValues {
             power: Some(StatValue::DefinedByAbility),
             abilities: vec![cda.clone()],
@@ -815,10 +793,9 @@ mod tests {
     /// P/T-defining ability so it doesn't ride along unused.
     #[test]
     fn retain_power_keeps_value_drops_defining_ability() {
-        let cda = Ability::r#static(StaticSpec::Modify(
-            Reference::Reg(sylex_core::RefId(0)),
-            Modification::Power(NumericOp::Set(StatValue::Number(0))),
-        ));
+        let cda = Ability::r#static(StaticSpec::CharacteristicDefining(Modification::Power(
+            NumericOp::Set(StatValue::Number(0)),
+        )));
         let base = CopiableValues {
             power: Some(StatValue::DefinedByAbility),
             abilities: vec![cda],

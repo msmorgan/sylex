@@ -537,13 +537,13 @@ struct Activation<'a> {
 
 /// The parameters of the `Each` body region a gathered static's changes sit
 /// in, through any `Conditionally` wrappers; `None` when they sit in the
-/// ability's own region (a single-object `Modify`). The body's candidate is
-/// the object being modified.
+/// ability's own region (a single-object `Modify`, or a characteristic-defining
+/// static). The body's candidate is the object being modified.
 fn each_body_params(spec: &StaticSpec) -> Option<&[sylex_core::Param]> {
     match spec {
         StaticSpec::Each(_, body) => Some(&body.params),
         StaticSpec::Conditionally(_, inner) => each_body_params(inner),
-        StaticSpec::Modify(..) => None,
+        StaticSpec::Modify(..) | StaticSpec::CharacteristicDefining(_) => None,
         StaticSpec::BecomesCopy(..)
         | StaticSpec::Deontic(_)
         | StaticSpec::Role { .. }
@@ -562,7 +562,8 @@ fn each_body_params(spec: &StaticSpec) -> Option<&[sylex_core::Param]> {
         | StaticSpec::ReplaceRoll { .. }
         | StaticSpec::PayPips(..) => {
             unreachable!(
-                "only Modify, Each and Conditionally statics are gathered as layer effects"
+                "only CharacteristicDefining, Modify, Each and Conditionally statics are \
+                 gathered as layer effects"
             )
         }
     }
@@ -844,11 +845,17 @@ fn gather(
                     // acquired.
                     acquired,
                     timestamp,
-                    // The 7a/CDA layer distinction is deferred (0 cards use
-                    // it; the surface no longer carries a
-                    // `characteristic_defining` flag at all) — every gathered
-                    // static routes through the non-CDA layers.
-                    is_cda: false,
+                    // A marked static is characteristic-defining only when
+                    // printed on the object, given to a token by the effect
+                    // that created it, or acquired through a copy or
+                    // text-changing effect [CR#604.3a]. The first two are the
+                    // object's printed list, which the first gather reads;
+                    // the last two are the layer-1 and layer-3 seams. One
+                    // acquired later was granted by another effect or by the
+                    // object to itself, and applies as an ordinary effect in
+                    // timestamp order.
+                    is_cda: !acquired
+                        && matches!(effect.body, StaticSpec::CharacteristicDefining(_)),
                     conditions,
                     // A static ability's `You` is the current controller of
                     // the permanent it is on ([CR#109.5]); this is the base
@@ -967,16 +974,17 @@ fn gather(
 /// `Floating(filter)` scope: the filter is NOT expanded to objects here: the
 /// existing `Floating` machinery re-evaluates it against each layer pass's
 /// derived characteristics ([CR#613.6]), which this function must not
-/// shortcut.
+/// shortcut. `CharacteristicDefining(change)`, which only ever is the whole
+/// static, locks the object the ability is on.
 ///
 /// Any other shape — `Each` over a non-`SelectAll` `Selection` (`Union`,
 /// `Random`, …), or an `Each` whose inner effect isn't a bare
 /// `Modify(It, _)` — is a documented seam: no current macro or card produces
 /// it, so it contributes no effect (`None`) rather than guessing a scope.
 /// Every other `StaticSpec` variant (`Deontic`, `CostModifier`, …) is
-/// likewise `None` here — the layer gather only ever contributes `Modify`/
-/// `Each`-of-`Modify` effects; the rest are read by their own consumers
-/// (`legal.rs`, `cast.rs`, `trigger.rs`, …).
+/// likewise `None` here — the layer gather only ever contributes
+/// `CharacteristicDefining`, `Modify` and `Each`-of-`Modify` effects; the rest
+/// are read by their own consumers (`legal.rs`, `cast.rs`, `trigger.rs`, …).
 fn static_spec_scope(
     state: &GameState,
     obj: ObjectId,
@@ -984,6 +992,30 @@ fn static_spec_scope(
     captures: &[(sylex_core::RefId, crate::activation::Value)],
 ) -> Option<(Vec<Condition>, ScopeResolved, Vec<Modification>)> {
     match &region.body {
+        // A characteristic-defining ability changes only the object it is on,
+        // unconditionally [CR#604.3a].
+        StaticSpec::CharacteristicDefining(change) => Some((
+            Vec::new(),
+            ScopeResolved::Locked(vec![obj]),
+            Modification::flatten(std::slice::from_ref(change)).to_vec(),
+        )),
+        _ => effect_scope(state, obj, region, captures),
+    }
+}
+
+/// [`static_spec_scope`] for a static ability's effect below its top, where
+/// no characteristic-defining static sits.
+fn effect_scope(
+    state: &GameState,
+    obj: ObjectId,
+    region: &sylex_core::Region<StaticSpec>,
+    captures: &[(sylex_core::RefId, crate::activation::Value)],
+) -> Option<(Vec<Condition>, ScopeResolved, Vec<Modification>)> {
+    match &region.body {
+        StaticSpec::CharacteristicDefining(_) => panic!(
+            "a characteristic-defining static nested under another static form on {obj:?}: \
+             core validation refuses one [CR#604.3a]"
+        ),
         StaticSpec::Modify(reference, change) => Some((
             Vec::new(),
             ScopeResolved::Locked(resolve_source_relative(
@@ -995,6 +1027,14 @@ fn static_spec_scope(
             )),
             Modification::flatten(std::slice::from_ref(change)).to_vec(),
         )),
+        StaticSpec::Each(_, inner)
+            if matches!(inner.body, StaticSpec::CharacteristicDefining(_)) =>
+        {
+            panic!(
+                "a characteristic-defining static distributed by Each on {obj:?}: core \
+                 validation refuses one [CR#604.3a]"
+            )
+        }
         StaticSpec::Each(Selection::SelectAll(filter), inner) => match &inner.body {
             StaticSpec::Modify(sylex_core::Reference::Reg(reference), change)
                 if matches!(
@@ -1017,8 +1057,7 @@ fn static_spec_scope(
         // still hold for the innermost modification to apply.
         StaticSpec::Conditionally(condition, inner) => {
             let nested = sylex_core::Region::new(region.params.clone(), inner.as_ref().clone());
-            let (mut conditions, scope, changes) =
-                static_spec_scope(state, obj, &nested, captures)?;
+            let (mut conditions, scope, changes) = effect_scope(state, obj, &nested, captures)?;
             conditions.insert(0, condition.clone());
             Some((conditions, scope, changes))
         }
@@ -3790,29 +3829,19 @@ mod tests {
     // engine (CDAs, "+X/+X for each …").
     // -----------------------------------------------------------------------
 
-    /// A self-CDA-SHAPED static ([CR#604.3]) that SETS its own P/T to the
-    /// number of creatures on the battlefield (the Tarmogoyf/creature-count
-    /// pattern) — `Power`/`Toughness(Set(CountOf(Creature)))` scoped
-    /// `Of(This)`. The 7a/CDA layer distinction is deferred (0 cards use it;
-    /// `characteristic_defining` is gone from the surface), so this routes
-    /// through plain 7b `Set` like any other static `Modify` — the dynamic
-    /// `Count` re-derivation this test exercises is a property of `Modify`'s
-    /// gather, not of the layer number.
+    /// A characteristic-defining static ([CR#604.3]) that sets its own P/T
+    /// to the number of creatures on the battlefield (the Tarmogoyf pattern).
     fn creature_count_cda() -> Ability {
-        use sylex_core::Reference;
         let count = Count::CountOf(Countable::Objects(Arc::new(sylex_core::Region::candidate(
             Predicate::creature(),
         ))));
-        Ability::r#static(StaticSpec::Modify(
-            Reference::Reg(sylex_core::RefId(0)),
-            Modification::Several(
-                vec![
-                    Modification::Power(NumericOp::Set(StatValue::Count(count.clone()))),
-                    Modification::Toughness(NumericOp::Set(StatValue::Count(count))),
-                ]
-                .into(),
-            ),
-        ))
+        Ability::r#static(StaticSpec::CharacteristicDefining(Modification::Several(
+            vec![
+                Modification::Power(NumericOp::Set(StatValue::Count(count.clone()))),
+                Modification::Toughness(NumericOp::Set(StatValue::Count(count))),
+            ]
+            .into(),
+        )))
     }
 
     /// A CDA setting P/T to `CountOf(creatures on the battlefield)` resolves to
@@ -3840,6 +3869,84 @@ mod tests {
             "adding a creature bumps the CDA to power 2"
         );
         assert_eq!(view.toughness(goyf), Some(2), "…and toughness 2");
+    }
+
+    /// A characteristic-defining ability granted to a token by the effect that
+    /// created it is one [CR#604.3a]: Ajani Goldmane's −6 creates "a white
+    /// Avatar creature token. It has 'This token's power and toughness are
+    /// each equal to your life total.'" Godhead of Awe's "Other creatures have
+    /// base power and toughness 1/1", on a creature that entered first, still
+    /// applies after the token's definition [CR#613.4a,613.4b].
+    #[test]
+    fn token_characteristic_defining_ability_applies_in_layer_7a() {
+        use sylex_core::PlayerAttr;
+        use sylex_core::Token;
+        use sylex_core::Type;
+
+        let other_creatures_base_1_1 = Ability::r#static(StaticSpec::Each(
+            Selection::SelectAll(Arc::new(static_candidate_filter(Predicate::And(
+                vec![
+                    Predicate::r#type(Type::Creature),
+                    Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                        1,
+                    ))))),
+                ]
+                .into(),
+            )))),
+            Arc::new(sylex_core::Region::candidate(StaticSpec::Modify(
+                Reference::Reg(sylex_core::RefId(0)),
+                Modification::Several(
+                    vec![
+                        Modification::Power(NumericOp::Set(StatValue::Number(1))),
+                        Modification::Toughness(NumericOp::Set(StatValue::Number(1))),
+                    ]
+                    .into(),
+                ),
+            ))),
+        ));
+        let (mut state, _godhead) = creature_on_field(game(), vec![other_creatures_base_1_1]);
+
+        let your_life = Count::PlayerStatOf(Reference::Reg(sylex_core::RefId(1)), PlayerAttr::Life);
+        let avatar = Token {
+            name: None,
+            mana_cost: sylex_core::ManaCost::default(),
+            color_indicator: vec![sylex_core::Color::White].into(),
+            supertypes: vec![].into(),
+            types: vec![Type::Creature.def()].into(),
+            subtypes: vec![sylex_core::Subtype {
+                name: "Avatar".into(),
+                types: Vec::new().into(),
+                confers: Vec::new().into(),
+            }]
+            .into(),
+            abilities: vec![Ability::r#static(StaticSpec::CharacteristicDefining(
+                Modification::Several(
+                    vec![
+                        Modification::Power(NumericOp::Set(StatValue::Count(your_life.clone()))),
+                        Modification::Toughness(NumericOp::Set(StatValue::Count(your_life))),
+                    ]
+                    .into(),
+                ),
+            ))]
+            .into(),
+            power: Some(StatValue::DefinedByAbility),
+            toughness: Some(StatValue::DefinedByAbility),
+            loyalty: None,
+            defense: None,
+        };
+        let card = state.cards.push_token(&avatar, PlayerId(0));
+        let token = state.objects.mint(
+            ObjectSource::Card(card),
+            PlayerId(0),
+            Some(Zone::Battlefield),
+        );
+        state.zones.battlefield.push(token);
+
+        let view = state.layers();
+        assert_eq!(
+            (view.power(token), view.toughness(token)),
+            (Some(1), Some(1))
+        );
     }
 
     /// A self-pump static ([CR#613.4c] layer 7c) that adds `CountOf(creatures)`
