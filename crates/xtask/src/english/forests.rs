@@ -31,6 +31,12 @@ use sylex_syntax::Gap;
 use sylex_syntax::HeadWord;
 use sylex_vocabulary::LexicalEnvironment;
 
+mod context;
+mod schema;
+
+use schema::SCHEMA;
+use schema::VIEWS;
+
 #[derive(Debug, Args)]
 #[command(
     after_long_help = "The tables and views are described in the database's own schema \
@@ -46,263 +52,6 @@ pub(super) struct ForestsArgs {
     #[arg(long = "card")]
     cards: Vec<String>,
 }
-
-/// The stored tables. Every `derivations` column is the exact number of the
-/// unit's Derivations that use the row's node, alternative, item, family,
-/// head or Embedding (`sylex_syntax::Counts`).
-pub(crate) const SCHEMA: &str = r"
--- The grammar's Categories and Productions. `functions` is a JSON array of
--- each child's name, punctuation included (an empty name); `frame` and
--- `variant` are a frame-headed Production's Selected Frame and what its id
--- adds after the frame's name: its Valence Alternation and derived shape,
--- `/`-separated (`passive`, `passive+by`, `adjectival`, `gap0`,
--- `shifted-object`, `clusters`, `prefix1`, `interleaved2`, ...; empty for the
--- frame's own phrase). `tail`: it builds a serial or
--- polysyndetic tail of a coordination, not a whole one.
-CREATE TABLE categories (category INTEGER PRIMARY KEY, name TEXT NOT NULL);
-CREATE TABLE productions (
-    production INTEGER PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE,
-    category INTEGER NOT NULL REFERENCES categories,
-    functions TEXT NOT NULL,
-    frame TEXT,
-    variant TEXT,
-    tail INTEGER NOT NULL
-);
--- Every lexeme a stored row names, with its lemma and part of speech.
-CREATE TABLE lexemes (lexeme TEXT PRIMARY KEY, lemma TEXT NOT NULL, part_of_speech TEXT NOT NULL);
--- One row per Corpus Unit. `oracle_id` joins mtgjson's
--- `cardIdentifiers.scryfallOracleId`; `face` is the Scryfall `card_faces`
--- index, NULL for a one-face card. `parsed` is the text parsed: the unit's
--- text, or a cleave line's Uncleaved Text. `derivations` is its total.
-CREATE TABLE units (
-    unit INTEGER PRIMARY KEY,
-    oracle_id TEXT NOT NULL,
-    face INTEGER,
-    face_name TEXT NOT NULL,
-    card_name TEXT NOT NULL,
-    kind TEXT NOT NULL CHECK (kind IN ('type line', 'line')),
-    line INTEGER NOT NULL,
-    text TEXT NOT NULL,
-    parsed TEXT NOT NULL,
-    derivations INTEGER NOT NULL
-);
--- Completed Constituents, by the forest's node index. `start` and `end` are
--- char offsets into `parsed` in logical order (a period written inside a
--- closing quotation mark follows it), `start` where the Constituent was
--- predicted, before any space that precedes its first word; `surface` is
--- that text without the space. `features` is
--- a JSON object of bound features; `gap` NULL is no Gap. A coordination has
--- its `coordinator` lexeme, or, for a Linked Coordination (which has none),
--- the `link` Category its linked conjunct is built as. `settled`: used by
--- every Derivation. `root`: spans the whole unit as the grammar's root.
-CREATE TABLE nodes (
-    unit INTEGER NOT NULL REFERENCES units,
-    node INTEGER NOT NULL,
-    category INTEGER NOT NULL REFERENCES categories,
-    start INTEGER NOT NULL,
-    end INTEGER NOT NULL,
-    surface TEXT NOT NULL,
-    gap TEXT,
-    features TEXT NOT NULL,
-    coordinator TEXT REFERENCES lexemes,
-    link TEXT,
-    root INTEGER NOT NULL,
-    settled INTEGER NOT NULL,
-    derivations INTEGER NOT NULL,
-    PRIMARY KEY (unit, node)
-) WITHOUT ROWID;
--- A node's alternatives: each a Production with the completed item that is
--- its children, in the forest's order.
-CREATE TABLE alternatives (
-    unit INTEGER NOT NULL,
-    node INTEGER NOT NULL,
-    alternative INTEGER NOT NULL,
-    production INTEGER NOT NULL REFERENCES productions,
-    item INTEGER NOT NULL,
-    derivations INTEGER NOT NULL,
-    PRIMARY KEY (unit, node, alternative)
-) WITHOUT ROWID;
--- Partial Productions: `dot` children found, spanning `start`..`end`.
-CREATE TABLE items (
-    unit INTEGER NOT NULL,
-    item INTEGER NOT NULL,
-    production INTEGER NOT NULL REFERENCES productions,
-    dot INTEGER NOT NULL,
-    start INTEGER NOT NULL,
-    end INTEGER NOT NULL,
-    derivations INTEGER NOT NULL,
-    PRIMARY KEY (unit, item)
-) WITHOUT ROWID;
--- An item's families: its previous item (NULL for its first child) and its
--- last child, a node, a leaf, or punctuation (both NULL).
-CREATE TABLE families (
-    unit INTEGER NOT NULL,
-    item INTEGER NOT NULL,
-    family INTEGER NOT NULL,
-    previous INTEGER,
-    child_node INTEGER,
-    child_leaf INTEGER,
-    derivations INTEGER NOT NULL,
-    PRIMARY KEY (unit, item, family)
-) WITHOUT ROWID;
--- The lexical alternatives some family takes. `kind` is `word` (with its
--- lexeme and Word Form), `flavor word` or `numeral` (with `value`).
-CREATE TABLE leaves (
-    unit INTEGER NOT NULL,
-    leaf INTEGER NOT NULL,
-    start INTEGER NOT NULL,
-    end INTEGER NOT NULL,
-    surface TEXT NOT NULL,
-    kind TEXT NOT NULL CHECK (kind IN ('word', 'flavor word', 'numeral')),
-    lexeme TEXT REFERENCES lexemes,
-    form TEXT,
-    value INTEGER,
-    PRIMARY KEY (unit, leaf)
-) WITHOUT ROWID;
--- Each alternative's head words: the leaf reached through `head` children
--- (lexeme NULL where that is no word, or there is no `head` child). One
--- alternative's items may reach several. `inside` is the alternative's own
--- Derivations with that head; `derivations` the unit's.
-CREATE TABLE heads (
-    unit INTEGER NOT NULL,
-    node INTEGER NOT NULL,
-    alternative INTEGER NOT NULL,
-    lexeme TEXT REFERENCES lexemes,
-    form TEXT,
-    inside INTEGER NOT NULL,
-    derivations INTEGER NOT NULL,
-    UNIQUE (unit, node, alternative, lexeme, form)
-);
--- Embeddings: the dependent functions a Constituent stands under, nearest
--- first, at most three. Going up from it through `head` children to the top
--- of its head line, step N records the Production there (`projectionN`),
--- the function that bears in its governor (`functionN`), the governor's
--- Production and its head word. `depth` is the number of steps; a root's own
--- head line has none.
-CREATE TABLE embeddings (
-    embedding INTEGER PRIMARY KEY,
-    depth INTEGER NOT NULL,
-    projection1 INTEGER REFERENCES productions, function1 TEXT,
-    governor1 INTEGER REFERENCES productions, governor_lexeme1 TEXT REFERENCES lexemes,
-    governor_form1 TEXT,
-    projection2 INTEGER REFERENCES productions, function2 TEXT,
-    governor2 INTEGER REFERENCES productions, governor_lexeme2 TEXT REFERENCES lexemes,
-    governor_form2 TEXT,
-    projection3 INTEGER REFERENCES productions, function3 TEXT,
-    governor3 INTEGER REFERENCES productions, governor_lexeme3 TEXT REFERENCES lexemes,
-    governor_form3 TEXT
-);
--- Each alternative's Embeddings. `outside` is the ways to surround its node
--- with that Embedding; `derivations` the unit's Derivations that use the
--- alternative under it. An alternative's head and Embedding are independent,
--- so the Derivations with a given head and Embedding are
--- `heads.inside * alternative_embeddings.outside`.
-CREATE TABLE alternative_embeddings (
-    unit INTEGER NOT NULL,
-    node INTEGER NOT NULL,
-    alternative INTEGER NOT NULL,
-    embedding INTEGER NOT NULL REFERENCES embeddings,
-    outside INTEGER NOT NULL,
-    derivations INTEGER NOT NULL,
-    PRIMARY KEY (unit, node, alternative, embedding)
-) WITHOUT ROWID;
--- For each alternative of a coordination node (one with a coordinator or a
--- link) whose Production is no tail, its conjuncts: its children named
--- `first` or `last`, its idiomatic `coordinate` (*and so on*), and those of
--- the tails it continues in through `rest`.
-CREATE TABLE conjuncts (
-    unit INTEGER NOT NULL,
-    node INTEGER NOT NULL,
-    alternative INTEGER NOT NULL,
-    conjuncts INTEGER NOT NULL,
-    derivations INTEGER NOT NULL,
-    PRIMARY KEY (unit, node, alternative, conjuncts)
-) WITHOUT ROWID;
-";
-
-/// Views for the questions already known. Each keeps a `derivations`
-/// column, so "in every Derivation" is `derivations = units.derivations` and
-/// "in some Derivation" is any row.
-pub(crate) const VIEWS: &str = r"
--- Embeddings with Production names and governor lemmas.
-CREATE VIEW named_embeddings AS
-SELECT e.embedding, e.depth,
-    p1.name AS projection1, e.function1, g1.name AS governor1, l1.lemma AS governor_lemma1,
-    e.governor_form1,
-    p2.name AS projection2, e.function2, g2.name AS governor2, l2.lemma AS governor_lemma2,
-    e.governor_form2,
-    p3.name AS projection3, e.function3, g3.name AS governor3, l3.lemma AS governor_lemma3,
-    e.governor_form3
-FROM embeddings e
-LEFT JOIN productions p1 ON p1.production = e.projection1
-LEFT JOIN productions g1 ON g1.production = e.governor1
-LEFT JOIN lexemes l1 ON l1.lexeme = e.governor_lexeme1
-LEFT JOIN productions p2 ON p2.production = e.projection2
-LEFT JOIN productions g2 ON g2.production = e.governor2
-LEFT JOIN lexemes l2 ON l2.lexeme = e.governor_lexeme2
-LEFT JOIN productions p3 ON p3.production = e.projection3
-LEFT JOIN productions g3 ON g3.production = e.governor3
-LEFT JOIN lexemes l3 ON l3.lexeme = e.governor_lexeme3;
-
--- Every verb phrase: each alternative of a frame-headed Production whose head
--- word is a verb, once per (head word, Embedding) it has, with its Selected
--- Frame, Valence Alternation variant, Voice and the Embedding it stands
--- under. `derivations` is exact: the unit's Derivations that use this
--- alternative with this head and Embedding. Summing it over rows of one node
--- counts that node's Derivations with those facts; never sum it across
--- different nodes of one unit as if they were exclusive Derivations, since
--- one Derivation uses many nodes.
---
--- The Embedding tells apart where a verb phrase stands (`english.fug`):
--- - an effect clause: step 1 `function1 = 'clause'` under `Declarative`, or
---   its Clause the `head` of an adjunct Production under it (then step 2);
--- - a trigger or condition clause: a `FiniteComplementClause` projection,
---   `complement` of `Valence:PrepositionPhrase/Clause(Finite)@Predicate`
---   whose head is *when*, *whenever*, *if*, ...;
--- - a replacement's *would* clause: a `BareInfinitival` projection,
---   `complement` of `Valence:VerbPhrase/Catenative(BareInf)` headed by
---   `will` in its Preterite form, with step 2 the *if* clause above;
--- - a deontic: the same with a modal head such as *can't*, *must* or *may*;
--- - a relative clause: function `clause` of a `RelativeClause` Production
---   such as `SubjectRelative`;
--- - a participial postmodifier: a `ParticipialPostmodifier` projection,
---   `modifier` of a Nominal.
-CREATE VIEW verb_phrases AS
-SELECT a.unit, a.node, a.alternative, n.surface, c.name AS category, p.name AS production,
-    h.lexeme AS verb, l.lemma, h.form, p.frame, p.variant,
-    json_extract(n.features, '$.Voice') AS voice, n.settled,
-    e.embedding, e.depth,
-    e.projection1, e.function1, e.governor1, e.governor_lemma1, e.governor_form1,
-    e.projection2, e.function2, e.governor2, e.governor_lemma2, e.governor_form2,
-    e.projection3, e.function3, e.governor3, e.governor_lemma3, e.governor_form3,
-    h.inside * ae.outside AS derivations
-FROM alternatives a
-JOIN productions p ON p.production = a.production AND p.frame IS NOT NULL
-JOIN nodes n ON n.unit = a.unit AND n.node = a.node
-JOIN categories c ON c.category = n.category
-JOIN heads h ON h.unit = a.unit AND h.node = a.node AND h.alternative = a.alternative
-JOIN lexemes l ON l.lexeme = h.lexeme AND l.part_of_speech = 'Verb'
-JOIN alternative_embeddings ae
-    ON ae.unit = a.unit AND ae.node = a.node AND ae.alternative = a.alternative
-JOIN named_embeddings e ON e.embedding = ae.embedding;
-
--- Every coordination node: each alternative with its conjunct count, its
--- Category and its coordinator (NULL for a Linked Coordination, whose `link`
--- is given instead). `derivations` is the unit's Derivations that use
--- this alternative with that many conjuncts; the same caution as for
--- `verb_phrases` applies to sums across nodes.
-CREATE VIEW coordinations AS
-SELECT j.unit, j.node, j.alternative, n.surface, c.name AS category, p.name AS production,
-    n.coordinator, l.lemma AS coordinator_lemma, n.link, j.conjuncts, n.settled,
-    j.derivations
-FROM conjuncts j
-JOIN nodes n ON n.unit = j.unit AND n.node = j.node
-JOIN categories c ON c.category = n.category
-JOIN alternatives a ON a.unit = j.unit AND a.node = j.node AND a.alternative = j.alternative
-JOIN productions p ON p.production = a.production
-LEFT JOIN lexemes l ON l.lexeme = n.coordinator;
-";
 
 pub(super) fn run(args: &ForestsArgs, output: &mut dyn Write) -> Result<()> {
     let started = Instant::now();
@@ -366,7 +115,9 @@ struct AlternativeRow {
     production: usize,
     item: usize,
     derivations: u128,
-    heads: Vec<(Option<HeadWord>, u128, u128)>,
+    /// (head leaf, its word, the alternative's own Derivations with it, the
+    /// unit's).
+    heads: Vec<(Option<usize>, Option<HeadWord>, u128, u128)>,
     embeddings: Vec<(Embedding, u128, u128)>,
     conjuncts: Vec<(usize, u128)>,
 }
@@ -434,6 +185,7 @@ pub(crate) fn write(
     db.execute_batch(SCHEMA)?;
     db.execute_batch(VIEWS)?;
     let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
+    let reader = context::Reader::new(grammar, &env.lexicon);
     let mut lexemes = BTreeSet::new();
     let mut embeddings: BTreeMap<Embedding, i64> = BTreeMap::new();
     let mut summary = Summary::default();
@@ -446,7 +198,10 @@ pub(crate) fn write(
         let end = (start + BATCH).min(corpus.units.len());
         let rows: Vec<UnitRows> = (start..end)
             .into_par_iter()
-            .map(|unit| unit_rows(corpus, unit, cleaves[unit].as_ref(), env, grammar))
+            .map(|unit| {
+                unit_rows(corpus, unit, cleaves[unit].as_ref(), env, grammar, &reader)
+                    .with_context(|| describe(corpus, unit))
+            })
             .collect::<Result<_>>()?;
         for (offset, rows) in rows.iter().enumerate() {
             let unit = start + offset;
@@ -462,7 +217,7 @@ pub(crate) fn write(
             .with_context(|| describe(corpus, unit))?;
         }
     }
-    write_embeddings(&tx, &embeddings, &mut lexemes)?;
+    write_embeddings(&tx, &embeddings, &reader, &mut lexemes)?;
     write_lexemes(&tx, &lexemes, env)?;
     tx.commit()?;
     let dangling: i64 = db.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| {
@@ -478,6 +233,7 @@ pub(crate) fn write(
         "leaves",
         "heads",
         "embeddings",
+        "embedding_steps",
         "alternative_embeddings",
         "conjuncts",
         "lexemes",
@@ -510,6 +266,7 @@ fn unit_rows(
     cleave: Option<&sylex_english::cleave::CleaveText>,
     env: &LexicalEnvironment,
     grammar: &CompiledGrammar,
+    reader: &context::Reader<'_>,
 ) -> Result<UnitRows> {
     let u = &corpus.units[unit];
     let face = &corpus.faces[u.face];
@@ -518,10 +275,11 @@ fn unit_rows(
         .lexicon
         .analyze_source_scoped(&parsed, None, &face.scope());
     let parse = grammar.parse_analyzed(&analyzed);
-    let counts = parse.counts().with_context(|| describe(corpus, unit))?;
+    let counts = parse.counts()?;
     let heads = parse.alternative_heads()?;
     let conjuncts = parse.alternative_conjuncts()?;
-    let embeddings = parse.alternative_embeddings()?;
+    let embeddings = parse.alternative_embeddings(context::DEPTH, |step| reader.wrapper(step))?;
+    exclusive(&parse, &counts)?;
     let forest = &parse.forest;
     let tokens = parse.tokens();
     // A Constituent's span begins where it was predicted, before the space
@@ -562,29 +320,35 @@ fn unit_rows(
             .map(|(index, (production, item))| {
                 let outside = counts.node_outside(node);
                 let inside = counts.item_inside(item);
-                AlternativeRow {
+                let word = |leaf: Option<usize>| match forest.leaf_reading(leaf?) {
+                    LexicalReading::Word(word) => Some((word.lexeme, word.form)),
+                    LexicalReading::FlavorWord { .. } | LexicalReading::Numeral { .. } => None,
+                };
+                Ok(AlternativeRow {
                     production,
                     item,
                     derivations: counts.node_family(node, index),
                     heads: heads[node][index]
                         .iter()
-                        .map(|(&head, &own)| (head, own, own * outside))
-                        .collect(),
+                        .map(|(&leaf, &own)| Ok((leaf, word(leaf), own, product(own, outside)?)))
+                        .collect::<Result<_>>()?,
                     embeddings: embeddings[node][index]
                         .iter()
-                        .map(|(embedding, &ways)| (embedding.clone(), ways, ways * inside))
-                        .collect(),
+                        .map(|(embedding, &ways)| {
+                            Ok((embedding.clone(), ways, product(ways, inside)?))
+                        })
+                        .collect::<Result<_>>()?,
                     conjuncts: match coordinator {
                         Some(_) if !grammar.production_is_tail(production) => conjuncts[node]
                             [index]
                             .iter()
-                            .map(|(&n, &own)| (n, own * outside))
-                            .collect(),
+                            .map(|(&n, &own)| Ok((n, product(own, outside)?)))
+                            .collect::<Result<_>>()?,
                         Some(_) | None => Vec::new(),
                     },
-                }
+                })
             })
-            .collect();
+            .collect::<Result<_>>()?;
         nodes.push(NodeRow {
             node,
             category: forest.node_category(node),
@@ -645,6 +409,96 @@ fn unit_rows(
     })
 }
 
+/// The product of two counts, which is a count of the unit's Derivations.
+fn product(a: u128, b: u128) -> Result<u128> {
+    a.checked_mul(b)
+        .with_context(|| format!("a Derivation count overflows u128: {a} * {b}"))
+}
+
+/// Checks the two facts that make sums across nodes exact (the
+/// `verb_phrases` view states them): no Derivation holds two alternatives of
+/// one Production over one span, nor two verb phrase alternatives
+/// (frame-headed, and no interleaved prefix) on one head leaf. Two such
+/// alternatives in one Derivation would be nested, the inner one under the
+/// outer one's item through children of the same span, or through `head`
+/// children; any path down the forest is part of some Derivation.
+fn exclusive(parse: &sylex_syntax::Parse<'_>, counts: &sylex_syntax::Counts<'_>) -> Result<()> {
+    let forest = &parse.forest;
+    let grammar = parse.grammar();
+    // A verb phrase: a frame-headed Production other than an interleaved
+    // prefix, which is the head of its `/interleaved` Production and part of
+    // that one verb phrase.
+    let framed = |production: usize| {
+        grammar.production_frame(production).is_some()
+            && !grammar.production_is_interleaved_prefix(production)
+    };
+    for node in (0..forest.node_count()).filter(|&n| counts.node(n) > 0) {
+        let span = forest.node_span(node);
+        for (production, item) in forest.node_alternatives(node) {
+            let below = descendants(parse, item, &|child, _| forest.node_span(child) == span);
+            for inner in below {
+                if forest
+                    .node_alternatives(inner)
+                    .any(|(p, _)| p == production)
+                {
+                    anyhow::bail!(
+                        "nodes {node} and {inner} share a span and Production `{}` and can share \
+                         a Derivation",
+                        grammar.production_id(production)
+                    );
+                }
+            }
+            if framed(production) {
+                let below = descendants(parse, item, &|_, function| function == "head");
+                for inner in below {
+                    if let Some((p, _)) = forest.node_alternatives(inner).find(|&(p, _)| framed(p))
+                    {
+                        anyhow::bail!(
+                            "frame-headed `{}` (node {node}) and `{}` (node {inner}) share a head \
+                             leaf and can share a Derivation",
+                            grammar.production_id(production),
+                            grammar.production_id(p)
+                        );
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+/// The nodes reached from a completed item through children `follow` admits
+/// (by node and function), and on through their alternatives' items.
+fn descendants(
+    parse: &sylex_syntax::Parse<'_>,
+    item: usize,
+    follow: &dyn Fn(usize, &str) -> bool,
+) -> BTreeSet<usize> {
+    let forest = &parse.forest;
+    let grammar = parse.grammar();
+    let mut items = vec![item];
+    let mut seen_items = BTreeSet::new();
+    let mut nodes = BTreeSet::new();
+    while let Some(item) = items.pop() {
+        if !seen_items.insert(item) {
+            continue;
+        }
+        let function = grammar.production_functions(forest.item_production(item))
+            [forest.item_dot(item) - 1]
+            .as_str();
+        for (previous, child) in forest.item_families(item) {
+            items.extend(previous);
+            if let ChildRef::Node(child) = child
+                && follow(child, function)
+                && nodes.insert(child)
+            {
+                items.extend(forest.node_items(child));
+            }
+        }
+    }
+    nodes
+}
+
 /// A count as SQLite's 64-bit integer.
 fn int(n: u128) -> Result<i64> {
     i64::try_from(n).with_context(|| format!("count {n} exceeds SQLite's 64-bit integers"))
@@ -660,7 +514,7 @@ fn write_grammar(tx: &rusqlite::Transaction<'_>, grammar: &CompiledGrammar) -> R
         category.execute(params![self::index(index), name.as_str()])?;
     }
     let mut production =
-        tx.prepare("INSERT INTO productions VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?;
+        tx.prepare("INSERT INTO productions VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)")?;
     for p in 0..grammar.production_count() {
         let functions: Vec<String> = grammar
             .production_functions(p)
@@ -676,6 +530,7 @@ fn write_grammar(tx: &rusqlite::Transaction<'_>, grammar: &CompiledGrammar) -> R
             frame.as_ref().map(|(_, label, _)| label.as_str()),
             frame.as_ref().map(|(_, _, variant)| *variant),
             grammar.production_is_tail(p),
+            grammar.production_is_interleaved_prefix(p),
         ])?;
     }
     Ok(())
@@ -728,7 +583,7 @@ fn write_unit(
     let mut alternative_insert =
         tx.prepare_cached("INSERT INTO alternatives VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?;
     let mut head_insert =
-        tx.prepare_cached("INSERT INTO heads VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?;
+        tx.prepare_cached("INSERT INTO heads VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)")?;
     let mut embedding_insert =
         tx.prepare_cached("INSERT INTO alternative_embeddings VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?;
     let mut conjunct_insert =
@@ -767,16 +622,17 @@ fn write_unit(
                 index(alternative.item),
                 int(alternative.derivations)?,
             ])?;
-            for (head, inside, derivations) in &alternative.heads {
-                if let Some((lexeme, _)) = head {
+            for (leaf, word, inside, derivations) in &alternative.heads {
+                if let Some((lexeme, _)) = word {
                     lexemes.insert(*lexeme);
                 }
                 head_insert.execute(params![
                     key.0,
                     key.1,
                     key.2,
-                    head.map(|(lexeme, _)| lexeme.as_str()),
-                    head.map(|(_, form)| format!("{form:?}")),
+                    leaf.map(index),
+                    word.map(|(lexeme, _)| lexeme.as_str()),
+                    word.map(|(_, form)| format!("{form:?}")),
                     int(*inside)?,
                     int(*derivations)?,
                 ])?;
@@ -899,37 +755,35 @@ fn write_leaves(
 fn write_embeddings(
     tx: &rusqlite::Transaction<'_>,
     embeddings: &BTreeMap<Embedding, i64>,
+    reader: &context::Reader<'_>,
     lexemes: &mut BTreeSet<LexemeId>,
 ) -> Result<()> {
-    let mut insert = tx.prepare(
-        "INSERT INTO embeddings VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, \
-         ?14, ?15, ?16, ?17)",
-    )?;
+    let mut embedding_insert = tx.prepare("INSERT INTO embeddings VALUES (?1, ?2, ?3, ?4)")?;
+    let mut step_insert =
+        tx.prepare("INSERT INTO embedding_steps VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)")?;
     for (embedding, &id) in embeddings {
-        let mut values: Vec<rusqlite::types::Value> =
-            vec![id.into(), index(embedding.len()).into()];
-        for depth in 0..sylex_syntax::EMBEDDING_DEPTH {
-            match embedding.get(depth) {
-                Some(step) => {
-                    if let Some((lexeme, _)) = step.governor_head {
-                        lexemes.insert(lexeme);
-                    }
-                    values.extend([
-                        index(step.projection).into(),
-                        step.function.as_str().to_owned().into(),
-                        index(step.governor).into(),
-                        step.governor_head
-                            .map(|(lexeme, _)| lexeme.as_str().to_owned())
-                            .into(),
-                        step.governor_head
-                            .map(|(_, form)| format!("{form:?}"))
-                            .into(),
-                    ]);
-                }
-                None => values.extend((0..5).map(|_| rusqlite::types::Value::Null)),
+        embedding_insert.execute(params![
+            id,
+            index(embedding.steps.len()),
+            embedding.truncated,
+            reader.context(embedding).name(),
+        ])?;
+        for (n, step) in embedding.steps.iter().enumerate() {
+            if let Some((lexeme, _)) = step.governor_head {
+                lexemes.insert(lexeme);
             }
+            step_insert.execute(params![
+                id,
+                index(n + 1),
+                index(step.projection),
+                index(step.child),
+                step.function.as_str(),
+                index(step.governor),
+                step.governor_head.map(|(lexeme, _)| lexeme.as_str()),
+                step.governor_head.map(|(_, form)| format!("{form:?}")),
+                reader.wrapper(step),
+            ])?;
         }
-        insert.execute(rusqlite::params_from_iter(values))?;
     }
     Ok(())
 }
@@ -1130,7 +984,7 @@ mod tests {
                  FROM alternatives a WHERE a.unit = n.unit AND a.node = n.node)",
             ),
             (
-                "an alternative's heads",
+                "an alternative's head leaves",
                 "SELECT count(*) FROM alternatives a WHERE derivations != (SELECT \
                  sum(derivations) FROM heads h WHERE (h.unit, h.node, h.alternative) = \
                  (a.unit, a.node, a.alternative))",
@@ -1171,21 +1025,21 @@ mod tests {
 
     /// *Crook of Condemnation*'s *Exile target card from a graveyard* has two
     /// Derivations: *from a graveyard* modifies *card* or *exile*. Each verb
-    /// phrase of *exile* is in one, as the `clause` of a `Declarative`.
+    /// phrase of *exile* is in one, an effect clause.
     #[test]
     fn crook_of_condemnation_s_verb_phrases_split_its_attachment() {
         let (_dir, path, _) = database(&["Crook of Condemnation"]);
         let db = Connection::open(&path).unwrap();
         let mut statement = db
             .prepare(
-                "SELECT v.surface, v.lemma, v.frame, v.voice, v.projection1, v.function1, \
-                 v.governor1, v.derivations, u.derivations FROM verb_phrases v JOIN units u \
-                 USING (unit) WHERE u.line = 0 AND u.kind = 'line' ORDER BY v.surface",
+                "SELECT v.surface, v.lemma, v.frame, v.voice, v.context, v.derivations, \
+                 u.derivations FROM verb_phrases v JOIN units u USING (unit) WHERE u.line = 0 \
+                 AND u.kind = 'line' ORDER BY v.surface",
             )
             .unwrap();
         let rows: Vec<String> = statement
             .query_map([], |r| {
-                Ok((0..9)
+                Ok((0..7)
                     .map(|i| format!("{:?}", r.get::<_, rusqlite::types::Value>(i).unwrap()))
                     .collect::<Vec<_>>()
                     .join(" "))
@@ -1201,12 +1055,154 @@ mod tests {
             assert!(
                 row.starts_with(&format!(
                     "Text(\"{surface}\") Text(\"exile\") Text(\"Monotransitive(NP)\") \
-                     Text(\"Active\") Text(\"Imperative\") Text(\"clause\") \
-                     Text(\"Declarative\") Integer(1) Integer(2)"
+                     Text(\"Active\") Text(\"effect clause\") Integer(1) Integer(2)"
                 )),
                 "{row}"
             );
         }
+    }
+
+    /// *Kykar, Zephyr Awakener*'s *Whenever you cast a noncreature spell*
+    /// has two Derivations, *cast* Present in one and Preterite in the
+    /// other: two nodes over one span, each in one Derivation. Summed by
+    /// span and Production, *cast* is in both.
+    #[test]
+    fn nodes_sharing_a_span_and_production_sum_to_every_derivation() {
+        let (_dir, path, _) = database(&["Kykar, Zephyr Awakener"]);
+        let db = Connection::open(&path).unwrap();
+        let per_node = column(
+            &db,
+            "SELECT sum(v.derivations) FROM verb_phrases v JOIN units u USING (unit) WHERE \
+             u.line = 1 AND u.kind = 'line' AND v.lemma = 'cast' GROUP BY v.node",
+        );
+        assert_eq!(per_node, [1, 1]);
+        let spans = column(
+            &db,
+            "SELECT s.every FROM verb_phrase_spans s JOIN units u USING (unit) WHERE u.line = 1 \
+             AND u.kind = 'line' AND s.lemma = 'cast' AND s.context = 'trigger clause' AND \
+             s.derivations = u.derivations",
+        );
+        assert_eq!(spans, [1]);
+        let tokens = column(
+            &db,
+            "SELECT t.every FROM verb_phrase_tokens t JOIN units u USING (unit) WHERE u.line = 1 \
+             AND u.kind = 'line' AND t.lemma = 'cast'",
+        );
+        assert_eq!(tokens, [1]);
+    }
+
+    /// Each context on a real unit: (card, verb, the verb phrase's text,
+    /// its context). A passive under *would* (*Glacial Chasm*), conjuncts
+    /// under a deontic (*Vigean Hydropon*), relative clauses of four
+    /// Productions, and a participial postmodifier of each Production that
+    /// builds one.
+    #[test]
+    fn each_context_is_read_on_real_units() {
+        const CASES: &[(&str, &str, &str, &str)] = &[
+            ("Field Trip", "learn", "Learn", "effect clause"),
+            ("Ao, the Dawn Sky", "die", "dies", "trigger clause"),
+            ("Possessed Skaab", "die", "die", "would clause"),
+            ("Glacial Chasm", "deal", "dealt to you", "would clause"),
+            ("Absorbing Man and Titania", "deal", "deal", "would clause"),
+            ("Vigean Hydropon", "attack", "attack", "deontic"),
+            ("Vigean Hydropon", "block", "block", "deontic"),
+            ("Circling Vultures", "cast", "cast an instant", "deontic"),
+            ("Dawn Charm", "target", "targets you", "relative clause"),
+            ("Tourach's Gate", "control", "control", "relative clause"),
+            (
+                "Absorbing Man and Titania",
+                "will",
+                "would deal",
+                "relative clause",
+            ),
+            (
+                "Circling Vultures",
+                "can",
+                "could cast an instant",
+                "relative clause",
+            ),
+            (
+                "Jungle Patrol",
+                "name",
+                "named Wood",
+                "participial postmodifier",
+            ),
+            (
+                "Boarded Window",
+                "attack",
+                "attacking you",
+                "participial postmodifier",
+            ),
+            (
+                "Enduring Renewal",
+                "reveal",
+                "revealed",
+                "participial postmodifier",
+            ),
+            (
+                "Torpor Orb",
+                "enter",
+                "entering",
+                "participial postmodifier",
+            ),
+            ("Graven Lore", "spend", "spent", "participial postmodifier"),
+            (
+                "Gorex, the Tombshell",
+                "exile",
+                "exiled",
+                "participial postmodifier",
+            ),
+            (
+                "Shadow of the Grave",
+                "discard",
+                "discarded",
+                "participial postmodifier",
+            ),
+            (
+                "Roil's Retribution",
+                "block",
+                "blocking creatures",
+                "participial postmodifier",
+            ),
+            ("Road of Return", "choose", "Choose one", "other"),
+        ];
+        let cards: BTreeSet<&str> = CASES.iter().map(|case| case.0).collect();
+        let (_dir, path, _) = database(&cards.into_iter().collect::<Vec<_>>());
+        let db = Connection::open(&path).unwrap();
+        for &(card, lemma, surface, context) in CASES {
+            let found: Vec<String> = db
+                .prepare(
+                    "SELECT DISTINCT s.context FROM verb_phrase_spans s JOIN units u USING \
+                     (unit) WHERE u.face_name = ?1 AND s.lemma = ?2 AND s.surface = ?3",
+                )
+                .unwrap()
+                .query_map([card, lemma, surface], |r| r.get(0))
+                .unwrap()
+                .map(Result::unwrap)
+                .collect();
+            assert!(
+                found.iter().any(|c| c == context),
+                "{card}: {surface:?} is {found:?}, not {context}"
+            );
+        }
+        // The passive under *would* is a passive, the would its step above
+        // the passive auxiliary's Complement.
+        let passive = column(
+            &db,
+            "SELECT count(*) FROM verb_phrases v JOIN units u USING (unit) WHERE u.face_name = \
+             'Glacial Chasm' AND v.lemma = 'deal' AND v.variant LIKE 'passive%' AND v.context = \
+             'would clause'",
+        );
+        assert!(passive[0] > 0);
+        // A conjunct under *can't* stands under its coordination first.
+        let conjunct = column(
+            &db,
+            "SELECT count(*) FROM verb_phrases v JOIN units u USING (unit) JOIN \
+             embedding_steps s ON s.embedding = v.embedding AND s.step = 1 JOIN productions g ON \
+             g.production = s.governor WHERE u.face_name = 'Vigean Hydropon' AND v.lemma = \
+             'attack' AND s.wrapper AND g.name LIKE 'Coordination:%'",
+        );
+        assert!(conjunct[0] > 0);
     }
 
     #[test]

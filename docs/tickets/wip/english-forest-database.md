@@ -34,12 +34,17 @@ The forest stays packed (`docs/decisions/english.md` §4): there is never a row 
   belong to a node's alternatives, not the node. One alternative may reach more than one head
   word through its items, so heads are rows of their own with exact counts.
 - Each alternative's Embedding, the chain of dependent functions it stands under, is stored with
-  exact counts per alternative, so a view over it can ask "in every Derivation" (count equals the
-  unit's total) and "in some Derivation" (count above zero) alike.
-- Views: every verb phrase alternative with its verb, Selected Frame, Voice and alternation
-  variant, form and Embedding; and every coordination node with its Category, coordinator and
-  conjunct count. A view that flattens says in its comment what it shows and what it must not be
-  used to count.
+  exact counts per alternative. It keeps steps up to the third that is no wrapper (an auxiliary's
+  Complement, a conjunct, do-support, an adjectival passive under *be*) and says when steps above
+  were cut. Its context (effect, trigger, *would*, deontic, relative clause, participial
+  postmodifier, other) is a stored column, read in Rust from its first step that is no wrapper,
+  since the rules need grammar facts the database does not hold.
+- A fact holds in every Derivation where the Derivations that have it equal the unit's total, a
+  sum exact only over rows no Derivation holds two of: one node's rows, nodes sharing a span and
+  Production, and verb phrases sharing a head token. The writer checks both cross-node facts on
+  every unit. Views: `verb_phrases` (each frame-headed alternative headed by a verb, with its
+  frame, variant, Voice, head token, context and Embedding), `verb_phrase_spans` and
+  `verb_phrase_tokens` (the exact sums, with `every`), and `coordinations`.
 - No unit is capped.
 
 ## Done when

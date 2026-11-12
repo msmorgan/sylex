@@ -184,62 +184,111 @@ Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
 - `units`; `nodes` (Category, span, surface, Gap, features, coordinator,
   settled); `alternatives` (Production, completed item); `items` (Production,
   dot, span); `families` (previous item, child node or leaf); `leaves`;
-- per alternative: `heads` (head lexeme and form), `alternative_embeddings`
-  (the Embedding it stands under, `embeddings`) and, for a coordination,
-  `conjuncts`; and the grammar's `productions` (with Selected Frame and
-  variant), `categories` and `lexemes`;
-- views `verb_phrases` and `coordinations`.
+- per alternative: `heads` (head leaf, lexeme and form),
+  `alternative_embeddings` (the Embedding it stands under: `embeddings`, with
+  its context, and `embedding_steps`) and, for a coordination, `conjuncts`;
+  and the grammar's `productions` (with Selected Frame and variant),
+  `categories` and `lexemes`;
+- views `verb_phrases`, `verb_phrase_spans`, `verb_phrase_tokens` and
+  `coordinations`.
 
-Every `derivations` column is exact. A fact holds in every Derivation where
-its node's rows with that fact sum to `units.derivations`, and in some
-Derivation where it has a row. Never sum `derivations` across different nodes
-of one unit: one Derivation uses many nodes.
+Every `derivations` column is exact. A fact holds in some Derivation where it
+has a row, and in every Derivation where the Derivations that have it equal
+`units.derivations`. That is a sum, exact only over rows no two of which one
+Derivation can hold: rows of one node; rows of nodes that share a span and a
+Production (the chart packs a Constituent by its bound features too, so one
+verb phrase is often several nodes, as *cast* Present and Preterite are in
+*Whenever you cast …*); and verb phrases that share a head token. The writer
+checks on every unit that no Derivation holds two of the second or third
+kind. `verb_phrase_spans` and `verb_phrase_tokens` do these sums, with an
+`every` column. Rows of different spans and head tokens are never summed.
+
+A verb phrase's context (`effect clause`, `trigger clause`, `would clause`,
+`deontic`, `relative clause`, `participial postmodifier` or `other`) is read
+from the first step of its Embedding that is no wrapper: a passive or perfect
+auxiliary's Complement, a conjunct, do-support and an adjectival passive under
+*be* only carry it to its context
+(`crates/xtask/src/english/forests/context.rs` states each rule).
 
 Passive verb phrases by verb and frame, in units where some Derivation has
-one, and where one node has it in every Derivation (*blocked* is passive or
-adjectival in most):
+one, and where one head token is one in every Derivation (*blocked* is
+passive or adjectival in most):
 
 ```sql
-WITH passive AS (
-  SELECT v.unit, v.node, v.lemma, v.frame, sum(v.derivations) AS n, u.derivations AS total
-  FROM verb_phrases v JOIN units u USING (unit)
-  WHERE v.variant LIKE 'passive%'
-  GROUP BY v.unit, v.node, v.lemma, v.frame)
 SELECT lemma, frame, count(DISTINCT unit) AS some_units,
-  count(DISTINCT CASE WHEN n = total THEN unit END) AS every_units
-FROM passive GROUP BY lemma, frame ORDER BY some_units DESC LIMIT 6;
+  count(DISTINCT CASE WHEN every THEN unit END) AS every_units
+FROM verb_phrase_tokens WHERE variant LIKE 'passive%'
+GROUP BY lemma, frame ORDER BY some_units DESC LIMIT 6;
 ```
 
 ```
 lemma  frame                                                                              some_units  every_units
-block  Monotransitive(NP)                                                                        719            3
-put    TransitiveWithPP(NP,PP[prep:into|prep:in|prep:on|prep:onto|prep:back|prep:there])         558          238
-deal   TransitiveWithPP(NP,PP[prep:to])                                                          405          353
-deal   Ditransitive(NP,NP)                                                                       390           79
-name   ComplexTransitive(NP,Name)                                                                334          323
-exile  Monotransitive(NP)                                                                        323          255
+block  Monotransitive(NP)                                                                        719           16
+put    TransitiveWithPP(NP,PP[prep:into|prep:in|prep:on|prep:onto|prep:back|prep:there])         558          549
+deal   TransitiveWithPP(NP,PP[prep:to])                                                          405          393
+deal   Ditransitive(NP,NP)                                                                       390           81
+name   ComplexTransitive(NP,Name)                                                                334          314
+exile  Monotransitive(NP)                                                                        323          247
 ```
 
-The verbs of a replacement's *would* clause: the Complement of preterite
-*will* inside the Complement of *if*:
+The verbs of *would* clauses, by Voice (1,084 units have one):
 
 ```sql
-SELECT lemma, frame, count(DISTINCT unit) AS units
-FROM verb_phrases
-WHERE projection1 = 'BareInfinitival' AND function1 = 'complement'
-  AND governor_lemma1 = 'will' AND governor_form1 = 'Preterite'
-  AND function2 = 'complement' AND governor_lemma2 = 'if'
-GROUP BY lemma, frame ORDER BY units DESC LIMIT 6;
+SELECT lemma, voice, count(DISTINCT unit) AS units
+FROM verb_phrase_tokens WHERE context = 'would clause'
+GROUP BY lemma, voice ORDER BY units DESC LIMIT 8;
 ```
 
 ```
-lemma  frame                             units
-deal   TransitiveWithPP(NP,PP[prep:to])    100
-die    Intransitive()                       94
-draw   Monotransitive(NP)                   38
-be     Copular(Pred)                        26
-gain   Monotransitive(NP)                   20
-leave  Monotransitive(NP)                   14
+lemma  voice    units
+deal   Passive    449
+deal   Active     207
+put    Passive    125
+be     Active     116
+die    Active      95
+draw   Active      49
+gain   Active      20
+create Passive     19
+```
+
+Verb phrases by context:
+
+```sql
+SELECT context, count(DISTINCT unit) AS some_units,
+  count(DISTINCT CASE WHEN every THEN unit END) AS every_units
+FROM verb_phrase_tokens GROUP BY context ORDER BY some_units DESC;
+```
+
+```
+context                   some_units  every_units
+effect clause                  45182        43552
+other                          15508        14007
+trigger clause                 13668        13406
+relative clause                11511        11203
+deontic                         7199         5221
+participial postmodifier        1960         1243
+would clause                    1084          919
+```
+
+Does every Derivation of a unit contain a passive verb phrase headed by
+*deal*? Yes where one head token is one in every Derivation. Different head
+tokens can share a Derivation, so their counts are never summed; a unit where
+no one token covers every Derivation is not answered by these columns:
+
+```sql
+SELECT u.face_name, u.line, t.lemma, t.frame
+FROM verb_phrase_tokens t JOIN units u USING (unit)
+WHERE t.lemma = 'deal' AND t.variant LIKE 'passive%' AND t.every
+ORDER BY u.face_name, u.line LIMIT 5;
+```
+
+```
+face_name         line  lemma  frame
+Abattoir Ghoul       1  deal   Ditransitive(NP,NP)
+Abuna Acolyte        0  deal   TransitiveWithPP(NP,PP[prep:to])
+Abuna Acolyte        1  deal   TransitiveWithPP(NP,PP[prep:to])
+Abuna's Chant        2  deal   TransitiveWithPP(NP,PP[prep:to])
+Acolyte's Reward     0  deal   TransitiveWithPP(NP,PP[prep:to])
 ```
 
 Coordinations by Category, coordinator (a Linked Coordination's link
@@ -256,10 +305,10 @@ FROM coordinations GROUP BY 1, 2, 3 ORDER BY some_nodes DESC LIMIT 6;
 category          coordinator          conjuncts  some_nodes  settled_nodes
 Nominal           or                           2        4958           1006
 VerbPhrase        and                          2        4242           1146
-Clause            Clause#LinkedClause          2        2489            459
+Clause            Clause#LinkedClause          2        2485            459
 Clause            and                          2        2411           1215
-NounPhrase        and                          2        2363            562
-DeterminerPhrase  or                           2        2020           1667
+NounPhrase        and                          2        2362            563
+DeterminerPhrase  or                           2        1969           1709
 ```
 
 The census faces with no Vintage `Legal` or `Restricted` printing in mtgjson
