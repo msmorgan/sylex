@@ -1012,3 +1012,476 @@ fn dependency_loop_falls_back_to_timestamp() {
         "B then catches the enchantment: Bad Moon becomes a creature ([CR#613.8b] loop → timestamp)"
     );
 }
+
+// ---------------------------------------------------------------------------
+// Humility, Opalescence and effect continuation ([CR#613.6])
+// ---------------------------------------------------------------------------
+
+/// A core fixture built from a real card's Oracle text, for the cards the v1
+/// corpus cannot load.
+fn fixture(
+    name: &str,
+    mana_cost: Vec<sylex_core::ManaSymbol>,
+    types: &[sylex_core::Type],
+    subtypes: &[&str],
+    power_toughness: Option<(i32, i32)>,
+    abilities: Vec<sylex_core::Ability>,
+) -> Arc<Card> {
+    use sylex_core::StatValue;
+    Arc::new(Card::Normal(sylex_card::CardFace::from(
+        sylex_card::Characteristics {
+            name: name.into(),
+            mana_cost: Arc::<[sylex_core::ManaSymbol]>::from(mana_cost).into(),
+            types: types.iter().map(|t| t.def()).collect(),
+            subtypes: subtypes
+                .iter()
+                .map(|s| sylex_core::Subtype {
+                    name: (*s).into(),
+                    types: Vec::new().into(),
+                    confers: Vec::new().into(),
+                })
+                .collect(),
+            power: power_toughness.map(|(p, _)| StatValue::Number(p)),
+            toughness: power_toughness.map(|(_, t)| StatValue::Number(t)),
+            abilities,
+            ..sylex_card::Characteristics::default()
+        },
+    )))
+}
+
+/// `{generic}` followed by `white` white pips.
+fn white_cost(generic: u32, white: usize) -> Vec<sylex_core::ManaSymbol> {
+    let mut cost = vec![sylex_core::ManaSymbol::Simple(
+        sylex_core::SimpleManaSymbol::Generic(generic),
+    )];
+    cost.extend(std::iter::repeat_n(
+        sylex_core::ManaSymbol::from(Color::White),
+        white,
+    ));
+    cost
+}
+
+/// The candidate filter region of a static's "each …" selection: register 0
+/// is the candidate, 1 the static's source (`~`), 2 its controller (`you`).
+fn static_candidate_filter(
+    body: sylex_core::Predicate,
+) -> Arc<sylex_core::Region<sylex_core::Predicate>> {
+    use sylex_core::DefId;
+    use sylex_core::Kind;
+    use sylex_core::Param;
+    use sylex_core::Provenance;
+    Arc::new(sylex_core::Region::new(
+        Arc::from([
+            Param {
+                def: DefId(0),
+                kind: Kind::Entity,
+                provenance: Provenance::Candidate(sylex_core::Domain::Entity),
+            },
+            Param {
+                def: DefId(1),
+                kind: Kind::Entity,
+                provenance: Provenance::Source,
+            },
+            Param {
+                def: DefId(2),
+                kind: Kind::Entity,
+                provenance: Provenance::Controller,
+            },
+        ]),
+        body,
+    ))
+}
+
+/// A static "each object matching `filter` gets `changes`".
+fn each_static(
+    filter: sylex_core::Predicate,
+    changes: Vec<sylex_core::Modification>,
+) -> sylex_core::Ability {
+    use sylex_core::Modification;
+    use sylex_core::Reference;
+    use sylex_core::StaticSpec;
+    sylex_core::Ability::r#static(StaticSpec::Each(
+        sylex_core::Selection::SelectAll(static_candidate_filter(filter)),
+        Arc::new(sylex_core::Region::candidate(StaticSpec::Modify(
+            Reference::Reg(sylex_core::RefId(0)),
+            Modification::Several(changes.into()),
+        ))),
+    ))
+}
+
+/// Opalescence ({2}{W}{W} Enchantment): "Each other non-Aura enchantment is a
+/// creature in addition to its other types and has base power and base
+/// toughness each equal to its mana value." Every enchantment these tests
+/// animate costs four, so the fixture sets base 4/4: the layer pass evaluates
+/// a count against the static's source, not the object it modifies
+/// (`engine-layer-count-per-affected-object`).
+fn opalescence() -> Arc<Card> {
+    use sylex_core::CharacteristicPredicate;
+    use sylex_core::CollectionOp;
+    use sylex_core::Modification;
+    use sylex_core::NumericOp;
+    use sylex_core::Predicate;
+    use sylex_core::Reference;
+    use sylex_core::StatValue;
+    use sylex_core::Type;
+    let animate = each_static(
+        Predicate::And(
+            vec![
+                Predicate::r#type(Type::Enchantment),
+                Predicate::Not(Arc::new(Predicate::Characteristic(
+                    CharacteristicPredicate::Subtype(sylex_core::SubtypeRef::named("Aura".into())),
+                ))),
+                Predicate::Not(Arc::new(Predicate::Ref(Reference::Reg(sylex_core::RefId(
+                    1,
+                ))))),
+            ]
+            .into(),
+        ),
+        vec![
+            Modification::CardTypes(CollectionOp::Add(Type::Creature.name())),
+            Modification::Power(NumericOp::Set(StatValue::Number(4))),
+            Modification::Toughness(NumericOp::Set(StatValue::Number(4))),
+        ],
+    );
+    fixture(
+        "Opalescence",
+        white_cost(2, 2),
+        &[Type::Enchantment],
+        &[],
+        None,
+        vec![animate],
+    )
+}
+
+/// Worship ({3}{W} Enchantment). Its one ability, a damage replacement, is
+/// left off: these tests read only its types and power and toughness.
+fn worship() -> Arc<Card> {
+    fixture(
+        "Worship",
+        white_cost(3, 1),
+        &[sylex_core::Type::Enchantment],
+        &[],
+        None,
+        vec![],
+    )
+}
+
+/// Battle Mastery ({2}{W} Enchantment — Aura): "Enchanted creature has double
+/// strike." Its enchant keyword is left off; the test attaches it by hand.
+fn battle_mastery() -> Arc<Card> {
+    use sylex_core::Ability;
+    use sylex_core::KeywordAbility;
+    use sylex_core::Modification;
+    use sylex_core::Reference;
+    use sylex_core::StaticSpec;
+    fixture(
+        "Battle Mastery",
+        white_cost(2, 1),
+        &[sylex_core::Type::Enchantment],
+        &["Aura"],
+        None,
+        vec![Ability::r#static(StaticSpec::Modify(
+            Reference::AttachHostOf(Arc::new(Reference::Reg(sylex_core::RefId(0)))),
+            Modification::GainAbility(Arc::new(Ability::Keyword(KeywordAbility::DoubleStrike))),
+        ))],
+    )
+}
+
+/// Dryad of the Ilysian Grove ({2}{G} Enchantment Creature — Nymph Dryad,
+/// 2/4): "Lands you control are every basic land type in addition to their
+/// other types." Its additional-land ability is left off; the test reads only
+/// the land-type effect.
+fn dryad_of_the_ilysian_grove() -> Arc<Card> {
+    use sylex_core::CollectionOp;
+    use sylex_core::Modification;
+    use sylex_core::Predicate;
+    use sylex_core::Reference;
+    use sylex_core::RelationPredicate;
+    use sylex_core::Type;
+    let lands_you_control = Predicate::And(
+        vec![
+            Predicate::r#type(Type::Land),
+            Predicate::Relation(RelationPredicate::ControlledBy(Arc::new(Predicate::Ref(
+                Reference::Reg(sylex_core::RefId(2)),
+            )))),
+        ]
+        .into(),
+    );
+    let every_basic_land_type = BASIC_LAND_TYPES
+        .iter()
+        .map(|name| {
+            Modification::Subtypes(CollectionOp::Add(sylex_core::SubtypeRef::named(
+                (*name).into(),
+            )))
+        })
+        .collect();
+    fixture(
+        "Dryad of the Ilysian Grove",
+        vec![
+            sylex_core::ManaSymbol::Simple(sylex_core::SimpleManaSymbol::Generic(2)),
+            sylex_core::ManaSymbol::from(Color::Green),
+        ],
+        &[Type::Enchantment, Type::Creature],
+        &["Nymph", "Dryad"],
+        Some((2, 4)),
+        vec![each_static(lands_you_control, every_basic_land_type)],
+    )
+}
+
+const BASIC_LAND_TYPES: [&str; 5] = ["Plains", "Island", "Swamp", "Mountain", "Forest"];
+
+/// A game whose P0 deck holds `cards` (padded with Grizzly Bears), and whose
+/// P1 plays Grizzly Bears.
+fn game_with_p0_deck(mut p0: Vec<Arc<Card>>) -> GameState {
+    while p0.len() < 10 {
+        p0.push(card("Grizzly Bears"));
+    }
+    GameState::new(GameConfig {
+        players: vec![
+            PlayerConfig { deck: p0 },
+            PlayerConfig {
+                deck: vec![card("Grizzly Bears"); 10],
+            },
+        ],
+        seed: 1,
+        starting_life: 20,
+        starting_player: StartingPlayer::Fixed(PlayerId(0)),
+        sba_rules: vec![],
+        conferral_rules: vec![],
+        damage_result_rules: vec![],
+        counter_decls: std::collections::HashMap::new(),
+        subtypes: std::collections::HashMap::new(),
+        types: std::collections::HashMap::new(),
+    })
+}
+
+/// Put P0's cards named `order` onto the battlefield, giving each a later
+/// timestamp than the one before it [CR#613.7d]. Returns their ids in order.
+fn enter_in_order(state: &mut GameState, order: &[&str]) -> Vec<ObjectId> {
+    order
+        .iter()
+        .zip(10_000..)
+        .map(|(name, stamp)| {
+            let id = force_onto_battlefield(state, PlayerId(0), name);
+            state.objects.obj_mut(id).timestamp = sylex_engine::Timestamp(stamp);
+            id
+        })
+        .collect()
+}
+
+/// Assert `id` is an enchantment creature with base `pt`/`pt` and no
+/// abilities.
+fn assert_blank_animated(view: &sylex_engine::LayeredView, id: ObjectId, pt: i32, what: &str) {
+    use sylex_core::Type;
+    let c = view.get(id);
+    assert!(
+        c.has_type(Type::Creature) && c.has_type(Type::Enchantment),
+        "{what} is a creature that is still an enchantment"
+    );
+    assert!(c.abilities.is_empty(), "{what} has no abilities");
+    assert_eq!(
+        (view.power(id), view.toughness(id)),
+        (Some(pt), Some(pt)),
+        "{what} is {pt}/{pt}"
+    );
+}
+
+/// Humility's 2009-10-01 ruling, Opalescence entered first: "if Opalescence,
+/// Humility, and Worship are on the battlefield and Opalescence entered before
+/// Humility, the following is true: Layer 4: Humility and Worship each become
+/// creatures that are still enchantments. (Opalescence). Layer 6: Humility and
+/// Worship each lose their abilities. (Humility) Layer 7b: Humility becomes
+/// 4/4 and Worship becomes 4/4. (Opalescence). Humility becomes 1/1 and
+/// Worship becomes 1/1 (Humility)."
+///
+/// Re-derived from the current CR: Opalescence animates Humility and Worship
+/// in layer 4 [CR#613.1d]; Humility strips both, itself included, in layer 6
+/// [CR#613.1f], yet its effect keeps applying in layer 7b [CR#613.6]; within
+/// 7b the earlier Opalescence sets 4/4 and the later Humility then sets 1/1
+/// [CR#613.4b,613.7]. Opalescence is not a creature and keeps its ability.
+#[test]
+fn humility_after_opalescence_leaves_animated_enchantments_1_1() {
+    let mut state = game_with_p0_deck(vec![opalescence(), card("Humility"), worship()]);
+    let ids = enter_in_order(&mut state, &["Opalescence", "Humility", "Worship"]);
+    let [opal, humility, worship] = ids[..] else { unreachable!() };
+
+    let view = state.layers();
+    assert_blank_animated(&view, humility, 1, "Humility");
+    assert_blank_animated(&view, worship, 1, "Worship");
+    assert!(
+        !view.get(opal).has_type(sylex_core::Type::Creature),
+        "Opalescence does not animate itself"
+    );
+    assert_eq!(
+        view.get(opal).abilities.len(),
+        1,
+        "Opalescence keeps its ability"
+    );
+}
+
+/// Humility's 2009-10-01 ruling, Humility entered first: "if Humility entered
+/// before Opalescence, the following is true: Layer 4: Humility and Worship
+/// each become creatures that are still enchantments (Opalescence). Layer 6:
+/// Humility and Worship each lose their abilities (Humility). Layer 7b:
+/// Humility becomes 1/1 and Worship becomes 1/1 (Humility). Humility becomes
+/// 4/4 and Worship becomes 4/4 (Opalescence)."
+///
+/// Re-derived from the current CR: layers 4 and 6 as in the other order; in 7b
+/// the earlier Humility sets 1/1 and the later Opalescence then sets 4/4
+/// [CR#613.4b,613.6,613.7].
+#[test]
+fn humility_before_opalescence_leaves_animated_enchantments_4_4() {
+    let mut state = game_with_p0_deck(vec![opalescence(), card("Humility"), worship()]);
+    let ids = enter_in_order(&mut state, &["Humility", "Opalescence", "Worship"]);
+    let [humility, _opal, worship] = ids[..] else { unreachable!() };
+
+    let view = state.layers();
+    assert_blank_animated(&view, humility, 4, "Humility");
+    assert_blank_animated(&view, worship, 4, "Worship");
+}
+
+/// Humility and two Opalescences entering in `order`; returns the view and the
+/// ids of Humility, the first Opalescence and the second Opalescence.
+fn humility_and_two_opalescences(
+    order: &[&str; 3],
+) -> (sylex_engine::LayeredView, ObjectId, ObjectId, ObjectId) {
+    let mut state = game_with_p0_deck(vec![opalescence(), opalescence(), card("Humility")]);
+    let ids = enter_in_order(&mut state, order);
+    let humility = ids[order.iter().position(|n| *n == "Humility").unwrap()];
+    let mut opals = ids.iter().zip(order).filter(|(_, n)| **n == "Opalescence");
+    let first = *opals.next().unwrap().0;
+    let second = *opals.next().unwrap().0;
+    (state.layers(), humility, first, second)
+}
+
+/// Humility's and Opalescence's 2006-02-01 ruling: "With a Humility and two
+/// Opalescences on the battlefield, if Humility has the latest timestamp, then
+/// all creatures are 1/1 with no abilities."
+///
+/// Re-derived from the current CR: each Opalescence animates Humility and the
+/// other Opalescence in layer 4 [CR#613.1d], so all three are creatures that
+/// Humility strips in layer 6 [CR#613.1f]; each effect, started before the
+/// stripping, continues into 7b [CR#613.6], where Humility, latest, sets 1/1
+/// last [CR#613.7].
+#[test]
+fn humility_latest_among_two_opalescences_makes_all_1_1() {
+    let (view, humility, first, second) =
+        humility_and_two_opalescences(&["Opalescence", "Opalescence", "Humility"]);
+    assert_blank_animated(&view, humility, 1, "Humility");
+    assert_blank_animated(&view, first, 1, "the first Opalescence");
+    assert_blank_animated(&view, second, 1, "the second Opalescence");
+}
+
+/// The 2006-02-01 ruling: "If the timestamp order is Opalescence, Humility,
+/// Opalescence, the second Opalescence is 1/1, and the Humility and first
+/// Opalescence are 4/4."
+///
+/// Re-derived from the current CR: layers 4 and 6 as above; in 7b the first
+/// Opalescence sets Humility and the second Opalescence 4/4, Humility sets all
+/// three 1/1, and the second Opalescence sets Humility and the first
+/// Opalescence 4/4 [CR#613.6,613.7].
+#[test]
+fn humility_between_two_opalescences_leaves_the_second_1_1() {
+    let (view, humility, first, second) =
+        humility_and_two_opalescences(&["Opalescence", "Humility", "Opalescence"]);
+    assert_blank_animated(&view, humility, 4, "Humility");
+    assert_blank_animated(&view, first, 4, "the first Opalescence");
+    assert_blank_animated(&view, second, 1, "the second Opalescence");
+}
+
+/// The 2006-02-01 ruling: "If Humility has the earliest timestamp, then
+/// everything is 4/4."
+///
+/// Re-derived from the current CR: in 7b Humility sets all three 1/1 first,
+/// then each Opalescence sets the other two 4/4 [CR#613.6,613.7].
+#[test]
+fn humility_earliest_among_two_opalescences_makes_all_4_4() {
+    let (view, humility, first, second) =
+        humility_and_two_opalescences(&["Humility", "Opalescence", "Opalescence"]);
+    assert_blank_animated(&view, humility, 4, "Humility");
+    assert_blank_animated(&view, first, 4, "the first Opalescence");
+    assert_blank_animated(&view, second, 4, "the second Opalescence");
+}
+
+/// [CR#613.6]: Dryad of the Ilysian Grove's land-type effect applies in layer
+/// 4 [CR#613.1d], before Humility removes the Dryad's abilities in layer 6
+/// [CR#613.1f], so the lands keep every basic land type while the Dryad is a
+/// 1/1 with no abilities.
+#[test]
+fn dryad_land_types_survive_humility() {
+    let mut state = game_with_p0_deck(vec![
+        dryad_of_the_ilysian_grove(),
+        card("Humility"),
+        card("Kabira Crossroads"),
+    ]);
+    let ids = enter_in_order(
+        &mut state,
+        &[
+            "Kabira Crossroads",
+            "Dryad of the Ilysian Grove",
+            "Humility",
+        ],
+    );
+    let [land, dryad, _humility] = ids[..] else { unreachable!() };
+
+    let view = state.layers();
+    assert!(
+        view.get(dryad).abilities.is_empty(),
+        "the Dryad has no abilities"
+    );
+    assert_eq!(
+        (view.power(dryad), view.toughness(dryad)),
+        (Some(1), Some(1)),
+        "the Dryad is 1/1"
+    );
+    let subtypes: Vec<&str> = view
+        .get(land)
+        .subtypes
+        .iter()
+        .map(|s| s.name.as_str())
+        .collect();
+    assert_eq!(
+        subtypes, BASIC_LAND_TYPES,
+        "the land is every basic land type"
+    );
+}
+
+/// [CR#613.8a,613.8b]: two Humilities animated by Opalescence each remove the
+/// other's ability in layer 6, so each depends on the other [CR#613.8a]: a
+/// dependency loop, applied in timestamp order among the layer's effects
+/// [CR#613.8b]. The first Humility applies before Battle Mastery's later,
+/// independent grant, so the first Humility keeps the double strike Battle
+/// Mastery gives it. The second Humility's ability is gone before its effect
+/// started applying, so that effect no longer exists [CR#604.2] and does not
+/// set 1/1 in layer 7b, where the first Humility's 1/1 and then
+/// Opalescence's 4/4 apply [CR#613.6,613.7].
+#[test]
+fn humility_loop_applies_in_timestamp_order() {
+    use sylex_core::Ability;
+    use sylex_core::KeywordAbility;
+
+    let mut state = game_with_p0_deck(vec![
+        card("Humility"),
+        opalescence(),
+        card("Humility"),
+        battle_mastery(),
+    ]);
+    let ids = enter_in_order(
+        &mut state,
+        &["Humility", "Opalescence", "Humility", "Battle Mastery"],
+    );
+    let [first, _opal, second, mastery] = ids[..] else { unreachable!() };
+    state.objects.obj_mut(mastery).attached_to = Some(first);
+
+    let view = state.layers();
+    assert_eq!(
+        view.get(first).abilities.as_slice(),
+        [Ability::Keyword(KeywordAbility::DoubleStrike)],
+        "the first Humility loses its own ability, then gains double strike"
+    );
+    assert_eq!(
+        (view.power(first), view.toughness(first)),
+        (Some(4), Some(4))
+    );
+    assert_blank_animated(&view, second, 4, "the second Humility");
+}

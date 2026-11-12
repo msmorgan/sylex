@@ -344,15 +344,21 @@ fn printed_base_len(state: &GameState, id: ObjectId) -> usize {
 /// unflattened list, where the container alone stands ([CR#702.21a]: a
 /// permanent with ward has ONE ability, ward, not ward plus its trigger).
 pub(crate) fn flatten_composites(ability: &Ability, out: &mut Vec<Ability>) {
+    visit_flattened(ability, &mut |member| out.push(member.clone()));
+}
+
+/// Visit, by reference, each ability [`flatten_composites`] would splice out
+/// of `ability`, in the same order, without cloning any of them.
+pub(crate) fn visit_flattened(ability: &Ability, visit: &mut impl FnMut(&Ability)) {
     if let Ability::Keyword(k) = ability
         && let Some(members) = composite_members(k)
     {
         for member in members {
-            flatten_composites(member, out);
+            visit_flattened(member, visit);
         }
         return;
     }
-    out.push(ability.clone());
+    visit(ability);
 }
 
 /// The member list of a composite keyword, looked up through the remembered
