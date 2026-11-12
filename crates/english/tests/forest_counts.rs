@@ -12,6 +12,8 @@
 
 #[path = "../../syntax/tests/support/forest_oracle.rs"]
 mod forest_oracle;
+#[path = "support/unit_texts.rs"]
+mod unit_texts;
 
 use std::collections::BTreeSet;
 use std::time::Duration;
@@ -45,24 +47,6 @@ const SAMPLE: &[&str] = &[
     "Maralen, Fae Ascendant",
     "Remove Enchantments",
 ];
-
-/// Every text the census parses for a unit (`census::run`): the unit's, or
-/// a cleave line's uncleaved and cleaved texts.
-fn texts<'c>(corpus: &'c Corpus, env: &LexicalEnvironment) -> Vec<(&'c Face, String)> {
-    let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
-    let mut out = Vec::new();
-    for (unit, cleave) in corpus.units.iter().zip(cleaves) {
-        let face = &corpus.faces[unit.face];
-        match cleave {
-            Some(split) => {
-                out.push((face, split.uncleaved));
-                out.push((face, split.cleaved));
-            }
-            None => out.push((face, unit.text.clone())),
-        }
-    }
-    out
-}
 
 /// Time spent in each pass over one text.
 #[derive(Default, Clone, Copy)]
@@ -116,7 +100,7 @@ fn check_corpus(keep: impl Fn(&Face) -> bool) -> (BTreeSet<String>, usize, Timin
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let corpus = Corpus::load(keep).unwrap();
-    let texts = texts(&corpus, &env);
+    let texts = unit_texts::texts(&corpus, &env);
     let pool = rayon::ThreadPoolBuilder::new()
         .stack_size(256 << 20)
         .build()
