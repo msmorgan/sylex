@@ -21,15 +21,20 @@ Readings wanted, and from there to the assertions a judgment needs.
   constituent tree, with a small set of judgment assertions that isolates it among the unit's
   Readings, found by greedy set cover over the assertions that hold on it, and marked as
   diagnostic output, not as a judgment to copy unread.
+- A selector spells a word, a fork's own or a governor's, as the survey prints it:
+  `"surface"#N`, its surface and 1-based occurrence. The occurrence is always written; a bare
+  `"surface"` is an error, for a surface that occurs once too. A name with its occurrence stays
+  valid when an edit elsewhere in the text adds the surface again (`ForkWord`), and a word copied
+  from the survey's output is already a valid selector word.
 - Selectors stay separate from the `=>` assertion syntax of judgments.
 - Slicing works on forests of any size and does not depend on `READING_LIMIT`.
 
 ## Open questions
 
-- How a selector spells a fork and an answer on the command line. A selector carries a name and
-  no offset (`ForkWord::names`, `Answer::names`): the kind, the leaf surface and its occurrence;
-  a dependency answer's function, governor Category and governor leaf's surface and occurrence;
-  a lexical answer's Lexeme, Word Form and features; a frame answer's Productions.
+- How a selector spells a fork's kind and an answer on the command line, around the word
+  spelling above. A selector carries a name and no offset (`ForkWord::names`, `Answer::names`):
+  the kind and the word; a dependency answer's function, governor Category and governor word; a
+  lexical answer's Lexeme, Word Form and features; a frame answer's Productions.
 
 - The isolating assertions must exclude every other Reading of the unit, which on a large forest
   cannot be enumerated. Options: count, for each candidate assertion, the Readings that satisfy

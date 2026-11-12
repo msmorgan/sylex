@@ -23,6 +23,9 @@ prints that, short enough to read.
   folded into one line), then every fork in the order `ForkForest::forks` gives, named as it
   names it (kind, leaf surface and occurrence, aliases, whether conditional), with its options
   and each option's exact count; tens of lines for a unit of thousands of Readings.
+- A word, a fork's own or a governor's, is printed as `"surface"#N`, its surface and 1-based
+  occurrence (`ForkWord`). The occurrence is always printed, for a surface that occurs once too:
+  it is the spelling `english-forestwalk-narrowing`'s selectors take.
 - An option may show the best Ranking Key among its Readings as information, labeled so that it
   does not read as a recommendation (`docs/decisions/english.md` §5). Options are never ordered
   or marked by it.
