@@ -18,7 +18,7 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
   legacy wart into new code. "Already failing on default" and "unrelated to my change" are never
   reasons to leave a failure. Fix the cause, not just the instance (add the missing `.gitignore`
   entry, not only delete the stray file); telling the owner to clean something up is leaving it.
-  When the fix is too large to ride along, ticket it and say so.
+  When an incidental fix is too large to ride along, ticket it and say so.
 - Crash early: fail with an error that names the defect. Never swallow unexpected state or
   missing data with silent fallbacks, dummy values, `unwrap_or_default()`, catch-all `_ =>` arms
   or an early `return`.
@@ -63,12 +63,12 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
   exploration, design or subagents** for work that will change the repository, then work in
   `.workspaces/NAME`. Answering a question needs no claim.
 - **Never `kata refresh --all`** (owner only).
-- Ticket form: `docs/tickets/README.md`.
+- Ticket form and column triage: `docs/tickets/README.md`.
 - A ticket with Open questions starts with research: answer each question with evidence and a
   recommendation, and present them to the owner before implementing.
-- Work inside a ticket's Done-when that waits only on an owner ruling stays in that ticket: ask,
-  and once the owner rules, implement it there. A follow-up ticket is for work outside the
-  Done-when or too large to ride along.
+- Satisfy the claimed ticket's full Done-when in that ticket: if a first design leaves cases
+  open or creates fallout, redesign until the whole problem holds cleanly. Work waiting on an
+  owner ruling stays in the ticket — ask, then implement it there; only the owner narrows scope.
 
 ## CR citations
 
