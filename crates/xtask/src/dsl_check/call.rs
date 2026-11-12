@@ -112,6 +112,7 @@ impl Resolver<'_> {
             }
             latest = Some(latest.map_or(index, |latest| latest.max(index)));
             bound.push((index, arg));
+            self.record.args.insert(std::ptr::from_ref(arg), index);
             self.value(&arg.value, &params[index].sort);
         }
         for (index, param) in params.iter().enumerate() {

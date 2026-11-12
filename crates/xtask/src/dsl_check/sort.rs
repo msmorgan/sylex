@@ -11,7 +11,7 @@ use super::schema;
 
 /// A sort: `Option(List(ManaSymbol))`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub(super) struct SortKey {
+pub(crate) struct SortKey {
     pub(super) head: String,
     pub(super) args: Vec<SortKey>,
 }
@@ -29,7 +29,7 @@ impl SortKey {
     /// # Panics
     ///
     /// If the text is no sort: the tables are this crate's own.
-    pub(super) fn table(text: &str) -> SortKey {
+    pub(crate) fn table(text: &str) -> SortKey {
         let (key, rest) = SortKey::table_prefix(text);
         assert!(rest.is_empty(), "malformed schema sort `{text}`");
         key

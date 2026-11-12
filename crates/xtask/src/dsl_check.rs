@@ -13,6 +13,10 @@
 //! [`schema`]'s. The only words and sorts written here are the language's own
 //! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3).
 //! The coercions are declared in `.syl`; [`coercion`] reads and checks them.
+//!
+//! The resolver records what it resolved ([`Resolutions`]) for
+//! [`crate::dsl_expand`], the throwaway expander; [`load`] returns the record
+//! with the registry it was resolved against.
 
 mod call;
 mod coercion;
@@ -23,6 +27,7 @@ mod sort;
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
+use std::collections::HashMap;
 use std::collections::btree_map::Entry;
 use std::fmt;
 use std::path::Path;
@@ -30,7 +35,9 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use clap::Args;
+use sylex_syl::Arg;
 use sylex_syl::Bundle;
+use sylex_syl::Call;
 use sylex_syl::Declaration;
 use sylex_syl::FileId;
 use sylex_syl::Item;
@@ -48,9 +55,9 @@ pub use self::refusal::Refusal;
 pub use self::refusal::RefusalKind;
 use self::schema::Form;
 use self::schema::KINDS;
-use self::schema::Kind;
+pub(crate) use self::schema::Kind;
 use self::schema::RECORDS;
-use self::sort::SortKey;
+pub(crate) use self::sort::SortKey;
 use self::sort::sort_key;
 
 #[derive(Debug, Args)]
@@ -112,9 +119,9 @@ impl fmt::Display for Summary {
 
 /// A parameter of a declaration, or a field of a record or block.
 #[derive(Debug, Clone)]
-struct Slot {
-    name: String,
-    sort: SortKey,
+pub(crate) struct Slot {
+    pub(crate) name: String,
+    pub(crate) sort: SortKey,
     optional: bool,
     /// A parameter's declared default; `None` for a field.
     default: Option<Value>,
@@ -122,8 +129,13 @@ struct Slot {
 
 /// What a word resolves to at one sort.
 #[derive(Debug)]
-struct Signature {
+pub(crate) struct Signature {
     params: Vec<Slot>,
+    /// The declaration's index in [`Checked::decls`].
+    pub(crate) decl: usize,
+    /// Registered at its kind's second sort (`syl.md` §3), which names the
+    /// declaration and calls nothing.
+    pub(crate) secondary: bool,
     /// The declaration's node in the dependency graph; `None` for a second
     /// registration and a catalog declaration, which are no dependency edge.
     node: Option<usize>,
@@ -134,22 +146,59 @@ struct Signature {
     span: Span,
 }
 
-type Registry = BTreeMap<(String, SortKey), Signature>;
+pub(crate) type Registry = BTreeMap<(String, SortKey), Signature>;
+
+/// What the resolver resolved, keyed by the address of the syntax node in its
+/// bundle, for [`crate::dsl_expand`].
+#[derive(Debug, Default)]
+pub(crate) struct Resolutions {
+    /// The sort each call's word was found at: its registry key's sort.
+    calls: HashMap<*const Call, SortKey>,
+    /// The index of the parameter each argument binds.
+    args: HashMap<*const Arg, usize>,
+    /// The declaration index of the coercion each coerced value went through.
+    coerced: HashMap<*const Value, usize>,
+}
+
+impl Resolutions {
+    /// The sort `call`'s word was found at, if it was resolved.
+    pub(crate) fn call(&self, call: &Call) -> Option<&SortKey> {
+        self.calls.get(&std::ptr::from_ref(call))
+    }
+
+    /// The index of the parameter `arg` binds, if it was bound.
+    pub(crate) fn arg(&self, arg: &Arg) -> Option<usize> {
+        self.args.get(&std::ptr::from_ref(arg)).copied()
+    }
+
+    /// The declaration index of the coercion `value` went through, if any.
+    pub(crate) fn coerced(&self, value: &Value) -> Option<usize> {
+        self.coerced.get(&std::ptr::from_ref(value)).copied()
+    }
+}
+
+/// Everything a passing check resolved.
+pub(crate) struct Checked<'a> {
+    pub(crate) summary: Summary,
+    pub(crate) decls: Vec<Decl<'a>>,
+    pub(crate) registry: Registry,
+    pub(crate) resolutions: Resolutions,
+}
 
 /// One declaration whose header passed.
-struct Decl<'a> {
-    declaration: &'a Declaration,
-    kind: &'static Kind,
+pub(crate) struct Decl<'a> {
+    pub(crate) declaration: &'a Declaration,
+    pub(crate) kind: &'static Kind,
     /// `None` for a kind written without a name, which declares no word.
-    name: Option<String>,
-    sort: SortKey,
-    params: Vec<Slot>,
+    pub(crate) name: Option<String>,
+    pub(crate) sort: SortKey,
+    pub(crate) params: Vec<Slot>,
     /// Whether this is the Ring exception's file.
     ring: bool,
 }
 
-impl Decl<'_> {
-    fn block(&self) -> Option<&Record> {
+impl<'a> Decl<'a> {
+    pub(crate) fn block(&self) -> Option<&'a Record> {
         match &self.declaration.shape {
             Shape::Header(header) => header.body.as_ref(),
             Shape::Value(_) => None,
@@ -158,7 +207,7 @@ impl Decl<'_> {
 
     /// The declaration as a refusal names it: its kind word and its name, or
     /// for a nameless header its signature.
-    fn label(&self) -> String {
+    pub(crate) fn label(&self) -> String {
         let word = self.kind.word;
         if let Some(name) = &self.name {
             return format!("`{word}` {name}");
@@ -167,7 +216,7 @@ impl Decl<'_> {
         format!("`{word}`({}): {}", params.join(", "), self.sort)
     }
 
-    fn field(&self, name: &str) -> Option<&Value> {
+    pub(crate) fn field(&self, name: &str) -> Option<&'a Value> {
         self.block()?
             .nodes()
             .find(|f| f.name.ident == name)
@@ -184,7 +233,13 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
     let bundles: Vec<&Bundle> = std::iter::once(builtin)
         .chain(others.iter().copied())
         .collect();
-    sylex_syl::check(&bundles).map_err(CheckError::Declarations)?;
+    load(&bundles).map(|checked| checked.summary)
+}
+
+/// Checks `bundles`, the builtin bundle first, and returns what was resolved.
+pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError> {
+    let builtin = bundles[0];
+    sylex_syl::check(bundles).map_err(CheckError::Declarations)?;
     let ring_file = builtin.root().join(schema::RING_EXCEPTION.0);
     let mut refusals = Vec::new();
     let mut decls = Vec::new();
@@ -192,7 +247,7 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
         files: 0,
         declarations: BTreeMap::new(),
     };
-    for bundle in &bundles {
+    for bundle in bundles {
         for file in bundle.files().values() {
             summary.files += 1;
             let ring = std::ptr::eq(*bundle, builtin) && file.path == ring_file;
@@ -211,8 +266,16 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
     unknown_sorts(&decls, &known_sorts(&decls, &registry), &mut refusals);
     let coercions = coercion::coercions(&decls, &registry, &mut refusals);
     let mut edges = vec![Vec::new(); decls.len()];
+    let mut resolutions = Resolutions::default();
     for (decl, edges) in decls.iter().zip(&mut edges) {
-        resolve(decl, &registry, &coercions, &mut refusals, edges);
+        resolve(
+            decl,
+            &registry,
+            &coercions,
+            &mut refusals,
+            edges,
+            &mut resolutions,
+        );
     }
     for cycle in cycles::cycles(&edges) {
         // A cycle names a declaration by its name, a nameless one by its label.
@@ -226,7 +289,12 @@ pub fn check(builtin: &Bundle, others: &[&Bundle]) -> Result<Summary, CheckError
         });
     }
     if refusals.is_empty() {
-        return Ok(summary);
+        return Ok(Checked {
+            summary,
+            decls,
+            registry,
+            resolutions,
+        });
     }
     let rendered = refusals
         .iter()
@@ -380,6 +448,8 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
         let span = decl.declaration.span;
         let signature = Signature {
             params: decl.params.clone(),
+            decl: index,
+            secondary: false,
             node: (!decl.kind.catalog).then_some(index),
             ring_only,
             span,
@@ -397,6 +467,8 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
         }
         let signature = Signature {
             params: Vec::new(),
+            decl: index,
+            secondary: true,
             node: None,
             ring_only: false,
             span,
@@ -492,6 +564,7 @@ fn resolve(
     coercions: &[Coercion],
     refusals: &mut Vec<Refusal>,
     edges: &mut Vec<usize>,
+    record: &mut Resolutions,
 ) {
     let ring = decl.ring;
     if let Shape::Header(header) = &decl.declaration.shape {
@@ -505,6 +578,7 @@ fn resolve(
                     coercions,
                     refusals: &mut *refusals,
                     edges: &mut *edges,
+                    record: &mut *record,
                     params,
                     ring,
                 }
@@ -518,6 +592,7 @@ fn resolve(
         coercions,
         refusals,
         edges,
+        record,
         params,
         ring,
     }
@@ -531,6 +606,7 @@ struct Resolver<'r> {
     refusals: &'r mut Vec<Refusal>,
     /// The dependency nodes the declaration reaches.
     edges: &'r mut Vec<usize>,
+    record: &'r mut Resolutions,
     /// The parameters a `$name` may read.
     params: &'r [Slot],
     ring: bool,
@@ -638,7 +714,7 @@ impl Resolver<'_> {
     fn value_at(&mut self, value: &Value, expected: &SortKey, coerce: bool) {
         match &value.kind {
             ValueKind::Parameter(name) => {
-                return self.parameter(name.ident.as_str(), value.span, expected, coerce);
+                return self.parameter(value, name.ident.as_str(), expected, coerce);
             }
             ValueKind::Call(call) => {
                 let head = call.head.ident.as_str();
@@ -655,6 +731,9 @@ impl Resolver<'_> {
                     return self.refuse(value.span, RefusalKind::SomeWritten);
                 }
                 if let Some(signature) = self.registry.get(&(head.to_owned(), expected.clone())) {
+                    self.record
+                        .calls
+                        .insert(std::ptr::from_ref(call), expected.clone());
                     return self.call(call, signature);
                 }
             }
@@ -733,6 +812,9 @@ impl Resolver<'_> {
             [] => false,
             [coercion] => {
                 self.edges.push(coercion.node);
+                self.record
+                    .coerced
+                    .insert(std::ptr::from_ref(value), coercion.node);
                 self.value_at(value, &coercion.from, false);
                 true
             }
@@ -751,7 +833,8 @@ impl Resolver<'_> {
 
     /// `$name` at `expected`: the parameter's own sort, `Option` of it, or a
     /// sort it is coerced into.
-    fn parameter(&mut self, name: &str, span: Span, expected: &SortKey, coerce: bool) {
+    fn parameter(&mut self, value: &Value, name: &str, expected: &SortKey, coerce: bool) {
+        let span = value.span;
         let Some(param) = self.params.iter().find(|p| p.name == name) else {
             return self.refuse(span, RefusalKind::UnknownParameter(name.to_owned()));
         };
@@ -767,7 +850,12 @@ impl Resolver<'_> {
             .iter()
             .find(|c| c.from == *sort && c.to == *at);
         match coercion {
-            Some(coercion) if coerce => self.edges.push(coercion.node),
+            Some(coercion) if coerce => {
+                self.edges.push(coercion.node);
+                self.record
+                    .coerced
+                    .insert(std::ptr::from_ref(value), coercion.node);
+            }
             Some(_) | None => self.refuse(
                 span,
                 RefusalKind::ParameterSort {
