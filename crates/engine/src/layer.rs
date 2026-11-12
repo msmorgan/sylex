@@ -3871,19 +3871,10 @@ mod tests {
         assert_eq!(view.toughness(goyf), Some(2), "…and toughness 2");
     }
 
-    /// A characteristic-defining ability granted to a token by the effect that
-    /// created it is one [CR#604.3a]: Ajani Goldmane's −6 creates "a white
-    /// Avatar creature token. It has 'This token's power and toughness are
-    /// each equal to your life total.'" Godhead of Awe's "Other creatures have
-    /// base power and toughness 1/1", on a creature that entered first, still
-    /// applies after the token's definition [CR#613.4a,613.4b].
-    #[test]
-    fn token_characteristic_defining_ability_applies_in_layer_7a() {
-        use sylex_core::PlayerAttr;
-        use sylex_core::Token;
+    /// Godhead of Awe's "Other creatures have base power and toughness 1/1."
+    fn other_creatures_base_1_1() -> Ability {
         use sylex_core::Type;
-
-        let other_creatures_base_1_1 = Ability::r#static(StaticSpec::Each(
+        Ability::r#static(StaticSpec::Each(
             Selection::SelectAll(Arc::new(static_candidate_filter(Predicate::And(
                 vec![
                     Predicate::r#type(Type::Creature),
@@ -3903,8 +3894,22 @@ mod tests {
                     .into(),
                 ),
             ))),
-        ));
-        let (mut state, _godhead) = creature_on_field(game(), vec![other_creatures_base_1_1]);
+        ))
+    }
+
+    /// A characteristic-defining ability granted to a token by the effect that
+    /// created it is one [CR#604.3a]: Ajani Goldmane's −6 creates "a white
+    /// Avatar creature token. It has 'This token's power and toughness are
+    /// each equal to your life total.'" Godhead of Awe's "Other creatures have
+    /// base power and toughness 1/1", on a creature that entered first, still
+    /// applies after the token's definition [CR#613.4a,613.4b].
+    #[test]
+    fn token_characteristic_defining_ability_applies_in_layer_7a() {
+        use sylex_core::PlayerAttr;
+        use sylex_core::Token;
+        use sylex_core::Type;
+
+        let (mut state, _godhead) = creature_on_field(game(), vec![other_creatures_base_1_1()]);
 
         let your_life = Count::PlayerStatOf(Reference::Reg(sylex_core::RefId(1)), PlayerAttr::Life);
         let avatar = Token {
@@ -3945,6 +3950,85 @@ mod tests {
         let view = state.layers();
         assert_eq!(
             (view.power(token), view.toughness(token)),
+            (Some(1), Some(1))
+        );
+    }
+
+    /// A transformed permanent's back-face characteristic-defining ability is
+    /// printed on the face it shows [CR#604.3a,712.6d]: Westvale Cult Leader
+    /// (the back of Hanweir Militia Captain) reads "Westvale Cult Leader's
+    /// power and toughness are each equal to the number of creatures you
+    /// control." Godhead of Awe, on a creature that entered first, still sets
+    /// it to 1/1 after its definition [CR#613.4a,613.4b].
+    #[test]
+    fn back_face_characteristic_defining_ability_applies_in_layer_7a() {
+        use sylex_card::Card;
+        use sylex_card::CardFace;
+        use sylex_card::Characteristics;
+        use sylex_card::DoubleFacedLayout;
+        use sylex_core::RelationPredicate;
+        use sylex_core::Type;
+
+        use crate::object::Side;
+
+        let (mut state, _godhead) = creature_on_field(game(), vec![other_creatures_base_1_1()]);
+        let creatures_you_control = Count::CountOf(Countable::Objects(Arc::new(
+            static_candidate_filter(Predicate::And(
+                vec![
+                    Predicate::r#type(Type::Creature),
+                    Predicate::Relation(RelationPredicate::ControlledBy(Arc::new(Predicate::Ref(
+                        Reference::Reg(sylex_core::RefId(2)),
+                    )))),
+                ]
+                .into(),
+            )),
+        )));
+        let front = CardFace::from(Characteristics {
+            name: "Hanweir Militia Captain".into(),
+            types: vec![Type::Creature.def()],
+            power: Some(StatValue::Number(2)),
+            toughness: Some(StatValue::Number(2)),
+            ..Characteristics::default()
+        });
+        let back = CardFace::from(Characteristics {
+            name: "Westvale Cult Leader".into(),
+            types: vec![Type::Creature.def()],
+            power: Some(StatValue::DefinedByAbility),
+            toughness: Some(StatValue::DefinedByAbility),
+            abilities: vec![Ability::r#static(StaticSpec::CharacteristicDefining(
+                Modification::Several(
+                    vec![
+                        Modification::Power(NumericOp::Set(StatValue::Count(
+                            creatures_you_control.clone(),
+                        ))),
+                        Modification::Toughness(NumericOp::Set(StatValue::Count(
+                            creatures_you_control,
+                        ))),
+                    ]
+                    .into(),
+                ),
+            ))],
+            ..Characteristics::default()
+        });
+        let card = state.cards.push(
+            Arc::new(Card::DoubleFaced {
+                layout: DoubleFacedLayout::Transforming,
+                front,
+                back,
+            }),
+            PlayerId(0),
+        );
+        let leader = state.objects.mint(
+            ObjectSource::Card(card),
+            PlayerId(0),
+            Some(Zone::Battlefield),
+        );
+        state.zones.battlefield.push(leader);
+        state.objects.obj_mut(leader).side = Side::Back;
+
+        let view = state.layers();
+        assert_eq!(
+            (view.power(leader), view.toughness(leader)),
             (Some(1), Some(1))
         );
     }

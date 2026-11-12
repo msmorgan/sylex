@@ -119,19 +119,21 @@ pub(crate) fn printed_of_face(face: &CardFace) -> Vec<Ability> {
     face.characteristics.abilities.clone()
 }
 
-/// The object's PRINTED abilities, from the per-card cache.
+/// The PRINTED abilities of the face the object presents
+/// ([CR#712.6c,712.6d]), from the per-card cache: the same list
+/// `layer::base_values` starts from.
 ///
-/// This is the cycle-safe base used by the layer pipeline itself
-/// (`layer::base_values` and `layer::gather`). External callers should
-/// use [`abilities`] to get the layer-6–derived list instead.
+/// This is the cycle-safe base `layer::gather` reads. External callers
+/// should use [`abilities`] to get the layer-6–derived list instead.
 ///
 /// # Panics
 ///
 /// Panics on a player proxy — callers guard on `card_id()` first.
 #[must_use]
 pub(crate) fn printed_abilities(state: &GameState, id: ObjectId) -> &[Ability] {
-    let card = state.objects.obj(id).card_id().expect("card-backed object");
-    &state.cards.get(card).front.printed
+    let obj = state.objects.obj(id);
+    let card = obj.card_id().expect("card-backed object");
+    &state.cards.get(card).face_cache(obj.side).printed
 }
 
 /// Predicate-scoped ability conferrals ([Task 2], `ConferralRule`): for each
