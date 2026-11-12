@@ -7,6 +7,7 @@ use serde::Deserialize;
 
 use crate::LoadError;
 use crate::frames::SlotKind;
+use crate::step::Gap;
 
 /// An authored grammar data file.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
@@ -59,6 +60,13 @@ pub struct Grammar {
     pub idiomatic_coordinates: Vec<(Ident, Ident)>,
 }
 
+/// The variant of an engine or lexicon enum that a name the grammar writes
+/// names, read through the enum's own `serde` derive, or `None` if it names
+/// none.
+pub(crate) fn variant<T: serde::de::DeserializeOwned>(name: &str) -> Option<T> {
+    T::deserialize(serde::de::value::StrDeserializer::<serde::de::value::Error>::new(name)).ok()
+}
+
 impl Grammar {
     /// Parses `.fug` source (the language [`crate::fug`] describes).
     ///
@@ -85,7 +93,7 @@ pub struct CategoryDecl {
     /// contains, as a non-finite Complement never passes up a predicative
     /// Gap (*can't be __*).
     #[serde(default)]
-    pub closed_gaps: Vec<Ident>,
+    pub closed_gaps: Vec<Gap>,
     /// Whether this Category names a grammatical function, as `Predicative`
     /// names the predicative Complement: its head child bears that function
     /// in the same phrase too.

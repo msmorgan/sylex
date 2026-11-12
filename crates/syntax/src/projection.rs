@@ -18,6 +18,7 @@ use sylex_lexicon::Tense;
 use sylex_lexicon::WordForm;
 
 use crate::LoadError;
+use crate::grammar::variant;
 use crate::step::MAX_FEATURES;
 
 /// Lexical features the engine projects onto leaves, by grammar feature name.
@@ -86,12 +87,6 @@ fn verb_form(form: WordForm) -> Option<&'static str> {
         | WordForm::Singular
         | WordForm::Plural => None,
     }
-}
-
-/// The variant of a lexicon enum that a grammar value names, read through
-/// the enum's own `serde` derive, or `None` if it names none.
-fn variant<T: DeserializeOwned>(name: &str) -> Option<T> {
-    T::deserialize(serde::de::value::StrDeserializer::<serde::de::value::Error>::new(name)).ok()
 }
 
 /// The values of one projected feature by the lexical variant each names.

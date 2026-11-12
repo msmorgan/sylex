@@ -29,6 +29,7 @@ use crate::grammar::Grammar;
 use crate::grammar::HostKind;
 use crate::grammar::SchemaDecl;
 use crate::grammar::Side;
+use crate::grammar::variant;
 use crate::grammar::SymbolDecl;
 use crate::lexeme::Lexeme;
 use crate::lexeme::Lexemes;
@@ -787,12 +788,10 @@ impl<'a> Binder<'a> {
             category_features.push(ids);
         }
         let mut category_gap = Vec::new();
-        for (name, declaration) in &declared {
+        for declaration in declared.values() {
             let mut mask = if declaration.gap { !Gap::None.bit() } else { 0 };
-            for kind in &declaration.closed_gaps {
-                mask &= !gap_named(kind)
-                    .ok_or_else(|| invalid(format!("category `{name}`: unknown gap `{kind}`")))?
-                    .bit();
+            for gap in &declaration.closed_gaps {
+                mask &= !gap.bit();
             }
             category_gap.push(mask);
         }
@@ -1168,13 +1167,23 @@ impl<'a> Binder<'a> {
         Test::Words(set)
     }
 
-    /// The name of a Slot Kind, which a `complement_kind` feature takes as
-    /// its value: an unlike slot's declared name, or the kind's own.
-    fn kind_name(&self, kind: SlotKind) -> String {
-        match kind {
-            SlotKind::Unlike(slot) => self.grammar.unlike_slots[usize::from(slot)].0.to_string(),
-            kind => format!("{kind:?}"),
-        }
+    /// The value of a `complement_kind` or `unlike` feature that names a
+    /// Slot Kind: an unlike slot's declared name, or the kind's own.
+    fn kind_value(&self, feature: usize, kind: SlotKind) -> Result<u16, LoadError> {
+        let names = |name: &Ident| match kind {
+            SlotKind::Unlike(slot) => *name == self.grammar.unlike_slots[usize::from(slot)].0,
+            kind => variant::<SlotKind>(name) == Some(kind),
+        };
+        let index = self.out.values[feature]
+            .iter()
+            .position(names)
+            .ok_or_else(|| {
+                invalid(format!(
+                    "feature `{}` has no value naming Slot Kind {kind:?}",
+                    self.out.features[feature]
+                ))
+            })?;
+        Ok(u16::try_from(index).expect("feature domains are small"))
     }
 
     /// Restricts child `child`, a derived unlike Frame Slot, to coordinations
@@ -1227,9 +1236,8 @@ impl<'a> Binder<'a> {
             }
         };
         let mut mask = 0u64;
-        for kind in kinds {
-            let value = self.value(feature, &format!("{kind:?}"))?;
-            mask |= 1u64 << value;
+        for &kind in kinds {
+            mask |= 1u64 << self.kind_value(feature, kind)?;
         }
         Ok(mask)
     }
@@ -1440,7 +1448,7 @@ impl<'a> Binder<'a> {
             if let Equation::Require(path, value) = equation
                 && let Some(child) = path.strip_suffix(".Gap")
             {
-                let gap = gap_named(value.as_str())
+                let gap = variant::<Gap>(value)
                     .ok_or_else(|| context(invalid(format!("unknown gap `{value}`"))))?;
                 required_gaps.insert(child.to_owned(), gap);
             }
@@ -1568,6 +1576,30 @@ impl<'a> Binder<'a> {
         let name = std::mem::replace(&mut draft.children[child].name, Ident::new("internalised"));
         let result = self.equations(draft, equations);
         draft.children[child].name = name;
+        result
+    }
+
+    /// Adds a Coordination schema's equations over its `initial` conjunct to
+    /// a whole coordination, over its `first` child, which is that conjunct.
+    fn initial_equations(&self, draft: &mut Draft, equations: &[Equation]) -> Result<(), LoadError> {
+        let (first, initial) = (Ident::new("first"), Ident::new("initial"));
+        if draft.children.iter().any(|c| c.name == initial) {
+            return Err(invalid(format!(
+                "production `{}`: a coordination's child may not be named `initial`, which \
+                 names its initial conjunct in the schema's equations",
+                draft.id
+            )));
+        }
+        let firsts: Vec<usize> = (0..draft.children.len())
+            .filter(|&at| draft.children[at].name == first)
+            .collect();
+        for &at in &firsts {
+            draft.children[at].name = initial;
+        }
+        let result = self.equations(draft, equations);
+        for &at in &firsts {
+            draft.children[at].name = first;
+        }
         result
     }
 
@@ -2912,7 +2944,7 @@ impl<'a> Binder<'a> {
             // *to the difference* stranded for an outer host.
             bare.omits_complement = true;
             if let Some(f) = complement_kind {
-                let kind = self.value(f, &format!("{:?}", SlotFill::Intransitive.kind()))?;
+                let kind = self.kind_value(f, SlotKind::Intransitive)?;
                 bare.equations.push((Path::Mother(f), Target::Value(kind)));
             }
             drafts.push(bare);
@@ -2945,7 +2977,7 @@ impl<'a> Binder<'a> {
                 heavy_shift,
             )?;
             if let (Some(f), Some(first)) = (complement_kind, slots.first()) {
-                let kind = self.value(f, &self.kind_name(first.kind()))?;
+                let kind = self.kind_value(f, first.kind())?;
                 for draft in &mut family {
                     draft.equations.push((Path::Mother(f), Target::Value(kind)));
                 }
@@ -3096,7 +3128,7 @@ impl<'a> Binder<'a> {
                 GapRule::Closed,
             );
             if let Some(f) = complement_kind {
-                let kind = self.value(f, &self.kind_name(frame.complement.kind()))?;
+                let kind = self.kind_value(f, frame.complement.kind())?;
                 draft.equations.push((Path::Mother(f), Target::Value(kind)));
             }
             if frame.complement == SlotFill::Intransitive {
@@ -3144,7 +3176,7 @@ impl<'a> Binder<'a> {
                 stranded.introduces = if amount { Gap::Amount } else { Gap::NP };
                 // It names the Slot Kind of the Complement it strands.
                 if let Some(f) = complement_kind {
-                    let kind = self.value(f, &self.kind_name(frame.complement.kind()))?;
+                    let kind = self.kind_value(f, frame.complement.kind())?;
                     stranded
                         .equations
                         .push((Path::Mother(f), Target::Value(kind)));
@@ -4270,8 +4302,8 @@ struct Conjoin {
     /// Equations over every conjunct but the last (`first`) and the last.
     firsts: Vec<Equation>,
     lasts: Vec<Equation>,
-    /// Equations over the initial conjunct alone (`initial`), rewritten over
-    /// the whole coordination's `first` child.
+    /// Equations over the initial conjunct alone (`initial`), which is a
+    /// whole coordination's `first` child.
     initials: Vec<Equation>,
 }
 
@@ -4386,7 +4418,7 @@ impl Conjoin {
             joints,
             firsts: select("first."),
             lasts: select("last."),
-            initials: select("initial.").iter().map(initial_as_first).collect(),
+            initials: select("initial."),
         })
     }
 
@@ -4738,7 +4770,7 @@ impl Conjoin {
         if first {
             binder.equations(draft, &self.firsts)?;
             if whole {
-                binder.equations(draft, &self.initials)?;
+                binder.initial_equations(draft, &self.initials)?;
             }
         }
         if overt_last && matches!(edge, Edge::Whole { last: true } | Edge::Tail { last: true }) {
@@ -5117,21 +5149,6 @@ fn phrase_remnants(draft: &mut Draft, remnants: &[(usize, usize)]) -> Vec<Draft>
         draft.remnant = crate::step::RemnantRole::SharesHead;
     }
     out
-}
-
-/// An equation over the `initial` conjunct, as one over a whole
-/// coordination's `first` child, which is that conjunct.
-fn initial_as_first(equation: &Equation) -> Equation {
-    let first = |p: &Ident| Ident::new(&p.replacen("initial.", "first.", 1));
-    match equation {
-        Equation::Require(p, v) => Equation::Require(first(p), *v),
-        Equation::Exclude(p, v) => Equation::Exclude(first(p), *v),
-        Equation::Carry(p, v) => Equation::Carry(first(p), *v),
-        Equation::Agree(p, q) => Equation::Agree(first(p), first(q)),
-        Equation::ExcludeTogether(conditions) => {
-            Equation::ExcludeTogether(conditions.iter().map(|(p, v)| (first(p), *v)).collect())
-        }
-    }
 }
 
 fn equation_path(equation: &Equation) -> &str {
@@ -5528,23 +5545,6 @@ fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
         *i = map(*i);
     }
     draft.predicative = draft.predicative.map(&map);
-}
-
-/// The Gap a grammar names.
-fn gap_named(name: &str) -> Option<Gap> {
-    Some(match name {
-        "None" => Gap::None,
-        "NP" => Gap::NP,
-        "Adjunct" => Gap::Adjunct,
-        "Pred" => Gap::Pred,
-        "Keyword" => Gap::Keyword,
-        "ToInf" => Gap::ToInf,
-        "PP" => Gap::PP,
-        "Measure" => Gap::Measure,
-        "BareInf" => Gap::BareInf,
-        "Amount" => Gap::Amount,
-        _ => return None,
-    })
 }
 
 /// The child names that bear a dependent function in their mother (CGEL's
