@@ -53,6 +53,69 @@ pub(crate) enum Vertex {
     Item(usize),
 }
 
+/// A depth-first search frame over a forest: a vertex and where its next
+/// successor is.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Frame<V> {
+    pub(crate) vertex: V,
+    /// The family the next successor comes from.
+    family: usize,
+    /// Within an item's family, whether its child comes next, its previous
+    /// item being taken.
+    phase: Phase,
+}
+
+/// Which successor of an item's family comes next.
+#[derive(Debug, Clone, Copy)]
+enum Phase {
+    Previous,
+    Child,
+}
+
+impl<V> Frame<V> {
+    pub(crate) fn new(vertex: V) -> Self {
+        Self {
+            vertex,
+            family: 0,
+            phase: Phase::Previous,
+        }
+    }
+
+    /// A node's next successor: its `family`th item, if it has one.
+    pub(crate) fn next_item(&mut self, item: impl FnOnce(usize) -> Option<V>) -> Option<V> {
+        let next = item(self.family)?;
+        self.family += 1;
+        Some(next)
+    }
+
+    /// An item's next successor: through its families in order, each
+    /// family's previous item then its child node, where it has them;
+    /// `family(index)` is the `index`th family's pair, if it has one.
+    pub(crate) fn next_of_family(
+        &mut self,
+        family: impl Fn(usize) -> Option<(Option<V>, Option<V>)>,
+    ) -> Option<V> {
+        loop {
+            let (previous, child) = family(self.family)?;
+            match self.phase {
+                Phase::Previous => {
+                    self.phase = Phase::Child;
+                    if previous.is_some() {
+                        return previous;
+                    }
+                }
+                Phase::Child => {
+                    self.phase = Phase::Previous;
+                    self.family += 1;
+                    if child.is_some() {
+                        return child;
+                    }
+                }
+            }
+        }
+    }
+}
+
 impl Parse<'_> {
     /// The exact Derivation counts of every node, item and edge, by an inside
     /// pass and a top-down outside pass over the nodes the roots reach.
@@ -151,11 +214,10 @@ impl Parse<'_> {
                 continue;
             }
             nodes[root] = Mark::Open;
-            // Each frame: a vertex and the index of its next successor.
-            let mut stack = vec![(Vertex::Node(root), 0usize)];
+            let mut stack = vec![Frame::new(Vertex::Node(root))];
             while let Some(top) = stack.last_mut() {
-                let (vertex, next) = (top.0, top.1);
-                let Some(successor) = self.successor(vertex, next) else {
+                let Some(successor) = self.successor(top) else {
+                    let vertex = top.vertex;
                     match vertex {
                         Vertex::Node(n) => nodes[n] = Mark::Done,
                         Vertex::Item(i) => items[i] = Mark::Done,
@@ -164,7 +226,6 @@ impl Parse<'_> {
                     stack.pop();
                     continue;
                 };
-                top.1 += 1;
                 let mark = match successor {
                     Vertex::Node(n) => &mut nodes[n],
                     Vertex::Item(i) => &mut items[i],
@@ -172,12 +233,12 @@ impl Parse<'_> {
                 match *mark {
                     Mark::New => {
                         *mark = Mark::Open;
-                        stack.push((successor, 0));
+                        stack.push(Frame::new(successor));
                     }
                     Mark::Open => {
                         let from = stack
                             .iter()
-                            .position(|&(v, _)| v == successor)
+                            .position(|frame| frame.vertex == successor)
                             .expect("an open vertex is on the stack");
                         return Err(self.cycle(&stack[from..]));
                     }
@@ -188,34 +249,32 @@ impl Parse<'_> {
         Ok(order)
     }
 
-    /// The `index`th vertex a vertex derives from: a node's items, then an
-    /// item's previous items and child nodes, family by family.
-    fn successor(&self, vertex: Vertex, index: usize) -> Option<Vertex> {
-        match vertex {
-            Vertex::Node(node) => self.forest.nodes[node]
-                .families
-                .get(index)
-                .map(|&(_, item)| Vertex::Item(item)),
-            Vertex::Item(item) => self.forest.items[item]
-                .families
-                .iter()
-                .flat_map(|&(previous, child)| {
-                    let child = match child {
-                        ChildRef::Node(n) => Some(Vertex::Node(n)),
-                        ChildRef::Leaf(_) | ChildRef::Punct => None,
-                    };
-                    previous.map(Vertex::Item).into_iter().chain(child)
-                })
-                .nth(index),
+    /// The next vertex a frame's vertex derives from, advancing the frame: a
+    /// node's items, then an item's previous items and child nodes, family
+    /// by family.
+    fn successor(&self, frame: &mut Frame<Vertex>) -> Option<Vertex> {
+        match frame.vertex {
+            Vertex::Node(node) => frame.next_item(|index| {
+                let &(_, item) = self.forest.nodes[node].families.get(index)?;
+                Some(Vertex::Item(item))
+            }),
+            Vertex::Item(item) => frame.next_of_family(|index| {
+                let &(previous, child) = self.forest.items[item].families.get(index)?;
+                let child = match child {
+                    ChildRef::Node(n) => Some(Vertex::Node(n)),
+                    ChildRef::Leaf(_) | ChildRef::Punct => None,
+                };
+                Some((previous.map(Vertex::Item), child))
+            }),
         }
     }
 
     /// Names a cycle: each node with its Category and span, and each item
     /// with its Production and span.
-    fn cycle(&self, stack: &[(Vertex, usize)]) -> ForestCycle {
+    fn cycle(&self, stack: &[Frame<Vertex>]) -> ForestCycle {
         let steps: Vec<String> = stack
             .iter()
-            .map(|&(vertex, _)| match vertex {
+            .map(|frame| match frame.vertex {
                 Vertex::Node(n) => {
                     let node = &self.forest.nodes[n];
                     format!(

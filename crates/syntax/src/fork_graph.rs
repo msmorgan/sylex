@@ -24,6 +24,7 @@ use dpsi::Ident;
 use crate::chart::ChildRef;
 use crate::chart::Parse;
 use crate::counts::ForestCycle;
+use crate::counts::Frame;
 use crate::counts::Vertex;
 
 /// A word of the unit: the start of a leaf some Derivation uses, named by the
@@ -570,44 +571,38 @@ impl Graph {
         let mut node_seen = vec![false; self.nodes.len()];
         let mut item_seen = vec![false; self.items.len()];
         let mut order = Vec::with_capacity(self.nodes.len() + self.items.len());
-        let successors = |vertex: V| -> Vec<V> {
-            match vertex {
-                V::Node(n) => self.nodes[n].items.iter().map(|&i| V::Item(i)).collect(),
-                V::Item(i) => self.items[i]
-                    .families
-                    .iter()
-                    .flat_map(|&f| {
-                        let family = &self.families[f];
-                        let child = match family.child {
-                            GChild::Node(c) => Some(V::Node(c)),
-                            GChild::Leaf(_) | GChild::Punct => None,
-                        };
-                        family.previous.map(V::Item).into_iter().chain(child)
-                    })
-                    .collect(),
+        let successor = |frame: &mut Frame<V>| match frame.vertex {
+            V::Node(n) => {
+                frame.next_item(|index| self.nodes[n].items.get(index).map(|&i| V::Item(i)))
             }
+            V::Item(i) => frame.next_of_family(|index| {
+                let family = &self.families[*self.items[i].families.get(index)?];
+                let child = match family.child {
+                    GChild::Node(c) => Some(V::Node(c)),
+                    GChild::Leaf(_) | GChild::Punct => None,
+                };
+                Some((family.previous.map(V::Item), child))
+            }),
         };
         for root in &self.roots {
             if node_seen[root.node] {
                 continue;
             }
             node_seen[root.node] = true;
-            let mut stack = vec![(V::Node(root.node), successors(V::Node(root.node)), 0)];
+            let mut stack = vec![Frame::new(V::Node(root.node))];
             while let Some(top) = stack.last_mut() {
-                if top.2 == top.1.len() {
-                    order.push(top.0);
+                let Some(next) = successor(top) else {
+                    order.push(top.vertex);
                     stack.pop();
                     continue;
-                }
-                let next = top.1[top.2];
-                top.2 += 1;
+                };
                 let seen = match next {
                     V::Node(n) => &mut node_seen[n],
                     V::Item(i) => &mut item_seen[i],
                 };
                 if !*seen {
                     *seen = true;
-                    stack.push((next, successors(next), 0));
+                    stack.push(Frame::new(next));
                 }
             }
         }
