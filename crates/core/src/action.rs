@@ -141,16 +141,12 @@ pub enum Action {
     /// ([CR#701.28a]) is the same operation. Identity is preserved — a
     /// transform does not remint ([CR#712.15]).
     Transform(Reference),
-    /// The referenced object ceases to exist ([CR#704.5d,707.10a]) — no zone
-    /// move, no card left behind. Today the only reachable target is a
-    /// card-less stack copy (`StackEntry.copy`): a copy of a spell stranded
-    /// anywhere other than the stack ceases this way ([CR#707.10a]). This is
-    /// the data-usable shape the copy-cease SBA (`sba.rs`) speaks through —
-    /// its scan still walks `state.stack` natively (the generic `SbaRule`
-    /// domain is battlefield objects only, `sba_rule.rs`'s doc), but the
-    /// removal it emits now names its own verb rather than borrowing
-    /// `Counter`'s. A reference that isn't on the stack is a no-op (bad
-    /// semantic/state drift fizzles, never panics).
+    /// The referenced copy of a spell, in a zone other than the stack, ceases
+    /// to exist ([CR#704.5e,707.10a]) — no zone move. This is the data-usable
+    /// shape the copy-cease SBA (`sba.rs`) speaks through; its scan is native
+    /// because the generic `SbaRule` domain is battlefield objects only
+    /// (`sba_rule.rs`'s doc). Tokens cease through their own state-based
+    /// action, not this verb.
     Cease(Reference),
     /// Attach `what` to `to` ([CR#701.3a..701.3b]) — the one verb the whole
     /// attachment family shares (Equipment, Auras, Fortifications). The

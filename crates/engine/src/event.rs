@@ -114,16 +114,6 @@ impl Cause {
         Self::verb("RemoveFromStack", agency, agent)
     }
 
-    /// "Cease" ([CR#704.5d,707.10a]) — an object ceasing to exist, distinct
-    /// from being countered even though both currently share
-    /// `AbilityCountered`'s removal apply (remove the stack entry, remove
-    /// the object, no zone move): the copy-cease SBA's `Action::Cease`
-    /// resolve names its own verb here rather than borrowing "Counter"'s.
-    #[must_use]
-    pub fn cease(agency: sylex_core::Agency, agent: Option<(ObjectId, PlayerId)>) -> Self {
-        Self::verb("Cease", agency, agent)
-    }
-
     /// "Tap" — distinguishable from the others only by `agency` ([CR#107.5]
     /// cost vs [CR#508.1f] attack vs [CR#701.26a] effect vs [CR#106.12] mana).
     #[must_use]
@@ -514,14 +504,14 @@ pub struct AbilityUsed {
     pub ability: Uint,
 }
 
-/// A triggered or activated ability, or a copy of a spell or ability,
-/// leaves the stack without resolving and vanishes — no zone move, no card
-/// behind it. `cause` tells why: it doesn't resolve (an intervening-if no
-/// longer held, or every target went illegal, [CR#608.2a,608.2b];
-/// `Cause::remove_from_stack`), it was countered [CR#701.6a], or a copy
-/// ceased to exist [CR#704.5e,707.10a]. Its apply removes the
-/// stack entry whose `id` is the carried (minted, for a spell copy freshly
-/// minted) token, and the backing object with it — no remint.
+/// A triggered or activated ability (a copy of one included) leaves the
+/// stack without resolving and is gone — no zone move, no card behind it.
+/// `cause` tells why: it doesn't resolve (an intervening-if no longer held
+/// [CR#608.2a], or every target went illegal [CR#608.2b];
+/// `Cause::remove_from_stack`), or it was countered [CR#701.6a]. A spell,
+/// copy or not, leaves by a `ZoneChange` to its owner's graveyard instead.
+/// Its apply removes the stack entry whose `id` is the carried (minted)
+/// token, and the backing object with it — no remint.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AbilityCountered {
     pub id: ObjectId,
@@ -772,6 +762,11 @@ pub enum GameEvent {
     /// move that stranded it ([CR#111.7]'s note); anything still pointing at
     /// it reads the LKI that rode that fact.
     TokenCeased(ObjectId),
+    /// [CR#704.5e,707.10a]: a copy of a spell found in a zone other than the
+    /// stack ceases to exist. Its apply removes the object from its zone and
+    /// the store outright — no remint, no `ZoneChange` fact. The move that put
+    /// it there already fired its zone-change triggers.
+    CopyCeased(ObjectId),
     PlayerLost(PlayerLost),
     PlayerWon(PlayerWon),
     /// [CR#601.2i] — a spell becomes cast. Applies by promoting `announcing`
@@ -796,10 +791,11 @@ pub enum GameEvent {
     AbilityUsed(AbilityUsed),
     AbilityCountered(AbilityCountered),
     /// [CR#608.2n]: a triggered or activated ability finished resolving and
-    /// vanishes — no zone move. [CR#707.10a]: a RESOLVED copy (of a spell)
-    /// vanishes the same way instead of moving to a graveyard — it has no
-    /// card to put there. Its apply removes the stack entry whose `id` is
-    /// the carried (minted) token, and the backing object with it.
+    /// ceases to exist — no zone move. A resolving copy of a permanent spell
+    /// leaves the same way until it becomes a token [CR#707.10f]
+    /// (`engine-copy-permanent-spells`). Its apply removes the stack entry
+    /// whose `id` is the carried (minted) token, and the backing object with
+    /// it.
     AbilityResolved(ObjectId),
     Revealed(Revealed),
     DesignationChanged(DesignationChanged),
@@ -940,6 +936,7 @@ impl GameEvent {
             | GameEvent::TokenCreated(_)
             | GameEvent::EmblemCreated(_)
             | GameEvent::TokenCeased(_)
+            | GameEvent::CopyCeased(_)
             | GameEvent::PlayerLost(_)
             | GameEvent::PlayerWon(_)
             | GameEvent::SpellCast(_)

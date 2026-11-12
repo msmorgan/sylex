@@ -52,6 +52,11 @@ impl EventApply for Copied {
             }
         };
         let new = g.objects.mint(source, controller, Some(Zone::Stack));
+        if matches!(entry.object, StackObject::Spell(_)) {
+            // [CR#707.10]: a copy of a spell is owned by the player under
+            // whose control it was put on the stack.
+            g.objects.obj_mut(new).spell_copy_owner = Some(controller);
+        }
         let activation = g.clone_activation(entry.activation);
         // [CR#700.2g]: a copy keeps the original spell or ability's announced
         // modes; its controller cannot choose again. Targets, X, and paid
@@ -173,12 +178,22 @@ impl EventApply for ManaAbilityActivated {
 }
 
 impl EventApply for AbilityCountered {
-    // [CR#608.2n,701.6a,707.10a]: the triggered/activated ability —
-    // or a countered/resolved COPY of a spell or ability — vanishes:
-    // remove its stack entry and discard the (minted, for a spell
-    // copy freshly minted) backing object. No zone move; the source
-    // (already gone for a dies-trigger) is untouched.
+    // A triggered or activated ability (a copy of one included) that leaves
+    // the stack without resolving is gone: remove its stack entry and discard
+    // its minted stack object. No zone move; the source (already gone for a
+    // dies-trigger) is untouched. A spell, copy or not, leaves the stack by a
+    // zone change instead [CR#608.2b,701.6a].
     fn apply(&self, g: &mut GameState) -> Option<GameEvent> {
+        let entry = g
+            .stack
+            .iter()
+            .find(|e| e.id == self.id)
+            .expect("an AbilityCountered names a stack entry");
+        assert!(
+            !matches!(entry.object, StackObject::Spell(_)),
+            "AbilityCountered names the spell {:?}: a spell leaves the stack by a zone change",
+            self.id
+        );
         g.remove_stack_entry(self.id);
         g.objects.remove(self.id);
         None
@@ -205,10 +220,10 @@ pub(crate) fn handle_spell_cast(g: &mut GameState, object: ObjectId) -> Option<G
 /// `AbilityResolved` carries a bare `ObjectId` — see `handle_spell_cast`.
 ///
 /// [CR#608.2n]: a triggered or activated ability finished resolving and
-/// vanishes — no zone move. [CR#707.10a]: a RESOLVED copy (of a spell)
-/// vanishes the same way instead of moving to a graveyard — it has no card
-/// to put there. Removes the stack entry whose `id` is the carried (minted)
-/// token, and the backing object with it.
+/// ceases to exist — no zone move. A resolving copy of a permanent spell
+/// leaves the same way until it becomes a token [CR#707.10f]
+/// (`engine-copy-permanent-spells`). Removes the stack entry whose `id` is
+/// the carried (minted) token, and the backing object with it.
 pub(crate) fn handle_ability_resolved(g: &mut GameState, id: ObjectId) -> Option<GameEvent> {
     g.remove_stack_entry(id);
     g.objects.remove(id);

@@ -9,7 +9,6 @@
 use sylex_core::Zone;
 
 use crate::agenda::WorkItem;
-use crate::event::AbilityCountered;
 use crate::event::Act;
 use crate::event::GameEvent;
 use crate::event::LossReason;
@@ -18,11 +17,10 @@ use crate::event::PlayerLost;
 use crate::event::Unattached;
 use crate::event::ZoneChange;
 use crate::object::ObjectId;
-use crate::stack::StackObject;
 use crate::state::GameState;
 
 /// One sweep ([CR#704.3]): the `PlayerLost`, `Act(Destroy)` (the replaceable
-/// destruction event), `TokenCeased`, and off-stack-copy `AbilityCountered`
+/// destruction event), `TokenCeased`, and `CopyCeased`
 /// events this check would perform. The caller emits them and re-checks until
 /// a sweep comes back empty. A destroy's LKI snapshot is captured later, at
 /// the will-change apply the `Act(Destroy)` resolves into (the object is still
@@ -100,49 +98,20 @@ pub fn sweep(state: &GameState) -> Vec<GameEvent> {
         }
     }
 
-    // [CR#704.5d,707.10a]: a copy of a spell anywhere other than the stack
-    // ceases to exist. The SCAN stays native (core-copy-grammar Task 5,
-    // Path B — see the task report): the generic `SbaRule` domain is
-    // battlefield objects ONLY (`global_sba_rules`'s
-    // `state.zones.battlefield` loop, per `sba_rule.rs`'s "for every
-    // battlefield object" doc) and never reaches a stranded STACK entry.
-    // Widening that shared domain to also walk the stack would risk
-    // misfiring every OTHER battlefield-scoped rule (toughness-zero,
-    // loyalty-zero, battle-defense-zero — none of which guard their
-    // `scope`/`when` against a same-shaped object still resolving on the
-    // stack) against it — a correctness rewrite this task does not sign up
-    // for. The EMISSION, though, is now data-usable: it speaks through
-    // `Action::Cease` ([CR#704.5d,707.10a]) via the SAME two calls
-    // (`run_sba_effect` + `stamp_sba_cause`) `global_sba_rules` makes per
-    // rule, instead of building `AbilityCountered` inline — so the
-    // cease-to-exist SHAPE is unified even though this rule's domain stays
-    // native.
-    //
-    // The resolution/counter divert (`resolve_object`'s Spell arm,
-    // `Action::Counter`) is the happy path — a copy vanishes there before it
-    // ever reaches this sweep. This is the safety net for a copy some OTHER
-    // (not yet built) generic zone-mover strands off-stack: `state.stack`
-    // still carries the copy's entry (the mover hasn't reached
-    // `remove_stack_entry` for it), but its backing object's zone reads
-    // something other than `Stack`. `Action::Cease`'s resolve reuses
-    // `AbilityCountered`'s apply (remove the stack entry, remove the
-    // object, no zone move) — ceases it the same way the happy path does.
-    for entry in &state.stack {
-        if entry.copy
-            && let StackObject::Spell(spell) = &entry.object
-            && state
-                .objects
-                .get(*spell)
-                .is_some_and(|o| o.zone != Some(Zone::Stack))
-        {
-            let frame = state.frame(entry.id, entry.controller);
+    // [CR#704.5e,707.10a]: a copy of a spell in a zone other than the stack
+    // ceases to exist. A copy that resolves, fails to resolve or is countered
+    // is put into its owner's graveyard [CR#608.2n,608.2b,701.6a], so the
+    // zone-change triggers see it first; this sweep then removes it. The scan
+    // is native because the generic `SbaRule` domain is battlefield objects
+    // only (`global_sba_rules`, `sba_rule.rs`); the removal speaks through
+    // `Action::Cease`, run the way `global_sba_rules` runs a rule's `then`.
+    for obj in state.objects.iter() {
+        if obj.spell_copy_owner.is_some() && obj.zone != Some(Zone::Stack) {
+            let frame = state.frame(obj.id, obj.controller);
             let effect = sylex_core::Instruction::act(sylex_core::Action::Cease(
                 sylex_core::Reference::source_parameter(),
             ));
-            for mut ev in run_sba_effect(state, &effect, &frame) {
-                stamp_sba_cause(&mut ev);
-                actions.push(ev);
-            }
+            actions.extend(run_sba_effect(state, &effect, &frame));
         }
     }
 
@@ -307,19 +276,6 @@ fn global_sba_rules(state: &GameState, view: &crate::layer::LayeredView) -> Vec<
 /// events whose `cause` is `None` (plain `Move` actions), upserts a
 /// `StateBasedAction` cause so no rules-SBA event goes unattributed.
 fn stamp_sba_cause(ev: &mut GameEvent) {
-    // `AbilityCountered.cause` is a plain `Cause` (always present — no
-    // `None`/upsert branch applies), so it gets its own short-circuit arm:
-    // same "preserve verb, correct agency, drop agent" treatment as the
-    // `Some` case below. This is what lets the copy-cease SBA
-    // ([CR#704.5d,707.10a]) route its removal through `Action::Cease`'s
-    // resolve (which stamps a generic `EffectInstruction` cause, since the
-    // verb is reusable outside an SBA context) and still land on
-    // `StateBasedAction`/no-agent here, same as any other rules-SBA event.
-    if let GameEvent::AbilityCountered(AbilityCountered { cause, .. }) = ev {
-        cause.agency = sylex_core::Agency::StateBasedAction;
-        cause.agent = None;
-        return;
-    }
     let cause_slot = match ev {
         GameEvent::Act(Act { cause, .. })
         | GameEvent::ZoneChange(ZoneChange {
@@ -981,86 +937,41 @@ mod tests {
         );
     }
 
-    /// core-copy-grammar Task 5 (Path B): the copy-cease SBA's
-    /// ([CR#704.5d,707.10a]) native scan still walks `state.stack` — the
-    /// generic `SbaRule` domain (`global_sba_rules`'s
-    /// `state.zones.battlefield` loop) never reaches a stranded stack
-    /// entry, so data-fying the SCAN itself is out of scope here — but the
-    /// removal it emits now speaks through the data-usable `Action::Cease`
-    /// verb instead of borrowing `Counter`'s: the returned
-    /// `AbilityCountered`'s cause carries the "Cease" verb and
-    /// `StateBasedAction` agency with no agent, the same re-attribution a
-    /// rules-driven `SbaRule`'s cause gets from `stamp_sba_cause`. A copy
-    /// stranded off the stack — its `StackEntry` still lingers, only the
-    /// backing object's zone reads something other than `Stack` —
-    /// reproduces the exact shape `off_stack_copy_ceases_via_sba`
-    /// (`tests/stack.rs`) reaches via a forced zone mutation on a fully
-    /// cast-and-copied Bolt; built here by hand (mint + push a `StackEntry`
-    /// directly) for a focused unit check on the emitted cause.
+    /// [CR#704.5e,707.10a]: a copy of a spell in a graveyard ceases to exist.
+    /// The sweep speaks through `Action::Cease` and yields exactly one
+    /// `CopyCeased`; applying it removes the copy from its owner's graveyard
+    /// — the copy's owner, the player who put it on the stack [CR#707.10],
+    /// not the copied card's owner — and from the store.
     #[test]
-    fn stranded_copy_ceases_via_unified_cease_action() {
-        use sylex_core::Agency;
-
-        use crate::event::AbilityCountered;
-
+    fn graveyard_copy_ceases_via_the_cease_action() {
         let bolt = Arc::new(canon().card("Lightning Bolt").unwrap().core);
         let mut state = game();
         let card_id = state.cards.push(bolt, PlayerId(0));
-        // Stranded: the backing object's zone already reads something other
-        // than `Stack` while its `StackEntry` still lingers — the exact
-        // precondition the native scan checks (`entry.copy && ... zone !=
-        // Some(Zone::Stack)`, below).
         let copy_obj = state.objects.mint(
             ObjectSource::Card(card_id),
-            PlayerId(0),
+            PlayerId(1),
             Some(Zone::Graveyard),
         );
-        state.stack.push(crate::stack::StackEntry {
-            activation: crate::ActivationId::NONE,
-            id: copy_obj,
-            object: crate::stack::StackObject::Spell(copy_obj),
-            controller: PlayerId(0),
-            targets: vec![],
-            chosen_modes: std::sync::Arc::from([]),
-            x: None,
-            paid_costs: vec![],
-            copy: true,
-        });
+        state.objects.obj_mut(copy_obj).spell_copy_owner = Some(PlayerId(1));
+        state.zones.graveyards[1].push(copy_obj);
 
         let actions = sba::sweep(&state);
-        let removal = actions
-            .iter()
-            .find(|e| {
-                matches!(e, GameEvent::AbilityCountered(AbilityCountered { id, .. }) if *id == copy_obj)
-            })
-            .unwrap_or_else(|| {
-                panic!("[CR#707.10a]: sweep must cease the stranded copy; got {actions:?}")
-            });
-        let GameEvent::AbilityCountered(AbilityCountered { cause, .. }) = removal else {
-            unreachable!("matched above");
-        };
-        assert_eq!(
-            cause.verb.as_str(),
-            "Cease",
-            "[CR#704.5d,707.10a]: the emitted removal must speak through the \
-             unified Cease verb, not the borrowed Counter one; got {cause:?}"
-        );
-        assert_eq!(
-            cause.agency,
-            Agency::StateBasedAction,
-            "a state-based action has no agent; got {cause:?}"
-        );
+        assert_eq!(actions, vec![GameEvent::CopyCeased(copy_obj)]);
+        state.schedule_front(vec![WorkItem::Emit(Occurrence::Batch(actions))]);
+        let _ = state.step();
+        assert!(state.zones.graveyards[1].is_empty(), "[CR#704.5e]");
         assert!(
-            cause.agent.is_none(),
-            "state-based actions carry no agent; got {cause:?}"
+            state.objects.get(copy_obj).is_none(),
+            "the ceased copy's id must be gone from the store"
         );
     }
 
     /// core-copy-grammar Task 5 (review follow-up): [CR#111.7] a token —
     /// INCLUDING a token copy ([CR#707.1]) — on the battlefield is NEVER
-    /// touched by the copy-cease SBA ([CR#704.5d,707.10a]). Provable
-    /// structurally (the native scan's domain is `state.stack` only, and a
-    /// token never rides a `StackEntry` — it isn't cast), but this pins it
+    /// touched by the copy-cease SBA ([CR#704.5e,707.10a]). Provable
+    /// structurally (the native scan selects only objects carrying the
+    /// spell-copy marker, which a token never carries — it is created, not
+    /// copied onto the stack), but this pins it
     /// behaviorally: mint a token COPY (the shape most likely to be
     /// confused for a `CopyOfACard`, per `target::is_object_class`'s [CR#109.1]
     /// carve-out —
@@ -1068,7 +979,7 @@ mod tests {
     /// `resolve/player_action.rs`, pins the same carve-out at the
     /// classification layer), put it on the battlefield, run the FULL sweep
     /// (`sba::sweep` — there is no copy-cease-only entry point), and assert
-    /// no `AbilityCountered` fires for it and the object survives.
+    /// no `CopyCeased` fires for it and the object survives.
     #[test]
     fn battlefield_token_copy_survives_the_copy_cease_sweep() {
         use sylex_core::Action;
@@ -1078,8 +989,6 @@ mod tests {
         use sylex_core::Instruction;
         use sylex_core::ObjectClass;
         use sylex_core::Reference;
-
-        use crate::event::AbilityCountered;
 
         let (mut state, bear) = bear_on_field();
         let frame = state.frame(bear, PlayerId(0));
@@ -1116,12 +1025,11 @@ mod tests {
 
         let actions = sba::sweep(&state);
         assert!(
-            actions.iter().all(|e| !matches!(
-                e,
-                GameEvent::AbilityCountered(AbilityCountered { id, .. }) if *id == copy_token
-            )),
+            actions
+                .iter()
+                .all(|e| !matches!(e, GameEvent::CopyCeased(id) if *id == copy_token)),
             "[CR#111.7]: a battlefield token copy must NEVER be removed by the \
-             copy-cease SBA ([CR#704.5d,707.10a]) — its own cease rule is the \
+             copy-cease SBA ([CR#704.5e,707.10a]) — its own cease rule is the \
              token SBA (a token stranded OFF the battlefield), not this one; \
              got {actions:?}"
         );

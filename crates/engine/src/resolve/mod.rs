@@ -119,8 +119,8 @@ impl GameState {
                 if entry.copy && self.is_permanent_spell(spell) {
                     // [CR#707.10f]: a resolving permanent-spell copy should
                     // become a token permanent; until that support lands
-                    // (follow-up ticket), it vanishes like any other copy
-                    // ([CR#707.10a]).
+                    // (`engine-copy-permanent-spells`), it leaves the stack
+                    // with no zone move.
                     self.schedule_front(vec![WorkItem::Emit(Occurrence::single(
                         GameEvent::AbilityResolved(spell),
                     ))]);
@@ -326,23 +326,18 @@ impl GameState {
             entry.x,
             None,
         );
-        let leave = if entry.copy {
-            // [CR#707.10a]: a copy leaves the stack by CEASING to exist — no
-            // zone move, no card. Same shape as a triggered ability vanishing
-            // ([CR#608.2n]).
-            GameEvent::AbilityResolved(spell)
-        } else {
-            GameEvent::ZoneChange(ZoneChange {
-                snapshot: None,
-                object: spell,
-                from: Some(Zone::Stack),
-                to: Zone::Graveyard,
-                enters: None,
-                position: None,
-                face: None,
-                cause: None,
-            })
-        };
+        // [CR#608.2n]: a copy too is put into its owner's graveyard, where it
+        // ceases to exist as a state-based action [CR#704.5e,707.10a].
+        let leave = GameEvent::ZoneChange(ZoneChange {
+            snapshot: None,
+            object: spell,
+            from: Some(Zone::Stack),
+            to: Zone::Graveyard,
+            enters: None,
+            position: None,
+            face: None,
+            cause: None,
+        });
         let mut items = self.resolving_effect_items(entry, &effect, &frame, resolving);
         items.push(WorkItem::Emit(Occurrence::single(leave)));
         self.schedule_front(items);
@@ -464,15 +459,15 @@ pub(crate) fn spell_ability_in(abilities: &[Ability]) -> Option<Arc<sylex_core::
 }
 
 /// The event that removes `entry` from the stack when it doesn't resolve
-/// [CR#608.2a,608.2b,608.3b]: a spell card goes to its owner's graveyard,
-/// while an ability or a spell copy leaves no card behind ([CR#707.10a]). The
-/// removal is the resolution procedure's own, never a counter [CR#701.6a] and
-/// never a state-based action [CR#704.3], so a "becomes countered" view never
-/// sees it.
+/// [CR#608.2a,608.2b,608.3b]: a spell goes to its owner's graveyard (a copy
+/// then ceases to exist there [CR#704.5e,707.10a]), while an ability is gone.
+/// The removal is the resolution procedure's own, never a counter [CR#701.6a]
+/// and never a state-based action [CR#704.3], so a "becomes countered" view
+/// never sees it.
 fn failed_resolution_exit(entry: &StackEntry) -> GameEvent {
     let cause = Cause::remove_from_stack(Agency::FailedResolution, None);
     match &entry.object {
-        StackObject::Spell(spell) if !entry.copy => GameEvent::ZoneChange(ZoneChange {
+        StackObject::Spell(spell) => GameEvent::ZoneChange(ZoneChange {
             snapshot: None,
             object: *spell,
             from: Some(Zone::Stack),
@@ -482,7 +477,6 @@ fn failed_resolution_exit(entry: &StackEntry) -> GameEvent {
             face: None,
             cause: Some(cause),
         }),
-        StackObject::Spell(id) => GameEvent::AbilityCountered(AbilityCountered { id: *id, cause }),
         StackObject::Triggered { .. } | StackObject::Activated { .. } => {
             GameEvent::AbilityCountered(AbilityCountered {
                 id: entry.id,

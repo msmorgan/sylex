@@ -1614,6 +1614,7 @@ fn facts_equivalent_mapped(
         }
         (GameEvent::Transformed(actual), GameEvent::Transformed(expected))
         | (GameEvent::TokenCeased(actual), GameEvent::TokenCeased(expected))
+        | (GameEvent::CopyCeased(actual), GameEvent::CopyCeased(expected))
         | (GameEvent::SpellCast(actual), GameEvent::SpellCast(expected))
         | (GameEvent::AbilityResolved(actual), GameEvent::AbilityResolved(expected)) => {
             objects_equivalent(*actual, *expected, inputs, replay_map)

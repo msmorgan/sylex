@@ -471,7 +471,9 @@ impl GameState {
             GameEvent::ManaEmptied(e) => e.apply(self),
             GameEvent::TokenCreated(e) => e.apply(self),
             GameEvent::EmblemCreated(e) => e.apply(self),
-            GameEvent::TokenCeased(id) => zone::handle_token_ceased(self, *id),
+            GameEvent::TokenCeased(id) | GameEvent::CopyCeased(id) => {
+                zone::handle_ceased(self, *id)
+            }
             GameEvent::PlayerLost(e) => e.apply(self),
             GameEvent::PlayerWon(e) => e.apply(self),
             GameEvent::Revealed(e) => {
@@ -562,6 +564,10 @@ impl GameState {
         // A permanent that leaves the battlefield is a new object when it comes
         // back ([CR#400.7]); its inherited record dies with the old id.
         self.paid_costs_by_object.remove(&object);
+        // [CR#707.10,704.5e]: a copy of a spell stays a copy, owned by the
+        // player who put it on the stack, in whatever zone it is put into; the
+        // copy-cease state-based action then finds it there.
+        let spell_copy_owner = self.objects.obj(object).spell_copy_owner;
 
         // 3. Move + remint. Remove the old object from its `from` zone's list,
         //    then from the store; mint a fresh object into `to`.
@@ -605,7 +611,7 @@ impl GameState {
         let ObjectSource::Card(card) = snapshot.source else {
             unreachable!("only card-backed objects change zones")
         };
-        let owner = self.cards.get(card).owner;
+        let owner = spell_copy_owner.unwrap_or(self.cards.get(card).owner);
         // [CR#614.12]: how it enters — emitted status (Stage 4 replacements)
         // plus the object's own AsEnters self-replacement (enters tapped /
         // attached) folded in below. Cloned (not moved) so the original
@@ -622,6 +628,7 @@ impl GameState {
             owner
         };
         let new = self.objects.mint(snapshot.source, controller, Some(to));
+        self.objects.obj_mut(new).spell_copy_owner = spell_copy_owner;
         // [CR#400.7j,400.7e]: the same effect (and a zone-change trigger) can
         // find the object it became — but only in a PUBLIC zone. Hidden
         // destinations record nothing: the old id simply goes stale.
@@ -802,11 +809,12 @@ impl GameState {
         self.zones.command.push(new);
     }
 
-    /// Applies a `TokenCeased` ([CR#704.5d,111.7]): removes the token object
-    /// from its zone and the store outright. No remint, no `ZoneChange` —
-    /// ceasing to exist is not a zone change. The card-table entry stays as
-    /// inert history (`Cards` never shrinks).
-    fn apply_token_ceased(&mut self, id: ObjectId) {
+    /// Applies a `TokenCeased` ([CR#704.5d,111.7]) or a `CopyCeased`
+    /// ([CR#704.5e,707.10a]): removes the object from its zone and the store
+    /// outright. No remint, no `ZoneChange` — ceasing to exist is not a zone
+    /// change. The card-table entry stays as inert history (`Cards` never
+    /// shrinks).
+    fn apply_ceased(&mut self, id: ObjectId) {
         let owner = self.owner_of(id);
         match self.objects.obj(id).zone {
             Some(Zone::Graveyard) => self.remove_from_graveyard(owner, id),
@@ -814,7 +822,7 @@ impl GameState {
             Some(Zone::Library) => self.remove_from_library(owner, id),
             Some(Zone::Exile) => self.remove_from_exile(id),
             other => unreachable!(
-                "a token ceases only from a non-battlefield, non-stack zone, got {other:?}"
+                "an object ceases only from a non-battlefield, non-stack zone, got {other:?}"
             ),
         }
         self.objects.remove(id);

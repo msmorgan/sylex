@@ -2961,8 +2961,9 @@ mod tests {
     /// under its OWN rule instead ([CR#111.7]). So BOTH a minted token copy
     /// (`TokenSpec::Copy`) and a plain token (`TokenSpec::Token`) classify
     /// `Token` and do NOT match `Filter::CardCopy`. (The genuinely
-    /// `CardCopy`-classifying case — a card-less spell copy stranded off
-    /// the stack, [CR#707.10a] — is `off_stack_copy_classifies_as_card_copy`
+    /// `CardCopy`-classifying case — a card-less spell copy put into a
+    /// graveyard, [CR#707.10a] — is
+    /// `resolved_copy_is_in_its_owners_graveyard_until_the_next_sba_check`
     /// in `tests/stack.rs`, since it needs the stack-copy harness, not this
     /// token-mint one.) Both classifications go through the SAME
     /// `is_object_class` / `Predicate::Class` path an SBA `scope` predicate

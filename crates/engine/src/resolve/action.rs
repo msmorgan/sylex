@@ -111,14 +111,13 @@ impl GameState {
             // above (which reads the body facet off the stored move and commits
             // it atomically on the one `Act(Destroy)` event).
             // [CR#701.6a]: countering cancels an object on the stack — it
-            // never resolves. A countered SPELL is put into its owner's
-            // graveyard (reminted off the stack, [CR#400.7]), cause-tagged
-            // "Counter" so a "becomes countered" view can narrow by verb. A
-            // countered ABILITY isn't a card and goes nowhere — it simply
-            // ceases (remove from stack, no zone move). [CR#707.10a]: a
-            // countered COPY (of a spell or ability) ceases the same way — no
-            // card, no zone move; it shares the ABILITY arm's shape below. An
-            // object already gone from the stack ([CR#608.2b]) is a no-op.
+            // never resolves. A countered SPELL, copy or not, is put into its
+            // owner's graveyard (reminted off the stack, [CR#400.7]),
+            // cause-tagged "Counter" so a "becomes countered" view can narrow
+            // by verb; a copy then ceases to exist there
+            // [CR#704.5e,707.10a]. A countered ABILITY, copy or not, goes
+            // nowhere — it simply ceases (remove from stack, no zone move).
+            // An object already gone from the stack ([CR#608.2b]) is a no-op.
             // Spell is the happy path (ward's verb).
             Action::Counter(sel) => {
                 let mut events = Vec::new();
@@ -135,9 +134,9 @@ impl GameState {
                         .stack
                         .iter()
                         .find(|e| e.id == object)
-                        .map(|e| (e.copy, &e.object))
+                        .map(|e| &e.object)
                     {
-                        Some((false, StackObject::Spell(spell))) => {
+                        Some(StackObject::Spell(spell)) => {
                             events.push(GameEvent::ZoneChange(ZoneChange {
                                 snapshot: None,
                                 object: *spell,
@@ -152,10 +151,7 @@ impl GameState {
                                 )),
                             }));
                         }
-                        // [CR#707.10a]: a copy of a spell, or a triggered/
-                        // activated ability (copy or not), ceases the same
-                        // way — no card, no zone move.
-                        Some(_) => {
+                        Some(StackObject::Triggered { .. } | StackObject::Activated { .. }) => {
                             events.push(GameEvent::AbilityCountered(AbilityCountered {
                                 id: object,
                                 cause: Cause::counter(
@@ -169,26 +165,23 @@ impl GameState {
                 }
                 vec![WorkItem::Emit(occurrence_of(events))]
             }
-            // [CR#704.5d,707.10a]: the referenced object ceases to exist — no
-            // zone move, no card. Written generically over any stack entry
-            // (mirrors `Counter`'s ability-vanish arm above), though today
-            // only the copy-cease SBA (`sba.rs`) reaches it, resolving
-            // `This` to a stranded stack-copy entry. A reference that isn't
-            // on the stack (invalid semantic input, state drift) fizzles silently —
-            // never a panic.
+            // [CR#704.5e,707.10a]: the referenced copy of a spell, in a zone
+            // other than the stack, ceases to exist — no zone move. Only the
+            // copy-cease state-based action (`sba.rs`) reaches it, resolving
+            // `This` to such a copy; anything else is an engine defect.
             Action::Cease(sel) => {
                 let events: Vec<GameEvent> = self
                     .eval_reference_set(sel, frame)
                     .into_iter()
-                    .filter(|&object| self.stack.iter().any(|e| e.id == object))
                     .map(|object| {
-                        GameEvent::AbilityCountered(AbilityCountered {
-                            id: object,
-                            cause: Cause::cease(
-                                Agency::EffectInstruction,
-                                Some((frame.source(self), frame.controller(self))),
-                            ),
-                        })
+                        let o = self.objects.obj(object);
+                        assert!(
+                            o.spell_copy_owner.is_some() && o.zone != Some(Zone::Stack),
+                            "Cease reaches only a copy of a spell off the stack, \
+                             got {object:?} in {:?}",
+                            o.zone
+                        );
+                        GameEvent::CopyCeased(object)
                     })
                     .collect();
                 vec![WorkItem::Emit(occurrence_of(events))]

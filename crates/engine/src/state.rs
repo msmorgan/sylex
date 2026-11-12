@@ -958,7 +958,8 @@ impl GameState {
     }
 
     /// [CR#108.3]: a card's owner never changes; an object's owner is its
-    /// card's.
+    /// card's. A copy of a spell has no card and is owned by the player under
+    /// whose control it was put on the stack [CR#707.10].
     ///
     /// # Panics
     ///
@@ -966,8 +967,10 @@ impl GameState {
     /// — engine invariants, not caller input.
     #[must_use]
     pub fn owner_of(&self, id: ObjectId) -> PlayerId {
-        let card = self.objects.obj(id).card_id().expect("card-backed object");
-        self.cards.get(card).owner
+        let obj = self.objects.obj(id);
+        let card = obj.card_id().expect("card-backed object");
+        obj.spell_copy_owner
+            .unwrap_or_else(|| self.cards.get(card).owner)
     }
 
     /// # Panics

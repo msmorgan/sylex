@@ -102,9 +102,10 @@ pub struct StackEntry {
     /// read while this entry resolves ([CR#607.2] linked reads). Copied from
     /// the announce slot at promote; empty for triggers.
     pub paid_costs: Vec<(sylex_core::CostTag, sylex_core::Uint)>,
-    /// [CR#707.10]: this entry is a COPY — no card behind it; it vanishes
-    /// instead of moving zones when it leaves the stack ([CR#707.10a]).
-    /// Otherwise a full citizen: "a copy of a spell is itself a spell".
+    /// [CR#707.10]: this entry is a COPY — no card behind it. Otherwise a full
+    /// citizen: "a copy of a spell is itself a spell", which leaves the stack
+    /// for its owner's graveyard and then ceases to exist there
+    /// [CR#704.5e,707.10a] (its object's `spell_copy_owner`).
     pub copy: bool,
 }
 

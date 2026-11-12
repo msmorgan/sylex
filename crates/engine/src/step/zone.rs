@@ -72,22 +72,23 @@ impl EventApply for EmblemCreated {
     }
 }
 
-/// `TokenCeased` carries a bare `ObjectId` — no dedicated payload struct
-/// (Tasks 3.1–3.2 structified only multi-field variants) — so it dispatches
-/// through a plain function rather than `EventApply`.
+/// `TokenCeased` and `CopyCeased` carry a bare `ObjectId` — no dedicated
+/// payload struct (Tasks 3.1–3.2 structified only multi-field variants) — so
+/// they dispatch through a plain function rather than `EventApply`.
 ///
-/// [CR#704.5d,111.7]: a token found in a zone other than the battlefield
-/// ceases to exist. Removes the object from its zone and the store
-/// outright — no remint, no `ZoneChange` fact (the token doesn't move, it
-/// stops existing). Zone-leave triggers already fired at the move that
-/// stranded it ([CR#111.7]'s note); anything still pointing at it reads the
-/// LKI that rode that fact.
-pub(crate) fn handle_token_ceased(g: &mut GameState, id: ObjectId) -> Option<GameEvent> {
-    g.apply_token_ceased(id);
+/// A token found in a zone other than the battlefield [CR#704.5d,111.7], or a
+/// copy of a spell found in a zone other than the stack [CR#704.5e,707.10a],
+/// ceases to exist. Removes the object from its zone and the store outright —
+/// no remint, no `ZoneChange` fact (the object doesn't move, it stops
+/// existing). Zone-change triggers already fired at the move that put it
+/// there ([CR#111.7]'s note); anything still pointing at it reads the LKI that
+/// rode that fact.
+pub(crate) fn handle_ceased(g: &mut GameState, id: ObjectId) -> Option<GameEvent> {
+    g.apply_ceased(id);
     None
 }
 
-/// `Shuffled` carries a bare `PlayerId` — see `handle_token_ceased`.
+/// `Shuffled` carries a bare `PlayerId` — see `handle_ceased`.
 ///
 /// [CR#701.24a]: randomize so NO player knows the order — the seeded rng.
 /// Revealed-state reset ([CR#701.20d]) is unbuilt (no reveal

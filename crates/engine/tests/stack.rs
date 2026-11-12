@@ -3784,8 +3784,9 @@ fn copy_game(seed: u64, mountains: usize) -> GameState {
 
 /// Like `copy_game`, but the spell to copy is a PERMANENT: P0 holds Grizzly
 /// Bears + Forests (the spell to copy); P1's deck is the copier fixture plus
-/// Forests (unused — the ability's only cost is {T}). Backs the
-/// permanent-spell-copy-vanish finding ([CR#707.10a],[CR#707.10f]).
+/// Forests (unused — the ability's only cost is {T}). Backs the interim
+/// permanent-spell-copy vanish, which stands in for the copy becoming a token
+/// [CR#707.10f] (`engine-copy-permanent-spells`).
 fn bears_copy_game(seed: u64, forests: usize) -> GameState {
     let bears = card("Grizzly Bears");
     let copier = testing_card("Creature tap-activated CopySpell Target Spell");
@@ -3941,7 +3942,8 @@ fn copied_bolt_shares_targets_and_controller() {
 }
 
 /// Like `copy_game`, but P0 additionally holds Mana Leak and Islands — the
-/// [CR#118.12a] counter `countered_copy_vanishes` aims at the minted copy.
+/// [CR#118.12a] counter `countered_copy_moves_to_graveyard_then_ceases` aims at
+/// the minted copy.
 fn copy_counter_game(seed: u64, mountains: usize, islands: usize) -> GameState {
     let bolt = card("Lightning Bolt");
     let mana_leak = card("Mana Leak");
@@ -4048,14 +4050,44 @@ fn cast_and_copy_bolt_at_face(state: &mut GameState) -> (ObjectId, ObjectId, Obj
     (bolt, copy, face)
 }
 
-/// [CR#707.10a]: a copy leaves the stack by CEASING TO EXIST, never by moving
-/// zones — resolution is the happy path. Bolt and its copy both target P1's
-/// face (a player proxy is always a legal target, so neither resolution can
-/// fizzle the other by killing a shared creature target first). Both deal
-/// their 3 damage; only the ORIGINAL Bolt — a real card — lands in the
-/// graveyard. The copy's minted object simply disappears.
+/// Every event `trace` applied, batch members included.
+fn applied_events(trace: &[Progress]) -> Vec<&GameEvent> {
+    trace
+        .iter()
+        .flat_map(|p| match p {
+            Progress::Applied(Occurrence::Single(e)) => vec![e],
+            Progress::Applied(Occurrence::Batch(es)) => es.iter().collect(),
+            _ => Vec::new(),
+        })
+        .collect()
+}
+
+/// Whether `events` hold the past-form move of `object` from the stack to a
+/// graveyard.
+fn moved_stack_to_graveyard(events: &[&GameEvent], object: ObjectId) -> bool {
+    events.iter().any(|e| {
+        matches!(
+            e,
+            GameEvent::ZoneChange(ZoneChange {
+                object: o,
+                snapshot: Some(_),
+                from: Some(Zone::Stack),
+                to: Zone::Graveyard,
+                ..
+            }) if *o == object
+        )
+    })
+}
+
+/// [CR#608.2n,704.5e,707.10a]: a resolved copy of an instant is put into its
+/// owner's graveyard like any instant spell, then ceases to exist there as a
+/// state-based action. Bolt and its copy both target P1's face (a player
+/// proxy is always a legal target, so neither resolution can fizzle the
+/// other). Both deal their 3 damage; the copy moves Stack→Graveyard and is
+/// gone by the time the stack is empty, so only the original Bolt card stays
+/// in a graveyard.
 #[test]
-fn resolved_copy_vanishes_without_zone_move() {
+fn resolved_copy_moves_to_graveyard_then_ceases() {
     let mut state = copy_game(1, 1);
     let (bolt, copy, face) = cast_and_copy_bolt_at_face(&mut state);
     assert_eq!(
@@ -4078,49 +4110,276 @@ fn resolved_copy_vanishes_without_zone_move() {
             other => panic!("unexpected stop while draining the stack: {other:?}"),
         }
     }
+    let (t, _) = step_to_stop(&mut state);
+    trace.extend(t);
 
-    let damage_events = trace
+    let events = applied_events(&trace);
+    let damage_events = events
         .iter()
-        .filter(|p| {
+        .filter(|e| {
             matches!(
-                applied(p),
-                Some(GameEvent::DamageDealt(DamageDealt { target, amount: 3, .. })) if *target == face
+                e,
+                GameEvent::DamageDealt(DamageDealt { target, amount: 3, .. }) if *target == face
             )
         })
         .count();
     assert_eq!(
         damage_events, 2,
-        "damage applied twice — the original Bolt and its copy each dealt 3, trace: {trace:?}"
+        "the original Bolt and its copy each dealt 3"
     );
     assert_eq!(state.players[1].life, 14, "20 - 3 - 3: bolted twice over");
-    assert!(state.stack.is_empty(), "both spells left the stack");
-
     assert!(
-        state.objects.get(bolt).is_none(),
-        "the original Bolt's old id is gone after reminting into the graveyard"
+        moved_stack_to_graveyard(&events, copy),
+        "the resolved copy moved Stack→Graveyard ([CR#608.2n])"
     );
     assert!(
-        state.objects.get(copy).is_none(),
-        "the copy's ObjectId is gone from self.objects — it ceased, it didn't remint"
+        events.iter().any(|e| matches!(e, GameEvent::CopyCeased(_))),
+        "the copy ceased to exist in the graveyard ([CR#704.5e])"
+    );
+    assert!(state.objects.get(bolt).is_none());
+    assert!(state.objects.get(copy).is_none());
+    assert_eq!(
+        state.zones.graveyards[1],
+        [] as [ObjectId; 0],
+        "the copy's owner's graveyard is empty again"
     );
     assert_eq!(
         state.zones.graveyards[0].len(),
         1,
-        "graveyard contains ONLY the original Bolt card — the copy left no card behind"
+        "only the original Bolt card stays in a graveyard"
     );
-    assert!(
-        is_card(&state, state.zones.graveyards[0][0], "Lightning Bolt"),
-        "the one graveyard entry is the original Bolt"
-    );
+    assert!(is_card(
+        &state,
+        state.zones.graveyards[0][0],
+        "Lightning Bolt"
+    ));
 }
 
-/// [CR#707.10a,701.6a]: a COUNTERED copy also ceases rather than moving to a
-/// graveyard. Mana Leak targets the minted copy directly (its own target
-/// choice, independent of what the original Bolt targets) and P1 — the
-/// copy's controller, "that player" ([CR#118.12a]) — declines the {3}
-/// punisher, so `Counter(It)` hits the copy.
+/// [CR#707.10,704.5e,707.10a]: between its move and the next state-based
+/// action check, a resolved copy sits in its owner's graveyard — the owner is
+/// the player who put it on the stack (P1), not the copied card's owner (P0).
+/// There it is a copy of a card, not a card ([CR#109.1]); the very next check
+/// removes it.
 #[test]
-fn countered_copy_vanishes() {
+fn resolved_copy_is_in_its_owners_graveyard_until_the_next_sba_check() {
+    use sylex_core::ObjectClass;
+    use sylex_core::Predicate;
+
+    let mut state = copy_game(1, 1);
+    let (_bolt, copy, _face) = cast_and_copy_bolt_at_face(&mut state);
+    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+    assert!(
+        sylex_engine::is_object_class(&state, copy, ObjectClass::Spell),
+        "[CR#707.10]: on the stack, the copy is a spell"
+    );
+
+    // Both pass: the copy (on top) resolves. Step until its move applies.
+    state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+    let _ = run_to_priority(&mut state, PlayerId(1), PhaseStep::PrecombatMain);
+    state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+    loop {
+        let StepOutcome::Progress(p) = state.step() else {
+            panic!("the copy resolves without a decision");
+        };
+        if moved_stack_to_graveyard(&applied_events(&[p]), copy) {
+            break;
+        }
+    }
+    assert_eq!(
+        state.zones.graveyards[1].len(),
+        1,
+        "the copy is in P1's graveyard"
+    );
+    let moved = state.zones.graveyards[1][0];
+    assert!(
+        sylex_engine::is_object_class(&state, moved, ObjectClass::CopyOfACard),
+        "[CR#109.1,707.10a]: off the stack, the card-less copy is a copy of a card"
+    );
+    assert!(
+        !sylex_engine::is_object_class(&state, moved, ObjectClass::Card),
+        "a copy has no card [CR#707.10]"
+    );
+    assert!(
+        sylex_engine::matches(&state, moved, &Predicate::Class(ObjectClass::CopyOfACard)),
+        "Filter::CardCopy matches through the predicate path an SBA scope evaluates"
+    );
+    assert!(
+        state.zones.graveyards[0].is_empty(),
+        "nothing in P0's graveyard yet"
+    );
+
+    // The next state-based action check ceases it.
+    let ceased = loop {
+        let StepOutcome::Progress(p) = state.step() else {
+            panic!("the next state-based action check precedes any decision");
+        };
+        if let Progress::SbasChecked { .. } = p {
+            let (t, _) = step_to_stop(&mut state);
+            break applied_events(&t)
+                .iter()
+                .any(|e| matches!(e, GameEvent::CopyCeased(id) if *id == moved));
+        }
+    };
+    assert!(ceased, "the check removed the copy ([CR#704.5e])");
+    assert!(state.objects.get(moved).is_none());
+    assert_eq!(state.zones.graveyards[1], [] as [ObjectId; 0]);
+}
+
+/// [CR#608.2b,704.5e,707.10a]: a copy whose only target has become illegal
+/// doesn't resolve: it is removed from the stack and put into its owner's
+/// graveyard under the failed-resolution cause, then ceases to exist at the
+/// next state-based action check. P0 bolts P1's 1/1 copier; P1 copies the
+/// Bolt (the copy targets the copier too); P0 then kills the copier with a
+/// second Bolt above the copy, so the copy's target is gone when it resolves.
+#[test]
+fn fizzled_copy_moves_to_its_owners_graveyard_then_ceases() {
+    use sylex_core::Agency;
+    use sylex_core::ObjectClass;
+
+    let mut state = copy_game(1, 2);
+    let copier = force_into_play(
+        &mut state,
+        PlayerId(1),
+        "Creature tap-activated CopySpell Target Spell",
+    );
+    state.objects.obj_mut(copier).summoning_sick = false;
+
+    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+    float_mana(&mut state, PlayerId(0), 1); // {R}
+    let bolt = find_in_hand(&state, PlayerId(0), "Lightning Bolt");
+    state
+        .submit_decision(Decision::Act(Action::CastSpell { object: bolt }))
+        .unwrap();
+    let _ = step_to_stop(&mut state);
+    state
+        .submit_decision(Decision::Targets(vec![vec![copier]]))
+        .unwrap();
+    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+
+    // P1 copies the Bolt; the copy ability resolves and pushes the copy.
+    state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+    let legal = run_to_priority(&mut state, PlayerId(1), PhaseStep::PrecombatMain);
+    let activate = legal
+        .iter()
+        .find(|a| matches!(a, Action::ActivateAbility { object, .. } if *object == copier))
+        .cloned()
+        .expect("the copier's tap ability is offered");
+    state.submit_decision(Decision::Act(activate)).unwrap();
+    let _ = step_to_stop(&mut state);
+    state
+        .submit_decision(Decision::Targets(vec![vec![bolt]]))
+        .unwrap();
+    let _ = step_through_payment(&mut state);
+    state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+    state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
+    let copy = state
+        .stack
+        .iter()
+        .find(|e| e.copy)
+        .expect("the copy is on the stack")
+        .id;
+    assert_eq!(
+        state.stack.iter().find(|e| e.copy).unwrap().targets,
+        vec![vec![copier]]
+    );
+
+    // P0 kills the copier with a second Bolt above the copy.
+    float_mana(&mut state, PlayerId(0), 1); // {R}
+    let second = find_in_hand(&state, PlayerId(0), "Lightning Bolt");
+    state
+        .submit_decision(Decision::Act(Action::CastSpell { object: second }))
+        .unwrap();
+    let _ = step_to_stop(&mut state);
+    state
+        .submit_decision(Decision::Targets(vec![vec![copier]]))
+        .unwrap();
+
+    // Drain one step at a time, looking at the copy right after its move.
+    let mut trace = Vec::new();
+    let mut moved_copy = None;
+    while !state.stack.is_empty() {
+        match state.step() {
+            StepOutcome::Progress(p) => {
+                if moved_copy.is_none()
+                    && moved_stack_to_graveyard(&applied_events(std::slice::from_ref(&p)), copy)
+                {
+                    let &moved = state.zones.graveyards[1]
+                        .last()
+                        .expect("the copy is in its owner's graveyard");
+                    assert!(
+                        sylex_engine::is_object_class(&state, moved, ObjectClass::CopyOfACard),
+                        "the object P1's graveyard gained is the copy [CR#707.10]"
+                    );
+                    moved_copy = Some(moved);
+                }
+                trace.push(p);
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::Priority(_)) => {
+                state.submit_decision(Decision::Act(Action::Pass)).unwrap();
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::PayMana(_)) => {
+                let pay = state.auto_pay_pending();
+                state.submit_decision(Decision::Pay(pay)).unwrap();
+            }
+            StepOutcome::NeedsDecision(DecisionPointKind::Payment(_)) => {
+                let decision = state
+                    .auto_payment_pending()
+                    .expect("a Payment prompt has an automatic runner answer");
+                state.submit_decision(decision).unwrap();
+            }
+            other => panic!("unexpected stop while draining the stack: {other:?}"),
+        }
+    }
+    let (t, _) = step_to_stop(&mut state);
+    trace.extend(t);
+
+    let events = applied_events(&trace);
+    assert!(
+        events.iter().any(|e| matches!(
+            e,
+            GameEvent::ZoneChange(ZoneChange {
+                object,
+                snapshot: Some(_),
+                from: Some(Zone::Stack),
+                to: Zone::Graveyard,
+                cause: Some(cause),
+                ..
+            }) if *object == copy
+                && cause.verb.as_str() == "RemoveFromStack"
+                && cause.agency == Agency::FailedResolution
+        )),
+        "the fizzled copy moved Stack→Graveyard under the failed-resolution cause [CR#608.2b]"
+    );
+    let moved = moved_copy.expect("the copy moved");
+    assert!(
+        events
+            .iter()
+            .any(|e| matches!(e, GameEvent::CopyCeased(id) if *id == moved)),
+        "the copy ceased to exist in the graveyard [CR#704.5e]"
+    );
+    assert!(state.objects.get(moved).is_none());
+    assert_eq!(
+        state.zones.graveyards[1].len(),
+        1,
+        "P1's graveyard holds only the dead copier card"
+    );
+    assert!(is_card(
+        &state,
+        state.zones.graveyards[1][0],
+        "Creature tap-activated CopySpell Target Spell"
+    ));
+}
+
+/// [CR#701.6a,704.5e,707.10a]: a COUNTERED copy is put into its owner's
+/// graveyard like any countered spell, then ceases to exist there. Mana Leak
+/// targets the minted copy directly (its own target choice, independent of
+/// what the original Bolt targets) and P1 — the copy's controller, "that
+/// player" ([CR#118.12a]) — declines the {3} punisher, so `Counter(It)` hits
+/// the copy.
+#[test]
+fn countered_copy_moves_to_graveyard_then_ceases() {
     let mut state = copy_counter_game(1, 1, 2);
     let (_bolt, copy, _face) = cast_and_copy_bolt_at_face(&mut state);
 
@@ -4148,8 +4407,10 @@ fn countered_copy_vanishes() {
 
     // Drive Mana Leak to resolution; P1 declines the punisher.
     let mut declined = false;
+    let mut trace = Vec::new();
     loop {
-        let (_t, stop) = step_to_stop(&mut state);
+        let (t, stop) = step_to_stop(&mut state);
+        trace.extend(t);
         match stop {
             StepOutcome::NeedsDecision(DecisionPointKind::YesNo(sylex_engine::YesNo {
                 player,
@@ -4200,114 +4461,48 @@ fn countered_copy_vanishes() {
     }
     assert!(declined, "Mana Leak's optional payment was declined");
 
+    let events = applied_events(&trace);
     assert!(
-        state.objects.get(copy).is_none(),
-        "the copy's ObjectId is gone from self.objects"
+        events.iter().any(|e| matches!(
+            e,
+            GameEvent::ZoneChange(ZoneChange {
+                object,
+                snapshot: Some(_),
+                from: Some(Zone::Stack),
+                to: Zone::Graveyard,
+                cause: Some(cause),
+                ..
+            }) if *object == copy && cause.verb.as_str() == "Counter"
+        )),
+        "the countered copy moved Stack→Graveyard ([CR#701.6a])"
     );
+    assert!(
+        events.iter().any(|e| matches!(e, GameEvent::CopyCeased(_))),
+        "the copy ceased to exist in the graveyard ([CR#704.5e])"
+    );
+    assert!(state.objects.get(copy).is_none());
     assert!(
         !state.stack.iter().any(|e| e.copy),
         "no copy entry remains on the stack"
     );
     assert_eq!(
+        state.zones.graveyards[1],
+        [] as [ObjectId; 0],
+        "the copy's owner's graveyard is empty again"
+    );
+    assert_eq!(
         state.zones.graveyards[0].len(),
         1,
-        "graveyard contains only Mana Leak itself — no entry for the countered copy"
-    );
-    assert!(
-        !state.zones.graveyards[0]
-            .iter()
-            .any(|&o| is_card(&state, o, "Lightning Bolt")),
-        "no graveyard entry for the copy"
+        "P0's graveyard holds only Mana Leak itself"
     );
 }
 
-/// [CR#707.10a]: the native SBA safety net. If a copy of a spell somehow ends
-/// up off the stack (a future generic zone-mover, not yet built), the sweep
-/// notices and it ceases — the same "no card, no zone move" shape as the
-/// resolution/counter divert, just triggered from a different angle.
-#[test]
-fn off_stack_copy_ceases_via_sba() {
-    // A second Mountain: casting Bolt taps the first, leaving one spare to
-    // float mana with below (no card/decision needed to force a resweep).
-    let mut state = copy_game(1, 2);
-    let (bolt, copy, _face) = cast_and_copy_bolt_at_face(&mut state);
-    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
-
-    // Force-move the copy off the stack: mutate its backing object's zone
-    // directly, the way an as-yet-unbuilt generic mover (bounce, bury) might
-    // leave it mid-transition. `state.stack` still carries the copy's entry —
-    // only the object it points at is now stranded off-stack.
-    state.objects.obj_mut(copy).zone = Some(Zone::Graveyard);
-
-    // A bare `Action::Pass` that doesn't complete an all-pass round only
-    // hands priority to the next player — it does NOT re-run `CheckSbas`
-    // (see `take_priority_action`'s `Action::Pass` arm). Tapping the spare
-    // Mountain for mana instead goes through `priority_tail()` =
-    // `[CheckSbas, PlaceTriggers, OpenPriority]` ([CR#704.3]) — the simplest
-    // action that forces a fresh sweep without resolving the still-2-deep
-    // stack (which would exercise the resolution divert, not this SBA).
-    float_mana(&mut state, PlayerId(0), 1);
-
-    assert!(
-        state.objects.get(copy).is_none(),
-        "the copy object ceased ([CR#707.10a])"
-    );
-    assert!(
-        !state.stack.iter().any(|e| e.copy),
-        "no copy entry remains on the stack"
-    );
-    assert!(
-        state.stack.iter().any(|e| e.id == bolt && !e.copy),
-        "the original Bolt is untouched, still on the stack — the SBA only \
-         swept the off-stack copy"
-    );
-}
-
-/// core-copy-grammar Task 4: [CR#109.1] a card-less spell copy classifies
-/// through `is_object_class`/`Predicate::Class` — the SAME predicate-evaluation
-/// path an SBA `scope` uses (`sba.rs`'s `crate::matches(state, id,
-/// &rule.scope)`) — as `Spell` while genuinely on the stack ([CR#707.10]:
-/// "a copy of a spell is itself a spell"), and as `CardCopy` once stranded
-/// off it (the same stranded state `off_stack_copy_ceases_via_sba`'s native
-/// safety net sweeps). This is the classification the copy-cease SBA's
-/// planned `scope` predicate (core-copy-grammar Task 5) will select over.
-#[test]
-fn off_stack_copy_classifies_as_card_copy() {
-    use sylex_core::ObjectClass;
-    use sylex_core::Predicate;
-
-    let mut state = copy_game(1, 2);
-    let (_bolt, copy, _face) = cast_and_copy_bolt_at_face(&mut state);
-    let _ = run_to_priority(&mut state, PlayerId(0), PhaseStep::PrecombatMain);
-
-    assert!(
-        sylex_engine::is_object_class(&state, copy, ObjectClass::Spell),
-        "[CR#707.10]: still genuinely on the stack, the copy is a Spell"
-    );
-
-    // Force-move the copy off the stack, exactly as
-    // `off_stack_copy_ceases_via_sba` does: mutate its backing object's
-    // zone directly (simulating an as-yet-unbuilt generic mover leaving it
-    // mid-transition). `state.stack` still carries the copy's entry.
-    state.objects.obj_mut(copy).zone = Some(Zone::Graveyard);
-
-    assert!(
-        sylex_engine::is_object_class(&state, copy, ObjectClass::CopyOfACard),
-        "[CR#109.1,707.10a]: stranded off the stack, the card-less copy \
-         entry classifies as CardCopy"
-    );
-    assert!(
-        sylex_engine::matches(&state, copy, &Predicate::Class(ObjectClass::CopyOfACard)),
-        "Filter::CardCopy matches through the same predicate path an SBA \
-         scope evaluates"
-    );
-}
-
-/// [CR#707.10a,707.10f]: a copy of a PERMANENT spell vanishes on resolution
-/// too — it does NOT take the [CR#608.3] battlefield zone move. (The
-/// CR-correct outcome, a resolving permanent-spell copy becoming a token
-/// permanent, is deferred to a follow-up ticket; vanishing is the interim
-/// placeholder, same as any other copy.) P0 casts Grizzly Bears; while it
+/// [CR#707.10f]: a resolving copy of a PERMANENT spell vanishes — it does
+/// NOT take the [CR#608.3] battlefield zone move. (The CR-correct outcome, the
+/// copy becoming a token permanent, is deferred to
+/// `engine-copy-permanent-spells`; vanishing is the interim placeholder for
+/// this case only — every other spell copy leaves the stack for its owner's
+/// graveyard.) P0 casts Grizzly Bears; while it
 /// sits on the stack, P1's copier copies it (`Kind(Spell)` targets any spell
 /// on the stack, permanent or not). Only the ORIGINAL Bears should reach the
 /// battlefield.

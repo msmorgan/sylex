@@ -331,6 +331,13 @@ pub struct GameObject {
     pub side: Side,
     /// `None` for a player proxy.
     pub zone: Option<Zone>,
+    /// `Some(owner)` iff this object is a copy of a spell [CR#707.10]. It has
+    /// no card of its own (its `ObjectSource::Card` aliases the original's
+    /// `CardId`), and it is owned by the player under whose control it was put
+    /// on the stack, not by that card's owner. A zone change carries it onto
+    /// the reminted object, so a copy put into a graveyard is still known as
+    /// one until it ceases to exist [CR#704.5e,707.10a].
+    pub spell_copy_owner: Option<PlayerId>,
 }
 
 impl GameObject {
@@ -439,6 +446,7 @@ impl ObjectStore {
             attached_to: None,
             side: Side::Front,
             zone,
+            spell_copy_owner: None,
         })
     }
 

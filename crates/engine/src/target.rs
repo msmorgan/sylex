@@ -46,15 +46,15 @@ fn is_ability_on_stack(state: &GameState, id: ObjectId) -> bool {
     })
 }
 
-/// Whether `id` is a card-less copy ([CR#707.10]) — the engine's
-/// `StackEntry.copy` marker. A copy TOKEN is not one: its copiable values are
+/// Whether `id` is a card-less copy of a spell ([CR#707.10]), on the stack or
+/// in the zone it was put into on leaving it — the object's
+/// `spell_copy_owner` marker. A copy TOKEN is not one: its copiable values are
 /// baked into its definition at mint ([CR#707.1]) and it ceases under
 /// [CR#111.7] rather than [CR#707.10a]'s copy-cease SBA. The marker is the
 /// only per-object, non-aliased signal available, because a card-less copy's
 /// `ObjectSource::Card` aliases the ORIGINAL's `CardId`.
 fn is_cardless_copy(state: &GameState, id: ObjectId) -> bool {
-    matches!(state.objects.obj(id).source, ObjectSource::Card(_))
-        && state.stack.iter().any(|e| e.id == id && e.copy)
+    state.objects.obj(id).spell_copy_owner.is_some()
 }
 
 /// Whether `id` is in the CR object class `class` ([CR#109.1]). The classes
