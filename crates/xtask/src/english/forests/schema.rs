@@ -190,6 +190,88 @@ CREATE TABLE conjuncts (
     derivations INTEGER NOT NULL,
     PRIMARY KEY (unit, node, alternative, conjuncts)
 ) WITHOUT ROWID;
+-- A unit's words (`sylex_syntax::ForkWord`), in order: the starts of the
+-- leaves its Derivations use (`start` is those leaves' `start`), each named
+-- by the surface of its shortest leaf and that surface's 1-based occurrence
+-- among the unit's words.
+CREATE TABLE words (
+    unit INTEGER NOT NULL REFERENCES units,
+    word INTEGER NOT NULL,
+    start INTEGER NOT NULL,
+    surface TEXT NOT NULL,
+    occurrence INTEGER NOT NULL,
+    PRIMARY KEY (unit, word),
+    UNIQUE (unit, surface, occurrence)
+) WITHOUT ROWID;
+-- A unit's forks (`sylex_syntax::ForkForest::forks`), in display order: where
+-- its Derivations differ, each a question about one word. `kind` is the
+-- question: `lexical` (which lexical alternative the leaf starting at the word
+-- is), `dependency` (what the word's maximal projection depends on) or `frame`
+-- (the frame Productions of its Head Line, where the other two questions do
+-- not determine them). `context` is the Derivations in which the word has an
+-- answer, which the options partition; `conditional`: that is not every
+-- Derivation of the unit.
+CREATE TABLE forks (
+    unit INTEGER NOT NULL REFERENCES units,
+    fork INTEGER NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('lexical', 'dependency', 'frame')),
+    word INTEGER NOT NULL,
+    context INTEGER NOT NULL,
+    conditional INTEGER NOT NULL,
+    PRIMARY KEY (unit, fork),
+    FOREIGN KEY (unit, word) REFERENCES words
+) WITHOUT ROWID;
+-- The other questions that partition a fork's context as it does, numbered
+-- from 1 in display order.
+CREATE TABLE fork_aliases (
+    unit INTEGER NOT NULL,
+    fork INTEGER NOT NULL,
+    alias INTEGER NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('lexical', 'dependency', 'frame')),
+    word INTEGER NOT NULL,
+    PRIMARY KEY (unit, fork, alias),
+    FOREIGN KEY (unit, fork) REFERENCES forks,
+    FOREIGN KEY (unit, word) REFERENCES words
+) WITHOUT ROWID;
+-- A fork's options, in display order (by governor position, then the rest of
+-- the answer; never by count), each with the Derivations that give it.
+CREATE TABLE fork_options (
+    unit INTEGER NOT NULL,
+    fork INTEGER NOT NULL,
+    option INTEGER NOT NULL,
+    derivations INTEGER NOT NULL,
+    PRIMARY KEY (unit, fork, option),
+    FOREIGN KEY (unit, fork) REFERENCES forks
+) WITHOUT ROWID;
+-- Each option's answer to its fork's question (`question` 0) and to each of
+-- the fork's aliases (`question` = `fork_aliases.alias`), as that question's
+-- kind has it. A lexical answer is its `leaf`. A dependency answer is
+-- `dependency` = `root`, or `dependent`: the `function` the maximal projection
+-- bears in its governor, the governor's Category (`governor_category`, a
+-- private Category named as the one it copies) and the governor's head-line
+-- word (`governor`; NULL where that head line ends in punctuation or no
+-- child). A frame answer is `frames`, a JSON array of the head line's frame
+-- Production names, from the leaf up.
+CREATE TABLE fork_answers (
+    unit INTEGER NOT NULL,
+    fork INTEGER NOT NULL,
+    option INTEGER NOT NULL,
+    question INTEGER NOT NULL,
+    leaf INTEGER,
+    dependency TEXT CHECK (dependency IN ('root', 'dependent')),
+    governor INTEGER,
+    function TEXT,
+    governor_category TEXT,
+    frames TEXT,
+    PRIMARY KEY (unit, fork, option, question),
+    FOREIGN KEY (unit, fork, option) REFERENCES fork_options,
+    FOREIGN KEY (unit, leaf) REFERENCES leaves,
+    FOREIGN KEY (unit, governor) REFERENCES words,
+    CHECK ((leaf IS NOT NULL) + (dependency IS NOT NULL) + (frames IS NOT NULL) = 1),
+    CHECK ((dependency IS 'dependent') = (function IS NOT NULL)),
+    CHECK ((dependency IS 'dependent') = (governor_category IS NOT NULL)),
+    CHECK (governor IS NULL OR dependency IS 'dependent')
+) WITHOUT ROWID;
 ";
 
 /// Views for the questions already known. Each keeps a `derivations`

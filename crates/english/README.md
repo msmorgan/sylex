@@ -189,6 +189,10 @@ Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
   its context, and `embedding_steps`) and, for a coordination, `conjuncts`;
   and the grammar's `productions` (with Selected Frame and variant),
   `categories` and `lexemes`;
+- per unit, its forks (`sylex_syntax::ForkForest::forks`): `words`, `forks`
+  (kind, word, context, conditional), `fork_aliases`, `fork_options` (with
+  their Derivations) and `fork_answers` (each option's answer to the fork's
+  question and to each alias's);
 - views `verb_phrases`, `verb_phrase_spans`, `verb_phrase_tokens` and
   `coordinations`.
 

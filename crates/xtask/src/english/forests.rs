@@ -4,7 +4,8 @@
 //! The stored tables keep the forest as the chart packs and binarizes it
 //! (`docs/decisions/english.md` §4): a node's alternative is a (Production,
 //! completed item) pair, and an item's families are (previous item, child)
-//! pairs. Only the part some Derivation uses is stored. The schema, with
+//! pairs. Only the part some Derivation uses is stored, with the unit's
+//! forks (`ForkForest::forks`, written by `forks.rs`). The schema, with
 //! each table's and view's meaning, is [`SCHEMA`] and [`VIEWS`].
 
 use std::collections::BTreeMap;
@@ -32,6 +33,7 @@ use sylex_syntax::HeadWord;
 use sylex_vocabulary::LexicalEnvironment;
 
 mod context;
+mod forks;
 mod schema;
 
 use schema::SCHEMA;
@@ -87,6 +89,7 @@ struct UnitRows {
     nodes: Vec<NodeRow>,
     items: Vec<ItemRow>,
     leaves: Vec<LeafRow>,
+    forks: forks::ForkRows,
 }
 
 struct NodeRow {
@@ -236,6 +239,11 @@ pub(crate) fn write(
         "embedding_steps",
         "alternative_embeddings",
         "conjuncts",
+        "words",
+        "forks",
+        "fork_aliases",
+        "fork_options",
+        "fork_answers",
         "lexemes",
         "productions",
         "categories",
@@ -399,13 +407,15 @@ fn unit_rows(
                 reading: forest.leaf_reading(leaf).clone(),
             }
         })
-        .collect();
+        .collect::<Vec<_>>();
+    let forks = forks::rows(&parse, &leaves)?;
     Ok(UnitRows {
         derivations: counts.total(),
         parsed,
         nodes,
         items,
         leaves,
+        forks,
     })
 }
 
@@ -662,6 +672,7 @@ fn write_unit(
     }
     let families = write_items(tx, u_id, &rows.items)?;
     write_leaves(tx, u_id, &rows.leaves, lexemes)?;
+    forks::write(tx, u_id, &rows.forks)?;
     summary.units += 1;
     let size = (rows.nodes.len() + rows.items.len()) as u64 + families;
     if summary.largest.as_ref().is_none_or(|(n, _)| size > *n) {
@@ -845,7 +856,7 @@ mod tests {
     }
 
     /// Writes the database for the faces of the named cards.
-    fn database(cards: &[&str]) -> (tempfile::TempDir, PathBuf, Corpus) {
+    pub(super) fn database(cards: &[&str]) -> (tempfile::TempDir, PathBuf, Corpus) {
         let env = LexicalEnvironment::load().unwrap();
         let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
         let corpus = Corpus::load(|face| cards.contains(&face.card.as_str())).unwrap();
