@@ -1,5 +1,6 @@
 // "an opponent controls [object]" — [`YouControl`]'s opponent-relative twin:
-// `Exists(And([<object>, ControlledBy(OpponentOf(Ref(You)))]))`. See
+// `Exists(And([And([Permanent, <object>]), ControlledBy(OpponentOf(Ref(You)))]))`:
+// what a player controls is a permanent [CR#109.2]. See
 // `YouControl` for the shared `Param(0)` object-predicate vocabulary and the
 // render note (a hand-written `Exists` render arm, not the generic template
 // filler, supplies the indefinite article).
@@ -10,5 +11,5 @@
     template: "an opponent controls ${0}",
     kinds: [Condition],
     params: [Predicate],
-    body: Exists(And([Param(0), ControlledBy(OpponentOf(Ref(You)))])),
+    body: Exists(And([And([Permanent, Param(0)]), ControlledBy(OpponentOf(Ref(You)))])),
 )

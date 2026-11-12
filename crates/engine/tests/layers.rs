@@ -1747,3 +1747,99 @@ fn joraga_warcaller_counts_counters_on_itself() {
         (Some(3), Some(3))
     );
 }
+
+// ---------------------------------------------------------------------------
+// "As long as you control …" gates ([CR#611.3a])
+// ---------------------------------------------------------------------------
+
+/// Scrapyard Mongrel ({3}{R} Creature — Dog, 3/3): "As long as you control an
+/// artifact, this creature gets +2/+0 and has trample." Lowered from the
+/// wizards corpus's own spelling, through the `YouControl` macro.
+fn scrapyard_mongrel() -> Arc<Card> {
+    lowered(
+        r#"Normal(
+  name: "Scrapyard Mongrel",
+  mana_cost: [Generic(3), Red],
+  types: [Creature],
+  abilities: [
+    Static(Conditionally(YouControl(Type(Artifact)), Modify(This, Several([Power(Up(2)), Toughness(Up(0)), GainAbility(Keyword(Trample))])))),
+  ],
+  power: 3,
+  toughness: 3,
+)"#,
+    )
+}
+
+/// Darksteel Relic ({0} Artifact). Its indestructible is left off.
+fn darksteel_relic() -> Arc<Card> {
+    lowered(
+        r#"Normal(
+  name: "Darksteel Relic",
+  mana_cost: [Generic(0)],
+  types: [Artifact],
+)"#,
+    )
+}
+
+/// Place P0's two cards named `name`, wherever setup dealt them, one in their
+/// hand and one in their library.
+fn one_in_hand_one_in_library(state: &mut GameState, name: &str) {
+    let named = |state: &GameState, o: &ObjectId| is_named(state, *o, name);
+    let mut found: Vec<ObjectId> = state.zones.hands[0]
+        .iter()
+        .chain(state.zones.libraries[0].iter())
+        .filter(|o| named(state, o))
+        .copied()
+        .collect();
+    assert_eq!(found.len(), 2, "P0 has two {name} in hand and library");
+    state.zones.hands[0].retain(|o| !found.contains(o));
+    state.zones.libraries[0].retain(|o| !found.contains(o));
+    let in_library = found.pop().expect("two found");
+    let in_hand = found.pop().expect("two found");
+    state.objects.obj_mut(in_hand).zone = Some(Zone::Hand);
+    state.zones.hands[0].push(in_hand);
+    state.objects.obj_mut(in_library).zone = Some(Zone::Library);
+    state.zones.libraries[0].push_back(in_library);
+}
+
+/// Whether Scrapyard Mongrel is the 5/3 trampler its gate grants.
+fn mongrel_pumped(view: &sylex_engine::LayeredView, mongrel: ObjectId) -> bool {
+    let pumped = (view.power(mongrel), view.toughness(mongrel)) == (Some(5), Some(3));
+    let trample = view
+        .get(mongrel)
+        .abilities
+        .contains(&sylex_core::Ability::Keyword(
+            sylex_core::KeywordAbility::Trample,
+        ));
+    assert_eq!(
+        pumped, trample,
+        "the gate grants +2/+0 and trample together"
+    );
+    pumped
+}
+
+/// An artifact permanent you control opens Scrapyard Mongrel's gate
+/// [CR#611.3a,109.2].
+#[test]
+fn scrapyard_mongrel_with_an_artifact_on_the_battlefield() {
+    let mut state = game_with_p0_deck(vec![scrapyard_mongrel(), darksteel_relic()]);
+    let ids = enter_in_order(&mut state, &["Scrapyard Mongrel", "Darksteel Relic"]);
+    let mongrel = ids[0];
+    assert!(mongrel_pumped(&state.layers(), mongrel));
+}
+
+/// "You control an artifact" means an artifact permanent [CR#109.2]: artifact
+/// cards in your library and hand, which you own but which are not
+/// permanents, leave Scrapyard Mongrel a 3/3 without trample.
+#[test]
+fn scrapyard_mongrel_with_artifacts_only_in_library_and_hand() {
+    let mut state = game_with_p0_deck(vec![
+        scrapyard_mongrel(),
+        darksteel_relic(),
+        darksteel_relic(),
+    ]);
+    let ids = enter_in_order(&mut state, &["Scrapyard Mongrel"]);
+    let mongrel = ids[0];
+    one_in_hand_one_in_library(&mut state, "Darksteel Relic");
+    assert!(!mongrel_pumped(&state.layers(), mongrel));
+}

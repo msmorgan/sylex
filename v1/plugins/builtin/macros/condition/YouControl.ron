@@ -1,8 +1,10 @@
 // "you control [object]" ([CR#603.4] the common `Exists` intervening-if
 // shape) — the controller-relative existence check a conditional static's
 // "as long as you control an artifact" composes
-// (`StaticEffect::Conditionally`, [CR#611.3a]): `Exists(And([<object>,
-// ControlledBy(Ref(You))]))`. `Param(0)` is the object's own `Predicate`
+// (`StaticEffect::Conditionally`, [CR#611.3a]): `Exists(And([And([Permanent,
+// <object>]), ControlledBy(Ref(You))]))`. What you control is a permanent
+// [CR#109.2]: a card you own in your hand, library or graveyard is not "an
+// artifact you control". `Param(0)` is the object's own `Predicate`
 // description (a bare card type, a creature-type subtype noun, a color/
 // multicolored/colorless adjective, the "other"/"another" self-exclusion) —
 // the `crate::parsers::condition` routing's Predicate-slot vocabulary.
@@ -20,5 +22,5 @@
     template: "you control ${0}",
     kinds: [Condition],
     params: [Predicate],
-    body: Exists(And([Param(0), ControlledBy(Ref(You))])),
+    body: Exists(And([And([Permanent, Param(0)]), ControlledBy(Ref(You))])),
 )
