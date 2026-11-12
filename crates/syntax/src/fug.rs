@@ -47,10 +47,10 @@
 //! `'c':Binding` (a mark), `'c':Binding:Spoken` (a mark spoken as a word, a
 //! sign: `'+':Prefix:Spoken`), or `[role:]Kind(args)` for the other
 //! [`SymbolDecl`] kinds (`Class(X)`, `Word(X)`, `Lex(Noun)`, `Free(X)`,
-//! `FreeLex(Noun)`, `OtherCardName()`, `Numeral(Cardinal)`, `Numeral(Arabic(false))`,
-//! `Hosted(X, Nominal)`, `Attached(X, Suffix)`, `Selected(X, Of, ...)`). An
-//! equation is `path = Value` (require), `path = path` (agree),
-//! `path := Value` (carry), `path != A | B` (exclude each), or
+//! `FreeLex(Noun)`, `OtherCardName()`, `Numeral(Cardinal)`,
+//! `Numeral(Arabic(false))`, `Hosted(X, Nominal)`, `Attached(X, Suffix)`,
+//! `Selected(X, Of, ...)`). An equation is `path = Value` (require), `path =
+//! path` (agree), `path := Value` (carry), `path != A | B` (exclude each), or
 //! `!(path = A & path = B)` (exclude together), where a path is `$.Feature`
 //! or `child.Feature`; `=` is written only in equations. A child that leaves
 //! a feature unvalued passes `child.F = Value`; a test that the child carries

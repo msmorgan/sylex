@@ -950,7 +950,12 @@ impl<'a> Binder<'a> {
     /// Restricts child `child`, a derived unlike Frame Slot, to coordinations
     /// whose conjuncts' values of the coordination's `unlike` feature are
     /// each the name of a kind the head selects there.
-    fn unlike_slot(&self, draft: &mut Draft, child: usize, fill: &SlotFill) -> Result<(), LoadError> {
+    fn unlike_slot(
+        &self,
+        draft: &mut Draft,
+        child: usize,
+        fill: &SlotFill,
+    ) -> Result<(), LoadError> {
         let SlotFill::Unlike(unlike) = fill else {
             return Ok(());
         };
@@ -3660,7 +3665,9 @@ impl<'a> Binder<'a> {
                 }
             }
             serial.distinct_coordinator = vec![a];
-            serial.unlike = conjoin.unlike.map(|feature| Unlike::new(a, t, feature, true));
+            serial.unlike = conjoin
+                .unlike
+                .map(|feature| Unlike::new(a, t, feature, true));
             conjoin.close(self, &mut serial, &[a, t], Edge::Whole { last: false })?;
             for &feature in &conjoin.recovered {
                 serial.equations.push((
@@ -3844,7 +3851,9 @@ impl Binder<'_> {
             draft.coordinator = Some(b);
             draft.link = Some(identity);
             draft.distinct_coordinator = vec![a, b];
-            draft.unlike = conjoin.unlike.map(|feature| Unlike::new(a, b, feature, false));
+            draft.unlike = conjoin
+                .unlike
+                .map(|feature| Unlike::new(a, b, feature, false));
             conjoin.close(self, &mut draft, &[a, b], Edge::Whole { last: true })?;
             drafts.push(draft);
         }
@@ -3863,7 +3872,9 @@ impl Binder<'_> {
         serial.coordinator = Some(t);
         serial.link = Some(identity);
         serial.distinct_coordinator = vec![a];
-        serial.unlike = conjoin.unlike.map(|feature| Unlike::new(a, t, feature, true));
+        serial.unlike = conjoin
+            .unlike
+            .map(|feature| Unlike::new(a, t, feature, true));
         conjoin.close(self, &mut serial, &[a, t], Edge::Whole { last: false })?;
         drafts.push(serial);
         let mut more = Draft::new(id("serial-more"), conjoin.tail_id, 0);
@@ -4971,14 +4982,22 @@ fn unlike_fill(
     UnlikeFill {
         slot,
         name: *name,
-        kinds: kinds.iter().filter(|k| selected.contains(k)).copied().collect(),
+        kinds: kinds
+            .iter()
+            .filter(|k| selected.contains(k))
+            .copied()
+            .collect(),
     }
 }
 
 /// A derived unlike Fill as a Production id shows it: the slot's name and
 /// the kinds selected (`UnlikeObject[NP|KeywordPhrase]`).
 fn unlike_label(unlike: &UnlikeFill) -> String {
-    let kinds: Vec<String> = unlike.kinds.iter().map(|kind| format!("{kind:?}")).collect();
+    let kinds: Vec<String> = unlike
+        .kinds
+        .iter()
+        .map(|kind| format!("{kind:?}"))
+        .collect();
     format!("{}[{}]", unlike.name, kinds.join("|"))
 }
 

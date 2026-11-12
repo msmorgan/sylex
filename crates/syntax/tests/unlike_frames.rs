@@ -24,7 +24,12 @@ fn lexicon() -> Lexicon {
         owner: "test".to_owned(),
     };
     Lexicon::new([
-        Lexeme::invariant("c:and", "and", Category::Coordinator, source(SourceKind::Core)),
+        Lexeme::invariant(
+            "c:and",
+            "and",
+            Category::Coordinator,
+            source(SourceKind::Core),
+        ),
         Lexeme::verb("v:lose", "lose", source(SourceKind::Catalog)),
         Lexeme::verb("v:destroy", "destroy", source(SourceKind::Catalog)),
         Lexeme::invariant(
@@ -126,7 +131,9 @@ fn assert_no_reading(text: &str) {
 /// The Fill of the Object slot of the clause's Selected Frame.
 fn object_fill(reading: &Reading) -> SlotFill {
     let clause = reading.node().unwrap().children[0].node().unwrap();
-    clause.selected_frame.as_ref().unwrap().slots[0].fill.clone()
+    clause.selected_frame.as_ref().unwrap().slots[0]
+        .fill
+        .clone()
 }
 
 #[test]
@@ -164,7 +171,10 @@ fn a_head_selecting_one_kind_takes_no_unlike_coordination() {
     // As *destroy* in *destroy target creature* takes no keyword beside it.
     assert_no_reading("Destroy abilities and banding.");
     assert_no_reading("Destroy banding and abilities.");
-    assert_eq!(object_fill(&readings("Destroy abilities.")[0]), SlotFill::NP);
+    assert_eq!(
+        object_fill(&readings("Destroy abilities.")[0]),
+        SlotFill::NP
+    );
 }
 
 #[test]
@@ -186,6 +196,12 @@ fn a_conjunct_with_no_value_of_the_unlike_feature_is_of_no_selected_kind() {
         1,
     );
     assert_ne!(unvalued, GRAMMAR);
-    assert_eq!(readings_in(&unvalued, "Lose banding, 2, and abilities.").len(), 0);
-    assert_eq!(readings_in(&unvalued, "Lose banding and abilities.").len(), 1);
+    assert_eq!(
+        readings_in(&unvalued, "Lose banding, 2, and abilities.").len(),
+        0
+    );
+    assert_eq!(
+        readings_in(&unvalued, "Lose banding and abilities.").len(),
+        1
+    );
 }

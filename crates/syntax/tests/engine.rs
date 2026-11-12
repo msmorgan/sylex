@@ -338,7 +338,11 @@ fn load_errors() {
         "feature VerbForm = ",
         "feature Count = Singular | Plural | Dual\n    feature VerbForm = ",
     )
-    .replacen("category Nominal [Number]", "category Nominal [Number, Count]", 1)
+    .replacen(
+        "category Nominal [Number]",
+        "category Nominal [Number, Count]",
+        1,
+    )
     .replacen(
         "Noun: Nominal -> Lex(Noun)",
         "Noun: Nominal -> Lex(Noun) where $.Count = $.Number",
