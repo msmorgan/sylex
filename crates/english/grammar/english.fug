@@ -563,14 +563,16 @@ class SuperlativeQuantifier = ["det:most", "det:least", "det:fewest"]
 class CountSuperlativeQuantifier = ["det:fewest"]
 // They stand alone as a fused determiner-head (*replacing all instances of
 // one color word with another*; CGEL 5§9.1:410). Fused *each* is an
-// implicit partitive, in Oracle a Subject only.
+// implicit partitive (CGEL 5§9.2:413), as in *each enters with ...*
+// (Storyweave).
 class FusedQuantifier = [
     "det:another", "det:both", "det:each", "det:more.count", "det:everything", "det:this",
     "det:none",
 ]
 // They choose from a set in an implicit partitive (*If a player does
-// either*; CGEL 5§9.2:413). Unlike fused *each*, they make an ordinary
-// singular Noun Phrase, so a Complement as well as a Subject.
+// either*; CGEL 5§9.2:413, which would put *each* here too but for its
+// fixed uses such as *each to their own*). Their Noun Phrase is Ordinary,
+// so NonNumericComplement's ban on fused *each* does not reach it.
 class FusedChoice = ["det:either", "det:neither"]
 class RelativeMarker = ["sub:that", "pronoun:which", "pronoun:who"]
 // Only *other*, which heads a Noun Phrase with ordinary determination (*the
@@ -759,8 +761,12 @@ NumericNounPhrase: NounPhrase -> Amount
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-// Fused *each* is a Subject only (*each enters with ...*); a Complement is
-// *each of them*, so *of* after fused *each* is its partitive oblique.
+// No fused *each*: as a Complement it would let an *of* phrase right after
+// it attach to another host, where it is *each*'s partitive oblique
+// (*[lands on each] [of your turns]*, Fastbond). The ban is wider than that:
+// it also refuses *one of each*, which QuantityPartitiveOfEach builds
+// instead, and a fused *each* before a Nominal it could determine (*cast
+// [for each] [1 life you gained]*, Licia, Sanguine Tribune).
 NonNumericComplement: ComplementNounPhrase -> NounPhrase { transparent: [head] }
     where head.NounKind != Numeric,
           head.Case != Nominative | Genitive,
@@ -1643,11 +1649,13 @@ QuantityPartitive: PartitiveHead -> DeterminerPhrase complement:Selected(Preposi
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// *Create one of each*. Not a Preposition Phrase, which would let *of* take
-// *each* before a second *of* phrase (*the beginning of each of your main
-// phases*); fused at once, so no Preposition Phrase after it modifies it
-// (*one of each of those kinds of counters* is the partitive of a
-// partitive).
+// *Create one of each* (Academy Manufactor), flat because fused *each* is
+// no Complement (NonNumericComplement); fused at once, so no Preposition
+// Phrase after it modifies it (*one of each of those kinds of counters* is
+// the partitive of a partitive). It is Distributive, which its Numerical
+// head is not, only so that DegreeArithmetic refuses it as an operand:
+// otherwise *of those kinds of counters* is stranded after *each* in *[that
+// many plus one of each] [of those kinds of counters]* (Winding Constrictor).
 QuantityPartitiveOfEach: FusedNounPhrase -> DeterminerPhrase preposition:Word(Of) oblique:Word(Each) {
     unshared: [DeterminativeDistribution],
 }
@@ -1869,8 +1877,9 @@ FrequencyAdverbArithmetic: AdverbPhrase ->
     AdverbPhrase modifier:Selected(PrepositionPhrase, Plus, Minus)
     where head.AdjunctPosition = End,
           modifier.NounKind = Temporal
-// Its operand is no distributive phrase (*that many plus one of each of
-// those kinds*: *one of each* is the partitive's).
+// Its operand is never QuantityPartitiveOfEach's *one of each*, which would
+// strand the *of* phrase after *each* (*[that many plus one of each] [of
+// those kinds of counters]*, Winding Constrictor).
 DegreeArithmetic: DeterminerPhrase ->
     DeterminerPhrase modifier:Selected(PrepositionPhrase, Plus, Minus) { heavy: [head] }
     where head.ComplementKind = Intransitive,
@@ -2875,7 +2884,9 @@ GapInterrogative: InterrogativeClause -> marker:InterrogativePhrase clause:Claus
 AdverbialInterrogative: InterrogativeClause -> marker:Word(How) clause:AdjunctGapClause
     where clause.Gap = Adjunct
 
-// Never fused *each*: *are each equal to 2* has floated *each*. A bare mass
+// Never fused *each*: in *power and toughness are each equal to ...* (Eluge,
+// the Shoreless Sea) *each* is floated (FloatedEachAdjective), never a
+// Predicative *[are each]* with *equal to ...* a depictive. A bare mass
 // Noun Phrase is a Predicative, but not one headed by a `HeadOnly` noun,
 // whose modifying uses are an adjective's: a bare color word after a copula
 // is the adjective (CGEL 19§3.3:1642).
