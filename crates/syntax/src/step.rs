@@ -365,7 +365,7 @@ pub(crate) struct Production {
     /// Coordinator leaf: it stands for one as the coordination's own
     /// (`Summary::coordinator`) and keeps each chain to one tree
     /// (`Summary::link`).
-    pub link: Option<LexemeId>,
+    pub link: Option<LinkedCoordination>,
     /// The child whose engine fields (preposition, extensions) the mother
     /// inherits.
     pub head: Option<usize>,
@@ -395,6 +395,20 @@ pub(crate) enum RemnantRole {
     SharesHead,
     /// It is a remnant, this head elided (`Summary::remnant`).
     Elides(Elided),
+}
+
+/// A Linked Coordination's identity: its serial tail Category, which
+/// names the one schema whose drafts build it (`Production::link`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub(crate) struct LinkedCoordination(pub u16);
+
+/// What a coordination's Summary names as its coordinator
+/// (`Summary::coordinator`): its Coordinator's Lexeme, or the identity of
+/// the Linked Coordination, which has no Coordinator, standing for one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub(crate) enum CoordinatorId {
+    Lexeme(LexemeId),
+    Linked(LinkedCoordination),
 }
 
 /// The head a remnant elides (`Summary::remnant`).
@@ -763,8 +777,9 @@ pub(crate) struct Summary {
     /// Complements that would extend this phrase's selected frame, as an
     /// index into [`CompiledGrammar::extension_sets`].
     pub extensions: u16,
-    /// The coordinator of a coordination.
-    pub coordinator: Option<LexemeId>,
+    /// The coordinator of a coordination, or the identity of the Linked
+    /// Coordination that stands for one.
+    pub coordinator: Option<CoordinatorId>,
     /// It is a coordination, or a post-adjunct host's Production
     /// (`Production::post_adjunct_host`) over one: a dependent after a
     /// coordination leaves it a coordination for the `coordinated` and
@@ -839,7 +854,7 @@ pub(crate) struct Summary {
     /// card]*). No Conjunct of a Linked Coordination carries the
     /// coordination's own: a chain linked by one connective has one tree,
     /// its serial (`Production::link`).
-    pub link: Option<LexemeId>,
+    pub link: Option<LinkedCoordination>,
     /// The frame, plus one, of the Complement Cluster it is, or of the first
     /// one its head line holds (0: none). The Clusters of one coordination
     /// are parallel: their frames have one shape
@@ -1013,7 +1028,7 @@ pub(crate) struct State {
     unlike_omissions: bool,
     preposition: Option<(LexemeId, usize)>,
     extensions: u16,
-    coordinator: Option<LexemeId>,
+    coordinator: Option<CoordinatorId>,
     /// The head of a post-adjunct host's Production is a coordination
     /// (`Summary::coordinated`).
     coordinated_head: bool,
@@ -1021,7 +1036,7 @@ pub(crate) struct State {
     head_coordination: bool,
     /// The head child's `Summary::whole_coordination`.
     only_head_coordination: bool,
-    conjunct_coordinators: [Option<LexemeId>; MAX_DISTINCT_COORDINATORS],
+    conjunct_coordinators: [Option<CoordinatorId>; MAX_DISTINCT_COORDINATORS],
     other_preposition: Option<LexemeId>,
     /// The conjuncts of a coordination have more than two prepositions, or
     /// one has none.
@@ -1059,7 +1074,7 @@ pub(crate) struct State {
     /// (`Summary::unclosed`).
     unclosed: bool,
     /// The `head` child's `Summary::link`.
-    headed_link: Option<LexemeId>,
+    headed_link: Option<LinkedCoordination>,
     /// The `Summary::cluster` and `Summary::cluster_other` of the head-line
     /// children so far.
     cluster: Option<(u16, u16)>,
@@ -1725,7 +1740,7 @@ impl Production {
         leaf: &LeafFacts,
     ) {
         if self.coordinator == Some(position) {
-            next.coordinator = leaf.lexeme;
+            next.coordinator = leaf.lexeme.map(CoordinatorId::Lexeme);
         }
         // Only a head whose Complement Clusters it must declare is recorded,
         // so that homographs elsewhere still pack.
@@ -1849,6 +1864,15 @@ impl Production {
             }
         }
         !host.is_some_and(|kind| summary.hosts & crate::frames::host_bit(kind) == 0)
+    }
+
+    /// Whether `coordinator` is one a plain serial coordination's tail may
+    /// not end with (`Production::foreign_coordinators`).
+    fn foreign_coordinator(&self, coordinator: CoordinatorId) -> bool {
+        match coordinator {
+            CoordinatorId::Lexeme(lexeme) => self.foreign_coordinators.contains(&lexeme),
+            CoordinatorId::Linked(_) => false,
+        }
     }
 
     /// Records the Linked Coordination that child `position`, the head, is
@@ -2059,14 +2083,14 @@ impl Production {
                 if self.coordinator == Some(position)
                     && summary
                         .coordinator
-                        .is_some_and(|c| self.foreign_coordinators.contains(&c))
+                        .is_some_and(|c| self.foreign_coordinator(c))
                 {
                     return None;
                 }
                 if self.coordinator == Some(position) {
                     if self
                         .paired_coordinator
-                        .is_some_and(|p| summary.coordinator != Some(p))
+                        .is_some_and(|p| summary.coordinator != Some(CoordinatorId::Lexeme(p)))
                     {
                         return None;
                     }
@@ -2179,7 +2203,7 @@ impl Production {
             last_resolved,
             unlike_values: if self.unlike.is_some() { state.unlike_values } else { 0 },
             extensions: state.extensions,
-            coordinator: self.link.or(state.coordinator),
+            coordinator: self.link.map(CoordinatorId::Linked).or(state.coordinator),
             coordinated: coordination || state.coordinated_head,
             head_coordination: coordination || state.coordinated_head || state.head_coordination,
             whole_coordination: coordination

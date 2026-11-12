@@ -12,7 +12,9 @@ use crate::compile::CompiledGrammar;
 use crate::hash::ChartHasher;
 use crate::reading::glues_after;
 use crate::step::ChildView;
+use crate::step::CoordinatorId;
 use crate::step::LeafFacts;
+use crate::step::LinkedCoordination;
 use crate::step::State;
 use crate::step::Summary;
 use crate::step::Symbol;
@@ -44,6 +46,16 @@ pub(crate) struct Leaf {
     pub reading: LexicalReading,
     pub facts: LeafFacts,
     pub edges: sylex_lexicon::Edges,
+}
+
+/// What a coordination names as its coordinator.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Coordinator {
+    /// The Lexeme of its Coordinator.
+    Lexeme(sylex_lexicon::LexemeId),
+    /// A Linked Coordination, which has no Coordinator: the name of its
+    /// serial tail Category, its identity.
+    Linked(dpsi::Ident),
 }
 
 /// A child of a partial Production in a Packed Forest: a completed
@@ -232,8 +244,16 @@ impl<'g> Parse<'g> {
 
     /// The coordinator of a completed Constituent that is a coordination.
     #[must_use]
-    pub fn node_coordinator(&self, node: usize) -> Option<sylex_lexicon::LexemeId> {
-        self.forest.nodes[node].summary.coordinator
+    pub fn node_coordinator(&self, node: usize) -> Option<Coordinator> {
+        self.forest.nodes[node]
+            .summary
+            .coordinator
+            .map(|coordinator| match coordinator {
+                CoordinatorId::Lexeme(lexeme) => Coordinator::Lexeme(lexeme),
+                CoordinatorId::Linked(LinkedCoordination(tail)) => {
+                    Coordinator::Linked(self.grammar.categories[usize::from(tail)])
+                }
+            })
     }
 
     /// Parses another analyzed text as the Category this Parse was made for.

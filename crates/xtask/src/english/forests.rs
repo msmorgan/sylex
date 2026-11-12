@@ -27,6 +27,7 @@ use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_syntax::ChildRef;
 use sylex_syntax::CompiledGrammar;
+use sylex_syntax::Coordinator;
 use sylex_syntax::Embedding;
 use sylex_syntax::Gap;
 use sylex_syntax::HeadWord;
@@ -105,15 +106,6 @@ struct NodeRow {
     settled: bool,
     derivations: u128,
     alternatives: Vec<AlternativeRow>,
-}
-
-/// What a coordination node's Summary names as its coordinator.
-#[derive(Clone, Copy)]
-enum Coordinator {
-    Lexeme(LexemeId),
-    /// A Linked Coordination's identity: the name of its serial tail
-    /// Category.
-    Link(LexemeId),
 }
 
 struct AlternativeRow {
@@ -309,20 +301,7 @@ fn unit_rows(
     let mut nodes = Vec::new();
     for node in (0..forest.node_count()).filter(|&n| counts.node(n) > 0) {
         let span = forest.node_span(node);
-        let coordinator = parse
-            .node_coordinator(node)
-            .map(|id| {
-                if env.lexicon.lexemes().contains_key(&id) {
-                    Ok(Coordinator::Lexeme(id))
-                } else if grammar.category_id(id.as_str()).is_some() {
-                    Ok(Coordinator::Link(id))
-                } else {
-                    Err(anyhow::anyhow!(
-                        "coordinator `{id}` is neither a lexeme nor a Category"
-                    ))
-                }
-            })
-            .transpose()?;
+        let coordinator = parse.node_coordinator(node);
         let features: BTreeMap<&str, &str> = parse
             .node_features(node)
             .into_iter()
@@ -633,7 +612,7 @@ fn write_unit(
                 lexemes.insert(id);
                 (Some(id.as_str()), None)
             }
-            Some(Coordinator::Link(id)) => (None, Some(id.as_str())),
+            Some(Coordinator::Linked(tail)) => (None, Some(tail.as_str())),
             None => (None, None),
         };
         inserts.node.execute(params![

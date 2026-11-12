@@ -33,6 +33,7 @@ pub use alternatives::EmbeddingStep;
 pub use alternatives::HeadLeaf;
 pub use alternatives::HeadWord;
 pub use chart::ChildRef;
+pub use chart::Coordinator;
 pub use chart::Metrics;
 pub use chart::PackedForest;
 pub use chart::Parse;

@@ -516,7 +516,7 @@ struct Draft {
     /// (`Production::nonfinal_conjuncts`).
     nonfinal_conjuncts: Vec<usize>,
     /// A Linked Coordination's identity (`Production::link`).
-    link: Option<LexemeId>,
+    link: Option<crate::step::LinkedCoordination>,
     /// It builds a Complement Cluster of this frame (`Production::cluster`).
     cluster: Option<usize>,
     /// The child that must be a coordination of Complement Clusters of this
@@ -4113,7 +4113,7 @@ impl Binder<'_> {
     /// delimiter when `delimited`) and the serial, whose middle Conjuncts are
     /// ordinary ones that may begin with the connective as well (*A, B, then
     /// C*; *A, then B, then C*): the serial reads every such chain, so there
-    /// is no polysyndetic shape. Its identity is its serial tail's name:
+    /// is no polysyndetic shape. Its identity is its serial tail Category:
     /// no Conjunct is, or is headed by, a Linked Coordination of the same
     /// identity (`Summary::link`), so each chain has one tree.
     fn linked_coordination(
@@ -4131,7 +4131,10 @@ impl Binder<'_> {
             prepositions: None,
             host: None,
         };
-        let identity = Ident::new(&conjoin.tail_name);
+        let identity = crate::step::LinkedCoordination(
+            u16::try_from(conjoin.tail_id)
+                .map_err(|_| invalid(format!("too many Categories for `{}`", conjoin.tail_name)))?,
+        );
         let id = |shape: &str| format!("Coordination:{}/{shape}", conjoin.tail_name);
         let mut drafts = Vec::new();
         // Binary: X Y, or X , Y.
