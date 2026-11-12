@@ -50,9 +50,9 @@ fn is_ability_on_stack(state: &GameState, id: ObjectId) -> bool {
 /// in the zone it was put into on leaving it — the object's
 /// `spell_copy_owner` marker. A copy TOKEN is not one: its copiable values are
 /// baked into its definition at mint ([CR#707.1]) and it ceases under
-/// [CR#111.7] rather than [CR#707.10a]'s copy-cease SBA. The marker is the
-/// only per-object, non-aliased signal available, because a card-less copy's
-/// `ObjectSource::Card` aliases the ORIGINAL's `CardId`.
+/// [CR#111.7] rather than the copy-cease SBA [CR#704.5e,707.10a]. The marker is
+/// the only per-object, non-aliased signal available, because a card-less
+/// copy's `ObjectSource::Card` aliases the ORIGINAL's `CardId`.
 fn is_cardless_copy(state: &GameState, id: ObjectId) -> bool {
     state.objects.obj(id).spell_copy_owner.is_some()
 }

@@ -2956,11 +2956,11 @@ mod tests {
     /// CardCopy": [CR#109.1] lists "a copy of a card" and "a token" as
     /// DISTINCT object kinds; [CR#111.1] defines a token as "a marker used
     /// to represent any permanent that isn't represented by a card" with no
-    /// carve-out for a copy-token; and [CR#707.10a]'s copy-cease SBA targets
-    /// a copy of a spell/card, never a token — a token (copy or not) ceases
-    /// under its OWN rule instead ([CR#111.7]). So BOTH a minted token copy
-    /// (`TokenSpec::Copy`) and a plain token (`TokenSpec::Token`) classify
-    /// `Token` and do NOT match `Filter::CardCopy`. (The genuinely
+    /// carve-out for a copy-token; and the copy-cease SBA [CR#704.5e,707.10a]
+    /// targets a copy of a spell/card, never a token — a token (copy or not)
+    /// ceases under its OWN rule instead ([CR#111.7]). So BOTH a minted token
+    /// copy (`TokenSpec::Copy`) and a plain token (`TokenSpec::Token`)
+    /// classify `Token` and do NOT match `Filter::CardCopy`. (The genuinely
     /// `CardCopy`-classifying case — a card-less spell copy put into a
     /// graveyard, [CR#707.10a] — is
     /// `resolved_copy_is_in_its_owners_graveyard_until_the_next_sba_check`

@@ -3,8 +3,8 @@
 //! poison counters ([CR#704.5c]). A permanent with both +1/+1 and -1/-1
 //! counters has the smaller count of each removed ([CR#704.5q]). Creatures
 //! with lethal marked damage are destroyed ([CR#704.5g]); tokens stranded off
-//! the battlefield cease to exist ([CR#704.5d]); a copy of a spell stranded
-//! anywhere other than the stack ceases to exist too ([CR#707.10a]).
+//! the battlefield cease to exist ([CR#704.5d]); a copy of a spell in a zone
+//! other than the stack ceases to exist too ([CR#704.5e,707.10a]).
 
 use sylex_core::Zone;
 

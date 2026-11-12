@@ -5595,7 +5595,7 @@ fn ability_copy_same_source_resolves_and_vanishes() {
     );
     assert!(
         state.objects.get(copy_entry.id).is_none(),
-        "the copy's minted id is gone after resolving — no zone move ([CR#707.10a])"
+        "the copy's minted id is gone after resolving — no zone move ([CR#608.2n])"
     );
 }
 
