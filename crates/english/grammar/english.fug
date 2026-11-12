@@ -1188,9 +1188,10 @@ MeasureNominal: BareNominal -> Measure
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
 MeasureNounPhrase: MeasureNounPhrase -> Measure
-// A counter's first base is its name [CR#122.1]: a keyword, or a slash
-// measure for a +X/+Y counter [CR#122.1a,122.1b].
 WordPartCoordination: BareNominal -> CompoundCoordination
+// A counter's first base is its name [CR#122.1]: a keyword, or a slash
+// measure for a +X/+Y counter [CR#122.1a,122.1b]. It is `modifier`: it
+// modifies the head noun the conjuncts share, which it never heads.
 KeywordBase: CompoundConjunct -> modifier:KeywordPhrase
     where $.CompoundPart = Base,
           modifier.FinalParameter != SetOffAbility | Cost
@@ -1725,8 +1726,8 @@ ComparativeBoundedAmount: Amount -> first:Amount coordinator:Word(Or) last:Adjec
 // A comparative bound as the endpoint of a scalar change (*reduce it to
 // less than 1*; CGEL 8§5.2:691–692).
 ComparativeAmount: Amount ->
-    quantifier:Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
-    where quantifier.Countability = Mass,
+    Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
+    where head.Countability = Mass,
           complement.NounKind = Numeric,
           $.ComplementKind = PP
 // A sum adjective after a determined Noun Phrase (*ten or more creature
@@ -1795,28 +1796,24 @@ ComparativeMassDetermined: NounPhrase ->
           $.Person = Third
 // The comparative and its *than* Complement as siblings (*more than one*).
 // The bare standard gives the phrase its Number (*more than two lands*), so
-// the comparative is `quantifier`, not `head`. A determined standard is
-// ComparativeCountDetermined's, a bounding frequency ComparativeAdverb's.
+// Number is unshared. A determined standard is ComparativeCountDetermined's,
+// a bounding frequency ComparativeAdverb's.
 ComparativeDeterminer: DeterminerPhrase ->
-    quantifier:Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
+    Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than) { unshared: [Number] }
     where complement.Determination = Bare,
           complement.ComplementKind != AdvP,
           $.Number = complement.Number,
-          $.Countability = quantifier.Countability,
-          $.DeterminativeDistribution = quantifier.DeterminativeDistribution,
           $.ComplementKind = PP,
           $.ObliqueNumber = complement.Number,
           $.ObliqueKind = complement.ComplementKind,
           $.ObliqueDetermination = complement.Determination
 // *No more than one*, *many more than two*.
 ModifiedComparativeDeterminer: DeterminerPhrase ->
-    modifier:Lex(Determinative) quantifier:Class(ComparativeQuantifier)
-    complement:Selected(PrepositionPhrase, Than)
+    modifier:Lex(Determinative) Class(ComparativeQuantifier)
+    complement:Selected(PrepositionPhrase, Than) { unshared: [Number] }
     where complement.Determination = Bare,
           complement.ComplementKind != AdvP,
           $.Number = complement.Number,
-          $.Countability = quantifier.Countability,
-          $.DeterminativeDistribution = quantifier.DeterminativeDistribution,
           $.ComplementKind = PP,
           $.ObliqueNumber = complement.Number,
           $.ObliqueKind = complement.ComplementKind,
@@ -1925,28 +1922,31 @@ DegreeModifiedAdverb: AdverbPhrase -> modifier:Word(Most) AdverbPhrase
     where head.AdjunctPosition = Central
 // *Ignore all but the highest roll* (CGEL 5§11(f):433): count *all*, plural
 // whatever the exception's Number. Only a definite standard; a bare
-// quantity is ComparativeFusedHead's.
-ExceptiveFusedHead: NounPhrase -> quantifier:DeterminerPhrase
-    where quantifier.ComplementKind = PP,
-          quantifier.ObliqueKind = NP,
-          quantifier.ObliqueDetermination = Overt,
-          quantifier.ObliqueDistribution := Dependent,
-          quantifier.Countability := Count,
-          $.Number = quantifier.Number,
+// quantity is ComparativeFusedHead's. A fused quantifier gives the Noun
+// Phrase no DeterminativeDistribution, so it is never a standard under a
+// dependent determinative (ComparativeDeterminedStandard): that is unshared.
+ExceptiveFusedHead: NounPhrase -> DeterminerPhrase { unshared: [DeterminativeDistribution] }
+    where head.ComplementKind = PP,
+          head.ObliqueKind = NP,
+          head.ObliqueDetermination = Overt,
+          head.ObliqueDistribution := Dependent,
+          head.Countability := Count,
           $.Countability = Count,
           $.NounKind = Ordinary,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
 // *By more than {5}*: a bare standard, whose Number the Noun Phrase takes.
-// Scalar *less than* is the adjective's.
-ComparativeFusedHead: NounPhrase -> quantifier:DeterminerPhrase
-    where quantifier.ComplementKind = PP,
-          quantifier.ObliqueKind != AdvP | FiniteClause,
-          quantifier.ObliqueDetermination = Bare,
-          quantifier.Countability != Mass,
-          $.Number = quantifier.ObliqueNumber,
-          $.Countability = quantifier.Countability,
+// Scalar *less than* is the adjective's. DeterminativeDistribution is
+// unshared, as in ExceptiveFusedHead.
+ComparativeFusedHead: NounPhrase -> DeterminerPhrase {
+    unshared: [Number, DeterminativeDistribution],
+}
+    where head.ComplementKind = PP,
+          head.ObliqueKind != AdvP | FiniteClause,
+          head.ObliqueDetermination = Bare,
+          head.Countability != Mass,
+          $.Number = head.ObliqueNumber,
           $.NounKind = Ordinary,
           $.Determination = Overt,
           $.Case = Plain,
@@ -1954,14 +1954,16 @@ ComparativeFusedHead: NounPhrase -> quantifier:DeterminerPhrase
 // *Can't be more than the total number of ...* (CGEL 13§4.5(a):1132): a
 // standard under a dependent determinative. Never a quantified one (*more
 // than two* determines *lands*). Predicative *less than* is the
-// adjective's.
+// adjective's. DeterminativeDistribution is unshared, as in
+// ExceptiveFusedHead.
 ComparativeDeterminedStandard: NounPhrase ->
-    quantifier:Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
+    Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than) {
+    unshared: [Number, DeterminativeDistribution],
+}
     where complement.ComplementKind = NP,
           complement.Determination = Overt,
           complement.DeterminativeDistribution := Dependent,
-          quantifier.Countability != Mass,
-          $.Countability = quantifier.Countability,
+          head.Countability != Mass,
           $.Number = complement.Number,
           $.NounKind = Ordinary,
           $.Determination = Overt,
@@ -2001,11 +2003,12 @@ MeasuredComparativeDetermined: NounPhrase ->
 // Takes the measure's Number (*one more spell*, *one fewer revival
 // counter*).
 MeasuredComparativeDeterminer: DeterminerPhrase ->
-    modifier:DeterminerPhrase quantifier:Class(ComparativeQuantifier)
+    modifier:DeterminerPhrase Class(ComparativeQuantifier) {
+    unshared: [Number, DeterminativeDistribution],
+}
     where modifier.DeterminativeDistribution = Numerical,
           $.Number = modifier.Number,
           $.Countability = Count,
-          quantifier.Countability = $.Countability,
           $.DeterminativeDistribution = Numerical,
           $.ComplementKind = Intransitive
 // *Are each equal to ...*, *power and toughness each equal to ...*.
@@ -2266,10 +2269,10 @@ SuperlativeQuantifierFusedHead: BareNominalComplement -> Class(CountSuperlativeQ
 // none. CGEL's nearest description is the preposition + adjective idiom
 // (*at last*, *in brief*), which for want of *the* it does not analyze as a
 // fused head (7§3.2(c):626).
-SuperlativeFusedHead: BareNominalComplement -> modifier:AdjectivePhrase
-    where modifier.Grade := Superlative,
-          modifier.ComplementKind = Intransitive,
-          modifier.AdjectivePosition != Predicative
+SuperlativeFusedHead: BareNominalComplement -> AdjectivePhrase
+    where head.Grade := Superlative,
+          head.ComplementKind = Intransitive,
+          head.AdjectivePosition != Predicative
 // A bare Noun Phrase is never a coordination of Nominals (BarePlural too):
 // the Noun Phrases coordinate (*creatures and lands*), Nominals only under
 // something shared (*all [creatures and lands]*; ADR §8).
@@ -2475,26 +2478,31 @@ IndependentGenitive: NounPhrase -> Lex(Pronoun) { unshared: [Number, Person, Cas
           $.Case = Plain,
           head.Inflection = IndependentGenitive,
           $.Person = Third
-PossessiveDeterminer: DeterminerPhrase -> possessor:Lex(Pronoun)
+// A genitive pronoun determines either Number (*your creature*, *your
+// creatures*): Number is unshared.
+PossessiveDeterminer: DeterminerPhrase -> Lex(Pronoun) { unshared: [Number] }
     where $.DeterminativeDistribution = Dependent,
           $.ComplementKind = Intransitive,
-          possessor.Case := Genitive,
-          possessor.Inflection = Invariant,
-          possessor.PronounKind != Relative
-GenitivePossessor: NounPhrase -> possessor:Possessor marker:Word(Genitive)
+          head.Case := Genitive,
+          head.Inflection = Invariant,
+          head.PronounKind != Relative
+// The possessor is plain, the genitive Noun Phrase genitive: Case is
+// unshared.
+GenitivePossessor: NounPhrase -> Possessor marker:Word(Genitive) { unshared: [Case] }
     where $.Determination = Bare,
           $.Case = Genitive,
-          possessor.Case := Plain,
-          $.Number = possessor.Number,
-          $.Person = possessor.Person
+          head.Case := Plain
 // A genitive with its head understood (*power less than Mirko's*; CGEL
 // 5§16.3:467–468). A following nominal that can be the head ranks first
-// (*during [its controller's next untap step]*).
-FusedSubjectDeterminerHead: NounPhrase -> possessor:Possessor marker:Word(Genitive)
+// (*during [its controller's next untap step]*). Number is the understood
+// head's (5§16.3:468), and Person and Case are the Noun Phrase's own.
+FusedSubjectDeterminerHead: NounPhrase -> Possessor marker:Word(Genitive) {
+    unshared: [Number, Person, Case],
+}
     where $.NounKind = Ordinary,
           $.Determination = Overt,
           $.Case = Plain,
-          possessor.Case := Plain,
+          head.Case := Plain,
           $.Person = Third
 GenitiveDetermined: NounPhrase -> determiner:NounPhrase Nominal
     where $.Determination = Overt,
