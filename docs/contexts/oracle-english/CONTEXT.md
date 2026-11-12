@@ -67,6 +67,24 @@ steps that are no wrapper (a step such as a conjunct's or a passive
 auxiliary's Complement, kept but not counted), and says when steps above
 were cut.
 
+**Head Line**:
+Of a word in one Derivation: the chain from its leaf up through each mother of
+which it is the head-line child: in a Linked Conjunct, its connective; else
+the `head` child; in a coordination with no `head`, the child that carries the
+coordinator; in any other Production, its only child, a coordinator or marker,
+or else its first child that bears no dependent function. Its top is the
+word's maximal projection.
+
+**Fork**:
+A question about one word of an expression whose answer differs between its
+Derivations: which lexical alternative the word's leaf is, what its maximal
+projection depends on (function, governor's Category and head word), or which
+frame Productions its Head Line has where the other two do not determine
+them. Each option is one answer, with the exact number of Derivations that
+give it; a conditional fork is one some Derivations do not answer.
+_Avoid_: fork for a vertex of the Packed Forest with several alternatives,
+which is where analyses re-merge
+
 **Preference**:
 A ranking over admitted Readings. It orders them and never adds or removes
 one.
