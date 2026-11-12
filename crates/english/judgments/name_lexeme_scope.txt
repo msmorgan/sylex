@@ -45,17 +45,19 @@
 * <card=Garth One-Eye> Choose Black Lotus.
 * <card=Garth One-Eye> Create a copy of Black Lotus.
 * <card=Garth One-Eye> Choose a card name among Disenchant and Black Lotus.
-# a meld result's name is an own name on both cards of its meld pair [CR#712.4], the Complement of *into*; on any other card it is another card's name, which *into* does not admit
-+ <card=Gisela, the Broken Blade> At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares. => NounPhrase "Brisela, Voice of Nightmares" as Complement of into
-+ <card=Graf Rats> At the beginning of combat on your turn, if you both own and control this creature and a creature named Midnight Scavengers, exile them, then meld them into Chittering Host. => NounPhrase "Chittering Host" as Complement of into
-+ <card=Hanweir Battlements> {3}{R}{R}, {T}: If you both own and control this land and a creature named Hanweir Garrison, exile them, then meld them into Hanweir, the Writhing Township. => NounPhrase "Hanweir, the Writhing Township" as Complement of into
-+ <card=Mishra, Claimed by Gix> Whenever you attack, each opponent loses X life and you gain X life, where X is the number of attacking creatures. If Mishra, Claimed by Gix and a creature named Phyrexian Dragon Engine are attacking, and you both own and control them, exile them, then meld them into Mishra, Lost to Phyrexia. It enters tapped and attacking. => NounPhrase "Mishra, Lost to Phyrexia" as Complement of into
-+ <card=Titania, Voice of Gaea> At the beginning of your upkeep, if there are four or more land cards in your graveyard and you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them, then meld them into Titania, Gaea Incarnate. => NounPhrase "Titania, Gaea Incarnate" as Complement of into
-+ <card=Urza, Lord Protector> {7}: If you both own and control Urza, Lord Protector and an artifact named The Mightstone and Weakstone, exile them, then meld them into Urza, Planeswalker. Activate only as a sorcery. => NounPhrase "Urza, Planeswalker" as Complement of into
-+ <card=Vanille, Cheerful l'Cie> At the beginning of your first main phase, if you both own and control Vanille and a creature named Fang, Fearless l'Cie, you may pay {3}{B}{G}. If you do, exile them, then meld them into Ragnarok, Divine Deliverance. => NounPhrase "Ragnarok, Divine Deliverance" as Complement of into
-+ <card=Bruna, the Fading Light> Exile them, then meld them into Brisela, Voice of Nightmares. => NounPhrase "Brisela, Voice of Nightmares" as Complement of into
-* <card=Lightning Bolt> Exile them, then meld them into Brisela, Voice of Nightmares.
-* Exile them, then meld them into Brisela, Voice of Nightmares.
-# a meld result's name is in its Full form alone on its pair's cards: neither card's text shortens it, so *Mishra* and *Titania* are no name there
+# a meld result's name is the name of neither card of its meld pair: on every card it is another card's name, which stands as the Name Complement of *into* after *meld*, as after *named*
++ <card=Gisela, the Broken Blade> At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into
++ <card=Graf Rats> At the beginning of combat on your turn, if you both own and control this creature and a creature named Midnight Scavengers, exile them, then meld them into Chittering Host. => NameComplement "Chittering Host" as Complement of into
++ <card=Hanweir Battlements> {3}{R}{R}, {T}: If you both own and control this land and a creature named Hanweir Garrison, exile them, then meld them into Hanweir, the Writhing Township. => NameComplement "Hanweir, the Writhing Township" as Complement of into
++ <card=Mishra, Claimed by Gix> Whenever you attack, each opponent loses X life and you gain X life, where X is the number of attacking creatures. If Mishra, Claimed by Gix and a creature named Phyrexian Dragon Engine are attacking, and you both own and control them, exile them, then meld them into Mishra, Lost to Phyrexia. It enters tapped and attacking. => NameComplement "Mishra, Lost to Phyrexia" as Complement of into
++ <card=Titania, Voice of Gaea> At the beginning of your upkeep, if there are four or more land cards in your graveyard and you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them, then meld them into Titania, Gaea Incarnate. => NameComplement "Titania, Gaea Incarnate" as Complement of into
++ <card=Urza, Lord Protector> {7}: If you both own and control Urza, Lord Protector and an artifact named The Mightstone and Weakstone, exile them, then meld them into Urza, Planeswalker. Activate only as a sorcery. => NameComplement "Urza, Planeswalker" as Complement of into
++ <card=Vanille, Cheerful l'Cie> At the beginning of your first main phase, if you both own and control Vanille and a creature named Fang, Fearless l'Cie, you may pay {3}{B}{G}. If you do, exile them, then meld them into Ragnarok, Divine Deliverance. => NameComplement "Ragnarok, Divine Deliverance" as Complement of into
++ <card=Bruna, the Fading Light> Exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into
+# from: Gisela, the Broken Blade
++ Exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into
+# off that position a meld result's name stays unread on its pair's cards, after *into* under another verb or as a Subject, and neither card's text shortens it, so *Mishra* and *Titania* are no names there
+* <card=Gisela, the Broken Blade> Put them into Brisela, Voice of Nightmares.
+* <card=Gisela, the Broken Blade> Brisela, Voice of Nightmares deals 3 damage to any target.
 * <card=Phyrexian Dragon Engine> Mishra deals 3 damage to any target.
 * <card=Argoth, Sanctum of Nature> When Titania enters, draw a card.

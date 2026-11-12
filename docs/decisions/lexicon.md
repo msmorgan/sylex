@@ -142,12 +142,11 @@ term are a second tree of its analysis ([English](english.md) §8).
 
 **Names are scoped.** A card's own name, full or Shortened, is its own only in
 the text of its own face [CR#201.5,201.5c,712.6c..712.6e], and everywhere in
-that text. The name of a meld result is also own on both cards of its meld
-pair, since each carries half of its face on its back [CR#713.1], as the card
-data records for each: the text of the card with the meld ability melds the
-pair into it by name [CR#713.1a], and its partner's text never names it. Only
-its Full form is in scope there: it is the name of neither card, so neither
-card's text shortens it, and *Mishra* on Phyrexian Dragon Engine is no name. A
+that text. A face's Card Scope is its own name and nothing else: it is computed
+from the name alone, so a text parsed as if its card had a given name needs
+nothing but that name. The name of a meld result is the name of neither card of
+its meld pair, so it is another card's name on both, and neither card's text
+shortens it: *Mishra* on Phyrexian Dragon Engine is no name. A
 card has a Shortened Name only where its own text uses one, and never one that
 other vocabulary in scope on that card already spells: a token name or
 Introduced Name always, any other word unless it is the name before the comma
@@ -175,20 +174,24 @@ Number of what it names, which only its text shows, so its Lexeme is unmarked
 for Number (§2). Why: a declared Number is knowledge of the cards before
 parsing them.
 
-**Another card's name stands only after *named*, *Partner with* or *from
-among*.** A card's full name is spelled on every face, and off its own card it
+**Another card's name stands only after *named*, *Partner with*, *from
+among* or *meld ... into*.** A card's full name is spelled on every face, and off its own card it
 is another card's name, which a position admits only by opting in: no leaf
 symbol of the grammar admits it but `OtherCardName()`, which admits nothing
-else. Three positions opt in, as a `NameComplement`, alone or coordinated: the
+else. Four positions opt in, as a `NameComplement`, alone or coordinated: the
 predicative complement of *named* (*cards named Relentless Rats*); the Keyword
 Parameter of *Partner with*, whose name is the one its ability searches for as
-*a card named [name]* [CR#702.124j]; and the complement of *among* after
+*a card named [name]* [CR#702.124j]; the complement of *among* after
 *from*, wherever that phrase attaches, as in the options of a choice (*choose a
-card name ... from among Disenchant, ..., and Black Lotus*). *From* selects
+card name ... from among Disenchant, ..., and Black Lotus*); and the complement
+of *into* after *meld*, in the ability of a meld pair that melds it
+[CR#713.1a] (*meld them into Brisela, Voice of Nightmares*). *From* selects
 that *among* phrase by its Complement's kind and *among* takes a name only so
 selected, as *do the same for* selects *for* with a cited word
 (`PPWith(["for"], Mention)`): a name after *among* under any other head
-(*divide it among Black Lotus*) is refused. Any other position, a Subject,
+(*divide it among Black Lotus*) is refused. *Meld* selects its *into* phrase
+the same way, and *into* takes a name under no other head (*put it into Black
+Lotus*). Any other position, a Subject,
 Object, possessor or premodifier among them, refuses another card's name with
 no clause of its own. A name a card gives an object, or a vote option, spelled
 like another card's name is listed as that card's Introduced Name or vote

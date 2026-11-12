@@ -262,26 +262,25 @@ it shortens.
 
 **Card Scope**:
 The card names a text is in the scope of, each with the forms of it that the
-text admits. A face's text holds its own names in every form [CR#201.5c]; a
-Card Scope may hold a name in its Full form alone. A Shortened form stands only
+text admits. A face's text holds its own name in every form [CR#201.5c], and a
+face's Card Scope is computed from that name alone. A Shortened form stands only
 where its Card Scope holds that form, and an Introduced Name or Anchor Word
 only where it holds one of its cards.
 
 **Own Name**:
-A card's name, full or Shortened, in the text of its own face [CR#201.5], and
-the full name of a meld result, never its Shortened Name, in the text of either
-card of its meld pair, each of which carries half of the result's face
-[CR#713.1]. The grammar reads it as any other Proper Name.
+A card's name, full or Shortened, in the text of its own face [CR#201.5]. The
+grammar reads it as any other Proper Name.
 
 **Another Card's Name**:
 A card's full name in the text of a face where it is no Own Name: any face but
-its own, except that a meld result's full name is own on both cards of its
-meld pair. Only a position that opts in admits it, through the grammar's
+its own. Only a position that opts in admits it, through the grammar's
 `OtherCardName()` symbol: the predicative complement of *named* (*cards named
-Relentless Rats*), the Keyword Parameter of *Partner with* [CR#702.124j], and
-the complement of *among* after *from*, wherever that phrase attaches, as in
-the options of a choice (*choose a card name ... from among Disenchant, ...,
-and Black Lotus*).
+Relentless Rats*), the Keyword Parameter of *Partner with* [CR#702.124j], the
+complement of *among* after *from*, wherever that phrase attaches, as in the
+options of a choice (*choose a card name ... from among Disenchant, ..., and
+Black Lotus*), and the complement of *into* after *meld*, in the ability of a
+meld pair that melds it [CR#713.1a] (*meld them into Brisela, Voice of
+Nightmares*): a meld result's name is the name of neither card of its pair.
 
 **Introduced Name**:
 A name a card's own text gives an object that is not a card, such as the name

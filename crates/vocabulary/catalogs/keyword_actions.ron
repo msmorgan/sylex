@@ -130,7 +130,10 @@
         (lemma: "support", frames: [Amount]),
     ]),
     (rule: "[CR#701.42]", name: "Meld", verbs: [
-        (lemma: "meld", frames: [TransitiveWithPP(["into"])]),
+        // The meld result's name is the name of neither card of the pair:
+        // another card's name, cited after *into* (*meld them into Brisela,
+        // Voice of Nightmares*).
+        (lemma: "meld", frames: [TransitiveWithComplement(PPWith(["into"], Name))]),
     ]),
     (rule: "[CR#701.43]", name: "Exert", verbs: [
         (lemma: "exert", frames: [Monotransitive]),

@@ -172,7 +172,12 @@
         (complement: Intransitive, hosts: Predicate),
         (complement: PP(["of"]), hosts: Predicate),
     ]),
-    (lemma: "into", frames: [(complement: NP, hosts: ComplementOnly)]),
+    (lemma: "into", frames: [
+        (complement: NP, hosts: ComplementOnly),
+        // A name cited as a name, where another card's name stands, only as
+        // *meld*'s Complement (*meld them into Brisela, Voice of Nightmares*).
+        (complement: Name, hosts: ComplementOnly, named_only: true),
+    ]),
     // *5 minus X damage*
     (lemma: "minus", frames: [(complement: Amount, hosts: ComplementOnly), (complement: NP, hosts: ComplementOnly)]),
     // Temporal intransitive preposition (CGEL p. 615): *Those creatures are now
