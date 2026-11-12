@@ -15,11 +15,15 @@ Verb Phrase, so no adjunct, coordination of values or other auxiliary reaches th
 one borrows `class StrandableModal`, and the value is `Class(Subtype)` rather than the `Mention`
 Category for a word cited rather than used.
 
-## Open questions
+## Design
 
-- Route the value through the copula's Predicative as a `Mention`, find what keeps that from
-  adding a Reading to every *is red*, or keep the two Productions with a comment that names
-  Artificial Evolution?
+- `SpecifyingClause` and `SpecifyingModalClause` stay, for Artificial Evolution.
+- The value is not a `Mention` Predicative of the copula: that gives every bare color word,
+  *day*/*night* and plural-syncretic subtype after a copula a cited-word twin (*All Mountains are
+  Plains*, Conversion).
+- *Type*'s `Variable` flag stays, with comments that say it exists for Artificial Evolution:
+  without it the Productions also read *All Mountains are Plains* (Conversion) and *Urza's
+  Power-Plant* (Urza's Tower) as specifying clauses.
 
 ## Done when
 
