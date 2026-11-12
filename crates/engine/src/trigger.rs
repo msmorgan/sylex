@@ -3910,7 +3910,6 @@ mod tests {
             duration: Duration::FixedUntil(TurnMarker::EndOfTurn),
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         assert_eq!(
             state.layers().power(delver),
@@ -5566,7 +5565,6 @@ mod tests {
             duration: sylex_core::Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
 
         let facts = destroy_all(&mut state, &[animated]);
@@ -5615,7 +5613,6 @@ mod tests {
             duration: sylex_core::Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         assert_eq!(
             state.objects.obj(bear).controller,

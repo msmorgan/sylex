@@ -184,7 +184,6 @@ fn steal_for(
         duration,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     timestamp
 }

@@ -681,7 +681,6 @@ impl GameState {
                                 rows: vec![],
                                 duration,
                                 origin,
-                                is_cda: false,
                             });
                         }
                     }
@@ -840,7 +839,6 @@ impl GameState {
                     rows,
                     duration: e.duration.clone(),
                     origin,
-                    is_cda: false,
                 });
             }
             // The LIST spelling of `Continuously` ([CR#611.2c] — a single
@@ -2869,7 +2867,6 @@ mod tests {
             rows: vec![],
             duration: sylex_core::Duration::EndOfGame,
             origin: None,
-            is_cda: false,
         });
         timestamp
     }
@@ -3643,7 +3640,6 @@ mod tests {
             rows: vec![],
             duration: Duration::ForAsLongAs(cond),
             origin: Some(Box::new(origin)),
-            is_cda: false,
         });
         state.sweep_condition_durations();
         assert!(
@@ -3792,7 +3788,6 @@ mod tests {
                 rows: vec![],
                 duration: Duration::FixedUntil(TurnMarker::EndOfCombat),
                 origin: None,
-                is_cda: false,
             });
         };
         mint(&mut state);
@@ -3826,7 +3821,6 @@ mod tests {
             rows: vec![],
             duration: Duration::FixedUntil(TurnMarker::YourNextTurn),
             origin: None,
-            is_cda: false,
         });
         state.expire_your_next_turn(PlayerId(1));
         assert_eq!(state.continuous.len(), 1, "survives the opponent's turn");
@@ -3864,7 +3858,6 @@ mod tests {
             rows: vec![],
             duration: Duration::UntilEvent(filter),
             origin: Some(Box::new(origin)),
-            is_cda: false,
         });
         // A non-matching fact (a life gain) leaves it in place.
         state.sweep_event_durations(&crate::event::Occurrence::single(GameEvent::LifeGained(
@@ -5648,7 +5641,6 @@ mod tests {
             ce.changes,
             vec![Modification::Power(NumericOp::Up(Count::Literal(1)))]
         );
-        assert!(!ce.is_cda);
     }
 
     /// [CR#601.2d,120.3]: dividing damage among a MIXED group — a creature AND a

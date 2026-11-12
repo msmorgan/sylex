@@ -1435,7 +1435,6 @@ mod tests {
             duration: sylex_core::Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         assert_eq!(state.eval_count(&power, &frame), 3);
     }

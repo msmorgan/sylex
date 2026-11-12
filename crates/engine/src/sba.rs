@@ -1414,7 +1414,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
     }
 

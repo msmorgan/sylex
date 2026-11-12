@@ -188,7 +188,6 @@ fn one_shot_pump_expires_at_cleanup() {
         duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     assert_eq!(state.layers().power(bear), Some(5), "2/2 +3/+3 → 5");
 
@@ -224,7 +223,6 @@ fn negative_modify_lowers_power_and_toughness() {
         duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
 
     let view = state.layers();
@@ -568,7 +566,6 @@ fn layer_added_subtype_confers_its_keyword() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
 
     assert!(
@@ -678,7 +675,6 @@ fn losing_creature_type_removes_the_combatant_role() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
 
     let view = state.layers();
@@ -755,7 +751,6 @@ fn gain_control_changes_derived_controller() {
         duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     assert_eq!(
         state.layers().controller(bear),
@@ -787,7 +782,6 @@ fn gained_control_reverts_when_effect_expires() {
         duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     assert_eq!(state.layers().controller(bear), PlayerId(1), "stolen");
 
@@ -832,7 +826,6 @@ fn dependency_orders_dependent_effect_after_its_dependency() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     // B (EARLIER timestamp): enchantments are also artifacts. Depends on A.
     state.continuous.push(ContinuousEffect {
@@ -847,7 +840,6 @@ fn dependency_orders_dependent_effect_after_its_dependency() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
 
     let view = state.layers();
@@ -887,7 +879,6 @@ fn independent_effects_keep_timestamp_order() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     state.continuous.push(ContinuousEffect {
         timestamp: Timestamp(2_000),
@@ -899,7 +890,6 @@ fn independent_effects_keep_timestamp_order() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
 
     let view = state.layers();
@@ -943,7 +933,6 @@ fn dependency_loop_falls_back_to_timestamp() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     // B (later): enchantments are also creatures. Mutually dependent with A.
     state.continuous.push(ContinuousEffect {
@@ -958,7 +947,6 @@ fn dependency_loop_falls_back_to_timestamp() {
         duration: Duration::EndOfGame,
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
 
     // Must terminate (no hang) and resolve in timestamp order.
@@ -2112,7 +2100,6 @@ fn tarmogoyf_hit_by_turn_to_frog_is_1_1() {
         duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     let view = state.layers();
     assert!(
@@ -2273,7 +2260,6 @@ fn myth_realized_gained_definition_is_not_characteristic_defining() {
         duration: Duration::FixedUntil(sylex_core::TurnMarker::EndOfTurn),
         rows: vec![],
         origin: None,
-        is_cda: false,
     });
     let view = state.layers();
     assert_eq!((view.power(myth), view.toughness(myth)), (Some(3), Some(3)));

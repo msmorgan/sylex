@@ -1218,7 +1218,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
 
         // The derived view says Creature...
@@ -1388,7 +1387,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         assert!(matches(&state, bear, &cf(CF::Multicolored)));
     }
@@ -1496,7 +1494,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         assert!(matches_with(&state, candidate, &skulk_filter, watcher));
     }
@@ -2510,7 +2507,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         let watcher = Some(state.objects.obj(bear).source);
         let p0 = state.player(PlayerId(0)).object;

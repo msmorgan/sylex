@@ -1647,7 +1647,6 @@ mod tests {
             duration: sylex_core::Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         let sacrifice_this = [Action::Sacrifice(
             Reference::Reg(sylex_core::RefId(1)),

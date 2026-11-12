@@ -91,7 +91,6 @@ pub struct ContinuousEffect {
     /// `EndOfGame` duration, whose sweep needs no such context. Boxed so the
     /// common `None` case keeps `ContinuousEffect` small.
     pub origin: Option<Box<crate::stack::ExecutionFrame>>,
-    pub is_cda: bool,
 }
 
 /// An object's derived characteristics ([CR#109.3]): the strict set the rules
@@ -940,7 +939,9 @@ fn gather(
             origin: EffectOrigin::Resolved { index },
             acquired: false,
             timestamp: ce.timestamp,
-            is_cda: ce.is_cda,
+            // A characteristic-defining ability is a static ability
+            // [CR#604.3]; a resolved effect is never one.
+            is_cda: false,
             conditions: Vec::new(),
             controller: ce.controller,
             scope: ce.scope.clone(),
@@ -3067,7 +3068,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
     }
 
@@ -3327,7 +3327,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
         assert!(
             derived_has_static(&state, id),
@@ -3808,7 +3807,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
 
         let view = state.layers();
@@ -4116,7 +4114,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
     }
 

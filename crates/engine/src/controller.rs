@@ -83,7 +83,6 @@ impl GameState {
             rows: vec![],
             duration: Duration::EndOfGame,
             origin: None,
-            is_cda: false,
         });
         self.observe_control_changes();
         let after = self.controller_of(object);
@@ -205,7 +204,6 @@ mod tests {
             duration: Duration::EndOfGame,
             rows: vec![],
             origin: None,
-            is_cda: false,
         });
     }
 
