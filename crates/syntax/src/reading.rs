@@ -1470,9 +1470,8 @@ impl CompiledGrammar {
                 let text = lexicon.realize(value).map_err(|_| AdmissionError::Leaf)?;
                 let binding = match value {
                     LexicalReading::Word(v) => self
-                        .lexemes
-                        .get(&v.lexeme)
-                        .map_or(Binding::Free, |f| f.binding),
+                        .lexeme(&v.lexeme)
+                        .map_or(Binding::Free, |l| self.facts(l).binding),
                     _ => Binding::Free,
                 };
                 out.push((text, binding, AtomKind::Word));

@@ -18,6 +18,7 @@ pub mod fug;
 pub mod grammar;
 mod hash;
 mod laws;
+mod lexeme;
 mod normal_form;
 mod prediction;
 mod reading;

@@ -359,7 +359,7 @@ impl CompiledGrammar {
         let Some(Reading::Leaf(LexicalReading::Word(preposition))) = phrase.children.first() else {
             return None;
         };
-        let facts = self.lexemes.get(&head.lexeme)?;
+        let facts = self.facts(self.lexeme(&head.lexeme)?);
         for &candidate in &facts.frames {
             let longer = &self.frames[candidate];
             if longer.slots.len() == frame.slots.len() + 1

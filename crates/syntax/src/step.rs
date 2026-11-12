@@ -1,11 +1,11 @@
 //! Productions as compiled, and the one step function shared by the chart
 //! and by Admission: adding a child to a partial Production.
 
+use crate::lexeme::Lexeme;
 use dpsi::Ident;
 use serde::Deserialize;
 use serde::Serialize;
 use sylex_lexicon::Category as LexicalCategory;
-use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::WordForm;
 
@@ -56,16 +56,16 @@ impl FeatureValue {
 pub(crate) enum Extension {
     /// A Preposition Phrase headed by the preposition, with a Complement of
     /// the kind where the slot names one.
-    Preposition(LexemeId, Option<SlotKind>),
+    Preposition(Lexeme, Option<SlotKind>),
     Slot(SlotKind),
-    Predicative(LexemeId),
+    Predicative(Lexeme),
 }
 
 impl Extension {
     /// Whether a frame selecting `self` selects `phrase`, an adjunct's or a
     /// following phrase's extension: a Preposition Phrase slot that names no
     /// Complement kind selects its preposition with any Complement.
-    pub(crate) fn selects(&self, phrase: &Self) -> bool {
+    pub(crate) fn selects(self, phrase: Self) -> bool {
         match (self, phrase) {
             (Self::Preposition(p, None), Self::Preposition(q, _)) => p == q,
             (Self::Preposition(p, Some(k)), Self::Preposition(q, Some(j))) => p == q && k == j,
@@ -152,9 +152,9 @@ pub(crate) enum Test {
     /// to active voice: an Active-only verb has no passive participle.
     FreeNotActiveOnly(LexicalCategory),
     Numeral(sylex_lexicon::Numeral),
-    Word(LexemeId),
+    Word(Lexeme),
     Class(usize),
-    Words(std::collections::BTreeSet<LexemeId>),
+    Words(std::collections::BTreeSet<Lexeme>),
     /// A lexeme that declares this Subcategorization Frame.
     Frame(usize),
     /// A free (unbound) lexeme that declares this Subcategorization Frame.
@@ -180,7 +180,7 @@ pub(crate) enum Symbol {
         binding: Option<sylex_lexicon::Binding>,
         /// A selected `PP` slot: the phrase's preposition must be one of
         /// these, and its Complement of the kind where one is named.
-        prepositions: Option<(Vec<LexemeId>, Option<SlotKind>)>,
+        prepositions: Option<(Vec<Lexeme>, Option<SlotKind>)>,
         /// An unselected adjunct: a phrase with a preposition must admit this
         /// host.
         host: Option<HostKind>,
@@ -266,7 +266,7 @@ pub(crate) struct Production {
     pub head_line: Vec<bool>,
     /// The `unextended` child, and the prepositions of a Preposition Phrase
     /// it may not end in (`ProductionDecl::unextended`).
-    pub unextended: Option<(usize, std::collections::BTreeSet<LexemeId>)>,
+    pub unextended: Option<(usize, std::collections::BTreeSet<Lexeme>)>,
     /// The `unadjoined` child, and the Categories of a trailing Adjunct it
     /// may not end in (`ProductionDecl::unadjoined`).
     pub unadjoined: Option<(usize, Vec<u16>)>,
@@ -305,7 +305,7 @@ pub(crate) struct Production {
     pub distinct_coordinator: Vec<usize>,
     pub requires_coordination: Option<usize>,
     /// The coordinator a correlative coordination's serial tail must end with.
-    pub paired_coordinator: Option<LexemeId>,
+    pub paired_coordinator: Option<Lexeme>,
     /// Children that may not be a coordination.
     pub uncoordinated: Vec<usize>,
     /// Children that must be a coordination.
@@ -327,12 +327,12 @@ pub(crate) struct Production {
     /// A polysyndetic tail child that must repeat the mother's coordinator.
     pub chained: Option<usize>,
     /// The preposition of the Preposition Phrase Complement it extracts.
-    pub gap_preposition: Option<LexemeId>,
+    pub gap_preposition: Option<Lexeme>,
     /// The shared child of Right Node Raising, which must be headed by the
     /// preposition of the Gap it fills.
     pub fills_preposition: Option<usize>,
     /// Coordinators a plain serial coordination's tail may not end with.
-    pub foreign_coordinators: Vec<LexemeId>,
+    pub foreign_coordinators: Vec<Lexeme>,
     /// The conjuncts of an unlike coordination, which may not all share a
     /// feature value. Its Summary gathers their values
     /// (`Summary::unlike_values`); the whole requires two or more.
@@ -407,7 +407,7 @@ pub(crate) struct LinkedCoordination(pub u16);
 /// the Linked Coordination, which has no Coordinator, standing for one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub(crate) enum CoordinatorId {
-    Lexeme(LexemeId),
+    Lexeme(Lexeme),
     Linked(LinkedCoordination),
 }
 
@@ -415,7 +415,7 @@ pub(crate) enum CoordinatorId {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub(crate) enum Elided {
     /// This lexeme, as a keyword elided from its parameters.
-    Lexeme(LexemeId),
+    Lexeme(Lexeme),
     /// The head of this frame, as a verb elided from its Complements: any
     /// lexeme that declares the frame (`grammar::SchemaDecl::Valence`
     /// `remnants`).
@@ -429,17 +429,14 @@ pub(crate) enum Elided {
 impl Elided {
     /// Whether `head`, the lexical head shared by an initial conjunct
     /// (`Summary::shared_head`), is the head this remnant elides.
-    fn recovered_by(self, grammar: &CompiledGrammar, head: LexemeId) -> bool {
+    fn recovered_by(self, grammar: &CompiledGrammar, head: Lexeme) -> bool {
         match self {
             Self::Lexeme(elided) => elided == head,
-            Self::Frame(frame) => grammar
-                .lexemes
-                .get(&head)
-                .is_some_and(|facts| facts.frames.contains(&usize::from(frame))),
+            Self::Frame(frame) => grammar.facts(head).frames.contains(&usize::from(frame)),
             Self::PrepositionFrame(frame) => grammar
-                .lexemes
-                .get(&head)
-                .is_some_and(|facts| facts.preposition_frames.contains(&usize::from(frame))),
+                .facts(head)
+                .preposition_frames
+                .contains(&usize::from(frame)),
         }
     }
 }
@@ -727,7 +724,7 @@ pub(crate) struct Summary {
     /// child it comes from. Right Node Raising shares only such a Gap.
     pub gap_right_edge: bool,
     /// The preposition of an extracted Preposition Phrase Complement.
-    pub gap_preposition: Option<LexemeId>,
+    pub gap_preposition: Option<Lexeme>,
     /// Its lexical leaves, counted to two.
     pub leaves: u8,
     /// It ends in its head (through conjuncts of a coordination), not in a
@@ -736,7 +733,7 @@ pub(crate) struct Summary {
     pub head_final: bool,
     /// The preposition of the Preposition Phrase dependent it ends in, through
     /// its head line, when that preposition closes some `unextended` child.
-    pub final_preposition: Option<LexemeId>,
+    pub final_preposition: Option<Lexeme>,
     /// The Category of the trailing Adjunct it ends in, through its edge line
     /// (`Production::edge_line`), when that Category closes some
     /// `unadjoined` child.
@@ -764,10 +761,10 @@ pub(crate) struct Summary {
     /// a Complement (*the type and amount of mana*), but of no other host.
     pub unlike_omissions: bool,
     /// The preposition and complement frame heading a Preposition Phrase.
-    pub preposition: Option<(LexemeId, usize)>,
+    pub preposition: Option<(Lexeme, usize)>,
     /// A coordination's second preposition (*into your hand or onto the
     /// battlefield*).
-    pub other_preposition: Option<LexemeId>,
+    pub other_preposition: Option<Lexeme>,
     /// A serial tail's last conjunct's value of each resolved feature.
     pub last_resolved: [FeatureValue; MAX_RESOLUTIONS],
     /// An unlike coordination's or serial tail's conjuncts' values of the
@@ -877,11 +874,11 @@ pub(crate) struct Summary {
     pub remnant: Option<Elided>,
     /// The lexical head of a phrase a later Cluster's remnant may elide,
     /// through its head line (`RemnantRole::SharesHead`).
-    pub shared_head: Option<LexemeId>,
+    pub shared_head: Option<Lexeme>,
     /// The preposition of an Adjunct Cluster's last Preposition Phrase, or
     /// the one every Cluster of a parallel coordination shares
     /// (`grammar::AdjunctClustersDecl`).
-    pub cluster_preposition: Option<LexemeId>,
+    pub cluster_preposition: Option<Lexeme>,
 }
 
 /// The bare Complement Clusters a phrase is or holds, of a single Slot and no
@@ -963,7 +960,7 @@ pub(crate) struct LeafFacts {
     pub binding: sylex_lexicon::Binding,
     pub integer: Option<i32>,
     pub notation: Option<sylex_lexicon::Numeral>,
-    pub lexeme: Option<LexemeId>,
+    pub lexeme: Option<Lexeme>,
     pub category: LexicalCategory,
     /// Feature values by feature id.
     pub features: [Option<u16>; MAX_FEATURES],
@@ -997,7 +994,7 @@ pub(crate) struct State {
     gap: Option<Gap>,
     gap_right_edge: bool,
     shared_gap_right_edge: bool,
-    gap_preposition: Option<LexemeId>,
+    gap_preposition: Option<Lexeme>,
     /// A conjunct has been taken into the coordination.
     conjoined: bool,
     /// Lexical leaves so far, counted to two.
@@ -1007,7 +1004,7 @@ pub(crate) struct State {
     pub head_final: bool,
     /// The preposition of the Preposition Phrase dependent the last child
     /// so far ends in (`Summary::final_preposition`).
-    final_preposition: Option<LexemeId>,
+    final_preposition: Option<Lexeme>,
     /// The trailing Adjunct the last child so far ends in
     /// (`Summary::final_adjunct`).
     final_adjunct: Option<u16>,
@@ -1026,7 +1023,7 @@ pub(crate) struct State {
     conjunct_omitted: Option<u16>,
     /// Some conjunct so far omits other Complements than the first.
     unlike_omissions: bool,
-    preposition: Option<(LexemeId, usize)>,
+    preposition: Option<(Lexeme, usize)>,
     extensions: u16,
     coordinator: Option<CoordinatorId>,
     /// The head of a post-adjunct host's Production is a coordination
@@ -1037,7 +1034,7 @@ pub(crate) struct State {
     /// The head child's `Summary::whole_coordination`.
     only_head_coordination: bool,
     conjunct_coordinators: [Option<CoordinatorId>; MAX_DISTINCT_COORDINATORS],
-    other_preposition: Option<LexemeId>,
+    other_preposition: Option<Lexeme>,
     /// The conjuncts of a coordination have more than two prepositions, or
     /// one has none.
     mixed_prepositions: bool,
@@ -1082,19 +1079,19 @@ pub(crate) struct State {
     bare: Bare,
     /// The lexeme of the lexical `head` child of a Production that requires
     /// a coordination of Complement Clusters (`Production::clusters`).
-    head_lexeme: Option<LexemeId>,
+    head_lexeme: Option<Lexeme>,
     /// The head elided from the remnant it is or begins with
     /// (`Summary::remnant`).
     remnant: Option<Elided>,
     /// `Summary::shared_head` so far.
-    shared_head: Option<LexemeId>,
+    shared_head: Option<Lexeme>,
     /// `Summary::cluster_preposition` so far.
-    cluster_preposition: Option<LexemeId>,
+    cluster_preposition: Option<Lexeme>,
     /// A coordination's initial conjunct has been taken (`remnant_anchor`).
     remnant_seen: bool,
     /// The `Summary::shared_head` of a coordination's initial conjunct that
     /// is no remnant (`Summary::remnant`).
-    remnant_anchor: Option<LexemeId>,
+    remnant_anchor: Option<Lexeme>,
 }
 
 impl Production {
@@ -1369,10 +1366,7 @@ impl Production {
         if let Some((at, frame)) = self.clusters
             && at == position
         {
-            let declared = next
-                .head_lexeme
-                .and_then(|head| grammar.lexemes.get(&head))
-                .map(|facts| &facts.frames)?;
+            let declared = next.head_lexeme.map(|head| &grammar.facts(head).frames)?;
             if cluster != frame + 1
                 || !bare.licensed()
                 || (other != 0
@@ -1526,7 +1520,7 @@ impl Production {
                             (Extension::Preposition(p, _), Extension::Preposition(q, None)) => {
                                 p == q
                             }
-                            _ => selected.selects(&phrase),
+                            _ => selected.selects(phrase),
                         })
                     }) {
                         return None;
@@ -2116,7 +2110,7 @@ impl Production {
             && grammar
                 .extension_set(state.host_extensions)
                 .iter()
-                .any(|selected| selected.selects(e))
+                .any(|selected| selected.selects(*e))
         {
             return None;
         }
@@ -2281,7 +2275,7 @@ impl CompiledGrammar {
 
     /// Whether a lexical leaf satisfies a test.
     pub(crate) fn leaf_matches(&self, test: &Test, leaf: &LeafFacts) -> bool {
-        let facts = leaf.lexeme.as_ref().and_then(|l| self.lexemes.get(l));
+        let facts = leaf.lexeme.map(|l| self.facts(l));
         self.leaf_matches_with_facts(test, leaf, facts)
     }
 
@@ -2316,20 +2310,18 @@ impl CompiledGrammar {
                     })
             }
             Test::Numeral(notation) => leaf.notation == Some(*notation),
-            Test::Word(id) => leaf.lexeme.as_ref() == Some(id),
+            Test::Word(id) => leaf.lexeme == Some(*id),
             Test::Words(words) => leaf.lexeme.is_some_and(|id| words.contains(&id)),
             Test::Class(class) => leaf
                 .lexeme
-                .as_ref()
-                .is_some_and(|l| self.classes[*class].contains(l)),
+                .is_some_and(|l| self.classes[*class].contains(&l)),
             Test::Frame(frame) => facts.is_some_and(|f| f.frames.contains(frame)),
             Test::FreeFrame(frame) => facts.is_some_and(|f| {
                 f.frames.contains(frame) && f.binding == sylex_lexicon::Binding::Free
             }),
             Test::ClassFrame { class, frame, free } => {
                 leaf.lexeme
-                    .as_ref()
-                    .is_some_and(|l| self.classes[*class].contains(l))
+                    .is_some_and(|l| self.classes[*class].contains(&l))
                     && facts.is_some_and(|f| {
                         f.frames.contains(frame)
                             && (!free || f.binding == sylex_lexicon::Binding::Free)
@@ -2345,7 +2337,7 @@ impl CompiledGrammar {
     /// lexicon licenses.
     pub(crate) fn leaf_edges(&self, reading: &LexicalReading) -> Option<sylex_lexicon::Edges> {
         match reading {
-            LexicalReading::Word(value) => self.edges.get(value).copied(),
+            LexicalReading::Word(value) => self.value_facts(value).map(|v| v.edges),
             LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
                 sylex_lexicon::Edges::non_word(reading)
             }
@@ -2361,7 +2353,8 @@ impl CompiledGrammar {
     ) -> Option<LeafFacts> {
         match reading {
             LexicalReading::Word(value) => {
-                let facts = self.lexemes.get(&value.lexeme)?;
+                let lexeme = self.lexeme(&value.lexeme)?;
+                let facts = self.facts(lexeme);
                 let f = &value.features;
                 let verb_form = match value.form {
                     WordForm::Plain => Some("Plain"),
@@ -2403,15 +2396,11 @@ impl CompiledGrammar {
                     binding: facts.binding,
                     integer: None,
                     notation: None,
-                    lexeme: Some(value.lexeme),
+                    lexeme: Some(lexeme),
                     category: facts.category,
                     features,
-                    forms: self
-                        .homograph_forms
-                        .get(value)
-                        .copied()
-                        .unwrap_or_else(|| form_bit(value.form)),
-                    other_card_name: self.card_names.contains(&value.lexeme)
+                    forms: self.value_facts(value)?.forms,
+                    other_card_name: facts.card_name
                         && !value
                             .features
                             .name

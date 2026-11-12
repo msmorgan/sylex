@@ -1,9 +1,6 @@
 //! Left-corner terminal sets, compiled once and tested once per chart position.
 
-use std::collections::BTreeMap;
-
 use sylex_lexicon::Category;
-use sylex_lexicon::LexemeId;
 
 use crate::compile::CompiledGrammar;
 use crate::compile::LexemeFacts;
@@ -21,7 +18,8 @@ enum Terminal {
 #[derive(Debug, Default)]
 pub(crate) struct Prediction {
     terminals: Vec<Terminal>,
-    lexemes: BTreeMap<LexemeId, Vec<u64>>,
+    /// Each declared Lexeme's terminals, by `Lexeme::index`.
+    lexemes: Vec<Vec<u64>>,
     categories: Vec<Vec<u64>>,
     productions: Vec<Vec<u64>>,
 }
@@ -101,9 +99,9 @@ impl Prediction {
             terminals,
             categories,
             productions,
-            lexemes: BTreeMap::new(),
+            lexemes: Vec::with_capacity(grammar.lexemes.len()),
         };
-        for (&id, facts) in &grammar.lexemes {
+        for (id, facts) in grammar.declared_lexemes() {
             let leaf = LeafFacts {
                 binding: facts.binding,
                 integer: None,
@@ -118,14 +116,14 @@ impl Prediction {
             prediction.add_tests(grammar, &leaf, Some(facts), &mut mask);
             // A card name is the face's own or another card's by the face's
             // scope, so it predicts the terminals of both.
-            if grammar.card_names.contains(&id) {
+            if facts.card_name {
                 let other = LeafFacts {
                     other_card_name: true,
                     ..leaf
                 };
                 prediction.add_tests(grammar, &other, Some(facts), &mut mask);
             }
-            prediction.lexemes.insert(id, mask);
+            prediction.lexemes.push(mask);
         }
         prediction
     }
@@ -152,7 +150,7 @@ impl Prediction {
 
     pub(crate) fn add_leaf(&self, grammar: &CompiledGrammar, leaf: &LeafFacts, active: &mut [u64]) {
         if let Some(id) = leaf.lexeme {
-            for (word, mask) in active.iter_mut().zip(&self.lexemes[&id]) {
+            for (word, mask) in active.iter_mut().zip(&self.lexemes[id.index()]) {
                 *word |= mask;
             }
         } else {

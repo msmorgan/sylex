@@ -229,9 +229,8 @@ impl Parse<'_> {
         Ok(match &leaf.reading {
             LexicalReading::Word(v) => self
                 .grammar
-                .lexemes
-                .get(&v.lexeme)
-                .map_or(Binding::Free, |f| f.binding),
+                .lexeme(&v.lexeme)
+                .map_or(Binding::Free, |l| self.grammar.facts(l).binding),
             _ => Binding::Free,
         })
     }

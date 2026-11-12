@@ -249,7 +249,9 @@ impl<'g> Parse<'g> {
             .summary
             .coordinator
             .map(|coordinator| match coordinator {
-                CoordinatorId::Lexeme(lexeme) => Coordinator::Lexeme(lexeme),
+                CoordinatorId::Lexeme(lexeme) => {
+                    Coordinator::Lexeme(self.grammar.lexeme_id(lexeme))
+                }
                 CoordinatorId::Linked(LinkedCoordination(tail)) => {
                     Coordinator::Linked(self.grammar.categories[usize::from(tail)])
                 }
@@ -477,7 +479,8 @@ impl CompiledGrammar {
             analyzed.matches.iter().any(|p| {
                 p.start == start
                     && matches!(&p.reading, LexicalReading::Word(w)
-                    if self.lexemes.get(&w.lexeme).is_some_and(|f| {
+                    if self.lexeme(&w.lexeme).is_some_and(|l| {
+                        let f = self.facts(l);
                         f.category == sylex_lexicon::Category::Preposition
                     }))
             })
@@ -487,7 +490,7 @@ impl CompiledGrammar {
             .iter()
             .filter_map(|m| {
                 let LexicalReading::Word(word) = &m.reading else { return None };
-                let facts = self.lexemes.get(&word.lexeme)?;
+                let facts = self.facts(self.lexeme(&word.lexeme)?);
                 (m.start == 0 || !analyzed.tokens[m.start - 1].is_alphanumeric()).then_some(())?;
                 (facts.category == sylex_lexicon::Category::Noun
                     && analyzed.tokens[m.start..m.end].contains(&' ')

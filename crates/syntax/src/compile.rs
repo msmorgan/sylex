@@ -30,6 +30,8 @@ use crate::grammar::HostKind;
 use crate::grammar::SchemaDecl;
 use crate::grammar::Side;
 use crate::grammar::SymbolDecl;
+use crate::lexeme::Lexeme;
+use crate::lexeme::Lexemes;
 use crate::step::Extension;
 use crate::step::Gap;
 use crate::step::GapRule;
@@ -71,6 +73,10 @@ pub(crate) const SIGN: usize = 7;
 
 /// The lexical facts a bound grammar keeps about one lexeme.
 #[derive(Debug, Clone)]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "independent facts of one lexeme"
+)]
 pub(crate) struct LexemeFacts {
     pub countability: Option<Ident>,
     /// A noun both count and mass is count in its plural form.
@@ -89,6 +95,31 @@ pub(crate) struct LexemeFacts {
     pub preposition_frames: BTreeSet<usize>,
     /// The kind of source that declares it.
     pub source: sylex_lexicon::SourceKind,
+    /// It is a card name [CR#201.1]: a leaf of one the face's scope does
+    /// not hold is another card's name (`LeafFacts::other_card_name`).
+    pub card_name: bool,
+}
+
+/// A lexical value the lexicon licenses, less its Lexeme, with what a bound
+/// grammar keeps about it.
+#[derive(Debug, Clone)]
+pub(crate) struct ValueFacts {
+    form: sylex_lexicon::WordForm,
+    features: sylex_lexicon::FeatureBundle,
+    capitalization: sylex_lexicon::SurfaceCase,
+    /// Its Adjacency Agreement edges (`sylex_lexicon::Lexicon::edges`).
+    pub edges: sylex_lexicon::Edges,
+    /// The word forms of every Word spelled like it, ignoring case, as a
+    /// mask (`step::form_bit`; `LeafFacts::forms`).
+    pub forms: u16,
+}
+
+impl ValueFacts {
+    fn is(&self, value: &sylex_lexicon::LexicalValue) -> bool {
+        self.form == value.form
+            && self.capitalization == value.capitalization
+            && self.features == value.features
+    }
 }
 
 /// A grammar bound to a lexical environment, ready to parse, admit and realize.
@@ -110,18 +141,12 @@ pub struct CompiledGrammar {
     pub(crate) by_id: BTreeMap<Ident, usize>,
     pub(crate) by_lhs: Vec<Vec<usize>>,
     pub(crate) root: usize,
-    pub(crate) lexemes: BTreeMap<LexemeId, LexemeFacts>,
-    /// The word forms of every Word spelled like a lexical value, ignoring
-    /// case, as a mask (`step::form_bit`), where they are more than the
-    /// value's own form (`LeafFacts::forms`).
-    pub(crate) homograph_forms: BTreeMap<sylex_lexicon::LexicalValue, u16>,
-    /// The Adjacency Agreement edges of every licensed word value
-    /// (`sylex_lexicon::Lexicon::edges`).
-    pub(crate) edges: BTreeMap<sylex_lexicon::LexicalValue, sylex_lexicon::Edges>,
-    /// The card names of the lexicon [CR#201.1]: a leaf of one the face's
-    /// scope does not hold is another card's name
-    /// (`LeafFacts::other_card_name`).
-    pub(crate) card_names: BTreeSet<LexemeId>,
+    /// The lexicon's declared Lexemes, interned as dense ids.
+    pub(crate) lexeme_ids: Lexemes,
+    /// Each declared Lexeme's facts, by `Lexeme::index`.
+    pub(crate) lexemes: Vec<LexemeFacts>,
+    /// Each declared Lexeme's licensed values, by `Lexeme::index`.
+    pub(crate) word_values: Vec<Vec<ValueFacts>>,
     pub(crate) frames: Vec<Frame>,
     /// Each frame's shape for Complement Clusters, as the index of the first
     /// frame with the same: the relation of each Frame Slot, and what fills
@@ -133,13 +158,13 @@ pub struct CompiledGrammar {
     pub(crate) preposition_frames: Vec<PrepositionFrame>,
     /// Prepositions whose `PP` slot would extend a head's selected frame,
     /// by (lexeme, selected frame), as an index into `extension_sets`.
-    pub(crate) extensions: BTreeMap<(LexemeId, Option<usize>), u16>,
+    pub(crate) extensions: BTreeMap<(Lexeme, Option<usize>), u16>,
     /// Distinct extension lists; index `0` is the empty list.
     pub(crate) extension_sets: Vec<Vec<Extension>>,
-    pub(crate) classes: Vec<BTreeSet<LexemeId>>,
+    pub(crate) classes: Vec<BTreeSet<Lexeme>>,
     /// Prepositions some Production's `unextended` child may not end in, the
     /// only ones a Summary's `final_preposition` records.
-    pub(crate) unextended_prepositions: BTreeSet<LexemeId>,
+    pub(crate) unextended_prepositions: BTreeSet<Lexeme>,
     /// Categories some Production's `unadjoined` child may not end in, the
     /// only ones a Summary's `final_adjunct` records.
     pub(crate) unadjoined_categories: BTreeSet<u16>,
@@ -191,6 +216,34 @@ impl CompiledGrammar {
     #[must_use]
     pub fn category_id(&self, name: &str) -> Option<usize> {
         self.category_ids.get(name).copied()
+    }
+
+    /// The dense id of a Lexeme the lexicon declares.
+    pub(crate) fn lexeme(&self, id: &LexemeId) -> Option<Lexeme> {
+        self.lexeme_ids.get(id)
+    }
+
+    /// The `LexemeId` a dense id stands for.
+    pub(crate) fn lexeme_id(&self, lexeme: Lexeme) -> LexemeId {
+        self.lexeme_ids.id(lexeme)
+    }
+
+    /// Every declared Lexeme, ascending, with its facts.
+    pub(crate) fn declared_lexemes(&self) -> impl Iterator<Item = (Lexeme, &LexemeFacts)> {
+        self.lexeme_ids.all().zip(&self.lexemes)
+    }
+
+    /// The facts kept about a declared Lexeme.
+    pub(crate) fn facts(&self, lexeme: Lexeme) -> &LexemeFacts {
+        &self.lexemes[lexeme.index()]
+    }
+
+    /// What is kept about a lexical value the lexicon licenses, or `None`
+    /// if it licenses no such value.
+    pub(crate) fn value_facts(&self, value: &sylex_lexicon::LexicalValue) -> Option<&ValueFacts> {
+        self.word_values[self.lexeme(&value.lexeme)?.index()]
+            .iter()
+            .find(|v| v.is(value))
     }
 
     /// The name of every Category, by index.
@@ -380,28 +433,49 @@ impl CompiledGrammar {
     }
 }
 
-/// The word forms of every Word spelled like each lexical value, ignoring
-/// case, where they are more than the value's own form
-/// (`CompiledGrammar::homograph_forms`).
-fn homograph_forms(lexicon: &Lexicon) -> BTreeMap<sylex_lexicon::LexicalValue, u16> {
-    let spelled: Vec<(String, &sylex_lexicon::LexicalValue)> = lexicon
+/// Each declared Lexeme's licensed values, by `Lexeme::index`
+/// (`CompiledGrammar::word_values`): their edges, and the word forms of
+/// every Word spelled like each, ignoring case (a value that has no
+/// spelling has only its own form).
+fn word_values(lexicon: &Lexicon, lexemes: &Lexemes) -> Vec<Vec<ValueFacts>> {
+    let spelled: Vec<(Option<String>, &sylex_lexicon::LexicalValue)> = lexicon
         .values()
-        .filter_map(|value| {
+        .map(|value| {
             let reading = sylex_lexicon::LexicalReading::Word(value.clone());
-            Some((lexicon.realize(&reading).ok()?.to_lowercase(), value))
+            let spelling = lexicon.realize(&reading).ok().map(|s| s.to_lowercase());
+            (spelling, value)
         })
         .collect();
     let mut by_spelling: BTreeMap<&str, u16> = BTreeMap::new();
     for (spelling, value) in &spelled {
-        *by_spelling.entry(spelling).or_default() |= crate::step::form_bit(value.form);
+        if let Some(spelling) = spelling {
+            *by_spelling.entry(spelling).or_default() |= crate::step::form_bit(value.form);
+        }
     }
-    spelled
-        .iter()
-        .filter_map(|(spelling, value)| {
-            let forms = by_spelling[spelling.as_str()];
-            (forms != crate::step::form_bit(value.form)).then(|| ((*value).clone(), forms))
-        })
-        .collect()
+    let mut table = vec![Vec::new(); lexemes.len()];
+    for (spelling, value) in &spelled {
+        let reading = sylex_lexicon::LexicalReading::Word((*value).clone());
+        let edges = lexicon
+            .edges(&reading)
+            .expect("every licensed value has its edges");
+        let lexeme = lexemes.get(&value.lexeme).unwrap_or_else(|| {
+            panic!(
+                "the lexicon licenses a value of undeclared lexeme `{}`",
+                value.lexeme
+            )
+        });
+        table[lexeme.index()].push(ValueFacts {
+            form: value.form,
+            features: value.features.clone(),
+            capitalization: value.capitalization,
+            edges,
+            forms: spelling.as_deref().map_or_else(
+                || crate::step::form_bit(value.form),
+                |spelling| by_spelling[spelling],
+            ),
+        });
+    }
+    table
 }
 
 fn invalid(message: impl Into<String>) -> LoadError {
@@ -412,7 +486,7 @@ struct Binder<'a> {
     grammar: &'a Grammar,
     catalog: &'a FrameCatalog,
     out: CompiledGrammar,
-    closed_words: BTreeMap<Ident, LexemeId>,
+    closed_words: BTreeMap<Ident, Lexeme>,
     class_names: BTreeMap<Ident, usize>,
     /// The holders of each (feature, value) that Productions set on their
     /// mother: each such Production, or the lexemes its lexical `head` names
@@ -470,7 +544,7 @@ struct Draft {
     distinct_coordinator: Vec<usize>,
     requires_coordination: Option<usize>,
     /// The coordinator a correlative coordination's serial tail must end with.
-    paired_coordinator: Option<LexemeId>,
+    paired_coordinator: Option<Lexeme>,
     uncoordinated: Vec<usize>,
     coordinated: Vec<usize>,
     /// `Production::whole_coordination`.
@@ -495,11 +569,11 @@ struct Draft {
     unlike_slots: Vec<(usize, u64)>,
     /// A polysyndetic tail that must repeat the coordinator.
     chained: Option<usize>,
-    gap_preposition: Option<LexemeId>,
+    gap_preposition: Option<Lexeme>,
     fills_preposition: Option<usize>,
     /// Coordinators a serial tail admits for correlatives only, which a
     /// plain serial coordination may not end with.
-    foreign_coordinators: Vec<LexemeId>,
+    foreign_coordinators: Vec<Lexeme>,
     /// A derived passive's Internalised Complement.
     internalised: Option<usize>,
     /// A non-verbal head's bare phrase, which omits its head's Complements.
@@ -777,57 +851,55 @@ impl<'a> Binder<'a> {
         // Frames, deduplicated into global ids.
         let mut frames: Vec<Frame> = Vec::new();
         let mut preposition_frames: Vec<PrepositionFrame> = Vec::new();
-        let mut lexemes = BTreeMap::new();
+        let lexeme_ids = Lexemes::new(lexicon.lexemes().keys().copied());
+        let mut lexemes = Vec::with_capacity(lexicon.lexemes().len());
         for (id, lexeme) in lexicon.lexemes() {
-            lexemes.insert(
-                *id,
-                LexemeFacts {
-                    features: lexeme
+            lexemes.push(LexemeFacts {
+                features: lexeme
+                    .properties
+                    .features
+                    .iter()
+                    .filter_map(|(key, value)| {
+                        let feature = features.iter().position(|f| f == key)?;
+                        Some(
+                            values[feature]
+                                .iter()
+                                .position(|v| v == value)
+                                .ok_or_else(|| {
+                                    invalid(format!("lexeme `{id}`: unknown {key} value `{value}`"))
+                                })
+                                .map(|v| {
+                                    (feature, u16::try_from(v).expect("small feature domain"))
+                                }),
+                        )
+                    })
+                    .collect::<Result<Vec<_>, _>>()?,
+                countability: match lexeme.properties.countability.as_slice() {
+                    [value] => Some(Ident::new(&format!("{value:?}"))),
+                    _ => lexeme
                         .properties
                         .features
-                        .iter()
-                        .filter_map(|(key, value)| {
-                            let feature = features.iter().position(|f| f == key)?;
-                            Some(
-                                values[feature]
-                                    .iter()
-                                    .position(|v| v == value)
-                                    .ok_or_else(|| {
-                                        invalid(format!(
-                                            "lexeme `{id}`: unknown {key} value `{value}`"
-                                        ))
-                                    })
-                                    .map(|v| {
-                                        (feature, u16::try_from(v).expect("small feature domain"))
-                                    }),
-                            )
-                        })
-                        .collect::<Result<Vec<_>, _>>()?,
-                    countability: match lexeme.properties.countability.as_slice() {
-                        [value] => Some(Ident::new(&format!("{value:?}"))),
-                        _ => lexeme
-                            .properties
-                            .features
-                            .get(PROJECTED[COUNTABILITY])
-                            .copied(),
-                    },
-                    countable_plural: lexeme
-                        .properties
-                        .countability
-                        .contains(&sylex_lexicon::Countability::Count),
-                    category: lexeme.category,
-                    binding: lexeme.binding,
-                    frames: BTreeSet::new(),
-                    optional_complement: true,
-                    active_only: false,
-                    preposition_frames: BTreeSet::new(),
-                    source: lexeme.source.kind,
+                        .get(PROJECTED[COUNTABILITY])
+                        .copied(),
                 },
-            );
+                countable_plural: lexeme
+                    .properties
+                    .countability
+                    .contains(&sylex_lexicon::Countability::Count),
+                category: lexeme.category,
+                binding: lexeme.binding,
+                frames: BTreeSet::new(),
+                optional_complement: true,
+                active_only: false,
+                preposition_frames: BTreeSet::new(),
+                source: lexeme.source.kind,
+                card_name: lexeme.card_name,
+            });
         }
         for (id, list) in &catalog.frames {
-            let facts = lexemes
-                .get_mut(id)
+            let facts = lexeme_ids
+                .get(id)
+                .map(|lexeme| &mut lexemes[lexeme.index()])
                 .ok_or_else(|| invalid(format!("frame catalog names unknown lexeme `{id}`")))?;
             if facts.category == LexicalCategory::Preposition {
                 return Err(invalid(format!(
@@ -850,8 +922,9 @@ impl<'a> Binder<'a> {
             }
         }
         for (id, list) in &catalog.prepositions {
-            let facts = lexemes
-                .get_mut(id)
+            let facts = lexeme_ids
+                .get(id)
+                .map(|lexeme| &mut lexemes[lexeme.index()])
                 .ok_or_else(|| invalid(format!("frame catalog names unknown lexeme `{id}`")))?;
             if facts.category != LexicalCategory::Preposition {
                 return Err(invalid(format!("`{id}` is not a preposition")));
@@ -878,8 +951,9 @@ impl<'a> Binder<'a> {
             }
         }
         for (id, complement) in referenced {
-            let Some(facts) = lexemes
+            let Some(facts) = lexeme_ids
                 .get(&id)
+                .map(|lexeme| &lexemes[lexeme.index()])
                 .filter(|facts| !facts.preposition_frames.is_empty())
             else {
                 return Err(invalid(format!(
@@ -909,13 +983,13 @@ impl<'a> Binder<'a> {
                 });
             u16::try_from(index).map_err(|_| invalid("too many distinct extension lists"))
         };
-        for (id, facts) in &lexemes {
+        for (id, facts) in lexeme_ids.all().zip(&lexemes) {
             if facts.category != LexicalCategory::Verb {
                 let mut preps: Vec<_> = facts
                     .frames
                     .iter()
                     .filter_map(|&frame| match frames[frame].slots.as_slice() {
-                        [slot] => Some(extensions_of(&slot.fill)),
+                        [slot] => Some(extensions_of(&lexeme_ids, &slot.fill)),
                         _ => None,
                     })
                     .flatten()
@@ -923,7 +997,7 @@ impl<'a> Binder<'a> {
                 preps.sort();
                 preps.dedup();
                 if !preps.is_empty() {
-                    extensions.insert((*id, None), intern(preps)?);
+                    extensions.insert((id, None), intern(preps)?);
                 }
             }
             for &selected in &facts.frames {
@@ -934,7 +1008,7 @@ impl<'a> Binder<'a> {
                         && longer.slots[..base.slots.len()] == base.slots[..]
                         && let Some(last) = longer.slots.last()
                     {
-                        preps.extend(extensions_of(&last.fill));
+                        preps.extend(extensions_of(&lexeme_ids, &last.fill));
                     }
                     // A rival frame with a PP where this one has a predicative.
                     if base.slots.len() == longer.slots.len() {
@@ -948,14 +1022,17 @@ impl<'a> Binder<'a> {
                             && a.fill == SlotFill::Pred
                             && let SlotFill::PP(list, _) = &b.fill
                         {
-                            preps.extend(list.iter().map(|p| Extension::Predicative(*p)));
+                            preps.extend(
+                                list.iter()
+                                    .map(|p| Extension::Predicative(dense(&lexeme_ids, p))),
+                            );
                         }
                     }
                 }
                 if !preps.is_empty() {
                     preps.sort();
                     preps.dedup();
-                    extensions.insert((*id, Some(selected)), intern(preps)?);
+                    extensions.insert((id, Some(selected)), intern(preps)?);
                 }
             }
         }
@@ -963,7 +1040,7 @@ impl<'a> Binder<'a> {
         for (name, id) in &grammar.closed_words {
             let id = *id;
             check_closed(lexicon, &id, &format!("closed word `{name}`"))?;
-            closed_words.insert(*name, id);
+            closed_words.insert(*name, dense(&lexeme_ids, &id));
         }
         let mut classes = Vec::new();
         let mut class_names = BTreeMap::new();
@@ -972,7 +1049,7 @@ impl<'a> Binder<'a> {
             for id in members {
                 let id = *id;
                 check_closed(lexicon, &id, &format!("lexical class `{name}`"))?;
-                set.insert(id);
+                set.insert(dense(&lexeme_ids, &id));
             }
             if set.len() < 2 {
                 report.warnings.push(format!(
@@ -993,7 +1070,7 @@ impl<'a> Binder<'a> {
                 .lexemes()
                 .iter()
                 .filter(|(_, l)| l.properties.classes.contains(name))
-                .map(|(id, _)| *id)
+                .map(|(id, _)| dense(&lexeme_ids, id))
                 .collect();
             if members.len() < 2 {
                 report.warnings.push(format!(
@@ -1024,24 +1101,9 @@ impl<'a> Binder<'a> {
                 by_id: BTreeMap::new(),
                 by_lhs,
                 root,
+                word_values: word_values(lexicon, &lexeme_ids),
+                lexeme_ids,
                 lexemes,
-                homograph_forms: homograph_forms(lexicon),
-                edges: lexicon
-                    .values()
-                    .map(|value| {
-                        let reading = sylex_lexicon::LexicalReading::Word(value.clone());
-                        let edges = lexicon
-                            .edges(&reading)
-                            .expect("every licensed value has its edges");
-                        (value.clone(), edges)
-                    })
-                    .collect(),
-                card_names: lexicon
-                    .lexemes()
-                    .values()
-                    .filter(|lexeme| lexeme.card_name)
-                    .map(|lexeme| lexeme.id)
-                    .collect(),
                 frames,
                 cluster_shapes: Vec::new(),
                 preposition_frames,
@@ -1090,7 +1152,7 @@ impl<'a> Binder<'a> {
         Ok(u16::try_from(index).expect("feature domains are small"))
     }
 
-    fn word(&self, name: &str) -> Result<LexemeId, LoadError> {
+    fn word(&self, name: &str) -> Result<Lexeme, LoadError> {
         self.closed_words
             .get(name)
             .copied()
@@ -1107,8 +1169,15 @@ impl<'a> Binder<'a> {
             .ok_or_else(|| invalid(format!("unknown closed word or class `{name}`")))
     }
 
+    /// A catalog's nonempty class of declared words, or `None` if it is
+    /// empty or names an undeclared one.
+    fn word_class(&self, words: &[LexemeId]) -> Option<BTreeSet<Lexeme>> {
+        let class: Option<BTreeSet<Lexeme>> = words.iter().map(|w| self.out.lexeme(w)).collect();
+        class.filter(|class| !class.is_empty())
+    }
+
     /// Whether a coordinator test admits this Closed Word.
-    fn admits(&self, test: &Test, word: LexemeId) -> bool {
+    fn admits(&self, test: &Test, word: Lexeme) -> bool {
         match test {
             Test::Word(id) => *id == word,
             Test::Class(class) => self.out.classes[*class].contains(&word),
@@ -1119,8 +1188,8 @@ impl<'a> Binder<'a> {
 
     /// A coordinator test widened by the paired coordinators of the
     /// correlatives, as a serial tail ends with any of them.
-    fn with_words(&self, test: Test, words: &[LexemeId]) -> Test {
-        let mut set: BTreeSet<LexemeId> = words.iter().copied().collect();
+    fn with_words(&self, test: Test, words: &[Lexeme]) -> Test {
+        let mut set: BTreeSet<Lexeme> = words.iter().copied().collect();
         match &test {
             Test::Word(id) => {
                 set.insert(*id);
@@ -1815,12 +1884,12 @@ impl<'a> Binder<'a> {
     fn report_holders(&mut self) {
         let out = &mut self.out;
         let mut lexical: BTreeMap<(usize, u16), BTreeSet<String>> = BTreeMap::new();
-        for (id, facts) in &out.lexemes {
+        for (lexeme, facts) in out.declared_lexemes() {
             for &(feature, value) in &facts.features {
                 lexical
                     .entry((feature, value))
                     .or_default()
-                    .insert(id.to_string());
+                    .insert(out.lexeme_id(lexeme).to_string());
             }
         }
         // Features equated with one another, closed transitively.
@@ -1929,32 +1998,34 @@ impl<'a> Binder<'a> {
                 symbol: Symbol::Leaf(test),
                 ..
             }) => match test {
-                Test::Word(id) => BTreeSet::from([id.to_string()]),
-                Test::Words(words) => words.iter().map(ToString::to_string).collect(),
+                Test::Word(id) => BTreeSet::from([self.out.lexeme_id(*id).to_string()]),
+                Test::Words(words) => words
+                    .iter()
+                    .map(|&id| self.out.lexeme_id(id).to_string())
+                    .collect(),
                 Test::Class(class) => self.out.classes[*class]
                     .iter()
-                    .map(ToString::to_string)
+                    .map(|&id| self.out.lexeme_id(id).to_string())
                     .collect(),
                 Test::Frame(frame)
                 | Test::FreeFrame(frame)
                 | Test::PrepositionFrame(frame)
                 | Test::ClassFrame { frame, .. } => self
                     .out
-                    .lexemes
-                    .iter()
+                    .declared_lexemes()
                     .filter(|(id, facts)| match test {
                         Test::Frame(_) => facts.frames.contains(frame),
                         Test::FreeFrame(_) => {
                             facts.frames.contains(frame) && facts.binding == Binding::Free
                         }
                         Test::ClassFrame { class, free, .. } => {
-                            self.out.classes[*class].contains(*id)
+                            self.out.classes[*class].contains(id)
                                 && facts.frames.contains(frame)
                                 && (!free || facts.binding == Binding::Free)
                         }
                         _ => facts.preposition_frames.contains(frame),
                     })
-                    .map(|(id, _)| id.to_string())
+                    .map(|(id, _)| self.out.lexeme_id(id).to_string())
                     .collect(),
                 _ => BTreeSet::new(),
             },
@@ -2656,10 +2727,11 @@ impl<'a> Binder<'a> {
         let remnant = remnant.map(|r| self.category(r)).transpose()?;
         let mut drafts = Vec::new();
         for (id, patterns) in &self.catalog.parameters {
-            let facts =
-                self.out.lexemes.get(id).ok_or_else(|| {
-                    invalid(format!("parameter pattern names unknown lexeme `{id}`"))
-                })?;
+            let lexeme = self
+                .out
+                .lexeme(id)
+                .ok_or_else(|| invalid(format!("parameter pattern names unknown lexeme `{id}`")))?;
+            let facts = self.out.facts(lexeme);
             if facts.category != head || binding.is_some_and(|b| b != facts.binding) {
                 continue;
             }
@@ -2690,7 +2762,7 @@ impl<'a> Binder<'a> {
                                 .push((Path::Mother(feature), Target::Value(value)));
                             continue;
                         }
-                        ParameterPart::Head => ("head", Symbol::Leaf(Test::Word(*id))),
+                        ParameterPart::Head => ("head", Symbol::Leaf(Test::Word(lexeme))),
                         ParameterPart::Slot(kind) => (
                             "complement",
                             Symbol::Cat {
@@ -2701,45 +2773,26 @@ impl<'a> Binder<'a> {
                             },
                         ),
                         ParameterPart::Word(word) => {
-                            if !self.out.lexemes.contains_key(word) {
-                                return Err(invalid(format!("unknown parameter marker `{word}`")));
-                            }
-                            ("marker", Symbol::Leaf(Test::Word(*word)))
+                            let word = self.out.lexeme(word).ok_or_else(|| {
+                                invalid(format!("unknown parameter marker `{word}`"))
+                            })?;
+                            ("marker", Symbol::Leaf(Test::Word(word)))
                         }
                         ParameterPart::Words(words) => {
-                            if words.is_empty()
-                                || words
-                                    .iter()
-                                    .any(|word| !self.out.lexemes.contains_key(word))
-                            {
-                                return Err(invalid(format!(
-                                    "invalid parameter word class of `{id}`"
-                                )));
-                            }
-                            (
-                                "complement",
-                                Symbol::Leaf(Test::Words(words.iter().copied().collect())),
-                            )
+                            let words = self.word_class(words).ok_or_else(|| {
+                                invalid(format!("invalid parameter word class of `{id}`"))
+                            })?;
+                            ("complement", Symbol::Leaf(Test::Words(words)))
                         }
                         ParameterPart::ModifiedWords(words, modifier, target) => {
-                            if words.is_empty()
-                                || words
-                                    .iter()
-                                    .any(|word| !self.out.lexemes.contains_key(word))
-                            {
-                                return Err(invalid(format!(
-                                    "invalid modified word class of `{id}`"
-                                )));
-                            }
+                            let words = self.word_class(words).ok_or_else(|| {
+                                invalid(format!("invalid modified word class of `{id}`"))
+                            })?;
                             let target = self.slot_category(*target)?;
                             let modifier = self.slot_category(*modifier)?;
                             let category = self.private_category(target);
                             let mut base = Draft::new(format!("{}/Stem", draft.id), category, 0);
-                            base.child(
-                                "head",
-                                Symbol::Leaf(Test::Words(words.iter().copied().collect())),
-                                GapRule::Closed,
-                            );
+                            base.child("head", Symbol::Leaf(Test::Words(words)), GapRule::Closed);
                             drafts.push(base);
                             let mut recursive =
                                 Draft::new(format!("{}/ModifiedStem", draft.id), category, 0);
@@ -2786,7 +2839,7 @@ impl<'a> Binder<'a> {
                         elided.child(child.name.as_ref(), child.symbol.clone(), GapRule::Closed);
                     }
                     elided.remnant =
-                        crate::step::RemnantRole::Elides(crate::step::Elided::Lexeme(*id));
+                        crate::step::RemnantRole::Elides(crate::step::Elided::Lexeme(lexeme));
                     draft.remnant = crate::step::RemnantRole::SharesHead;
                     drafts.push(elided);
                 }
@@ -2946,12 +2999,9 @@ impl<'a> Binder<'a> {
                 }
                 Some(decl) if decl.families.contains(&frame.family) => CentralSite::AnyHead,
                 Some(decl)
-                    if self.out.classes[decl.class].iter().any(|member| {
-                        self.out
-                            .lexemes
-                            .get(member)
-                            .is_some_and(|facts| facts.frames.contains(&index))
-                    }) =>
+                    if self.out.classes[decl.class]
+                        .iter()
+                        .any(|&member| self.out.facts(member).frames.contains(&index)) =>
                 {
                     CentralSite::ClassHead
                 }
@@ -2970,7 +3020,7 @@ impl<'a> Binder<'a> {
                 && matches!(slots.first(), Some(SlotFill::NP))
             {
                 // The Internalised Complement is a `by` Preposition Phrase.
-                let by_pp = SlotFill::PP(vec![self.word(passive.by)?], None);
+                let by_pp = SlotFill::PP(vec![self.out.lexeme_id(self.word(passive.by)?)], None);
                 for agent in [false, true] {
                     let mut rest: Vec<&SlotFill> = slots[1..].to_vec();
                     if agent {
@@ -3021,7 +3071,7 @@ impl<'a> Binder<'a> {
         fill: &SlotFill,
         passive: &PassiveDecl<'_>,
     ) -> Result<Vec<Draft>, LoadError> {
-        let by_pp = SlotFill::PP(vec![self.word(passive.by)?], None);
+        let by_pp = SlotFill::PP(vec![self.out.lexeme_id(self.word(passive.by)?)], None);
         let relation = self.out.frames[frame].slots[0].relation;
         let mut drafts = Vec::new();
         for agent in [false, true] {
@@ -3061,7 +3111,7 @@ impl<'a> Binder<'a> {
         let used: BTreeSet<usize> = self
             .out
             .lexemes
-            .values()
+            .iter()
             .flat_map(|f| f.preposition_frames.iter().copied())
             .collect();
         for index in used {
@@ -3204,10 +3254,9 @@ impl<'a> Binder<'a> {
     fn plural_fault(&self, frame: usize, why: &str) -> LoadError {
         let prepositions: Vec<String> = self
             .out
-            .lexemes
-            .iter()
+            .declared_lexemes()
             .filter(|(_, f)| f.preposition_frames.contains(&frame))
-            .map(|(id, _)| id.to_string())
+            .map(|(id, _)| self.out.lexeme_id(id).to_string())
             .collect();
         invalid(format!(
             "plural Complement of {} ({}): {why}",
@@ -3220,19 +3269,20 @@ impl<'a> Binder<'a> {
     /// must be a Closed Word or a Lexical Class member the grammar names.
     fn used_frames(&self, head: LexicalCategory) -> Result<BTreeSet<usize>, LoadError> {
         let mut used = BTreeSet::new();
-        for (id, facts) in &self.out.lexemes {
+        for (lexeme, facts) in self.out.declared_lexemes() {
             if facts.category != head {
                 continue;
             }
+            let id = self.out.lexeme_id(lexeme);
             if facts.frames.is_empty()
                 && head == LexicalCategory::Verb
-                && !self.closed_words.values().any(|w| w == id)
+                && !self.closed_words.values().any(|&w| w == lexeme)
                 && !self
                     .grammar
                     .lexical_classes
                     .values()
                     .flatten()
-                    .any(|m| LexemeId::new(m) == *id)
+                    .any(|m| LexemeId::new(m) == id)
             {
                 return Err(invalid(format!(
                     "verb `{id}` has no Subcategorization Frame"
@@ -3365,7 +3415,7 @@ impl<'a> Binder<'a> {
             }
             if let Some(i) = gap {
                 if let SlotFill::PP(list, _) = slots[i] {
-                    draft.gap_preposition = list.first().copied();
+                    draft.gap_preposition = list.first().map(|p| dense(&self.out.lexeme_ids, p));
                 }
                 draft.introduces = match slots[i] {
                     SlotFill::PP(..) => Gap::PP,
@@ -3718,7 +3768,12 @@ impl<'a> Binder<'a> {
             binding: None,
             category: self.slot_category(fill.kind())?,
             prepositions: match fill {
-                SlotFill::PP(list, complement) => Some((list.clone(), *complement)),
+                SlotFill::PP(list, complement) => Some((
+                    list.iter()
+                        .map(|p| dense(&self.out.lexeme_ids, p))
+                        .collect(),
+                    *complement,
+                )),
                 _ => None,
             },
             host: None,
@@ -3907,7 +3962,7 @@ impl<'a> Binder<'a> {
             }
         };
         for (marker, test, paired) in variants {
-            let suffix = paired.map_or(String::new(), |p| format!("-{p}"));
+            let suffix = paired.map_or(String::new(), |p| format!("-{}", self.out.lexeme_id(p)));
             let id = |shape: &str| format!("Coordination:{}/{shape}{suffix}", conjoin.tail_name);
             // Binary: X Coord X.
             if !*delimited {
@@ -4085,7 +4140,7 @@ impl<'a> Binder<'a> {
 impl Binder<'_> {
     /// Whether `schema` is the first Coordination schema of its Category
     /// with no `unlike` feature whose coordinators admit `word`.
-    fn first_admitting(&self, schema: &SchemaDecl, word: LexemeId) -> Result<bool, LoadError> {
+    fn first_admitting(&self, schema: &SchemaDecl, word: Lexeme) -> Result<bool, LoadError> {
         let SchemaDecl::Coordination { category, .. } = schema else {
             unreachable!("a coordination schema")
         };
@@ -4131,10 +4186,10 @@ impl Binder<'_> {
             prepositions: None,
             host: None,
         };
-        let identity = crate::step::LinkedCoordination(
-            u16::try_from(conjoin.tail_id)
-                .map_err(|_| invalid(format!("too many Categories for `{}`", conjoin.tail_name)))?,
-        );
+        let identity =
+            crate::step::LinkedCoordination(u16::try_from(conjoin.tail_id).map_err(|_| {
+                invalid(format!("too many Categories for `{}`", conjoin.tail_name))
+            })?);
         let id = |shape: &str| format!("Coordination:{}/{shape}", conjoin.tail_name);
         let mut drafts = Vec::new();
         // Binary: X Y, or X , Y.
@@ -4582,7 +4637,7 @@ impl Conjoin {
     fn idiomatic(
         &self,
         binder: &Binder<'_>,
-        word: LexemeId,
+        word: Lexeme,
         idiomatic: usize,
         cost: u32,
         plain: Option<()>,
@@ -5335,12 +5390,19 @@ fn complement_label(fill: &SlotFill) -> String {
     }
 }
 
+/// The dense id of a Lexeme binding has already found in the lexicon.
+fn dense(lexemes: &Lexemes, id: &LexemeId) -> Lexeme {
+    lexemes
+        .get(id)
+        .unwrap_or_else(|| panic!("`{id}` was checked to be a declared lexeme"))
+}
+
 /// What a Frame Slot selects, as same-head complement priority sees it.
-fn extensions_of(fill: &SlotFill) -> Vec<Extension> {
+fn extensions_of(lexemes: &Lexemes, fill: &SlotFill) -> Vec<Extension> {
     match fill {
         SlotFill::PP(list, complement) => list
             .iter()
-            .map(|p| Extension::Preposition(*p, *complement))
+            .map(|p| Extension::Preposition(dense(lexemes, p), *complement))
             .collect(),
         other => vec![Extension::Slot(other.kind())],
     }
