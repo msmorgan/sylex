@@ -1304,8 +1304,8 @@ impl GameState {
         }
         // [CR#601.2b..601.2c]: at least one complete mode/target
         // announcement must exist before offering this resolution cast.
-        !self.spell_effect(object).is_some_and(|effect| {
-            !self.announcement_effect_satisfiable(
+        self.spell_effect(object).is_none_or(|effect| {
+            self.announcement_effect_satisfiable(
                 object,
                 caster,
                 &effect,
