@@ -78,9 +78,11 @@ on are the contract documented on `grammar::ProductionDecl`.
   conjunct count and Embedding (`alternatives.rs`).
   `cargo xtask english forests` writes all of it for the pool to SQLite.
 - `Parse::fork_forest()` gives the forest split by head: its forks
-  (`forks.rs`), narrowing by `pick` and `exclude`, and its settled spine
-  (`settled_spine.rs`). `cargo xtask english forestwalk` prints a unit's
-  spine and forks.
+  (`forks.rs`), narrowing by `pick` and `exclude`, its settled spine
+  (`settled_spine.rs`) and, for a narrowed forest of few Derivations, each
+  Reading as a settled tree (`settled_readings`). `cargo xtask english
+  forestwalk` prints a unit's spine and forks, narrows them by `--pick` and
+  `--exclude`, and prints the Readings left.
 - The `tree-ranking-key` feature, enabled for this crate's tests, adds
   `CompiledGrammar::ranking_key`, which computes a Reading's key from its tree
   to check the forest's.

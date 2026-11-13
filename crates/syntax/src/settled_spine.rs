@@ -6,7 +6,11 @@
 //! with one alternative whose children split its span in more than one way
 //! stops it too. Below a node with one alternative and one split, every
 //! child is settled, so the spine is a tree of settled nodes.
+//!
+//! A narrowed forest of few Derivations also gives each Derivation as such a
+//! tree ([`ForkForest::settled_readings`]), so one printer serves both.
 
+use std::collections::HashMap;
 use std::ops::Range;
 
 use dpsi::Ident;
@@ -14,8 +18,10 @@ use sylex_lexicon::LexicalReading;
 
 use crate::chart::ChildRef;
 use crate::fork_graph::PackedCounts;
+use crate::fork_graph::Tree;
 use crate::forks::ForkForest;
 use crate::forks::ForkWord;
+use crate::reading::Reading;
 
 /// The settled spine of a forest.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -81,6 +87,59 @@ impl ForkForest<'_> {
         match roots[..] {
             [root] => SettledSpine::Root(self.settled(root, &packed, counts.total)),
             _ => SettledSpine::Roots(roots.len()),
+        }
+    }
+
+    /// The forest's Readings, each with its tree as a settled node (every
+    /// node of it has the one Production and split its Derivation has), or
+    /// `None` when the forest has more than `limit` Derivations.
+    #[must_use]
+    pub fn settled_readings(&self, limit: u128) -> Option<Vec<(Reading, SettledNode)>> {
+        (self.total() <= limit).then(|| {
+            let mut features = HashMap::new();
+            self.graph
+                .derivation_trees(self.parse)
+                .iter()
+                .map(|tree| {
+                    (
+                        tree.reading(self.parse, &mut features),
+                        self.settled_tree(tree),
+                    )
+                })
+                .collect()
+        })
+    }
+
+    fn settled_tree(&self, tree: &Tree) -> SettledNode {
+        let Tree::Node {
+            node,
+            production,
+            children,
+        } = tree
+        else {
+            panic!("a Derivation's root and its nodes are nodes");
+        };
+        let grammar = self.parse.grammar;
+        let packed_node = &self.parse.forest.nodes[*node];
+        let mut named = Vec::new();
+        let mut at = children.as_deref();
+        while let Some(sequence) = at {
+            let child = match &*sequence.last {
+                tree @ Tree::Node { .. } => SettledChild::Node(self.settled_tree(tree)),
+                Tree::Leaf(leaf) => self.leaf(*leaf),
+                Tree::Punct => SettledChild::Punct,
+            };
+            named.push((sequence.name, child));
+            at = sequence.prefix.as_deref();
+        }
+        named.reverse();
+        SettledNode {
+            category: grammar.categories[packed_node.category],
+            span: packed_node.start..packed_node.end,
+            rest: SettledRest::Children {
+                production: grammar.production_id(*production),
+                children: named,
+            },
         }
     }
 
@@ -157,21 +216,23 @@ impl ForkForest<'_> {
     fn child(&self, child: ChildRef, packed: &PackedCounts, total: u128) -> SettledChild {
         match child {
             ChildRef::Node(c) => SettledChild::Node(self.settled(c, packed, total)),
-            ChildRef::Leaf(l) => {
-                let leaf = &self.parse.forest.leaves[l];
-                let word = self
-                    .unit
-                    .words
-                    .iter()
-                    .find(|w| w.start == leaf.start)
-                    .expect("a leaf some Derivation uses starts a word");
-                SettledChild::Leaf {
-                    word: word.clone(),
-                    span: leaf.start..leaf.end,
-                    reading: leaf.reading.clone(),
-                }
-            }
+            ChildRef::Leaf(l) => self.leaf(l),
             ChildRef::Punct => SettledChild::Punct,
+        }
+    }
+
+    fn leaf(&self, leaf: usize) -> SettledChild {
+        let leaf = &self.parse.forest.leaves[leaf];
+        let word = self
+            .unit
+            .words
+            .iter()
+            .find(|w| w.start == leaf.start)
+            .expect("a leaf some Derivation uses starts a word");
+        SettledChild::Leaf {
+            word: word.clone(),
+            span: leaf.start..leaf.end,
+            reading: leaf.reading.clone(),
         }
     }
 }

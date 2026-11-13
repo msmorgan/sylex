@@ -1,14 +1,17 @@
 //! The settled spine (`sylex_syntax::ForkForest::settled_spine`) on real
 //! Corpus Units, against two oracles:
 //!
-//! - on the unit's forest, the same walk computed from the Packed Forest's
-//!   own counts (`Parse::counts`): from the one root with Derivations, down
-//!   through each node with one alternative with Derivations and one family
-//!   with Derivations at each step of its item chain;
-//! - on the forest and each forest narrowed from it by picking the first
-//!   option of the first fork until none is left, the enumerated Readings:
-//!   every Reading builds each spine node as the spine says, and where the
-//!   spine stops, the Readings differ.
+//! - on the unit's forest, the same walk computed from the Packed Forest's own
+//!   counts (`Parse::counts`): from the one root with Derivations, down through
+//!   each node with one alternative with Derivations and one family with
+//!   Derivations at each step of its item chain;
+//! - on the forest and each forest narrowed from it by picking the first option
+//!   of the first fork until none is left, the enumerated Readings: every
+//!   Reading builds each spine node as the spine says, and where the spine
+//!   stops, the Readings differ;
+//! - on the same forests, `settled_readings`: the Readings of `readings`, each
+//!   with a tree that builds it, and for a forest of one Derivation the spine
+//!   itself.
 
 #[path = "support/unit_texts.rs"]
 mod unit_texts;
@@ -27,8 +30,8 @@ use sylex_vocabulary::LexicalEnvironment;
 
 /// Real units, each for what it exercises:
 /// - *Draugr Necromancer* (3,312 Derivations), *Maralen, Fae Ascendant* (5,955)
-///   and *Remove Enchantments* (9,216): large forests, and on narrowing a
-///   spine that grows to the whole tree;
+///   and *Remove Enchantments* (9,216): large forests, and on narrowing a spine
+///   that grows to the whole tree;
 /// - *Crook of Condemnation*: a spine that stops where one dependency fork
 ///   begins;
 /// - *Decimate*: more than one live root;
@@ -273,6 +276,37 @@ fn check_enumerated(forest: &ForkForest<'_>) -> Result<(), String> {
     }
 }
 
+/// `settled_readings` gives the forest's Readings, each with a settled tree
+/// that builds it and has no stop; a forest of one Derivation gives its
+/// spine.
+fn check_settled_readings(forest: &ForkForest<'_>) -> Result<(), String> {
+    let mut readings = forest
+        .readings(ENUMERATED)
+        .expect("checked only at or below the enumeration bound");
+    let mut settled = forest
+        .settled_readings(ENUMERATED)
+        .expect("checked only at or below the enumeration bound");
+    if forest.total() > 0 && forest.settled_readings(forest.total() - 1).is_some() {
+        return Err("`settled_readings` ignores its limit".to_owned());
+    }
+    for (reading, node) in &settled {
+        agrees(node, &[reading])?;
+    }
+    if let [(_, node)] = &settled[..]
+        && forest.settled_spine() != SettledSpine::Root(node.clone())
+    {
+        return Err("the one Derivation's tree is not the spine".to_owned());
+    }
+    readings.sort();
+    settled.sort_by(|a, b| a.0.cmp(&b.0));
+    let settled: Vec<Reading> = settled.into_iter().map(|(reading, _)| reading).collect();
+    if readings == settled {
+        Ok(())
+    } else {
+        Err("`settled_readings` are not the Readings".to_owned())
+    }
+}
+
 #[test]
 fn the_settled_spine_agrees_with_the_counts_and_the_readings() {
     let env = LexicalEnvironment::load().unwrap();
@@ -297,7 +331,7 @@ fn the_settled_spine_agrees_with_the_counts_and_the_readings() {
         let mut narrowed = forest;
         loop {
             if narrowed.total() <= ENUMERATED
-                && let Err(why) = check_enumerated(&narrowed)
+                && let Err(why) = check_enumerated(&narrowed).and(check_settled_readings(&narrowed))
             {
                 failures.push(name(why));
                 break;

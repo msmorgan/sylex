@@ -956,6 +956,15 @@ impl Graph {
 
     /// The Derivations as Readings.
     pub(crate) fn trees(&self, parse: &Parse<'_>) -> Vec<crate::Reading> {
+        let mut features = HashMap::new();
+        self.derivation_trees(parse)
+            .iter()
+            .map(|tree| tree.reading(parse, &mut features))
+            .collect()
+    }
+
+    /// The Derivations as trees, one per root Derivation.
+    pub(crate) fn derivation_trees(&self, parse: &Parse<'_>) -> Vec<Rc<Tree>> {
         let mut nodes: Vec<Vec<Rc<Tree>>> = vec![Vec::new(); self.nodes.len()];
         let mut items: Vec<Vec<Option<Rc<Sequence>>>> = vec![Vec::new(); self.items.len()];
         for vertex in self.order() {
@@ -975,6 +984,9 @@ impl Graph {
                     nodes[n] = out;
                 }
                 V::Item(i) => {
+                    let original = &parse.forest.items[self.items[i].original];
+                    let name =
+                        parse.grammar.productions[original.production].names[original.dot - 1];
                     let mut out = Vec::new();
                     for &f in &self.items[i].families {
                         let family = &self.families[f];
@@ -982,20 +994,18 @@ impl Graph {
                             Some(p) => &items[p],
                             None => &[None],
                         };
-                        let lasts: Vec<Option<Rc<Tree>>> = match family.child {
-                            GChild::Node(c) => nodes[c].iter().cloned().map(Some).collect(),
-                            GChild::Leaf(l) => vec![Some(Rc::new(Tree::Leaf(l)))],
-                            GChild::Punct => vec![None],
+                        let lasts: Vec<Rc<Tree>> = match family.child {
+                            GChild::Node(c) => nodes[c].clone(),
+                            GChild::Leaf(l) => vec![Rc::new(Tree::Leaf(l))],
+                            GChild::Punct => vec![Rc::new(Tree::Punct)],
                         };
                         for prefix in prefixes {
                             for last in &lasts {
-                                out.push(match last {
-                                    Some(tree) => Some(Rc::new(Sequence {
-                                        prefix: prefix.clone(),
-                                        last: Rc::clone(tree),
-                                    })),
-                                    None => prefix.clone(),
-                                });
+                                out.push(Some(Rc::new(Sequence {
+                                    prefix: prefix.clone(),
+                                    name,
+                                    last: Rc::clone(last),
+                                })));
                             }
                         }
                     }
@@ -1003,39 +1013,43 @@ impl Graph {
                 }
             }
         }
-        let mut features = HashMap::new();
         self.roots
             .iter()
-            .flat_map(|root| nodes[root.node].iter())
-            .map(|tree| tree.reading(parse, &mut features))
+            .flat_map(|root| nodes[root.node].iter().cloned())
             .collect()
     }
 }
 
 /// A Derivation's tree before it is read as a Reading.
-enum Tree {
+pub(crate) enum Tree {
     Node {
+        /// The Packed Forest node.
         node: usize,
         production: usize,
         children: Option<Rc<Sequence>>,
     },
+    /// A leaf of the Packed Forest.
     Leaf(usize),
+    /// Punctuation, which a Reading does not store.
+    Punct,
 }
 
-/// A sequence of children, last first.
-struct Sequence {
-    prefix: Option<Rc<Sequence>>,
-    last: Rc<Tree>,
+/// A sequence of children, last first, each with its name in the Production.
+pub(crate) struct Sequence {
+    pub(crate) prefix: Option<Rc<Sequence>>,
+    pub(crate) name: Ident,
+    pub(crate) last: Rc<Tree>,
 }
 
 impl Tree {
-    fn reading(
+    pub(crate) fn reading(
         &self,
         parse: &Parse<'_>,
         features: &mut HashMap<usize, std::collections::BTreeMap<Ident, Ident>>,
     ) -> crate::Reading {
         match self {
             Tree::Leaf(l) => crate::Reading::Leaf(parse.forest.leaves[*l].reading.clone()),
+            Tree::Punct => panic!("punctuation is no Reading"),
             Tree::Node {
                 node,
                 production,
@@ -1044,7 +1058,9 @@ impl Tree {
                 let mut readings = Vec::new();
                 let mut at = children.as_deref();
                 while let Some(sequence) = at {
-                    readings.push(sequence.last.reading(parse, features));
+                    if !matches!(*sequence.last, Tree::Punct) {
+                        readings.push(sequence.last.reading(parse, features));
+                    }
                     at = sequence.prefix.as_deref();
                 }
                 readings.reverse();
