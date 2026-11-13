@@ -25,7 +25,6 @@ sylex_render_v1 = { version = "0.1.0", path = "../../v1/crates/render" }
 sylex_core = { version = "0.1.0", path = "../core" }
 # Reuse the locked substring scanner for JSONL name candidates.
 memchr = "2.8.2"
-libc = "0.2.186"
 sylex_pipeline_v1 = { version = "0.1.0", path = "../../v1/crates/pipeline" }
 macro_ron = { version = "0.1.0", path = "../../v1/crates/macro_ron" }
 # `map enums`: parse Rust sources to find `pub enum` shapes; span-locations
