@@ -590,9 +590,9 @@ impl GameState {
             // Move (exile is `Move(_, Exile)`)/Tap/Untap take a single
             // `Reference` (an agent slot spelled as the controller register in
             // cost context on the verbs that carry one) — it always names its
-            // one object, so it is payable. The choose-feasibility of "sacrifice
-            // a creature" lives in the cost's own `Choose` instruction, not the
-            // verb.
+            // one object, so it is payable. The choose-feasibility of
+            // "sacrifice a creature" lives in the cost's own `Choose`
+            // instruction, not the verb.
             Action::Move(..) | Action::Tap(_) | Action::Untap(_) => true,
             // [CR#119.4]: pay-life needs life ≥ the amount; [CR#119.4b]: paying
             // 0 is always allowed (and `life >= 0` holds trivially).

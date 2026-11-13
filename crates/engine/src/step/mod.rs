@@ -1641,10 +1641,10 @@ impl GameState {
                 vec![WorkItem::AssignCombatDamage]
             }
             // [CR#511.1]: the End of Combat step has NO turn-based actions — the
-            // removal-from-combat ([CR#511.3]) happens as the step *ends*, after
-            // its priority window, scheduled from `end_of_step_items` (so an
-            // "at end of combat" trigger resolving during that priority can still
-            // read combat state).
+            // removal-from-combat ([CR#511.3]) happens as the step *ends*,
+            // after its priority window, scheduled from `end_of_step_items` (so
+            // an "at end of combat" trigger resolving during that priority can
+            // still read combat state).
             // [CR#514.1]: first, discard to hand size; [CR#514.2]: second,
             // marked damage is removed and "until end of turn" and "this turn"
             // effects end. The discard's submission front-schedules its events
@@ -2015,8 +2015,8 @@ impl GameState {
         }
         let lib = &mut self.zones.libraries[owner.index()];
         match pile.end {
-            // Top pile: `order[0]` is the very top. Re-insert front-most last so
-            // it ends up at the front of the deque (= top of library).
+            // Top pile: `order[0]` is the very top. Re-insert front-most last
+            // so it ends up at the front of the deque (= top of library).
             LibraryEnd::Top => {
                 for &object in order.iter().rev() {
                     lib.push_front(object);

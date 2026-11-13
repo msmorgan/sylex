@@ -344,11 +344,12 @@ fn macro_slot_reader(ty: &str, input: &str) -> Option<(String, usize)> {
         "Count" => Some((number_word(input.trim())?.to_string(), input.len())),
         // An object reference. Only the self-reference forms are modeled here:
         // the `~` sigil (and the `it` / `this creature` anaphors that survive
-        // when the upstream `~` rewrite didn't fire) name the object the ability
-        // is printed on ([CR#201.5]) — `This`. A `target …` / `enchanted …`
-        // reference would need a target declaration or an attachment ref hoisted
-        // onto the frame, which a slot reader can't do (it returns only `(arg,
-        // consumed)`); those decline, leaving the clause for a later production.
+        // when the upstream `~` rewrite didn't fire) name the object the
+        // ability is printed on ([CR#201.5]) — `This`. A `target …` /
+        // `enchanted …` reference would need a target declaration or an
+        // attachment ref hoisted onto the frame, which a slot reader can't do
+        // (it returns only `(arg, consumed)`); those decline, leaving the
+        // clause for a later production.
         "Reference" => self_reference(input.trim()).map(|r| (r, input.len())),
         // A card-type-descriptor slot ("… if it's a ${0} card …"): the
         // descriptor word(s) between "a" and "card", classified into the
@@ -2745,7 +2746,8 @@ fn damage_target(text: &str, slot: usize) -> Option<DamagePatient> {
         },
         // "each creature and each player" — every member of the combined set
         // ([CR#608.2d] distributive each). The two "each" groups union into one
-        // `SelectAll(Or([…]))` selection (Pestilence / Earthquake-style sweeps).
+        // `SelectAll(Or([…]))` selection (Pestilence / Earthquake-style
+        // sweeps).
         "each creature and each player" => DamagePatient::EachOf {
             filter: "Or([Creature, Player])".to_owned(),
         },

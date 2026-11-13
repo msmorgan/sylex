@@ -1,9 +1,9 @@
 /// Core RON spells numeric values explicitly as `Number(3)`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, serde::Serialize)]
 pub enum StatValue {
-    // Power or toughness set by a characteristic-defining ability ([CR#208.2a] —
-    // the `*`, worded "[this creature's] power/toughness is equal to …", set per
-    // the CDA rule [CR#604.3]). Any power or toughness containing * is
+    // Power or toughness set by a characteristic-defining ability ([CR#208.2a]
+    // — the `*`, worded "[this creature's] power/toughness is equal to …", set
+    // per the CDA rule [CR#604.3]). Any power or toughness containing * is
     // essentially reminder text.
     DefinedByAbility,
 

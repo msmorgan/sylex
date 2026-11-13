@@ -410,9 +410,10 @@ pub(crate) fn unless_cost_action(
                  its own instruction, never as a single Action"
             )
         }
-        // The `unless` cost list is `Cost::normalize`d at the `Instruction::Unless`
-        // boundary (see `resolve.rs`), which splices every nested `Cost` flat,
-        // so a `Cost` component never survives to here.
+        // The `unless` cost list is `Cost::normalize`d at the
+        // `Instruction::Unless` boundary (see `resolve.rs`), which splices
+        // every nested `Cost` flat, so a `Cost` component never survives to
+        // here.
         CostComponent::Cost(_) => {
             unreachable!("nested Cost is spliced away by normalize at the Unless boundary")
         }
@@ -684,9 +685,9 @@ impl GameState {
                     from: Some(Zone::Hand),
                     to: Some(Zone::Graveyard),
                     cause: Some(Cause::discard(Agency::EffectInstruction, None)),
-                    // Each per-card discard is a FUTURE window ([CR#616.1]) whose
-                    // apply commits the single Hand → Graveyard move; a bound
-                    // single move needs no `contents`.
+                    // Each per-card discard is a FUTURE window ([CR#616.1])
+                    // whose apply commits the single Hand → Graveyard move; a
+                    // bound single move needs no `contents`.
                     committed: false,
                     contents: None,
                     batch: None,

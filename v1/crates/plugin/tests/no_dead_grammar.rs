@@ -146,13 +146,14 @@ fn structurally_untagged() -> BTreeSet<Node> {
         ("Predicate", "Characteristic"),
         ("Predicate", "State"),
         ("Predicate", "Relation"),
-        // The mana enums' `#[serde(untagged)]` fall-through variants: the tag is
-        // never a spelled token because the untagged arm serializes its payload
-        // transparently. `ManaSpec::Specific` writes `White` (not
-        // `Specific(White)`), `SimpleManaSymbol::Specific` and `ManaSymbol::Simple`
-        // likewise lift the inner symbol, and `ManaProduction::Bare` writes the
-        // bare spec (`AddMana(Literal(1), AnyColor)`, no `Bare(...)`). Each is
-        // exercised on every mana card; there is simply nothing to grep for.
+        // The mana enums' `#[serde(untagged)]` fall-through variants: the tag
+        // is never a spelled token because the untagged arm serializes its
+        // payload transparently. `ManaSpec::Specific` writes `White` (not
+        // `Specific(White)`), `SimpleManaSymbol::Specific` and
+        // `ManaSymbol::Simple` likewise lift the inner symbol, and
+        // `ManaProduction::Bare` writes the bare spec (`AddMana(Literal(1),
+        // AnyColor)`, no `Bare(...)`). Each is exercised on every mana card;
+        // there is simply nothing to grep for.
         ("ManaSpec", "Specific"),
         ("SimpleManaSymbol", "Specific"),
         ("ManaSymbol", "Simple"),

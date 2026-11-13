@@ -13,7 +13,7 @@ use sylex_syntax::Counts;
 use sylex_syntax::Parse;
 
 /// A use of the forest in a Derivation.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub enum Use {
     Node(usize),
     Item(usize),

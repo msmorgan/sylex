@@ -912,9 +912,9 @@ fn gather(
                     conditions: Vec::new(),
                     controller,
                     scope,
-                    // Flatten first (so `bake` sees the flat P/T ops), then bake
-                    // the self-scoped counter counts — the same single boundary
-                    // as the static-ability path.
+                    // Flatten first (so `bake` sees the flat P/T ops), then
+                    // bake the self-scoped counter counts — the same single
+                    // boundary as the static-ability path.
                     changes: bake_counter_counts(&Modification::flatten(&changes), &obj.counters),
                     grant_runtimes: vec![
                         crate::activation::AbilityRuntime::default();
@@ -949,12 +949,13 @@ fn gather(
             // `+N/+N until end of turn`) is flattened before the layer pass.
             changes,
             grant_runtimes,
-            // A spell-built floating effect's source spell has left the stack by
-            // the time the layer pass runs, so `Ref(You)` anchors on the locked
-            // controller's player proxy (`controller_of_source(Player(p)) == p`,
-            // always live) rather than the gone spell. A floating `Matching`
-            // scope naming `Ref(This)` (no canonical card does) would resolve to
-            // that proxy; the spell itself is not re-derivable here ([CR#611.2c]).
+            // A spell-built floating effect's source spell has left the stack
+            // by the time the layer pass runs, so `Ref(You)` anchors on the
+            // locked controller's player proxy
+            // (`controller_of_source(Player(p)) == p`, always live) rather than
+            // the gone spell. A floating `Matching` scope naming `Ref(This)`
+            // (no canonical card does) would resolve to that proxy; the spell
+            // itself is not re-derivable here ([CR#611.2c]).
             watcher: Some(ObjectSource::Player(ce.controller)),
             locked: None,
         });
@@ -1112,12 +1113,12 @@ fn resolve_source_relative(
                 .filter_map(|id| state.objects.get(id).and_then(|o| o.attached_to))
                 .collect()
         }
-        // ExecutionFrame-dependent references only: `Target`, bindings (`Bound`,
-        // `Linked`, `EventObject`, `EventActor`) — and the player-valued
-        // `You`/`ControllerOf`/`OwnerOf` — cannot be resolved without an `ExecutionFrame`
-        // in gather, so they stay an empty locked set (a documented seam; these
-        // need `eval_reference`, which `gather` deliberately lacks to avoid the
-        // layers()→eval recursion).
+        // ExecutionFrame-dependent references only: `Target`, bindings
+        // (`Bound`, `Linked`, `EventObject`, `EventActor`) — and the
+        // player-valued `You`/`ControllerOf`/`OwnerOf` — cannot be resolved
+        // without an `ExecutionFrame` in gather, so they stay an empty locked
+        // set (a documented seam; these need `eval_reference`, which `gather`
+        // deliberately lacks to avoid the layers()→eval recursion).
         _ => Vec::new(),
     }
 }
@@ -1209,8 +1210,9 @@ fn matches_derived(
         }
         // Stat over DERIVED P/T (in the working map); mana value is printed
         // (layer-stable), read without the layer view. Evaluated HERE rather
-        // than delegated so the derived matcher never re-enters `state.layers()`
-        // mid-build via `target::matches`'s layers-reading Stat arm.
+        // than delegated so the derived matcher never re-enters
+        // `state.layers()` mid-build via `target::matches`'s layers-reading
+        // Stat arm.
         Predicate::Characteristic(CharacteristicPredicate::Stat(stat, cmp, count)) => {
             use sylex_core::Stat;
             let value = match stat {
@@ -1271,20 +1273,21 @@ fn matches_derived(
             params,
         ),
         // `Named` and everything non-characteristic (zone, status, kind,
-        // combat, relations, refs …): delegate to the printed matcher, threading
-        // the carrier `watcher` so a scope's `Ref(This)`/`Ref(You)` (and the
-        // `Ref(You)` nested inside a `ControlledBy`) anchors against the host
-        // instead of hitting the frameless-targeting `todo!`. None of the
-        // delegated arms re-enter `state.layers()` — the recursion-safety
+        // combat, relations, refs …): delegate to the printed matcher,
+        // threading the carrier `watcher` so a scope's `Ref(This)`/`Ref(You)`
+        // (and the `Ref(You)` nested inside a `ControlledBy`) anchors against
+        // the host instead of hitting the frameless-targeting `todo!`. None of
+        // the delegated arms re-enter `state.layers()` — the recursion-safety
         // invariant this matcher rests on. That holds for EVERY id it sees, and
-        // it sees every live card-backed object, not only battlefield permanents:
-        // `base_map` derives objects in all zones, so a predicate-scoped
-        // conferral / `SelectAll` scope resolves over that whole set — an
-        // off-battlefield (in-hand/graveyard) card is matched here too. Each
-        // delegated arm is zone-agnostic — `Named` reads the printed face;
-        // relations resolve over player proxies / object iteration; combat and
-        // state read stored fields — so the layers()-free guarantee is
-        // independent of the id's zone. Characteristic leaves are handled above.
+        // it sees every live card-backed object, not only battlefield
+        // permanents: `base_map` derives objects in all zones, so a
+        // predicate-scoped conferral / `SelectAll` scope resolves over that
+        // whole set — an off-battlefield (in-hand/graveyard) card is matched
+        // here too. Each delegated arm is zone-agnostic — `Named` reads the
+        // printed face; relations resolve over player proxies / object
+        // iteration; combat and state read stored fields — so the layers()-free
+        // guarantee is independent of the id's zone. Characteristic leaves are
+        // handled above.
         _ => crate::target::matches_with(state, id, filter, env.watcher),
     }
 }
@@ -1689,8 +1692,8 @@ fn eval_stat_of(
         .expect("mana value fits Int"),
         // [CR#209.1,306.5a]: loyalty is the PRINTED loyalty characteristic off
         // the card face — never the live counter count (current loyalty is
-        // `CounterCount(This, LoyaltyCounter)`). `base_stat` maps `Number(n)→n`,
-        // `DefinedByAbility`/`Variable`/absent → 0.
+        // `CounterCount(This, LoyaltyCounter)`). `base_stat` maps
+        // `Number(n)→n`, `DefinedByAbility`/`Variable`/absent → 0.
         Stat::Loyalty => base_stat(
             crate::derive::face(state.def(id))
                 .characteristics
@@ -1744,8 +1747,8 @@ fn eval_count(
     match n {
         Count::Literal(v) => (*v).cast_signed(),
         // "For each …": the filter's cardinality over the working derived map,
-        // matched the same way scopes are ([CR#613.6] — `matches_derived`), so a
-        // count over types/colors sees the values earlier layers produced.
+        // matched the same way scopes are ([CR#613.6] — `matches_derived`), so
+        // a count over types/colors sees the values earlier layers produced.
         Count::CountOf(source) => match source {
             // [CR#119.1]: a player-filter's cardinality reads exactly like an
             // object filter's — both range over Entities
@@ -1803,9 +1806,9 @@ fn eval_count(
             // engine yet — fizzles to 0, like `ManaSymbols`'s siblings.
             Countable::ManaSpentMatching(..) => 0,
         },
-        // "Equal to its power": resolve the reference, read the DERIVED stat off
-        // `working`. Mana value / loyalty / defense are layer-stable base state
-        // (read off the card face / counter map, as `resolve.rs` does). A
+        // "Equal to its power": resolve the reference, read the DERIVED stat
+        // off `working`. Mana value / loyalty / defense are layer-stable base
+        // state (read off the card face / counter map, as `resolve.rs` does). A
         // negative result counts as `0` ([CR#107.1b,613]).
         Count::StatOf(reference, stat) => eval_stat_of(state, working, reference, *stat, env),
         // [CR#119.1,402.2]: a player's numeric attribute — read straight off
@@ -1831,8 +1834,8 @@ fn eval_count(
                 Int::try_from(state.opponent_count(p)).expect("opponent count fits Int")
             }),
         // [CR#122.1]: the count of a counter kind on the resolved object, read
-        // off the raw counter map (base state — no derived/recursion). An absent
-        // object or kind is `0`.
+        // off the raw counter map (base state — no derived/recursion). An
+        // absent object or kind is `0`.
         Count::CounterCount(reference, kind) => resolve_count_ref(state, working, reference, env)
             .and_then(|id| state.objects.get(id))
             .and_then(|o| o.counters.get(kind.as_str()).copied())
@@ -1977,17 +1980,18 @@ fn eval_count(
         // the variant does; `core-demacro` deletes both.
         // Announce-time / history context (`ThatMuch`, `EventCount`,
         // `EventSum`) is unavailable during layer derivation — those
-        // need a resolution `ExecutionFrame` (`resolve.rs::eval_count`), so a continuous
-        // effect built on one defaults to `0` here (a documented seam).
+        // need a resolution `ExecutionFrame` (`resolve.rs::eval_count`), so a
+        // continuous effect built on one defaults to `0` here (a documented
+        // seam).
         //
         // [CR#107.1]: `Aggregate`'s per-element fold binds `It` via a resolution
-        // `ExecutionFrame` sub-binding (`resolve.rs::eval_count`'s `Selection::Pick`-style
-        // loop) — the layer pass has no `ExecutionFrame` to bind against, so a CDA built
-        // on an aggregate fold defaults to `0` here too (unforced: no CDA needs
-        // one yet).
+        // `ExecutionFrame` sub-binding (`resolve.rs::eval_count`'s
+        // `Selection::Pick`-style loop) — the layer pass has no
+        // `ExecutionFrame` to bind against, so a CDA built on an aggregate fold
+        // defaults to `0` here too (unforced: no CDA needs one yet).
         // [CR#115.9a]: `TargetsOf` reads the announcing stack entry's target
-        // list — announce-time context this ExecutionFrame-less layer pass lacks
-        // (same seam as `TimesPaid`'s paid-cost record) — defaults to 0.
+        // list — announce-time context this ExecutionFrame-less layer pass
+        // lacks (same seam as `TimesPaid`'s paid-cost record) — defaults to 0.
         Count::Reg(_)
         | Count::EventCount(..)
         | Count::EventSum(..)
@@ -2230,11 +2234,12 @@ fn apply_static(
         // --- Layer 7d: switch ---
         Modification::SwitchPowerToughness => std::mem::swap(&mut c.power, &mut c.toughness),
         // --- Layer 4: type-changing ([CR#613.1d]) ---
-        // The op's elements are bare `Ident` names; `Characteristics::card_types`
-        // holds full `TypeDef` structs (with `permanent`/`confers`). Resolve each
-        // name through the engine's type registry (`state.types`, populated from
-        // the loaded plugin), so a granted type's `confers` ride along — exactly
-        // like the `Subtypes` arm. An `Ident` absent from the registry applies as
+        // The op's elements are bare `Ident` names;
+        // `Characteristics::card_types` holds full `TypeDef` structs (with
+        // `permanent`/`confers`). Resolve each name through the engine's type
+        // registry (`state.types`, populated from the loaded plugin), so a
+        // granted type's `confers` ride along — exactly like the `Subtypes`
+        // arm. An `Ident` absent from the registry applies as
         // a minimal name-only `TypeDef` (no `confers`): the type still applies,
         // it just carries no inherent rules (fizzle, never crash).
         Modification::CardTypes(op) => match op {
@@ -2264,14 +2269,15 @@ fn apply_static(
             CollectionOp::Remove(s) => Arc::make_mut(&mut c.supertypes).retain(|x| x != s),
         },
         // --- Layer 4: subtype-changing ([CR#613.1d]) ---
-        // The op's elements are name-keyed `SubtypeRef`s (`.name()` is the key);
-        // `Characteristics::subtypes` holds full `Subtype` structs (with
+        // The op's elements are name-keyed `SubtypeRef`s (`.name()` is the
+        // key); `Characteristics::subtypes` holds full `Subtype` structs (with
         // `confers`/`types`). Resolve each name
-        // through the engine's subtype registry (`state.subtypes`, populated from
-        // the loaded plugin), so a granted subtype's inherent rules ride along —
-        // e.g. a basic land type's mana ability ([CR#305.6]). An `Ident` absent
-        // from the registry applies as a minimal name-only `Subtype` (no `confers`,
-        // no `types`): the type still applies, it just carries no inherent rules.
+        // through the engine's subtype registry (`state.subtypes`, populated
+        // from the loaded plugin), so a granted subtype's inherent rules ride
+        // along — e.g. a basic land type's mana ability ([CR#305.6]). An
+        // `Ident` absent from the registry applies as a minimal name-only
+        // `Subtype` (no `confers`, no `types`): the type still applies, it just
+        // carries no inherent rules.
         Modification::Subtypes(op) => match op {
             CollectionOp::Set(names) => {
                 c.subtypes = Arc::new(
@@ -2292,8 +2298,9 @@ fn apply_static(
                 Arc::make_mut(&mut c.subtypes).retain(|s| s.name != name.name());
             }
         },
-        // [CR#305.7] deferred: replace land subtypes + strip abilities + grant basic
-        // mana ability (no fixture yet). Do NOT implement the mana-ability construction.
+        // [CR#305.7] deferred: replace land subtypes + strip abilities + grant
+        // basic mana ability (no fixture yet). Do NOT implement the
+        // mana-ability construction.
         Modification::BecomeBasicLandType(_) => {}
         // TODO(kw-changeling): every-creature-type subtype fill
         // ([CR#702.73a,205.3m]) — no-op stub until built (reachable now that
@@ -2349,8 +2356,8 @@ fn apply_static(
         }
         // --- Layer 3: text-changing ([CR#613.1c]) — documented slot ---
         // A real [CR#612] word-replacement needs text→ability re-derivation the
-        // engine does not do; tracked by its own todo. The op still occupies its
-        // layer-3 position in the pass (so dependency ordering sees it).
+        // engine does not do; tracked by its own todo. The op still occupies
+        // its layer-3 position in the pass (so dependency ordering sees it).
         Modification::SetText(_) => {}
         // --- No [CR#613] layer ---
         Modification::BaseLoyalty(_) | Modification::BaseDefense(_) => {

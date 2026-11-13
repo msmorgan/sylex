@@ -224,8 +224,9 @@ impl Interaction {
                 legal.get(*active).cloned().unwrap_or_default()
             }
             // Attackers and Discard are both "toggle a subset of these ids":
-            // every listed id is a candidate (the caps are enforced in `toggle`,
-            // not by hiding candidates, so chosen cards stay toggle-off-able).
+            // every listed id is a candidate (the caps are enforced in
+            // `toggle`, not by hiding candidates, so chosen cards stay
+            // toggle-off-able).
             Interaction::Attackers { legal, .. } | Interaction::Discard { legal, .. } => {
                 legal.clone()
             }
@@ -393,7 +394,8 @@ impl Interaction {
                 .all(|slot| !slot.is_empty())
                 .then(|| Decision::Targets(chosen.clone())),
             // [CR#508.1b]: every attacker attacks the defending player (the
-            // proxy stored at build time); a planeswalker picker is a follow-up.
+            // proxy stored at build time); a planeswalker picker is a
+            // follow-up.
             Interaction::Attackers {
                 chosen, defender, ..
             } => Some(Decision::Attackers(
@@ -455,9 +457,9 @@ impl Interaction {
                 _ => {}
             },
             // ---- Priority, object-first ----
-            // Pass is `a`, not Space — Space is the giant easy-to-fat-finger key
-            // and still toggles selections in the pick modes below, so binding
-            // priority-pass off it stops accidental advances.
+            // Pass is `a`, not Space — Space is the giant easy-to-fat-finger
+            // key and still toggles selections in the pick modes below, so
+            // binding priority-pass off it stops accidental advances.
             Interaction::Priority { sub: None } => match key.code {
                 KeyCode::Char('a') | KeyCode::F(2) => {
                     outcome.submit = Some(Decision::Act(Action::Pass));
@@ -479,7 +481,8 @@ impl Interaction {
                             // No legal action right now — but a spell may be
                             // castable if its mana were floated. Defer to the
                             // autotapper (run after the match); it no-ops back
-                            // to the error message when it can't cover the cost.
+                            // to the error message when it can't cover the
+                            // cost.
                             0 => outcome.autotap_cast = Some(id),
                             1 => outcome.submit = Some(Decision::Act(acts[0].clone())),
                             _ => {
@@ -992,7 +995,8 @@ mod tests {
                     let it = Interaction::for_decision(&pending).expect("interactive");
                     it.confirm().expect("blocks confirm")
                 }
-                // Discard: drop the first `count` cards, built through for_discard.
+                // Discard: drop the first `count` cards, built through
+                // for_discard.
                 DecisionPointKind::DiscardToHandSize(sylex_engine::DiscardToHandSize {
                     player,
                     count,

@@ -7,7 +7,6 @@ use std::sync::OnceLock;
 
 use hashbrown::HashTable;
 use hashbrown::hash_table::Entry;
-
 use sylex_lexicon::AnalyzedText;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;

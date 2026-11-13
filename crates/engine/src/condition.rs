@@ -24,12 +24,13 @@ impl GameState {
     pub(crate) fn condition_holds(&self, cond: &Condition, frame: &ExecutionFrame) -> bool {
         let you = frame.controller(self);
         match cond {
-            // "if you control a creature" / "if a creature is on the battlefield"
-            // — threads the frame's watcher (mirrors `Condition::Is` below) so
-            // a carrier-relative filter INSIDE the existential ("a creature
-            // card directly above it" = `Adjacent(Above, Ref(This))`, Death
-            // Spark) can anchor `Ref(This)`/`Ref(You)` instead of hitting the
-            // frameless-targeting seam.
+            // "if you control a creature" / "if a creature is on the
+            // battlefield" — threads the frame's watcher (mirrors
+            // `Condition::Is` below) so a carrier-relative filter INSIDE the
+            // existential ("a creature card directly above it" =
+            // `Adjacent(Above, Ref(This))`, Death Spark) can anchor
+            // `Ref(This)`/`Ref(You)` instead of hitting the frameless-targeting
+            // seam.
             Condition::Exists(filter) => {
                 let watcher = self.frame_watcher(frame);
                 !crate::target::candidates_with_activation(
@@ -50,8 +51,9 @@ impl GameState {
             // graveyard), evaluate against its last-known information
             // ([CR#603.10a]) via `filter_matches_snapshot`: Undying/Persist's
             // intervening-if "if it had no +1/+1 (resp. -1/-1) counters on it"
-            // ([CR#702.93a,702.79a]) reads the DYING object's captured counters,
-            // which no live object holds. A live object takes the live path.
+            // ([CR#702.93a,702.79a]) reads the DYING object's captured
+            // counters, which no live object holds. A live object takes the
+            // live path.
             Condition::Matches(reference, filter) => {
                 let watcher = self.frame_watcher(frame);
                 let product = self.eval_reference_product(reference, frame);
@@ -102,8 +104,8 @@ impl GameState {
             // passes `attachment_legal` (the same predicate the attach no-op
             // uses). Unattached / illegal-host / self-attached all read false —
             // exactly the Aura graveyard SBA's "or is not attached" trigger
-            // (`ConditionallyDo(Not(LegallyAttached(Ref(This))), …)`). Generic: no
-            // subtype branch.
+            // (`ConditionallyDo(Not(LegallyAttached(Ref(This))), …)`). Generic:
+            // no subtype branch.
             Condition::LegallyAttached(reference) => {
                 let object = self.eval_reference(reference, frame);
                 self.objects
@@ -187,10 +189,11 @@ impl GameState {
 
             // "if its [keyword] cost was paid" ([CR#702.34a,702.74a]) — the
             // ALTERNATIVE-cost twin of `PaidCost`. The announce record that
-            // marks a spell as cast with an alternative cost is engine-alt-costs
-            // (unbuilt), so no object is yet recorded as cast that way: the
-            // rider it gates (Flashback's exile, Evoke's sacrifice) does not
-            // fire until then. Conservative `false`, never a panic.
+            // marks a spell as cast with an alternative cost is
+            // engine-alt-costs (unbuilt), so no object is yet recorded as cast
+            // that way: the rider it gates (Flashback's exile, Evoke's
+            // sacrifice) does not fire until then. Conservative `false`, never
+            // a panic.
             Condition::CastWith(_tag) => false,
 
             // It is the evaluating player's turn — the frame-robust sugar for

@@ -923,8 +923,8 @@ impl CompiledGrammar {
         let mut key = RankingKey::default();
         match p.roles[index] {
             ChildRole::Head if !child.coordination => {
-                key.right_association_words = signed(child.words)
-                    .saturating_mul(i64::from(attachment.dependents_after));
+                key.right_association_words =
+                    signed(child.words).saturating_mul(i64::from(attachment.dependents_after));
             }
             role @ (ChildRole::Adjunct | ChildRole::Modifier | ChildRole::Supplement)
                 if attachment.after_head =>

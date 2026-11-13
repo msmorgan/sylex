@@ -50,8 +50,8 @@ pub(super) fn condition(c: &Condition, ctx: &Ctx) -> String {
             )
         }
         // "you have the city's blessing" ([`YouHaveTheCitysBlessing`
-        // Condition macro](../../../../plugins/builtin/macros/condition/YouHaveTheCitysBlessing.
-        // ron)).
+        // Condition macro](../../../../plugins/builtin/macros/condition/
+        // YouHaveTheCitysBlessing. ron)).
         Condition::Matches(Reference::You, filter)
             if matches!(
                 strip_expanded(filter),
@@ -80,7 +80,8 @@ pub(super) fn condition(c: &Condition, ctx: &Ctx) -> String {
         {
             "creatures you control have total power 8 or greater".to_string()
         }
-        // "you control three or more artifacts" ([`YouControlThreeOrMoreArtifacts`]).
+        // "you control three or more artifacts"
+        // ([`YouControlThreeOrMoreArtifacts`]).
         Condition::Compare(
             Count::CountOf(Countable::Objects(f)),
             Cmp::AtLeast,

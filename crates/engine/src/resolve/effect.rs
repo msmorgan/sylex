@@ -735,8 +735,8 @@ impl GameState {
                     ),
                     // The distributor shape ("target creature and all creatures
                     // it shares a color with get +1/+1", or a plain anthem)
-                    // stays `Floating(f)`: the filter is NOT expanded to objects
-                    // here.
+                    // stays `Floating(f)`: the filter is NOT expanded to
+                    // objects here.
                     StaticSpec::Each(Selection::SelectAll(f), inner) => match &inner.body {
                         StaticSpec::Modify(Reference::Reg(reference), change)
                             if matches!(
@@ -759,9 +759,10 @@ impl GameState {
                     // block this turn"): its subject `Reference`s resolve at
                     // mint ([CR#611.2c] object lock) — `scope = Locked(ids)`,
                     // the subject rewritten to `It`, so a consumer reads `It` =
-                    // the scope members. Row EVALUATION stays LOUD at `legal.rs`
-                    // (core-casting-restrictions / engine-combat-requirements
-                    // own it); this only makes the row EXIST in the view.
+                    // the scope members. Row EVALUATION stays LOUD at
+                    // `legal.rs` (core-casting-restrictions /
+                    // engine-combat-requirements own it); this only makes the
+                    // row EXIST in the view.
                     StaticSpec::Deontic(deontic) => {
                         let (ids, locked) = self.lock_deontic_subject(deontic, frame);
                         (
@@ -784,15 +785,18 @@ impl GameState {
                     StaticSpec::Prevention(_) => todo!(
                         "engine seam: Continuously(Prevention) ([CR#615.1]) — granted prevention shields/windows unbuilt; owner: engine-granted-prevention-rows"
                     ),
-                    // Narrower than the old catch-all: name the specific unbuilt
-                    // granted static-row kind.
+                    // Narrower than the old catch-all: name the specific
+                    // unbuilt granted static-row kind.
                     StaticSpec::Each(sel, _) => todo!(
                         "engine seam: Continuously(Each({sel:?}, _)) — only Each(SelectAll, Modify(It, _)) is wired; owner: engine-granted-static-rows"
                     ),
-                    // Becomes-a-copy is a deferred-exec seam: its copiable-value install is
-                    // owned by engine-layers-1-copy-facedown-text (base_values). Until that
-                    // lands a resolved becomes-a-copy FIZZLES — installs nothing — per the
-                    // never-panic contract, matching the early-return fizzles above (473/555).
+                    // Becomes-a-copy is a deferred-exec seam: its
+                    // copiable-value install is
+                    // owned by engine-layers-1-copy-facedown-text
+                    // (base_values). Until that lands a resolved becomes-a-copy
+                    // FIZZLES — installs nothing — per the never-panic
+                    // contract, matching the early-return fizzles above
+                    // (473/555).
                     StaticSpec::BecomesCopy(..) => return,
                     // A characteristic-defining ability is a static ability
                     // of the object it defines [CR#604.3]; a resolved effect
@@ -1164,16 +1168,17 @@ impl GameState {
                 });
             }
             // [CR#601.2f,118.8]: "As an additional cost, [pay]; then [body]." The
-            // NESTED (resolution-time) form — an extra cost paid mid-resolution,
-            // after which `body` runs reading the paid object via the event
-            // references. The payer is the controller (an additional cost is
-            // never another player's, [CR#601.2b]), so each component runs as
-            // `You`'s action, exactly like the `Unless`/`MayPay` payment walk.
-            // When the cost moves a single resolvable object (`Sacrifice(This)`,
-            // …) its last-known snapshot ([CR#603.10a]) is bound as the event
-            // AGENT, so `body` reads "the sacrificed creature" via `EventObject`
-            // (`StatOf(EventObject, Power)` = Fling). Cost items are
-            // front-scheduled BEFORE the body so the payment precedes it.
+            // NESTED (resolution-time) form — an extra cost paid
+            // mid-resolution, after which `body` runs reading the paid object
+            // via the event references. The payer is the controller (an
+            // additional cost is never another player's, [CR#601.2b]), so each
+            // component runs as `You`'s action, exactly like the
+            // `Unless`/`MayPay` payment walk. When the cost moves a single
+            // resolvable object (`Sacrifice(This)`, …) its last-known snapshot
+            // ([CR#603.10a]) is bound as the event AGENT, so `body` reads "the
+            // sacrificed creature" via `EventObject` (`StatOf(EventObject,
+            // Power)` = Fling). Cost items are front-scheduled BEFORE the body
+            // so the payment precedes it.
             //
             // SEAMS (deferred, see the ticket): (1) ROOT-level HOISTING to
             // cast/activation time ([CR#601.2f]) — a resolution node can't
@@ -1360,10 +1365,11 @@ impl GameState {
             // a `With(Produce(...))` just performed — madness's "when a card is
             // exiled this way"), it is reflexive-checked on the spot
             // ([CR#603.12]) and fires now rather than waiting for a future
-            // occurrence. Only when no earlier event matches does it register in
-            // the `delayed_triggers` registry for the future. Source/controller
-            // follow [CR#603.7d,603.7e]; `~`/`This` is the creating object's
-            // snapshot (the produced object when the source moved itself away).
+            // occurrence. Only when no earlier event matches does it register
+            // in the `delayed_triggers` registry for the future.
+            // Source/controller follow [CR#603.7d,603.7e]; `~`/`This` is the
+            // creating object's snapshot (the produced object when the source
+            // moved itself away).
             Instruction::Delayed(ability) => {
                 if !self.scan_created_reflexive(&ability, frame) {
                     let (source, bindings) = self.created_trigger_context(&ability, frame);

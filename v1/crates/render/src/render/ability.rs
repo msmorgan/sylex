@@ -1059,10 +1059,7 @@ fn peel_deontic(d: &Deontic) -> &Deontic {
 /// A two-slot targeting agent as a noun phrase — "spells and abilities you
 /// control" ([CR#702.11d]'s two-armed agent read as a single subject).
 fn deed_agent_noun(by: &DeedAgent) -> String {
-    let control = by
-        .stack_object
-        .as_ref()
-        .map_or_default(control_qualifier);
+    let control = by.stack_object.as_ref().map_or_default(control_qualifier);
     format!("spells and abilities{control}")
 }
 

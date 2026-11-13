@@ -413,7 +413,8 @@ fn parse_symbol_body(body: &str) -> Option<ManaSymbol> {
         ["X"] => ManaSymbol::Variable,
         ["S"] => ManaSymbol::Snow,
         [simple] => ManaSymbol::Simple(parse_simple(simple)?),
-        // Phyrexian symbols need a colored left half: there is no {2/P} or {C/P}.
+        // Phyrexian symbols need a colored left half: there is no {2/P} or
+        // {C/P}.
         [simple, "P"] => ManaSymbol::Phyrexian(parse_simple(simple)?.color()?, None),
         [simple, hybrid] => ManaSymbol::Hybrid(parse_simple(simple)?, Color::from_code(hybrid)?),
         [simple, hybrid, "P"] => ManaSymbol::Phyrexian(

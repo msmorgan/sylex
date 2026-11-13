@@ -32,7 +32,7 @@ use crate::counts::Vertex;
 /// among the unit's words. The name is its identity ([`ForkWord::names`]),
 /// which an edit elsewhere in the text leaves valid; its start orders words
 /// for display.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct ForkWord {
     /// Its start, in chars of the analyzed text: display order only.
     pub start: usize,
@@ -49,7 +49,7 @@ impl ForkWord {
 }
 
 /// What a word's maximal projection depends on, by interned word indices.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub(crate) enum Dep {
     Root,
     Dependent {
@@ -117,7 +117,7 @@ struct GRoot {
 }
 
 /// An edge of the split forest: an item's family, or the choice of a root.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub(crate) enum Edge {
     Family(usize),
     Root(usize),
@@ -161,7 +161,7 @@ pub(crate) struct PackedCounts {
 }
 
 /// A node's head: its head line's word and frame Productions (interned).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 struct Head {
     word: Option<u32>,
     frames: u32,

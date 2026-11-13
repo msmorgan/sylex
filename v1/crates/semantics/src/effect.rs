@@ -603,14 +603,15 @@ mod tests {
             "Composite(name:Destroy,body:Move(This,Graveyard))",
             "Sequentially([ChangeLife(You,Up(1)),ChangeLife(You,Up(1))])",
             "May(who:You,effect:ChangeLife(You,Up(1)))",
-            // `Each.binder` is a many-`Binder` (the set of all creatures wrapped
-            // in `Existing`), binding `It` per element.
+            // `Each.binder` is a many-`Binder` (the set of all creatures
+            // wrapped in `Existing`), binding `It` per element.
             "Each(binder:Existing(SelectAll(Supertype(Basic))),effect:ChangeLife(You,Up(1)))",
-            // Brainstorm's shape in the new model: choose 2 cards (a many-binder
-            // `With`), then `Each` over the bound group (`Existing(They)`), moving
-            // each onto the library via the `It` element. Core reader has no
-            // macros, so the `Quantity` is the bare `Range` primitive
-            // (`Exactly(2)` is the cards-layer macro spelling).
+            // Brainstorm's shape in the new model: choose 2 cards (a
+            // many-binder `With`), then `Each` over the bound group
+            // (`Existing(They)`), moving each onto the library via the `It`
+            // element. Core reader has no macros, so the `Quantity` is the bare
+            // `Range` primitive (`Exactly(2)` is the cards-layer macro
+            // spelling).
             "With(binder:Choose(quantity:Range(Literal(2),Literal(2)),filter:InZone(Hand)),\
              body:Each(binder:Existing(They),\
              effect:Move(It,Library(FromTop(Literal(0))))))",

@@ -274,8 +274,8 @@ mod tests {
             DecisionPointKind::DeclareBlockers(sylex_engine::DeclareBlockers { .. }) => {
                 Decision::Blocks(vec![])
             }
-            // Discards now surface to the human, so the test driver answers them
-            // too — drop the first `count` cards.
+            // Discards now surface to the human, so the test driver answers
+            // them too — drop the first `count` cards.
             DecisionPointKind::DiscardToHandSize(sylex_engine::DiscardToHandSize {
                 player,
                 count,
@@ -289,7 +289,8 @@ mod tests {
                         .collect(),
                 )
             }
-            // Priority and every other interactive kind are handled by the caller.
+            // Priority and every other interactive kind are handled by the
+            // caller.
             _ => Decision::Act(Action::Pass),
         }
     }

@@ -385,10 +385,10 @@ fn apply_modification(result: &mut CopiableValues, m: &Modification) {
         }
         // Loyalty/defense have no 613 layer in the live engine (`layer.rs`
         // stubs `BaseLoyalty`/`BaseDefense` for that reason), but
-        // `CopiableValues` mirrors `Characteristics` directly, so "except it enters
-        // with base loyalty N"/defense N is a plain field write — no CDA-drop
-        // (loyalty/defense CDAs are outside `defines_pt`'s scope; see the
-        // module doc).
+        // `CopiableValues` mirrors `Characteristics` directly, so "except it
+        // enters with base loyalty N"/defense N is a plain field write — no
+        // CDA-drop (loyalty/defense CDAs are outside `defines_pt`'s scope; see
+        // the module doc).
         Modification::BaseLoyalty(op) => apply_numeric_field(&mut result.loyalty, op),
         Modification::BaseDefense(op) => apply_numeric_field(&mut result.defense, op),
         Modification::Colors(op) => apply_collection(&mut result.color_indicator, op),

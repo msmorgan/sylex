@@ -170,8 +170,8 @@ fn render_arg(ident: &str, arg: &str) -> anyhow::Result<Option<String>> {
     // Predicate the macro's param expects).
     match ident {
         // An all-defaulted invocation still needs its parens — bare `Hexproof`
-        // doesn't read. The "hexproof from [quality]" oracle line is now claimed
-        // by the macro-template parser; this empty-arg form is what
+        // doesn't read. The "hexproof from [quality]" oracle line is now
+        // claimed by the macro-template parser; this empty-arg form is what
         // `match_keyword_name` reuses for keyword grants.
         "Hexproof" if arg.is_empty() => return Ok(Some("Hexproof()".to_owned())),
         "Protection" => {

@@ -735,11 +735,11 @@ pub enum GameEvent {
     // placeholder reserved). Destroy is `Act(Destroy(x))`, a dual-facet event
     // whose apply COMMITS the Battlefield → Graveyard move directly (carrying
     // its `cause`, [CR#701.8a,701.8b]) — no separate replaceable future-form
-    // `ZoneChange` below it; indestructible ([CR#702.12b]) cants it and regeneration
-    // ([CR#701.19a]) replaces it, both keyed on `Act(Destroy(…))`. Draw is the
-    // atomic single-card `Act(Draw)` ([CR#121.1,121.2]): its apply binds the
-    // library top LATE and either commits the Library → Hand move (tagged
-    // `cause: Draw`, the success fact) or sets `drew_from_empty`
+    // `ZoneChange` below it; indestructible ([CR#702.12b]) cants it and
+    // regeneration ([CR#701.19a]) replaces it, both keyed on `Act(Destroy(…))`.
+    // Draw is the atomic single-card `Act(Draw)` ([CR#121.1,121.2]): its apply
+    // binds the library top LATE and either commits the Library → Hand move
+    // (tagged `cause: Draw`, the success fact) or sets `drew_from_empty`
     // ([CR#121.4,704.5b]) — "draw N" is `Repeat(n, Draw)`. A future draw
     // replacement (Notion Thief, Lab Maniac) keys on `Act(Draw)`.
     /// The failed-draw fact ([CR#121.4,704.5b]): a draw attempt over an empty

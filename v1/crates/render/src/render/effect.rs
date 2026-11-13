@@ -91,11 +91,12 @@ pub(super) fn effect(e: &OneShotEffect, ctx: &Ctx) -> String {
             out
         }
         // A macro invocation renders via its template. Args are resolved
-        // context-aware here (the template layer is context-free and can't reach
-        // `fragment`): a `Reference` arg — a fight's `Target(n)` — renders as its
-        // phrase ("target creature you control"), so `${0} fights ${1}` reads
-        // back to oracle; other args keep the context-free `render_slot`. The
-        // sentence is capitalized (a reference-leading template starts lower).
+        // context-aware here (the template layer is context-free and can't
+        // reach `fragment`): a `Reference` arg — a fight's `Target(n)` —
+        // renders as its phrase ("target creature you control"), so `${0}
+        // fights ${1}` reads back to oracle; other args keep the context-free
+        // `render_slot`. The sentence is capitalized (a reference-leading
+        // template starts lower).
         OneShotEffect::Expanded(e) => match expanded_effect(e, ctx) {
             Some(s) => ensure_period(&capitalize_first(&s)),
             None => effect(&e.value, ctx),
@@ -1846,8 +1847,8 @@ fn additional_payment(cost: &[sylex_semantics_v1::CostComponent], ctx: &Ctx) -> 
                 parts.push(super::ability::lower_first(&phrase));
             }
             // A cost-side choose-then-pay step ([CR#601.2b]): bind the binder's
-            // noun phrase as the body verbs' `That`/`Those` anaphor, then render
-            // the body's `Do` verbs — "sacrifice a creature".
+            // noun phrase as the body verbs' `That`/`Those` anaphor, then
+            // render the body's `Do` verbs — "sacrifice a creature".
             CostComponent::With { binder, body } => {
                 let phrase = binder_phrase(binder, ctx);
                 let inner = ctx.with_that(&phrase);
@@ -1975,12 +1976,12 @@ pub(super) fn activated_cost(cost: &[sylex_semantics_v1::CostComponent], ctx: &C
                     }
                 }
             }
-            // A macro-expanded cost component ("Pay {E}{E}") renders through its
-            // own `template` — the printed cost text, e.g. the energy-repeat
-            // construct — overriding the generic structural render of its
-            // `value` ([CR#602.1]). The template already carries the segment's
-            // capitalized verb ("Pay …"), so it is pushed verbatim; only a
-            // template-less / unrenderable macro falls back.
+            // A macro-expanded cost component ("Pay {E}{E}") renders through
+            // its own `template` — the printed cost text, e.g. the
+            // energy-repeat construct — overriding the generic structural
+            // render of its `value` ([CR#602.1]). The template already carries
+            // the segment's capitalized verb ("Pay …"), so it is pushed
+            // verbatim; only a template-less / unrenderable macro falls back.
             CostComponent::Expanded(e) => match super::template::expanded(e, ctx.subject) {
                 Some(s) => parts.push(s),
                 None => parts.push(format!("[unrendered: {:?}]", e.value)),
@@ -2108,7 +2109,8 @@ fn player_action(action: &Action, ctx: &Ctx) -> String {
         } if riders.is_empty() => create_text(count, spec, ctx),
         // A sacrifice ([CR#701.21]) — the patient is a single reference. A
         // chosen permanent ("sacrifice a creature", Fling) arrives pre-bound as
-        // `Reference::That` from an enclosing `With`, which supplies the phrase.
+        // `Reference::That` from an enclosing `With`, which supplies the
+        // phrase.
         Action::Sacrifice(_, what) => format!("Sacrifice {}.", fragment::reference(what, ctx)),
         Action::GetDesignation(_, name) if name.as_ref() == "CitysBlessing" => {
             "You get the city's blessing.".to_string()
@@ -3524,7 +3526,8 @@ mod tests {
         let fling = super::effect(
             &sylex_semantics_v1::OneShotEffect::AdditionalCost(AdditionalCost {
                 // "sacrifice a creature" is now the choose-then-pay `With` cost
-                // step: ChooseOne(Creature) binds `That`, then `Sacrifice(That)`.
+                // step: ChooseOne(Creature) binds `That`, then
+                // `Sacrifice(That)`.
                 pay: Cost(
                     vec![CostComponent::With {
                         binder: Arc::new(Binder::ChooseOne {

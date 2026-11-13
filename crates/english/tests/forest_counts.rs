@@ -49,7 +49,7 @@ const SAMPLE: &[&str] = &[
 ];
 
 /// Time spent in each pass over one text.
-#[derive(Default, Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 struct Timing {
     parse: Duration,
     inside: Duration,

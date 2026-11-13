@@ -249,9 +249,10 @@ fn activate_and_drive(state: &mut GameState, object: ObjectId, ability: usize) -
     loop {
         let (_, stop) = step_to_stop(state);
         match stop {
-            // Pass priorities while the loyalty ability is still resolving; once
-            // it (and any cast it put on the stack) has left, an empty-stack
-            // priority means resolution settled with no YesNo — return it.
+            // Pass priorities while the loyalty ability is still resolving;
+            // once it (and any cast it put on the stack) has left, an
+            // empty-stack priority means resolution settled with no YesNo —
+            // return it.
             StepOutcome::NeedsDecision(DecisionPointKind::Priority(sylex_engine::Priority {
                 ..
             })) if state.stack.is_empty() => {

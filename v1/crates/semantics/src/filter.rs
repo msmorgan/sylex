@@ -767,8 +767,9 @@ mod tests {
             "Owner(Kind(Player))",
             "OpponentOf(Kind(Player))",
             "TeammateOf(Kind(Player))",
-            // The inner filters avoid `Type`/`Subtype` because this unit fixture
-            // has no declarations loaded; plugin tests cover those round trips.
+            // The inner filters avoid `Type`/`Subtype` because this unit
+            // fixture has no declarations loaded; plugin tests cover those
+            // round trips.
             "AttachedTo(InZone(Battlefield))",
             "Attachment(Supertype(Basic))",
             "InZone(Battlefield)",

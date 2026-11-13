@@ -219,7 +219,8 @@ fn marker_expired_at(marker: sylex_core::TurnMarker, ending: sylex_core::PhaseSt
     match marker {
         TurnMarker::EndOfTurn => ending == PhaseStep::Ending(EndingStep::Cleanup),
         TurnMarker::EndOfCombat => ending == PhaseStep::Combat(CombatStep::EndOfCombat),
-        // Seam: "until your next turn" needs turn-owner tracking; retained for now.
+        // Seam: "until your next turn" needs turn-owner tracking; retained for
+        // now.
         TurnMarker::YourNextTurn => false,
     }
 }

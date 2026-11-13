@@ -37,9 +37,10 @@ impl EventApply for Copied {
             return None;
         };
         let source = match &entry.object {
-            // Safe: a live Spell entry's object id IS the entry's own id, and entry/object
-            // removal is atomic — a live entry's Spell object can't be dead (contrast the
-            // Activated arm below, whose SEPARATE source id can go stale).
+            // Safe: a live Spell entry's object id IS the entry's own id, and
+            // entry/object removal is atomic — a live entry's Spell object
+            // can't be dead (contrast the Activated arm below, whose SEPARATE
+            // source id can go stale).
             StackObject::Spell(obj) => g.objects.obj(*obj).source,
             StackObject::Triggered { source, .. } => *source,
             StackObject::Activated { source, .. } => {

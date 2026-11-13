@@ -2425,8 +2425,9 @@ impl GameState {
         let view = self.layers();
         let _ = crate::legal::walk_abilities(
             &abilities,
-            // Presence scan of the spell's own rows: look through `Conditionally`
-            // unconditionally (a cost-modifier read, not a live-condition gate).
+            // Presence scan of the spell's own rows: look through
+            // `Conditionally` unconditionally (a cost-modifier read, not a
+            // live-condition gate).
             &mut |_: &sylex_core::Condition| true,
             &mut |e| {
                 if let sylex_core::StaticSpec::CostModifier { of, change } = e

@@ -249,13 +249,15 @@ impl PredefinedToken {
         // (leading keyword abilities, activated-ability cost, effect)
         let (keywords, cost, effect): (Arc<[Ability]>, Arc<[CostComponent]>, OneShotEffect) =
             match self {
-                // [CR#111.10a] "{T}, Sacrifice this token: Add one mana of any color."
+                // [CR#111.10a] "{T}, Sacrifice this token: Add one mana of any
+                // color."
                 Self::Treasure => (
                     [].into(),
                     vec![CostComponent::Tap, sac].into(),
                     OneShotEffect::Act(add_any()),
                 ),
-                // [CR#111.10b] "{2}, {T}, Sacrifice this token: You gain 3 life."
+                // [CR#111.10b] "{2}, {T}, Sacrifice this token: You gain 3
+                // life."
                 Self::Food => (
                     [].into(),
                     vec![mana(2), CostComponent::Tap, sac].into(),
@@ -264,7 +266,8 @@ impl PredefinedToken {
                         LifeOp::Up(Count::Literal(3)),
                     )),
                 ),
-                // [CR#111.10c] "Sacrifice this token: Add one mana of any color."
+                // [CR#111.10c] "Sacrifice this token: Add one mana of any
+                // color."
                 Self::Gold => ([].into(), vec![sac].into(), OneShotEffect::Act(add_any())),
                 // [CR#111.10f] "{2}, Sacrifice this token: Draw a card."
                 Self::Clue => (
@@ -272,7 +275,8 @@ impl PredefinedToken {
                     vec![mana(2), sac].into(),
                     crate::OneShotEffect::draw(Reference::You, Count::Literal(1)),
                 ),
-                // [CR#111.10g] "{1}, {T}, Discard a card, Sacrifice this token: Draw a card."
+                // [CR#111.10g] "{1}, {T}, Discard a card, Sacrifice this token:
+                // Draw a card."
                 Self::Blood => (
                     [].into(),
                     vec![
@@ -288,8 +292,8 @@ impl PredefinedToken {
                     .into(),
                     crate::OneShotEffect::draw(Reference::You, Count::Literal(1)),
                 ),
-                // [CR#111.10w] indestructible; "{T}: Add {C}. This mana can't be
-                // spent to cast a nonartifact spell."
+                // [CR#111.10w] indestructible; "{T}: Add {C}. This mana can't
+                // be spent to cast a nonartifact spell."
                 Self::Vibranium => (
                     vec![indestructible()].into(),
                     vec![CostComponent::Tap].into(),

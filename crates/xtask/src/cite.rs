@@ -1610,14 +1610,11 @@ fn read_audit_diff(root: &Path) -> anyhow::Result<String> {
         std::io::stdin().read_to_string(&mut diff)?;
         return Ok(diff);
     }
-    for mut command in [
-        jj_command(root, &["diff", "--git"]),
-        {
-            let mut command = Command::new("git");
-            command.arg("-C").arg(root).arg("diff");
-            command
-        },
-    ] {
+    for mut command in [jj_command(root, &["diff", "--git"]), {
+        let mut command = Command::new("git");
+        command.arg("-C").arg(root).arg("diff");
+        command
+    }] {
         if let Ok(output) = command.output()
             && output.status.success()
         {

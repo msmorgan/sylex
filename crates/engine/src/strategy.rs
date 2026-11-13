@@ -462,7 +462,8 @@ impl StrategyEvaluator {
                 legal,
                 ..
             }) => Decision::Targets(crate::sim::pick_target_set(spec, legal)),
-            // No-op defaults: declaring no attackers / no blocks is always legal.
+            // No-op defaults: declaring no attackers / no blocks is always
+            // legal.
             DecisionPointKind::DeclareAttackers(crate::decide::pending::DeclareAttackers {
                 ..
             }) => Decision::Attackers(vec![]),
@@ -490,8 +491,8 @@ impl StrategyEvaluator {
                 ..
             }) => Decision::Chosen(candidates.iter().copied().take(*min as usize).collect()),
             // [CR#601.2b,608.2c]: the minimal always-legal default (0) — the
-            // X-announce and a resolution note number ("choose a number") alike,
-            // both answered through the `Decision::XValue` shape.
+            // X-announce and a resolution note number ("choose a number")
+            // alike, both answered through the `Decision::XValue` shape.
             DecisionPointKind::ChooseXValue(crate::decide::pending::ChooseXValue { .. })
             | DecisionPointKind::ChooseNoteNumber(crate::decide::pending::ChooseNoteNumber {
                 ..

@@ -78,22 +78,22 @@ where
         let workers = std::panic::catch_unwind(AssertUnwindSafe(|| {
             rayon::broadcast(|_| {
                 let _stop = StopOnPanic(gate);
-                // Why this cannot deadlock: let `c` be the lowest unit the writer
-                // has yet to receive in order (`Ordered::next`). Units are claimed
-                // in increasing order, and every unit below `c` was claimed, so
-                // `c` is claimed or is the next claim. Its worker passes `admit`
-                // at once (`c < c + window`), and computing and sending never
-                // wait on anything, so `c` reaches the writer, which hands it
-                // over and moves the window. Only units at `c + window` or above
-                // ever wait, and they wait for the writer alone, never for one
-                // another.
+                // Why this cannot deadlock: let `c` be the lowest unit the
+                // writer has yet to receive in order (`Ordered::next`). Units
+                // are claimed in increasing order, and every unit below `c` was
+                // claimed, so `c` is claimed or is the next claim. Its worker
+                // passes `admit` at once (`c < c + window`), and computing and
+                // sending never wait on anything, so `c` reaches the writer,
+                // which hands it over and moves the window. Only units at `c +
+                // window` or above ever wait, and they wait for the writer
+                // alone, never for one another.
                 //
-                // This relies on `work` never using Rayon, so that computing `c`
-                // waits on nothing: a worker thread waiting in a nested `join`
-                // for a stolen part of `c` could run its own broadcast job there
-                // and block in `admit` above `c`'s unfinished part, and the writer
-                // would wait forever. `unit_rows` calls only crates that do not
-                // depend on Rayon.
+                // This relies on `work` never using Rayon, so that computing
+                // `c` waits on nothing: a worker thread waiting in a nested
+                // `join` for a stolen part of `c` could run its own broadcast
+                // job there and block in `admit` above `c`'s unfinished part,
+                // and the writer would wait forever. `unit_rows` calls only
+                // crates that do not depend on Rayon.
                 loop {
                     let unit = claimed.fetch_add(1, Ordering::Relaxed);
                     if unit >= units || !gate.admit(unit) {

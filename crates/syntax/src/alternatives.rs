@@ -42,7 +42,7 @@ pub type HeadLeaf = Option<usize>;
 /// One dependent function a Constituent stands under: going up from it
 /// through `head` children to the top of its head line, the Production
 /// there, and the function that projection bears in its governor.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct EmbeddingStep {
     /// The Production at the top of the head line: the alternative of the
     /// dependent itself.
@@ -61,7 +61,7 @@ pub struct EmbeddingStep {
 /// nearest first, up to and including the `depth`th step that is no wrapper
 /// ([`Parse::alternative_embeddings`]). A root's own head line stands under
 /// none.
-#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct Embedding {
     pub steps: Vec<EmbeddingStep>,
     /// Steps above the kept ones were cut.
@@ -84,7 +84,7 @@ pub(crate) struct Inside<K> {
 
 /// An Embedding step whose projection is not reached yet: the dependent's
 /// own alternative fills it.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 struct Pending {
     child: usize,
     function: Ident,
@@ -94,7 +94,7 @@ struct Pending {
 
 /// What the outside pass carries to a node: its Embedding so far, and the
 /// step its own alternative completes when it is a dependent's top.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 struct Above {
     steps: Embedding,
     pending: Option<Pending>,

@@ -10,7 +10,7 @@ use super::refusal::RefusalKind;
 use super::schema;
 
 /// A sort: `Option(List(ManaSymbol))`.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub(crate) struct SortKey {
     pub(super) head: String,
     pub(super) args: Vec<SortKey>,

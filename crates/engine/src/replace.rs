@@ -155,9 +155,10 @@ impl GameState {
             }
             // [CR#614.1d,608.2c]: a conditional enters-replacement — the
             // dual-land "enters tapped unless you control …" gate, modeled as
-            // `AsEnters(If(condition: <gate>, then: <fold>, otherwise: <fold>))`.
-            // Evaluate the gate against a `This`-anchored entry frame (the "you"
-            // is the entering object's controller) and fold the chosen branch.
+            // `AsEnters(If(condition: <gate>, then: <fold>, otherwise:
+            // <fold>))`. Evaluate the gate against a `This`-anchored entry
+            // frame (the "you" is the entering object's controller) and fold
+            // the chosen branch.
             Instruction::If(if_effect) => {
                 if self.condition_holds(&if_effect.condition, frame) {
                     self.apply_as_enters(&if_effect.then, entering, status, frame);

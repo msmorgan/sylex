@@ -571,9 +571,10 @@ fn slot_noun(filter: &Predicate) -> Option<String> {
 /// A `TargetSpec` as the phrase naming what it points at.
 pub(super) fn target_spec(spec: &TargetSpec) -> String {
     match spec {
-        // Macro-provenance: prefer the invocation's own template (e.g. AnyTarget
-        // -> "any target"); fall back to the expansion. Target templates name
-        // the target, never the host, so the subject is irrelevant here.
+        // Macro-provenance: prefer the invocation's own template (e.g.
+        // AnyTarget -> "any target"); fall back to the expansion. Target
+        // templates name the target, never the host, so the subject is
+        // irrelevant here.
         TargetSpec::Expanded(exp) => {
             super::template::expanded(exp, "").unwrap_or_else(|| target_spec(&exp.value))
         }
@@ -708,7 +709,8 @@ pub(super) fn filter_noun(filter: &Predicate) -> String {
             super::card::supertype_str(*s).to_lowercase()
         }
         Predicate::Kind(ObjectKind::Player) => "player".to_string(),
-        // An ability on the stack ([CR#602.2a,603.3]): "counter target ability".
+        // An ability on the stack ([CR#602.2a,603.3]): "counter target
+        // ability".
         Predicate::Kind(ObjectKind::Ability) => "ability".to_string(),
         // Team-relative player nouns ([CR#102.3]): "target opponent" /
         // "target teammate" (relative to the carrier's controller).
@@ -932,7 +934,8 @@ fn reference_subject(r: &Reference, ctx: &super::Ctx) -> String {
         // An announced slot as a sentence subject ("Target creature gets
         // +3/+3 …") — named by position ([CR#115.3,601.2c]).
         Reference::Target(n) => capitalize(&target_phrase(*n, ctx)),
-        // Aura host: "Enchanted creature gets +2/+2." (matches deontic_subject).
+        // Aura host: "Enchanted creature gets +2/+2." (matches
+        // deontic_subject).
         Reference::AttachHostOf(inner) if matches!(**inner, Reference::This) => {
             "Enchanted creature".to_string()
         }

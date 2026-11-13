@@ -134,14 +134,14 @@ pub struct CategoryDecl {
 ///     head (`step.rs`, `comma_scope_excludes`).
 /// - `first`, `last`, `rest`:
 ///   - the head line;
-///   - `first` is the lexical head of a Production with no `head`
-///     (`step.rs`, `Production::lexical_head`);
+///   - `first` is the lexical head of a Production with no `head` (`step.rs`,
+///     `Production::lexical_head`);
 ///   - conjunct balance and the coordination Attachment Class (`reading.rs`,
 ///     `attachment_key` and `anchors`);
 ///   - the fronted-scope rule, which `first` keys on only outside a serial tail
 ///     (`step.rs`, `comma_scope_excludes`, `Production::tail`);
-///   - the conjunct count (`alternatives.rs`, `alternative_conjuncts`):
-///     `first` and `last` are one conjunct each, `rest` its tail's.
+///   - the conjunct count (`alternatives.rs`, `alternative_conjuncts`): `first`
+///     and `last` are one conjunct each, `rest` its tail's.
 /// - `coordinate`: an idiomatic coordinate (*and so on*), one conjunct in the
 ///   conjunct count.
 /// - `coordinator`, `marker`: in a Production with neither a `head` nor a
@@ -155,8 +155,7 @@ pub struct CategoryDecl {
 ///   Adjuncts (`Summary::bare`, `Summary::nominal_unhosted`).
 /// - `supplement`: reversed Right Association (`reading.rs`).
 /// - `dependent`: what a `dependents` declaration calls each dependent it
-///   applies to (`compile.rs`, `dependents`); no Production names a child
-///   so.
+///   applies to (`compile.rs`, `dependents`); no Production names a child so.
 /// - `object`, `shared`: the Reading functions of postposed Modifiers
 ///   (`object`) and of Right Node Raising (`shared`) (`reading.rs`, `locate`).
 /// - The dependent functions `subject`, `object`, `indirect_object`,

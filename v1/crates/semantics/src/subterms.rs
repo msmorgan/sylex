@@ -204,10 +204,11 @@ impl AbilitySubterms for crate::Action {
             // site; see `AbilitySubterms for CopySpec`.
             Self::CastCopy(_, spec) => spec.push_abilities(out),
             // As with `StaticEffect`: 44 variants, few of them ability-bearing,
-            // and the list churns. The corpus oracle catches any ability-bearing
-            // variant the canon corpus actually exercises — a position no canon
-            // card reaches is caught by nothing, which is why the positions
-            // that DO bear abilities are named above rather than left to it.
+            // and the list churns. The corpus oracle catches any
+            // ability-bearing variant the canon corpus actually exercises — a
+            // position no canon card reaches is caught by nothing, which is why
+            // the positions that DO bear abilities are named above rather than
+            // left to it.
             _ => {}
         }
     }

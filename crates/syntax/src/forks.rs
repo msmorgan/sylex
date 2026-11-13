@@ -46,7 +46,7 @@ use crate::fork_graph::Unit;
 use crate::reading::Reading;
 
 /// The question a fork asks about its word.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub enum ForkKind {
     /// Which lexical alternative the leaf starting at the word is.
     Lexical,
@@ -57,7 +57,7 @@ pub enum ForkKind {
 }
 
 /// One answer to a fork's question, named by its grammatical content.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub enum Answer {
     /// The leaf's lexical reading (its Lexeme, Word Form and features),
     /// which also fixes how far it reaches.
@@ -70,7 +70,7 @@ pub enum Answer {
 }
 
 /// What a maximal projection depends on.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd)]
 pub enum Dependency {
     /// It is the whole unit.
     Root,
@@ -202,14 +202,14 @@ impl<'p> Parse<'p> {
 }
 
 /// A question, by its word's index.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 struct Key {
     word: u32,
     kind: ForkKind,
 }
 
 /// An answer, by its interned content.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 enum Value {
     Leaf(u32),
     Dep(u32),

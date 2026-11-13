@@ -437,7 +437,8 @@ fn a_limit_prints_each_remaining_reading_at_the_spines_stops() {
     // Without a selector or a limit the output has no Readings.
     let default = survey(&["--card", "Crook of Condemnation", "--line", "1"]).unwrap();
     assert!(!default.contains("Readings:"), "{default}");
-    // With two stops on the spine, each Reading prints both stops in spine order.
+    // With two stops on the spine, each Reading prints both stops in spine
+    // order.
     let two_stops = survey(&[
         "Exile target card from a graveyard. Exile target creature from a graveyard.",
         "--limit",
@@ -448,18 +449,30 @@ fn a_limit_prints_each_remaining_reading_at_the_spines_stops() {
     let (spine_part, two_stop_readings) =
         two_stops.split_once("\nReadings: 4\n").expect(&two_stops);
     assert!(
-        spine_part.contains("    first: Sentence [Declarative] \"Exile target card from a graveyard.\":"),
+        spine_part
+            .contains("    first: Sentence [Declarative] \"Exile target card from a graveyard.\":"),
         "{spine_part}"
     );
     assert!(
         spine_part.contains("    rest: Sentences [SingleSentence] > Sentence [Declarative] \"Exile target creature from a graveyard.\":"),
         "{spine_part}"
     );
-    for header in ["Reading 1:\n", "\nReading 2:\n", "\nReading 3:\n", "\nReading 4:\n"] {
-        let (_, body) = two_stop_readings.split_once(header).expect(two_stop_readings);
+    for header in [
+        "Reading 1:\n",
+        "\nReading 2:\n",
+        "\nReading 3:\n",
+        "\nReading 4:\n",
+    ] {
+        let (_, body) = two_stop_readings
+            .split_once(header)
+            .expect(two_stop_readings);
         let section = body.split("\nReading ").next().unwrap();
-        let first_at = section.find("  first: Sentence [Declarative]\n").expect(section);
-        let rest_at = section.find("  rest: Sentence [Declarative]\n").expect(section);
+        let first_at = section
+            .find("  first: Sentence [Declarative]\n")
+            .expect(section);
+        let rest_at = section
+            .find("  rest: Sentence [Declarative]\n")
+            .expect(section);
         assert!(first_at < rest_at, "{section}");
     }
     // When no root Constituent is settled, each Reading prints its whole tree.
@@ -544,7 +557,10 @@ fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
         "{spine}"
     );
     let (first, second) = readings.split_once("\nReading 2:\n").unwrap();
-    assert!(first.starts_with("Reading 1:\n  head: Nominal ["), "{readings}");
+    assert!(
+        first.starts_with("Reading 1:\n  head: Nominal ["),
+        "{readings}"
+    );
     assert!(second.starts_with("  head: Nominal ["), "{readings}");
     assert!(!readings.contains("\"destroy\"#1"), "{readings}");
     assert!(first.contains("\"Auras\"#4"), "{first}");

@@ -14,7 +14,7 @@ pub(super) const DEPTH: usize = 3;
 
 /// The context a verb phrase stands in: the first step of its Embedding that
 /// is no wrapper.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 pub(crate) enum Context {
     /// The `clause` of a Sentence Production: an ability's effect, or a
     /// static ability's statement.

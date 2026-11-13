@@ -859,8 +859,8 @@ where
     match e {
         // Distributed statics ([`StaticSpec::Each`]) are looked through to
         // their inner effect for this presence scan: the walker's callers
-        // (Cant/state-checked/CostModifier row collectors) match on the effect KIND,
-        // not the affected set, so the wrapping `Selection` is immaterial
+        // (Cant/state-checked/CostModifier row collectors) match on the effect
+        // KIND, not the affected set, so the wrapping `Selection` is immaterial
         // here.
         StaticSpec::Each(_, inner) => walk_static(&inner.body, enter, visit),
         // [CR#611.3a]: a `Conditionally` wrapper contributes its inner
@@ -1691,7 +1691,8 @@ mod tests {
         vec![
             // [0] plain Static Spec.
             static_ability(gate(CantLose)),
-            // [0b] effect reached through an `Each` wrapper, as a sibling ability.
+            // [0b] effect reached through an `Each` wrapper, as a sibling
+            // ability.
             static_ability(StaticSpec::Each(
                 Selection::SelectAll(Arc::new(sylex_core::Region::candidate(Predicate::Any))),
                 Arc::new(sylex_core::Region::candidate(gate(CantWin))),

@@ -81,8 +81,9 @@ traverse_leaf!(
     bool,
     char,
     String,
-    // `Arc<str>` is a leaf like `String` (shared, cheap-clone text). The `Arc<T>`
-    // blanket above can't cover it — `str` is unsized, so it's not a `T: Sized`.
+    // `Arc<str>` is a leaf like `String` (shared, cheap-clone text). The
+    // `Arc<T>` blanket above can't cover it — `str` is unsized, so it's not a
+    // `T: Sized`.
     Arc<str>,
     Ident,
 );

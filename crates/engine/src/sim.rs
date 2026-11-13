@@ -488,7 +488,8 @@ pub(crate) fn mechanical(state: &GameState, pending: &DecisionPointKind) -> Deci
         DecisionPointKind::DeclareBlockers(crate::decide::pending::DeclareBlockers { .. }) => {
             Decision::Blocks(vec![])
         }
-        // Unblocked attackers are forced (one recipient); no multi-block arises.
+        // Unblocked attackers are forced (one recipient); no multi-block
+        // arises.
         DecisionPointKind::AssignCombatDamage(crate::decide::pending::AssignCombatDamage {
             source,
             recipients,
@@ -660,8 +661,8 @@ pub fn play(cards: &DeckCards, seed: u64, p0: &dyn Strategy, p1: &dyn Strategy) 
         // Headless sim hardcodes empty rules-as-data (ticket
         // `sim-play-wire-rules-as-data` wires `sba_rules`/`conferral_rules`/
         // `damage_result_rules` from the loaded plugin). Until then a
-        // planeswalker in sim takes no loyalty loss from damage — acceptable for
-        // the current land/creature sim corpus.
+        // planeswalker in sim takes no loyalty loss from damage — acceptable
+        // for the current land/creature sim corpus.
         sba_rules: vec![],
         conferral_rules: vec![],
         damage_result_rules: vec![],

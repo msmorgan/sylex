@@ -102,8 +102,8 @@ mod tests {
             name_of::<ManaRider>(),
             // The mana specs / production wrapper and the symbol leaves embed
             // their inner value untagged (`#[macro_ron(embed)]`); `StatValue`
-            // reads a bare-integer `literal` — all registered so those spellings
-            // stay flat and macro-aware.
+            // reads a bare-integer `literal` — all registered so those
+            // spellings stay flat and macro-aware.
             name_of::<ManaProduction>(),
             name_of::<ManaSpec>(),
             name_of::<sylex_semantics_v1::Color>(),

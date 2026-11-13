@@ -129,8 +129,8 @@ impl Normalize for CostComponent {
     fn normalize(self) -> Self {
         match self {
             CostComponent::Cost(inner) => CostComponent::Cost(inner.normalize()),
-            // Recurse into a `With` step's scoped body so a macro-spliced nested
-            // cost there still flattens.
+            // Recurse into a `With` step's scoped body so a macro-spliced
+            // nested cost there still flattens.
             CostComponent::With { binder, body } => CostComponent::With {
                 binder,
                 body: body.normalize(),

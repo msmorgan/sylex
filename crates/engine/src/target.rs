@@ -252,8 +252,8 @@ pub(crate) fn matches_with_activation(
                 })
         }
         // The candidate matches iff the condition holds with the iteration
-        // anaphor `It` bound to it. `This`/`You` still anchor to the carrier, so
-        // build a match frame from the watcher (source → live carrier id +
+        // anaphor `It` bound to it. `This`/`You` still anchor to the carrier,
+        // so build a match frame from the watcher (source → live carrier id +
         // controller) and set `it` to the candidate. Re-binding across nested
         // relation filters is automatic: those arms recurse with a new `id`, so
         // a nested `Where` sees the related object as `It`. A frameless caller
@@ -332,9 +332,9 @@ pub(crate) fn matches_with_activation(
         // armor to express "the enchanted permanent" as the watched subject of
         // a static other-watching replacement ([CR#702.89a]).
         //
-        // Only `inner = This` is resolvable from the carrier alone (no ExecutionFrame).
-        // The general `AttachHostOf(inner)` case needs `eval_reference` and is
-        // therefore left as a seam.
+        // Only `inner = This` is resolvable from the carrier alone (no
+        // ExecutionFrame). The general `AttachHostOf(inner)` case needs
+        // `eval_reference` and is therefore left as a seam.
         Predicate::Ref(Reference::AttachHostOf(inner))
             if matches!(inner.as_ref(), Reference::Reg(reference)
             if state.activation_reference_is(
@@ -508,7 +508,8 @@ pub(crate) fn matches_with_activation(
             }
         }
         // [CR#302.6]: summoning sickness — read the tracked `summoning_sick` bool
-        // off the live object. A player proxy is never sick (field defaults false).
+        // off the live object. A player proxy is never sick (field defaults
+        // false).
         Predicate::State(StatePredicate::SummoningSick) => state.objects.obj(id).summoning_sick,
         // [CR#508.1a]: declared as an attacker, still in combat.
         Predicate::State(StatePredicate::Attacking) => state.combat.is_attacking(id),
@@ -548,8 +549,8 @@ pub(crate) fn matches_with_activation(
 
         // [CR#301.5,303.4]: `id` is an attachment attached to a host matching
         // `inner` — read the attachment→host relation (engine-attach's
-        // `attached_to`), then match the host, threading the watcher so a nested
-        // `Ref` resolves against the carrier.
+        // `attached_to`), then match the host, threading the watcher so a
+        // nested `Ref` resolves against the carrier.
         Predicate::Relation(RelationPredicate::AttachedTo(inner)) => {
             state.objects.obj(id).attached_to.is_some_and(|host| {
                 matches_with_activation(state, host, inner, watcher, activation)
@@ -595,10 +596,10 @@ pub(crate) fn matches_with_activation(
             ObjectSource::Card(_) => false,
         },
         // The move-provenance twin of `WasCastFrom` ([CR#701.17a,701.9a]).
-        // Past-form `ZoneChange` history facts key on the pre-move (stale) `ObjectId`
-        // — correlating one back to the CURRENT (post-remint) live object
-        // needs either a persistent old→new provenance map (the engine only
-        // keeps `moved_chain`, cleared at the start of every resolution,
+        // Past-form `ZoneChange` history facts key on the pre-move (stale)
+        // `ObjectId` — correlating one back to the CURRENT (post-remint) live
+        // object needs either a persistent old→new provenance map (the engine
+        // only keeps `moved_chain`, cleared at the start of every resolution,
         // [`resolve::eval_selection_set`]'s doc) or a dedicated per-object
         // "arrived from Z this turn" memo field `GameObject` does not carry.
         // Genuinely absent-subsystem (like the equally-unbuilt sibling
@@ -620,8 +621,8 @@ pub(crate) fn matches_with_activation(
         ),
         // The alt-cost twin of `WasPaidWith` ([CR#118.9,702.34a]) — a filter
         // over "a spell cast with [keyword]". No card fixture forces it yet
-        // (Flashback/Evoke read the alt cost via `Condition::CastWith`, not this
-        // filter); it needs the same engine-alt-costs announce record.
+        // (Flashback/Evoke read the alt cost via `Condition::CastWith`, not
+        // this filter); it needs the same engine-alt-costs announce record.
         Predicate::State(StatePredicate::WasCastWith(tag)) => todo!(
             "engine-alt-costs: WasCastWith({tag:?}) needs the [CR#118.9,702.34a] alt-cost \
              announce record; owner: engine-alt-costs"
@@ -635,8 +636,8 @@ pub(crate) fn matches_with_activation(
         // The register file is addressed by `activation`; with none (a
         // structural caller) the intrinsic source/controller parameters still
         // answer from the carrier, and anything else reads `false` rather than
-        // guessing. The fallback compares by `ObjectSource` rather than by id so
-        // a reminted carrier still matches its own register.
+        // guessing. The fallback compares by `ObjectSource` rather than by id
+        // so a reminted carrier still matches its own register.
         Predicate::Ref(Reference::Reg(reference)) => state
             .activation_product(activation, *reference)
             .and_then(|product| product.current)
@@ -672,9 +673,9 @@ pub(crate) fn matches_with_activation(
         // may name the register it derives from: resolve it against the same
         // activation record + carrier the `Reg` arm above reads, and match iff
         // it lands on THIS candidate. Unresolvable (a gone register, no
-        // carrier, or a shape needing the selection evaluator's `ExecutionFrame` —
-        // `Single`/`Source`) reads `false`, the same never-crash fizzle
-        // `Predicate::Adjacent` takes.
+        // carrier, or a shape needing the selection evaluator's
+        // `ExecutionFrame` — `Single`/`Source`) reads `false`, the same
+        // never-crash fizzle `Predicate::Adjacent` takes.
         Predicate::Ref(r) => resolve_frameless_reference(state, r, watcher, activation)
             .is_some_and(|resolved| resolved == id),
     }
@@ -706,8 +707,9 @@ fn resolve_frameless_reference(
 ) -> Option<ObjectId> {
     match r {
         // The register's own product first (a resolution-time caller passed a
-        // real activation), then the carrier fallbacks the `Predicate::Ref(Reg)`
-        // arm takes for a structural caller with no activation record.
+        // real activation), then the carrier fallbacks the
+        // `Predicate::Ref(Reg)` arm takes for a structural caller with no
+        // activation record.
         &Reference::Reg(reference) => state
             .activation_product(activation, reference)
             .and_then(|product| product.current)
@@ -854,9 +856,9 @@ fn derived_stat(
         ),
         // [CR#209.1,306.5a]: loyalty is the PRINTED loyalty characteristic off
         // the card face — never the live counter count (current loyalty is
-        // `CounterCount(This, LoyaltyCounter)`). `base_stat` maps `Number(n)→n`,
-        // `DefinedByAbility`/`Variable`/absent → 0, and `None` (no printed
-        // loyalty) → `None`, mirroring the P/T arms above.
+        // `CounterCount(This, LoyaltyCounter)`). `base_stat` maps
+        // `Number(n)→n`, `DefinedByAbility`/`Variable`/absent → 0, and `None`
+        // (no printed loyalty) → `None`, mirroring the P/T arms above.
         sylex_core::Stat::Loyalty => crate::layer::base_stat(
             crate::derive::face(state.def(id))
                 .characteristics

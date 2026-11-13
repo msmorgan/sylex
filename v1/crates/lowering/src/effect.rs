@@ -884,8 +884,8 @@ mod tests {
             lower_targeted_spell(sem::OneShotEffect::Sequentially(
                 [
                     move_to(sem::Reference::Target(0), sem::Zone::Exile),
-                    // The inserted producing clause: it defines a second card-sorted
-                    // product between the binder and its mention.
+                    // The inserted producing clause: it defines a second
+                    // card-sorted product between the binder and its mention.
                     move_to(sem::Reference::This, sem::Zone::Graveyard),
                     move_to(
                         sem::Reference::That(sem::Sort::Card),

@@ -534,7 +534,8 @@ impl GameState {
             }
 
             // A gone object has no live stack entry, so it currently targets
-            // nothing ([CR#115.9b] — departed objects are not read through LKI).
+            // nothing ([CR#115.9b] — departed objects are not read through
+            // LKI).
             Predicate::State(StatePredicate::Targets(_) | StatePredicate::TargetCount(_)) => false,
             // [CR#607]: no linked-ability relation registry yet.
             Predicate::State(StatePredicate::RelatedBy(..)) => {
@@ -549,11 +550,12 @@ impl GameState {
             // contains it; never a panic, just no match.
             Predicate::Adjacent(..) => false,
             // See `target::matches_with`'s identical arm: the past-form
-            // `ZoneChange` history keys on the pre-move stale id, with no persistent
-            // link back to a live object — genuinely unbuilt, not a
+            // `ZoneChange` history keys on the pre-move stale id, with no
+            // persistent link back to a live object — genuinely unbuilt, not a
             // convenient-wrong default.
             Predicate::State(StatePredicate::WasPutFrom(_)) => false,
-            // A snapshot holds a damage TOTAL, not deal-time marks ([CR#120.3]).
+            // A snapshot holds a damage TOTAL, not deal-time marks
+            // ([CR#120.3]).
             Predicate::State(StatePredicate::WasDealtDamageBy(_)) => false,
             // [CR#302.6]: a gone/moved object has no summoning-sickness state
             // (snapshot doesn't capture it) — sound never-crash default.
@@ -807,7 +809,8 @@ impl GameState {
     /// stale/missing id yields no role.
     pub(crate) fn event_roles(&self, event: &GameEvent) -> EventRoles {
         let (that_object, that_player, that_patient) = match event {
-            // The past-form zone-change FACT carries the moved object's snapshot.
+            // The past-form zone-change FACT carries the moved object's
+            // snapshot.
             GameEvent::ZoneChange(ZoneChange {
                 snapshot: Some(snapshot),
                 ..
@@ -824,7 +827,8 @@ impl GameState {
             // [CR#601.2c] becomes-target / [CR#120.3] damage: the source/agent
             // binds as `EventObject`, the recipient (object or player) as the
             // kind-poly patient. Ward's `Counter(EventObject)` ([CR#702.21a])
-            // counters "it" (the source on the stack), not the warded permanent.
+            // counters "it" (the source on the stack), not the warded
+            // permanent.
             GameEvent::BecameTarget(BecameTarget { target, source })
             | GameEvent::DamageDealt(DamageDealt { source, target, .. }) => {
                 let (agent, actor) = self.event_agent(*source);

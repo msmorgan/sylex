@@ -258,9 +258,9 @@ pub enum ReplacementKey {
 
 #[derive(Debug, Clone)]
 pub(crate) enum ApplicableEffect {
-    // Arc-shared: `Replacement` (~928 B) / `Prevention` (~656 B) are large ASTs.
-    // `gather_applicable` builds a `Vec<Applicable>` per event, so an unboxed
-    // payload made every element ~960 B; the pointer keeps it thin. See
+    // Arc-shared: `Replacement` (~928 B) / `Prevention` (~656 B) are large
+    // ASTs. `gather_applicable` builds a `Vec<Applicable>` per event, so an
+    // unboxed payload made every element ~960 B; the pointer keeps it thin. See
     // `engine-event-size-boxing`.
     Replacement(Arc<Replacement>),
     Prevention(Arc<Prevention>),
@@ -270,7 +270,7 @@ pub(crate) enum ApplicableEffect {
 /// derived `Ord`): when two or more replacement and/or prevention effects
 /// apply to one event, one from the first non-empty tier must be chosen. Each
 /// replacement kind carries its tier.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 pub(crate) enum ReplacementTier {
     /// [CR#616.1a]: a self-replacement effect ([CR#614.15]).
     #[cfg_attr(

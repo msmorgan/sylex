@@ -98,7 +98,8 @@ impl GameState {
                             source: dealer,
                             target,
                             amount,
-                            // Instruction damage is never combat damage ([CR#510.1]).
+                            // Instruction damage is never combat damage
+                            // ([CR#510.1]).
                             combat: false,
                         })
                     })
@@ -220,8 +221,8 @@ impl GameState {
                 vec![WorkItem::Emit(occurrence_of(events))]
             }
             // [CR#701.3d]: unattach each selected attachment from its host —
-            // emit the `Unattached` fact (the `attached_to` clear happens at the
-            // fact's apply). No-op (no fact) on an attachment that isn't
+            // emit the `Unattached` fact (the `attached_to` clear happens at
+            // the fact's apply). No-op (no fact) on an attachment that isn't
             // attached, mirroring the transition-only idiom ([CR#603.2e]).
             Action::Unattach(sel) => {
                 let events: Vec<GameEvent> = self
@@ -246,13 +247,14 @@ impl GameState {
             // `ReturnToHand` verb. NOT destruction (indestructible doesn't
             // apply) and NOT a sacrifice — the [CR#704.5m] Aura graveyard SBA's
             // mover. A library destination ([CR#401.7]) carries an insertion
-            // index: `FromTop(n)` is a from-top index (0 = top); `FromBottom(n)`
-            // is converted to one against the owner's current library size
-            // (`len - n`), clamped at apply ("an index past the bottom places it
-            // on the bottom"). This arm subsumes the former `PutInLibrary`.
-            // `from` is the optional fizzle-guard ([CR#701.8a,701.9a,701.17a]):
-            // `move_items` skips any object not currently in that zone —
-            // never a panic, per-object like the existing gone-object skip.
+            // index: `FromTop(n)` is a from-top index (0 = top);
+            // `FromBottom(n)` is converted to one against the owner's current
+            // library size (`len - n`), clamped at apply ("an index past the
+            // bottom places it on the bottom"). This arm subsumes the former
+            // `PutInLibrary`. `from` is the optional fizzle-guard
+            // ([CR#701.8a,701.9a,701.17a]): `move_items` skips any object not
+            // currently in that zone — never a panic, per-object like the
+            // existing gone-object skip.
             Action::Move(sel, destination, riders, from) => {
                 // Face-down arrival ([CR#708]) awaits `engine-face-down`'s
                 // state machinery — a loud seam, like the other unbuilt
@@ -412,8 +414,8 @@ impl GameState {
                     let library_owner = self.owner_of(objects[0].0);
                     let arranger = match arrangement {
                         // [CR#401.4]: "any order" is arranged by the cards'
-                        // owner; RandomOrder/SameOrder carry no arranger (unused,
-                        // defaulted to the owner).
+                        // owner; RandomOrder/SameOrder carry no arranger
+                        // (unused, defaulted to the owner).
                         sylex_core::Arrangement::ChosenOrder(r) => self.acting_player(r, frame),
                         sylex_core::Arrangement::AnyOrder
                         | sylex_core::Arrangement::RandomOrder
@@ -455,11 +457,11 @@ impl GameState {
                 )
             }
             // [CR#701.27a]: flip each targeted transforming DFC. No-op (fizzle,
-            // never panic) on a non-transforming-DFC permanent — the check is on
-            // the CARD, not copied characteristics ([CR#701.27d,712.7]) — or when
-            // the destination face is an instant/sorcery ([CR#701.27e]). Identity
-            // is preserved by the apply, which toggles `side` without reminting
-            // ([CR#712.15]).
+            // never panic) on a non-transforming-DFC permanent — the check is
+            // on the CARD, not copied characteristics ([CR#701.27d,712.7]) — or
+            // when the destination face is an instant/sorcery ([CR#701.27e]).
+            // Identity is preserved by the apply, which toggles `side` without
+            // reminting ([CR#712.15]).
             Action::Transform(sel) => {
                 let mut events = Vec::new();
                 for object in self.eval_reference_set(sel, frame) {
@@ -719,7 +721,8 @@ impl GameState {
                 );
                 self.act_window(act, FinalizeWatch::Patients(vec![on]))
             }
-            // ── Discard: bound single move, or the chosen-from-hand decision ──
+            // ── Discard: bound single move, or the chosen-from-hand decision
+            // ──
             "Discard" => {
                 // Lowering lifts a cost-position discard's top-level choice
                 // into `CostComponent::ChooseAndPay`. Its runnable composite
@@ -801,11 +804,11 @@ impl GameState {
                 }
             }
             // ── Mill: simultaneous Library → Graveyard batch ([CR#701.17a]).
-            // The slice-family shape (`Batch(n, Act(Composite(name: Mill, …)))`)
-            // resolves through the aggregate lane (`batch_act_head` + the batch
-            // apply's simultaneous slice); this arm covers a bare per-unit Mill
-            // composite reaching the ordinary lane, milling its `MoveGroup`
-            // slice as one batch. ──
+            // The slice-family shape (`Batch(n, Act(Composite(name: Mill,
+            // …)))`) resolves through the aggregate lane (`batch_act_head` +
+            // the batch apply's simultaneous slice); this arm covers a bare
+            // per-unit Mill composite reaching the ordinary lane, milling its
+            // `MoveGroup` slice as one batch. ──
             "Mill" => {
                 let Some(who) = composite_body_whose(body) else {
                     return vec![];
@@ -835,8 +838,9 @@ impl GameState {
             // NOTE: there is deliberately no "Draw" arm. Drawing is [CR#121], a
             // game action, not one of the keyword actions [CR#701] enumerates,
             // so it is not a `Composite` at all — it is
-            // `By(who, PlayerAction::DrawCard)`, resolved by `player_action_items`.
-            // ── Reorder verbs: scry / surveil / fateseal ([CR#701.22a]) ──
+            // `By(who, PlayerAction::DrawCard)`, resolved by
+            // `player_action_items`. ── Reorder verbs: scry / surveil /
+            // fateseal ([CR#701.22a]) ──
             verb @ ("Scry" | "Surveil" | "Fateseal") => {
                 let Some(who) = composite_body_whose(body) else {
                     return vec![];

@@ -46,10 +46,10 @@ impl<'de> Deserialize<'de> for TodoAbility {
         let ron_text = raw.get_ron(); // the verbatim RON of this slot
         match crate::ron_output::ron_options().from_str::<UnparsedProbe>(ron_text) {
             Ok(UnparsedProbe::Unparsed(text)) => Ok(TodoAbility::Unparsed(text)),
-            // Any non-`Unparsed` slot is a structured ability: the probe failure
-            // means "not that variant", not "invalid RON". A genuinely malformed
-            // slot will also land here; `serialize` will catch it when it calls
-            // `RawValue::from_ron` on the stored string.
+            // Any non-`Unparsed` slot is a structured ability: the probe
+            // failure means "not that variant", not "invalid RON". A genuinely
+            // malformed slot will also land here; `serialize` will catch it
+            // when it calls `RawValue::from_ron` on the stored string.
             Err(_) => Ok(TodoAbility::Parsed(ron_text.trim().to_owned())),
         }
     }

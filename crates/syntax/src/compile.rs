@@ -29,8 +29,8 @@ use crate::grammar::Grammar;
 use crate::grammar::HostKind;
 use crate::grammar::SchemaDecl;
 use crate::grammar::Side;
-use crate::grammar::variant;
 use crate::grammar::SymbolDecl;
+use crate::grammar::variant;
 use crate::lexeme::Lexeme;
 use crate::lexeme::Lexemes;
 use crate::projection::NUMBER;
@@ -772,7 +772,11 @@ impl<'a> Binder<'a> {
                     .cloned()
                     .ok_or_else(|| invalid(format!("unknown category `{category}`")))?;
                 let tail = Ident::new(&serial_tail(&grammar.schemas, schema, category));
-                for name in [tail, Ident::new(&format!("{tail}+")), Ident::new(&format!("{tail}++"))] {
+                for name in [
+                    tail,
+                    Ident::new(&format!("{tail}+")),
+                    Ident::new(&format!("{tail}++")),
+                ] {
                     declared.insert(name, declaration.clone());
                     tail_bases.insert(name, *category);
                 }
@@ -1320,7 +1324,8 @@ impl<'a> Binder<'a> {
             let link = self.out.link_categories.contains(&production.lhs);
             production.seal(link, &self.out.unadjoined_categories);
         }
-        self.out.normal_forms = crate::normal_form::NormalForms::compile(&self.out, &self.tail_bases);
+        self.out.normal_forms =
+            crate::normal_form::NormalForms::compile(&self.out, &self.tail_bases);
         self.out.cluster_shapes = cluster_shapes(&self.out.frames);
         self.out.prediction = crate::prediction::Prediction::compile(&self.out);
         Ok(self.out)
@@ -1645,7 +1650,11 @@ impl<'a> Binder<'a> {
 
     /// Adds a Coordination schema's equations over its `initial` conjunct to
     /// a whole coordination, over its `first` child, which is that conjunct.
-    fn initial_equations(&self, draft: &mut Draft, equations: &[Equation]) -> Result<(), LoadError> {
+    fn initial_equations(
+        &self,
+        draft: &mut Draft,
+        equations: &[Equation],
+    ) -> Result<(), LoadError> {
         let (first, initial) = (Ident::new("first"), Ident::new("initial"));
         if draft.children.iter().any(|c| c.name == initial) {
             return Err(invalid(format!(
@@ -2188,7 +2197,8 @@ impl<'a> Binder<'a> {
         gate_slots(&mut production, &mut draft)
             .map_err(|e| invalid(format!("production `{}`: {e}", draft.id)))?;
         match (draft.frame, &draft.frame_variant) {
-            (Some(frame), Some(variant)) if variant.id(&self.out.frames[frame]) == draft.id.as_str() => {}
+            (Some(frame), Some(variant))
+                if variant.id(&self.out.frames[frame]) == draft.id.as_str() => {}
             (None, None) => {}
             _ => {
                 return Err(invalid(format!(
@@ -3183,7 +3193,9 @@ impl<'a> Binder<'a> {
                     && slots.len() == 1
                 {
                     drafts.extend(
-                        self.adjectival_passive(adjectival, &active, index, cost, equations, &by_pp)?,
+                        self.adjectival_passive(
+                            adjectival, &active, index, cost, equations, &by_pp,
+                        )?,
                     );
                 }
             }
@@ -3191,9 +3203,8 @@ impl<'a> Binder<'a> {
                 && frame.family == FrameFamily::Prepositional
                 && let [fill @ SlotFill::PP(..)] = slots.as_slice()
             {
-                drafts.extend(self.prepositional_passive(
-                    lhs, &active, index, cost, fill, passive,
-                )?);
+                drafts
+                    .extend(self.prepositional_passive(lhs, &active, index, cost, fill, passive)?);
             }
         }
         Ok(drafts)
@@ -5247,10 +5258,7 @@ fn phrase_remnants(draft: &mut Draft, remnants: &[(usize, usize)]) -> Vec<Draft>
         }
         _ => return Vec::new(),
     };
-    if draft.children.len() < 2
-        || draft.derived()
-        || draft.children[0].name != "head"
-    {
+    if draft.children.len() < 2 || draft.derived() || draft.children[0].name != "head" {
         return Vec::new();
     }
     let first_slot = match &draft.children[1].symbol {
@@ -5439,15 +5447,22 @@ pub(crate) enum Alternation {
     Active,
     /// A verbal or prepositional passive, `by` with its Internalised
     /// Complement.
-    Passive { by: bool },
+    Passive {
+        by: bool,
+    },
     /// An Adjectival Passive, `by` with its Internalised Complement.
-    Adjectival { by: bool },
+    Adjectival {
+        by: bool,
+    },
 }
 
 impl Alternation {
     /// Whether it has an Internalised Complement: a passive with *by*.
     pub(crate) fn by(self) -> bool {
-        matches!(self, Self::Passive { by: true } | Self::Adjectival { by: true })
+        matches!(
+            self,
+            Self::Passive { by: true } | Self::Adjectival { by: true }
+        )
     }
 }
 

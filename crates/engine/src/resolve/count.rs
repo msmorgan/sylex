@@ -228,7 +228,8 @@ impl GameState {
             // counter on this permanent" AFTER the object is gone (Modular,
             // [CR#702.43a]). `This`/`EventObject` then resolves to the firing
             // object's now-stale id; the live object store no longer holds it,
-            // so the count comes from the trigger's last-known snapshot instead.
+            // so the count comes from the trigger's last-known snapshot
+            // instead.
             Count::CounterCount(reference, kind) => {
                 let product = self.eval_reference_product(reference, frame);
                 // [CR#608.2h]: current information while the object is still
@@ -273,8 +274,9 @@ impl GameState {
             // the smaller of the two counter counts of each kind).
             Count::Min(a, b) => self.eval_count(a, frame).min(self.eval_count(b, frame)),
             // [CR#107.1] basic value arithmetic. A count never goes negative
-            // ([CR#107.1b]), so `Minus` floors at 0 (saturating); `Plus`/`Times`
-            // saturate at the `Uint` ceiling rather than wrapping.
+            // ([CR#107.1b]), so `Minus` floors at 0 (saturating);
+            // `Plus`/`Times` saturate at the `Uint` ceiling rather than
+            // wrapping.
             Count::Max(a, b) => self.eval_count(a, frame).max(self.eval_count(b, frame)),
             Count::Plus(a, b) => self
                 .eval_count(a, frame)

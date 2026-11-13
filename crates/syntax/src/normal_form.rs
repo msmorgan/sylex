@@ -205,7 +205,10 @@ impl CompiledGrammar {
             && let Some(at) = p.distributed
             && let at = child(p, at)
             && let Some(Reading::Node(coordination)) = children.get(at)
-            && self.normal_forms.flat_ids.contains(&coordination.production)
+            && self
+                .normal_forms
+                .flat_ids
+                .contains(&coordination.production)
         {
             return self.distribute(node, &children, at, p.lhs);
         }

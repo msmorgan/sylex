@@ -127,7 +127,7 @@ const LINKED: &[&str] = &[
 type Answers = BTreeMap<(usize, ForkKind), Answer>;
 
 /// An interned answer.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
 struct Id(u32);
 
 /// A question: its word's start and its kind.
@@ -394,7 +394,7 @@ fn oracle_forks(answers: &[Interned], within: &BTreeSet<usize>, show: &[Answer])
 }
 
 /// What one unit's check measured.
-#[derive(Default, Clone)]
+#[derive(Clone, Default)]
 struct Measure {
     derivations: u128,
     roots: usize,

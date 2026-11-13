@@ -1,7 +1,6 @@
 //! Productions as compiled, and the one step function shared by the chart
 //! and by Admission: adding a child to a partial Production.
 
-use crate::lexeme::Lexeme;
 use dpsi::Ident;
 use serde::Deserialize;
 use serde::Serialize;
@@ -13,6 +12,7 @@ use crate::compile::CompiledGrammar;
 use crate::compile::LexemeFacts;
 use crate::frames::SlotKind;
 use crate::grammar::HostKind;
+use crate::lexeme::Lexeme;
 
 /// The most features one Category may carry, so a Summary is inline.
 pub(crate) const MAX_CATEGORY_FEATURES: usize = 12;
@@ -341,7 +341,10 @@ impl ChildRole {
 /// before it copies and propagates its State, and, for a Category child,
 /// where its Category carries each feature.
 #[derive(Debug, Clone, Default)]
-#[expect(clippy::struct_excessive_bools, reason = "independent gates of one child")]
+#[expect(
+    clippy::struct_excessive_bools,
+    reason = "independent gates of one child"
+)]
 pub(crate) struct ChildSlot {
     /// For a Category child, the offset in its `Summary::values` of each
     /// feature its Category carries, by feature id.
@@ -774,7 +777,10 @@ pub(crate) fn resolve(
             }
         }
     }
-    let roles: Vec<ChildRole> = children.iter().map(|(name, ..)| ChildRole::of(name)).collect();
+    let roles: Vec<ChildRole> = children
+        .iter()
+        .map(|(name, ..)| ChildRole::of(name))
+        .collect();
     let head = roles.iter().position(|&role| role == ChildRole::Head);
     let lexical_head = head.or_else(|| roles.iter().position(|&role| role == ChildRole::First));
     let head_line = roles.iter().map(|role| role.in_head_line()).collect();
@@ -1452,12 +1458,7 @@ impl Production {
     /// trailing Adjunct is the last child, named `adjunct`, of a Production
     /// whose head precedes it with no comma between: an unselected post-head
     /// dependent, not one set off.
-    fn track_final_adjunct(
-        &self,
-        next: &mut State,
-        position: usize,
-        child: &ChildView<'_>,
-    ) {
+    fn track_final_adjunct(&self, next: &mut State, position: usize, child: &ChildView<'_>) {
         match child {
             ChildView::Node(summary) => {
                 next.final_adjunct = if self.edge_line[position] {
@@ -1830,9 +1831,8 @@ impl Production {
     /// (`ChildSlot::unlike_mask`; the mask never holds
     /// [`UNVALUED_CONJUNCT`]).
     fn unlike_slot_admits(slot: &ChildSlot, summary: &Summary) -> bool {
-        slot.unlike_mask.is_none_or(|mask| {
-            summary.unlike_values != 0 && summary.unlike_values & !mask == 0
-        })
+        slot.unlike_mask
+            .is_none_or(|mask| summary.unlike_values != 0 && summary.unlike_values & !mask == 0)
     }
 
     /// Records the joint-exclusion conditions child `position` meets, or
@@ -2151,7 +2151,9 @@ impl Production {
                 ..
             }
         );
-        let foreign = summary.coordinator.is_some_and(|c| self.foreign_coordinator(c));
+        let foreign = summary
+            .coordinator
+            .is_some_and(|c| self.foreign_coordinator(c));
         let unpaired = self
             .paired_coordinator
             .is_some_and(|p| summary.coordinator != Some(CoordinatorId::Lexeme(p)));

@@ -178,7 +178,8 @@ impl GameState {
             Selection::Pile(reference) => self.activation_objects(frame.activation, *reference),
             // Thread the carrier (like `Pick`) so a carrier-relative predicate
             // resolves rather than panicking frameless: "each opponent" =
-            // `SelectAll(OpponentOf(Ref(You)))` reads `Ref(You)` off the watcher.
+            // `SelectAll(OpponentOf(Ref(You)))` reads `Ref(You)` off the
+            // watcher.
             Selection::SelectAll(f) => crate::target::candidates_region_with_activation(
                 self,
                 f,
@@ -289,10 +290,11 @@ impl GameState {
             // member. Wiring the choice replaces this arm's body, not its
             // shape.
             Selection::InChosenOrder(inner, _by) => self.eval_selection_set(inner, frame),
-            // The top `count` cards of `of`'s library, front-to-back (top→down).
-            // `of` resolves to a player via `eval_reference` → player proxy →
-            // PlayerId. Supports `You` (controller's library) and `Opponent`
-            // (the opponent's library, e.g. Fateseal [CR#701.29a]).
+            // The top `count` cards of `of`'s library, front-to-back
+            // (top→down). `of` resolves to a player via `eval_reference` →
+            // player proxy → PlayerId. Supports `You` (controller's library)
+            // and `Opponent` (the opponent's library, e.g. Fateseal
+            // [CR#701.29a]).
             Selection::TopOfLibrary { count, whose } => {
                 let proxy = self.eval_reference(whose, frame);
                 let pid = match self.objects.get(proxy).map(|o| o.source) {
@@ -451,8 +453,9 @@ impl GameState {
                 let opponent = self.next_live_after(player.id);
                 self.player(opponent).object
             }
-            // Demote a group-valued expression to one Entity. Empty or ambiguous
-            // groups fail closed rather than silently choosing a member.
+            // Demote a group-valued expression to one Entity. Empty or
+            // ambiguous groups fail closed rather than silently choosing a
+            // member.
             Reference::Single(selection) => {
                 let values = self.eval_selection_set(selection, frame);
                 if let [only] = values.as_slice() { *only } else { ObjectId::null() }

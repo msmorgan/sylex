@@ -422,11 +422,7 @@ fn stop_lines(
 ) -> Result<()> {
     match &spine.rest {
         SettledRest::Alternatives(_) | SettledRest::Splits { .. } => {
-            let prefix = if label.is_empty() {
-                "  ".to_owned()
-            } else {
-                format!("  {label}: ")
-            };
+            let prefix = if label.is_empty() { "  ".to_owned() } else { format!("  {label}: ") };
             spine_lines(reading, prefix, 1, false, tokens, output)
         }
         SettledRest::Children {
@@ -441,7 +437,12 @@ fn stop_lines(
                 panic!("a Reading's node is built by one Production and split");
             };
             assert_eq!(
-                (spine.category, &spine.span, spine_prod, spine_children.len()),
+                (
+                    spine.category,
+                    &spine.span,
+                    spine_prod,
+                    spine_children.len()
+                ),
                 (
                     reading.category,
                     &reading.span,
@@ -463,22 +464,15 @@ fn stop_lines(
                     }
                     (SettledChild::Leaf { .. }, SettledChild::Leaf { .. })
                     | (SettledChild::Punct, SettledChild::Punct) => {}
-                    (
-                        SettledChild::Node(_),
-                        SettledChild::Leaf { .. } | SettledChild::Punct,
-                    )
-                    | (
-                        SettledChild::Leaf { .. },
-                        SettledChild::Node(_) | SettledChild::Punct,
-                    )
-                    | (
-                        SettledChild::Punct,
-                        SettledChild::Node(_) | SettledChild::Leaf { .. },
-                    ) => panic!(
-                        "child {index} of {} [{spine_prod}] at {:?} differs in kind between \
+                    (SettledChild::Node(_), SettledChild::Leaf { .. } | SettledChild::Punct)
+                    | (SettledChild::Leaf { .. }, SettledChild::Node(_) | SettledChild::Punct)
+                    | (SettledChild::Punct, SettledChild::Node(_) | SettledChild::Leaf { .. }) => {
+                        panic!(
+                            "child {index} of {} [{spine_prod}] at {:?} differs in kind between \
                          the settled spine and a Reading",
-                        spine.category, spine.span
-                    ),
+                            spine.category, spine.span
+                        )
+                    }
                 }
             }
             Ok(())
@@ -543,7 +537,14 @@ fn spine_lines(
                             }
                             match child {
                                 SettledChild::Node(child) => {
-                                    spine_lines(child, line, depth + 1, fold_closed, tokens, output)?;
+                                    spine_lines(
+                                        child,
+                                        line,
+                                        depth + 1,
+                                        fold_closed,
+                                        tokens,
+                                        output,
+                                    )?;
                                 }
                                 SettledChild::Leaf { .. } | SettledChild::Punct => {
                                     writeln!(output, "{line}{}", child_text(child, tokens))?;
