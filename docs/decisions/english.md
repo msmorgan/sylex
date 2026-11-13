@@ -168,10 +168,12 @@ by convention what only meaning can decide.
 
 **Keep it packed.** When a phrase can attach at more than one site, every
 grammatical attachment stays in the Packed Forest, and nothing in this layer
-chooses among them. Admission and validation run over the forest. No consumer
-enumerates every tree, because a chain of unselected Preposition Phrases has
-Catalan-many attachments. Spelling recovery reads the forest and never
-re-parses the text.
+chooses among them. Admission, and the pipeline's consumers such as spelling
+recovery, run over the forest and enumerate no tree, because a chain of
+unselected Preposition Phrases has Catalan-many attachments; spelling recovery
+reads the forest and never re-parses the text. Judgment evaluation
+(`Judge::evaluate`) enumerates every Reading of a unit, so that no verdict
+depends on rank (§5).
 
 **Structure over suppression.** A missing or wrong analysis is fixed by a
 general rule that cites CGEL, the style guide or the CR. The rule adds whatever
