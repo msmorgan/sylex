@@ -74,7 +74,7 @@ impl Args for Steps {
                 .long("pick")
                 .value_name("SELECTOR")
                 .action(ArgAction::Append)
-                .help("Keep the Derivations that give a fork's option (repeatable)")
+                .help("Keep the Derivations that give a fork's option (`KIND \"surface\"#N ANSWER`, repeatable)")
                 .long_help(
                     "Keep the Derivations that give a fork's option (repeatable). A selector is \
                      one argument, `KIND \"surface\"#N ANSWER`: a fork's name as the survey \
@@ -89,7 +89,7 @@ impl Args for Steps {
                 .long("exclude")
                 .value_name("SELECTOR")
                 .action(ArgAction::Append)
-                .help("Drop the Derivations that give a fork's option (repeatable)")
+                .help("Drop the Derivations that give a fork's option (`KIND \"surface\"#N ANSWER`, repeatable)")
                 .long_help(
                     "Drop the Derivations that give a fork's option (repeatable). A selector is \
                      spelled as for `--pick`.",

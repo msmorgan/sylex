@@ -453,18 +453,19 @@ unit when the picked units have the same text. A wrong choice is an error
 that lists the face's units or names.
 
 It prints the Derivation count, then the settled spine
-(`ForkForest::settled_spine`): from the root, each ancestor of an unsettled
-stop as `function: Category [Production]`, a chain of single children folded
-into one line and a leaf as its word and lexical reading, without repeating the
-span surface on expanded mothers. While choices remain (or under `--limit 0`),
-each settled subtree with no unsettled stop inside it folds to one `function:
-Category "surface"` line; each unsettled stop prints its `"surface"` with its
-alternative count or child-split difference. Then come the forks
+(`ForkForest::settled_spine`): expanded branching nodes print as `function:
+Category [Production]` without repeating the span surface, a chain of single
+children folds into one line, and a leaf prints as its word and lexical
+reading. With one Derivation left (unless `--limit 0` is given), the whole
+Reading expands on `Settled spine:`; while choices remain (or under
+`--limit 0`), each settled subtree with no stop inside it folds to one
+`function: Category "surface"` line, and each stop prints its `"surface"` with
+its alternative count or child-split difference. Then come the forks
 (`ForkForest::forks`), each named by its kind and word, with whether it is
-conditional and its aliases, and under it each option's exact Derivation
-count and answer (an alias's answer after `=`). A word is printed
-`"surface"#N`, its surface and 1-based occurrence. Options are in the forks'
-order, never ranked: the survey decides nothing
+conditional and its aliases, and under it each option's exact Derivation count
+and answer (an alias's answer after `=`). A word is printed `"surface"#N`, its
+surface and 1-based occurrence. Options are in the forks' order, never ranked:
+the survey decides nothing
 ([english.md](../../docs/decisions/english.md) §4, §5).
 
 ### Narrowing a forest
@@ -483,28 +484,28 @@ cargo xtask english forestwalk --card 'Crook of Condemnation' --line 1 --limit 2
 of any size narrows. A selector is one argument, `KIND "surface"#N ANSWER`: a
 fork's name as the survey prints it (an alias's too) and, after it, one
 option's answer without its count or any ` = ` alias answer (an alias's answer
-for an alias's name). The
-occurrence is always written, a governor's too; a bare `"surface"` is an error,
-for a surface that occurs once as well. A selector begins with a lowercase
-`lexical`, `dependency` or `frame` and names grammar child names (`adjunct`,
-`first`), which keeps it apart from a judgment's assertions (`Category
-"surface" as Function of lemma`). Steps apply in the order written, `--pick`
-and `--exclude` interleaved, and each prints the Derivations left; then the
-survey prints the narrowed forest. A selector that names no word, fork or
-option of the unit, a copied ` = ` alias tail, an option an earlier step has
-removed, and a step that leaves no Derivation are errors naming the selector.
+for an alias's name). The occurrence is always written, a governor's too; a
+bare `"surface"` is an error, for a surface that occurs once as well. A
+selector begins with a lowercase `lexical`, `dependency` or `frame` and names
+grammar child names (`adjunct`, `first`), which keeps it apart from a
+judgment's assertions (`Category "surface" as Function of lemma`). Steps apply
+in the order written, `--pick` and `--exclude` interleaved, and each prints the
+Derivations left; then the survey prints the narrowed forest. A selector that
+names no word, fork or option of the unit, a copied ` = ` alias tail, an option
+an earlier step has removed, and a step that leaves no Derivation are errors
+naming the selector.
 
 With at most `--limit` Derivations left (default 1), one Derivation expands the
 whole Reading on `Settled spine:` (`--limit 0` folds its root to `Category
 "surface"`), and two or more print each `Reading N:` as its folded subtree(s)
-at the unsettled stop(s) of `Settled spine:` (`ForkForest::settled_readings`,
-or the whole Reading when no root Constituent is settled). `--assertions`
-accepts between 1 and `max(--limit, 1)` Derivations (`--limit 0 --assertions`
-isolates a single Reading without printing its tree) and prints, for each
-remaining Reading, judgment
-assertions that isolate it among the unit's Readings. They are found by greedy
-set cover over the assertions the Reading's own Constituents suggest (a
-Category and surface, with an occurrence, a head word, a function or a Gap
+at the stop(s) of `Settled spine:` (`ForkForest::settled_readings`, each
+carrying the function label its stop bears on `Settled spine:`, or the whole
+Reading when no root Constituent is settled). `--assertions` accepts between 1
+and `max(--limit, 1)` Derivations (`--limit 0 --assertions` isolates a single
+Reading without printing its tree) and prints, for each remaining Reading,
+judgment assertions that isolate it among the unit's Readings. They are found
+by greedy set cover over the assertions the Reading's own Constituents suggest
+(a Category and surface, with an occurrence, a head word, a function or a Gap
 Antecedent), each holding on it (`Judge::holds`) and covering the unit's other
 Readings it fails on, and it enumerates the unit's Readings as the judge does
 (`Judge::evaluate`). The output is diagnostic, not a judgment to copy unread:

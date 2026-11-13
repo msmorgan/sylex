@@ -67,7 +67,11 @@ pub(super) struct ForestwalkArgs {
     type_line: bool,
     #[command(flatten)]
     steps: selector::Steps,
-    /// With at most N Derivations left after narrowing, print each as a tree.
+    /// With 2 to N Derivations left after narrowing, print each Reading's
+    /// subtrees at the spine's stops (or whole Reading when no root Constituent
+    /// is settled); with 1 left, the spine is the whole Reading. `--limit 0`
+    /// folds a single Derivation's spine to one line, for when only
+    /// `--assertions` are wanted.
     #[arg(long, value_name = "N", default_value_t = 1)]
     limit: u64,
     /// Print judgment assertions that isolate each remaining Reading among
@@ -395,8 +399,8 @@ fn is_closed(node: &SettledNode) -> bool {
 }
 
 /// A Reading's differing subtrees: the whole Reading when no root
-/// Constituent is settled, or the Reading's subtree at each unsettled stop
-/// of `spine`, in spine order.
+/// Constituent is settled, or the Reading's subtree at each stop of `spine`,
+/// in spine order, carrying the function label its stop bears on `spine`.
 fn reading_lines(
     spine: &SettledSpine,
     reading: &SettledNode,
@@ -405,19 +409,25 @@ fn reading_lines(
 ) -> Result<()> {
     match spine {
         SettledSpine::Roots(_) => spine_lines(reading, "  ".to_owned(), 1, false, tokens, output),
-        SettledSpine::Root(spine_root) => stop_lines(spine_root, reading, tokens, output),
+        SettledSpine::Root(spine_root) => stop_lines(spine_root, reading, "", tokens, output),
     }
 }
 
 fn stop_lines(
     spine: &SettledNode,
     reading: &SettledNode,
+    label: &str,
     tokens: &[char],
     output: &mut dyn Write,
 ) -> Result<()> {
     match &spine.rest {
         SettledRest::Alternatives(_) | SettledRest::Splits { .. } => {
-            spine_lines(reading, "  ".to_owned(), 1, false, tokens, output)
+            let prefix = if label.is_empty() {
+                "  ".to_owned()
+            } else {
+                format!("  {label}: ")
+            };
+            spine_lines(reading, prefix, 1, false, tokens, output)
         }
         SettledRest::Children {
             production: spine_prod,
@@ -440,14 +450,35 @@ fn stop_lines(
                 ),
                 "a Reading's tree agrees with the settled spine above every stop"
             );
-            for ((_, spine_child), (_, reading_child)) in
-                spine_children.iter().zip(reading_children)
+            let pass_through = matches!(&spine_children[..], [(_, SettledChild::Node(_))]);
+            for (index, ((name, spine_child), (_, reading_child))) in
+                spine_children.iter().zip(reading_children).enumerate()
             {
-                if let (SettledChild::Node(s), SettledChild::Node(r)) =
-                    (spine_child, reading_child)
-                    && !is_closed(s)
-                {
-                    stop_lines(s, r, tokens, output)?;
+                match (spine_child, reading_child) {
+                    (SettledChild::Node(s), SettledChild::Node(r)) => {
+                        if !is_closed(s) {
+                            let child_label = if pass_through { label } else { name.as_str() };
+                            stop_lines(s, r, child_label, tokens, output)?;
+                        }
+                    }
+                    (SettledChild::Leaf { .. }, SettledChild::Leaf { .. })
+                    | (SettledChild::Punct, SettledChild::Punct) => {}
+                    (
+                        SettledChild::Node(_),
+                        SettledChild::Leaf { .. } | SettledChild::Punct,
+                    )
+                    | (
+                        SettledChild::Leaf { .. },
+                        SettledChild::Node(_) | SettledChild::Punct,
+                    )
+                    | (
+                        SettledChild::Punct,
+                        SettledChild::Node(_) | SettledChild::Leaf { .. },
+                    ) => panic!(
+                        "child {index} of {} [{spine_prod}] at {:?} differs in kind between \
+                         the settled spine and a Reading",
+                        spine.category, spine.span
+                    ),
                 }
             }
             Ok(())

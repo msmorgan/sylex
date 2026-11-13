@@ -396,9 +396,10 @@ fn the_printed_assertions_isolate_a_reading_of_a_large_unit() {
 }
 
 /// With `--limit` at the Derivations left, each Reading prints only its
-/// subtrees at the unsettled stops of `Settled spine:`.
+/// subtrees at the stops of `Settled spine:`, each labeled with the function
+/// its stop bears on the spine.
 #[test]
-fn a_limit_prints_each_remaining_reading_as_a_tree() {
+fn a_limit_prints_each_remaining_reading_at_the_spines_stops() {
     let output = survey(&[
         "--card",
         "Crook of Condemnation",
@@ -412,10 +413,13 @@ fn a_limit_prints_each_remaining_reading_as_a_tree() {
     let readings = output.split("\nReadings: 2\n").nth(1).expect(&output);
     let (first, second) = readings.split_once("\nReading 2:\n").unwrap();
     assert!(
-        first.starts_with("Reading 1:\n  Sentence [Declarative]\n"),
+        first.starts_with("Reading 1:\n  effect: Sentence [Declarative]\n"),
         "{output}"
     );
-    assert!(second.starts_with("  Sentence [Declarative]\n"), "{output}");
+    assert!(
+        second.starts_with("  effect: Sentence [Declarative]\n"),
+        "{output}"
+    );
     assert!(!first.contains("ActivationCost"), "{output}");
     assert!(!second.contains("ActivationCost"), "{output}");
     let modifier = "modifier: PrepositionPhrase [Valence:PrepositionPhrase/NP@NominalAndPredicate]";
@@ -433,6 +437,31 @@ fn a_limit_prints_each_remaining_reading_as_a_tree() {
     // Without a selector or a limit the output has no Readings.
     let default = survey(&["--card", "Crook of Condemnation", "--line", "1"]).unwrap();
     assert!(!default.contains("Readings:"), "{default}");
+    // With two stops on the spine, each Reading prints both stops in spine order.
+    let two_stops = survey(&[
+        "Exile target card from a graveyard. Exile target creature from a graveyard.",
+        "--limit",
+        "4",
+    ])
+    .unwrap();
+    assert!(two_stops.contains("\nDerivations: 4\n"), "{two_stops}");
+    let (spine_part, two_stop_readings) =
+        two_stops.split_once("\nReadings: 4\n").expect(&two_stops);
+    assert!(
+        spine_part.contains("    first: Sentence [Declarative] \"Exile target card from a graveyard.\":"),
+        "{spine_part}"
+    );
+    assert!(
+        spine_part.contains("    rest: Sentences [SingleSentence] > Sentence [Declarative] \"Exile target creature from a graveyard.\":"),
+        "{spine_part}"
+    );
+    for header in ["Reading 1:\n", "\nReading 2:\n", "\nReading 3:\n", "\nReading 4:\n"] {
+        let (_, body) = two_stop_readings.split_once(header).expect(two_stop_readings);
+        let section = body.split("\nReading ").next().unwrap();
+        let first_at = section.find("  first: Sentence [Declarative]\n").expect(section);
+        let rest_at = section.find("  rest: Sentence [Declarative]\n").expect(section);
+        assert!(first_at < rest_at, "{section}");
+    }
     // When no root Constituent is settled, each Reading prints its whole tree.
     let unsettled_root = survey(&["+Clause you cast a spell", "--limit", "2"]).unwrap();
     assert!(
@@ -515,18 +544,55 @@ fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
         "{spine}"
     );
     let (first, second) = readings.split_once("\nReading 2:\n").unwrap();
-    assert!(first.starts_with("Reading 1:\n  Nominal ["), "{readings}");
-    assert!(second.starts_with("  Nominal ["), "{readings}");
+    assert!(first.starts_with("Reading 1:\n  head: Nominal ["), "{readings}");
+    assert!(second.starts_with("  head: Nominal ["), "{readings}");
     assert!(!readings.contains("\"destroy\"#1"), "{readings}");
     assert!(first.contains("\"Auras\"#4"), "{first}");
     assert!(second.contains("\"Auras\"#4"), "{second}");
 }
 
-/// `--limit 0` folds a single remaining Reading's root to one line and still
-/// permits `--assertions` when one Derivation remains.
+/// `--limit 0` folds closed subtrees with or without `--assertions` (folding a
+/// single remaining Reading's root to one line) and still permits
+/// `--assertions` when one Derivation remains.
 #[test]
 fn limit_zero_folds_a_single_reading_and_still_isolates_assertions() {
     let pick = "dependency \"from\"#1 modifier of Nominal \"card\"#1";
+    let folded_spine = "Derivations: 1\n\
+                        Settled spine:\n  \
+                        Document \"{1}, {T}: Exile target card from a graveyard.\"\n\
+                        Forks: 0\n";
+    let one_without = survey(&[
+        "--card",
+        "Crook of Condemnation",
+        "--line",
+        "1",
+        "--pick",
+        pick,
+        "--limit",
+        "0",
+    ])
+    .unwrap();
+    assert!(one_without.ends_with(folded_spine), "{one_without}");
+    assert!(!one_without.contains("\"Exile\"#1"), "{one_without}");
+    assert!(!one_without.contains("Readings:"), "{one_without}");
+    assert!(!one_without.contains("Assertions"), "{one_without}");
+
+    let two_without = survey(&[
+        "--card",
+        "Crook of Condemnation",
+        "--line",
+        "1",
+        "--limit",
+        "0",
+    ])
+    .unwrap();
+    assert!(
+        two_without.contains("    cost: ActivationCost \"{1}, {T}\"\n"),
+        "{two_without}"
+    );
+    assert!(!two_without.contains("Readings:"), "{two_without}");
+    assert!(!two_without.contains("Assertions"), "{two_without}");
+
     let output = survey(&[
         "--card",
         "Crook of Condemnation",
@@ -539,15 +605,7 @@ fn limit_zero_folds_a_single_reading_and_still_isolates_assertions() {
         "--assertions",
     ])
     .unwrap();
-    assert!(
-        output.contains(
-            "Derivations: 1\n\
-             Settled spine:\n  \
-             Document \"{1}, {T}: Exile target card from a graveyard.\"\n\
-             Forks: 0\n"
-        ),
-        "{output}"
-    );
+    assert!(output.contains(folded_spine), "{output}");
     assert!(!output.contains("\"Exile\"#1"), "{output}");
     assert!(!printed_assertions(&output).is_empty(), "{output}");
     let two = survey(&[
