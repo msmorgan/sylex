@@ -131,8 +131,7 @@ CREATE TABLE heads (
     lexeme TEXT REFERENCES lexemes,
     form TEXT,
     inside INTEGER NOT NULL,
-    derivations INTEGER NOT NULL,
-    UNIQUE (unit, node, alternative, leaf)
+    derivations INTEGER NOT NULL
 );
 -- Embeddings: the dependent functions a Constituent stands under, nearest
 -- first. Going up from it through `head` children to the top of its head
@@ -201,8 +200,7 @@ CREATE TABLE words (
     start INTEGER NOT NULL,
     surface TEXT NOT NULL,
     occurrence INTEGER NOT NULL,
-    PRIMARY KEY (unit, word),
-    UNIQUE (unit, surface, occurrence)
+    PRIMARY KEY (unit, word)
 ) WITHOUT ROWID;
 -- Each node some Derivation uses, once per word whose Head Line runs through
 -- it (`sylex_syntax::ForkForest::head_lines`): the word its head line ends
@@ -216,11 +214,9 @@ CREATE TABLE head_lines (
     node INTEGER NOT NULL,
     word INTEGER,
     derivations INTEGER NOT NULL,
-    UNIQUE (unit, node, word),
     FOREIGN KEY (unit, node) REFERENCES nodes,
     FOREIGN KEY (unit, word) REFERENCES words
 );
-CREATE INDEX head_lines_by_word ON head_lines (unit, word);
 -- A unit's forks (`sylex_syntax::ForkForest::forks`), in display order: where
 -- its Derivations differ, each a question about one word. `kind` is the
 -- question: `lexical` (which lexical alternative the leaf starting at the word
@@ -460,4 +456,12 @@ WHERE q.kind = 'dependency'
         WHERE hl.unit = q.unit AND hl.word = na.governor
             AND n.start <= d.start AND d.start < n.end
             AND NOT (n.start <= cw.start AND cw.start < n.end));
+";
+
+/// Secondary and unique indexes built in one sorted pass after bulk insertion.
+pub(crate) const INDEXES: &str = r"
+CREATE UNIQUE INDEX heads_unique ON heads (unit, node, alternative, leaf);
+CREATE UNIQUE INDEX words_by_surface ON words (unit, surface, occurrence);
+CREATE UNIQUE INDEX head_lines_unique ON head_lines (unit, node, word);
+CREATE INDEX head_lines_by_word ON head_lines (unit, word);
 ";

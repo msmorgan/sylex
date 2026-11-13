@@ -6,8 +6,6 @@
 use anyhow::Context;
 use anyhow::Result;
 use rusqlite::Connection;
-use rusqlite::Statement;
-use rusqlite::params;
 use sylex_syntax::Answer;
 use sylex_syntax::Dependency;
 use sylex_syntax::ForkKind;
@@ -16,6 +14,8 @@ use sylex_syntax::HeadLineNode;
 use sylex_syntax::Parse;
 
 use super::LeafRow;
+use super::batch::BatchInsert;
+use super::batch::Val;
 use super::index;
 use super::int;
 
@@ -50,8 +50,8 @@ enum AnswerRow {
         function: &'static str,
         governor_category: &'static str,
     },
-    /// The head line's frame Productions, from the leaf up.
-    Frame(Vec<String>),
+    /// The head line's frame Productions as a JSON array, from the leaf up.
+    Frame(String),
 }
 
 pub(super) fn kind_name(kind: ForkKind) -> &'static str {
@@ -98,7 +98,8 @@ pub(super) fn rows(parse: &Parse<'_>, leaves: &[LeafRow]) -> Result<ForkRows> {
                 governor_category: governor_category.as_str(),
             },
             (ForkKind::Frame, Answer::Frame(productions)) => {
-                AnswerRow::Frame(productions.iter().map(ToString::to_string).collect())
+                let ids: Vec<&str> = productions.iter().map(sylex_lexicon::LexemeId::as_str).collect();
+                AnswerRow::Frame(serde_json::to_string(&ids)?)
             }
             (kind, answer) => anyhow::bail!("a {kind:?} question answers {answer:?}"),
         })
@@ -150,99 +151,144 @@ pub(super) fn rows(parse: &Parse<'_>, leaves: &[LeafRow]) -> Result<ForkRows> {
 
 /// The `INSERT`s of a unit's fork rows, prepared once for the transaction.
 pub(super) struct Inserts<'t> {
-    word: Statement<'t>,
-    head_line: Statement<'t>,
-    fork: Statement<'t>,
-    alias: Statement<'t>,
-    option: Statement<'t>,
-    answer: Statement<'t>,
+    word: BatchInsert<'t, 5, 64>,
+    head_line: BatchInsert<'t, 4, 128>,
+    fork: BatchInsert<'t, 6, 64>,
+    alias: BatchInsert<'t, 5, 64>,
+    option: BatchInsert<'t, 4, 128>,
+    answer: BatchInsert<'t, 10, 64>,
 }
 
 impl<'t> Inserts<'t> {
     pub(super) fn prepare(tx: &'t Connection) -> Result<Self> {
         Ok(Self {
-            word: tx.prepare("INSERT INTO words VALUES (?1, ?2, ?3, ?4, ?5)")?,
-            head_line: tx.prepare("INSERT INTO head_lines VALUES (?1, ?2, ?3, ?4)")?,
-            fork: tx.prepare("INSERT INTO forks VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?,
-            alias: tx.prepare("INSERT INTO fork_aliases VALUES (?1, ?2, ?3, ?4, ?5)")?,
-            option: tx.prepare("INSERT INTO fork_options VALUES (?1, ?2, ?3, ?4)")?,
-            answer: tx.prepare(
-                "INSERT INTO fork_answers VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
-            )?,
+            word: BatchInsert::prepare(tx, "words")?,
+            head_line: BatchInsert::prepare(tx, "head_lines")?,
+            fork: BatchInsert::prepare(tx, "forks")?,
+            alias: BatchInsert::prepare(tx, "fork_aliases")?,
+            option: BatchInsert::prepare(tx, "fork_options")?,
+            answer: BatchInsert::prepare(tx, "fork_answers")?,
         })
+    }
+
+    pub(super) fn finish(&mut self) -> Result<()> {
+        self.word.finish()?;
+        self.head_line.finish()?;
+        self.fork.finish()?;
+        self.alias.finish()?;
+        self.option.finish()?;
+        self.answer.finish()?;
+        Ok(())
     }
 }
 
-pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Result<()> {
+pub(super) struct ForkCounts {
+    pub(super) words: i64,
+    pub(super) head_lines: i64,
+    pub(super) forks: i64,
+    pub(super) fork_aliases: i64,
+    pub(super) fork_options: i64,
+    pub(super) fork_answers: i64,
+}
+
+pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Result<ForkCounts> {
+    let mut counts = ForkCounts {
+        words: index(rows.words.len()),
+        head_lines: index(rows.head_lines.len()),
+        forks: index(rows.forks.len()),
+        fork_aliases: 0,
+        fork_options: 0,
+        fork_answers: 0,
+    };
     for (w, word) in rows.words.iter().enumerate() {
-        inserts.word.execute(params![
-            u_id,
-            index(w),
-            index(word.start),
-            word.surface,
-            index(word.occurrence),
+        inserts.word.push([
+            Val::Int(u_id),
+            Val::Int(index(w)),
+            Val::Int(index(word.start)),
+            Val::Text(&word.surface),
+            Val::Int(index(word.occurrence)),
         ])?;
     }
     for line in &rows.head_lines {
-        inserts.head_line.execute(params![
-            u_id,
-            index(line.node),
-            line.word.map(index),
-            int(line.derivations)?,
+        inserts.head_line.push([
+            Val::Int(u_id),
+            Val::Int(index(line.node)),
+            line.word.map_or(Val::Null, |w| Val::Int(index(w))),
+            Val::Int(int(line.derivations)?),
         ])?;
     }
     for (f, fork) in rows.forks.iter().enumerate() {
-        inserts.fork.execute(params![
-            u_id,
-            index(f),
-            kind_name(fork.kind),
-            index(fork.word),
-            int(fork.context)?,
-            fork.conditional,
+        inserts.fork.push([
+            Val::Int(u_id),
+            Val::Int(index(f)),
+            Val::Static(kind_name(fork.kind)),
+            Val::Int(index(fork.word)),
+            Val::Int(int(fork.context)?),
+            Val::Bool(fork.conditional),
         ])?;
+        counts.fork_aliases += index(fork.aliases.len());
         for (a, (kind, word)) in fork.aliases.iter().enumerate() {
-            inserts.alias.execute(params![
-                u_id,
-                index(f),
-                index(a + 1),
-                kind_name(*kind),
-                index(*word)
+            inserts.alias.push([
+                Val::Int(u_id),
+                Val::Int(index(f)),
+                Val::Int(index(a + 1)),
+                Val::Static(kind_name(*kind)),
+                Val::Int(index(*word)),
             ])?;
         }
+        counts.fork_options += index(fork.options.len());
         for (o, option) in fork.options.iter().enumerate() {
-            inserts
-                .option
-                .execute(params![u_id, index(f), index(o), int(option.derivations)?])?;
+            inserts.option.push([
+                Val::Int(u_id),
+                Val::Int(index(f)),
+                Val::Int(index(o)),
+                Val::Int(int(option.derivations)?),
+            ])?;
+            counts.fork_answers += index(option.answers.len());
             for (q, answer) in option.answers.iter().enumerate() {
                 let (leaf, dependency, governor, function, category, frames) = match answer {
-                    AnswerRow::Lexical(leaf) => (Some(index(*leaf)), None, None, None, None, None),
-                    AnswerRow::Root => (None, Some("root"), None, None, None, None),
+                    AnswerRow::Lexical(leaf) => (
+                        Val::Int(index(*leaf)),
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                    ),
+                    AnswerRow::Root => (
+                        Val::Null,
+                        Val::Static("root"),
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                    ),
                     AnswerRow::Dependent {
                         governor,
                         function,
                         governor_category,
                     } => (
-                        None,
-                        Some("dependent"),
-                        governor.map(index),
-                        Some(*function),
-                        Some(*governor_category),
-                        None,
+                        Val::Null,
+                        Val::Static("dependent"),
+                        governor.map_or(Val::Null, |g| Val::Int(index(g))),
+                        Val::Static(function),
+                        Val::Static(governor_category),
+                        Val::Null,
                     ),
-                    AnswerRow::Frame(productions) => (
-                        None,
-                        None,
-                        None,
-                        None,
-                        None,
-                        Some(serde_json::to_string(productions)?),
+                    AnswerRow::Frame(frames) => (
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                        Val::Null,
+                        Val::Text(frames.as_str()),
                     ),
                 };
-                inserts.answer.execute(params![
-                    u_id,
-                    index(f),
-                    index(o),
-                    index(q),
+                inserts.answer.push([
+                    Val::Int(u_id),
+                    Val::Int(index(f)),
+                    Val::Int(index(o)),
+                    Val::Int(index(q)),
                     leaf,
                     dependency,
                     governor,
@@ -253,7 +299,7 @@ pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Re
             }
         }
     }
-    Ok(())
+    Ok(counts)
 }
 
 #[cfg(test)]

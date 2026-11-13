@@ -6,11 +6,13 @@
 //! completed item) pair, and an item's families are (previous item, child)
 //! pairs. Only the part some Derivation uses is stored, with the unit's
 //! forks (`ForkForest::forks`, written by `forks.rs`). The schema, with
-//! each table's and view's meaning, is [`SCHEMA`] and [`VIEWS`].
+//! each table's, index's, and view's meaning, is [`SCHEMA`], [`INDEXES`], and
+//! [`VIEWS`].
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
@@ -21,12 +23,12 @@ use anyhow::Context;
 use anyhow::Result;
 use clap::Args;
 use rusqlite::Connection;
-use rusqlite::Statement;
 use rusqlite::params;
 use sylex_english::corpus::Corpus;
 use sylex_english::corpus::UnitKind;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
+use sylex_lexicon::WordForm;
 use sylex_syntax::ChildRef;
 use sylex_syntax::CompiledGrammar;
 use sylex_syntax::Coordinator;
@@ -35,11 +37,15 @@ use sylex_syntax::Gap;
 use sylex_syntax::HeadWord;
 use sylex_vocabulary::LexicalEnvironment;
 
+mod batch;
 mod context;
 mod forks;
 mod pipeline;
 mod schema;
 
+use batch::BatchInsert;
+use batch::Val;
+use schema::INDEXES;
 use schema::SCHEMA;
 use schema::VIEWS;
 
@@ -90,6 +96,7 @@ pub(super) fn run(args: &ForestsArgs, output: &mut dyn Write) -> Result<()> {
 struct UnitRows {
     derivations: u128,
     parsed: String,
+    embeddings: Vec<Embedding>,
     nodes: Vec<NodeRow>,
     items: Vec<ItemRow>,
     leaves: Vec<LeafRow>,
@@ -117,7 +124,8 @@ struct AlternativeRow {
     /// (head leaf, its word, the alternative's own Derivations with it, the
     /// unit's).
     heads: Vec<(Option<usize>, Option<HeadWord>, u128, u128)>,
-    embeddings: Vec<(Embedding, u128, u128)>,
+    /// (index into `UnitRows::embeddings`, outside ways, the unit's Derivations).
+    embeddings: Vec<(usize, u128, u128)>,
     conjuncts: Vec<(usize, u128)>,
 }
 
@@ -163,11 +171,13 @@ impl std::fmt::Display for Summary {
 }
 
 /// How many units past the next one to write may be parsed ahead of it,
-/// which bounds the parsed units held in memory at once.
-const WINDOW: usize = 256;
+/// which bounds the parsed units held in memory at once while absorbing
+/// head-of-line stalls when a complex unit takes hundreds of milliseconds to
+/// parse and other worker threads continue finishing short units ahead of it.
+const WINDOW: usize = 1024;
 
 /// How many written units may wait to be freed off the writer thread.
-const FREEING: usize = 64;
+const FREEING: usize = 256;
 
 /// Writes the database for `corpus` to `path`, replacing it.
 pub(crate) fn write(
@@ -184,27 +194,47 @@ pub(crate) fn write(
         std::fs::remove_file(&partial)?;
     }
     let mut db = Connection::open(&partial)?;
-    db.execute_batch("PRAGMA journal_mode = OFF; PRAGMA synchronous = OFF;")?;
+    // The `.sqlite.partial` scratch file is written in one transaction by a
+    // single connection and renamed into place only after every check passes:
+    // - 32 KiB pages reduce B-tree splits across multi-million-row append tables;
+    // - journaling, fsync, and shared locks are unneeded on an unshared scratch file;
+    // - `temp_store = MEMORY`, `threads = 8` (`SQLITE_MAX_WORKER_THREADS`), and a
+    //   1 GiB page cache (`cache_size = -1048576`, negative = KiB) keep dirty B-tree
+    //   pages and post-load `CREATE INDEX` sort runs in RAM instead of spilling
+    //   under SQLite's 2 MiB default cache.
+    db.execute_batch(
+        "PRAGMA page_size = 32768;
+         PRAGMA journal_mode = OFF;
+         PRAGMA synchronous = OFF;
+         PRAGMA locking_mode = EXCLUSIVE;
+         PRAGMA temp_store = MEMORY;
+         PRAGMA threads = 8;
+         PRAGMA cache_size = -1048576;",
+    )?;
     db.execute_batch(SCHEMA)?;
     db.execute_batch(VIEWS)?;
     let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
     let reader = context::Reader::new(grammar, &env.lexicon);
-    // Lexemes and Embeddings are written last, so references are checked
-    // once at the end (`foreign_key_check`), not on each insert.
+    // `lexemes` and `embeddings` are written after the unit rows that reference
+    // them so each table grows in key order in one pass; `pragma_foreign_key_check`
+    // verifies every foreign key once the transaction commits.
     db.execute_batch("PRAGMA foreign_keys = OFF;")?;
     // Units are written in order, so each `(unit, …)` table grows at its
     // end and Embeddings are numbered as they are first met in unit order.
-    let mut summary = pipeline::run(
+    let summary = pipeline::run(
         corpus.units.len(),
         WINDOW,
         |unit| describe(corpus, unit),
         |unit| unit_rows(corpus, unit, cleaves[unit].as_ref(), env, grammar, &reader),
         |units| {
             let tx = db.transaction()?;
-            write_grammar(&tx, grammar)?;
-            let mut lexemes = BTreeSet::new();
-            let mut embeddings: HashMap<Embedding, i64> = HashMap::new();
-            let mut summary = Summary::default();
+            let mut state = WriterState {
+                lexemes: HashSet::new(),
+                embeddings: HashMap::new(),
+                unit_embedding_ids: Vec::new(),
+                summary: Summary::default(),
+            };
+            write_grammar(&tx, grammar, &mut state.summary)?;
             let mut inserts = Inserts::prepare(&tx)?;
             // A unit's rows are freed on a thread of their own once written,
             // which keeps the writer, the run's bottleneck, from freeing them.
@@ -217,16 +247,8 @@ pub(crate) fn write(
                 let freer = scope.spawn(move || freeing.into_iter().for_each(drop));
                 let written = (|| -> Result<()> {
                     while let Some((unit, rows)) = units.next()? {
-                        write_unit(
-                            &mut inserts,
-                            corpus,
-                            unit,
-                            &rows,
-                            &mut lexemes,
-                            &mut embeddings,
-                            &mut summary,
-                        )
-                        .with_context(|| describe(corpus, unit))?;
+                        write_unit(&mut inserts, &mut state, corpus, unit, &rows)
+                            .with_context(|| describe(corpus, unit))?;
                         to_free
                             .send(rows)
                             .map_err(|_| anyhow::anyhow!("the thread freeing rows stopped"))?;
@@ -234,50 +256,36 @@ pub(crate) fn write(
                     Ok(())
                 })();
                 drop(to_free);
-                freer.join().map_err(|panic| {
+                let joined = freer.join().map_err(|panic| {
                     anyhow::anyhow!(
                         "the thread freeing rows panicked: {}",
                         pipeline::message(panic.as_ref())
                     )
-                })?;
-                written
+                });
+                written?;
+                joined?;
+                inserts.finish()?;
+                Ok(())
             })?;
             drop(inserts);
-            write_embeddings(&tx, &embeddings, &reader, &mut lexemes)?;
-            write_lexemes(&tx, &lexemes, env)?;
+            write_embeddings(
+                &tx,
+                &state.embeddings,
+                &reader,
+                &mut state.lexemes,
+                &mut state.summary,
+            )?;
+            write_lexemes(&tx, &state.lexemes, env, &mut state.summary)?;
+            tx.execute_batch(INDEXES)?;
             tx.commit()?;
-            Ok(summary)
+            Ok(state.summary)
         },
     )?;
-    let dangling: i64 = db.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| {
-        r.get(0)
-    })?;
+    let dangling: i64 =
+        db.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| {
+            r.get(0)
+        })?;
     anyhow::ensure!(dangling == 0, "{dangling} rows reference no row");
-    for table in [
-        "units",
-        "nodes",
-        "alternatives",
-        "items",
-        "families",
-        "leaves",
-        "heads",
-        "embeddings",
-        "embedding_steps",
-        "alternative_embeddings",
-        "conjuncts",
-        "words",
-        "head_lines",
-        "forks",
-        "fork_aliases",
-        "fork_options",
-        "fork_answers",
-        "lexemes",
-        "productions",
-        "categories",
-    ] {
-        let rows: i64 = db.query_row(&format!("SELECT count(*) FROM {table}"), [], |r| r.get(0))?;
-        summary.rows.insert(table, rows);
-    }
     drop(db);
     std::fs::rename(&partial, path)?;
     Ok(summary)
@@ -327,6 +335,8 @@ fn unit_rows(
             .to_owned()
     };
     let roots: BTreeSet<usize> = forest.roots().iter().copied().collect();
+    let mut unit_embeddings: Vec<Embedding> = Vec::new();
+    let mut unit_embedding_index: HashMap<Embedding, usize> = HashMap::new();
     let mut nodes = Vec::new();
     for node in (0..forest.node_count()).filter(|&n| counts.node(n) > 0) {
         let span = forest.node_span(node);
@@ -357,7 +367,15 @@ fn unit_rows(
                     embeddings: embeddings[node][index]
                         .iter()
                         .map(|(embedding, &ways)| {
-                            Ok((embedding.clone(), ways, product(ways, inside)?))
+                            let local = if let Some(&id) = unit_embedding_index.get(embedding) {
+                                id
+                            } else {
+                                let id = unit_embeddings.len();
+                                unit_embeddings.push(embedding.clone());
+                                unit_embedding_index.insert(embedding.clone(), id);
+                                id
+                            };
+                            Ok((local, ways, product(ways, inside)?))
                         })
                         .collect::<Result<_>>()?,
                     conjuncts: match coordinator {
@@ -426,6 +444,7 @@ fn unit_rows(
     Ok(UnitRows {
         derivations: counts.total(),
         parsed,
+        embeddings: unit_embeddings,
         nodes,
         items,
         leaves,
@@ -532,11 +551,54 @@ fn index(n: usize) -> i64 {
     i64::try_from(n).expect("an index fits in i64")
 }
 
-fn write_grammar(tx: &rusqlite::Transaction<'_>, grammar: &CompiledGrammar) -> Result<()> {
+fn form_name(form: WordForm) -> &'static str {
+    match form {
+        WordForm::Invariant => "Invariant",
+        WordForm::IndependentGenitive => "IndependentGenitive",
+        WordForm::Singular => "Singular",
+        WordForm::Plural => "Plural",
+        WordForm::Plain => "Plain",
+        WordForm::Present => "Present",
+        WordForm::Preterite => "Preterite",
+        WordForm::Irrealis => "Irrealis",
+        WordForm::GerundParticiple => "GerundParticiple",
+        WordForm::PastParticiple => "PastParticiple",
+    }
+}
+
+fn category_name(category: sylex_lexicon::Category) -> &'static str {
+    match category {
+        sylex_lexicon::Category::Noun => "Noun",
+        sylex_lexicon::Category::Verb => "Verb",
+        sylex_lexicon::Category::Adjective => "Adjective",
+        sylex_lexicon::Category::Adverb => "Adverb",
+        sylex_lexicon::Category::Determinative => "Determinative",
+        sylex_lexicon::Category::Pronoun => "Pronoun",
+        sylex_lexicon::Category::Preposition => "Preposition",
+        sylex_lexicon::Category::Coordinator => "Coordinator",
+        sylex_lexicon::Category::Subordinator => "Subordinator",
+        sylex_lexicon::Category::Affix => "Affix",
+        sylex_lexicon::Category::Clitic => "Clitic",
+        sylex_lexicon::Category::Numeral => "Numeral",
+        sylex_lexicon::Category::Catalog => "Catalog",
+        sylex_lexicon::Category::Keyword => "Keyword",
+        sylex_lexicon::Category::FlavorWord => "FlavorWord",
+        sylex_lexicon::Category::Symbol => "Symbol",
+    }
+}
+
+fn write_grammar(
+    tx: &rusqlite::Transaction<'_>,
+    grammar: &CompiledGrammar,
+    summary: &mut Summary,
+) -> Result<()> {
     let mut category = tx.prepare("INSERT INTO categories VALUES (?1, ?2)")?;
     for (index, name) in grammar.category_names().iter().enumerate() {
         category.execute(params![self::index(index), name.as_str()])?;
     }
+    summary
+        .rows
+        .insert("categories", index(grammar.category_names().len()));
     let mut production =
         tx.prepare("INSERT INTO productions VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)")?;
     for p in 0..grammar.production_count() {
@@ -557,52 +619,78 @@ fn write_grammar(tx: &rusqlite::Transaction<'_>, grammar: &CompiledGrammar) -> R
             grammar.production_is_interleaved_prefix(p),
         ])?;
     }
+    summary
+        .rows
+        .insert("productions", index(grammar.production_count()));
     Ok(())
 }
 
 /// The per-unit `INSERT`s, prepared once for the transaction.
 struct Inserts<'t> {
-    unit: Statement<'t>,
-    node: Statement<'t>,
-    alternative: Statement<'t>,
-    head: Statement<'t>,
-    embedding: Statement<'t>,
-    conjunct: Statement<'t>,
-    item: Statement<'t>,
-    family: Statement<'t>,
-    leaf: Statement<'t>,
+    unit: BatchInsert<'t, 10, 64>,
+    node: BatchInsert<'t, 13, 64>,
+    alternative: BatchInsert<'t, 6, 128>,
+    head: BatchInsert<'t, 8, 128>,
+    embedding: BatchInsert<'t, 6, 128>,
+    conjunct: BatchInsert<'t, 5, 64>,
+    item: BatchInsert<'t, 7, 128>,
+    family: BatchInsert<'t, 7, 128>,
+    leaf: BatchInsert<'t, 9, 96>,
     forks: forks::Inserts<'t>,
 }
 
 impl<'t> Inserts<'t> {
     fn prepare(tx: &'t Connection) -> Result<Self> {
         Ok(Self {
-            unit: tx
-                .prepare("INSERT INTO units VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)")?,
-            node: tx.prepare(
-                "INSERT INTO nodes VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
-            )?,
-            alternative: tx.prepare("INSERT INTO alternatives VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?,
-            head: tx.prepare("INSERT INTO heads VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)")?,
-            embedding: tx
-                .prepare("INSERT INTO alternative_embeddings VALUES (?1, ?2, ?3, ?4, ?5, ?6)")?,
-            conjunct: tx.prepare("INSERT INTO conjuncts VALUES (?1, ?2, ?3, ?4, ?5)")?,
-            item: tx.prepare("INSERT INTO items VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?,
-            family: tx.prepare("INSERT INTO families VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)")?,
-            leaf: tx.prepare("INSERT INTO leaves VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)")?,
+            unit: BatchInsert::prepare(tx, "units")?,
+            node: BatchInsert::prepare(tx, "nodes")?,
+            alternative: BatchInsert::prepare(tx, "alternatives")?,
+            head: BatchInsert::prepare(tx, "heads")?,
+            embedding: BatchInsert::prepare(tx, "alternative_embeddings")?,
+            conjunct: BatchInsert::prepare(tx, "conjuncts")?,
+            item: BatchInsert::prepare(tx, "items")?,
+            family: BatchInsert::prepare(tx, "families")?,
+            leaf: BatchInsert::prepare(tx, "leaves")?,
             forks: forks::Inserts::prepare(tx)?,
         })
     }
+
+    fn finish(&mut self) -> Result<()> {
+        self.unit.finish()?;
+        self.node.finish()?;
+        self.alternative.finish()?;
+        self.head.finish()?;
+        self.embedding.finish()?;
+        self.conjunct.finish()?;
+        self.item.finish()?;
+        self.family.finish()?;
+        self.leaf.finish()?;
+        self.forks.finish()?;
+        Ok(())
+    }
+}
+
+struct WriterState {
+    lexemes: HashSet<LexemeId>,
+    embeddings: HashMap<Embedding, i64>,
+    unit_embedding_ids: Vec<i64>,
+    summary: Summary,
+}
+
+#[derive(Default)]
+struct NodeCounts {
+    alternatives: i64,
+    heads: i64,
+    embeddings: i64,
+    conjuncts: i64,
 }
 
 fn write_unit(
     inserts: &mut Inserts<'_>,
+    state: &mut WriterState,
     corpus: &Corpus,
     unit: usize,
     rows: &UnitRows,
-    lexemes: &mut BTreeSet<LexemeId>,
-    embeddings: &mut HashMap<Embedding, i64>,
-    summary: &mut Summary,
 ) -> Result<()> {
     let u = &corpus.units[unit];
     let face = &corpus.faces[u.face];
@@ -620,103 +708,61 @@ fn write_unit(
         ),
     };
     let u_id = index(unit);
-    inserts.unit.execute(params![
-        u_id,
-        oracle_id,
-        face_index,
-        face.name,
-        face.card,
-        match u.kind {
+    inserts.unit.push([
+        Val::Int(u_id),
+        Val::Text(oracle_id),
+        face_index.map_or(Val::Null, Val::Int),
+        Val::Text(&face.name),
+        Val::Text(&face.card),
+        Val::Static(match u.kind {
             UnitKind::TypeLine => "type line",
             UnitKind::Line => "line",
-        },
-        index(u.index),
-        u.text,
-        rows.parsed,
-        int(rows.derivations)?,
+        }),
+        Val::Int(index(u.index)),
+        Val::Text(&u.text),
+        Val::Text(&rows.parsed),
+        Val::Int(int(rows.derivations)?),
     ])?;
-    for node in &rows.nodes {
-        let (coordinator, link) = match node.coordinator {
-            Some(Coordinator::Lexeme(id)) => {
-                lexemes.insert(id);
-                (Some(id.as_str()), None)
-            }
-            Some(Coordinator::Linked(tail)) => (None, Some(tail.as_str())),
-            None => (None, None),
+    state.unit_embedding_ids.clear();
+    state.unit_embedding_ids.reserve(rows.embeddings.len());
+    for embedding in &rows.embeddings {
+        let id = if let Some(&id) = state.embeddings.get(embedding) {
+            id
+        } else {
+            let id = index(state.embeddings.len());
+            state.embeddings.insert(embedding.clone(), id);
+            id
         };
-        inserts.node.execute(params![
-            u_id,
-            index(node.node),
-            index(node.category),
-            index(node.span.start),
-            index(node.span.end),
-            node.surface,
-            node.gap,
-            node.features,
-            coordinator,
-            link,
-            node.root,
-            node.settled,
-            int(node.derivations)?,
-        ])?;
-        for (a, alternative) in node.alternatives.iter().enumerate() {
-            let key = (u_id, index(node.node), index(a));
-            inserts.alternative.execute(params![
-                key.0,
-                key.1,
-                key.2,
-                index(alternative.production),
-                index(alternative.item),
-                int(alternative.derivations)?,
-            ])?;
-            for (leaf, word, inside, derivations) in &alternative.heads {
-                if let Some((lexeme, _)) = word {
-                    lexemes.insert(*lexeme);
-                }
-                inserts.head.execute(params![
-                    key.0,
-                    key.1,
-                    key.2,
-                    leaf.map(index),
-                    word.map(|(lexeme, _)| lexeme.as_str()),
-                    word.map(|(_, form)| format!("{form:?}")),
-                    int(*inside)?,
-                    int(*derivations)?,
-                ])?;
-            }
-            for (embedding, outside, derivations) in &alternative.embeddings {
-                let id = if let Some(&id) = embeddings.get(embedding) {
-                    id
-                } else {
-                    let id = index(embeddings.len());
-                    embeddings.insert(embedding.clone(), id);
-                    id
-                };
-                inserts.embedding.execute(params![
-                    key.0,
-                    key.1,
-                    key.2,
-                    id,
-                    int(*outside)?,
-                    int(*derivations)?,
-                ])?;
-            }
-            for (conjuncts, derivations) in &alternative.conjuncts {
-                inserts.conjunct.execute(params![
-                    key.0,
-                    key.1,
-                    key.2,
-                    index(*conjuncts),
-                    int(*derivations)?,
-                ])?;
-            }
-        }
+        state.unit_embedding_ids.push(id);
     }
+    let node_counts = write_nodes(
+        inserts,
+        u_id,
+        &rows.nodes,
+        &mut state.lexemes,
+        &state.unit_embedding_ids,
+    )?;
     let families = write_items(inserts, u_id, &rows.items)?;
-    write_leaves(inserts, u_id, &rows.leaves, lexemes)?;
-    forks::write(&mut inserts.forks, u_id, &rows.forks)?;
+    write_leaves(inserts, u_id, &rows.leaves, &mut state.lexemes)?;
+    let fork_counts = forks::write(&mut inserts.forks, u_id, &rows.forks)?;
+    let summary = &mut state.summary;
     summary.units += 1;
-    let size = (rows.nodes.len() + rows.items.len()) as u64 + families;
+    *summary.rows.entry("units").or_default() += 1;
+    *summary.rows.entry("nodes").or_default() += index(rows.nodes.len());
+    *summary.rows.entry("alternatives").or_default() += node_counts.alternatives;
+    *summary.rows.entry("heads").or_default() += node_counts.heads;
+    *summary.rows.entry("alternative_embeddings").or_default() += node_counts.embeddings;
+    *summary.rows.entry("conjuncts").or_default() += node_counts.conjuncts;
+    *summary.rows.entry("items").or_default() += index(rows.items.len());
+    *summary.rows.entry("families").or_default() += index(families);
+    *summary.rows.entry("leaves").or_default() += index(rows.leaves.len());
+    *summary.rows.entry("words").or_default() += fork_counts.words;
+    *summary.rows.entry("head_lines").or_default() += fork_counts.head_lines;
+    *summary.rows.entry("forks").or_default() += fork_counts.forks;
+    *summary.rows.entry("fork_aliases").or_default() += fork_counts.fork_aliases;
+    *summary.rows.entry("fork_options").or_default() += fork_counts.fork_options;
+    *summary.rows.entry("fork_answers").or_default() += fork_counts.fork_answers;
+    let size = (rows.nodes.len() + rows.items.len() + families) as u64;
     if summary.largest.as_ref().is_none_or(|(n, _)| size > *n) {
         summary.largest = Some((size, describe(corpus, unit)));
     }
@@ -730,33 +776,118 @@ fn write_unit(
     Ok(())
 }
 
+fn write_nodes(
+    inserts: &mut Inserts<'_>,
+    u_id: i64,
+    nodes: &[NodeRow],
+    lexemes: &mut HashSet<LexemeId>,
+    unit_embedding_ids: &[i64],
+) -> Result<NodeCounts> {
+    let mut counts = NodeCounts::default();
+    for node in nodes {
+        let (coordinator, link) = match node.coordinator {
+            Some(Coordinator::Lexeme(id)) => {
+                lexemes.insert(id);
+                (Val::Static(id.as_str()), Val::Null)
+            }
+            Some(Coordinator::Linked(tail)) => (Val::Null, Val::Text(tail.as_str())),
+            None => (Val::Null, Val::Null),
+        };
+        inserts.node.push([
+            Val::Int(u_id),
+            Val::Int(index(node.node)),
+            Val::Int(index(node.category)),
+            Val::Int(index(node.span.start)),
+            Val::Int(index(node.span.end)),
+            Val::Text(&node.surface),
+            node.gap.as_deref().map_or(Val::Null, Val::Text),
+            Val::Text(&node.features),
+            coordinator,
+            link,
+            Val::Bool(node.root),
+            Val::Bool(node.settled),
+            Val::Int(int(node.derivations)?),
+        ])?;
+        counts.alternatives += index(node.alternatives.len());
+        for (a, alternative) in node.alternatives.iter().enumerate() {
+            let key = (u_id, index(node.node), index(a));
+            inserts.alternative.push([
+                Val::Int(key.0),
+                Val::Int(key.1),
+                Val::Int(key.2),
+                Val::Int(index(alternative.production)),
+                Val::Int(index(alternative.item)),
+                Val::Int(int(alternative.derivations)?),
+            ])?;
+            counts.heads += index(alternative.heads.len());
+            for (leaf, word, inside, derivations) in &alternative.heads {
+                if let Some((lexeme, _)) = word {
+                    lexemes.insert(*lexeme);
+                }
+                inserts.head.push([
+                    Val::Int(key.0),
+                    Val::Int(key.1),
+                    Val::Int(key.2),
+                    leaf.map_or(Val::Null, |l| Val::Int(index(l))),
+                    word.map_or(Val::Null, |(lexeme, _)| Val::Static(lexeme.as_str())),
+                    word.map_or(Val::Null, |(_, form)| Val::Static(form_name(form))),
+                    Val::Int(int(*inside)?),
+                    Val::Int(int(*derivations)?),
+                ])?;
+            }
+            counts.embeddings += index(alternative.embeddings.len());
+            for &(local_emb, outside, derivations) in &alternative.embeddings {
+                inserts.embedding.push([
+                    Val::Int(key.0),
+                    Val::Int(key.1),
+                    Val::Int(key.2),
+                    Val::Int(unit_embedding_ids[local_emb]),
+                    Val::Int(int(outside)?),
+                    Val::Int(int(derivations)?),
+                ])?;
+            }
+            counts.conjuncts += index(alternative.conjuncts.len());
+            for (conjuncts, derivations) in &alternative.conjuncts {
+                inserts.conjunct.push([
+                    Val::Int(key.0),
+                    Val::Int(key.1),
+                    Val::Int(key.2),
+                    Val::Int(index(*conjuncts)),
+                    Val::Int(int(*derivations)?),
+                ])?;
+            }
+        }
+    }
+    Ok(counts)
+}
+
 /// Writes a unit's items and their families; returns the families written.
-fn write_items(inserts: &mut Inserts<'_>, u_id: i64, items: &[ItemRow]) -> Result<u64> {
-    let mut families = 0u64;
+fn write_items(inserts: &mut Inserts<'_>, u_id: i64, items: &[ItemRow]) -> Result<usize> {
+    let mut families = 0usize;
     for item in items {
-        inserts.item.execute(params![
-            u_id,
-            index(item.item),
-            index(item.production),
-            index(item.dot),
-            index(item.span.start),
-            index(item.span.end),
-            int(item.derivations)?,
+        inserts.item.push([
+            Val::Int(u_id),
+            Val::Int(index(item.item)),
+            Val::Int(index(item.production)),
+            Val::Int(index(item.dot)),
+            Val::Int(index(item.span.start)),
+            Val::Int(index(item.span.end)),
+            Val::Int(int(item.derivations)?),
         ])?;
         for (f, (previous, child, derivations)) in item.families.iter().enumerate() {
             let (node, leaf) = match child {
-                ChildRef::Node(n) => (Some(index(*n)), None),
-                ChildRef::Leaf(l) => (None, Some(index(*l))),
-                ChildRef::Punct => (None, None),
+                ChildRef::Node(n) => (Val::Int(index(*n)), Val::Null),
+                ChildRef::Leaf(l) => (Val::Null, Val::Int(index(*l))),
+                ChildRef::Punct => (Val::Null, Val::Null),
             };
-            inserts.family.execute(params![
-                u_id,
-                index(item.item),
-                index(f),
-                previous.map(index),
+            inserts.family.push([
+                Val::Int(u_id),
+                Val::Int(index(item.item)),
+                Val::Int(index(f)),
+                previous.map_or(Val::Null, |p| Val::Int(index(p))),
                 node,
                 leaf,
-                int(*derivations)?,
+                Val::Int(int(*derivations)?),
             ])?;
             families += 1;
         }
@@ -768,28 +899,35 @@ fn write_leaves(
     inserts: &mut Inserts<'_>,
     u_id: i64,
     leaves: &[LeafRow],
-    lexemes: &mut BTreeSet<LexemeId>,
+    lexemes: &mut HashSet<LexemeId>,
 ) -> Result<()> {
     for leaf in leaves {
         let (kind, lexeme, form, value) = match &leaf.reading {
             LexicalReading::Word(word) => {
                 lexemes.insert(word.lexeme);
                 (
-                    "word",
-                    Some(word.lexeme.as_str()),
-                    Some(format!("{:?}", word.form)),
-                    None,
+                    Val::Static("word"),
+                    Val::Static(word.lexeme.as_str()),
+                    Val::Static(form_name(word.form)),
+                    Val::Null,
                 )
             }
-            LexicalReading::FlavorWord { .. } => ("flavor word", None, None, None),
-            LexicalReading::Numeral { value, .. } => ("numeral", None, None, Some(*value)),
+            LexicalReading::FlavorWord { .. } => {
+                (Val::Static("flavor word"), Val::Null, Val::Null, Val::Null)
+            }
+            LexicalReading::Numeral { value, .. } => (
+                Val::Static("numeral"),
+                Val::Null,
+                Val::Null,
+                Val::Int(i64::from(*value)),
+            ),
         };
-        inserts.leaf.execute(params![
-            u_id,
-            index(leaf.leaf),
-            index(leaf.span.start),
-            index(leaf.span.end),
-            leaf.surface,
+        inserts.leaf.push([
+            Val::Int(u_id),
+            Val::Int(index(leaf.leaf)),
+            Val::Int(index(leaf.span.start)),
+            Val::Int(index(leaf.span.end)),
+            Val::Text(&leaf.surface),
             kind,
             lexeme,
             form,
@@ -803,59 +941,71 @@ fn write_embeddings(
     tx: &rusqlite::Transaction<'_>,
     embeddings: &HashMap<Embedding, i64>,
     reader: &context::Reader<'_>,
-    lexemes: &mut BTreeSet<LexemeId>,
+    lexemes: &mut HashSet<LexemeId>,
+    summary: &mut Summary,
 ) -> Result<()> {
-    let mut embedding_insert = tx.prepare("INSERT INTO embeddings VALUES (?1, ?2, ?3, ?4)")?;
-    let mut step_insert =
-        tx.prepare("INSERT INTO embedding_steps VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)")?;
+    let mut embedding_insert: BatchInsert<'_, 4, 128> = BatchInsert::prepare(tx, "embeddings")?;
+    let mut step_insert: BatchInsert<'_, 9, 96> = BatchInsert::prepare(tx, "embedding_steps")?;
     // In id order, so each table grows at its end.
     let mut in_order: Vec<(&Embedding, i64)> = embeddings.iter().map(|(e, &id)| (e, id)).collect();
     in_order.sort_unstable_by_key(|&(_, id)| id);
+    let mut step_count = 0i64;
     for (embedding, id) in in_order {
-        embedding_insert.execute(params![
-            id,
-            index(embedding.steps.len()),
-            embedding.truncated,
-            reader.context(embedding).name(),
+        embedding_insert.push([
+            Val::Int(id),
+            Val::Int(index(embedding.steps.len())),
+            Val::Bool(embedding.truncated),
+            Val::Static(reader.context(embedding).name()),
         ])?;
+        step_count += index(embedding.steps.len());
         for (n, step) in embedding.steps.iter().enumerate() {
             if let Some((lexeme, _)) = step.governor_head {
                 lexemes.insert(lexeme);
             }
-            step_insert.execute(params![
-                id,
-                index(n + 1),
-                index(step.projection),
-                index(step.child),
-                step.function.as_str(),
-                index(step.governor),
-                step.governor_head.map(|(lexeme, _)| lexeme.as_str()),
-                step.governor_head.map(|(_, form)| format!("{form:?}")),
-                reader.wrapper(step),
+            step_insert.push([
+                Val::Int(id),
+                Val::Int(index(n + 1)),
+                Val::Int(index(step.projection)),
+                Val::Int(index(step.child)),
+                Val::Static(step.function.as_str()),
+                Val::Int(index(step.governor)),
+                step.governor_head
+                    .map_or(Val::Null, |(lexeme, _)| Val::Static(lexeme.as_str())),
+                step.governor_head
+                    .map_or(Val::Null, |(_, form)| Val::Static(form_name(form))),
+                Val::Bool(reader.wrapper(step)),
             ])?;
         }
     }
+    embedding_insert.finish()?;
+    step_insert.finish()?;
+    summary.rows.insert("embeddings", index(embeddings.len()));
+    summary.rows.insert("embedding_steps", step_count);
     Ok(())
 }
 
 fn write_lexemes(
     tx: &rusqlite::Transaction<'_>,
-    lexemes: &BTreeSet<LexemeId>,
+    lexemes: &HashSet<LexemeId>,
     env: &LexicalEnvironment,
+    summary: &mut Summary,
 ) -> Result<()> {
+    let mut sorted: Vec<LexemeId> = lexemes.iter().copied().collect();
+    sorted.sort_unstable_by_key(LexemeId::as_str);
     let mut insert = tx.prepare("INSERT INTO lexemes VALUES (?1, ?2, ?3)")?;
-    for id in lexemes {
+    for id in sorted {
         let lexeme = env
             .lexicon
             .lexemes()
-            .get(id)
-            .with_context(|| format!("lexeme `{id}` is not in the lexicon"))?;
+            .get(&id)
+            .with_context(|| format!("lexeme `{}` is not in the lexicon", id.as_str()))?;
         insert.execute(params![
             id.as_str(),
             lexeme.lemma,
-            format!("{:?}", lexeme.category)
+            category_name(lexeme.category)
         ])?;
     }
+    summary.rows.insert("lexemes", index(lexemes.len()));
     Ok(())
 }
 
