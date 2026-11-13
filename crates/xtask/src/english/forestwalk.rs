@@ -4,9 +4,11 @@
 //!
 //! `--pick` and `--exclude` narrow the forest by fork options first
 //! (`ForkForest::pick`, `ForkForest::exclude`; [`selector`]) and survey what
-//! is left; with at most `--limit` Derivations left, each is also printed as a
-//! tree (`ForkForest::settled_readings`), and `--assertions` adds the judgment
-//! assertions that isolate it among the unit's Readings ([`isolate`]).
+//! is left; with at most `--limit` Derivations left, one Derivation expands the
+//! spine itself and two or more print each Reading's subtrees at the spine's
+//! stops (`ForkForest::settled_readings`), while `--assertions` adds the
+//! judgment assertions that isolate each remaining Reading among the unit's
+//! Readings ([`isolate`]).
 //!
 //! The survey reports the forest and decides nothing
 //! (`docs/decisions/english.md` §4): options are listed in the order the
@@ -70,7 +72,8 @@ pub(super) struct ForestwalkArgs {
     limit: u64,
     /// Print judgment assertions that isolate each remaining Reading among
     /// the unit's Readings, by greedy set cover. Diagnostic output, not a
-    /// judgment to copy unread; needs between 1 and `--limit` Derivations.
+    /// judgment to copy unread; needs between 1 and max(`--limit`, 1)
+    /// Derivations.
     #[arg(long)]
     assertions: bool,
 }
@@ -107,17 +110,28 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
     };
     let total = forest.total();
     let limit = u128::from(args.limit);
-    let isolating = (1..=limit).contains(&total);
-    anyhow::ensure!(
-        isolating || !args.assertions,
-        "`--assertions` needs between 1 and `--limit` ({limit}) Derivations, and the slice has \
-         {total}: narrow it with `--pick` and `--exclude`, or raise `--limit`"
-    );
+    let assertion_limit = limit.max(1);
+    if args.assertions && !(1..=assertion_limit).contains(&total) {
+        if limit == 0 {
+            anyhow::bail!(
+                "`--assertions` with `--limit 0` needs 1 Derivation, and the slice has {total}: \
+                 narrow it with `--pick` and `--exclude`, or raise `--limit`"
+            );
+        }
+        anyhow::bail!(
+            "`--assertions` needs between 1 and `--limit` ({limit}) Derivations, and the slice \
+             has {total}: narrow it with `--pick` and `--exclude`, or raise `--limit`"
+        );
+    }
     writeln!(output, "Derivations: {total}")?;
     let tokens = parse.tokens();
+    let spine = forest.settled_spine();
+    let fold_closed = total > 1 || limit == 0;
     writeln!(output, "Settled spine:")?;
-    match forest.settled_spine() {
-        SettledSpine::Root(root) => spine_lines(&root, "  ".to_owned(), 1, tokens, output)?,
+    match &spine {
+        SettledSpine::Root(root) => {
+            spine_lines(root, "  ".to_owned(), 1, fold_closed, tokens, output)?;
+        }
         SettledSpine::Roots(0) => writeln!(output, "  (no Derivation)")?,
         SettledSpine::Roots(n) => {
             writeln!(output, "  (none: {n} root Constituents have Derivations)")?;
@@ -128,8 +142,11 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
     for fork in &forks {
         fork_lines(fork, total, output)?;
     }
-    let remaining = if isolating && (total >= 2 || args.assertions) {
+    let show_readings = total >= 2 && total <= limit;
+    let remaining = if show_readings {
         forest.settled_readings(limit)
+    } else if args.assertions {
+        forest.settled_readings(assertion_limit)
     } else {
         None
     };
@@ -139,18 +156,18 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
             isolations(&judge, &parse, readings.iter().map(|(reading, _)| reading))?.into_iter()
         }
         (None, true) => unreachable!(
-            "`--assertions` is refused unless 1 to `--limit` Derivations are left, and then the \
-             forest's Readings are taken"
+            "`--assertions` is refused unless 1 to max(`--limit`, 1) Derivations are left, and \
+             then the forest's Readings are taken"
         ),
     };
     if let Some(readings) = &remaining {
-        if total >= 2 {
+        if show_readings {
             writeln!(output, "Readings: {total}")?;
         }
         for (index, (_, node)) in readings.iter().enumerate() {
-            let label = if total >= 2 {
+            let label = if show_readings {
                 writeln!(output, "Reading {}:", index + 1)?;
-                spine_lines(node, "  ".to_owned(), 1, tokens, output)?;
+                reading_lines(&spine, node, tokens, output)?;
                 format!("Reading {}", index + 1)
             } else {
                 "the Reading".to_owned()
@@ -366,25 +383,106 @@ fn fetched_unit(name: &str, line: Option<usize>, type_line: bool) -> Result<Pars
     Ok(first.item(None))
 }
 
-/// A settled node's lines: its pass-through chain folded into one line,
-/// then its children's lines one level deeper. `line` is the line so far:
-/// its indent and the name the node bears in its mother.
+/// Whether every Derivation builds `node` and all its descendants alike.
+fn is_closed(node: &SettledNode) -> bool {
+    match &node.rest {
+        SettledRest::Alternatives(_) | SettledRest::Splits { .. } => false,
+        SettledRest::Children { children, .. } => children.iter().all(|(_, child)| match child {
+            SettledChild::Node(child) => is_closed(child),
+            SettledChild::Leaf { .. } | SettledChild::Punct => true,
+        }),
+    }
+}
+
+/// A Reading's differing subtrees: the whole Reading when no root
+/// Constituent is settled, or the Reading's subtree at each unsettled stop
+/// of `spine`, in spine order.
+fn reading_lines(
+    spine: &SettledSpine,
+    reading: &SettledNode,
+    tokens: &[char],
+    output: &mut dyn Write,
+) -> Result<()> {
+    match spine {
+        SettledSpine::Roots(_) => spine_lines(reading, "  ".to_owned(), 1, false, tokens, output),
+        SettledSpine::Root(spine_root) => stop_lines(spine_root, reading, tokens, output),
+    }
+}
+
+fn stop_lines(
+    spine: &SettledNode,
+    reading: &SettledNode,
+    tokens: &[char],
+    output: &mut dyn Write,
+) -> Result<()> {
+    match &spine.rest {
+        SettledRest::Alternatives(_) | SettledRest::Splits { .. } => {
+            spine_lines(reading, "  ".to_owned(), 1, false, tokens, output)
+        }
+        SettledRest::Children {
+            production: spine_prod,
+            children: spine_children,
+        } => {
+            let SettledRest::Children {
+                production: reading_prod,
+                children: reading_children,
+            } = &reading.rest
+            else {
+                panic!("a Reading's node is built by one Production and split");
+            };
+            assert_eq!(
+                (spine.category, &spine.span, spine_prod, spine_children.len()),
+                (
+                    reading.category,
+                    &reading.span,
+                    reading_prod,
+                    reading_children.len()
+                ),
+                "a Reading's tree agrees with the settled spine above every stop"
+            );
+            for ((_, spine_child), (_, reading_child)) in
+                spine_children.iter().zip(reading_children)
+            {
+                if let (SettledChild::Node(s), SettledChild::Node(r)) =
+                    (spine_child, reading_child)
+                    && !is_closed(s)
+                {
+                    stop_lines(s, r, tokens, output)?;
+                }
+            }
+            Ok(())
+        }
+    }
+}
+
+/// A settled node's lines: a closed subtree as one `Category "surface"` line
+/// when `fold_closed` is set; otherwise its pass-through chain folded into
+/// one line without repeating `"surface"`, then its children's lines one
+/// level deeper. `line` is the line so far: its indent and the name the node
+/// bears in its mother.
 fn spine_lines(
     node: &SettledNode,
     mut line: String,
     depth: usize,
+    fold_closed: bool,
     tokens: &[char],
     output: &mut dyn Write,
 ) -> Result<()> {
+    if fold_closed && is_closed(node) {
+        let surface = span_text(&node.span, tokens);
+        writeln!(output, "{line}{} {surface:?}", node.category)?;
+        return Ok(());
+    }
     let mut node = node;
     loop {
-        let surface = span_text(&node.span, tokens);
         match &node.rest {
             SettledRest::Alternatives(n) => {
+                let surface = span_text(&node.span, tokens);
                 line = format!("{line}{} {surface:?}: {n} alternatives", node.category);
                 break;
             }
             SettledRest::Splits { production } => {
+                let surface = span_text(&node.span, tokens);
                 line = format!(
                     "{line}{} [{production}] {surface:?}: its children differ between Derivations",
                     node.category
@@ -406,7 +504,7 @@ fn spine_lines(
                         break;
                     }
                     _ => {
-                        writeln!(output, "{line} {surface:?}")?;
+                        writeln!(output, "{line}")?;
                         for (name, child) in children {
                             let mut line = format!("{:indent$}", "", indent = 2 * (depth + 1));
                             if !name.as_str().is_empty() {
@@ -414,7 +512,7 @@ fn spine_lines(
                             }
                             match child {
                                 SettledChild::Node(child) => {
-                                    spine_lines(child, line, depth + 1, tokens, output)?;
+                                    spine_lines(child, line, depth + 1, fold_closed, tokens, output)?;
                                 }
                                 SettledChild::Leaf { .. } | SettledChild::Punct => {
                                     writeln!(output, "{line}{}", child_text(child, tokens))?;

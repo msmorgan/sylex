@@ -35,7 +35,8 @@ fn survey(inputs: &[&str]) -> Result<String, String> {
 }
 
 /// *Draugr Necromancer*'s type line has one Reading: the spine is its
-/// whole tree, pass-through chains folded, and there is no fork.
+/// whole tree, pass-through chains folded without repeating spans on
+/// expanded mothers, and there is no fork.
 #[test]
 fn a_unit_with_one_reading_is_its_whole_spine() {
     let output = survey(&["--card", "Draugr Necromancer", "--type-line"]).unwrap();
@@ -44,12 +45,12 @@ fn a_unit_with_one_reading_is_its_whole_spine() {
         r##"Draugr Necromancer type line: "Snow Creature — Zombie Cleric"
 Derivations: 1
 Settled spine:
-  Document [TextTypeLine] > TypeLine [SupertypePrefix] "Snow Creature — Zombie Cleric"
+  Document [TextTypeLine] > TypeLine [SupertypePrefix]
     modifier: "Snow"#1 supertype:snow Invariant
-    head: TypeLine [TypesWithSubtypes] "Creature — Zombie Cleric"
+    head: TypeLine [TypesWithSubtypes]
       head: CardTypes [SingleCardType] > "Creature"#1 type:creature Singular {number=Singular}
       punctuation
-      subtypes: Subtypes [MultipleSubtypes] "Zombie Cleric"
+      subtypes: Subtypes [MultipleSubtypes]
         first: "Zombie"#1 subtype:Zombie Singular {number=Singular}
         rest: Subtypes [SingleSubtype] > "Cleric"#1 subtype:Cleric Singular {number=Singular}
 Forks: 0
@@ -58,8 +59,9 @@ Forks: 0
 }
 
 /// *Crook of Condemnation*'s first line: "from a graveyard" modifies
-/// "card" or adjoins the Verb Phrase, so the spine stops at the
-/// Sentence and one dependency fork has two options.
+/// "card" or adjoins the Verb Phrase, so the settled activation cost folds
+/// to one line, the spine stops at the Sentence, and one dependency fork
+/// has two options.
 #[test]
 fn a_dependency_fork_lists_its_options_with_their_derivations() {
     let output = survey(&["--card", "Crook of Condemnation", "--line", "1"]).unwrap();
@@ -68,11 +70,8 @@ fn a_dependency_fork_lists_its_options_with_their_derivations() {
         r##"Crook of Condemnation line 1: "{1}, {T}: Exile target card from a graveyard."
 Derivations: 2
 Settled spine:
-  Document [TextAbility] > Ability [ActivatedAbility] "{1}, {T}: Exile target card from a graveyard."
-    cost: ActivationCost [ActivationPayment] > Cost [SymbolCost] > SymbolCosts [CostSequence] "{1}, {T}"
-      first: Symbols [SingleSymbol] > "{1}"#1 symbol:{1} Invariant
-      punctuation
-      rest: SymbolCosts [SingleSymbolCost] > Symbols [SingleSymbol] > "{T}"#1 symbol:{T} Invariant
+  Document [TextAbility] > Ability [ActivatedAbility]
+    cost: ActivationCost "{1}, {T}"
     punctuation
     effect: Effect [SentenceEffect] > Sentences [SingleSentence] > Sentence [Declarative] "Exile target card from a graveyard.": its children differ between Derivations
 Forks: 1
@@ -102,7 +101,7 @@ fn stated_text_is_surveyed_with_its_stated_card() {
     assert!(bare.contains("Derivations: 0\n"), "{bare}");
     let phrase = survey(&["+NounPhrase target creature"]).unwrap();
     assert!(
-        phrase.contains("Settled spine:\n  NounPhrase [Determined] \"target creature\"\n"),
+        phrase.contains("Settled spine:\n  NounPhrase [Determined]\n"),
         "{phrase}"
     );
 }
@@ -396,7 +395,8 @@ fn the_printed_assertions_isolate_a_reading_of_a_large_unit() {
     check_isolation("Draugr Necromancer", 2, 4);
 }
 
-/// With `--limit` at the Derivations left, each Reading is a folded tree.
+/// With `--limit` at the Derivations left, each Reading prints only its
+/// subtrees at the unsettled stops of `Settled spine:`.
 #[test]
 fn a_limit_prints_each_remaining_reading_as_a_tree() {
     let output = survey(&[
@@ -411,9 +411,15 @@ fn a_limit_prints_each_remaining_reading_as_a_tree() {
     assert!(output.contains("\nForks: 1\n"), "{output}");
     let readings = output.split("\nReadings: 2\n").nth(1).expect(&output);
     let (first, second) = readings.split_once("\nReading 2:\n").unwrap();
-    assert!(first.starts_with("Reading 1:\n"), "{output}");
-    let modifier = r#"modifier: PrepositionPhrase [Valence:PrepositionPhrase/NP@NominalAndPredicate] "from a graveyard""#;
-    let adjunct = r#"adjunct: PrepositionPhrase [Valence:PrepositionPhrase/NP@NominalAndPredicate] "from a graveyard""#;
+    assert!(
+        first.starts_with("Reading 1:\n  Sentence [Declarative]\n"),
+        "{output}"
+    );
+    assert!(second.starts_with("  Sentence [Declarative]\n"), "{output}");
+    assert!(!first.contains("ActivationCost"), "{output}");
+    assert!(!second.contains("ActivationCost"), "{output}");
+    let modifier = "modifier: PrepositionPhrase [Valence:PrepositionPhrase/NP@NominalAndPredicate]";
+    let adjunct = "adjunct: PrepositionPhrase [Valence:PrepositionPhrase/NP@NominalAndPredicate]";
     assert_ne!(
         first.contains(modifier),
         second.contains(modifier),
@@ -427,6 +433,174 @@ fn a_limit_prints_each_remaining_reading_as_a_tree() {
     // Without a selector or a limit the output has no Readings.
     let default = survey(&["--card", "Crook of Condemnation", "--line", "1"]).unwrap();
     assert!(!default.contains("Readings:"), "{default}");
+    // When no root Constituent is settled, each Reading prints its whole tree.
+    let unsettled_root = survey(&["+Clause you cast a spell", "--limit", "2"]).unwrap();
+    assert!(
+        unsettled_root.contains("  (none: 2 root Constituents have Derivations)\n"),
+        "{unsettled_root}"
+    );
+    let (_, roots_readings) = unsettled_root
+        .split_once("\nReadings: 2\n")
+        .expect(&unsettled_root);
+    let (r1, r2) = roots_readings.split_once("\nReading 2:\n").unwrap();
+    assert!(r1.starts_with("Reading 1:\n  Clause [SubjectPredicate]\n"));
+    assert!(r2.starts_with("  Clause [SubjectPredicate]\n"));
+    assert_ne!(r1.contains("Present"), r2.contains("Present"));
+}
+
+/// On *Remove Enchantments* narrowed to two Derivations in its final
+/// conjunct, `Settled spine:` folds the settled first sentence and earlier
+/// conjuncts to single lines, and `--limit 2` prints only the stopped
+/// `Nominal` under each Reading.
+#[test]
+fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
+    let output = survey(&[
+        "--card",
+        "Remove Enchantments",
+        "--line",
+        "1",
+        "--pick",
+        "dependency \"and\"#2 object of VerbPhrase \"Return\"#1",
+        "--pick",
+        "dependency \"and\"#3 object of VerbPhrase \"destroy\"#1",
+        "--pick",
+        "dependency \"both\"#1 correlative of VerbPhrase \"and\"#1",
+        "--pick",
+        "lexical \"attached\"#1 adj:attached Invariant",
+        "--pick",
+        "dependency \"attached\"#1 modifier of Nominal \"Auras\"#1",
+        "--pick",
+        "dependency \"control\"#2 modifier of Nominal \"permanents\"#1",
+        "--pick",
+        "lexical \"attached\"#2 adj:attached Invariant",
+        "--pick",
+        "dependency \"attached\"#2 modifier of Nominal \"Auras\"#2",
+        "--pick",
+        "dependency \"attacking\"#1 modifier of Nominal \"creatures\"#1",
+        "--pick",
+        "dependency \"control\"#3 modifier of Nominal \"creatures\"#1",
+        "--pick",
+        "lexical \"attached\"#3 adj:attached Invariant",
+        "--pick",
+        "dependency \"control\"#5 modifier of Nominal \"permanents\"#2",
+        "--pick",
+        "lexical \"attached\"#4 adj:attached Invariant",
+        "--pick",
+        "dependency \"attached\"#4 modifier of Nominal \"Auras\"#4",
+        "--pick",
+        "dependency \"attacking\"#2 modifier of Nominal \"creatures\"#2",
+        "--limit",
+        "2",
+    ])
+    .unwrap();
+    assert!(output.contains("\nDerivations: 2\n"), "{output}");
+    let (before_readings, readings) = output.split_once("\nReadings: 2\n").expect(&output);
+    let (_, spine) = before_readings
+        .split_once("\nSettled spine:\n")
+        .expect(before_readings);
+    assert!(
+        spine.contains("    first: Sentence \"Return to your hand "),
+        "{spine}"
+    );
+    assert!(!spine.contains("\"Return\"#1"), "{spine}");
+    assert!(
+        spine.contains("first: NounPhrase \"all other Auras attached to permanents you control\""),
+        "{spine}"
+    );
+    assert!(
+        spine.contains(
+            "head: Nominal \"other Auras attached to attacking creatures your opponents \
+             control\": 2 alternatives"
+        ),
+        "{spine}"
+    );
+    let (first, second) = readings.split_once("\nReading 2:\n").unwrap();
+    assert!(first.starts_with("Reading 1:\n  Nominal ["), "{readings}");
+    assert!(second.starts_with("  Nominal ["), "{readings}");
+    assert!(!readings.contains("\"destroy\"#1"), "{readings}");
+    assert!(first.contains("\"Auras\"#4"), "{first}");
+    assert!(second.contains("\"Auras\"#4"), "{second}");
+}
+
+/// `--limit 0` folds a single remaining Reading's root to one line and still
+/// permits `--assertions` when one Derivation remains.
+#[test]
+fn limit_zero_folds_a_single_reading_and_still_isolates_assertions() {
+    let pick = "dependency \"from\"#1 modifier of Nominal \"card\"#1";
+    let output = survey(&[
+        "--card",
+        "Crook of Condemnation",
+        "--line",
+        "1",
+        "--pick",
+        pick,
+        "--limit",
+        "0",
+        "--assertions",
+    ])
+    .unwrap();
+    assert!(
+        output.contains(
+            "Derivations: 1\n\
+             Settled spine:\n  \
+             Document \"{1}, {T}: Exile target card from a graveyard.\"\n\
+             Forks: 0\n"
+        ),
+        "{output}"
+    );
+    assert!(!output.contains("\"Exile\"#1"), "{output}");
+    assert!(!printed_assertions(&output).is_empty(), "{output}");
+    let two = survey(&[
+        "--card",
+        "Crook of Condemnation",
+        "--line",
+        "1",
+        "--limit",
+        "0",
+        "--assertions",
+    ])
+    .unwrap_err();
+    assert!(
+        two.contains("`--assertions` with `--limit 0` needs 1 Derivation, and the slice has 2"),
+        "{two}"
+    );
+}
+
+#[test]
+fn an_aliased_selector_answer_with_equals_names_the_single_answer() {
+    let full = "adj:attached Invariant = complement of AdjectivePhrase \"attached\"#1";
+    let primary = survey(&[
+        "--card",
+        "Remove Enchantments",
+        "--line",
+        "1",
+        "--pick",
+        &format!("lexical \"attached\"#1 {full}"),
+    ])
+    .unwrap_err();
+    assert!(
+        primary.contains(
+            "` = ` separates aliased answers on one survey line; for lexical \"attached\"#1 \
+             alone, write `adj:attached Invariant`"
+        ),
+        "{primary}"
+    );
+    let alias = survey(&[
+        "--card",
+        "Remove Enchantments",
+        "--line",
+        "1",
+        "--pick",
+        &format!("dependency \"to\"#2 {full}"),
+    ])
+    .unwrap_err();
+    assert!(
+        alias.contains(
+            "` = ` separates aliased answers on one survey line; for dependency \"to\"#2 alone, \
+             write `complement of AdjectivePhrase \"attached\"#1`"
+        ),
+        "{alias}"
+    );
 }
 
 #[test]
