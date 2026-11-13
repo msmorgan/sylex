@@ -1112,31 +1112,32 @@ mod tests {
         }
     }
 
-    /// *Kykar, Zephyr Awakener*'s *Whenever you cast a noncreature spell*
+    /// *Acolyte of Bahamut*'s *The first Dragon spell you cast each turn*
     /// has two Derivations, *cast* Present in one and Preterite in the
     /// other: two nodes over one span, each in one Derivation. Summed by
     /// span and Production, *cast* is in both.
     #[test]
     fn nodes_sharing_a_span_and_production_sum_to_every_derivation() {
-        let (_dir, path, _) = database(&["Kykar, Zephyr Awakener"]);
+        let (_dir, path, _) = database(&["Acolyte of Bahamut"]);
         let db = Connection::open(&path).unwrap();
         let per_node = column(
             &db,
             "SELECT sum(v.derivations) FROM verb_phrases v JOIN units u USING (unit) WHERE \
-             u.line = 1 AND u.kind = 'line' AND v.lemma = 'cast' GROUP BY v.node",
+             u.line = 0 AND u.kind = 'line' AND v.lemma = 'cast' AND \
+             v.context = 'relative clause' GROUP BY v.node",
         );
         assert_eq!(per_node, [1, 1]);
         let spans = column(
             &db,
-            "SELECT s.every FROM verb_phrase_spans s JOIN units u USING (unit) WHERE u.line = 1 \
-             AND u.kind = 'line' AND s.lemma = 'cast' AND s.context = 'trigger clause' AND \
+            "SELECT s.every FROM verb_phrase_spans s JOIN units u USING (unit) WHERE u.line = 0 \
+             AND u.kind = 'line' AND s.lemma = 'cast' AND s.context = 'relative clause' AND \
              s.derivations = u.derivations",
         );
         assert_eq!(spans, [1]);
         let tokens = column(
             &db,
-            "SELECT t.every FROM verb_phrase_tokens t JOIN units u USING (unit) WHERE u.line = 1 \
-             AND u.kind = 'line' AND t.lemma = 'cast'",
+            "SELECT t.every FROM verb_phrase_tokens t JOIN units u USING (unit) WHERE u.line = 0 \
+             AND u.kind = 'line' AND t.lemma = 'cast' AND t.context = 'relative clause'",
         );
         assert_eq!(tokens, [1]);
     }
