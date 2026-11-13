@@ -288,7 +288,7 @@ impl StrategyEvaluator {
             Preference::Attack { what } => Some(what),
             _ => None,
         })
-        .map(|what| {
+        .map_or_default(|what| {
             legal
                 .iter()
                 .copied()
@@ -302,7 +302,6 @@ impl StrategyEvaluator {
                 })
                 .collect()
         })
-        .unwrap_or_default()
     }
 
     /// Declare blocks per the applicable `Block` preference's policy. No

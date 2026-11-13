@@ -963,8 +963,7 @@ impl crate::state::GameState {
         self.activations
             .borrow()
             .get(&activation)
-            .map(|record| record.context.targets.clone())
-            .unwrap_or_default()
+            .map_or_default(|record| record.context.targets.clone())
     }
 
     /// Fill the announced-target parameters after target selection commits.

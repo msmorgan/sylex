@@ -308,8 +308,7 @@ impl Server {
 
 fn hover_markdown(name: &str, container: &str, detail: Option<&str>) -> String {
     let body = detail
-        .map(|detail| format!("\n\n```\n{detail}\n```"))
-        .unwrap_or_default();
+        .map_or_default(|detail| format!("\n\n```\n{detail}\n```"));
     format!("**{name}**  \n`{container}`{body}")
 }
 

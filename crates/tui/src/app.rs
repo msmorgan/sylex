@@ -33,7 +33,6 @@ use crate::ui::Selected;
 const KEY_FLASH_DURATION: Duration = Duration::from_millis(250);
 
 /// Binary entry point. Prints a clean error and exits non-zero on failure.
-#[must_use]
 pub fn run() -> ExitCode {
     match try_run() {
         Ok(()) => ExitCode::SUCCESS,

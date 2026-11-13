@@ -382,11 +382,7 @@ impl GameState {
         // [CR#601.2b..601.2c,602.2b]: at least one complete mode/target
         // announcement must exist. A top-level Modal itself has no target
         // wrapper, so every permitted mode must be considered here.
-        if !self.announcement_effect_satisfiable(object, player, &ability.effect, &ability.targets)
-        {
-            return false;
-        }
-        true
+        self.announcement_effect_satisfiable(object, player, &ability.effect, &ability.targets)
     }
 
     /// [CR#500.1]: does the current active player stand in the named

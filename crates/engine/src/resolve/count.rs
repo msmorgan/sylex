@@ -607,13 +607,11 @@ impl GameState {
             Ch::Power => self
                 .layers()
                 .power(id)
-                .map(|p| vec![p.max(0).to_string()])
-                .unwrap_or_default(),
+                .map_or_default(|p| vec![p.max(0).to_string()]),
             Ch::Toughness => self
                 .layers()
                 .toughness(id)
-                .map(|t| vec![t.max(0).to_string()])
-                .unwrap_or_default(),
+                .map_or_default(|t| vec![t.max(0).to_string()]),
             Ch::Defense => vec![
                 self.objects
                     .obj(id)

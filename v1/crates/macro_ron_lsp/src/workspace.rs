@@ -301,8 +301,7 @@ fn container_for(plugins: &Path, path: &Path, category: &str) -> String {
         .strip_prefix(plugins)
         .ok()
         .and_then(|rel| rel.components().next())
-        .map(|component| component.as_os_str().to_string_lossy().into_owned())
-        .unwrap_or_default();
+        .map_or_default(|component| component.as_os_str().to_string_lossy().into_owned());
     format!("{plugin}/{category}")
 }
 

@@ -1462,8 +1462,7 @@ impl GameState {
                 // it — an empty result (empty library / count 0) fizzles the
                 // whole aggregate before any window opens [CR#701.17b].
                 let patients: Vec<ObjectId> = composite_body_group(body)
-                    .map(|(group, _)| self.eval_selection_set(&group, frame))
-                    .unwrap_or_default()
+                    .map_or_default(|(group, _)| self.eval_selection_set(&group, frame))
                     .into_iter()
                     .filter(|&o| self.objects.get(o).and_then(|x| x.zone) == Some(Zone::Library))
                     .collect();

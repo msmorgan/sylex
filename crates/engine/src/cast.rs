@@ -1304,17 +1304,14 @@ impl GameState {
         }
         // [CR#601.2b..601.2c]: at least one complete mode/target
         // announcement must exist before offering this resolution cast.
-        if self.spell_effect(object).is_some_and(|effect| {
+        !self.spell_effect(object).is_some_and(|effect| {
             !self.announcement_effect_satisfiable(
                 object,
                 caster,
                 &effect,
                 &self.spell_targets(object),
             )
-        }) {
-            return false;
-        }
-        true
+        })
     }
 
     /// [CR#608.2g]: the work-item chain that casts `object` from resolution,

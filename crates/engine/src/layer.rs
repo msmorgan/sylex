@@ -2043,13 +2043,11 @@ fn distinct_keys_derived(
         Ch::Power => working
             .get(&id)
             .and_then(|d| d.characteristics.power)
-            .map(|p| vec![p.max(0).to_string()])
-            .unwrap_or_default(),
+            .map_or_default(|p| vec![p.max(0).to_string()]),
         Ch::Toughness => working
             .get(&id)
             .and_then(|d| d.characteristics.toughness)
-            .map(|t| vec![t.max(0).to_string()])
-            .unwrap_or_default(),
+            .map_or_default(|t| vec![t.max(0).to_string()]),
         Ch::Defense => vec![
             state
                 .objects

@@ -434,8 +434,7 @@ impl GameState {
     #[must_use]
     pub(crate) fn spell_additional_cost(&self, id: ObjectId) -> sylex_core::Cost {
         self.spell_ability(id)
-            .map(|spell| spell.cost.clone())
-            .unwrap_or_default()
+            .map_or_default(|spell| spell.cost.clone())
     }
 
     #[must_use]
