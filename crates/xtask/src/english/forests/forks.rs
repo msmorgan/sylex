@@ -3,6 +3,8 @@
 //! tables, and its nodes' Head Lines (`ForkForest::head_lines`) as rows of
 //! `head_lines`.
 
+use std::collections::BTreeMap;
+
 use anyhow::Context;
 use anyhow::Result;
 use rusqlite::Connection;
@@ -98,7 +100,10 @@ pub(super) fn rows(parse: &Parse<'_>, leaves: &[LeafRow]) -> Result<ForkRows> {
                 governor_category: governor_category.as_str(),
             },
             (ForkKind::Frame, Answer::Frame(productions)) => {
-                let ids: Vec<&str> = productions.iter().map(sylex_lexicon::LexemeId::as_str).collect();
+                let ids: Vec<&str> = productions
+                    .iter()
+                    .map(sylex_lexicon::LexemeId::as_str)
+                    .collect();
                 AnswerRow::Frame(serde_json::to_string(&ids)?)
             }
             (kind, answer) => anyhow::bail!("a {kind:?} question answers {answer:?}"),
@@ -171,35 +176,21 @@ impl<'t> Inserts<'t> {
         })
     }
 
-    pub(super) fn finish(&mut self) -> Result<()> {
-        self.word.finish()?;
-        self.head_line.finish()?;
-        self.fork.finish()?;
-        self.alias.finish()?;
-        self.option.finish()?;
-        self.answer.finish()?;
+    /// Flushes every table's remainder and records its row count in `rows`.
+    pub(super) fn finish(&mut self, rows: &mut BTreeMap<&'static str, i64>) -> Result<()> {
+        rows.extend([
+            self.word.finish()?,
+            self.head_line.finish()?,
+            self.fork.finish()?,
+            self.alias.finish()?,
+            self.option.finish()?,
+            self.answer.finish()?,
+        ]);
         Ok(())
     }
 }
 
-pub(super) struct ForkCounts {
-    pub(super) words: i64,
-    pub(super) head_lines: i64,
-    pub(super) forks: i64,
-    pub(super) fork_aliases: i64,
-    pub(super) fork_options: i64,
-    pub(super) fork_answers: i64,
-}
-
-pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Result<ForkCounts> {
-    let mut counts = ForkCounts {
-        words: index(rows.words.len()),
-        head_lines: index(rows.head_lines.len()),
-        forks: index(rows.forks.len()),
-        fork_aliases: 0,
-        fork_options: 0,
-        fork_answers: 0,
-    };
+pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Result<()> {
     for (w, word) in rows.words.iter().enumerate() {
         inserts.word.push([
             Val::Int(u_id),
@@ -226,7 +217,6 @@ pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Re
             Val::Int(int(fork.context)?),
             Val::Bool(fork.conditional),
         ])?;
-        counts.fork_aliases += index(fork.aliases.len());
         for (a, (kind, word)) in fork.aliases.iter().enumerate() {
             inserts.alias.push([
                 Val::Int(u_id),
@@ -236,7 +226,6 @@ pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Re
                 Val::Int(index(*word)),
             ])?;
         }
-        counts.fork_options += index(fork.options.len());
         for (o, option) in fork.options.iter().enumerate() {
             inserts.option.push([
                 Val::Int(u_id),
@@ -244,7 +233,6 @@ pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Re
                 Val::Int(index(o)),
                 Val::Int(int(option.derivations)?),
             ])?;
-            counts.fork_answers += index(option.answers.len());
             for (q, answer) in option.answers.iter().enumerate() {
                 let (leaf, dependency, governor, function, category, frames) = match answer {
                     AnswerRow::Lexical(leaf) => (
@@ -299,7 +287,7 @@ pub(super) fn write(inserts: &mut Inserts<'_>, u_id: i64, rows: &ForkRows) -> Re
             }
         }
     }
-    Ok(counts)
+    Ok(())
 }
 
 #[cfg(test)]
@@ -571,12 +559,12 @@ mod tests {
     /// Time*). *Court Hussar*'s *in any order* and *on the bottom* attach
     /// over *look …, then put …* or inside its last conjunct, among them on
     /// the Complement Cluster *the rest on the bottom*, whose Head Line ends
-    /// in *rest* though no `head` child leads there. Not *Kessig Naturalist*'s *Until end of turn, you don't lose
-    /// this mana as steps and phases end*: every Clause headed by *don't*
-    /// that holds *Until* also holds *and*, which there joins only *steps and
-    /// phases*; the options differ in what is coordinated. Its back face,
-    /// *Lord of the Ulvenwald*, has *you control* over *Wolves and
-    /// Werewolves* or on *Werewolves*. *Crook of
+    /// in *rest* though no `head` child leads there. Not *Kessig Naturalist*'s
+    /// *Until end of turn, you don't lose this mana as steps and phases end*:
+    /// every Clause headed by *don't* that holds *Until* also holds *and*,
+    /// which there joins only *steps and phases*; the options differ in what is
+    /// coordinated. Its back face, *Lord of the Ulvenwald*, has *you control*
+    /// over *Wolves and Werewolves* or on *Werewolves*. *Crook of
     /// Condemnation*'s one dependency fork has no coordination.
     #[test]
     fn wide_and_narrow_attachments_over_a_coordination() {

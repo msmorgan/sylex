@@ -28,7 +28,6 @@ use sylex_english::corpus::Corpus;
 use sylex_english::corpus::UnitKind;
 use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
-use sylex_lexicon::WordForm;
 use sylex_syntax::ChildRef;
 use sylex_syntax::CompiledGrammar;
 use sylex_syntax::Coordinator;
@@ -124,7 +123,8 @@ struct AlternativeRow {
     /// (head leaf, its word, the alternative's own Derivations with it, the
     /// unit's).
     heads: Vec<(Option<usize>, Option<HeadWord>, u128, u128)>,
-    /// (index into `UnitRows::embeddings`, outside ways, the unit's Derivations).
+    /// (index into `UnitRows::embeddings`, outside ways, the unit's
+    /// Derivations).
     embeddings: Vec<(usize, u128, u128)>,
     conjuncts: Vec<(usize, u128)>,
 }
@@ -179,6 +179,24 @@ const WINDOW: usize = 1024;
 /// How many written units may wait to be freed off the writer thread.
 const FREEING: usize = 256;
 
+/// The connection settings of the writer. The `.sqlite.partial` scratch file
+/// is written in one transaction by a single connection and renamed into
+/// place only after every check passes:
+/// - 32 KiB pages reduce B-tree splits across multi-million-row append tables;
+/// - journaling, fsync, and shared locks are unneeded on an unshared scratch
+///   file;
+/// - `temp_store = MEMORY`, `threads = 8` (`SQLITE_MAX_WORKER_THREADS`), and a
+///   1 GiB page cache (`cache_size = -1048576`, negative = KiB) keep dirty
+///   B-tree pages and post-load `CREATE INDEX` sort runs in RAM instead of
+///   spilling under SQLite's 2 MiB default cache.
+const PRAGMAS: &str = "PRAGMA page_size = 32768;
+     PRAGMA journal_mode = OFF;
+     PRAGMA synchronous = OFF;
+     PRAGMA locking_mode = EXCLUSIVE;
+     PRAGMA temp_store = MEMORY;
+     PRAGMA threads = 8;
+     PRAGMA cache_size = -1048576;";
+
 /// Writes the database for `corpus` to `path`, replacing it.
 pub(crate) fn write(
     path: &Path,
@@ -194,30 +212,15 @@ pub(crate) fn write(
         std::fs::remove_file(&partial)?;
     }
     let mut db = Connection::open(&partial)?;
-    // The `.sqlite.partial` scratch file is written in one transaction by a
-    // single connection and renamed into place only after every check passes:
-    // - 32 KiB pages reduce B-tree splits across multi-million-row append tables;
-    // - journaling, fsync, and shared locks are unneeded on an unshared scratch file;
-    // - `temp_store = MEMORY`, `threads = 8` (`SQLITE_MAX_WORKER_THREADS`), and a
-    //   1 GiB page cache (`cache_size = -1048576`, negative = KiB) keep dirty B-tree
-    //   pages and post-load `CREATE INDEX` sort runs in RAM instead of spilling
-    //   under SQLite's 2 MiB default cache.
-    db.execute_batch(
-        "PRAGMA page_size = 32768;
-         PRAGMA journal_mode = OFF;
-         PRAGMA synchronous = OFF;
-         PRAGMA locking_mode = EXCLUSIVE;
-         PRAGMA temp_store = MEMORY;
-         PRAGMA threads = 8;
-         PRAGMA cache_size = -1048576;",
-    )?;
+    db.execute_batch(PRAGMAS)?;
     db.execute_batch(SCHEMA)?;
     db.execute_batch(VIEWS)?;
     let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
     let reader = context::Reader::new(grammar, &env.lexicon);
     // `lexemes` and `embeddings` are written after the unit rows that reference
-    // them so each table grows in key order in one pass; `pragma_foreign_key_check`
-    // verifies every foreign key once the transaction commits.
+    // them so each table grows in key order in one pass;
+    // `pragma_foreign_key_check` verifies every foreign key once the
+    // transaction commits.
     db.execute_batch("PRAGMA foreign_keys = OFF;")?;
     // Units are written in order, so each `(unit, …)` table grows at its
     // end and Embeddings are numbered as they are first met in unit order.
@@ -247,8 +250,12 @@ pub(crate) fn write(
                 let freer = scope.spawn(move || freeing.into_iter().for_each(drop));
                 let written = (|| -> Result<()> {
                     while let Some((unit, rows)) = units.next()? {
-                        write_unit(&mut inserts, &mut state, corpus, unit, &rows)
-                            .with_context(|| describe(corpus, unit))?;
+                        write_unit(&mut inserts, &mut state, corpus, unit, &rows).map_err(
+                            |error| {
+                                let unit = row_unit(&error).unwrap_or(unit);
+                                error.context(describe(corpus, unit))
+                            },
+                        )?;
                         to_free
                             .send(rows)
                             .map_err(|_| anyhow::anyhow!("the thread freeing rows stopped"))?;
@@ -264,8 +271,12 @@ pub(crate) fn write(
                 });
                 written?;
                 joined?;
-                inserts.finish()?;
-                Ok(())
+                inserts
+                    .finish(&mut state.summary.rows)
+                    .map_err(|error| match row_unit(&error) {
+                        Some(unit) => error.context(describe(corpus, unit)),
+                        None => error,
+                    })
             })?;
             drop(inserts);
             write_embeddings(
@@ -281,14 +292,22 @@ pub(crate) fn write(
             Ok(state.summary)
         },
     )?;
-    let dangling: i64 =
-        db.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| {
-            r.get(0)
-        })?;
+    let dangling: i64 = db.query_row("SELECT count(*) FROM pragma_foreign_key_check", [], |r| {
+        r.get(0)
+    })?;
     anyhow::ensure!(dangling == 0, "{dangling} rows reference no row");
     drop(db);
     std::fs::rename(&partial, path)?;
     Ok(summary)
+}
+
+/// The unit of the row `error` says an `INSERT` failed on. Rows are buffered
+/// (`BatchInsert`), so it may be an earlier unit than the one being written
+/// when the failure surfaced. Every table written unit by unit has the unit
+/// as its first column.
+fn row_unit(error: &anyhow::Error) -> Option<usize> {
+    let unit = error.downcast_ref::<batch::RowError>()?.first()?;
+    Some(usize::try_from(unit).expect("a unit column holds a unit index"))
 }
 
 fn describe(corpus: &Corpus, unit: usize) -> String {
@@ -551,42 +570,6 @@ fn index(n: usize) -> i64 {
     i64::try_from(n).expect("an index fits in i64")
 }
 
-fn form_name(form: WordForm) -> &'static str {
-    match form {
-        WordForm::Invariant => "Invariant",
-        WordForm::IndependentGenitive => "IndependentGenitive",
-        WordForm::Singular => "Singular",
-        WordForm::Plural => "Plural",
-        WordForm::Plain => "Plain",
-        WordForm::Present => "Present",
-        WordForm::Preterite => "Preterite",
-        WordForm::Irrealis => "Irrealis",
-        WordForm::GerundParticiple => "GerundParticiple",
-        WordForm::PastParticiple => "PastParticiple",
-    }
-}
-
-fn category_name(category: sylex_lexicon::Category) -> &'static str {
-    match category {
-        sylex_lexicon::Category::Noun => "Noun",
-        sylex_lexicon::Category::Verb => "Verb",
-        sylex_lexicon::Category::Adjective => "Adjective",
-        sylex_lexicon::Category::Adverb => "Adverb",
-        sylex_lexicon::Category::Determinative => "Determinative",
-        sylex_lexicon::Category::Pronoun => "Pronoun",
-        sylex_lexicon::Category::Preposition => "Preposition",
-        sylex_lexicon::Category::Coordinator => "Coordinator",
-        sylex_lexicon::Category::Subordinator => "Subordinator",
-        sylex_lexicon::Category::Affix => "Affix",
-        sylex_lexicon::Category::Clitic => "Clitic",
-        sylex_lexicon::Category::Numeral => "Numeral",
-        sylex_lexicon::Category::Catalog => "Catalog",
-        sylex_lexicon::Category::Keyword => "Keyword",
-        sylex_lexicon::Category::FlavorWord => "FlavorWord",
-        sylex_lexicon::Category::Symbol => "Symbol",
-    }
-}
-
 fn write_grammar(
     tx: &rusqlite::Transaction<'_>,
     grammar: &CompiledGrammar,
@@ -655,18 +638,20 @@ impl<'t> Inserts<'t> {
         })
     }
 
-    fn finish(&mut self) -> Result<()> {
-        self.unit.finish()?;
-        self.node.finish()?;
-        self.alternative.finish()?;
-        self.head.finish()?;
-        self.embedding.finish()?;
-        self.conjunct.finish()?;
-        self.item.finish()?;
-        self.family.finish()?;
-        self.leaf.finish()?;
-        self.forks.finish()?;
-        Ok(())
+    /// Flushes every table's remainder and records its row count in `rows`.
+    fn finish(&mut self, rows: &mut BTreeMap<&'static str, i64>) -> Result<()> {
+        rows.extend([
+            self.unit.finish()?,
+            self.node.finish()?,
+            self.alternative.finish()?,
+            self.head.finish()?,
+            self.embedding.finish()?,
+            self.conjunct.finish()?,
+            self.item.finish()?,
+            self.family.finish()?,
+            self.leaf.finish()?,
+        ]);
+        self.forks.finish(rows)
     }
 }
 
@@ -675,14 +660,6 @@ struct WriterState {
     embeddings: HashMap<Embedding, i64>,
     unit_embedding_ids: Vec<i64>,
     summary: Summary,
-}
-
-#[derive(Default)]
-struct NodeCounts {
-    alternatives: i64,
-    heads: i64,
-    embeddings: i64,
-    conjuncts: i64,
 }
 
 fn write_unit(
@@ -735,7 +712,7 @@ fn write_unit(
         };
         state.unit_embedding_ids.push(id);
     }
-    let node_counts = write_nodes(
+    write_nodes(
         inserts,
         u_id,
         &rows.nodes,
@@ -744,24 +721,9 @@ fn write_unit(
     )?;
     let families = write_items(inserts, u_id, &rows.items)?;
     write_leaves(inserts, u_id, &rows.leaves, &mut state.lexemes)?;
-    let fork_counts = forks::write(&mut inserts.forks, u_id, &rows.forks)?;
+    forks::write(&mut inserts.forks, u_id, &rows.forks)?;
     let summary = &mut state.summary;
     summary.units += 1;
-    *summary.rows.entry("units").or_default() += 1;
-    *summary.rows.entry("nodes").or_default() += index(rows.nodes.len());
-    *summary.rows.entry("alternatives").or_default() += node_counts.alternatives;
-    *summary.rows.entry("heads").or_default() += node_counts.heads;
-    *summary.rows.entry("alternative_embeddings").or_default() += node_counts.embeddings;
-    *summary.rows.entry("conjuncts").or_default() += node_counts.conjuncts;
-    *summary.rows.entry("items").or_default() += index(rows.items.len());
-    *summary.rows.entry("families").or_default() += index(families);
-    *summary.rows.entry("leaves").or_default() += index(rows.leaves.len());
-    *summary.rows.entry("words").or_default() += fork_counts.words;
-    *summary.rows.entry("head_lines").or_default() += fork_counts.head_lines;
-    *summary.rows.entry("forks").or_default() += fork_counts.forks;
-    *summary.rows.entry("fork_aliases").or_default() += fork_counts.fork_aliases;
-    *summary.rows.entry("fork_options").or_default() += fork_counts.fork_options;
-    *summary.rows.entry("fork_answers").or_default() += fork_counts.fork_answers;
     let size = (rows.nodes.len() + rows.items.len() + families) as u64;
     if summary.largest.as_ref().is_none_or(|(n, _)| size > *n) {
         summary.largest = Some((size, describe(corpus, unit)));
@@ -782,8 +744,7 @@ fn write_nodes(
     nodes: &[NodeRow],
     lexemes: &mut HashSet<LexemeId>,
     unit_embedding_ids: &[i64],
-) -> Result<NodeCounts> {
-    let mut counts = NodeCounts::default();
+) -> Result<()> {
     for node in nodes {
         let (coordinator, link) = match node.coordinator {
             Some(Coordinator::Lexeme(id)) => {
@@ -808,7 +769,6 @@ fn write_nodes(
             Val::Bool(node.settled),
             Val::Int(int(node.derivations)?),
         ])?;
-        counts.alternatives += index(node.alternatives.len());
         for (a, alternative) in node.alternatives.iter().enumerate() {
             let key = (u_id, index(node.node), index(a));
             inserts.alternative.push([
@@ -819,7 +779,6 @@ fn write_nodes(
                 Val::Int(index(alternative.item)),
                 Val::Int(int(alternative.derivations)?),
             ])?;
-            counts.heads += index(alternative.heads.len());
             for (leaf, word, inside, derivations) in &alternative.heads {
                 if let Some((lexeme, _)) = word {
                     lexemes.insert(*lexeme);
@@ -830,12 +789,12 @@ fn write_nodes(
                     Val::Int(key.2),
                     leaf.map_or(Val::Null, |l| Val::Int(index(l))),
                     word.map_or(Val::Null, |(lexeme, _)| Val::Static(lexeme.as_str())),
-                    word.map_or(Val::Null, |(_, form)| Val::Static(form_name(form))),
+                    word.as_ref()
+                        .map_or(Val::Null, |(_, form)| Val::Debug(form)),
                     Val::Int(int(*inside)?),
                     Val::Int(int(*derivations)?),
                 ])?;
             }
-            counts.embeddings += index(alternative.embeddings.len());
             for &(local_emb, outside, derivations) in &alternative.embeddings {
                 inserts.embedding.push([
                     Val::Int(key.0),
@@ -846,7 +805,6 @@ fn write_nodes(
                     Val::Int(int(derivations)?),
                 ])?;
             }
-            counts.conjuncts += index(alternative.conjuncts.len());
             for (conjuncts, derivations) in &alternative.conjuncts {
                 inserts.conjunct.push([
                     Val::Int(key.0),
@@ -858,7 +816,7 @@ fn write_nodes(
             }
         }
     }
-    Ok(counts)
+    Ok(())
 }
 
 /// Writes a unit's items and their families; returns the families written.
@@ -908,7 +866,7 @@ fn write_leaves(
                 (
                     Val::Static("word"),
                     Val::Static(word.lexeme.as_str()),
-                    Val::Static(form_name(word.form)),
+                    Val::Debug(&word.form),
                     Val::Null,
                 )
             }
@@ -949,7 +907,6 @@ fn write_embeddings(
     // In id order, so each table grows at its end.
     let mut in_order: Vec<(&Embedding, i64)> = embeddings.iter().map(|(e, &id)| (e, id)).collect();
     in_order.sort_unstable_by_key(|&(_, id)| id);
-    let mut step_count = 0i64;
     for (embedding, id) in in_order {
         embedding_insert.push([
             Val::Int(id),
@@ -957,7 +914,6 @@ fn write_embeddings(
             Val::Bool(embedding.truncated),
             Val::Static(reader.context(embedding).name()),
         ])?;
-        step_count += index(embedding.steps.len());
         for (n, step) in embedding.steps.iter().enumerate() {
             if let Some((lexeme, _)) = step.governor_head {
                 lexemes.insert(lexeme);
@@ -972,15 +928,15 @@ fn write_embeddings(
                 step.governor_head
                     .map_or(Val::Null, |(lexeme, _)| Val::Static(lexeme.as_str())),
                 step.governor_head
-                    .map_or(Val::Null, |(_, form)| Val::Static(form_name(form))),
+                    .as_ref()
+                    .map_or(Val::Null, |(_, form)| Val::Debug(form)),
                 Val::Bool(reader.wrapper(step)),
             ])?;
         }
     }
-    embedding_insert.finish()?;
-    step_insert.finish()?;
-    summary.rows.insert("embeddings", index(embeddings.len()));
-    summary.rows.insert("embedding_steps", step_count);
+    summary
+        .rows
+        .extend([embedding_insert.finish()?, step_insert.finish()?]);
     Ok(())
 }
 
@@ -1002,7 +958,7 @@ fn write_lexemes(
         insert.execute(params![
             id.as_str(),
             lexeme.lemma,
-            category_name(lexeme.category)
+            format!("{:?}", lexeme.category)
         ])?;
     }
     summary.rows.insert("lexemes", index(lexemes.len()));

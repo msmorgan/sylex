@@ -1,6 +1,7 @@
 //! Buffered multi-row `INSERT` statements to amortize SQLite VDBE startup,
 //! parameter binding, and B-tree cursor positioning across `BATCH` rows.
 
+use std::fmt;
 use std::fmt::Write;
 use std::mem;
 
@@ -18,12 +19,39 @@ pub(super) enum Val<'a> {
     Bool(bool),
     Text(&'a str),
     Static(&'static str),
+    /// The value's `Debug` text, such as a fieldless enum's variant name.
+    Debug(&'a dyn fmt::Debug),
+}
+
+/// The row an `INSERT` failed on, as context on the SQLite error.
+#[derive(Debug)]
+pub(super) struct RowError {
+    table: &'static str,
+    row: String,
+    first: Option<i64>,
+}
+
+impl RowError {
+    /// The row's first column, when it is an integer.
+    pub(super) fn first(&self) -> Option<i64> {
+        self.first
+    }
+}
+
+impl fmt::Display for RowError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "inserting into `{}` row {}", self.table, self.row)
+    }
 }
 
 /// Buffers rows of `COLS` columns and flushes them in chunks of `BATCH` via a
 /// multi-row `INSERT`, falling back to a 1-row `INSERT` for the final `< BATCH`
 /// remainder (and to pinpoint the offending row when a batch flush fails).
+///
+/// Pinpointing counts the table's rows, so the table must be empty at
+/// [`BatchInsert::prepare`] and have no other writer.
 pub(super) struct BatchInsert<'t, const COLS: usize, const BATCH: usize> {
+    db: &'t Connection,
     table: &'static str,
     batch: Statement<'t>,
     single: Statement<'t>,
@@ -31,6 +59,8 @@ pub(super) struct BatchInsert<'t, const COLS: usize, const BATCH: usize> {
     /// Static strings, integers, booleans, and nulls need no copy.
     arena: String,
     rows: Vec<[Slot; COLS]>,
+    /// Rows pushed so far.
+    pushed: i64,
 }
 
 #[derive(Clone, Copy)]
@@ -58,11 +88,13 @@ impl<'t, const COLS: usize, const BATCH: usize> BatchInsert<'t, COLS, BATCH> {
             .prepare(&single_sql)
             .with_context(|| format!("preparing single insert into `{table}`"))?;
         Ok(Self {
+            db: tx,
             table,
             batch,
             single,
             arena: String::with_capacity(64 * 1024),
             rows: Vec::with_capacity(BATCH),
+            pushed: 0,
         })
     }
 
@@ -77,13 +109,24 @@ impl<'t, const COLS: usize, const BATCH: usize> BatchInsert<'t, COLS, BATCH> {
                 Val::Static(s) => Slot::StaticText(s),
                 Val::Text(s) => {
                     let start = self.arena.len();
-                    let len = s.len();
                     self.arena.push_str(s);
-                    Slot::ArenaText { start, len }
+                    Slot::ArenaText {
+                        start,
+                        len: s.len(),
+                    }
+                }
+                Val::Debug(value) => {
+                    let start = self.arena.len();
+                    write!(self.arena, "{value:?}").expect("writing to a String succeeds");
+                    Slot::ArenaText {
+                        start,
+                        len: self.arena.len() - start,
+                    }
                 }
             };
         }
         self.rows.push(row);
+        self.pushed += 1;
         if self.rows.len() == BATCH {
             self.flush_full()?;
         }
@@ -96,7 +139,10 @@ impl<'t, const COLS: usize, const BATCH: usize> BatchInsert<'t, COLS, BATCH> {
         for row in &self.rows {
             for &slot in row {
                 bind_slot(&mut self.batch, idx, slot, &self.arena).with_context(|| {
-                    format!("binding parameter {idx} for batch insert into `{}`", self.table)
+                    format!(
+                        "binding parameter {idx} for batch insert into `{}`",
+                        self.table
+                    )
                 })?;
                 idx += 1;
             }
@@ -108,29 +154,40 @@ impl<'t, const COLS: usize, const BATCH: usize> BatchInsert<'t, COLS, BATCH> {
                 Ok(())
             }
             Err(batch_err) => {
-                // SQLite rolled back the failed multi-row statement without
-                // inserting any of `self.rows`; replay them one by one so the
-                // error names the exact offending row instead of the row that
-                // happened to fill the batch.
-                self.flush_single()?;
+                // Replay the batch's rows one by one, so the error names the
+                // exact offending row instead of the row that happened to
+                // fill the batch. The rows before the offending one are still
+                // in the table unless SQLite undid the failed statement, which
+                // it does not under `journal_mode = OFF`; replaying those
+                // would fail on the table's key and blame the wrong row.
+                let flushed = self.pushed - i64::try_from(BATCH)?;
+                let present: i64 = self
+                    .db
+                    .query_row(&format!("SELECT count(*) FROM {}", self.table), [], |r| {
+                        r.get(0)
+                    })
+                    .with_context(|| format!("counting the rows of `{}`", self.table))?;
+                self.flush_single(usize::try_from(present - flushed)?)?;
                 Err(batch_err)
                     .with_context(|| format!("executing batch insert into `{}`", self.table))
             }
         }
     }
 
-    pub(super) fn finish(&mut self) -> Result<()> {
+    /// Flushes the remainder; returns the table and the rows pushed to it.
+    pub(super) fn finish(&mut self) -> Result<(&'static str, i64)> {
         debug_assert!(self.rows.len() < BATCH);
         if !self.rows.is_empty() {
-            self.flush_single()?;
+            self.flush_single(0)?;
         }
-        Ok(())
+        Ok((self.table, self.pushed))
     }
 
-    fn flush_single(&mut self) -> Result<()> {
+    /// Inserts the buffered rows one by one, but for the first `skip`.
+    fn flush_single(&mut self, skip: usize) -> Result<()> {
         let rows = mem::take(&mut self.rows);
         let arena = mem::take(&mut self.arena);
-        for row in &rows {
+        for row in &rows[skip..] {
             for (idx, &slot) in (1_usize..).zip(row.iter()) {
                 bind_slot(&mut self.single, idx, slot, &arena).with_context(|| {
                     format!(
@@ -140,8 +197,15 @@ impl<'t, const COLS: usize, const BATCH: usize> BatchInsert<'t, COLS, BATCH> {
                     )
                 })?;
             }
-            self.single.raw_execute().with_context(|| {
-                format!("inserting into `{}` row {}", self.table, format_row(row, &arena))
+            self.single.raw_execute().map_err(|error| {
+                anyhow::Error::new(error).context(RowError {
+                    table: self.table,
+                    row: format_row(row, &arena),
+                    first: match row.first() {
+                        Some(&Slot::Int(n)) => Some(n),
+                        _ => None,
+                    },
+                })
             })?;
         }
         Ok(())
@@ -209,18 +273,15 @@ mod tests {
         let mut insert: BatchInsert<'_, 4, 3> = BatchInsert::prepare(&tx, "items")?;
         for i in 0..8_i64 {
             let owned = format!("row-{i}");
+            let wrapped = Some(i);
             insert.push([
                 Val::Int(i),
                 Val::Bool(i % 2 == 0),
-                if i == 5 {
-                    Val::Null
-                } else {
-                    Val::Text(&owned)
-                },
-                Val::Static("kind"),
+                if i == 5 { Val::Null } else { Val::Text(&owned) },
+                if i == 7 { Val::Debug(&wrapped) } else { Val::Static("kind") },
             ])?;
         }
-        insert.finish()?;
+        assert_eq!(insert.finish()?, ("items", 8));
         drop(insert);
         tx.commit()?;
 
@@ -231,28 +292,31 @@ mod tests {
         assert_eq!(rows.len(), 8);
         assert_eq!(rows[0], (0, true, Some("row-0".into()), "kind".into()));
         assert_eq!(rows[5], (5, false, None, "kind".into()));
-        assert_eq!(rows[7], (7, false, Some("row-7".into()), "kind".into()));
+        assert_eq!(rows[7], (7, false, Some("row-7".into()), "Some(7)".into()));
         Ok(())
     }
 
-    #[test]
-    fn batch_failure_attributes_the_offending_buffered_row() -> Result<()> {
-        let mut db = Connection::open_in_memory()?;
+    /// A keyed table, like the writer's, with a failure in a batch after the
+    /// first: replaying a row the failed batch had already inserted would
+    /// blame that row for breaking the key.
+    fn blames_the_offending_row(db: &mut Connection) -> Result<()> {
         db.execute_batch(
             "CREATE TABLE positive (
                 unit INTEGER NOT NULL,
                 n INTEGER NOT NULL CHECK (n > 0),
-                note TEXT NOT NULL
-            );",
+                note TEXT NOT NULL,
+                PRIMARY KEY (unit, n)
+            ) WITHOUT ROWID;",
         )?;
         let tx = db.transaction()?;
         let mut insert: BatchInsert<'_, 3, 4> = BatchInsert::prepare(&tx, "positive")?;
-        insert.push([Val::Int(10), Val::Int(1), Val::Static("ok")])?;
-        // Bad row at unit 11, buffered until unit 13 fills the batch of 4.
+        for unit in 5..=10 {
+            insert.push([Val::Int(unit), Val::Int(1), Val::Static("ok")])?;
+        }
+        // Bad row at unit 11, buffered until unit 12 fills the batch of 4.
         insert.push([Val::Int(11), Val::Int(0), Val::Text("bad-row")])?;
-        insert.push([Val::Int(12), Val::Int(2), Val::Static("ok")])?;
         let err = insert
-            .push([Val::Int(13), Val::Int(3), Val::Static("trigger")])
+            .push([Val::Int(12), Val::Int(3), Val::Static("trigger")])
             .expect_err("CHECK violation must fail the flush");
         let chain = format!("{err:#}");
         assert!(
@@ -263,6 +327,28 @@ mod tests {
             chain.contains("CHECK constraint failed"),
             "missing SQLite message in error chain: {chain}"
         );
+        let row = err
+            .downcast_ref::<RowError>()
+            .expect("the error names its row");
+        assert_eq!(row.first(), Some(11));
         Ok(())
+    }
+
+    /// Under the writer's settings, SQLite leaves a failed batch's earlier
+    /// rows in the table.
+    #[test]
+    fn batch_failure_names_the_offending_row_without_a_journal() -> Result<()> {
+        let dir = tempfile::tempdir()?;
+        let mut db = Connection::open(dir.path().join("rows.sqlite"))?;
+        db.execute_batch(crate::english::forests::PRAGMAS)?;
+        let mode: String = db.query_row("PRAGMA journal_mode", [], |r| r.get(0))?;
+        assert_eq!(mode, "off");
+        blames_the_offending_row(&mut db)
+    }
+
+    /// With a rollback journal, SQLite undoes the whole failed batch.
+    #[test]
+    fn batch_failure_names_the_offending_row_with_a_journal() -> Result<()> {
+        blames_the_offending_row(&mut Connection::open_in_memory()?)
     }
 }
