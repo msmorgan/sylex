@@ -465,6 +465,44 @@ count and answer (an alias's answer after `=`). A word is printed
 order, never ranked: the survey decides nothing
 ([english.md](../../docs/decisions/english.md) §4, §5).
 
+### Narrowing a forest
+
+```sh
+cargo xtask english forestwalk --card 'Draugr Necromancer' --line 2 \
+  --pick 'dependency "from"#1 modifier of Nominal "spells"#1' \
+  --exclude 'dependency "in"#1 modifier of Nominal "cards"#1'
+cargo xtask english forestwalk --card 'Crook of Condemnation' --line 1 \
+  --pick 'dependency "from"#1 modifier of Nominal "card"#1' --assertions
+cargo xtask english forestwalk --card 'Crook of Condemnation' --line 1 --limit 2
+```
+
+`--pick` and `--exclude` narrow the forest by fork options before the survey
+(`ForkForest::pick`, `ForkForest::exclude`), enumerating no Reading, so a unit
+of any size narrows. A selector is one argument, `KIND "surface"#N ANSWER`: a
+fork's name as the survey prints it (an alias's too) and, after it, one
+option's answer without its count (an alias's answer for an alias's name). The
+occurrence is always written, a governor's too; a bare `"surface"` is an error,
+for a surface that occurs once as well. A selector begins with a lowercase
+`lexical`, `dependency` or `frame` and names grammar child names (`adjunct`,
+`first`), which keeps it apart from a judgment's assertions (`Category
+"surface" as Function of lemma`). Steps apply in the order written, `--pick`
+and `--exclude` interleaved, and each prints the Derivations left; then the
+survey prints the narrowed forest. A selector that names no word, fork or
+option of the unit, an option an earlier step has removed, and a step that
+leaves no Derivation are errors naming the selector.
+
+With at most `--limit` Derivations left (default 1) each is printed as the
+survey's folded tree (`ForkForest::settled_readings`); one Derivation is the
+spine itself. `--assertions` also prints, for each such Reading, judgment
+assertions that isolate it among the unit's Readings. They are found by greedy
+set cover over the assertions the Reading's own Constituents suggest (a
+Category and surface, with an occurrence, a head word, a function or a Gap
+Antecedent), each holding on it (`Judge::holds`) and covering the unit's other
+Readings it fails on, and it enumerates the unit's Readings as the judge does
+(`Judge::evaluate`). The output is diagnostic, not a judgment to copy unread:
+when no assertion of these forms tells some Readings apart from it, as when
+they differ only in Productions, it reports how many.
+
 ## Judgment set
 
 [`judgments/`](judgments/README.md) holds the hand-written judgments, one line

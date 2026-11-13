@@ -2,6 +2,12 @@
 //! enumerating it: its settled spine (`ForkForest::settled_spine`), then its
 //! forks (`ForkForest::forks`), each option with its exact Derivation count.
 //!
+//! `--pick` and `--exclude` narrow the forest by fork options first
+//! (`ForkForest::pick`, `ForkForest::exclude`; [`selector`]) and survey what
+//! is left; with at most `--limit` Derivations left, each is also printed as a
+//! tree (`ForkForest::settled_readings`), and `--assertions` adds the judgment
+//! assertions that isolate it among the unit's Readings ([`isolate`]).
+//!
 //! The survey reports the forest and decides nothing
 //! (`docs/decisions/english.md` §4): options are listed in the order the
 //! forks give them, never by count or rank.
@@ -12,20 +18,29 @@ use anyhow::Context;
 use anyhow::Result;
 use clap::Args;
 use sylex_english::corpus::UnitKind;
+use sylex_english::judgment::Judge;
+use sylex_english::judgment::Located;
 use sylex_lexicon::LexicalReading;
 use sylex_syntax::Answer;
 use sylex_syntax::Dependency;
 use sylex_syntax::Fork;
+use sylex_syntax::ForkForest;
 use sylex_syntax::ForkKind;
 use sylex_syntax::ForkWord;
+use sylex_syntax::NarrowError;
 use sylex_syntax::SettledChild;
 use sylex_syntax::SettledNode;
 use sylex_syntax::SettledRest;
 use sylex_syntax::SettledSpine;
 use sylex_vocabulary::LexicalEnvironment;
 
+use self::selector::Narrowing;
+use self::selector::Selector;
 use super::FetchedUnit;
 use super::ParseItem;
+
+mod isolate;
+mod selector;
 
 #[derive(Debug, Args)]
 pub(super) struct ForestwalkArgs {
@@ -48,11 +63,20 @@ pub(super) struct ForestwalkArgs {
     /// With `--card`: the face's type line.
     #[arg(long)]
     type_line: bool,
+    #[command(flatten)]
+    steps: selector::Steps,
+    /// With at most N Derivations left after narrowing, print each as a tree.
+    #[arg(long, value_name = "N", default_value_t = 1)]
+    limit: u64,
+    /// Print judgment assertions that isolate each remaining Reading among
+    /// the unit's Readings, by greedy set cover. Diagnostic output, not a
+    /// judgment to copy unread; needs between 1 and `--limit` Derivations.
+    #[arg(long)]
+    assertions: bool,
 }
 
 pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
-    use sylex_english::judgment::Judge;
-
+    let selectors = args.steps.selectors()?;
     let item = unit(args)?;
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
     if let Some(name) = &args.as_card {
@@ -75,8 +99,20 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
     if !parse.vocabulary_gaps.is_empty() {
         writeln!(output, "Vocabulary gaps: {:?}", parse.vocabulary_gaps)?;
     }
-    let forest = parse.fork_forest()?;
+    let surveyed = parse.fork_forest()?;
+    let forest = if selectors.is_empty() {
+        surveyed
+    } else {
+        narrow(&surveyed, &selectors, output)?
+    };
     let total = forest.total();
+    let limit = u128::from(args.limit);
+    let isolating = (1..=limit).contains(&total);
+    anyhow::ensure!(
+        isolating || !args.assertions,
+        "`--assertions` needs between 1 and `--limit` ({limit}) Derivations, and the slice has \
+         {total}: narrow it with `--pick` and `--exclude`, or raise `--limit`"
+    );
     writeln!(output, "Derivations: {total}")?;
     let tokens = parse.tokens();
     writeln!(output, "Settled spine:")?;
@@ -91,6 +127,149 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
     writeln!(output, "Forks: {}", forks.len())?;
     for fork in &forks {
         fork_lines(fork, total, output)?;
+    }
+    let remaining = if isolating && (total >= 2 || args.assertions) {
+        forest.settled_readings(limit)
+    } else {
+        None
+    };
+    let mut found = match (&remaining, args.assertions) {
+        (_, false) => Vec::new().into_iter(),
+        (Some(readings), true) => {
+            isolations(&judge, &parse, readings.iter().map(|(reading, _)| reading))?.into_iter()
+        }
+        (None, true) => unreachable!(
+            "`--assertions` is refused unless 1 to `--limit` Derivations are left, and then the \
+             forest's Readings are taken"
+        ),
+    };
+    if let Some(readings) = &remaining {
+        if total >= 2 {
+            writeln!(output, "Readings: {total}")?;
+        }
+        for (index, (_, node)) in readings.iter().enumerate() {
+            let label = if total >= 2 {
+                writeln!(output, "Reading {}:", index + 1)?;
+                spine_lines(node, "  ".to_owned(), 1, tokens, output)?;
+                format!("Reading {}", index + 1)
+            } else {
+                "the Reading".to_owned()
+            };
+            if let Some((isolation, readings)) = found.next() {
+                isolation_lines(&label, &isolation, readings, output)?;
+            }
+        }
+    }
+    Ok(())
+}
+
+/// The forest narrowed by each selector in turn, printing the Derivations
+/// left after each step.
+fn narrow<'p>(
+    surveyed: &ForkForest<'p>,
+    selectors: &[Selector],
+    output: &mut dyn Write,
+) -> Result<ForkForest<'p>> {
+    let questions = selector::questions(&surveyed.forks())?;
+    let steps = selectors
+        .iter()
+        .map(|selector| selector.resolve(surveyed.words(), &questions))
+        .collect::<Result<Vec<_>>>()?;
+    writeln!(output, "Narrowing from {}:", derivations(surveyed.total()))?;
+    let mut forest = surveyed.clone();
+    for step in &steps {
+        let flag = step.narrowing.flag();
+        let narrowed = match step.narrowing {
+            Narrowing::Pick => forest.pick(step.kind, &step.word, &step.answer),
+            Narrowing::Exclude => forest.exclude(step.kind, &step.word, &step.answer),
+        }
+        .map_err(|why| match why {
+            NarrowError::NoAnswer { .. } => anyhow::anyhow!(
+                "`{flag} {}`: no Derivation left gives that option; an earlier step removed it",
+                step.text
+            ),
+            NarrowError::NoWord { .. } => anyhow::anyhow!("`{flag} {}`: {why}", step.text),
+        })?;
+        anyhow::ensure!(
+            narrowed.total() > 0,
+            "`{flag} {}` leaves no Derivation",
+            step.text
+        );
+        writeln!(
+            output,
+            "  {flag} {}: {}",
+            step.printed,
+            derivations(narrowed.total())
+        )?;
+        forest = narrowed;
+    }
+    Ok(forest)
+}
+
+/// A count of Derivations, in words.
+fn derivations(n: u128) -> String {
+    format!("{n} Derivation{}", if n == 1 { "" } else { "s" })
+}
+
+/// The assertions isolating each of `narrowed` among the unit's Readings,
+/// with how many Readings the unit has.
+fn isolations<'r>(
+    judge: &Judge<'_>,
+    parse: &sylex_syntax::Parse<'_>,
+    narrowed: impl Iterator<Item = &'r sylex_syntax::Reading>,
+) -> Result<Vec<(isolate::Isolation, usize)>> {
+    let located: Vec<(sylex_syntax::Reading, Located)> = parse
+        .readings()
+        .map(|reading| {
+            let (text, constituents) = judge.grammar.constituents(&reading, judge.lexicon)?;
+            Ok((reading, Located { text, constituents }))
+        })
+        .collect::<Result<_>>()?;
+    narrowed
+        .map(|reading| {
+            let at = located
+                .iter()
+                .position(|(r, _)| r == reading)
+                .context("a Reading of the narrowed forest is not among the unit's Readings")?;
+            let others: Vec<&Located> = located
+                .iter()
+                .enumerate()
+                .filter(|(index, _)| *index != at)
+                .map(|(_, (_, l))| l)
+                .collect();
+            Ok((
+                isolate::isolate(judge, &located[at].1, &others)?,
+                located.len(),
+            ))
+        })
+        .collect()
+}
+
+/// A Reading's isolating assertions, marked as diagnostic output.
+fn isolation_lines(
+    label: &str,
+    isolation: &isolate::Isolation,
+    readings: usize,
+    output: &mut dyn Write,
+) -> Result<()> {
+    writeln!(
+        output,
+        "Assertions isolating {label} among the unit's {readings} Readings (diagnostic output \
+         of a greedy cover, not a judgment to copy unread):"
+    )?;
+    if isolation.assertions.is_empty() && isolation.unseparated == 0 {
+        writeln!(output, "  (none: no other Reading to tell it from)")?;
+    }
+    for assertion in &isolation.assertions {
+        writeln!(output, "  {assertion}")?;
+    }
+    if isolation.unseparated > 0 {
+        writeln!(
+            output,
+            "  not isolated: {} other Readings satisfy every assertion of these forms that \
+             holds on it",
+            isolation.unseparated
+        )?;
     }
     Ok(())
 }
@@ -396,154 +575,4 @@ fn lexical(reading: &LexicalReading) -> String {
 }
 
 #[cfg(test)]
-mod tests {
-    use clap::Parser;
-
-    use super::super::EnglishArgs;
-    use super::super::run;
-
-    #[derive(Parser)]
-    struct Cli {
-        #[command(flatten)]
-        args: EnglishArgs,
-    }
-
-    fn survey(inputs: &[&str]) -> Result<String, String> {
-        let cli = Cli::try_parse_from(
-            ["english", "forestwalk"]
-                .into_iter()
-                .chain(inputs.iter().copied()),
-        )
-        .map_err(|e| e.to_string())?;
-        let mut output = Vec::new();
-        run(&cli.args, &mut output).map_err(|e| e.to_string())?;
-        Ok(String::from_utf8(output).unwrap())
-    }
-
-    /// *Draugr Necromancer*'s type line has one Reading: the spine is its
-    /// whole tree, pass-through chains folded, and there is no fork.
-    #[test]
-    fn a_unit_with_one_reading_is_its_whole_spine() {
-        let output = survey(&["--card", "Draugr Necromancer", "--type-line"]).unwrap();
-        assert_eq!(
-            output,
-            r##"Draugr Necromancer type line: "Snow Creature — Zombie Cleric"
-Derivations: 1
-Settled spine:
-  Document [TextTypeLine] > TypeLine [SupertypePrefix] "Snow Creature — Zombie Cleric"
-    modifier: "Snow"#1 supertype:snow Invariant
-    head: TypeLine [TypesWithSubtypes] "Creature — Zombie Cleric"
-      head: CardTypes [SingleCardType] > "Creature"#1 type:creature Singular {number=Singular}
-      punctuation
-      subtypes: Subtypes [MultipleSubtypes] "Zombie Cleric"
-        first: "Zombie"#1 subtype:Zombie Singular {number=Singular}
-        rest: Subtypes [SingleSubtype] > "Cleric"#1 subtype:Cleric Singular {number=Singular}
-Forks: 0
-"##
-        );
-    }
-
-    /// *Crook of Condemnation*'s first line: "from a graveyard" modifies
-    /// "card" or adjoins the Verb Phrase, so the spine stops at the
-    /// Sentence and one dependency fork has two options.
-    #[test]
-    fn a_dependency_fork_lists_its_options_with_their_derivations() {
-        let output = survey(&["--card", "Crook of Condemnation", "--line", "1"]).unwrap();
-        assert_eq!(
-            output,
-            r##"Crook of Condemnation line 1: "{1}, {T}: Exile target card from a graveyard."
-Derivations: 2
-Settled spine:
-  Document [TextAbility] > Ability [ActivatedAbility] "{1}, {T}: Exile target card from a graveyard."
-    cost: ActivationCost [ActivationPayment] > Cost [SymbolCost] > SymbolCosts [CostSequence] "{1}, {T}"
-      first: Symbols [SingleSymbol] > "{1}"#1 symbol:{1} Invariant
-      punctuation
-      rest: SymbolCosts [SingleSymbolCost] > Symbols [SingleSymbol] > "{T}"#1 symbol:{T} Invariant
-    punctuation
-    effect: Effect [SentenceEffect] > Sentences [SingleSentence] > Sentence [Declarative] "Exile target card from a graveyard.": its children differ between Derivations
-Forks: 1
-  dependency "from"#1
-    1  adjunct of VerbPhrase "Exile"#1
-    1  modifier of Nominal "card"#1
-"##
-        );
-    }
-
-    /// Stated text is read as given, its card stated by `--as-card` or by
-    /// the entry, and nothing is fetched; a Category prefix is the root.
-    #[test]
-    fn stated_text_is_surveyed_with_its_stated_card() {
-        let text = "Jace draws two cards.";
-        let as_card = survey(&["--as-card", "Jace, Cunning Castaway", text]).unwrap();
-        let entry = survey(&[&format!("<card=Jace, Cunning Castaway> {text}")]).unwrap();
-        assert_eq!(as_card, entry);
-        assert!(
-            as_card.contains(
-                "subject: NounPhrase [ProperName] > Name [NamedParameter] > \"Jace\"#1 \
-                 name:Jace, Cunning Castaway Invariant"
-            ),
-            "{as_card}"
-        );
-        let bare = survey(&[text]).unwrap();
-        assert!(bare.contains("Derivations: 0\n"), "{bare}");
-        let phrase = survey(&["+NounPhrase target creature"]).unwrap();
-        assert!(
-            phrase.contains("Settled spine:\n  NounPhrase [Determined] \"target creature\"\n"),
-            "{phrase}"
-        );
-    }
-
-    /// *Lightning Bolt* is also a face of *Emeritus of Conflict // Lightning
-    /// Bolt*; the faces' units have one text, so the name picks one unit.
-    #[test]
-    fn a_face_name_two_cards_share_picks_their_one_text() {
-        let output = survey(&["--card", "Lightning Bolt", "--line", "1"]).unwrap();
-        assert!(
-            output.starts_with(
-                "Lightning Bolt line 1: \"Lightning Bolt deals 3 damage to any target.\"\n\
-                 Derivations: 1\n"
-            ),
-            "{output}"
-        );
-    }
-
-    #[test]
-    fn each_bad_unit_choice_names_the_way_out() {
-        let fail = |inputs: &[&str]| survey(inputs).unwrap_err();
-        let units = "  Lightning Bolt type line: \"Instant\"\n  \
-                     Lightning Bolt line 1: \"Lightning Bolt deals 3 damage to any target.\"";
-        assert_eq!(
-            fail(&["--card", "Lightning Bolt"]),
-            format!(
-                "give exactly one of `--line N` and `--type-line` to pick a unit of \
-                 Lightning Bolt:\n{units}"
-            )
-        );
-        assert_eq!(
-            fail(&["--card", "Lightning Bolt", "--line", "1", "--type-line"]),
-            fail(&["--card", "Lightning Bolt"])
-        );
-        assert_eq!(
-            fail(&["--card", "Lightning Bolt", "--line", "2"]),
-            format!("Lightning Bolt has no line 2; its units:\n{units}")
-        );
-        assert_eq!(
-            fail(&[
-                "--card",
-                "Delver of Secrets // Insectile Aberration",
-                "--type-line"
-            ]),
-            "`--card Delver of Secrets // Insectile Aberration` names faces of more than one \
-             name (Delver of Secrets; Insectile Aberration); give one face's name"
-        );
-        assert!(fail(&["--line", "1", "Flying"]).contains("stated text is surveyed as given"));
-        assert!(fail(&["--type-line", "Flying"]).contains("stated text is surveyed as given"));
-        assert!(
-            fail(&["--card", "Lightning Bolt", "--line", "1", "Flying"])
-                .contains("use `--as-card`")
-        );
-        assert!(fail(&["--as-card", "Lightning Bolt"]).contains("use `--card`"));
-        assert!(fail(&[]).contains("nothing to survey"));
-        assert!(fail(&["Flying => NounPhrase \"Flying\""]).contains("checks no assertions"));
-    }
-}
+mod tests;
