@@ -29,7 +29,8 @@ pub enum Function {
 }
 
 impl Function {
-    const ALL: [Self; 8] = [
+    /// Every function, in the order the grammar lists them.
+    pub const ALL: [Self; 8] = [
         Self::Subject,
         Self::Object,
         Self::IndirectObject,
@@ -75,6 +76,61 @@ pub struct Assertion {
     pub function: Option<(Function, String)>,
     /// The surface of the Antecedent of its Gap.
     pub gap: Option<String>,
+}
+
+impl fmt::Display for Assertion {
+    /// The assertion as an entry writes it (`judgments/README.md`), which
+    /// [`parse_file`] reads back as this assertion.
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} {}", self.category, quote(&self.surface))?;
+        if let Some(occurrence) = self.occurrence {
+            write!(f, "#{occurrence}")?;
+        }
+        if let Some(head) = &self.head {
+            write!(f, " head {}", word(head))?;
+        }
+        if let Some((function, of)) = &self.function {
+            write!(f, " as {function:?} of {}", word(of))?;
+        }
+        if let Some(antecedent) = &self.gap {
+            write!(f, " gap {}", quote(antecedent))?;
+        }
+        Ok(())
+    }
+}
+
+/// `text` between double quotes, `"` escaped as `\"`.
+fn quote(text: &str) -> String {
+    format!("\"{}\"", text.replace('"', "\\\""))
+}
+
+/// A lemma or lexeme id as an assertion's clause takes it: bare
+/// when it is one run of word characters, else quoted.
+fn word(text: &str) -> String {
+    let bare = !text.is_empty()
+        && text
+            .chars()
+            .all(|c| c.is_alphanumeric() || matches!(c, '-' | '_' | ':' | '\''));
+    if bare { text.to_owned() } else { quote(text) }
+}
+
+/// Where `surface` occurs in `text` as whole words, by start: the `1` of
+/// `-10` is none. An assertion's 1-based occurrence indexes this list.
+#[must_use]
+pub fn occurrences(text: &str, surface: &str) -> Vec<usize> {
+    text.match_indices(surface)
+        .filter(|(at, found)| {
+            !text[..*at]
+                .chars()
+                .next_back()
+                .is_some_and(char::is_alphanumeric)
+                && !text[at + found.len()..]
+                    .chars()
+                    .next()
+                    .is_some_and(char::is_alphanumeric)
+        })
+        .map(|(at, _)| at)
+        .collect()
 }
 
 /// One judgment.
@@ -560,21 +616,10 @@ impl Judge<'_> {
     #[must_use]
     pub fn holds(&self, assertion: &Assertion, reading: &Located) -> bool {
         let text = &reading.text;
-        // Occurrences count whole words only: the `1` of `-10` is none.
         let wanted_start = assertion.occurrence.map(|n| {
-            text.match_indices(&assertion.surface)
-                .filter(|(at, found)| {
-                    !text[..*at]
-                        .chars()
-                        .next_back()
-                        .is_some_and(char::is_alphanumeric)
-                        && !text[at + found.len()..]
-                            .chars()
-                            .next()
-                            .is_some_and(char::is_alphanumeric)
-                })
-                .nth(n.saturating_sub(1))
-                .map(|(at, _)| at)
+            occurrences(text, &assertion.surface)
+                .get(n.saturating_sub(1))
+                .copied()
         });
         reading.constituents.iter().enumerate().any(|(index, c)| {
             c.category == assertion.category
@@ -687,4 +732,28 @@ fn has_antecedent(reading: &Located, index: usize, antecedent: &str) -> bool {
 /// Whether a Constituent bearing `function` (none at the root) bears `name`.
 fn bears(function: Option<Ident>, name: &str) -> bool {
     function.is_some_and(|f| f == name)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// An assertion displays as an entry writes it: each form the README
+    /// lists (a quoted multiword lemma, a lexeme id, an escaped quotation
+    /// mark, an occurrence, a gap) reads back as the assertion displayed.
+    #[test]
+    fn an_assertion_displays_as_the_entry_writes_it() {
+        for written in [
+            "NounPhrase \"target creature\"",
+            "NounPhrase \"target creature\" as Object of destroy",
+            "PrepositionPhrase \"for a card\"#2 head search",
+            "NounPhrase \"mana value\" head \"mana value\" as Modifier of action:counter",
+            "Clause \"you control\" gap \"permanents\"",
+            "NounPhrase \"say \\\"a\\\"\" as Subject of \"mana value\"",
+        ] {
+            let entries = parse_file("test", &format!("+ text => {written}")).unwrap();
+            let assertion = &entries[0].groups[0][0];
+            assert_eq!(assertion.to_string(), written);
+        }
+    }
 }
