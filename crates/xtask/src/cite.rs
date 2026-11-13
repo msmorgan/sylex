@@ -1505,12 +1505,21 @@ fn blank_bracketed_citations(line: &str) -> String {
     blanked
 }
 
-fn tracked_files(root: &Path) -> anyhow::Result<Vec<String>> {
-    let jj = Command::new("jj")
+fn jj_command(root: &Path, args: &[&str]) -> Command {
+    // `jj file list` formats paths relative to the process working directory
+    // even when `-R` names the repository root, so run from `root` too.
+    let mut command = Command::new("jj");
+    command
+        .current_dir(root)
+        .arg("--no-pager")
         .arg("-R")
         .arg(root)
-        .args(["file", "list"])
-        .output();
+        .args(args);
+    command
+}
+
+fn tracked_files(root: &Path) -> anyhow::Result<Vec<String>> {
+    let jj = jj_command(root, &["file", "list"]).output();
     if let Ok(output) = jj
         && output.status.success()
     {
@@ -1602,11 +1611,7 @@ fn read_audit_diff(root: &Path) -> anyhow::Result<String> {
         return Ok(diff);
     }
     for mut command in [
-        {
-            let mut command = Command::new("jj");
-            command.arg("-R").arg(root).args(["diff", "--git"]);
-            command
-        },
+        jj_command(root, &["diff", "--git"]),
         {
             let mut command = Command::new("git");
             command.arg("-C").arg(root).arg("diff");
@@ -2302,6 +2307,13 @@ const CR_FIXTURE: &str = "rule 100.1";
             1,
             "a symlink to a scanned file is not counted twice"
         );
+    }
+
+    #[test]
+    fn jj_helpers_run_from_repository_root() {
+        let fixture = Fixture::new();
+        let command = jj_command(fixture.path(), &["file", "list"]);
+        assert_eq!(command.get_current_dir(), Some(fixture.path()));
     }
 
     struct Fixture(PathBuf);
