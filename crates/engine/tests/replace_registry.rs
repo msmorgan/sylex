@@ -2453,8 +2453,8 @@ fn source_and_target(source_abilities: Vec<Ability>) -> (GameState, ObjectId, Ob
         // A COMBATANT (confers `May(Attack)`/`May(Block)`), unlike a bare
         // `Type::Creature.def()` —
         // `by_matcher_fires_only_for_damage_from_its_own_source` asserts this
-        // creature's OWN marked damage from a non-wither source ([CR#120.3d,
-        // 120.3e]).
+        // creature's OWN marked damage from a non-wither source
+        // ([CR#120.3d,120.3e]).
         types: vec![combatant_creature_def()],
         power: Some(StatValue::Number(4)),
         toughness: Some(StatValue::Number(4)),
