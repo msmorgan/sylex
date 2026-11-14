@@ -884,10 +884,11 @@ impl GameState {
     }
 
     /// Whether a battlefield `OutcomeGate` of `kind` applies to `player`
-    /// ([CR#101.1,704.3], ADR U5 — precedence, not consumption). Folds over
-    /// battlefield permanents; each gate's `who` predicate is matched against
-    /// `player`'s proxy with the gate's carrier as the watcher, so `Ref(You)`
-    /// and `OpponentOf(Ref(You))` anchor to the carrier's controller.
+    /// ([CR#101.1,704.3]; mtg-rules skill U5: precedence, not consumption).
+    /// Folds over battlefield permanents; each gate's `who` predicate is
+    /// matched against `player`'s proxy with the gate's carrier as the watcher,
+    /// so `Ref(You)` and `OpponentOf(Ref(You))` anchor to the carrier's
+    /// controller.
     #[must_use]
     pub fn gate_suppresses(
         &self,

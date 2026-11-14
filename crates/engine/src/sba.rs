@@ -36,8 +36,9 @@ pub fn sweep(state: &GameState) -> Vec<GameEvent> {
             continue;
         }
         // [CR#704.5a..704.5c] loss predicates; a CantLose gate suppresses the
-        // outcome at this check ([CR#101.1,704.3], ADR U5 precedence), leaving
-        // the underlying state (a "zombie" life ≤ 0 / poison ≥ 10) intact.
+        // outcome at this check ([CR#101.1,704.3]; mtg-rules skill U5:
+        // precedence, not consumption), leaving the underlying state (a
+        // "zombie" life ≤ 0 / poison ≥ 10) intact.
         let reason = if player.life <= 0 {
             Some(LossReason::LifeZero)
         } else if player.drew_from_empty {

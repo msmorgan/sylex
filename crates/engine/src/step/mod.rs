@@ -1804,10 +1804,10 @@ impl GameState {
     }
 
     /// [CR#704.5b] is a WINDOWED predicate ("since the last time SBAs were
-    /// checked"). When a `CantLose` gate ([CR#101.1], ADR U5) suppresses an
-    /// empty-draw loss, close that player's window so the loss does NOT
-    /// retroactively fire once the gate leaves — unlike the standing life/
-    /// poison predicates, which re-fire at the first ungated check.
+    /// checked"). When a `CantLose` gate ([CR#101.1]; mtg-rules skill U5)
+    /// suppresses an empty-draw loss, close that player's window so the loss
+    /// does NOT retroactively fire once the gate leaves — unlike the standing
+    /// life/poison predicates, which re-fire at the first ungated check.
     fn close_gated_draw_windows(&mut self) {
         // Fast path: the overwhelmingly common check has no pending empty-draw,
         // so skip the fixpoint `layers()` build entirely.
