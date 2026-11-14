@@ -1,10 +1,17 @@
-# ADR: The `.syl` Data Language
+# The `.syl` Data Language
+
+## Status: DRAFT
+
+This document is directional. It describes the `.syl` language the project is aiming at, and
+the design is not settled: read it for the intended shape, not as a contract the code keeps.
+`sylex_syl` parses the syntax today; name resolution and expansion have only temporary
+validators in `xtask`.
 
 - **Companion:** [`semantics.md`](./semantics.md), the semantic model `.syl` terms are read in.
 
 ## Overview
 
-`.syl` is the language in which the vocabulary and cards under `plugins/` are written. This ADR
+`.syl` is the language in which the vocabulary and cards under `plugins/` are written. This document
 says how a term is written, named and expanded; what the term means, and how its references
 resolve, is [`semantics.md`](./semantics.md). A file is parsed (§2), each name is resolved by the
 sort expected where it stands (§3), and Templates and Definitions are expanded (§4). The expanded

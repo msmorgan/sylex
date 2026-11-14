@@ -1,5 +1,11 @@
 # Spelling
 
+## Status: DRAFT
+
+This document is directional. It describes the spelling grammar the project is aiming at, and
+the design is not settled: read it for the intended shape, not as a contract the code keeps.
+§10 lists what is known to be open, and the rest is not fixed either.
+
 The spelling layer relates Readings to resolved terms ([Architecture](architecture.md), "The
 layers"). Recovery reads the Packed Forest of a card's text and assembles the resolved terms
 whose wording matches it; spelling a resolved term yields a Reading for the English layer to

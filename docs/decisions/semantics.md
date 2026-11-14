@@ -1,4 +1,11 @@
-# ADR: Semantics — DRT Reference Resolution, Definitions and Templates, and the Action-Clause Spine
+# Semantics
+
+## Status: DRAFT
+
+This document is directional. It describes the semantic model the project is aiming at
+(reference resolution over a Discourse Representation Structure, Definitions and Templates, and
+the action-clause spine), and the design is not settled: read it for the intended shape, not as
+a contract the code keeps.
 
 - **Companion:** [`syl.md`](./syl.md), the `.syl` data language this model is written in.
 
