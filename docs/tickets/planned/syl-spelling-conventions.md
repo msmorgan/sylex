@@ -17,7 +17,7 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 
 ## Design
 
-The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$name@Form` printed
+The notation is settled in `docs/design/spelling.md` §7 (`$name` Holes, `$name@Form` printed
 forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a fixed join, never one chosen by a
 parameter), `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails); where this
 ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every `<name>` Hole to
@@ -76,5 +76,5 @@ itself.
 
 ## Pointers
 
-`docs/decisions/spelling.md` §1 and §7, `docs/decisions/syl.md` §2,
-`docs/decisions/lexicon.md` §1, `crates/syl/`.
+`docs/design/spelling.md` §1 and §7, `docs/design/syl.md` §2,
+`docs/design/lexicon.md` §1, `crates/syl/`.

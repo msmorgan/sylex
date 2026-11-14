@@ -8,7 +8,7 @@ needs: []
 
 A Participial Description ("the exiled card", "the card exiled with this artifact")
 requires the unique referent the deed stamped, and reaches objects a linked ability published
-[CR#607.2a] (`docs/decisions/semantics.md` §2.4). Whether every such read refers to exactly one
+[CR#607.2a] (`docs/design/semantics.md` §2.4). Whether every such read refers to exactly one
 card, or a linked exile can stamp several, decides how reference resolution treats it.
 
 ## Done when
@@ -22,4 +22,4 @@ card, or a linked exile can stamp several, decides how reference resolution trea
 
 ## Pointers
 
-`data/mtgjson/AllPrintings.sqlite`, `docs/decisions/semantics.md` §2.4.
+`data/mtgjson/AllPrintings.sqlite`, `docs/design/semantics.md` §2.4.

@@ -2,7 +2,7 @@
 //! its exact Derivation counts, in one SQLite database.
 //!
 //! The stored tables keep the forest as the chart packs and binarizes it
-//! (`docs/decisions/english.md` §4): a node's alternative is a (Production,
+//! (`docs/design/english.md` §4): a node's alternative is a (Production,
 //! completed item) pair, and an item's families are (previous item, child)
 //! pairs. Only the part some Derivation uses is stored, with the unit's
 //! forks (`ForkForest::forks`, written by `forks.rs`). The schema, with

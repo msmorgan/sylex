@@ -6,7 +6,7 @@ needs: []
 
 ## Why
 
-`docs/decisions/english.md` §1 keeps `sylex_syntax` ignorant of grammar features, values and
+`docs/design/english.md` §1 keeps `sylex_syntax` ignorant of grammar features, values and
 Categories outside the lexicon feature-bundle mapping table. `PrepositionFrame` carries two
 booleans used by `prep:among` alone (`plural_complement` and `named_only`). To compile
 `plural_complement`, `sylex_syntax::compile::plural_complement` hardcodes the feature value
@@ -39,7 +39,7 @@ new `PrepositionFrame` flag and compiler branch in `sylex_syntax` per prepositio
 
 ## Pointers
 
-- `docs/decisions/english.md` §1, §3.
+- `docs/design/english.md` §1, §3.
 - `crates/syntax/src/frames.rs`: `PrepositionFrame`.
 - `crates/syntax/src/compile.rs`: `preposition_valence`, `plural_complement`,
   `unlike_preposition_frames`.

@@ -44,4 +44,4 @@ English does not, independent of name Number.
 ## Pointers
 
 - `crates/english/grammar/english.fug` (`coordination VerbPhrase`)
-- `docs/decisions/english.md`, `docs/decisions/lexicon.md` §2 (finite forms unmarked for Number)
+- `docs/design/english.md`, `docs/design/lexicon.md` §2 (finite forms unmarked for Number)

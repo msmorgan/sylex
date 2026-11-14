@@ -41,5 +41,5 @@ The engine's dungeon state (`engine-dungeons`).
 ## Pointers
 
 `plugins/builtin/definitions/designation/initiative.syl`,
-`plugins/builtin/templates/predicate/outsideTheGame.syl`, `docs/decisions/semantics.md` §1 items 4
+`plugins/builtin/templates/predicate/outsideTheGame.syl`, `docs/design/semantics.md` §1 items 4
 and 5.

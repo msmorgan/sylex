@@ -34,5 +34,5 @@ choose *enter* or *enters*.
 
 ## Pointers
 
-- `docs/decisions/spelling.md` §1, §4, `docs/decisions/syl.md` §2, `docs/decisions/lexicon.md` §6
+- `docs/design/spelling.md` §1, §4, `docs/design/syl.md` §2, `docs/design/lexicon.md` §6
 - `docs/tickets/planned/syl-self-name-references.md`

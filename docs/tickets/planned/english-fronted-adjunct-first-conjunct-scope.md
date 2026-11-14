@@ -28,5 +28,5 @@ the clause modifies *you lost 1 life*. No unit of the pool is known to have this
 ## Pointers
 
 - `crates/syntax/src/step.rs` (`Fronting`, `comma_scope_excludes`).
-- `docs/decisions/english.md` §8.
+- `docs/design/english.md` §8.
 - `crates/english/grammar/english.fug` (`dependents TimeGiving`).

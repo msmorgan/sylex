@@ -28,9 +28,9 @@ holds the label.
 ## Design
 
 - Anchor Words are strings read from a face's text across its units, with no catalog or `.syl`
-  declaration (`docs/decisions/lexicon.md` §3 drops its `khans.syl` `AnchorWord`-sort example).
+  declaration (`docs/design/lexicon.md` §3 drops its `khans.syl` `AnchorWord`-sort example).
 - `CardScope` holds the Anchor Words in a unit's parse context beside the face's own card names, so
-  `Lexicon::stands_in`, `Parse::admit` and round-trip law 2 (`docs/decisions/english.md` §7) keep
+  `Lexicon::stands_in`, `Parse::admit` and round-trip law 2 (`docs/design/english.md` §7) keep
   one scope parameter. Each unit still parses into its own Packed Forest, so a face's Derivation
   count stays the sum of its units', never their product.
 - Where `CardScope` holds an Anchor Word, `Lexicon::stands_in` admits the open Anchor Word reading
@@ -81,7 +81,7 @@ holds the label.
   unintroduced Anchor Word, and `FlavorWord` standing on the same spelling off-scope, replacing the
   `anchor_words.ron`-backed tests in `crates/vocabulary/tests/labels.rs`,
   `crates/vocabulary/tests/loader.rs` and `crates/lexicon/tests/analysis.rs`.
-- `docs/decisions/lexicon.md` (§2 open slots, §3 dropping the `khans.syl` `AnchorWord`-sort
+- `docs/design/lexicon.md` (§2 open slots, §3 dropping the `khans.syl` `AnchorWord`-sort
   example), `docs/contexts/oracle-english/CONTEXT.md` (Anchor Word, Card Scope, Proper Name) and
   `docs/tickets/planned/catalogs-into-plugins.md` state the design.
 - `cargo xtask english strata --check` passes, and `cargo test` and `cargo clippy --tests -- -D
@@ -104,5 +104,5 @@ holds the label.
   `crates/english/src/profile.rs`, `crates/english/src/judgment.rs`,
   `crates/english/judgments/anchored_abilities.txt`.
 - `crates/xtask/src/english.rs`, `crates/xtask/src/english/forests.rs`.
-- `docs/decisions/lexicon.md` §2–3, `docs/decisions/english.md` §7,
+- `docs/design/lexicon.md` §2–3, `docs/design/english.md` §7,
   `docs/contexts/oracle-english/CONTEXT.md`.

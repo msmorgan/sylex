@@ -11,7 +11,7 @@ self-reference such as `thisCreature` or `thisEnchantment` where the Oracle text
 the card itself: *Megatherium*'s "sacrifice it unless you pay …" is
 `sacrifice(thisCreature)`; *Charnel Troll* and *Blood Spatter Analysis* do the same. The author
 resolved the pronoun by hand, so it never reaches discourse and can't be checked, which breaks
-surface-faithfulness (`docs/decisions/semantics.md` §1 item 1).
+surface-faithfulness (`docs/design/semantics.md` §1 item 1).
 
 Written against the spine (`cleanup-step6-spine`).
 
@@ -35,4 +35,4 @@ Replacing the `this<Head>` Templates with one Template: `syl-this-head-template`
 
 `plugins/builtin/templates/noun/this*.syl`, `plugins/builtin/templates/pronoun/it.syl`,
 `plugins/canon/cards/` (*Megatherium*, *Charnel Troll*, *Blood Spatter Analysis*),
-`docs/decisions/semantics.md` §1 item 1.
+`docs/design/semantics.md` §1 item 1.

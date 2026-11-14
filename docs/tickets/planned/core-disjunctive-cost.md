@@ -35,4 +35,4 @@ the affected player may do) and make the payer the loop's player, not the abilit
 (`May`), `crates/engine/tests/region_witnesses.rs` (Perforating Artist, and Painful Quandary for
 the single-cost punisher), `plugins/builtin/primitives/cost/or.syl`,
 `plugins/builtin/templates/cost/either.syl`, `plugins/builtin/templates/action/doUnless.syl`,
-`docs/decisions/core.md`.
+`docs/design/core.md`.

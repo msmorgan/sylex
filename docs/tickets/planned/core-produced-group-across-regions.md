@@ -35,7 +35,7 @@ choices are made in APNAP order and the sacrifices happen simultaneously [CR#608
 
 ## Pointers
 
-`docs/decisions/core.md` (Laws, §1–§3), `crates/core/src/effect.rs` (`Each`),
+`docs/design/core.md` (Laws, §1–§3), `crates/core/src/effect.rs` (`Each`),
 `crates/engine/tests/region_witnesses.rs` (Deadly Brew),
 `plugins/canon/cards/Vaevictis Asmadi, the Dire.syl`,
 `plugins/builtin/primitives/timing/thisWay.syl`.

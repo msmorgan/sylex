@@ -2,7 +2,7 @@
 //!
 //! A temporary validator that guards `.syl` until the Rust resolution layer
 //! (step 7 of the semantics-v3 plan) replaces it. It checks names, sorts and
-//! argument binding only, following `docs/decisions/syl.md` §2 and §3; it
+//! argument binding only, following `docs/design/syl.md` §2 and §3; it
 //! expands nothing and reads no meaning.
 //!
 //! [`check`] first runs [`sylex_syl::check()`] (constructor clauses, and words

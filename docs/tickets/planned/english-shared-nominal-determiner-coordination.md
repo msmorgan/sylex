@@ -30,4 +30,4 @@ returns all tapped and all attacking creatures to their owners' hands.", has no 
 ## Pointers
 
 - `crates/english/grammar/english.fug` (`Determined`, the noun-phrase coordinations)
-- `docs/decisions/english.md` §3, §4
+- `docs/design/english.md` §3, §4

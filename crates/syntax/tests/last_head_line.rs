@@ -3,7 +3,7 @@
 //! `coordinator` still lets the chart record whether its first conjunct ends
 //! in its head. Its last conjunct, which ends in a dependent the first lacks,
 //! then has the Attachment Class the tree computes: the forest's Ranking Key
-//! equals the tree's (`docs/decisions/english.md` §5).
+//! equals the tree's (`docs/design/english.md` §5).
 
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;

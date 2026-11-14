@@ -25,4 +25,4 @@ together and what triggers see.
 
 - `crates/engine/src/step/mod.rs`: `check_sbas`, `emit_sba_batch`.
 - `crates/engine/src/sba.rs`: `sweep`, `legend_rule_groups`.
-- [Engine](../../decisions/engine.md) law 5.
+- [Engine](../../design/engine.md) law 5.

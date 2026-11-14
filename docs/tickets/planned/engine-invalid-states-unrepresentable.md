@@ -5,7 +5,7 @@ needs: []
 
 ## Why
 
-[Core](../../decisions/core.md) law 5 and [Engine](../../decisions/engine.md) law 6: a
+[Core](../../design/core.md) law 5 and [Engine](../../design/engine.md) law 6: a
 malformed shape that core's types can rule out is a compile error, the rest is
 refused at load, a run-time impossible state is a lowering or engine bug that
 fails loudly, and only what the rules make impossible is ignored [CR#101.3].

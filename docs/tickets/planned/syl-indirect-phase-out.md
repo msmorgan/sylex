@@ -23,7 +23,7 @@ Written against the surface (`cleanup-step6-surface`).
 - How a permanent phased out is recorded, and the row reads it: either the indirect phase-out is
   its own event (the attachment's phase-out caused by its host's), so the row reads "did not phase
   out because its host did", or the status carries the distinction. The choice follows the CR's
-  structure (`docs/decisions/semantics.md` §1 item 5).
+  structure (`docs/design/semantics.md` §1 item 5).
 - The row's header comment states the reading the row now makes, with no ticket slugs.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -38,4 +38,4 @@ Written against the surface (`cleanup-step6-surface`).
 
 - `plugins/builtin/rules/conferral/phasingTurnBased.syl`, `plugins/builtin/definitions/keyword_ability/phasing.syl`
 - `plugins/builtin/templates/action/phaseOut.syl`, `phaseIn.syl`, `phaseOutUntil.syl`
-- `docs/decisions/semantics.md` §1 item 5, §4.8 (lookback)
+- `docs/design/semantics.md` §1 item 5, §4.8 (lookback)

@@ -6,7 +6,7 @@ needs: []
 
 ## Why
 
-`docs/decisions/english.md` §3 forbids word flags: no feature or flag names a single open-class
+`docs/design/english.md` §3 forbids word flags: no feature or flag names a single open-class
 word to license an attachment or construction. `NounEntry::variable` in `nouns.ron` is set on
 `"type"` alone, projecting `feature Variable = Cited` onto `Nominal` and `NounPhrase` across the
 chart solely to license `SpecifyingClause` and `SpecifyingModalClause` for Artificial Evolution
@@ -37,7 +37,7 @@ another taxonomic noun (*subtype*, *supertype*) is refused.
 
 ## Pointers
 
-- `docs/decisions/english.md` §3, §6, §8.
+- `docs/design/english.md` §3, §6, §8.
 - `crates/english/grammar/english.fug`: `feature Variable`, `SpecifyingClause`,
   `SpecifyingModalClause`.
 - `crates/vocabulary/lexicon/english/nouns.ron`: `type`.

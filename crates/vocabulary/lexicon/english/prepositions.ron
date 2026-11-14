@@ -313,7 +313,7 @@
         // A keyword after *with* is a Modifier of a Nominal, and an Adjunct
         // of a predicate only coordinated with a *with*-phrase that is one
         // on its own (*enters with flying and with X +1/+1 counters on it*;
-        // `docs/decisions/english.md` §4).
+        // `docs/design/english.md` §4).
         (complement: KeywordPhrase, hosts: NominalAndConjoinedPredicate),
         (complement: NP, hosts: NominalAndPredicate),
         (complement: QuotedAbility, hosts: Nominal),

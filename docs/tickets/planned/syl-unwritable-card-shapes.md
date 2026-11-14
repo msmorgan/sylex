@@ -35,7 +35,7 @@ Written against the surface (`cleanup-step6-surface`).
 - *Alaundo the Seer*, *Tahngarth, First Mate* and one "all cards with the same name" card are in
   `plugins/canon/cards/` with their printed text in full, or each
   refusal names the rule that forbids it.
-- The linked-exile law is checked, or `docs/decisions/semantics.md` §4.8 says it is a convention.
+- The linked-exile law is checked, or `docs/design/semantics.md` §4.8 says it is a convention.
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
@@ -48,5 +48,5 @@ Un-set card, which is deferred.
 
 `plugins/builtin/primitives/zone/exiledWith.syl`,
 `plugins/builtin/templates/noun/withTheSameName.syl`,
-`plugins/builtin/templates/determiner/allOf.syl`, `docs/decisions/semantics.md` §2.3, §2.4 and
+`plugins/builtin/templates/determiner/allOf.syl`, `docs/design/semantics.md` §2.3, §2.4 and
 §4.8.

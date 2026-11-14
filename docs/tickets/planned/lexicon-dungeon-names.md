@@ -26,7 +26,7 @@ a dungeon is *Acererak the Archlich*. Every other in-scope "Undercity" is part o
 
 ## Design
 
-- Dungeon names come from the Oracle data, as card names do (`docs/decisions/lexicon.md` §3):
+- Dungeon names come from the Oracle data, as card names do (`docs/design/lexicon.md` §3):
   `cargo xtask catalogs generate` writes them to `data/gen/catalogs/`, from the cards whose card
   type is Dungeon, and `sylex_vocabulary` loads each as a Proper Name with no Card Scope.
 
@@ -67,5 +67,5 @@ a dungeon is *Acererak the Archlich*. Every other in-scope "Undercity" is part o
 
 - `crates/vocabulary/catalogs/cited_names.ron`, `crates/vocabulary/src/lib.rs`
   (`scoped_name_catalogs`), `crates/xtask/src/catalogs.rs`.
-- `docs/decisions/lexicon.md` §3; `docs/contexts/oracle-english/CONTEXT.md` (Proper Name).
+- `docs/design/lexicon.md` §3; `docs/contexts/oracle-english/CONTEXT.md` (Proper Name).
 - Evidence (gitignored): `docs/evidence/names-read-from-text/`.

@@ -30,5 +30,5 @@ Written against the surface (`cleanup-step6-surface`).
 ## Pointers
 
 `plugins/builtin/primitives/action/gainControlOf.syl`,
-`plugins/builtin/definitions/keyword_action/exchangeControl.syl`, `docs/decisions/semantics.md`
+`plugins/builtin/definitions/keyword_action/exchangeControl.syl`, `docs/design/semantics.md`
 §4.6 (the event gate, pattern-only heads).

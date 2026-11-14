@@ -1,7 +1,7 @@
 # sylex_english
 
 The Oracle English grammar
-([`docs/decisions/english.md`](../../docs/decisions/english.md)): the
+([`docs/design/english.md`](../../docs/design/english.md)): the
 grammar data file [`grammar/english.fug`](grammar/english.fug), written in the
 `.fug` language that `sylex_syntax::fug` describes, and its binding into
 `sylex_syntax`.
@@ -26,7 +26,7 @@ lexemes of that lexicon and that none of its own names spells a catalog item.
   No face is lost, and every unit whose verdict or Readings change is
   reported.
 - **Canonicalizations.** A change that introduces or tightens a
-  canonicalization ([`docs/decisions/english.md`](../../docs/decisions/english.md)
+  canonicalization ([`docs/design/english.md`](../../docs/design/english.md)
   §8) compares, per unit, the set of Reading Normal Forms before and after,
   under exactly that equivalence and nothing wider: the analyses stay the same
   while the number of trees falls.
@@ -38,7 +38,7 @@ lexemes of that lexicon and that none of its own names spells a catalog item.
   Surplus) are reported. None is a pass condition, and no change is made to
   move one.
 - **A gate's ablation.** Before adding or retiring a gate
-  ([`docs/decisions/english.md`](../../docs/decisions/english.md) §6), remove
+  ([`docs/design/english.md`](../../docs/design/english.md) §6), remove
   it, run the census, and compare with the census that has it: the spurious
   Readings and units the forest gains without it, and the largest units'
   growth. The comparison is reported with the change that adds or retires
@@ -53,7 +53,7 @@ lexemes of that lexicon and that none of its own names spells a catalog item.
 
 `tests/seed_proof.rs` proves the frame engine end to end on a seed of about
 fifteen open-class words: active complementation, same-head complement priority
-(`docs/decisions/english.md` §3), Host-Category-limited attachment with
+(`docs/design/english.md` §3), Host-Category-limited attachment with
 cross-head ambiguity retained (including Seedborn Muse), passives with and
 without `by`, object and stranded-preposition Gaps across finite, progressive,
 perfect and passive forms, and Right Node Raising.
@@ -136,7 +136,7 @@ multiply to its count, is not segmentable (its Surplus is `derivations − 1`);
 the summary lists it and `--check` fails on it.
 
 Each unit also reports its `cheapest_tier`: how many of its Derivations share
-the least Ranking Key (`docs/decisions/english.md` §5), before the final
+the least Ranking Key (`docs/design/english.md` §5), before the final
 tie-break, counted on the Packed Forest without building trees. The summary
 gives how many ambiguous units have a cheapest tier of one, the tiers' sum over
 ambiguous units, and the largest tier. Ranking never changes which Readings
@@ -178,7 +178,7 @@ writes every Corpus Unit's Packed Forest, with its exact Derivation counts
 `data/derived/english-forests.sqlite` (untracked). Each unit is parsed as the
 census parses it. Questions across the pool are SQL over it, and its units
 join mtgjson's `cardIdentifiers.scryfallOracleId` by `units.oracle_id`. The
-forest stays packed (`docs/decisions/english.md` §4): there is no row per
+forest stays packed (`docs/design/english.md` §4): there is no row per
 Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
 
 - `units`; `nodes` (Category, span, surface, Gap, features, coordinator,
@@ -466,7 +466,7 @@ conditional and its aliases, and under it each option's exact Derivation count
 and answer (an alias's answer after `=`). A word is printed `"surface"#N`, its
 surface and 1-based occurrence. Options are in the forks' order, never ranked:
 the survey decides nothing
-([english.md](../../docs/decisions/english.md) §4, §5).
+([english.md](../../docs/design/english.md) §4, §5).
 
 ### Narrowing a forest
 

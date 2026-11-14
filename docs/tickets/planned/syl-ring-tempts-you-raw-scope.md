@@ -8,7 +8,7 @@ needs: [syl-primitive-constructors, syl-explicit-deeds]
 
 `plugins/builtin/definitions/keyword_action/theRingTemptsYou.syl` writes `Action.ownScope` around
 its own deed, so that the Ring emblem can count the times the Ring has tempted you by the deed's
-own steps. `.syl` may not write a scope (`docs/decisions/syl.md` §4); the file does so through a
+own steps. `.syl` may not write a scope (`docs/design/syl.md` §4); the file does so through a
 temporary primitive declared in it (`ownScope`) and the validator's path-gated Ring exception,
 which is the only reason the file passes `cargo xtask dsl check`. The body also writes the same
 count of temptations (`eventCount(ownScope(theRingTemptsYou, …), actor(you), thisGame)`) three
@@ -34,5 +34,5 @@ times, once per emblem ability that reads it [CR#701.54c]; only the threshold di
 
 `plugins/builtin/definitions/keyword_action/theRingTemptsYou.syl`,
 `crates/xtask/src/dsl_check/schema.rs` (`RING_EXCEPTION`, `EXPANSION_CONSTRUCTORS`),
-`crates/xtask/src/dsl_check.rs` (`ring_only`), `docs/decisions/semantics.md` §2.3 and §3,
-`docs/decisions/syl.md` §4.
+`crates/xtask/src/dsl_check.rs` (`ring_only`), `docs/design/semantics.md` §2.3 and §3,
+`docs/design/syl.md` §4.

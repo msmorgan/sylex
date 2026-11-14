@@ -79,7 +79,7 @@ Writing the 57 non-canon cards. The `become` forms of "in addition to its other 
 
 ## Pointers
 
-`docs/decisions/spelling.md` (Constructions, substitution, the resolved term as the derivation);
-`docs/decisions/english.md` §3, §7;
+`docs/design/spelling.md` (Constructions, substitution, the resolved term as the derivation);
+`docs/design/english.md` §3, §7;
 `plugins/canon/cards/Efflorescence.syl`; `plugins/builtin/templates/ability/isAlso.syl`;
 `plugins/builtin/templates/action/become.syl`; `docs/evidence/syl-focus-also/`.

@@ -42,4 +42,4 @@ The order of the start-of-game procedure [CR#103] is the engine's.
 - `plugins/builtin/definitions/keyword_ability/companion.syl`
 - `plugins/builtin/primitives/condition/` (the `DeckCondition` primitives)
 - `plugins/builtin/rules/` (the existing `sba` and `conferral` rule declarations)
-- `docs/decisions/semantics.md` §1 item 4; `docs/decisions/syl.md` §1
+- `docs/design/semantics.md` §1 item 4; `docs/design/syl.md` §1

@@ -21,9 +21,9 @@ Written against the surface (`cleanup-step6-surface`).
 - Each clashing player's clash is its own event carrying the `clash` Deed, so "whenever you
   clash" triggers for each player who clashed.
 - "Clash with an opponent" is a Template over `clash`, not a Definition: an action the rules
-  define as another action is a Template (`docs/decisions/semantics.md` §3.1) [CR#701.30b].
+  define as another action is a Template (`docs/design/semantics.md` §3.1) [CR#701.30b].
 - The simultaneous reveal, the APNAP decisions and the simultaneous move [CR#701.30c] are the
-  engine's procedure (`docs/decisions/semantics.md` §1: timing and order belong to the engine).
+  engine's procedure (`docs/design/semantics.md` §1: timing and order belong to the engine).
   The body does not encode them.
 
 ## Done when
@@ -42,4 +42,4 @@ Written against the surface (`cleanup-step6-surface`).
 - `plugins/builtin/definitions/keyword_action/clash.syl`
 - `plugins/builtin/templates/action/flipCoins.syl`, `plugins/builtin/primitives/action/actionFlipCoins.syl`,
   `plugins/canon/cards/Chance Encounter.syl` (the coin-flip precedent)
-- `docs/decisions/semantics.md` §3.1 (keyword actions and Deeds), §4.8 (lookback)
+- `docs/design/semantics.md` §3.1 (keyword actions and Deeds), §4.8 (lookback)

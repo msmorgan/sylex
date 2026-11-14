@@ -23,8 +23,8 @@ The comment rule, which the sweep applies and new and edited code follows:
   known defect is fixed or ticketed with a `TODO`/`SEAM` naming the ticket. Also banned: diff
   narration ("previously", "now uses") and plan narration.
 - A plain `//` block over four lines is compressed, or moved to where its content belongs: the
-  doc comment of the item it's about when it's local, the module doc when module-wide, an ADR
-  when it's design.
+  doc comment of the item it's about when it's local, the module doc when module-wide, a design
+  doc when it's design.
 - A doc comment opens with a one-sentence contract and documents the interface.
 - A test comment states the scenario and the rule it proves.
 - Tracked code never cites local memory.

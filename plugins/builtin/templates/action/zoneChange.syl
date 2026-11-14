@@ -1,7 +1,7 @@
 # The Zone Change the put and return Templates write: `subject` moves from `from` to
 # `destination` with `riders` [CR#400.7]. "Put" and "return" name no deed, so the two verbs expand
 # to the same move; each Template keeps its own wording. Whether a trigger on the move looks back
-# in time is derived from its pattern (`docs/decisions/semantics.md` §4.6) [CR#603.10a]; "from
+# in time is derived from its pattern (`docs/design/semantics.md` §4.6) [CR#603.10a]; "from
 # anywhere" is not a leaves-the-battlefield trigger, even when the object comes from the
 # battlefield [CR#603.6c].
 template zoneChange(

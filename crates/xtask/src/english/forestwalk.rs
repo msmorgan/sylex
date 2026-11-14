@@ -11,7 +11,7 @@
 //! Readings ([`isolate`]).
 //!
 //! The survey reports the forest and decides nothing
-//! (`docs/decisions/english.md` §4): options are listed in the order the
+//! (`docs/design/english.md` §4): options are listed in the order the
 //! forks give them, never by count or rank.
 
 use std::io::Write;

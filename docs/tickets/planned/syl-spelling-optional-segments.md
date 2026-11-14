@@ -19,7 +19,7 @@ Written against the spine (`cleanup-step6-spine`).
 
 ## Design
 
-- The notation is settled in `docs/decisions/spelling.md` §7 (`$name` Holes, `$name@Form` printed
+- The notation is settled in `docs/design/spelling.md` §7 (`$name` Holes, `$name@Form` printed
   forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a join is nothing, `,`, `.`, `and`,
   `or`, `and/or` or `then`, never chosen by a parameter), `( … )` optional parts,
   `<~Category: …>` and `<~inner Category: …>` Tails) with its load rules; where this ticket's text
@@ -27,7 +27,7 @@ Written against the spine (`cleanup-step6-spine`).
 
 ## Done when
 
-- `sylex_syl` parses and formats the notation `docs/decisions/spelling.md` §7 states, form labels,
+- `sylex_syl` parses and formats the notation `docs/design/spelling.md` §7 states, form labels,
   `*` and the `<.>` join included, and refuses a form outside §7's set, with a negative test.
 - Every `TODO(spelling)` that needed an optional or repeated segment is written with it.
 - The notation has no mark yet for the Holes passive subject promotion links: a context's
@@ -60,4 +60,4 @@ The other spelling conventions (verb inflection, the hole syntax): `syl-spelling
 
 ## Pointers
 
-`docs/decisions/spelling.md` §7, `crates/syl/`, `rg 'TODO\(spelling\)' plugins/`.
+`docs/design/spelling.md` §7, `crates/syl/`, `rg 'TODO\(spelling\)' plugins/`.

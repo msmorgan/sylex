@@ -8,7 +8,7 @@ needs: [syl-spelling-optional-segments]
 
 A Tail prints at the edge of the phrase that hosts it. A trailing Tail stands inside the fronted
 dependents of its Category; unmarked, it stands outside the host's other trailing dependents,
-and marked `inner` it stands before them (`docs/decisions/spelling.md`, on Tails and the
+and marked `inner` it stands before them (`docs/design/spelling.md`, on Tails and the
 notation). No declaration uses the mark yet. *Aurochs* prints "gets +1/+0 until
 end of turn for each other attacking Aurochs" and *Ral's Staticaster* "gets +1/+0 for each card
 in your hand until end of turn": the same Tail on the same verb phrase, outside the duration on
@@ -33,7 +33,7 @@ recover to one term and one of them does not round-trip.
 
 - The open question is answered.
 - `sylex_syl` parses and formats `inner`, and resolving a Tail's host follows the Tail notation in
-  `docs/decisions/spelling.md`.
+  `docs/design/spelling.md`.
 - Every "for each" and "equal to" wording that in-scope text prints in more than one placement
   has a Template for each; the landing lists them with a card for each.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_syl` and
@@ -47,5 +47,5 @@ recover to one term and one of them does not round-trip.
 
 ## Pointers
 
-`docs/decisions/spelling.md` (Tails, the notation); `plugins/builtin/templates/amount/forEach.syl`;
+`docs/design/spelling.md` (Tails, the notation); `plugins/builtin/templates/amount/forEach.syl`;
 `crates/english/grammar/english.fug` (the distributive adjunct's attachment).

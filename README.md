@@ -244,7 +244,7 @@ assigned by a lexer (Magic overloads its vocabulary too heavily for tagging —
 legitimate ambiguity stays packed and visible instead of being decided by rule
 order. Unknown vocabulary and not-yet-covered text are retained explicitly
 rather than guessed at. One contract governs the grammar (recorded in
-`docs/decisions/`):
+`docs/design/`):
 
 - **English clauses are structural.** Dependency, valency, voice, modality,
   and attachment are parsed as English before any Magic meaning attaches. The
@@ -296,7 +296,7 @@ grammar continues to cover the remaining mechanics. The near-term work runs in t
    the noncanon suite growing alongside.
 
 `docs/tickets/` is the working queue (folder = status; `kata kanban ready`
-lists the next claimable items), and `docs/decisions/` records the design
+lists the next claimable items), and `docs/design/` records the design
 contracts the roadmap is built on.
 
 ---

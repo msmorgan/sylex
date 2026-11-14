@@ -16,7 +16,7 @@
 //! lowering or engine bug that fails loudly and names the defect. A part of an
 //! instruction the rules make impossible to perform is ignored and does
 //! nothing ([CR#101.3]); a departed object is one case ([CR#608.2b]). See
-//! `docs/decisions/engine.md`, law 6; that law is the only thing
+//! `docs/design/engine.md`, law 6; that law is the only thing
 //! that licenses a silent no-op.
 //!
 //! **An unsupported Magic mechanic panics loudly.** When the input is a legal

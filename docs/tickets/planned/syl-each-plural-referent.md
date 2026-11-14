@@ -31,7 +31,7 @@ retypes the `each…` determiners and rewrites their callers' descriptions.
   `plugins/` is written to match; the landing lists the verbs changed.
 - Which referent each anaphor resolves to is not checkable until reference resolution exists in
   step 8; the landing shows the readings of the cards above for the owner to review.
-- `docs/decisions/semantics.md` states the rule.
+- `docs/design/semantics.md` states the rule.
 - Declaration order stays the printed order (`syl.md` §5).
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -39,4 +39,4 @@ retypes the `each…` determiners and rewrites their callers' descriptions.
 ## Pointers
 
 `plugins/builtin/templates/noun/eachPlayer.syl` and the `each…` determiners under
-`plugins/builtin/`, `docs/decisions/semantics.md` §2.4.
+`plugins/builtin/`, `docs/design/semantics.md` §2.4.

@@ -6,7 +6,7 @@ needs: []
 ## Why
 
 These comments state a restriction the equations do not implement, or state a corpus or style
-observation as a fact of English, which ADR §6 says is not by itself a gate's justification:
+observation as a fact of English, which english.md §6 says is not by itself a gate's justification:
 
 - `category RelativeTemporalNominal`: "a *when*-less adverbial relative, then at most a
   temporal bound, and no other postmodifier". `RelativeTime` takes `Nominal` (not
@@ -50,6 +50,6 @@ observation as a fact of English, which ADR §6 says is not by itself a gate's j
 ## Pointers
 
 - `crates/english/grammar/english.fug`: the declarations above, `RelativeTemporalLocation`.
-- `docs/decisions/english.md` §6.
+- `docs/design/english.md` §6.
 - Local evidence (gitignored): `docs/evidence/english-fug-hax-check/fable.md` (F10),
   `docs/evidence/english-fug-hax-check/gemini.md` (E3).

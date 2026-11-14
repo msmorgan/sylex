@@ -61,4 +61,4 @@ Written against the surface (`cleanup-step6-surface`).
   `plugins/builtin/rules/conferral/toxicPoison.syl`,
   `plugins/builtin/templates/quantity/totalToxicValue.syl`,
   `plugins/builtin/definitions/counter/p1p1Counter.syl`
-- `docs/decisions/syl.md` §2, `docs/decisions/semantics.md` §5, `docs/decisions/engine.md` law 5
+- `docs/design/syl.md` §2, `docs/design/semantics.md` §5, `docs/design/engine.md` law 5

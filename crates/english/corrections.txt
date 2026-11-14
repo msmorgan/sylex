@@ -3,7 +3,7 @@
 # an error in the text: the Oracle text disagrees with its printed card because
 # of a data error (a dropped character, a wrong symbol), or the Oracle text is
 # ungrammatical English. A template difference is never grounds for one
-# (`docs/decisions/english.md` §4). Records are separated by a blank line;
+# (`docs/design/english.md` §4). Records are separated by a blank line;
 # each has the four fields below, one line each. `oracle` occurs exactly once
 # in the face's text, and a correction that matches no face is stale and fails
 # `strata --check`.

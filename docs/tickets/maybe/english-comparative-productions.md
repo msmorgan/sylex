@@ -7,7 +7,7 @@ needs: []
 
 About twenty-five Productions write out comparatives cell by cell over {determiner, fused head,
 adverb, frequency Noun Phrase, Amount} × {with *than*, without} × {modified, unmodified} ×
-{count, mass}, the multiplication ADR §1 calls a defect. The copies have drifted:
+{count, mass}, the multiplication english.md §1 calls a defect. The copies have drifted:
 `ModifiedComparativeDeterminer` takes any `Lex(Determinative)` as its modifier (so *each more
 than two* as well as *no more than two*), while `DegreeModifiedComparativeDeterminer` takes
 `Word(No)` only; a modified variant exists for the determiner (`ModifiedComparativeDeterminer`),
@@ -56,6 +56,6 @@ without passing through `Unmodified` may still take the Amount (*total power les
   `MeasuredComparativeDetermined`, `MeasuredComparativeDeterminer`,
   `ComparativeQuantityCountDetermined`, `ComparativeQuantityMassDetermined`,
   `NumericNounPhrase`, `Unmodified`.
-- `docs/decisions/english.md` §1.
+- `docs/design/english.md` §1.
 - Local evidence (gitignored): `docs/evidence/english-fug-hax-check/fable.md` (F11),
   `docs/evidence/english-fug-hax-check/gemini.md` (A3).

@@ -5,7 +5,7 @@ needs: [lean-retirement, syl-argument-naming, syl-sort-prefixed-primitive-names,
 
 ## Why
 
-Read order is printed order (`docs/decisions/syl.md` §5): where a declaration's printed order
+Read order is printed order (`docs/design/syl.md` §5): where a declaration's printed order
 differs from its parameter order, the parameters are reordered to match. Several `.syl`
 declarations still differ, and `doIf` carries a `postposed: Bool` flag that says in a boolean what
 the printed order should say. Arguments are written in declaration order, and `cargo xtask dsl
@@ -60,7 +60,7 @@ this ticket reorders them.
 
 ## Pointers
 
-- `docs/decisions/syl.md` §5
+- `docs/design/syl.md` §5
 - `plugins/builtin/templates/ability/when.syl`, `whenever.syl`, `at.syl`,
   `plugins/builtin/templates/static/gatedBy.syl`,
   `plugins/builtin/primitives/static/staticSpecGatedBy.syl`,

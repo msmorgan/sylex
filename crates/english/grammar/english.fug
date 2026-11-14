@@ -3,7 +3,7 @@
 // Subcategorization Frame, comes from the lexical environment it is bound to.
 // Citations: `CGEL 15§3.6:1335` is The Cambridge Grammar of the English
 // Language, Ch. 15 §3.6, p. 1335; `OSG` is `docs/oracle-style-guide.md`;
-// `ADR` is `docs/decisions/english.md`.
+// `english.md` is `docs/design/english.md`.
 root Document
 
 // Whether a keyword phrase carries a Keyword Parameter (*protection from
@@ -119,19 +119,19 @@ feature Countability = Count | Mass
 // `Linking`: a connective initial in its Linked Conjunct. `Multiplying`: a
 // multiplier (*twice the damage*), also a frequency adverb (*draw a card
 // twice*); it modifies a Noun Phrase or measure, never a Preposition Phrase
-// or temporal Noun Phrase (one tree, ADR §8).
+// or temporal Noun Phrase (one tree, english.md §8).
 feature AdjunctPosition = Front | Central | End | Phrasal | Multiplying | Bounding | Linking
 // A Clause whose front position holds a comma-set dependent (*If you do,
 // ...*). Dependents sharing one comma are siblings in one Production (*Then
 // if ...*), so a comma-less front Adverb Phrase never also precedes such a
-// Clause (ADR §8). A coordination takes it from its first conjunct:
+// Clause (english.md §8). A coordination takes it from its first conjunct:
 // dependents sharing one comma are siblings whether they scope over that
 // conjunct or the whole (*Once each turn, C1, and C2*), never split between
 // the two.
 feature FrontPosition = Occupied
 // A Verb Phrase that begins with a central Adjunct (*also gains trample*).
 // Before a bare imperative the adverb is the Clause's front Adjunct, never
-// also this (ADR §8). A coordination begins where its first conjunct does.
+// also this (english.md §8). A coordination begins where its first conjunct does.
 feature CentralPosition = Occupied
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
@@ -176,7 +176,7 @@ category Name [Number]
 // ... from among Disenchant, ..., and Black Lotus*), and as the complement of
 // *into* after *meld* (*meld them into Brisela, Voice of Nightmares*). Only
 // these admit another card's name, through `OtherCardName()`
-// (`docs/decisions/lexicon.md` §6).
+// (`docs/design/lexicon.md` §6).
 category NameComplement
 category Condition
 category Measure
@@ -208,7 +208,7 @@ category SubjectGapClause : Clause [Number, Person, VerbForm, Inflection] { gap 
 // A finite clause with an extracted Adjunct.
 category AdjunctGapClause : Clause [VerbForm] { gap }
 // A finite clause that opens with its Subject, as a bare relative's must
-// (CGEL 12§3.5.5:1055). An admission gate (ADR §6): it restates the Clause
+// (CGEL 12§3.5.5:1055). An admission gate (english.md §6): it restates the Clause
 // Productions that open with the Subject, which keeps *each turn, those coins
 // come up heads* from an adverbial relative of *The first time you flip one
 // or more coins* (Edgar, King of Figaro).
@@ -285,7 +285,7 @@ category ModifiedQuantifiedNominal : Nominal [
     QuantityNumber, NounKind, Determination, NounDistribution,
 ]
 // A temporal nominal bounded by a relative clause (*next time you cast a
-// spell*). An admission gate (ADR §6): RelativeTime and
+// spell*). An admission gate (english.md §6): RelativeTime and
 // RelativeTimePostmodifier restate NominalPostmodifier and
 // TemporalPostmodifier, so it takes a *when*-less adverbial relative, then
 // only temporal bounds. What it gates is the relative it requires: without
@@ -317,7 +317,7 @@ category TargetedNounPhrase : NounPhrase [Number, NounKind, Countability]
 category BareNominalComplement : Nominal
 // A genitive's possessor, never postmodified: Oracle fronts the player noun
 // "to avoid a dangling possessive" (OSG §6, Controller and owner). An
-// admission gate (ADR §6): it restates the Noun Phrase Productions over
+// admission gate (english.md §6): it restates the Noun Phrase Productions over
 // BareNominal, which keeps *[the top card of target player]'s library* from
 // a possessor (Merfolk Observer).
 category Possessor : NounPhrase [Number, Person, Case]
@@ -446,12 +446,12 @@ category Adverbial { function }
 // The Adjunct function before a selected Complement or shifted Object.
 category Interleaved [PastTime, NonPastTime] { function }
 // The Adjunct function before a passive's Internalised Complement only, the
-// *by* phrase (CGEL 4§3.2.1:241); an admission gate (ADR §6), see
+// *by* phrase (CGEL 4§3.2.1:241); an admission gate (english.md §6), see
 // InterleavedManner.
 category InternalisedInterleaved { function }
 // The Adjunct function in central position between *be* or a copula and
 // its Complement (*is still on top of your library*, *become no longer
-// suspected*; ADR §3).
+// suspected*; english.md §3).
 category CentralAdjunct { function }
 // A relative clause before the Complement its noun selects (*Equip
 // abilities [you activate] [of other Equipment]*; CGEL 5§15:454).
@@ -705,7 +705,7 @@ slot QuotedAbility = QuotedAbility
 slot Mention = Mention
 
 // A distributive adjunct (*for each …*) anchors to the outermost eligible
-// clause, as a comma-set Supplement does (ADR §5, AttachmentClass).
+// clause, as a comma-set Supplement does (english.md §5, AttachmentClass).
 high_attachment PrepositionPhrase where $.DeterminativeDistribution = Distributive
 
 TextMode: Document -> Mode
@@ -938,7 +938,7 @@ SingularNominalQuality: Quality -> Nominal
 NominalPhraseQuality: Quality -> NounPhrase
 // Only a lexicon-declared Quality head (*protection from multicolored*;
 // *protection from snow*, [CR#205.4a]). Never a color word, whose noun
-// conversion is the Quality (*protection from red*; one tree, ADR §8).
+// conversion is the Quality (*protection from red*; one tree, english.md §8).
 AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
 NamedParameter: Name -> Lex(Catalog)
 NameAsComplement: NameComplement -> Name { cost: 0 }
@@ -1236,7 +1236,7 @@ SymbolPremodifier: BareNominal -> modifier:Symbols BareNominal
 // +2/+2*); bare, it is a MeasureNounPhrase. A fused first base (*a 3/3*
 // [creature]), so never a non-final Conjunct of a Nominal Coordination:
 // there it is a Word-Part Coordination's base (*a +2/+0, +1/+1, or +0/+2
-// counter*; ADR §8).
+// counter*; english.md §8).
 MeasureNominal: BareNominal -> Measure
     where $.CompoundPart = Base,
           $.Determination = Overt,
@@ -1317,7 +1317,7 @@ DepictiveAdjunct: PredicateAdjunct -> filler:AdjectivePhrase
 // A trailing Preposition Phrase Adjunct scopes over every conjunct of a
 // Clause coordination (*[untap target creature and gain control of it]
 // until end of turn*; CGEL 15§1.3.4:1285–1286). Never the Verb Phrase
-// coordination's: the Imperative heads none (ADR §8).
+// coordination's: the Imperative heads none (english.md §8).
 CoordinatedClauseAdjunct: Clause -> Clause adjunct:Hosted(PrepositionPhrase, Predicate) {
     coordinated: [head],
 }
@@ -1533,7 +1533,7 @@ PreposedTemporalAdjunct: Clause -> adjunct:TemporalNounPhrase ',' Clause { trans
 // Complement: a Clause Complement keeps the temporal inside it (*When you
 // next cast a spell this turn, ...*; [CR#603.1]). A temporal that can
 // belong inside the phrase (*At the beginning of each combat this turn,
-// ...*) ranks first there ([CR#603.1,603.7]; Attachment Class, ADR §5).
+// ...*) ranks first there ([CR#603.1,603.7]; Attachment Class, english.md §5).
 PreposedPrepositionAndTemporal: Clause ->
     adjunct:Hosted(PrepositionPhrase, Predicate) adjunct:TemporalNounPhrase ',' Clause {
     cost: 2,
@@ -1547,7 +1547,7 @@ PreposedPrepositionAndTemporal: Clause ->
 // Complement keeps what follows it inside it (*If tapped for mana, ...*). A
 // phrase that can belong inside the first ranks first there (*at the
 // beginning of combat on your turn*): the second of two preposed dependents
-// violates an Attachment Class (ADR §5).
+// violates an Attachment Class (english.md §5).
 PreposedPrepositionPair: Clause ->
     adjunct:Hosted(PrepositionPhrase, Predicate) adjunct:Hosted(PrepositionPhrase, Predicate) ','
     Clause { cost: 2, transparent: [head] }
@@ -1582,7 +1582,7 @@ CardinalMassPremodifier: QuantifiedNominal -> modifier:Numeral(Cardinal) BareNom
           head.NounDistribution = DirectMeasure
 ModifiedQuantity: ModifiedQuantifiedNominal -> modifier:AdjectivePhrase QuantifiedNominal
 // Free-choice *any* with a cardinal is the determinative phrase *any one*
-// (SingularQuantifier), so excluding `FreeChoice` is a gate (ADR §6, §8):
+// (SingularQuantifier), so excluding `FreeChoice` is a gate (english.md §6, §8):
 // without it *add three mana of any one color* (Lotus Vale) is also *any
 // [one color]*, a second tree of FreeChoiceDetermined's. A multiplier with a
 // number is MultipliedNumber's (*[half X] damage*, Banshee), never *half
@@ -1612,7 +1612,7 @@ DistributiveQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNomina
 // with *further* or *additional* (*an additional two creatures*; CGEL
 // 5§3.4:353). The determiner carries Singular: a number-neutral one (*the*)
 // or a plural one is AgreeingModifiedQuantity's. A distributive one
-// is DistributiveModifiedQuantity's, and an admission gate (ADR §6) keeps it
+// is DistributiveModifiedQuantity's, and an admission gate (english.md §6) keeps it
 // out: without it *each five counters removed this way* (Sage of Hours) and
 // *every five creature types among ...* (Sarek, Federation Ambassador) are
 // also a DeterminedModifiedQuantity duplicate of their
@@ -2355,7 +2355,7 @@ AdjectivalAttribute: Attribute -> filler:AdjectivePhrase
 // (OSG §6, Determiners and modifier order). Any other comma is a serial
 // coordination's (*a Swamp, Mountain, black permanent, or red permanent*).
 // The `Polarity := Negative` carries here and in AttributeSequence and
-// FinalAttribute are one admission gate (ADR §6), with no effect apart: they
+// FinalAttribute are one admission gate (english.md §6), with no effect apart: they
 // keep *Plains* from an asyndetic premodifier before the coordination
 // *Island, Swamp, or Mountain* (*a Plains, Island, Swamp, or Mountain card*,
 // Farseek).
@@ -2381,7 +2381,7 @@ BarePrepositionalNominal: BareNominalComplement -> PrepositionalNominal
 // definite (13§6.3.4:1169); Oracle's *tied for* drops it. The head carries
 // Count itself: a noun that is also non-count drops the article as a bare
 // non-count Noun Phrase (BareMass; *(the) greatest need*, 13§6.3.4:1168),
-// the same analysis (*tied for greatest power*, Desecrator Hag; ADR §8).
+// the same analysis (*tied for greatest power*, Desecrator Hag; english.md §8).
 SuperlativeBareNominal: BareNominalComplement -> modifier:AdjectivePhrase BareNominal
     where modifier.Grade := Superlative,
           modifier.ComplementKind = Intransitive,
@@ -2404,7 +2404,7 @@ SuperlativeFusedHead: BareNominalComplement -> AdjectivePhrase
           head.AdjectivePosition != Predicative
 // A bare Noun Phrase is never a coordination of Nominals (BarePlural too):
 // the Noun Phrases coordinate (*creatures and lands*), Nominals only under
-// something shared (*all [creatures and lands]*; ADR §8).
+// something shared (*all [creatures and lands]*; english.md §8).
 BareMass: NounPhrase -> Nominal { transparent: [head], uncoordinated: [head] }
     where $.Determination = Bare,
           $.Case = Plain,
@@ -2424,7 +2424,7 @@ ProperName: NounPhrase -> Name
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-// Excluding `FreeChoice` is an admission gate (ADR §6): it keeps *any number
+// Excluding `FreeChoice` is an admission gate (english.md §6): it keeps *any number
 // of Ally cards* (Munda, Ambush Leader) from a second tree with the singular
 // head *number* beside TransparentQuantity's.
 Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [head] }
@@ -2967,7 +2967,7 @@ PostposedRelative: VerbPhrase ->
           object.Number = modifier.Number
 // A bare relative postposed past *at random* (*choose a creature at random
 // this Aura can enchant*, Infectious Rage; Volatile Chimera).
-// `adjunct.ComplementKind = AdjP`: an admission gate (ADR §6) against a
+// `adjunct.ComplementKind = AdjP`: an admission gate (english.md §6) against a
 // relative postposed onto the Object past any other Preposition Phrase
 // (*Draw a card for each Human [you control]*, Mass Appeal).
 PostposedBareRelative: VerbPhrase ->
@@ -3104,7 +3104,7 @@ parameters KeywordParameters {
 parameters BoundKeyword { head: Keyword, binding: Suffix }
 // `passive`: *by* plus the active's Subject; a *by* gerund is a means
 // Adjunct. An amount after *by* is also an extent (*reduced by {2}*): both
-// Readings stand, and semantics rejects the agent one (ADR §4). An
+// Readings stand, and semantics rejects the agent one (english.md §4). An
 // auxiliary has no prepositional or adjectival passive, nor has a verb with
 // a declared Adjectival Passive (*tapped*) an adjectival one; an Adjectival
 // Passive is predicative. A shifted heavy Object is determined (*chooses
@@ -3146,7 +3146,7 @@ valence VerbPhrase {
     remnants: [Pred -> PredicativeRemnant],
 }
 // A Noun Phrase Complement alone is a later Adjunct Cluster's remnant.
-// `closed_complement`: an admission gate (ADR §6) against spurious Right
+// `closed_complement`: an admission gate (english.md §6) against spurious Right
 // Node Raising out of a Complement (*less than [void counters on it] or
 // equal to the number of [void counters on it]*, Sphere of Annihilation);
 // only a stranded preposition's own Gap passes up.
@@ -3233,7 +3233,7 @@ adjunct AdjectivePhrase { host: NounPremodifierConjunct, side: Before, host_kind
           modifier.AdjectivePosition != Predicative
 // A Preposition Phrase Adjunct costs the same on every host: Right
 // Association in the Ranking Key, not a Production Cost, picks the host
-// (ADR §5).
+// (english.md §5).
 adjunct PrepositionPhrase { host: QuantifiedNominal, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: LocativeHead, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: PartitiveHead, side: After, host_kind: Nominal }
@@ -3253,7 +3253,7 @@ adjunct AdverbPhrase { host: Clause, side: Before, host_kind: Predicate, cost: 2
 // An intransitive Preposition Phrase preposed without a comma (*If this
 // spell was kicked, instead that creature gets ...*; OSG §13, Would and
 // instead). Like a comma-fronted dependent it attaches outermost, outside a
-// comma-set post-dependent (ADR §8).
+// comma-set post-dependent (english.md §8).
 adjunct PrepositionPhrase { host: Clause, side: Before, host_kind: Predicate }
     where adjunct.ComplementKind = Intransitive
 // A comma-set post-adjunct (*, except it has flying*) or Supplement (*,
@@ -3282,7 +3282,7 @@ adjunct PrepositionPhrase {
     nonfinal,
 }
 // A comma-set Supplement to a keyword line's item or an indexed
-// instruction, never to a Keyword Phrase in a sentence (ADR §2).
+// instruction, never to a Keyword Phrase in a sentence (english.md §2).
 adjunct PrepositionPhrase {
     host: KeywordLineItem,
     side: After,
@@ -3512,7 +3512,7 @@ coordination NounPhrase {
 // *And/or*: plural with a plural last conjunct, either Number with a
 // singular one (*you and/or at least one permanent you control becomes*).
 // A last conjunct with no Number (a card name) is the next schema's alone,
-// which leaves Number open: one tree per analysis (ADR §8).
+// which leaves Number open: one tree per analysis (english.md §8).
 coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
@@ -3530,7 +3530,7 @@ coordination NounPhrase {
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           last.Number = Singular
-// An admission gate (ADR §6): a Numeric Noun Phrase is no first conjunct,
+// An admission gate (english.md §6): a Numeric Noun Phrase is no first conjunct,
 // which keeps *lost [3] or [more life]* from a Noun Phrase coordination
 // (Davros, Dalek Creator); numbers alone are an Amount coordination.
 // `raising_delimiter`: commas may set off the final coordinate of Right
@@ -3576,7 +3576,7 @@ coordination RelativeClause { coordinators: Coordinator } where last.ClauseMarki
 coordination RelativeClause { coordinators: But }
 // *Any time [you could mulligan and this card is in your hand]*. Its own
 // Category, so RelativeAdjunctGap states the Gap once per conjunct and
-// never over the coordination (ADR §8).
+// never over the coordination (english.md §8).
 coordination SubjectInitialCoordination {
     coordinators: Coordinator,
     unshared: [Inflection],
@@ -3721,7 +3721,7 @@ coordination DeterminerPhrase {
     where first.DeterminativeDistribution != Targeting,
           last.DeterminativeDistribution != Targeting
 // Numbers alone are an Amount coordination (*X is 2 or 3*), never also
-// a fused quantity over them (ADR §8).
+// a fused quantity over them (english.md §8).
 coordination FusedQuantity {
     coordinators: Disjunctive,
     proximate: [Number, Countability, NounKind],

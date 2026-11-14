@@ -28,7 +28,7 @@ every one starts with `A–Z` or `0–9`.
 
 - A set name cited before *expansion* is an open lexical string read from the text by orthographic
   title shape in `sylex_lexicon`, with no card-name refusal and no lookahead for English words
-  (`docs/decisions/lexicon.md` §2). Because *expansion* is lowercase and no set name contains it, a
+  (`docs/design/lexicon.md` §2). Because *expansion* is lowercase and no set name contains it, a
   title run — space-separated tokens starting and ending on an `A–Z`/`0–9` token (allowing `:`, `'`,
   `-`, `.`, `,`, `/`) with internal connectors (`of`, `the`, `to`, `in`, `for`, `into`, `at`,
   `over`, `and`, `a`, `vs.`, `&`, `/`, `×`) — stops before `" expansion"` across all 121 `expansion`
@@ -36,7 +36,7 @@ every one starts with `A–Z` or `0–9`.
   parentheses reminder-text removal strips in `lexicon.md` §1).
 - `english.fug` admits that open leaf only in a dedicated expansion-citation production modifying
   `ClosedWord(Expansion)` rather than general `NamePremodifier`, so it never stands in `Name`
-  positions and builds no second tree (`docs/decisions/english.md` §8) where a card's own name
+  positions and builds no second tree (`docs/design/english.md` §8) where a card's own name
   matches the set name.
 - `cited_names.ron`, `Sources::cited_names` and the `cited_name:` loader path are deleted.
   `ScopedName` stays for `vote_options.ron`.
@@ -67,7 +67,7 @@ every one starts with `A–Z` or `0–9`.
   prepositions (*Adventures in the Forgotten Realms*, *Shadows over Innistrad*), digits and commas
   (*Warhammer 40,000 Commander*, *30th Anniversary Edition*), and admission's refusal of the open
   leaf off *expansion*.
-- `docs/decisions/lexicon.md` §2 (open lexical slots, beside Flavor Word [CR#207.2d]),
+- `docs/design/lexicon.md` §2 (open lexical slots, beside Flavor Word [CR#207.2d]),
   `docs/contexts/oracle-english/CONTEXT.md` (Proper Name dropping `"a cited name"`, Flavor Word no
   longer `"the one open lexical slot"`) and `docs/tickets/planned/catalogs-into-plugins.md`
   (dropping `cited_names.ron` and its open bullet on a set-name Catalog) state the design.
@@ -92,7 +92,7 @@ every one starts with `A–Z` or `0–9`.
   `crates/syntax/src/alternatives.rs`.
 - `crates/english/grammar/english.fug` (`NamePremodifier`), `crates/english/src/profile.rs`,
   `crates/english/judgments/mentions_and_votes.txt`.
-- `data/mtgjson/SetList.json`, `docs/decisions/lexicon.md` §2, `docs/decisions/english.md` §7–8,
+- `data/mtgjson/SetList.json`, `docs/design/lexicon.md` §2, `docs/design/english.md` §7–8,
   `docs/contexts/oracle-english/CONTEXT.md`,
   `docs/tickets/planned/syl-name-originally-printed-in.md`,
   `docs/tickets/planned/catalogs-into-plugins.md`.

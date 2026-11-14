@@ -48,4 +48,4 @@ Written against the spine (`cleanup-step6-spine`).
 `groupSize.syl`, `theDifference.syl`, `chosenNumber.syl`;
 `plugins/builtin/templates/quantity/preventedThisWay.syl`, `removedThisWay.syl`,
 `shortOfCeiling.syl`; `plugins/canon/cards/Woodland Champion.syl`, `Divine Visitation.syl`,
-`Sandstone Oracle.syl`; `docs/decisions/semantics.md` §1 (item 5(b)), §2.4.
+`Sandstone Oracle.syl`; `docs/design/semantics.md` §1 (item 5(b)), §2.4.

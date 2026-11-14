@@ -52,4 +52,4 @@ Written against the surface (`cleanup-step6-surface`).
 ## Pointers
 
 `plugins/builtin/definitions/counter/` (`flyingCounter.syl` and `p1p1Counter.syl` for the form),
-`docs/specs/confers-and-rules.md`, `docs/decisions/semantics.md` §1 item 4.
+`docs/specs/confers-and-rules.md`, `docs/design/semantics.md` §1 item 4.

@@ -1234,7 +1234,7 @@ impl GameState {
             // second card each turn") count events that can't co-occur,
             // because draws are individual [CR#121.2], so an ordinal within
             // one simultaneous batch is unreachable. It must not be relied
-            // on (`docs/decisions/engine.md` law 7).
+            // on (`docs/design/engine.md` law 7).
             EventFilter::Nth { n, of, within } => {
                 if !self.eval(of, fact, lane, bindings) {
                     return false;

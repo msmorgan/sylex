@@ -10,7 +10,7 @@ needs: []
 `objects`, `stack`, `turn`, `combat`, `rng`, `agenda`, `shields`, `history` and the rest) are
 `pub`. Any consumer crate can write `state.zones` or `state.stack` directly and bypass the
 zone-change pipeline (last known information, replacement shields, trigger noting, state-based
-action scheduling). [Engine](../../decisions/engine.md) law 2 gives consumers policy, never state
+action scheduling). [Engine](../../design/engine.md) law 2 gives consumers policy, never state
 transitions, and today nothing enforces it. A rough grep finds about 80 field accesses in
 `crates/tui` and `crates/matchups` and about 1200 in `crates/engine/tests`.
 

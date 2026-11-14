@@ -24,7 +24,7 @@ primitive quantifies over `card_type` declarations.
 - How the field is read. `cargo xtask dsl check` reads only a catalog field's sort, never its
   value (`crates/xtask/src/dsl_check/schema.rs` declares `required("permanentType", "Bool")`, and
   no check reads a field value), and expansion substitutes Templates and wraps Definitions but
-  computes nothing (`docs/decisions/syl.md` §4). The precedent is `hasSubtypesOf(token)`, an
+  computes nothing (`docs/design/syl.md` §4). The precedent is `hasSubtypesOf(token)`, an
   opaque primitive whose meaning reads a declaration's field after loading. Options: (a) the
   primitive stays opaque in `.syl` and the reading of the loaded catalog gives its meaning, so
   `dsl check` needs nothing new; (b) expansion rewrites it into the `or` of the flagged types,
@@ -42,4 +42,4 @@ primitive quantifies over `card_type` declarations.
 
 `plugins/builtin/templates/predicate/{isPermanentType,isPermanentCard}.syl`,
 `plugins/builtin/definitions/card_type/`, `plugins/builtin/primitives/predicate/{hasType,hasSubtypesOf}.syl`,
-`crates/xtask/src/dsl_check/schema.rs`, `docs/decisions/syl.md` §4.
+`crates/xtask/src/dsl_check/schema.rs`, `docs/design/syl.md` §4.

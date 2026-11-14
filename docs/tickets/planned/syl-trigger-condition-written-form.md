@@ -6,7 +6,7 @@ needs: [cleanup-step6-spine]
 
 ## Why
 
-One printed text has one written form (`docs/decisions/spelling.md` §4): a one-condition trigger
+One printed text has one written form (`docs/design/spelling.md` §4): a one-condition trigger
 is the Ability `when`, `whenever` or `at`, and `triggered` is written only over a disjunction of
 trigger conditions. `cargo xtask dsl check` resolves the other forms too:
 `triggered(when(e), action = a)` beside `when(e, a)`, an `and` at `TriggerCondition` (or the
@@ -31,6 +31,6 @@ nothing keeps the corpus on the one form.
 
 ## Pointers
 
-`docs/decisions/spelling.md` §4, `crates/xtask/src/dsl_check.rs`,
+`docs/design/spelling.md` §4, `crates/xtask/src/dsl_check.rs`,
 `plugins/builtin/primitives/ability/triggered.syl`, `plugins/builtin/primitives/triggerCondition/`,
 `plugins/builtin/templates/triggerCondition/`.

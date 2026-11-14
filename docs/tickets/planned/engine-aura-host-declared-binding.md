@@ -9,7 +9,7 @@ An Aura spell's target is defined by its enchant ability [CR#303.4a], and on res
 attached to what it was targeting [CR#608.3c]. Spell resolution instead attaches it to
 `entry.targets.first()`'s single member whenever `enters_attached_self` recognizes the card's
 self-attach replacement. That instruction reads outside its operands
-([Engine](../../decisions/engine.md) law 3): a targeted permanent spell whose enchant target is
+([Engine](../../design/engine.md) law 3): a targeted permanent spell whose enchant target is
 not slot 0, or whose slot 0 holds several objects, attaches to the wrong object.
 
 ## Done when

@@ -21,7 +21,7 @@ layer 3 [CR#613.1c] or an index collision misrenders a card.
   it.
 - Refs are the only route from a core value back to its prose: there is no value-keyed index
   fallback, which would be the reverse map from core that
-  [architecture](../../decisions/architecture.md) "Two-way above, one-way below" rejects. A value
+  [architecture](../../design/architecture.md) "Two-way above, one-way below" rejects. A value
   with no authored source fails visibly and never invents prose.
 
 ## Done when

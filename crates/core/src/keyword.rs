@@ -1,7 +1,7 @@
 //! The native keyword abilities ([CR#702]) the engine implements directly:
 //! a closed enum the combat code pattern-matches on, rather than plugin macros.
 //! What a keyword ability is and how one is defined are
-//! `docs/decisions/semantics.md` §3 and the Primitive Keyword Ability entry of
+//! `docs/design/semantics.md` §3 and the Primitive Keyword Ability entry of
 //! `docs/contexts/game-model/CONTEXT.md`.
 //! Per the keyword classification (primitive / composite / composite-given;
 //! never *intrinsic*, a name [CR#305.6] already owns), the

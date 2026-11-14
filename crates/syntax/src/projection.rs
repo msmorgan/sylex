@@ -1,6 +1,6 @@
 //! The lexicon feature-bundle mapping table: the one declared
 //! lexicon-to-syntax interface, and the only place the engine names a grammar
-//! feature or value (`docs/decisions/english.md` §1).
+//! feature or value (`docs/design/english.md` §1).
 //!
 //! Binding resolves it against the grammar's feature domains once
 //! ([`Projection`]): every licensed lexical value's leaf features are

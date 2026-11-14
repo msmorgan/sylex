@@ -33,11 +33,11 @@ Written against the surface (`cleanup-step6-surface`).
 - Every unread parameter in `plugins/` is read, or removed with its arguments at every call site;
   the landing lists each one and which it was.
 - Declaration order stays the printed order (`syl.md` §5).
-- `docs/decisions/syl.md` states the rule.
+- `docs/design/syl.md` states the rule.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers
 
 - `crates/xtask/src/dsl_check.rs` (`Resolver::body`), `crates/xtask/src/dsl_check/schema.rs`
   (the declaration kinds)
-- `docs/decisions/syl.md` §1 and §2
+- `docs/design/syl.md` §1 and §2

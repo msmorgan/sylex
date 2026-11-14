@@ -29,4 +29,4 @@ still load cards through it, and engine tests and examples load `v1/plugins/buil
 ## Pointers
 
 `v1/`, the workspace `Cargo.toml`, `crates/{card,engine,matchups,tui,xtask}/Cargo.toml`,
-`crates/engine/build.rs`, `.github/workflows/ci.yml`, `docs/decisions/architecture.md`.
+`crates/engine/build.rs`, `.github/workflows/ci.yml`, `docs/design/architecture.md`.

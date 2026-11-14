@@ -1383,7 +1383,7 @@ impl<'a> Binder<'a> {
     /// Complement of its own Category, the participial Verb Phrase Complement
     /// of perfect *have* or of passive or progressive *be*, never a modal's
     /// bare infinitival. It hosts no post-verbal Adjunct
-    /// (`docs/decisions/english.md` §8).
+    /// (`docs/design/english.md` §8).
     fn auxiliaries(&mut self) -> Result<(), LoadError> {
         let mut complements = BTreeMap::new();
         for (name, declaration) in &self.grammar.categories {
@@ -1938,7 +1938,7 @@ impl<'a> Binder<'a> {
     }
 
     /// Reports, as findings, a declared feature with no value and a feature
-    /// value with fewer than two holders (`docs/decisions/lexicon.md` §4,
+    /// value with fewer than two holders (`docs/design/lexicon.md` §4,
     /// `english.md` §3). A feature may declare one value, a
     /// privative one, whose unvalued feature is the unmarked default; the
     /// value is still a finding unless it has two or more holders. A

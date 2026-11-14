@@ -32,5 +32,5 @@ consequent introduces:
 
 ## Pointers
 
-`docs/decisions/semantics.md` §2.2; `plugins/canon/cards/Guardian Beast.syl` (the export rule's
+`docs/design/semantics.md` §2.2; `plugins/canon/cards/Guardian Beast.syl` (the export rule's
 one user).

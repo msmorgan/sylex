@@ -6,7 +6,7 @@ needs: [v1-retirement, plural-name-flag]
 ## Why
 
 Every game word is a `.syl` declaration under `plugins/`, its `lexical` field beside its spelling
-and meaning (`docs/decisions/lexicon.md` §3). The Catalogs still live in
+and meaning (`docs/design/lexicon.md` §3). The Catalogs still live in
 `crates/vocabulary/catalogs/*.ron`. Some are declared twice: card types, subtypes, counters,
 designations, keyword abilities and keyword actions also have `plugins/builtin/definitions/`
 declarations, so `ageCounter.syl` and the `age` entry of `counters.ron` both declare the age
@@ -37,5 +37,5 @@ field (*Khans* is `khans.syl`, of the AnchorWord sort). Undecided:
 
 - `crates/vocabulary/catalogs/` and `crates/vocabulary/src/schema.rs`
 - `plugins/builtin/definitions/` (the existing `lexical` blocks)
-- `docs/decisions/lexicon.md` §3, `docs/decisions/syl.md` §1
+- `docs/design/lexicon.md` §3, `docs/design/syl.md` §1
 - `docs/contexts/oracle-english/CONTEXT.md` (Catalog, Provenance)

@@ -7,7 +7,7 @@ needs: [cleanup-step6-surface]
 ## Why
 
 A phrase that coordinated clauses share is printed once, and the term writes it once
-(`docs/decisions/spelling.md`, on shared material at a coordination). The corpus writes it three other ways. *Arrest* copies it:
+(`docs/design/spelling.md`, on shared material at a coordination). The corpus writes it three other ways. *Arrest* copies it:
 `cant(actor(enchanted(creature)), attack)` and `cant(actor(enchanted(creature)), block)` for
 "can't attack or block". *Aether Tunnel* re-mentions it with an anaphor the card does not
 print: `cant(any, block(it))` for "gets +1/+0 and can't be blocked". *Aim High* takes it as
@@ -17,7 +17,7 @@ print: `cant(any, block(it))` for "gets +1/+0 and can't be blocked". *Aim High* 
 introduces it again, so *Predator's Strike* would get two targets and *Powerstone Minefield* a
 creature per arm; neither card can be written correctly today.
 
-`docs/decisions/semantics.md` contradicts `spelling.md`'s shared material at a coordination twice. §4.6 writes "attacks or
+`docs/design/semantics.md` contradicts `spelling.md`'s shared material at a coordination twice. §4.6 writes "attacks or
 blocks" as `or([does(actor(x), attack), does(actor(x), block)])`, each arm a whole event with its
 own subject, and says "An `or` over Actions would be a compound action, which the gate refuses";
 `spelling.md` writes it as one `does` over an `or` of the Actions. And §4.2 makes "becomes
@@ -47,14 +47,14 @@ so the `subject(np)` name has landed.
 - Where the shared phrase has the same role in every arm, the coordinated Actions stand under
   one Subject. An alternative event whose arms share their Subject is one `does` over an `or`
   of Actions ("Whenever a creature attacks or blocks"), and the event gate admits that `or` when
-  every arm is an event-capable head (`docs/decisions/semantics.md` §4.6, which this ticket
+  every arm is an event-capable head (`docs/design/semantics.md` §4.6, which this ticket
   updates). A Handoff, a deontic rule and the declaration that gives a continuous effect its
   subject (`syl-continuous-effect-subject`) take coordinated phrases the same way ("that player
   copies it and may choose new targets", "can't attack or block", "Target creature gets +3/+3
   and gains trample").
 - Where the roles differ, the coordination's declaration takes the shared phrase as a parameter
   and each arm holds a placeholder word where the phrase belongs. The parameter is the binding
-  (`docs/decisions/syl.md` §4). Spelling prints the phrase where the first arm's placeholder
+  (`docs/design/syl.md` §4). Spelling prints the phrase where the first arm's placeholder
   stands.
 - No arm holds a copy of the shared phrase or an anaphor the card does not print.
 - `becomeBlocked` and `resolve` take no subject parameter and read the context's Subject as `die`
@@ -102,7 +102,7 @@ so the `subject(np)` name has landed.
 
 ## Done when
 
-- `docs/decisions/semantics.md` agrees with `spelling.md` on shared material at a coordination: §4.6 writes "attacks or blocks"
+- `docs/design/semantics.md` agrees with `spelling.md` on shared material at a coordination: §4.6 writes "attacks or blocks"
   as one `does` over an `or` of Actions, no longer says the gate refuses an `or` over Actions, and
   states that the event gate admits such an `or` when every arm is an event-capable head (a
   Deed's Action or a keyword-action Definition matched by its Deed) and refuses it otherwise.
@@ -135,7 +135,7 @@ so the `subject(np)` name has landed.
 
 ## Pointers
 
-`docs/decisions/spelling.md` (shared material at a coordination); `docs/decisions/semantics.md` §4.1, §4.2, §4.6;
+`docs/design/spelling.md` (shared material at a coordination); `docs/design/semantics.md` §4.1, §4.2, §4.6;
 `plugins/builtin/primitives/event/or.syl`, `plugins/builtin/templates/action/establishFor.syl`,
 `plugins/builtin/definitions/keyword_ability/{bushido,afflict,rampage,buyback,haunt,rebound}.syl`,
 `plugins/builtin/templates/action/{die,becomeBlocked}.syl`,

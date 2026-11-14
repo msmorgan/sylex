@@ -6,9 +6,9 @@ needs: []
 
 ## Why
 
-`docs/decisions/lexicon.md` §3 gives a Lexeme's Provenance three kinds: Core (ordinary
+`docs/design/lexicon.md` §3 gives a Lexeme's Provenance three kinds: Core (ordinary
 English declared in `sylex_vocabulary`), Catalog (game vocabulary) and Symbol (notation symbols).
-The Catalog constraint (`docs/decisions/english.md` §2) needs only the line between ordinary
+The Catalog constraint (`docs/design/english.md` §2) needs only the line between ordinary
 English and game vocabulary. `SourceKind` in `crates/lexicon/src/model.rs` still has five kinds
 (`Core`, `Plugin`, `Catalog`, `Keyword`, `Symbol`), so the code draws distinctions the design does
 not have.
@@ -25,5 +25,5 @@ not have.
 
 ## Pointers
 
-`crates/lexicon/src/model.rs` (`SourceKind`), `docs/decisions/lexicon.md` §3, the
+`crates/lexicon/src/model.rs` (`SourceKind`), `docs/design/lexicon.md` §3, the
 Provenance entry in `docs/contexts/oracle-english/CONTEXT.md`.

@@ -25,4 +25,4 @@ policing") rules out:
 
 `crates/english/judgments/floated_each_quantifier.txt`,
 `crates/english/judgments/notation_coordination.txt`, `crates/english/grammar/english.fug`,
-`crates/english/README.md` ("Working rules"), `docs/decisions/english.md` §3, §6.
+`crates/english/README.md` ("Working rules"), `docs/design/english.md` §3, §6.

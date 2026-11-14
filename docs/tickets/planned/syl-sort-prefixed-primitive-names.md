@@ -31,4 +31,4 @@ argument), and lands first.
 ## Pointers
 
 `plugins/builtin/primitives/{action,determiner,quantity,timing,condition}/`,
-`docs/decisions/syl.md` §1 and §3.
+`docs/design/syl.md` §1 and §3.

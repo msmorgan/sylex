@@ -5,7 +5,7 @@
 //! property tests are rewritten against that target: their content is what
 //! lasts, not this code.
 //!
-//! It is expansion-lite (`docs/decisions/syl.md` §4). It reads what
+//! It is expansion-lite (`docs/design/syl.md` §4). It reads what
 //! [`crate::dsl_check`]'s resolver resolved and substitutes each Template and
 //! Definition call by its body with the arguments in place, fills declared
 //! defaults and applies coercions. It keeps one kind of boundary: a

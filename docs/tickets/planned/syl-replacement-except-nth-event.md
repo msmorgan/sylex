@@ -26,4 +26,4 @@ Written against the surface (`cleanup-step6-surface`).
 ## Pointers
 
 `plugins/builtin/primitives/would/nthOccurrence.syl`,
-`plugins/builtin/primitives/event/nthOccurrence.syl`, `docs/decisions/semantics.md` §4.5.
+`plugins/builtin/primitives/event/nthOccurrence.syl`, `docs/design/semantics.md` §4.5.

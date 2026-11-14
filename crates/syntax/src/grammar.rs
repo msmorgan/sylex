@@ -45,7 +45,7 @@ pub struct Grammar {
     pub dependents: Vec<DependentsDecl>,
     /// `(Category, feature, value)`: a dependent of that Category carrying
     /// that value attaches high by its Attachment Class, as a comma-set
-    /// Supplement does (`docs/decisions/english.md` §5): it counts its
+    /// Supplement does (`docs/design/english.md` §5): it counts its
     /// distance from its host's head reversed.
     pub high_attachment: Vec<(Ident, Ident, Ident)>,
     pub productions: Vec<ProductionDecl>,
@@ -190,7 +190,7 @@ pub struct ProductionDecl {
     /// Children that do not end, through their edge line, in a trailing
     /// Adjunct of one of these Categories: a dependent after the child that
     /// is coordinate with such an Adjunct is a basic coordination of the two,
-    /// never also attached beside it (`docs/decisions/english.md` §8).
+    /// never also attached beside it (`docs/design/english.md` §8).
     #[serde(default)]
     pub unadjoined: Vec<(Ident, Vec<Ident>)>,
     /// Children through which a Gap may pass to the mother. A Gap passes
@@ -211,7 +211,7 @@ pub struct ProductionDecl {
     /// like that follower's lexical head has one of those forms: a phrase
     /// right after the site that could be the omitted Complement is that
     /// Complement, so no ellipsis is there (p. 1519), as with a bare noun's
-    /// omitted Complement (`docs/decisions/english.md`
+    /// omitted Complement (`docs/design/english.md`
     /// §8).
     #[serde(default)]
     pub elliptical: Option<Vec<sylex_lexicon::WordForm>>,
@@ -347,7 +347,7 @@ pub struct DependentsDecl {
 /// Slot with no Adjunct is a Cluster only where it alone breaks parallelism,
 /// never last and before or between at least two Clusters that end in as many
 /// Adjuncts: a coordination of single Slots is their own coordination
-/// (`docs/decisions/english.md` §8).
+/// (`docs/design/english.md` §8).
 /// The coordinates are parallel: every Cluster of one coordination is of the
 /// head's frame (p. 1341, [17ii]). The head takes the coordination as the
 /// child `clusters`, which bears no function; each dependent in a Cluster
@@ -406,7 +406,7 @@ pub struct AdjunctClustersDecl {
 /// Binding compiles each Schema into Productions: authors write the active
 /// Subcategorization Frames and what each Schema changes, and the engine
 /// derives the alternations, Gap variants, coordination shapes and feature
-/// summaries (`docs/decisions/english.md` §1). A Schema derives nothing its
+/// summaries (`docs/design/english.md` §1). A Schema derives nothing its
 /// grammar does not declare: a missing declaration yields no derivation or a
 /// load error, never a default.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]

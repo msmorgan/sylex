@@ -79,5 +79,5 @@ turn, where X is …" on the clause after "If you do,", past its duration.
 `plugins/builtin/templates/action/define.syl`,
 `plugins/builtin/primitives/static/letterDefinition.syl`,
 `plugins/canon/cards/{Celebrate the Harvest,Death's Shadow,Phyrexian Ingester}.syl`;
-`crates/english/grammar/english.fug` (the comma-set Supplement adjuncts); `docs/decisions/spelling.md`
+`crates/english/grammar/english.fug` (the comma-set Supplement adjuncts); `docs/design/spelling.md`
 (substitution, Tails).

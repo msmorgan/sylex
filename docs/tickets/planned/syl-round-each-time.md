@@ -47,7 +47,7 @@ attaches it as a supplement to three different hosts, never inside the amount's 
 
 ## Done when
 
-- The open questions are answered and written in `docs/decisions/spelling.md` and the
+- The open questions are answered and written in `docs/design/spelling.md` and the
   declarations' doc comments.
 - The checks are structural: every fraction inside the wrapped Action is unrounded and at least
   one exists; an unrounded fraction that no `roundEachTime` wraps is refused, because the spell or

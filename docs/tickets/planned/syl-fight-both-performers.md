@@ -32,4 +32,4 @@ performer.
 ## Pointers
 
 `plugins/builtin/definitions/keyword_action/{fight,fightEachOther}.syl`,
-`docs/decisions/semantics.md` §3.1.
+`docs/design/semantics.md` §3.1.

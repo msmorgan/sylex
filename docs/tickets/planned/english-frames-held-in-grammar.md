@@ -5,8 +5,8 @@ needs: []
 
 ## Why
 
-ADR §3 says a frame is declared once, in the lexicon. Three selections are held in the grammar
-instead, as a hand-listed class or word list with Productions over it:
+english.md §3 says a frame is declared once, in the lexicon. Three selections are held in the
+grammar instead, as a hand-listed class or word list with Productions over it:
 
 - `class PartitiveQuantifier`, with `Partitive`, `DistributivePartitive` and their siblings: the
   determinatives that take an *of* oblique.
@@ -17,7 +17,7 @@ instead, as a hand-listed class or word list with Productions over it:
 
 They appear to be in the grammar because a frame cannot do two things these need: build a fused
 determiner-head, and give the mother its Number from the Complement (`ComparativeDeterminer`
-names the comparative `quantifier`, not `head`, for that reason). The cost is that what the ADR
+names the comparative `quantifier`, not `head`, for that reason). The cost is that what english.md
 promises for frames does not reach them: same-head complement priority cannot apply to *each of
 ...*, and the lists drift from the lexicon (the existential list has `After`, which *be* does
 not select).
@@ -62,4 +62,4 @@ each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
   `class ComparativeQuantifier`, `Partitive`, `ComparativeDeterminer`, `LocatedExistentialBe`,
   `LocatedProximateExistentialBe`, `valence DeterminerPhrase`.
 - `crates/vocabulary/lexicon/english/closed_class.ron`, `crates/syntax/src/compile.rs`.
-- `docs/decisions/english.md` §1, §3.
+- `docs/design/english.md` §1, §3.

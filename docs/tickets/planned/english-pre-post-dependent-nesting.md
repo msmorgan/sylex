@@ -31,7 +31,7 @@ Productions where two such Readings first differ.
 
 ## Open questions
 
-- Which of these pairs are two trees of one analysis (`docs/decisions/english.md` §8), to be
+- Which of these pairs are two trees of one analysis (`docs/design/english.md` §8), to be
   canonicalized in the chart, and which differ in meaning (*not [chosen this way]* against *[not
   chosen] this way*, *only [attack alone]*, *next [cast a creature spell this turn]*).
 - For pairs that differ in meaning, whether a fork kind tells them apart (which of two
@@ -45,6 +45,6 @@ Productions where two such Readings first differ.
 
 ## Pointers
 
-- `docs/decisions/english.md` §8; `crates/syntax/src/normal_form.rs` (the fronted Clause
+- `docs/design/english.md` §8; `crates/syntax/src/normal_form.rs` (the fronted Clause
   adjunct, kept outermost).
 - `crates/syntax/src/forks.rs`; `crates/english/tests/forest_forks.rs`.

@@ -120,7 +120,7 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   Recommendation: the Templates, one per construction, each with its card as caller.
 - **Two well-sorted trees for one nominal.** "Artifact or enchantment you control" is
   `nominal(or([artifact, enchantment]), post = [youControl])` or
-  `or([artifact, nominal(enchantment, post = [youControl])])`, and nothing in the ADRs picks
+  `or([artifact, nominal(enchantment, post = [youControl])])`, and nothing in the design docs picks
   between well-sorted candidates (`spelling.md`, on what spelling leaves to meaning). Recommendation:
   the owner rules which attachment canon writes, and `spelling.md` says how recovery picks.
 - **Consumers that are not descriptions.** Eight classes of declaration take a `Predicate` for a
@@ -240,9 +240,9 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 
 ## Pointers
 
-- `docs/decisions/spelling.md` (substitution, optional and list Holes, the resolved term as the
-  derivation, the notation, rejected alternatives); `docs/decisions/syl.md` §2, §3, §5;
-  `docs/decisions/semantics.md` §2.4, §4.5
+- `docs/design/spelling.md` (substitution, optional and list Holes, the resolved term as the
+  derivation, the notation, rejected alternatives); `docs/design/syl.md` §2, §3, §5;
+  `docs/design/semantics.md` §2.4, §4.5
 - `plugins/builtin/coercions/`, `plugins/builtin/primitives/noun/`,
   `plugins/builtin/primitives/nounWord/`, `plugins/builtin/primitives/predicate/`,
   `plugins/builtin/templates/predicate/`, `plugins/builtin/rules/`,

@@ -32,7 +32,7 @@ which this ticket's check can call, and lands first.
 - A face stores no Shortened Name string. The Shortened Name form names the shortening that
   `short_name` computes from the face's `name`, `supertypes` and `types` (a legendary permanent's
   name, cut by that ticket's rule), so names never come by hand
-  (`docs/decisions/lexicon.md` §3).
+  (`docs/design/lexicon.md` §3).
 - `cargo xtask dsl check` refuses the Shortened Name form on a face for which that rule gives no
   Shortened Name, and both forms anywhere in `plugins/builtin/`, where there is no face.
 

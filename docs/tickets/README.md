@@ -22,9 +22,9 @@ Front matter carries `needs: [...]`: the slugs of tickets that must reach `done/
 `kata kanban check` after editing it. The body is a `#` title, then up to six `##` sections:
 
 - **Why**: the problem, in a few sentences.
-- **Design**: optional; one bullet per choice the ticket builds that the CR and the ADRs don't
-  already make. A design that several tickets build goes in `docs/specs/`, and each of them names
-  it in `specs: [...]` front matter.
+- **Design**: optional; one bullet per choice the ticket builds that the CR and the design docs
+  don't already make. A design that several tickets build goes in `docs/specs/`, and each of
+  them names it in `specs: [...]` front matter.
 - **Open questions**: optional; one bullet per design decision that still needs the owner.
   Planned work waiting on one stays in `planned/`; `maybe/` never holds planned work.
 - **Done when**: checkable acceptance criteria, including which tests or gates must pass. Each
@@ -33,7 +33,7 @@ Front matter carries `needs: [...]`: the slugs of tickets that must reach `done/
 - **Pointers**: the files or documents to read.
 
 Never put in a ticket: "Standard constraints apply" or any restatement of `CLAUDE.md`; design
-prose beyond the Design bullets and Open questions (a design decision lives in the ADR, the code
-or the declaration it shapes, or, until the code exists, in the ticket's Design or a shared spec);
-provenance or the history of the ticket or its predecessors; "(owner, date)" labels. Do not model
-a new ticket on an existing one.
+prose beyond the Design bullets and Open questions (a design decision lives in the design doc, the
+code or the declaration it shapes, or, until the code exists, in the ticket's Design or a shared
+spec); provenance or the history of the ticket or its predecessors; "(owner, date)" labels. Do
+not model a new ticket on an existing one.

@@ -1,5 +1,5 @@
 //! Another card's name stands only after *named*, *Partner with*, *from
-//! among* or *meld ... into* (`docs/decisions/lexicon.md` §6), so it never
+//! among* or *meld ... into* (`docs/design/lexicon.md` §6), so it never
 //! reads as a Subject.
 //! A card name is number-neutral, its Number read off the agreement the text
 //! shows, so *Exile*, *Remove* and *Turn* (of *Turn // Burn*) are other

@@ -19,9 +19,9 @@ A word with two sources can drift apart.
 - A catalog declaration's word is its `lexical` lemma. The capitalized form a type line prints
   ("Artifact Creature") is orthography the English layer supplies, not a second field.
 - `spelling` stays beside the lemma, though the two coincide on every catalog declaration: they
-  are two layers of the one block (`docs/decisions/syl.md` §2), the lexeme the English layer
+  are two layers of the one block (`docs/design/syl.md` §2), the lexeme the English layer
   inflects (`lexical`, with `plural = "Equipment"` where it is irregular) and the Construction's
-  wording that spells the call (`docs/decisions/spelling.md` §1).
+  wording that spells the call (`docs/design/spelling.md` §1).
 
 ## Done when
 

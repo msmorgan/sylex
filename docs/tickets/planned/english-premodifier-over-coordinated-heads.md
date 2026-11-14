@@ -54,6 +54,6 @@ artifact or creature you control"), which already get both readings.
 - `crates/english/grammar/english.fug`: `Premodifier`, `CoordinationPremodifier` (an
   *and*-coordination of singular nominals only), `NominalPremodifier`, the `Nominal` and
   `NounPremodifier` coordinations.
-- `docs/decisions/english.md` §4.
+- `docs/design/english.md` §4.
 - Local evidence (gitignored): `docs/evidence/cleanup-step6-syl/coordination-attachment-research.md`
   (§3, §3.1 and §4 Q3, with the site list).

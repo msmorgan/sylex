@@ -12,7 +12,7 @@ order [CR#616.1,101.4], and a player with several choices at once picks their or
 surfaces each member's choice as it reaches it (`replace_members`, `resume_replacements` and
 `surface_choice` in `crates/engine/src/replace_registry.rs`). So in a destroy-all over two
 players' creatures that each hold two regeneration shields, the chooser order is the members'
-order, which law 7 of `docs/decisions/engine.md` says no rule may read.
+order, which law 7 of `docs/design/engine.md` says no rule may read.
 
 ## Done when
 

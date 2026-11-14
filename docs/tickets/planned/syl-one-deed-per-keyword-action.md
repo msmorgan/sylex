@@ -53,4 +53,4 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 `plugins/builtin/definitions/keyword_action/{exchange,exile,double,triple}*.syl`,
 `plugins/builtin/primitives/action/exchange.syl`, `plugins/builtin/primitives/static/exchangeWith.syl`, the six variant files and
 their bases (`cast`, `mill`, `reveal`, `search`, `shuffle`, `vote`) in the same folder,
-`docs/decisions/semantics.md` §3 and §3.1.
+`docs/design/semantics.md` §3 and §3.1.

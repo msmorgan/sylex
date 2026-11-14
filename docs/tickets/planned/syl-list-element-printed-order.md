@@ -42,6 +42,6 @@ postmodifiers its respell writes in printed order, and `syl-sequentially-wording
 
 ## Pointers
 
-- `docs/decisions/syl.md` §5
+- `docs/design/syl.md` §5
 - `plugins/canon/cards/Celebrate the Harvest.syl`, `plugins/canon/cards/Arcum's Weathervane.syl`,
   `plugins/builtin/definitions/token/landerToken.syl`

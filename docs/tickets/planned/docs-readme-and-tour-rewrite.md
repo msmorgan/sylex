@@ -17,7 +17,7 @@ together, then checking the way a stranger would use them.
 
 ## Done when
 
-- The README carries the vision and rationale from `docs/decisions/architecture.md`, describes
+- The README carries the vision and rationale from `docs/design/architecture.md`, describes
   the English grammar, and says nothing that goes stale with the next landing; the tour follows one
   current `.syl` card through the pipeline.
 - Near the top, ahead of Design, the README says what Oracle text is, so a reader who does not
@@ -47,5 +47,5 @@ extraction.
 
 ## Pointers
 
-`README.md`, `docs/guided_tour.md`, `docs/decisions/architecture.md`,
+`README.md`, `docs/guided_tour.md`, `docs/design/architecture.md`,
 `.github/workflows/ci.yml`, `docs/oracle-style-guide.md`.

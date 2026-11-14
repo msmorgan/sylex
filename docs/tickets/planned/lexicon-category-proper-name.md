@@ -7,7 +7,7 @@ needs: []
 ## Why
 
 "Catalog" means the inventory of game vocabulary and the Provenance kind for it
-(`docs/decisions/lexicon.md` §3). `Category::Catalog` is a different thing: the Category of opaque
+(`docs/design/lexicon.md` §3). `Category::Catalog` is a different thing: the Category of opaque
 names (card names, Shortened Names, Introduced Names, Anchor Words). One word with two meanings
 invites confusion. The glossary names the Category Proper Name, CGEL's term for such expressions.
 The variant's doc comment ("an explicitly named inventory whose grammatical distribution is not
@@ -25,4 +25,4 @@ yet mapped") is also out of date.
 
 `crates/lexicon/src/types.rs` (`Category`), `crates/vocabulary/src/lib.rs`,
 `crates/english/grammar/english.fug`, `docs/contexts/oracle-english/CONTEXT.md` (Proper Name),
-`docs/decisions/lexicon.md` §2.
+`docs/design/lexicon.md` §2.

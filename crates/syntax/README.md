@@ -8,9 +8,9 @@ English and no Oracle: the Oracle English grammar is
 [`sylex_english`](../english/README.md)'s.
 
 The design and its reasons are in
-[`docs/decisions/english.md`](../../docs/decisions/english.md) (the crate
+[`docs/design/english.md`](../../docs/design/english.md) (the crate
 split in §1, the Ranking Key in §5, the parser contract in §7, Readings in §8)
-and [`docs/decisions/lexicon.md`](../../docs/decisions/lexicon.md). Terms
+and [`docs/design/lexicon.md`](../../docs/design/lexicon.md). Terms
 follow [`docs/contexts/oracle-english/CONTEXT.md`](../../docs/contexts/oracle-english/CONTEXT.md).
 Mechanism is documented in rustdoc on the types:
 

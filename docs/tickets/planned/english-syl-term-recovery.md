@@ -29,6 +29,6 @@ yet either.
 
 ## Pointers
 
-`docs/decisions/architecture.md` ("Spelling is a construction grammar"),
-`docs/decisions/english.md` §4, §8, `docs/decisions/semantics.md` §1, §3,
-`docs/decisions/syl.md`, `crates/english/`, `plugins/canon/cards/`.
+`docs/design/architecture.md` ("Spelling is a construction grammar"),
+`docs/design/english.md` §4, §8, `docs/design/semantics.md` §1, §3,
+`docs/design/syl.md`, `crates/english/`, `plugins/canon/cards/`.

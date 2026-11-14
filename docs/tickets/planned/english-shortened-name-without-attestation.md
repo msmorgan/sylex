@@ -80,4 +80,4 @@ token*) is a different matter with its own ticket; this one is about a card's ow
   `card_names`), `crates/vocabulary/src/lib.rs` (`LexicalEnvironment::load`).
 - `crates/english/src/judgment.rs` (`Judgment::scope`), `crates/xtask/src/english.rs`
   (`stated_items`), `crates/lexicon/src/scope.rs`.
-- `docs/decisions/lexicon.md` §6, `docs/oracle-style-guide.md` §5.
+- `docs/design/lexicon.md` §6, `docs/oracle-style-guide.md` §5.

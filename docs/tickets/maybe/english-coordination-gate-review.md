@@ -16,7 +16,7 @@ general construction:
   may come from *power* and *toughness* being listed as both count and mass in the lexicon,
   against the lexicon's own comment that a bare *power* or *toughness* is never a Noun Phrase.
   Both scopes of *its power and toughness* are grammatical English, attachments to different
-  heads that ADR §4 keeps packed unless a gate is measured.
+  heads that english.md §4 keeps packed unless a gate is measured.
 - **Noun premodifier conjuncts.** `adjunct NounPremodifier { host: NounPremodifierConjunct }`
   requires `modifier.Polarity := Negative`, refusing a positive noun premodifier inside a
   conjunct (*instant or [artifact creature] spell*). Both it and `adjunct AdjectivePhrase {

@@ -1,4 +1,4 @@
-//! A name is number-neutral (`docs/decisions/lexicon.md` §6): the agreement
+//! A name is number-neutral (`docs/design/lexicon.md` §6): the agreement
 //! its text shows fixes its Number in the Reading, and where the text shows
 //! none it stays unvalued, in one Reading.
 

@@ -15,7 +15,7 @@ Many doc comments under `plugins/` still speak Lean:
   `Predicate.…`" or "Full-arity binding for `….…`", and about 25 other comment lines that name a
   constructor as `Sort.ctor` (`Action.instruct`, `DeonticMods.rider`, `Definitions.wither`,
   `DRS.distributivePair?`, …), some of them in canon cards. A primitive's constructor clause is
-  the one place the AST's names appear (`docs/decisions/syl.md` §1).
+  the one place the AST's names appear (`docs/design/syl.md` §1).
 - Generator-inserted mentions: `templates/action/controllerSacrifices.syl`,
   `templates/action/lookAndSortSlice.syl` and `templates/duration/duringNextTurnOf.syl` say they
   use `firstMention` / `laterMention`, which `.syl` cannot write; expansion decides first mentions
@@ -53,4 +53,4 @@ and lands first.
 
 ## Pointers
 
-`docs/decisions/syl.md` §1 and §4.
+`docs/design/syl.md` §1 and §4.

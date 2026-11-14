@@ -3,7 +3,7 @@
 //! The supported corpus is every Vintage-playable (legal or restricted) Oracle
 //! record outside Scryfall `set_type: funny`. Each Card Face record
 //! yields one Type Line unit and one unit per paragraph line of its rules text
-//! after balanced reminder text is removed (`docs/decisions/lexicon.md` §1;
+//! after balanced reminder text is removed (`docs/design/lexicon.md` §1;
 //! a line break inside a quotation does not end a line); a face's count is a
 //! sum over its units. The split is deterministic, so a text has one
 //! segmentation into units.
@@ -198,7 +198,7 @@ pub enum CorpusError {
 /// that shorten to one spelling (*Ral*) name one object, not two, so a face's
 /// text shortens its own name. The whole card's name (*A // B*) is no card-name
 /// Lexeme, and a meld result's name is another card's on both cards of its pair
-/// (`docs/decisions/lexicon.md` §6).
+/// (`docs/design/lexicon.md` §6).
 #[must_use]
 pub fn own_names(name: &str) -> CardScope {
     CardScope::own_names([card_name_id(name)])

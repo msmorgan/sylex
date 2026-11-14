@@ -46,7 +46,7 @@ The numeric readbacks ("that much", "that many"): `syl-numeric-anaphors`.
 
 ## Pointers
 
-`plugins/builtin/primitives/timing/thisWay.syl` and its callers; `docs/decisions/semantics.md`
+`plugins/builtin/primitives/timing/thisWay.syl` and its callers; `docs/design/semantics.md`
 §1 item 5(b); `plugins/builtin/definitions/keyword_ability/{unleash,riot}.syl`,
 `plugins/builtin/primitives/static/{alongside,optionally,withRiders}.syl`,
 `plugins/builtin/templates/ability/mayHaveEnter.syl`.

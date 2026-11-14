@@ -6,7 +6,7 @@ needs: [syl-unused-parameter-refusal]
 
 ## Why
 
-`.syl` cannot write a raw Deed (`docs/decisions/syl.md` §4): an `action` declaration names its
+`.syl` cannot write a raw Deed (`docs/design/syl.md` §4): an `action` declaration names its
 Deed only through its `deed`, `permanent` and `ofAbility` fields
 (`crates/xtask/src/dsl_check/schema.rs`), and a keyword ability names none. Crew shows the cost.
 The `crew` keyword ability's cost is a bare `tap`, and a separate bodiless primitive
@@ -15,7 +15,7 @@ for the Deed, linked to nothing. Resolution by sort hides the clash: `crew(lit(2
 Beetle*) resolves to the ability, `crew(allOf(hasSubtype(vehicle)))` (*Revoke Privileges*) to the
 primitive. So *Revoke Privileges*' "can't crew Vehicles" [CR#702.122d] forbids nothing the cost
 does, *Hotshot Mechanic*'s "crews Vehicles as though its power were 2 greater" never reaches the
-power total, "crewed by" [CR#702.122c] has nothing to read, and `docs/decisions/semantics.md` §3's
+power total, "crewed by" [CR#702.122c] has nothing to read, and `docs/design/semantics.md` §3's
 claim that Crew's Definition carries a Deed is false.
 
 ## Design
@@ -66,7 +66,7 @@ These wait for the owner's design discussion of Deeds.
 
 ## Done when
 
-- The settled answers are in `docs/decisions/syl.md` §4 and `docs/decisions/semantics.md` §3 and
+- The settled answers are in `docs/design/syl.md` §4 and `docs/design/semantics.md` §3 and
   §3.1, and §3's statement about Crew's Deed is true.
 - `deed_action` exists in `cargo xtask dsl check`, and a `deed_action` with an unused parameter is
   accepted, with a test, while the same parameter on any other kind is refused.
@@ -90,4 +90,4 @@ These wait for the owner's design discussion of Deeds.
 - `plugins/canon/cards/{Debris Beetle,Revoke Privileges,Hotshot Mechanic}.syl`
 - `crates/xtask/src/dsl_check/schema.rs` (`action`, `EXPANSION_CONSTRUCTORS`),
   `crates/xtask/src/dsl_check.rs`
-- `docs/decisions/semantics.md` §3 and §3.1, `docs/decisions/syl.md` §4
+- `docs/design/semantics.md` §3 and §3.1, `docs/design/syl.md` §4

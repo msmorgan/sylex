@@ -346,7 +346,7 @@ fn run_sba_effect(
             }
         }
         // Data SBA rows are evaluated synchronously, one object at a time, into
-        // game events (`docs/decisions/engine.md` law 5), so this
+        // game events (`docs/design/engine.md` law 5), so this
         // interpreter runs only `Act` and `Sequentially`. The legend rule
         // ([CR#704.5j]) groups objects across a controller and pauses at a
         // Decision Point, so it stays native Rust and never routes through
@@ -354,7 +354,7 @@ fn run_sba_effect(
         // row (`aura.syl`).
         other => todo!(
             "SBA effect is only Act/Sequentially by design (got {other:?}) — a choice-bearing \
-             SBA stays imperative; owner: docs/decisions/engine.md law 5"
+             SBA stays imperative; owner: docs/design/engine.md law 5"
         ),
     }
     out

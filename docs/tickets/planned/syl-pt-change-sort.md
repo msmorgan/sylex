@@ -21,7 +21,7 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 - A power/toughness change is one value of the sort `PtChange`, built from its two deltas by the
   primitive `pt(power, toughness)`, matching the `Pt` in `getsPt` and `definesPt`; its glossary
   entry is **Power/Toughness Change**, beside **Delta** for one number's change. `get`, `getsPt`
-  and what they expand to take it whole (`docs/decisions/spelling.md`, on Tails and "for each").
+  and what they expand to take it whole (`docs/design/spelling.md`, on Tails and "for each").
 - `forEach` is declared at that sort: it takes a change and a Predicate and scales the whole
   change.
 - A bare "+N/+N" is two printed values and is written as two. `getsBoth` is deleted at `Action`
@@ -45,7 +45,7 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 ## Done when
 
-- The glossary has the sort's entry, and `docs/decisions/syl.md` §2 no longer gives `getsBoth`'s
+- The glossary has the sort's entry, and `docs/design/syl.md` §2 no longer gives `getsBoth`'s
   one delta as its example of a value written once.
 - `get`, `getsPt` and the keyword bodies that call them (`battleCry`, `bushido`, `exalted`,
   `flanking`, `frenzy`, `melee`, `prowess`, `rampage`, the doubling and tripling keyword
@@ -67,7 +67,7 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 ## Pointers
 
-`docs/decisions/spelling.md` (Tails and "for each"); `plugins/builtin/templates/action/{get,getsBoth}.syl`,
+`docs/design/spelling.md` (Tails and "for each"); `plugins/builtin/templates/action/{get,getsBoth}.syl`,
 `plugins/builtin/templates/ability/{getsPt,getsBoth,getsBase}.syl`,
 `plugins/builtin/templates/amount/forEach.syl`; glossary **Delta**
 (`docs/contexts/game-model/CONTEXT.md`), **Measure Noun Phrase**

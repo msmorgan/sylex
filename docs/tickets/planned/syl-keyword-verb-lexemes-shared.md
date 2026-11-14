@@ -26,4 +26,4 @@ the verb can't simply be declared once in `verbs.ron`.
 - `crates/vocabulary/catalogs/keyword_actions.ron`, `keyword_abilities.ron`
 - `plugins/builtin/primitives/action/faceDilemma.syl`,
   `plugins/builtin/definitions/keyword_action/beamUp.syl`
-- `docs/decisions/lexicon.md` §3 (Core vs Catalog)
+- `docs/design/lexicon.md` §3 (Core vs Catalog)

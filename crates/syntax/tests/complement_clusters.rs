@@ -106,7 +106,7 @@ fn clusters_of_two_slots_coordinate() {
 #[test]
 fn a_single_slot_clusters_only_beside_parallel_clusters_with_adjuncts() {
     // Single Objects coordinate as themselves, never as Clusters
-    // (`docs/decisions/english.md` §8); this grammar has no Noun Phrase
+    // (`docs/design/english.md` §8); this grammar has no Noun Phrase
     // coordination.
     assert_eq!(count("Give card and card."), 0);
     // A single Object is a Cluster only where it alone breaks parallelism:

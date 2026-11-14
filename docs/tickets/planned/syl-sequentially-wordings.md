@@ -67,7 +67,7 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 
 ## Done when
 
-- The open questions are answered and written in `docs/decisions/spelling.md`.
+- The open questions are answered and written in `docs/design/spelling.md`.
 - No call in `plugins/` writes `sequentially` where a Template spells its printed wording, and
   every call is checked against its card's Oracle text or the rule text its declaration cites;
   a sequence no Template spells yet keeps a `TODO(spelling)` naming the wording. A script makes
@@ -85,9 +85,9 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 
 ## Pointers
 
-- `docs/decisions/spelling.md` (a Hole that holds a run and the run rule in §2, shared material
+- `docs/design/spelling.md` (a Hole that holds a run and the run rule in §2, shared material
   at a coordination, the resolved term as the derivation, the round trip, the notation);
-  `docs/decisions/syl.md` §5
+  `docs/design/syl.md` §5
 - `plugins/builtin/primitives/action/sequentially.syl`;
   `plugins/canon/cards/{Duneblast,Cloudshift,Agate-Blade Assassin,Bonus Round,Juxtapose}.syl`
 - `crates/english/grammar/english.fug` (`SentenceSequence`, `LinkedClause`, `LinkedVerbPhrase`),

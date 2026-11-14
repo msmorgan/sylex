@@ -8,7 +8,7 @@ needs: [cleanup-step6-surface, syl-nominal-descriptions]
 
 Fourteen canon cards write a created token's characteristics as a record literal in a token slot
 (`written({characteristics = {…}})`, or the `token` argument of `createTappedAttacking`). A
-record written in place has no wording (`docs/decisions/spelling.md`, on records), so none of
+record written in place has no wording (`docs/design/spelling.md`, on records), so none of
 these tokens round-trips. Each prints its characteristics:
 
 | Card | Oracle |
@@ -78,7 +78,7 @@ in `docs/evidence/syl-token-records-to-templates/`.
   the Oracle card of that name [CR#111.11]. The Reading carries "Tarmogoyf" as an Introduced Name
   (`introduced_name:Tarmogoyf`, a name modifier of the nominal "Tarmogoyf token"), listed for
   *Disa the Restless* and *Tarmogoyf Nest* in `crates/vocabulary/catalogs/introduced_names.ron`;
-  another card's name is admitted only after "named" or "Partner with" (`docs/decisions/lexicon.md`
+  another card's name is admitted only after "named" or "Partner with" (`docs/design/lexicon.md`
   §6). Options: the `.syl` value is that Introduced Name, a name premodifier before the head
   `token`, whose lowering reads the Oracle card of the same name for the characteristics; or the
   grammar admits another card's name before "token" as a third opting-in position, and the value
@@ -110,7 +110,7 @@ in `docs/evidence/syl-token-records-to-templates/`.
 
 ## Pointers
 
-`docs/decisions/spelling.md` (the resolved term as the derivation, records, the notation); `plugins/builtin/templates/noun/{creatureToken,
+`docs/design/spelling.md` (the resolved term as the derivation, records, the notation); `plugins/builtin/templates/noun/{creatureToken,
 creatureTokenOf,artifactCreatureToken}.syl`; `plugins/builtin/primitives/noun/written.syl`;
 `plugins/builtin/templates/action/{createTappedToken,createTappedAttacking}.syl`;
 `docs/evidence/syl-token-records-to-templates/`.

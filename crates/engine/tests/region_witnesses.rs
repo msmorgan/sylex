@@ -1,6 +1,6 @@
 //! Hand-spelled region witnesses — one test per card for the nineteen
 //! witnesses `core-regions-substrate` inherited from the absorbed engine
-//! tickets (`docs/decisions/core.md`).
+//! tickets (`docs/design/core.md`).
 //!
 //! The generated wizards corpus cannot exercise these. Eighteen of the
 //! nineteen cards are `.ron.todo` with the witnessed clause parked in an

@@ -112,7 +112,7 @@
     (lemma: "mulligan", frames: [Intransitive]),
     // Only the passive is printed: *cards named CARDNAME*. Its predicative
     // complement is a name, where another card's name stands
-    // (`docs/decisions/lexicon.md` §6).
+    // (`docs/design/lexicon.md` §6).
     (lemma: "name", frames: [ComplexTransitive(Name)]),
     (lemma: "note", frames: [Monotransitive, ContentClause]),
     (lemma: "offer", frames: [Ditransitive]),

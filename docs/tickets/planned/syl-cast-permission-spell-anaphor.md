@@ -14,7 +14,7 @@ Two printed texts refer to the card a permission lets you cast as "that spell" /
 
 Casting moves the card to the stack, where it is the spell [CR#601.2a], so reference resolution
 has to resolve those anaphors to the permitted card. This is an exception to
-`docs/decisions/semantics.md` §2.2 item 3, under which modal `can` closes its hypothetical
+`docs/design/semantics.md` §2.2 item 3, under which modal `can` closes its hypothetical
 participants. Neither card is in the `.syl` corpus; the old fragments re-described the card
 instead of writing the anaphor.
 
@@ -47,6 +47,6 @@ Letting `toCast` take a noun phrase (today it takes a `Predicate`): that is
 
 ## Pointers
 
-- `docs/decisions/semantics.md` §2 (reference resolution)
+- `docs/design/semantics.md` §2 (reference resolution)
 - `plugins/builtin/primitives/mana/toCast.syl`, `plugins/builtin/primitives/static/conjunction.syl`,
   `plugins/builtin/templates/static/can.syl`, `plugins/builtin/primitives/static/spendManaAs.syl`

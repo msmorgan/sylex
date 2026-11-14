@@ -45,4 +45,4 @@ template's spelling ("your graveyard" for an owner's-graveyard body) is
 ## Pointers
 
 `plugins/builtin/definitions/keyword_action/{sacrifice,forage,destroy}.syl`,
-`plugins/builtin/templates/action/controllerSacrifices.syl`, `docs/decisions/semantics.md` §2.3.
+`plugins/builtin/templates/action/controllerSacrifices.syl`, `docs/design/semantics.md` §2.3.

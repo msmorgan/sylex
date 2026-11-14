@@ -46,4 +46,4 @@ or library must reach that same arrangement decision.
   by `body_repositions_ordered`.
 - `crates/engine/src/agenda.rs`: `WorkItem::ArrangePiles` and `WorkItem::ArrangeGroupLanding`.
 - `crates/engine/src/decide/pending/choice.rs`: `ArrangePile`.
-- `docs/decisions/engine.md` law 7.
+- `docs/design/engine.md` law 7.

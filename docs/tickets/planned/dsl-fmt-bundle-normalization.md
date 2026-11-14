@@ -6,12 +6,12 @@ needs: [cleanup-step6-syl]
 
 ## Why
 
-`.syl` declares three coercions (`docs/decisions/syl.md` §2): a card type and a subtype stand at
+`.syl` declares three coercions (`docs/design/syl.md` §2): a card type and a subtype stand at
 `NounWord` through `type` and `subtype`, and an integer at `Amount` through `lit`. The bare form
 is the corpus's spelling, and the wrapped primitive stays callable, so `lit(3)` and `3`, and
 `type(creature)` and `creature`, are both valid and resolve to one term. Nothing normalizes
 them, so the corpus can drift back to two spellings of one term. Recovery already yields the
-bare form (`docs/decisions/spelling.md` §4); the written corpus should match it.
+bare form (`docs/design/spelling.md` §4); the written corpus should match it.
 
 The `.syl` formatter (`sylex_syl`'s printer, which `cargo xtask dsl fmt` runs) cannot do it: it
 reads one file's syntax and resolves no sort, and `subtype(goblin)` is the `NounWord` primitive
@@ -42,5 +42,5 @@ coercions exist then.
 ## Pointers
 
 `crates/xtask/src/dsl_fmt.rs`, `crates/xtask/src/dsl_check.rs`,
-`crates/xtask/src/dsl_check/coercion.rs`, `docs/decisions/syl.md` §2–§3,
-`docs/decisions/spelling.md` §4.
+`crates/xtask/src/dsl_check/coercion.rs`, `docs/design/syl.md` §2–§3,
+`docs/design/spelling.md` §4.

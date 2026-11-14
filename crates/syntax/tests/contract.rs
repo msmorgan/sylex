@@ -1,5 +1,5 @@
 //! The parser-engine obligations of the engine contract
-//! (`docs/decisions/english.md` §§7–8), each over a small
+//! (`docs/design/english.md` §§7–8), each over a small
 //! hand grammar: lexical alternatives reach the chart unchosen, packing keeps
 //! exactly the distinctions a parent can see, Gaps close only at their
 //! governor, unary cycles hide nothing, and both round-trip laws hold for
@@ -338,7 +338,7 @@ fn multiword_lexeme_is_atomic_and_needs_its_separator() {
 /// a constituent boundary, each in a child that reaches past the lexeme, as
 /// in *[big first] [strike damage]*; never where they rebuild it, alone or
 /// with a dependent of one part, as in *first [strike damage]*. A core
-/// multiword lexeme's never do (`docs/decisions/lexicon.md` §5).
+/// multiword lexeme's never do (`docs/design/lexicon.md` §5).
 #[test]
 fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
     let mut first_strike = word("n:first-strike", "first strike", Category::Noun);

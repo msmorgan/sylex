@@ -47,4 +47,4 @@ built with the greenfield discourse checker, which takes the Design's rules as r
 - `plugins/builtin/primitives/ability/spell.syl`, `plugins/builtin/primitives/action/replace.syl`,
   `plugins/builtin/primitives/static/instead.syl`
 - `plugins/builtin/templates/ability_word/` (`revolt`, `ferocious`, `morbid`, `threshold`)
-- `docs/decisions/semantics.md` §2 (reference across a spell's abilities)
+- `docs/design/semantics.md` §2 (reference across a spell's abilities)

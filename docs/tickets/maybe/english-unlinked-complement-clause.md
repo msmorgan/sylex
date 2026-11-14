@@ -13,7 +13,7 @@ never *until [they exile a nonland card, then you may cast it]*. The comment sta
 subordinate clauses; the same sentence excludes non-finite Verb Phrases, which
 `LinkedVerbPhrase` links (*may search ..., put ..., then shuffle*). Both scopes are grammatical
 English, so the flag appears to decide a scope ambiguity between different heads by Oracle
-convention, which ADR §4 says stays packed.
+convention, which english.md §4 says stays packed.
 
 ## Open questions
 

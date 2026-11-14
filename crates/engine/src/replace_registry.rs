@@ -909,7 +909,7 @@ pub(crate) fn affected_player(state: &GameState, e: &GameEvent) -> PlayerId {
 /// [CR#616.1a..616.1e]: the effects a replacement choice offers — those of
 /// the first non-empty tier. Two or more effects apply, so one of them is
 /// chosen; a lone effect in that tier is still offered, as a choice with one
-/// option (the engine exposes every legal decision, `docs/decisions/engine.md`
+/// option (the engine exposes every legal decision, `docs/design/engine.md`
 /// law 2).
 fn first_tier(applicable: &[Applicable]) -> Vec<ReplacementKey> {
     let first = applicable

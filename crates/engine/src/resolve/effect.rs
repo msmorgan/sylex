@@ -7258,7 +7258,7 @@ mod tests {
     /// FIXTURE — a carried body with a CAPTURE LIST. A delayed trigger created
     /// inside an `Each` body captures that body's own per-element register:
     /// the loop element is region-local to the loop body, so the created body
-    /// can only see it by declaring it (`docs/decisions/core.md` law
+    /// can only see it by declaring it (`docs/design/core.md` law
     /// 2 — nothing else crosses a region boundary). Each iteration's
     /// capture is its own snapshot, so two elements produce two triggers
     /// that name two different objects.

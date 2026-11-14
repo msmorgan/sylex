@@ -1,6 +1,6 @@
 //! Parses `.syl` source files to a purely syntactic tree.
 //!
-//! The `.syl` language is described in `docs/decisions/syl.md` §1 to §3.
+//! The `.syl` language is described in `docs/design/syl.md` §1 to §3.
 //! This crate reads its syntax: it does not resolve names by sort, expand
 //! templates or check sorts. Parsing treats no declaration kind specially;
 //! only [`check()`] knows that a primitive names a constructor. A [`File`] is

@@ -63,7 +63,7 @@ impl Reading {
     }
 }
 
-/// The Ranking Key (`docs/decisions/english.md` §5): the Preference that
+/// The Ranking Key (`docs/design/english.md` §5): the Preference that
 /// orders a Parse's Readings, compared component by component in field order,
 /// lower first. A Reading's own order is the final tie-break, so the cheapest
 /// Reading is unique. Every component is a sum over the Reading's Productions
@@ -885,7 +885,7 @@ impl CompiledGrammar {
     }
 
     /// The Attachment Class and Right Association words
-    /// (`docs/decisions/english.md` §5) a child adds at position `index`
+    /// (`docs/design/english.md` §5) a child adds at position `index`
     /// of a Production. `head` gives the phrase's head's words; `first` a
     /// coordination's first conjunct's words and whether it ends in its head;
     /// `before` the words from the phrase's start to the child.
@@ -1053,7 +1053,7 @@ impl CompiledGrammar {
     }
 
     /// Lexical atomicity, decided on the Reading's own structure as the chart
-    /// decides it (`docs/decisions/lexicon.md` §5): a word
+    /// decides it (`docs/design/lexicon.md` §5): a word
     /// inside a multiword noun of `atomic` stands alone only where the term's
     /// words may stand apart, and then only where they straddle a constituent
     /// boundary. In the smallest Constituent spanning the term, the child

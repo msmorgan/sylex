@@ -1,5 +1,5 @@
 //! The declaration rules that need every declaration of a corpus at once
-//! (`docs/decisions/syl.md` §1 and §3).
+//! (`docs/design/syl.md` §1 and §3).
 //!
 //! Parsing alone refuses a capitalized word outside a sort or a constructor
 //! clause. [`check`] refuses, across a set of bundles:

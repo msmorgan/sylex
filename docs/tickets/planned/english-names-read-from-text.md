@@ -174,7 +174,7 @@ in the middle of a sentence at several positions. And it is used again after its
   `crates/syntax/tests/card_names.rs`
   (`admission_refuses_an_introduced_name_off_the_cards_that_introduce_it`).
   Admission still refuses a read name off its licensing position or scope.
-- `docs/decisions/lexicon.md` and the glossary state the design:
+- `docs/design/lexicon.md` and the glossary state the design:
   - §2's "The one open slot is the Flavor Word" names read names among the open slots.
   - §6's "A name a card gives an object, or a vote option, spelled like another card's name is
     listed as that card's Introduced Name or vote option (*create a Tarmogoyf token*, …)" no
@@ -209,7 +209,7 @@ in the middle of a sentence at several positions. And it is used again after its
 - `crates/vocabulary/src/lib.rs` (`introduced_names`),
   `crates/vocabulary/src/schema.rs`, `crates/english/src/profile.rs` (`introduced_name` skeleton
   class), `crates/syntax/src/reading.rs` (admission's `stands_in`).
-- `docs/decisions/lexicon.md` §2, §6; `docs/contexts/oracle-english/CONTEXT.md`.
+- `docs/design/lexicon.md` §2, §6; `docs/contexts/oracle-english/CONTEXT.md`.
 - Evidence (gitignored), `docs/evidence/names-read-from-text/`: `classify.py` and `classify.txt`
   (the table), `longest.py` and `longest_pool.ron` (the shape rule), `compare.py` with the
   `parse-*.txt` runs, `pool_named.py` (longest runs at every licensing position).

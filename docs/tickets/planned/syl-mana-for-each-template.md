@@ -9,7 +9,7 @@ needs: [cleanup-step6-spine]
 *Gaea's Cradle* prints "Add {G} for each creature you control", with no number before the
 symbol. Its term is `counted(forEach(1, …), symbols([pip(green)]))`, which stores a 1 the card
 does not print, and `counted`'s `TODO(spelling)` asks spelling to drop it. The notation has no
-omission governed by a value (`docs/decisions/spelling.md` §7), so the printed form is its own
+omission governed by a value (`docs/design/spelling.md` §7), so the printed form is its own
 Template (§3.2).
 
 ## Design
@@ -37,5 +37,5 @@ Template (§3.2).
 
 ## Pointers
 
-`docs/decisions/spelling.md` §3.2, §7; `plugins/builtin/primitives/producedMana/counted.syl`,
+`docs/design/spelling.md` §3.2, §7; `plugins/builtin/primitives/producedMana/counted.syl`,
 `plugins/builtin/templates/amount/forEach.syl`, `plugins/canon/cards/Gaea's Cradle.syl`.

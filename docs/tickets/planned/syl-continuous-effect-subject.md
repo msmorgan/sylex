@@ -104,7 +104,7 @@ Tunnel*'s "gets +1/+0 and can't be blocked", the coordination still binds it onc
 
 ## Done when
 
-- The open questions are answered and written in `docs/decisions/semantics.md` §4.7 and the
+- The open questions are answered and written in `docs/design/semantics.md` §4.7 and the
   glossary.
 - `spelling.md`'s account of shared material at a coordination names the declaration that gives *Predator's Strike*'s phrases their one
   subject, where it now says "one Handoff": a Handoff makes its subject the Actor, and a creature
@@ -124,7 +124,7 @@ Tunnel*'s "gets +1/+0 and can't be blocked", the coordination still binds it onc
 
 ## Pointers
 
-- `docs/decisions/spelling.md` (substitution, shared material at a coordination); `docs/decisions/semantics.md` §4.1, §4.7;
+- `docs/design/spelling.md` (substitution, shared material at a coordination); `docs/design/semantics.md` §4.1, §4.7;
   glossary **Handoff**, **Subject**, **Static Spec** (`docs/contexts/game-model/CONTEXT.md`)
 - `plugins/builtin/templates/action/{gain,get,getsBoth,establishFor,become}.syl`,
   `plugins/builtin/templates/ability/{getsPt,abilityGrant,getsBase}.syl`,

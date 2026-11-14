@@ -37,4 +37,4 @@ Written against the surface (`cleanup-step6-surface`).
 `plugins/builtin/primitives/action/exchange.syl`, `lifeTotals.syl`, `values.syl`;
 `plugins/builtin/definitions/keyword_action/exchangeLifeTotals.syl`, `exchangeValues.syl`;
 `plugins/builtin/templates/quantity/lifeTotalOf.syl`; `plugins/canon/cards/Mirror Universe.syl`;
-`docs/decisions/semantics.md` §1.
+`docs/design/semantics.md` §1.

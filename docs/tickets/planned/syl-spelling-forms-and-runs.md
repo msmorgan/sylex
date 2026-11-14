@@ -6,7 +6,7 @@ needs: [syl-spelling-conventions]
 
 ## Why
 
-`docs/decisions/spelling.md` §7 states a Hole's printed form (`$name@Form`), a Hole a run of
+`docs/design/spelling.md` §7 states a Hole's printed form (`$name@Form`), a Hole a run of
 sentences may fill (`$name*`) and a list whose elements are each a run (`<.>`), and no spelling
 under `plugins/` writes any of them. Without them a numeric Hole prints in no stated notation
 ("draw $amount cards" admits "draw 2 cards" and "draw a card" alike), `does` and `did` have the
@@ -47,6 +47,6 @@ A mark for passive subject promotion or for Factoring (`spelling.md` §10). The 
 
 ## Pointers
 
-`docs/decisions/spelling.md` §2 and §7, `crates/lexicon/src/types.rs` (`Numeral`, `WordForm`),
+`docs/design/spelling.md` §2 and §7, `crates/lexicon/src/types.rs` (`Numeral`, `WordForm`),
 `plugins/builtin/primitives/quantity/lit.syl`, `plugins/builtin/templates/quantity/plus.syl`,
 `plugins/builtin/primitives/action/sequentially.syl`.

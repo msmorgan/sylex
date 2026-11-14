@@ -29,7 +29,7 @@ wording-only `NounWord` does not. Two things are left:
 
 ## Done when
 
-- The open question is answered, and its answer is stated in `docs/decisions/semantics.md` §2.4
+- The open question is answered, and its answer is stated in `docs/design/semantics.md` §2.4
   and in the doc comments of `opponent` and the other head nouns it covers.
 - Encore writes "that opponent" as printed, and every canon and builtin "that opponent" or
   "those opponents" writes `opponent`.
@@ -39,5 +39,5 @@ wording-only `NounWord` does not. Two things are left:
 
 `plugins/builtin/primitives/noun/{opponent,player,permanent,spell,card,token}.syl`,
 `plugins/builtin/templates/pronoun/{that,those}.syl`,
-`plugins/builtin/definitions/keyword_ability/encore.syl`; `docs/decisions/semantics.md` §2.4;
+`plugins/builtin/definitions/keyword_ability/encore.syl`; `docs/design/semantics.md` §2.4;
 `syl-nominal-descriptions`, `syl-card-head-noun-sweep`.

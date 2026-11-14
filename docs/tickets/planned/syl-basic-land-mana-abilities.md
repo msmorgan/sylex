@@ -28,4 +28,4 @@ only through the step-9 lowering.
 ## Pointers
 
 `plugins/builtin/definitions/subtype/land/`, `plugins/builtin/definitions/card_type/creature.syl`
-(a type's `confers`), `crates/core/src/count.rs`, `docs/decisions/semantics.md` §1 item 4.
+(a type's `confers`), `crates/core/src/count.rs`, `docs/design/semantics.md` §1 item 4.

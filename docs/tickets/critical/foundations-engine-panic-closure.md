@@ -9,7 +9,7 @@ needs: [core-as-enters-choices, core-regions-substrate, core-regions-discourse, 
 An audit of the 517 distinct English card names in `data/mtgjson/AllSetFiles/FDN.json` found
 cards whose faithful core terms reach a production panic or a debug assertion in the engine.
 Each abort marks a missing mechanism. The missing mechanism is the defect, and the loud failure
-is correct until the mechanism lands ([Engine](../../decisions/engine.md) law 6). This ticket
+is correct until the mechanism lands ([Engine](../../design/engine.md) law 6). This ticket
 closes when those mechanisms exist; its `needs:` are the mechanism tickets, and the table keeps
 the card witnesses for the ones still open.
 
@@ -44,5 +44,5 @@ the card witnesses for the ones still open.
 
 ## Pointers
 
-- `docs/decisions/engine.md` (law 6)
+- `docs/design/engine.md` (law 6)
 - The owning tickets in the table

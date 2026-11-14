@@ -5,9 +5,9 @@ declared Lexeme occurrence it could be, and spells a lexical value back out.
 Morphology, Onsets, Adjacency Agreement and the numeral codecs live here. It
 depends on no grammar, vocabulary file or Game Model.
 
-The design of this layer is [Lexicon](../../docs/decisions/lexicon.md); what it
+The design of this layer is [Lexicon](../../docs/design/lexicon.md); what it
 owes the grammar is the parser contract in
-[English](../../docs/decisions/english.md) §7. Terms are the
+[English](../../docs/design/english.md) §7. Terms are the
 [glossary's](../../docs/contexts/oracle-english/CONTEXT.md).
 
 ## Data flow
@@ -55,7 +55,7 @@ loads it and prints the occurrences in a string.
 
 - Declare words in `sylex_vocabulary`, never here.
 - Fix a wrong default spelling with an override on its Lexeme, not with a new
-  rule in the morphology ([Lexicon](../../docs/decisions/lexicon.md) §2).
+  rule in the morphology ([Lexicon](../../docs/design/lexicon.md) §2).
 - Keep both lexical laws: every returned occurrence realizes to exactly its
   source substring, and every indexed value realizes and analyzes back to the
   same reading. `tests/analysis.rs` holds them, and `cargo xtask lexical`

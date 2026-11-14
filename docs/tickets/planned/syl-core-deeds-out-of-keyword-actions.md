@@ -36,5 +36,5 @@ is edited before it moves.
 
 ## Pointers
 
-`plugins/builtin/definitions/keyword_action/`, `docs/decisions/syl.md` §2 ("Paths are for
+`plugins/builtin/definitions/keyword_action/`, `docs/design/syl.md` §2 ("Paths are for
 people").

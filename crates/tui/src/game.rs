@@ -97,7 +97,7 @@ pub fn build_game_with_seed(seed: u64) -> Result<BuiltGame> {
     // Both halves of the pair survive here. The engine gets the core half; the
     // semantic half becomes the provenance the renderer needs, because lowering
     // erases invocation provenance and a core value carries no template
-    // (lowering is one-way: docs/decisions/architecture.md).
+    // (lowering is one-way: docs/design/architecture.md).
     let p0: Vec<Arc<sylex_card::Card>> = loaded0.iter().map(|l| Arc::new(l.core.clone())).collect();
     let p1: Vec<Arc<sylex_card::Card>> = loaded1.iter().map(|l| Arc::new(l.core.clone())).collect();
 
@@ -127,7 +127,7 @@ pub fn build_game_with_seed(seed: u64) -> Result<BuiltGame> {
     // precedence to mirror — every preimage is semantically exact
     // and the rule picks a SPELLING, not the winning plugin (spelling is a
     // many-to-many construction grammar, so several terms may word
-    // identically: `docs/decisions/architecture.md`).
+    // identically: `docs/design/architecture.md`).
     let mut provenance = ProvenanceIndex::default();
     provenance.extend(&canon.provenance);
     provenance.extend(&builtin.provenance);

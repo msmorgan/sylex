@@ -41,7 +41,7 @@ often infer them.
 
 ## Done when
 
-- The settled design is written into `docs/specs/` or an ADR.
+- The settled design is written into `docs/specs/` or a design doc.
 - `gather` no longer special-cases the battlefield and emblems: every static ability is gated by
   its declared zones.
 - `sylex_engine` tests show Grist being a creature in the graveyard and library and not on the
@@ -59,4 +59,4 @@ often infer them.
 
 - `crates/engine/src/layer.rs` (`gather`), `crates/core/src/ability.rs` (`from`).
 - `crates/engine/src/trigger.rs`: the triggered-ability zone check.
-- `docs/decisions/semantics.md`.
+- `docs/design/semantics.md`.

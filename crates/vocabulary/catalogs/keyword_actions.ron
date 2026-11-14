@@ -131,7 +131,7 @@
     ]),
     (rule: "[CR#701.42]", name: "Meld", verbs: [
         // *into* takes a card's name, like *named*, *Partner with* and
-        // *from among* (`docs/decisions/lexicon.md` §6): *meld them into
+        // *from among* (`docs/design/lexicon.md` §6): *meld them into
         // Brisela, Voice of Nightmares*. Oracle text uses "the full name when
         // the words identify an actual card name or face", meld text
         // included (`docs/oracle-style-guide.md` §5). *Meld* selects the

@@ -66,4 +66,4 @@ against the head's final sort.
 ## Pointers
 
 `plugins/builtin/templates/noun/this*.syl`, `plugins/builtin/primitives/pronoun/this.syl`,
-`docs/decisions/syl.md` §3.
+`docs/design/syl.md` §3.
