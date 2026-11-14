@@ -4,8 +4,8 @@
 
 This document is directional. It describes the `.syl` language the project is aiming at, and
 the design is not settled: read it for the intended shape, not as a contract the code keeps.
-`sylex_syl` parses the syntax today; name resolution and expansion have only temporary
-validators in `xtask`.
+`sylex_syl` parses and formats the syntax and checks the declaration rules today; resolution by
+sort and expansion exist only as throwaway tools in `xtask` (`dsl check`, `dsl expand`).
 
 - **Companion:** [`semantics.md`](./semantics.md), the semantic model `.syl` terms are read in.
 
