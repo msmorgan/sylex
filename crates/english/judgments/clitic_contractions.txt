@@ -1,4 +1,4 @@
-# Contracted auxiliaries and copulas ('s, 're, 've) analysed as their full forms: predicative complements, relative-clause subjects, perfect and progressive complements, and clitics needing a complement and a pronoun host
+# Contracted auxiliaries and copulas ('s, 're, 've) analyzed as their full forms: predicative complements, relative-clause subjects, perfect and progressive complements, and clitics needing a complement and a pronoun host
 + If it's a land card, you may put it onto the battlefield tapped. => NounPhrase "a land card" as PredicativeComplement of be
 # from: Mobile Homestead (uncontracted pair)
 + If it is a land card, you may put it onto the battlefield tapped. => NounPhrase "a land card" as PredicativeComplement of be

@@ -338,7 +338,7 @@ pub struct AdjectiveEntry {
     pub follows_sum: bool,
     /// The adjective names a Quality as a fused head, with no noun of its own
     /// (*protection from multicolored*; CGEL, Ch. 5 §9.3, p. 417): it is in
-    /// the grammar's `QualityHead` feature. A colour word is not: its noun
+    /// the grammar's `QualityHead` feature. A color word is not: its noun
     /// is the Quality (*protection from red*; Ch. 19 §3.3, p. 1642).
     #[serde(default)]
     pub fused_quality: bool,

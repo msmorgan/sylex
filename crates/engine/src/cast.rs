@@ -1028,10 +1028,10 @@ impl GameState {
     ///
     /// Minimal by design: it covers `{C}`/colored/generic pips paid by
     /// tap-for-fixed-specific-mana sources (basics and mono lands), matching
-    /// colored pips to exact-colour sources first, then generic pips to any
+    /// colored pips to exact-color sources first, then generic pips to any
     /// leftover. Costs with `{X}`/`{S}`/hybrid/Phyrexian pips, and
     /// `AnyColor`/`OneOf`/other non-fixed sources, return `None` (the player
-    /// taps those by hand). Colour-OPTIMAL selection (sparing a colored source
+    /// taps those by hand). Color-OPTIMAL selection (sparing a colored source
     /// for a generic pip) is a deferred refinement; the greedy here is correct
     /// for covering THIS cost.
     #[must_use]
@@ -1094,7 +1094,7 @@ impl GameState {
         }
         // Greedy coverage over a working bag of available units: the spendable
         // pool already floated ([CR#106.6] SpendOnly-filtered for this
-        // subject), then colored pips from exact-colour sources, then
+        // subject), then colored pips from exact-color sources, then
         // generic from any.
         let mut available: Vec<ColorOrColorless> = self
             .spendable_pool(player, object)
@@ -1146,7 +1146,7 @@ impl GameState {
                 available.push(s.color);
             }
         }
-        // Defence in depth: reuse the engine's exact pip matcher over the pool
+        // Defense in depth: reuse the engine's exact pip matcher over the pool
         // the plan would produce, so a planning slip fails closed (no taps)
         // rather than tapping lands for a cast that can't actually be paid.
         let mut projected = self.spendable_pool(player, object);

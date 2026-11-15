@@ -109,7 +109,7 @@ pub struct CategoryDecl {
 /// # Reserved child names (the contract)
 ///
 /// A child's name is its grammatical function (`Production::names`). Binding
-/// resolves each name to the role the engine keys behaviour on
+/// resolves each name to the role the engine keys behavior on
 /// (`step.rs`, `ChildRole`), from the names below; any other name is inert.
 /// A Production that names its semantic head something else forgoes every
 /// `head` item, so renaming a head to dodge implicit agreement also loses its

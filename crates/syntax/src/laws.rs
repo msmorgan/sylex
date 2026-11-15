@@ -30,12 +30,12 @@ pub enum RealizationFault {
     Edge,
 }
 
-/// The spacing behaviour of the first and last atom of a Derivation: whether
+/// The spacing behavior of the first and last atom of a Derivation: whether
 /// the first attaches to what precedes it, and whether the last attaches to
 /// what follows it.
 type Edges = (bool, bool);
 
-/// The four possible pairs of edge behaviours, without per-node allocation.
+/// The four possible pairs of edge behaviors, without per-node allocation.
 #[derive(Clone, Copy, Default)]
 struct EdgeMask(u8);
 
@@ -79,7 +79,7 @@ impl Parse<'_> {
     /// Round-trip law 1 over the whole forest: every Reading realizes as the
     /// analyzed text. Each reachable leaf's spelling is checked once, and the
     /// spacing between every pair of atoms adjacent in some Derivation is
-    /// checked once per pair of edge behaviours, so the work is bounded by
+    /// checked once per pair of edge behaviors, so the work is bounded by
     /// the forest's size, never by its number of trees.
     ///
     /// # Errors

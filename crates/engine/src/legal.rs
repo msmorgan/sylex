@@ -2111,7 +2111,7 @@ mod tests {
     // --- I1: a non-activated ability must not desync the activation index --
 
     /// A tap-for-mana activated ability `tap_mana_ability` recognizes: cost
-    /// `[Tap]`, no targets, producing one fixed-colour mana.
+    /// `[Tap]`, no targets, producing one fixed-color mana.
     fn tap_for_colorless() -> Ability {
         use sylex_core::Action;
         use sylex_core::ActivatedAbility;

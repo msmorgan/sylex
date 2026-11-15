@@ -362,7 +362,7 @@ impl<'e> Profiler<'e> {
     pub fn profile(&self, kind: UnitKind, analyzed: &AnalyzedText) -> Profile {
         let tokens = self.tokens(analyzed, kind);
         let mut families = BTreeSet::new();
-        // A label's words are not analysed: a Flavor Word is in no inventory.
+        // A label's words are not analyzed: a Flavor Word is in no inventory.
         let label = match kind {
             UnitKind::TypeLine => 0,
             UnitKind::Line => self.label_length(&tokens),
@@ -589,7 +589,7 @@ impl<'e> Profiler<'e> {
         }
         if head.iter().all(|t| t.roman() || t.is_punct(',')) {
             families.insert(CHAPTER_HEADER);
-            // A chapter may be labelled: *III — Hall of Sorrow — ...*.
+            // A chapter may be labeled: *III — Hall of Sorrow — ...*.
             return self.spine(rest, families);
         } else if is_notation(head) {
             families.insert(COSTED_MODE);

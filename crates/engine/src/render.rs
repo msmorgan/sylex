@@ -39,7 +39,7 @@ impl GameState {
     }
 
     /// If the ability at `index` is a (skeleton-subset) mana ability
-    /// ([CR#605.1a]), what it produces: the single colour/colourless and the
+    /// ([CR#605.1a]), what it produces: the single color/colorless and the
     /// fixed amount. `None` for non-mana abilities.
     #[must_use]
     pub fn mana_ability(&self, object: ObjectId, index: usize) -> Option<(ColorOrColorless, Uint)> {

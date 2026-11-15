@@ -18,8 +18,8 @@ fn error(item: &str) -> String {
 fn malformed_items_are_rejected_naming_the_defect() {
     for (item, expected) in [
         (
-            "A: S -> B { colour: [head] }",
-            "3:13: unknown field `colour`",
+            "A: S -> B { color: [head] }",
+            "3:13: unknown field `color`",
         ),
         (
             "A: S -> B { cost: 2, cost: 3 }",

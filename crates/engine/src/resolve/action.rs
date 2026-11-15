@@ -5591,7 +5591,7 @@ mod tests {
     /// its body never runs — no per-card decision surfaces, no `Act` fact
     /// fires, and the library is untouched. Absent the static, the same scry
     /// runs normally. Proves the keyword-action event flows through the guard
-    /// (cant) pass, modelled on `replace_registry`'s
+    /// (cant) pass, modeled on `replace_registry`'s
     /// indestructible/cant-happen patterns.
     #[test]
     fn cant_act_suppresses_composite_body() {

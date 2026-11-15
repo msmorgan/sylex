@@ -21,7 +21,7 @@ use crate::state::GameState;
 
 impl GameState {
     /// [CR#614.1c,614.12]: the entering status a permanent's own augment
-    /// replacements (`Also(would: Enters(This), also: …)`) impose. Recognises
+    /// replacements (`Also(would: Enters(This), also: …)`) impose. Recognizes
     /// `Also(would: Enters(This), also: Tap(This))` → enters tapped, and
     /// `Also(would: Enters(This), also: Attach(This, to))` → enters attached
     /// ([CR#303.4], §4) — the host resolved from `to`; a `Sequentially`/

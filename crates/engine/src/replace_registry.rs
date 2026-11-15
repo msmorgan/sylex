@@ -1086,7 +1086,7 @@ pub(crate) mod tests_support {
 
     /// A minimal two-player game state with a single vanilla 2/2 creature
     /// (player 0's) on the battlefield. No plugins loaded — the card is
-    /// synthesised in Rust.
+    /// synthesized in Rust.
     ///
     /// Returns `(state, view, id)`. Because `LayeredView` is owned, returning
     /// it alongside the state is safe (it holds computed data, not a

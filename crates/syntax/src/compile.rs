@@ -3495,7 +3495,7 @@ impl<'a> Binder<'a> {
         heavy_shift: bool,
     ) -> Result<Vec<Draft>, LoadError> {
         let mut drafts = Vec::new();
-        // Only a subjective predicative relativises (CGEL, Ch. 12 §3.3(c),
+        // Only a subjective predicative relativizes (CGEL, Ch. 12 §3.3(c),
         // p. 1045): never the objective one of *turn it face up*.
         let copular = self.out.frames[frame].family == FrameFamily::Copular;
         let noun = self.out.frames[frame].family == FrameFamily::NounComplement;

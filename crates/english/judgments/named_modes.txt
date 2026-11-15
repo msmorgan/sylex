@@ -1,4 +1,4 @@
-# Flavor-word labelled ability lines (the bodies of named modes) and fragments that are not abilities
+# Flavor-word labeled ability lines (the bodies of named modes) and fragments that are not abilities
 + <card=Megaton's Fate> Disarm — Destroy target artifact. Create four Treasure tokens.
 + <card=Megaton's Fate> Detonate — Megaton's Fate deals 8 damage to each creature. Each player gets four rad counters.
 + <card=Dawnbringer Cleric> Cure Wounds — You gain 2 life.

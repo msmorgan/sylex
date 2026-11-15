@@ -1,4 +1,4 @@
-# The noun "devotion" selecting a "to" prepositional complement naming colours, versus colour words as adjectival predicative complements
+# The noun "devotion" selecting a "to" prepositional complement naming colors, versus color words as adjectival predicative complements
 +NounPhrase your devotion to black => PrepositionPhrase "to black" as Complement of devotion; !PrepositionPhrase "to black" as Modifier of devotion
 +NounPhrase your devotion to black and green => PrepositionPhrase "to black and green" as Complement of devotion
 + <card=Nylea's Disciple> When this creature enters, you gain life equal to your devotion to green. => PrepositionPhrase "to green" as Complement of devotion; !PrepositionPhrase "to green" as Modifier of devotion
