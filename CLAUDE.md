@@ -37,8 +37,9 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
   never extend it or copy newer work into it.
 - `docs/design/`: design docs; `architecture.md` is the overall design and the place to start,
   `english.md` the English grammar, `semantics.md` the semantics design, `syl.md` the `.syl`
-  language and `spelling.md` the spelling grammar. The last three are marked DRAFT: they give
-  direction, not a settled design.
+  language, `spelling.md` the spelling grammar and `pragmatics.md` the step that ranks the
+  meanings a text can have. The last four are marked DRAFT: they give direction, not a settled
+  design.
 - `docs/specs/`: accepted designs not yet in code. `docs/unusual-cards.md`: cards whose text defeats
   a natural modeling assumption.
 
@@ -47,7 +48,9 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 - American spelling everywhere (code, identifiers, docs, tickets, messages); verbatim quotations
   keep theirs.
 - Before naming a public item or coining a term, check `docs/contexts/game-model/CONTEXT.md` or
-  `docs/contexts/oracle-english/CONTEXT.md`; rename the identifier to match, never the entry.
+  `docs/contexts/oracle-english/CONTEXT.md`. Where the entry describes settled design, rename
+  the identifier to match, never the entry. Where it describes a design a DRAFT doc is changing,
+  the design wins: update or delete the entry with the change.
 
 ## Version control
 
