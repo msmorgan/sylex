@@ -852,7 +852,7 @@ VariableDeterminer: NumericalDeterminer -> Class(Variable) where $.Countability 
 ArabicDeterminer: NumericalDeterminer -> Numeral(Arabic(false)) where $.Countability = Count
 GroupedArabicDeterminer: NumericalDeterminer -> Numeral(Arabic(true)) where $.Countability = Count
 NegativeAdjective: AdjectivePhrase -> prefix:Lex(Affix) AdjectivePhrase where $.Polarity = Negative
-LabelledModalHeader: Document -> label:Class(AbilityWord) '—':Free ModalHeader
+LabeledModalHeader: Document -> label:Class(AbilityWord) '—':Free ModalHeader
 // A flavor word carries its own dash (*Trick Arrows — Whenever ..., choose
 // one —*), as in FlavorLabeledAbility.
 FlavorLabeledModalHeader: Document -> label:Lex(FlavorWord) ModalHeader
