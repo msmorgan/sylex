@@ -504,10 +504,10 @@ pub enum SchemaDecl {
         #[serde(default)]
         prepositional_passive: Vec<Equation>,
         /// Equations on the Internalised Complement of every derived
-        /// passive, over the child `internalised`: what its Preposition
+        /// passive, over the child `internalized`: what its Preposition
         /// Phrase may contain (CGEL, Ch. 16 §10.1.1, p. 1428).
         #[serde(default)]
-        internalised: Vec<Equation>,
+        internalized: Vec<Equation>,
         /// Derive Adjectival Passives of this Category from verb frames whose
         /// passive leaves no Complement but the optional `by` phrase.
         #[serde(default)]

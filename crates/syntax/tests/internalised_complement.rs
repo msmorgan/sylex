@@ -1,4 +1,4 @@
-//! A Valence schema's `internalised` equations constrain the Internalised
+//! A Valence schema's `internalized` equations constrain the Internalised
 //! Complement of every derived passive: with them, *reduced by 2* is only the
 //! `PP[by]` extent its frame selects, and *reduced by Zombies* keeps its
 //! Internalised Complement (CGEL,
@@ -19,7 +19,7 @@ use sylex_syntax::frames::FrameFamily;
 fn lexicon() -> Lexicon {
     let source = |kind| Source {
         kind,
-        path: "tests/internalised_complement.rs".to_owned(),
+        path: "tests/internalized_complement.rs".to_owned(),
         owner: "test".to_owned(),
     };
     Lexicon::new([
@@ -58,10 +58,10 @@ const FRAMES: &str = r#"(
     },
 )"#;
 
-/// The grammar, with `internalised` spliced into its verb Valence schema.
+/// The grammar, with `internalized` spliced into its verb Valence schema.
 fn grammar(
     lexicon: &Lexicon,
-    internalised: &str,
+    internalized: &str,
 ) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
     let source = format!(
         r#"
@@ -91,7 +91,7 @@ fn grammar(
                 passive: By,
                 verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
                 prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
-                internalised: [{internalised}],
+                internalized: [{internalized}],
             }}
             valence PrepositionPhrase {{ head: Preposition, complement_kind: ComplementKind }}
             valence Nominal {{ head: Noun }}
@@ -104,9 +104,9 @@ fn grammar(
     )
 }
 
-fn families(internalised: &str, text: &str) -> Vec<Option<FrameFamily>> {
+fn families(internalized: &str, text: &str) -> Vec<Option<FrameFamily>> {
     let lexicon = lexicon();
-    let grammar = grammar(&lexicon, internalised).unwrap();
+    let grammar = grammar(&lexicon, internalized).unwrap();
     let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
     for reading in &readings {
         assert_eq!(
@@ -125,10 +125,10 @@ fn family(reading: &Reading) -> Option<FrameFamily> {
     clause.selected_frame.as_ref().map(|frame| frame.family)
 }
 
-const BY_NP: &str = "internalised.ComplementKind = NP";
+const BY_NP: &str = "internalized.ComplementKind = NP";
 
 #[test]
-fn an_unconstrained_internalised_complement_doubles_a_selected_by_extent() {
+fn an_unconstrained_internalized_complement_doubles_a_selected_by_extent() {
     assert_eq!(
         families("", "Reduced by 2."),
         [
@@ -147,12 +147,12 @@ fn an_amount_is_only_the_selected_by_extent() {
 }
 
 #[test]
-fn a_noun_phrase_stays_an_internalised_complement() {
+fn a_noun_phrase_stays_an_internalized_complement() {
     assert!(families(BY_NP, "Reduced by Zombies.").contains(&Some(FrameFamily::Monotransitive)));
 }
 
 #[test]
-fn an_internalised_equation_names_a_carried_feature() {
+fn an_internalized_equation_names_a_carried_feature() {
     let lexicon = lexicon();
-    assert!(grammar(&lexicon, "internalised.VerbForm = Plain").is_err());
+    assert!(grammar(&lexicon, "internalized.VerbForm = Plain").is_err());
 }

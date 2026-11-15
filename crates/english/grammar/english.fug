@@ -3117,7 +3117,7 @@ valence VerbPhrase {
     prepositional_passive: [
         $.Voice = Passive, $.VerbForm = PastParticiple, head.VerbKind != Auxiliary,
     ],
-    internalised: [internalised.ComplementKind = NP],
+    internalized: [internalized.ComplementKind = NP],
     adjectival: AdjectivePhrase,
     adjectival_passive: [
         head.VerbForm = PastParticiple, $.AdjectivePosition = Predicative, $.Voice = Passive,

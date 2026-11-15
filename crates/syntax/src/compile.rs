@@ -531,7 +531,7 @@ struct Draft {
     /// plain serial coordination may not end with.
     foreign_coordinators: Vec<Lexeme>,
     /// A derived passive's Internalised Complement.
-    internalised: Option<usize>,
+    internalized: Option<usize>,
     /// A non-verbal head's bare phrase, which omits its head's Complements.
     omits_complement: bool,
     /// It ends in an ellipsis site whose omitted Complement takes these word
@@ -665,7 +665,7 @@ impl Draft {
             foreign_coordinators: Vec::new(),
             unlike: None,
             unlike_slots: Vec::new(),
-            internalised: None,
+            internalized: None,
             omits_complement: false,
             elliptical: None,
             unclosed: false,
@@ -1632,17 +1632,17 @@ impl<'a> Binder<'a> {
         Ok(draft)
     }
 
-    /// Adds a Valence schema's `internalised` equations to a derived passive
-    /// with an Internalised Complement, the child they call `internalised`.
+    /// Adds a Valence schema's `internalized` equations to a derived passive
+    /// with an Internalised Complement, the child they call `internalized`.
     fn internalized_equations(
         &self,
         draft: &mut Draft,
         equations: &[Equation],
     ) -> Result<(), LoadError> {
-        let Some(child) = draft.internalised else {
+        let Some(child) = draft.internalized else {
             return Ok(());
         };
-        let name = std::mem::replace(&mut draft.children[child].name, Ident::new("internalised"));
+        let name = std::mem::replace(&mut draft.children[child].name, Ident::new("internalized"));
         let result = self.equations(draft, equations);
         draft.children[child].name = name;
         result
@@ -2517,7 +2517,7 @@ impl<'a> Binder<'a> {
                 head,
                 phrase,
                 cost,
-                internalised,
+                internalized,
                 interleaved,
                 interleaved_internalized,
                 heavy_shift,
@@ -2546,7 +2546,7 @@ impl<'a> Binder<'a> {
                     *closed_complement,
                 )?;
                 for draft in &mut drafts {
-                    self.internalized_equations(draft, internalised)?;
+                    self.internalized_equations(draft, internalized)?;
                 }
                 self.slot_agreement(phrase, &mut drafts, agree)?;
                 let central = match derivations.central {
@@ -2583,7 +2583,7 @@ impl<'a> Binder<'a> {
                 };
                 let interleaved = Interleaving {
                     adjunct: interleaved.as_deref(),
-                    internalised: interleaved_internalized.as_deref(),
+                    internalized: interleaved_internalized.as_deref(),
                 };
                 let shifted = heavy_shift.then_some(shifted_object.as_slice());
                 let mut ordered = self.valence_order(drafts.clone(), interleaved, shifted, host)?;
@@ -3238,7 +3238,7 @@ impl<'a> Binder<'a> {
             );
             self.slot_equations(&mut draft, child, fill.kind())?;
             if agent {
-                draft.internalised =
+                draft.internalized =
                     Some(draft.child("complement", self.slot_symbol(&by_pp)?, GapRule::Closed));
             }
             self.equations(&mut draft, passive.prepositional)?;
@@ -3466,7 +3466,7 @@ impl<'a> Binder<'a> {
             let mut draft = self.framed(variant, frame, lhs, cost);
             draft.child("head", Symbol::Leaf(Test::Frame(frame)), GapRule::Closed);
             if agent {
-                draft.internalised =
+                draft.internalized =
                     Some(draft.child("complement", self.slot_symbol(by_pp)?, GapRule::Closed));
             }
             self.equations(&mut draft, equations)?;
@@ -3546,7 +3546,7 @@ impl<'a> Binder<'a> {
                 // The Internalised Complement strands its preposition too
                 // (*the creature that damage was dealt by*).
                 if Some(i) == agent_slot {
-                    draft.internalised = Some(draft.child(
+                    draft.internalized = Some(draft.child(
                         "complement",
                         self.slot_symbol(fill)?,
                         GapRule::Transparent,
@@ -3599,12 +3599,12 @@ impl<'a> Binder<'a> {
 
     fn internalized_orders(draft: &Draft) -> Vec<Draft> {
         let mut ordered = Vec::new();
-        // The internalised Complement (CGEL, Ch. 16 §10.1.1, pp. 1428–1429)
+        // The internalized Complement (CGEL, Ch. 16 §10.1.1, pp. 1428–1429)
         // is a PP Complement like the Frame's own, so it can precede a later
         // one (*damage dealt by a source to a player*). Preserve the same
         // Frame and functions in each surface order, keeping any NP Object
         // before the by-phrase.
-        if let Some(agent) = draft.internalised {
+        if let Some(agent) = draft.internalized {
             for before in 1..agent {
                 if !draft.children[before..agent].iter().all(|child| {
                     matches!(
@@ -3618,7 +3618,7 @@ impl<'a> Binder<'a> {
                     continue;
                 }
                 let mut reordered = draft.clone();
-                reordered.extend_id(&format!("internalised-before{before}"));
+                reordered.extend_id(&format!("internalized-before{before}"));
                 let child = reordered.children.remove(agent);
                 reordered.children.insert(before, child);
                 remap_draft(&mut reordered, |i| {
@@ -3630,7 +3630,7 @@ impl<'a> Binder<'a> {
                         i
                     }
                 });
-                reordered.internalised = Some(before);
+                reordered.internalized = Some(before);
                 ordered.push(reordered);
             }
         }
@@ -3696,8 +3696,8 @@ impl<'a> Binder<'a> {
             .adjunct
             .map(|name| self.category(name))
             .transpose()?;
-        let internalised = interleaving
-            .internalised
+        let internalized = interleaving
+            .internalized
             .map(|name| self.category(name))
             .transpose()?;
         let mut ordered = Vec::new();
@@ -3819,9 +3819,9 @@ impl<'a> Binder<'a> {
                 // Before the Internalised Complement, its own Adjunct
                 // Category interleaves too.
                 let before_internalized =
-                    internalised.filter(|_| draft.internalised == Some(split));
+                    internalized.filter(|_| draft.internalized == Some(split));
                 for (adjunct, suffix) in std::iter::once((adjunct, ""))
-                    .chain(before_internalized.map(|c| (c, "/internalised")))
+                    .chain(before_internalized.map(|c| (c, "/internalized")))
                 {
                     let segment = format!("prefix{split}{suffix}");
                     out.extend(self.interleaved_dependent(
@@ -5008,7 +5008,7 @@ fn cluster_shapes(frames: &[Frame]) -> Vec<u16> {
 #[derive(Clone, Copy)]
 struct Interleaving<'a> {
     adjunct: Option<&'a str>,
-    internalised: Option<&'a str>,
+    internalized: Option<&'a str>,
 }
 
 /// The Categories a Valence schema's Complement Clusters are built in
@@ -5743,7 +5743,7 @@ fn central_adjuncts(
         .filter(|d| d.central_site != CentralSite::None)
     {
         // Every index a central site carries is one `remap_draft` moves.
-        if draft.internalised.is_some()
+        if draft.internalized.is_some()
             || draft.host_check.is_some()
             || draft.fills_preposition.is_some()
             || draft.clusters.is_some()
