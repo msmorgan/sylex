@@ -1,5 +1,5 @@
 ---
-needs: [syl-spelling-conventions, syl-spelling-optional-segments, cleanup-step6-syl]
+needs: [syl-spelling-conventions, syl-spelling-optional-segments]
 ---
 
 # Recover `.syl` terms from `sylex_english` Readings
@@ -16,16 +16,25 @@ each Template's and Definition's `spelling`, so it needs the spelling convention
 `sylex_english` Reading to a `.syl` term yet, and the resolved tree it would target does not exist
 yet either.
 
+Recovery does not wait for the rest of step 6 (`cleanup-step6-syl`). It reads whichever
+declarations have a wording when it runs, so its report changes as the corpus is reshaped.
+
 ## Done when
 
 - For a canon card, recovery reads the Packed Forest of its Oracle text and yields candidate
   resolved terms built from the builtin Templates and Definitions; candidates that discourse or
   the checker refuses drop out.
 - Every canon card's recovery is run and reported: one surviving candidate that matches the
-  card's `.syl` file, a mismatch, no candidate, or more than one candidate (reported, never stored
-  as a choice).
+  card's `.syl` file, a mismatch, no candidate, or more than one candidate. A card with more than
+  one is reported with each candidate; recovery chooses none, by rank or otherwise, and stores no
+  choice.
 - No check exists yet: recovery has no code, and the resolved tree it targets arrives with step 7.
   The landing names the command that runs recovery and reports its results.
+
+## Not in scope
+
+- Choosing among the candidates the checker and discourse leave: a pragmatics step, which is not
+  designed.
 
 ## Pointers
 

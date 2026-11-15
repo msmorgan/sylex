@@ -23,11 +23,12 @@ returns all tapped and all attacking creatures to their owners' hands.", has no 
 ## Done when
 
 - *Balthor the Defiled*'s line has a Reading in which "all black" and "all red" each determine
-  "creature cards", and that Reading's ranking key is the cheapest; the "all tapped and all
-  attacking creatures" line has that Reading too, in a grammar test.
+  "creature cards", and the "all tapped and all attacking creatures" line has that Reading too,
+  in a grammar test. The landing reports where the Reading ranks; no rank is required
+  (`english.md` §5).
 - `cargo xtask english strata --check` and `cargo test -p sylex_english` pass.
 
 ## Pointers
 
 - `crates/english/grammar/english.fug` (`Determined`, the noun-phrase coordinations)
-- `docs/design/english.md` §3, §4
+- `docs/design/english.md` §3, §4, §5
