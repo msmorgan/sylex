@@ -26,14 +26,14 @@ ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every 
 
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
-  - The performer is outside the declaration (`actor`): the spelling is the bare verb phrase.
-    `die` is `"die"`, `sacrifice` is `"sacrifice $subject"`, `win` is `"win the game"`.
-  - The grammatical Subject is a parameter: the hole stays and the verb is still uninflected,
-    as `phaseOutUntil`'s `"$subject phase out until $event"` while it keeps its parameter (the
-    open question below). `becomeBlocked` and `resolve` are not this case:
-    `syl-shared-phrase-written-once` makes them subjectless, read like `die` (`"become blocked"`,
-    `"resolve"`), their subject the context's.
-  - The Subject is fixed inside the declaration and no hole decides agreement: the verb is
+  - The subject is outside the declaration: the spelling is the bare verb phrase. `die` is
+    `"die"`, `sacrifice` is `"sacrifice $subject"`, `win` is `"win the game"`.
+  - The grammatical subject is still a parameter: the hole stays and the verb is uninflected, as
+    `phaseOutUntil`'s `"$subject phase out until $event"` and `becomeBlocked`'s `"$subject become
+    blocked"`. Every such declaration gives its subject up to the clause it stands in
+    (`syl-continuous-effect-subject`, `syl-passive-participle-and-trigger-events`), and none is
+    restructured here.
+  - The subject is fixed inside the declaration and no hole decides agreement: the verb is
     written as printed. `controllerSacrifices` stays `"$subject's controller sacrifices it"`.
 - A spelling that parses in several ways is several Constructions (`spelling.md`, the notation's
   load checks). A wording difference with the same meaning lives in which Template a card calls,
@@ -41,15 +41,6 @@ ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every 
 - A spelling's Holes stand in its declaration's parameter order, which is printed order, as
   arguments are written in declaration order (`syl.md` §2, §5); a spelling whose Hole order
   differs is `syl-printed-read-order`'s to reorder, not this ticket's.
-
-## Open questions
-
-- **`becomeBlocking`, `stopBlocking` and `phaseOutUntil`** ("$subject becomes blocking $blocked",
-  "$subject stops blocking $blocked", "$subject phases out until $event") take their subject as a
-  parameter, as `becomeBlocked` did, and nothing in `plugins/` calls them. Each prints its own
-  subject in the active: the creature that begins or stops blocking, the permanent that phases
-  out. Whether they become subjectless like `becomeBlocked`. Recommendation: yes, each when a
-  card first calls it, so its subject is the context's.
 
 ## Done when
 

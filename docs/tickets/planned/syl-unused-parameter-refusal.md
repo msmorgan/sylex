@@ -20,7 +20,8 @@ Written against the surface (`cleanup-step6-surface`).
 ## Design
 
 - A parameter that its declaration's block never reads is refused, on every declaration kind with
-  a body. `deed_action` (`syl-explicit-deeds`) is exempt.
+  a body. `deed_action` (`syl-explicit-deeds`) is exempt. The implicit `$actor` of an `action`
+  Definition (`syl-definition-actor-parameter`) is no declared parameter and is never refused.
 - A read in any field of the block counts, `number` included: toxic reads `amount` through
   `number = $amount`, which `keywordNumber(toxic)` projects and `totalToxicValue` sums
   [CR#702.164b,702.164c] (spec §7). A read inside `rules` is refused outright (spec §8), so it

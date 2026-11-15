@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-where-letter-supplement, syl-spelling-conventions]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-where-letter-supplement, syl-spelling-conventions, syl-clause-and-imperative]
 ---
 
 # Each printed sequence of instructions is a Template over `sequentially`
@@ -21,8 +21,8 @@ printed constructions, which the English grammar reads as different trees:
   with a comma before it is a different tree from one without (the coordination compiler's
   `binary` and `binary-delimited` drafts, `crates/syntax/src/compile.rs`).
 - A verb-phrase coordination under one subject: *Bonus Round*'s "that player copies it and may
-  choose new targets for the copy", which the card writes as two `instruct(that(player), …)`, so
-  the printed subject is written twice.
+  choose new targets for the copy", which the card writes as two sentences, each with its own
+  `that(player)`, so the printed subject is written twice.
 
 No program spells terms yet, so `cargo xtask dsl check` cannot see that none of these round-trips.
 
@@ -33,12 +33,14 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 ## Design
 
 - The steps' meaning is one: the instructions are followed in the order written [CR#608.2c].
-  `sequentially` stays the one expansion, and each printed wording is its own Template over it,
-  never one Template with a parameter that carries only wording (`spelling.md`, on the resolved
-  term as the derivation); a join is fixed in the wording, never chosen by a parameter. "And"
-  and "then" between steps are two Templates, `$steps<and>` and `$steps<then>`.
-- A verb-phrase coordination under one subject is one `instruct` over one Template of the steps,
-  as `spelling.md` writes a shared subject (shared material at a coordination).
+  `sequentially` is declared at `Clause`, for a sequence of sentences, and at `VerbPhrase`, for
+  verb phrases under one subject (`syl-clause-and-imperative`). It stays the one expansion at
+  each sort, and each printed wording is its own Template over it, never one Template with a
+  parameter that carries only wording (`spelling.md`, on the resolved term as the derivation); a
+  join is fixed in the wording, never chosen by a parameter. "And" and "then" between steps are
+  two Templates, `$steps<and>` and `$steps<then>`.
+- A verb-phrase coordination under one subject is one `clause` over a Template of the steps at
+  `VerbPhrase`, as `spelling.md` writes a shared subject (shared material at a coordination).
 - Separate sentences are a list Hole whose elements are runs of sentences (`spelling.md` §2, a
   Hole may hold a run), juxtaposed, each period coming from its own sentence: spelling reads a
   sentence sequence as flat, so the grammar's right-recursive `SentenceSequence` imposes no
@@ -64,6 +66,16 @@ of the sequences and lands first, so the steps this ticket spells are the printe
   punctuation a wording holds.
 - **Names** for the Templates. Recommendation: named for their wording, chosen with the answer
   above; the glossary's **Linked Coordination** names the ", then" form.
+- **How much of the way sentences join this ticket settles.**
+  `docs/specs/voice-and-object-phrases.md` §13 lists four things as not designed: a sequence of
+  sentences against a coordination of
+  clauses ("Draw two cards, then discard two cards"; "… . Then …"), a dependent in a run's first
+  sentence that governs the run, "Otherwise", and a trailing sentence over what precedes it
+  ("Activate only as a sorcery."). The Design above answers the first with Templates over
+  `sequentially` at each sort and the second with the run rule, and says nothing of the other
+  two. Recommendation: the owner confirms the first two before the corpus is rewritten;
+  "Otherwise" stays `doIf`'s, and the trailing sentence its own declarations'
+  (`activatedOnly…`), until a design says otherwise.
 
 ## Done when
 
@@ -78,8 +90,8 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 
 ## Not in scope
 
-- A printed "you" with no Handoff (*Agate-Blade Assassin*'s "you gain 1 life" is `gainLife(1)`;
-  *Harsh Sustenance*'s "and you gain X life"): an argument of the step, not of the sequence.
+- A printed "you" (*Agate-Blade Assassin*'s "you gain 1 life", *Harsh Sustenance*'s "and you
+  gain X life"): the subject of its own clause, which `syl-clause-and-imperative` writes.
 - Comma-joined and "and"-joined costs (`compound`, *Goblin Bomb*'s "Remove five fuse counters …
   and sacrifice it"): `Cost`, not `sequentially`.
 

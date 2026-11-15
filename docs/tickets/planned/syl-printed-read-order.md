@@ -14,11 +14,9 @@ own spelling every call is forced to write its arguments against printed order. 
 some required parameters after optional ones; a positional argument binds only required
 parameters, so those call sites need no naming.
 
-The same sites are rewritten by two other tickets, which land first:
-`syl-sort-prefixed-primitive-names` renames the `actionPay`, `actionRemoveCounters` and
-`actionVote` calls inside the `pay`, `removeCounters` and `vote` declarations (10 calls) that this
-ticket reorders; and `syl-spelling-optional-segments` merges the `preventAll`, `preventAllBy` and `preventNext`
-Templates whose `preventDamage` calls this ticket reorders (3 files).
+The same sites are rewritten by another ticket, which lands first:
+`syl-sort-prefixed-primitive-names` renames the `actionPay` and `actionVote` calls inside the
+`pay` and `vote` declarations that this ticket reorders.
 `syl-enlist-optional-attack-cost` gives `gatedBy` and `staticSpecGatedBy` their offered form after
 this ticket reorders them.
 
@@ -30,7 +28,7 @@ this ticket reorders them.
   its `spelling`'s Holes, and, for a declaration with no `spelling`, with the Holes of the wording
   its doc comment gives; it is re-run when the ticket is claimed. Cases found so far:
   - with no `spelling`: `gatedBy` and `staticSpecGatedBy` (the cost is printed last), and the
-    `preventDamage`, `removeCounters`, `vote` and `pay` families;
+    `vote` and `pay` families;
   - whose `spelling` prints a Hole before an earlier parameter's, 13 of the 15 the script finds:
     `markDamage(subject, amount)` "$amount damage is marked on $subject", `headed(head,
     subject)` "$subject as a $head", `abilityGrantSelected(subject, source, selection)` "$subject
@@ -46,7 +44,10 @@ this ticket reorders them.
   The other two are rewritten by other tickets and left to them: `createTappedToken(token,
   count)` "create $count tapped $token" (`syl-token-records-to-templates`, which writes created
   tokens as nominals) and `half(rounding, amount)` "half $amount, rounded $rounding"
-  (`syl-round-each-time`, which moves the rounding into Tails with the amount first).
+  (`syl-round-each-time`, which moves the rounding into Tails with the amount first). The
+  `preventDamage` and `removeCounters` families are left out as well: their object becomes one
+  noun phrase (`syl-prevent-damage-phrase`, `syl-counters-noun-phrase`), which replaces the
+  parameters a reorder would move.
   `abilityGrantSelected` loses its subject in `syl-continuous-effect-subject`; this ticket still
   puts `selection` before `source`.
 - `doIf` has no `postposed` parameter; `doOnlyIf` ("<action> if <condition>") says the printed

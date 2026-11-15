@@ -30,11 +30,12 @@ Written against the spine (`cleanup-step6-spine`).
 - `sylex_syl` parses and formats the notation `docs/design/spelling.md` §7 states, form labels,
   `*` and the `<.>` join included, and refuses a form outside §7's set, with a negative test.
 - Every `TODO(spelling)` that needed an optional or repeated segment is written with it.
-- The notation has no mark yet for the Holes passive subject promotion links: a context's
-  Subject and Action Holes (`does`, `would`, `did`, `cant`, `must`, `can`, `gatedBy`, `doesnt`).
-  Their optional parts are written like any other, no mark is invented for those Holes, and the
-  landing lists these declarations as standing outside the check that a variant is English until
-  `spelling.md` gives the mark.
+- The notation has no mark for the Holes of the words that take a `Subject` and a verb phrase
+  (`does`, `would`, `did`, `cant`, `must`, `can`, `gatedBy`, `doesnt`), whose `Subject` selects
+  the voice the verb phrase prints. Their optional parts are written like any other, no mark is
+  invented for those Holes, and the landing lists these declarations as standing outside the
+  check that a variant is English until each takes its subject as a noun phrase
+  (`syl-passive-participle-and-trigger-events` and the three tickets after it).
 - The optional parts this ticket writes leave form labels, `*` and `<.>` joins unwritten; that
   is `syl-spelling-forms-and-runs`'s.
 - The parser refuses a join chosen by a parameter (`$xs<$name>`), with a negative test.

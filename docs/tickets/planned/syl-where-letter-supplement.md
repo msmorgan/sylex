@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-spelling-conventions]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-spelling-conventions, syl-clause-and-imperative]
 ---
 
 # ", where X is …" is written as a supplement of what it follows
@@ -10,7 +10,7 @@ A printed ", where X is …" defines a letter for the clause before it. The Engl
 anchors it as a comma-set Supplement to a finite Clause, to a non-final verb-phrase conjunct under
 a shared subject, or to a keyword line's item (the comma-set Supplement adjuncts of `crates/english/grammar/english.fug`). The corpus writes it as a sibling of what it supplements instead:
 
-- In an effect, as the Action `define` ("$letter is $amount", over
+- In an effect, as `define` ("$letter is $amount", over
   `establish(letterDefinition(…))`), a step of a `sequentially`: 19 canon files.
   *Celebrate the Harvest* prints "Search your library for up to X basic land cards, where X is
   the number of different powers among creatures you control. Put those cards onto the
@@ -36,14 +36,14 @@ turn, where X is …" on the clause after "If you do,", past its duration.
 
 ## Design
 
-- One Template per host sort (Action, StaticSpec, and the keyword-line item where a keyword
+- One Template per host sort (`Clause`, `StaticSpec`, and the keyword-line item where a keyword
   prints "X, where X is …"), each taking its host and its letter definitions, worded
   "$host, where $definitions<and>", added as a card needs it. The supplement stands at its host's
   right edge, so the host is a Hole and the wording is substitution.
-- The Action Template's host is the Action that makes the finite clause the supplement adjoins: a
-  Handoff (*Aven Shrine*), `may` (*Surrakar Spellblade*), `establish` with its duration
-  (*Alistair*) or an imperative (*Celebrate the Harvest*). A trigger or a fronted "If you do,"
-  stays outside it, as their own calls over it.
+- The `Clause` Template's host is the finite clause the supplement adjoins: a `clause` (*Aven
+  Shrine*'s "that player gains X life", *Surrakar Spellblade*'s "you may draw X cards",
+  *Alistair*'s continuous effect with its duration) or an `imperative` (*Celebrate the
+  Harvest*). A trigger or a fronted "If you do," stays outside it, as their own calls over it.
 
 ## Open questions
 
@@ -52,7 +52,7 @@ turn, where X is …" on the clause after "If you do,", past its duration.
   them onto the battlefield tapped, then shuffles." The Reading adjoins the supplement to the
   first verb-phrase conjunct ("searches their library for up to X basic land cards") inside the
   linked coordination, by an adjunct the grammar admits only on a non-final conjunct (`nonfinal`).
-  A standalone wording "$host, where $definitions<and>" at that verb phrase is no English on its
+  A standalone wording "$host, where $definitions<and>" at `VerbPhrase` is no English on its
   own, so the load check that every variant of a `spelling` parses would refuse it. Options: the
   load check parses a wording in the context its Category allows (a non-final conjunct); or the
   supplement is part of the coordination's Template, which takes the first step's definitions.

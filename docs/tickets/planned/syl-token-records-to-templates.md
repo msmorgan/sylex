@@ -1,5 +1,6 @@
 ---
 needs: [cleanup-step6-surface, syl-nominal-descriptions]
+specs: [voice-and-object-phrases]
 ---
 
 # Created tokens are written as printed, not as raw records
@@ -38,20 +39,30 @@ omitted `colors` (*Chrome Replicator* against *Volrath's Laboratory*; a word pri
 absent value has no notation in `spelling.md`). The scan of every `{characteristics = …}` record is
 in `docs/evidence/syl-token-records-to-templates/`.
 
+The verb that creates them spreads the same phrase over arguments: `create(count, token,
+riders)` and `createObject(count, spec, under)` take the number apart from the description, so
+the tokens are no noun phrase and cannot be a passive clause's subject. *Divine Visitation*'s "If
+one or more creature tokens would be created under your control, that many 4/4 white Angel
+creature tokens with flying and vigilance are created instead." and *Primal Vigor*'s "twice that
+many of those tokens are created instead" each print them as one (spec §6).
+
+## Design
+
+- A created token's description is a `Nominal` whose head is `token`, with its size, colors,
+  types and subtypes as premodifiers and its abilities as a postmodifier, built from
+  `syl-nominal-descriptions`'s sorts and lowered to the token's characteristics. "A tapped 2/2
+  black Zombie creature token" and "colorless" are premodifiers like any other.
+- `create` and `createObject` take the tokens as one noun phrase, whose determiner is the count
+  (spec §6).
+
 ## Open questions
 
-- **How a created token is written.** Options:
-  - (a) As a nominal: the token's description is a `Nominal` whose head is `token`, with its
-    size, colors, types and subtypes as premodifiers and its abilities as a postmodifier, built
-    from `syl-nominal-descriptions`'s sorts, and lowered to the token's characteristics. "A tapped
-    2/2 black Zombie creature token" and "colorless" are premodifiers like any other.
-  - (b) Fixed-slot Templates, one per token shape, with a new Template for each shape no slot
-    covers (named legendary, `Amount`-sized artifact, chosen qualities), as `spelling.md` today gives
-    `creatureToken` for *Archfiend's Vessel*'s token.
-
-  Recommendation: (a). It writes every printed token in the table with no new shape, and (b)
-  adds a Template for every shape the corpus has not met yet. Under (a), `spelling.md`'s
-  `creatureToken` example is rewritten.
+- **An emblem under `createObject`.** `getEmblem` and `getNamedEmblem` expand to
+  `createObject(1, emblem(…))`: "[Player] gets an emblem with [ability]" means that player puts
+  such an emblem into the command zone [CR#114.2]. The spec gives `createObject` a tokens phrase
+  and does not say what an emblem is under it. Options: `emblem` is a head at `Nominal` with its
+  abilities a postmodifier, as cards print "an emblem with …", so `createObject` takes one noun
+  phrase for either; or an emblem gets a primitive of its own. Recommendation: the head `emblem`.
 - **A named token** ("create Marit Lage, a legendary 20/20 … token"; *Tuktuk the Explorer*; *There
   and Back Again*'s "Create Smaug, a legendary 6/6 red Dragon creature token …"; *Bonny Pall,
   Clearcutter*'s "create Beau, a legendary blue Ox creature token …"). The English grammar reads the
@@ -86,13 +97,16 @@ in `docs/evidence/syl-token-records-to-templates/`.
   and keeps §6's two positions; lowering's lookup by name is [CR#111.11]'s own rule. A predefined
   token ("a Treasure token") stays its `token` Definition.
 - **Chosen qualities** (*Volrath's Laboratory*, *Riptide Replicator*, *Sarpadian Empires, Vol.
-  VII*, which print "creature token of the chosen color and type"). Recommendation: under (a), a
-  postmodifier "of the chosen color and type"; under (b), a Template with fixed `ofChosen(color)`
-  and `ofChosen(subtype(creature))`.
+  VII*, which print "creature token of the chosen color and type"). Recommendation: a
+  postmodifier "of the chosen color and type".
 
 ## Done when
 
 - The open questions are answered, and `spelling.md`'s token example is one that exists.
+- `create` and `createObject` take their tokens as one noun phrase, and no call writes a count
+  beside a description. *Divine Visitation*'s and *Primal Vigor*'s replacements are passive
+  clauses whose subjects are the tokens phrases they print, over `done(create(subject))`, each
+  checked against its Oracle text.
 - *There and Back Again* and *Bonny Pall, Clearcutter* are in `plugins/canon/cards/`, their named
   tokens written as printed, each checked against its Oracle text.
 - No raw `{characteristics = …}` record remains in a token slot under `plugins/`; the fourteen

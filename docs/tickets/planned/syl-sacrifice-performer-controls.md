@@ -13,7 +13,7 @@ something that isn't a permanent, or something that's a permanent they don't con
 creature, and so can a bare "sacrifice a creature". The restriction cannot be written yet:
 `.syl` has no way to restrict a noun phrase of any plurality by a predicate while mentioning it
 once. A partitive over the subject is refused for a singular one (a Saga's
-`sacrifice(thisSaga)`), and `doIf(is(subject, actorControls), move(subject, …))` mentions the
+`sacrifice(thisSaga)`), and `doIf(is($subject, actorControls), move($subject, …))` mentions the
 subject twice.
 
 Written against the surface (`cleanup-step6-surface`).
@@ -23,10 +23,11 @@ Written against the surface (`cleanup-step6-surface`).
 - A primitive restricts a noun phrase, singular or plural, by a predicate with one mention of the
   noun phrase.
 - `sacrifice`'s body uses it to restrict its subject to permanents the performer controls, so no
-  card's noun phrase has to say "you control". The restriction is not `zone(battlefield, actor)`:
+  card's noun phrase has to say "you control". The restriction is not `zone(battlefield, $actor)`:
   `zone`'s second argument names an owner, and control is not ownership.
-- The body reads its performer, so a Handoff ("target opponent sacrifices a creature") decides
-  whose permanents are eligible.
+- The body reads its performer through `$actor`, so the subject of an active clause ("target
+  opponent sacrifices a creature") or the agent of a passive (*Tide of War*'s "each blocking
+  creature is sacrificed by its controller") decides whose permanents are eligible.
 - Everything built on sacrifice inherits the restriction (devour, exploit, champion, evoke,
   `controllerSacrifices`, every card that writes it); `forage.syl` drops its now-redundant
   `actorControls`.

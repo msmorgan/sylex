@@ -1,12 +1,13 @@
 ---
 needs: [syl-argument-naming, syl-single-face-card-call]
+specs: [voice-and-object-phrases]
 ---
 
 # Declarations whose name or spelling says something else
 
 ## Why
 
-Eight declarations are named or spelled for one use, or read poorly for what they build:
+Seven declarations are named or spelled for one use, or read poorly for what they build:
 
 - `modifiesPrecedingAction` (`primitives/timing/`) is a `Duration` spelled "It can't be
   regenerated", though it is any rider that modifies the action before it [CR#608.2c].
@@ -14,17 +15,17 @@ Eight declarations are named or spelled for one use, or read poorly for what the
 - `splitOverPermanent` (`templates/pronoun/`) is spelled "any target".
 - `under` (`primitives/zone/`), the move rider spelled "under <controller>'s control", reads
   as `under(you)`; it is renamed `underControlOf` (16 files call it).
-- `actor(np)` (`primitives/noun/actor.syl`), the active `Subject` constructor, is named for the
-  Actor, but its noun phrase is the clause's Subject, a Referent that pronouns and demonstratives
-  read, and not the Actor (`semantics.md` §2.1, §4.2); an effect can be one
-  (`doesnt(actor(thisEffect), remove(thisAura))`, *Black Ward*). It is renamed `subject(np)`.
 - `actor` at `NounPhrase` (`primitives/pronoun/actor.syl`) is described as the performer ("whoever
-  performs this action"), as are the glossary entry **Actor** and `semantics.md` §2.1 and §2.3,
-  but it means the subject of the clause: `die`, `enter` and `leave` read the thing that dies,
-  enters or leaves through it. It is renamed `subject`, beside `subject(np)` at `Subject`, a
-  different sort (`syl.md` §3). 48 calls in 39 files use it: 43 in 34 `plugins/builtin/` files and
-  one in each of 5 canon cards. The expansion tests (`crates/xtask/src/dsl_expand/tests.rs`) name
-  it by one constant, `SUBJECT_WORD`.
+  performs this action") and is read two ways. Six Templates read it as the thing their event
+  happens to: `die`, `enter`, `leave`, `becomeStatus`, `phaseIn` and `phaseOut` (`die` is
+  `move(actor, …)`), and so do five canon cards in their own terms (*Afflicted Deserter //
+  Werewolf Ransacker*, *Bewitching Leechcraft*, *Darksteel Garrison*, *Tuktuk Scrapper*, *Verity
+  Circle*). The keyword-action Definitions read it as whoever performs them (`mill` moves cards
+  from `libraryOf(actor)`), as do `gainControl` and `actorControls`. The first reading gets its
+  own word, `subject`, which reads what the verb phrase is said of as a participant of its event
+  and prints no word; `actor` keeps the second (spec §2). The expansion tests
+  (`crates/xtask/src/dsl_expand/tests.rs`) name the participant word by one constant,
+  `SUBJECT_WORD`.
 - `and` at `TriggerCondition` (`primitives/triggerCondition/and.syl`) is named for the printed
   coordinator, but it means that the ability triggers when any of its conditions is met
   [CR#603.1b,603.2]. The primitive is renamed `or`, for its meaning, and spelled with the "or"
@@ -46,16 +47,11 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 - Each is named for what it builds and spelled with words that mean it, or its one use moves into
   a Template that carries the printed wording; every caller in `plugins/` is updated.
-- The `Subject` constructor is `subject(np)`, and no `actor(` call is left in `plugins/`. The
-  rename is corpus-wide (every `actor(` call, about 640 today), so a one-off script makes it and
-  checks that every file parses to the same tree apart from the constructor's name; the landing
-  reports the counts it compared. The glossary entry **Subject**
-  (`docs/contexts/game-model/CONTEXT.md`), `syl.md` §2 and `semantics.md` §4.2, §4.6 and §4.7
-  name `subject(…)`.
-- The subject word at `NounPhrase` is `subject`, `SUBJECT_WORD` names it, and no `actor` call at
-  `NounPhrase` is left in `plugins/`. Its doc comment, the glossary entry **Actor**
-  (`docs/contexts/game-model/CONTEXT.md`) and the sentences of `semantics.md` §2.1 and §2.3 that
-  describe it as the performer say it means the subject of the clause.
+- `subject` exists at `NounPhrase` with no `spelling`; the six Templates and the five canon
+  cards write it, and `SUBJECT_WORD` names it. Every `actor` left at `NounPhrase` reads a
+  performer; the landing lists each use of either word with the reading it took. The doc
+  comments of the two words, and the sentences of `semantics.md` §2.1 and §2.3 that describe the
+  `actor` word, say which each reads.
 - The trigger-condition primitive is `or`, the printed "and" is the Template `and` over it, and
   no Template `or` exists at `TriggerCondition`; each of the 7 callers is checked against its
   card's Oracle text, so the 6 that print "and" call `and` and *Tenuous Truce* calls `or`.
@@ -63,13 +59,21 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 - Declaration order stays the printed order (`syl.md` §5).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
+## Not in scope
+
+- The `Subject` constructor `actor(np)` (`primitives/noun/actor.syl`): it is not renamed. Its
+  calls are deleted with the sort `Subject` (`syl-passive-participle-and-trigger-events` to
+  `syl-deontic-verb-phrase-operators`).
+- A Definition's own performer, `$actor`: `syl-definition-actor-parameter`.
+
 ## Pointers
 
 `plugins/builtin/primitives/timing/{modifiesPrecedingAction,thisObject}.syl`,
 `plugins/builtin/primitives/period/thisObject.syl`,
-`plugins/builtin/templates/pronoun/splitOverPermanent.syl`, `plugins/builtin/primitives/noun/actor.syl`,
-`plugins/builtin/primitives/pronoun/actor.syl`, `crates/xtask/src/dsl_expand/tests.rs`,
-`plugins/builtin/primitives/static/doesnt.syl`,
+`plugins/builtin/templates/pronoun/splitOverPermanent.syl`,
+`plugins/builtin/primitives/pronoun/actor.syl`,
+`plugins/builtin/templates/action/{die,enter,leave,becomeStatus,phaseIn,phaseOut}.syl`,
+`crates/xtask/src/dsl_expand/tests.rs`, `docs/specs/voice-and-object-phrases.md` §2,
 `plugins/builtin/primitives/triggerCondition/and.syl`,
 `plugins/builtin/templates/triggerCondition/or.syl`,
 `plugins/builtin/templates/static/onlyIfSo.syl`.

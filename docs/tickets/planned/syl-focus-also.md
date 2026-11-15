@@ -52,12 +52,13 @@ continuous effect, and the gate already orders the two, so this ticket names no 
   `crates/english/grammar/english.fug`), and spelling is substitution, so "also" is a Template
   over a subjectless phrase, with the subject supplied outside it. It adds no meaning: its body
   is its argument.
-- Its hosts: the subjectless continuous-effect phrase of `syl-continuous-effect-subject`
-  (*Efflorescence*, *Jetmir*, *Goatnap*); the Action a Handoff, an imperative or an event takes
-  for a deed (*Liliana's Triumph*'s "each opponent also discards a card", *Goblin Barrage*, *Okk*'s
-  "unless a creature with greater power also attacks"); and the sentence-initial "Also" before an
-  imperative (*Beast Mode*'s "Also put a +1/+1 counter on that creature if …"), its own Template
-  for its own placement. One Template per sort it wraps, added as a card needs it.
+- Its hosts are verb phrases: the subjectless continuous-effect phrase of
+  `syl-continuous-effect-subject` (*Efflorescence*, *Jetmir*, *Goatnap*), and a deed under a
+  clause or an event (*Liliana's Triumph*'s "each opponent also discards a card", *Goblin
+  Barrage*, *Okk*'s "unless a creature with greater power also attacks"). Both stand at
+  `VerbPhrase`, so one Template there serves them. The sentence-initial "Also" before an
+  imperative (*Beast Mode*'s "Also put a +1/+1 counter on that creature if …") is its own
+  Template, at `Clause`, for its own placement.
 - Not a Template per verb (`alsoGain`, `alsoGet`, …), which multiplies with the 13 verbs the
   corpus puts "also" before; not a modifier argument of each verb, which would be a flag stored
   beside the term; and not the English layer's, since a Reading holds the word "also" and the

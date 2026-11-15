@@ -9,7 +9,7 @@ needs: [cleanup-step6-surface]
 Each of these terms writes words its card does not print, or cannot print what it does:
 
 - *Answered Prayers* prints "Whenever a creature you control enters, you gain 1 life." and writes
-  `when(does(actor(a(and([isCreature, youControl]))), enter), …)`, the trigger word "When".
+  `when(does(a(and([isCreature, youControl])), enter), …)`, the trigger word "When".
 - *Helm of Possession* prints "Gain control of target creature for as long as you control this
   artifact and this artifact remains tapped." and writes
   `forAsLongAs(and([is(thisArtifact, youControl), is(thisArtifact, isTapped)]))`: the first part

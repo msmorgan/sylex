@@ -181,6 +181,19 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   information is its last known [CR#608.2h]. Recommendation: keep the permanent reading and read
   each such description at its event's time, which `semantics.md` §4.5 states and a lowering
   test proves.
+- **A verb phrase as a postmodifier.** The lookback descriptions are `did(subj, action, within,
+  ordinal)` and `was(action, within)` at `Predicate` today ("creatures that attacked this turn",
+  "each creature destroyed this way"), and this ticket retypes them with the other description
+  words. `docs/specs/voice-and-object-phrases.md` makes a lookback a verb-phrase operator that
+  stands in `post`, said of the thing the nominal describes, with a printed "that" a Template's
+  (§2, §8), and leaves to this ticket the relative words and how a verb phrase reaches
+  `PostModifier` (§11). Options: a coercion from the verb-phrase sort to `PostModifier`, so a
+  bare participle ("creatures destroyed this way") is written with no word, as it is printed; or
+  a word at `PostModifier` for each printed form, a silent one for the participle among them.
+  Recommendation: a Template for "that" and the coercion for the bare participle, provided no
+  word then stands at both sorts (`syl.md` §3); the landing reports the collisions it checked.
+  Whichever is chosen is declared here, so that `syl-lookback-operator-and-holds` changes only
+  what stands under it.
 - **Names and glossary.** `Nominal`, `PreModifier`, `PostModifier` and `Predicative` have no entry
   in either `CONTEXT.md`; the game-model glossary's **Predicate** ("A truth condition tested
   against a candidate") and **Head Noun** entries describe today's split. Recommendation: the
@@ -230,11 +243,13 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   encore's "that opponent": `syl-opponent-noun-and-predicate`.
 - Created tokens and characteristic-setting complements: `syl-token-records-to-templates`,
   `syl-become-replaces-types`.
+- The heads `damage`, `life` and `counter` and a counter kind standing at `Nominal`:
+  `syl-damage-and-life-noun-phrases`, `syl-counters-noun-phrase`.
 - Repeated determiners over one shared nominal: *Balthor the Defiled*'s "Each player returns all
   black and all red creature cards from their graveyard to the battlefield". The English grammar
   has no Reading for it yet (it misreads "all black" as a noun phrase of its own):
-  `english-shared-nominal-determiner-coordination`. Its term waits on that Reading, and
-  `syl-shared-phrase-written-once` lists it among the coordinations that take a shared phrase.
+  `english-shared-nominal-determiner-coordination`. Its term waits on that Reading; it is a
+  Template or a declaration of its own, not the `shared` of `syl-shared-phrase-written-once`.
 - Location postmodifiers ("in your graveyard", "exiled with …") beyond the retype:
   `syl-zone-words`.
 

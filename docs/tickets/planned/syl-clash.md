@@ -16,8 +16,8 @@ Written against the surface (`cleanup-step6-surface`).
 ## Design
 
 - The win/lose outcome is a field of the `clash` action, read back for "if you win" with a
-  `did(you, clash(… wins …), thisWay)` lookback, as a `flipCoins` outcome is. No "won a clash"
-  Condition exists.
+  `holds(you, did(clash(… wins …), within = thisWay))` lookback, as a `flipCoins` outcome is. No
+  "won a clash" Condition exists.
 - Each clashing player's clash is its own event carrying the `clash` Deed, so "whenever you
   clash" triggers for each player who clashed.
 - "Clash with an opponent" is a Template over `clash`, not a Definition: an action the rules

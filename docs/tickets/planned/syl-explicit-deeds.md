@@ -33,13 +33,13 @@ These wait for the owner's design discussion of Deeds.
   `action`. A seed, not settled:
   ```
   deed_action crew(what: NounPhrase) {
-    spelling = "crew <what>",
-    body = instruct(controllerOf(actor), tap(it))
+    spelling = "crew $what",
+    body = clause(controllerOf($actor), tap($actor))
   }
   ```
-  The creature is the actor and `what` (the Vehicle) is the Deed's object, unused in the body
-  because crewing is done by tapping and only names what got crewed [CR#702.122b]; `it` reaches
-  back past the handoff, where the actor is the controller.
+  The creature is the call's performer, `$actor`, which the clause inside the body does not
+  rebind, and `what` (the Vehicle) is the Deed's object, unused in the body because crewing is
+  done by tapping and only names what got crewed [CR#702.122b].
 - The crew, saddle [CR#702.171c] and convoke [CR#702.51c] Deeds: each chosen creature performs the
   Deed in the cost, the cost's power total is read in that Deed's context so *Hotshot Mechanic*'s
   +2 reaches it, and the `crew` and `saddle` primitives go. Improvise names no Deed.
@@ -59,6 +59,10 @@ These wait for the owner's design discussion of Deeds.
   regenerated" stops the shield from being applied [CR#701.19c]. Today `regenerate`
   (`deed = none`) installs the shield and `regeneration` carries the `"regenerate"` Deed. Which
   declaration carries the Deed, and whether the two are inverted, is settled in this discussion.
+  So is the printed verb: *Matopi Golem*'s "When it regenerates this way" is the shield's
+  application said of its subject, which names no performer
+  (`docs/specs/voice-and-object-phrases.md` §4), and the answer says which declaration that verb
+  is and how it is worded.
   Adapt is a second instance of the same instruction-versus-event split: [CR#701.46a] defines
   only the instruction "adapt N", but cards also use "<creature> adapts" as an event
   (`syl-keyword-verb-events`; *Biomancer's Familiar*, `syl-single-use-as-though`). One design

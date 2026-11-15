@@ -11,7 +11,7 @@ its own deed, so that the Ring emblem can count the times the Ring has tempted y
 own steps. `.syl` may not write a scope (`docs/design/syl.md` §4); the file does so through a
 temporary primitive declared in it (`ownScope`) and the validator's path-gated Ring exception,
 which is the only reason the file passes `cargo xtask dsl check`. The body also writes the same
-count of temptations (`eventCount(ownScope(theRingTemptsYou, …), actor(you), thisGame)`) three
+count of temptations (`eventCount(ownScope(theRingTemptsYou, …), you, thisGame)`) three
 times, once per emblem ability that reads it [CR#701.54c]; only the threshold differs.
 
 ## Done when

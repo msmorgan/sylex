@@ -46,8 +46,8 @@ three parts, where the card prints one subject and no "it".
 - **How what an object becomes is written.** Options: (a) as the copula's complement, a
   `Predicative` built from `syl-nominal-descriptions`'s sorts ("a 3/3 Angel creature with
   flying", "a Forest land", "snow"), lowered to the characteristics it sets; (b) a fixed-slot
-  Template per shape of record, as `creatureToken` is for tokens. Recommendation: (a), which
-  `syl-token-records-to-templates` asks the same of for created tokens; the two answers are one.
+  Template per shape of record, as `creatureToken` is for tokens. Recommendation: (a), the way
+  `syl-token-records-to-templates` writes a created token's description, as a nominal.
 - **The subject.** `become`, `qualityChange` and `becomeColor` take their subject first; with
   `syl-continuous-effect-subject` they take none. Recommendation: write these calls against
   that ticket's declarations, so *Frogify*'s one printed subject is written once.

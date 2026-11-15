@@ -13,19 +13,21 @@ only write twice. *Mutagen Connoisseur*'s `getsPt(thisCreature, up(forEach(1, โ€
 "+1/+0 for each" recovers a second way, as a flat 1 beside a scaled 0. `getsBoth` goes the
 other way and writes one delta for the two numbers of "+N/+N", which the text prints as two.
 
-`syl-continuous-effect-subject` takes the subject out of `get`, `getsPt` and `getsBoth` and
-rewrites their calls, and lands first, so each call is rewritten against its final shape.
+`syl-continuous-effect-subject` takes the subject out of `get`, `getsPt` and `getsBoth`, makes
+`getsBoth` one declaration, decides whether `get` stays beside `getsPt`, and rewrites their
+calls. It lands first, so each call is rewritten against its final shape.
 
 ## Design
 
 - A power/toughness change is one value of the sort `PtChange`, built from its two deltas by the
   primitive `pt(power, toughness)`, matching the `Pt` in `getsPt` and `definesPt`; its glossary
-  entry is **Power/Toughness Change**, beside **Delta** for one number's change. `get`, `getsPt`
-  and what they expand to take it whole (`docs/design/spelling.md`, on Tails and "for each").
+  entry is **Power/Toughness Change**, beside **Delta** for one number's change. The "gets"
+  declarations `syl-continuous-effect-subject` leaves (`getsPt`, and `get` if it stays) and what
+  they expand to take it whole (`docs/design/spelling.md`, on Tails and "for each").
 - `forEach` is declared at that sort: it takes a change and a Predicate and scales the whole
   change.
-- A bare "+N/+N" is two printed values and is written as two. `getsBoth` is deleted at `Action`
-  and at `StaticSpec`, and its callers write both deltas.
+- A bare "+N/+N" is two printed values and is written as two. `getsBoth` is deleted, and its
+  callers write both deltas.
 
 ## Open questions
 
@@ -47,10 +49,10 @@ rewrites their calls, and lands first, so each call is rewritten against its fin
 
 - The glossary has the sort's entry, and `docs/design/syl.md` ยง2 no longer gives `getsBoth`'s
   one delta as its example of a value written once.
-- `get`, `getsPt` and the keyword bodies that call them (`battleCry`, `bushido`, `exalted`,
-  `flanking`, `frenzy`, `melee`, `prowess`, `rampage`, the doubling and tripling keyword
-  actions, the Role tokens) take the change; `getsBoth` is gone. The landing reports how many
-  calls in `plugins/canon/` it rewrote (126 files call one of the three today).
+- The "gets" declarations and the keyword bodies that call them (`battleCry`, `bushido`,
+  `exalted`, `flanking`, `frenzy`, `melee`, `prowess`, `rampage`, the doubling and tripling
+  keyword actions, the Role tokens) take the change; `getsBoth` is gone. The landing reports how
+  many calls in `plugins/canon/` it rewrote (126 files call `get`, `getsPt` or `getsBoth` today).
 - *Johtull Wurm* is in `plugins/canon/cards/` with one `forEach`, and every "+P/+T for each"
   in `plugins/` scales the whole change (*Adelbert Steiner*, *Mutagen Connoisseur*, *Nissa,
   Ascended Animist*, *Coat of Arms*, `rampage`).
