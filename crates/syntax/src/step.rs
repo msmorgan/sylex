@@ -446,6 +446,9 @@ pub(crate) struct Shape {
     pub post_adjunct_host: bool,
     /// Its last non-punctuation child is in the head line.
     pub ends_in_head_line: bool,
+    /// Its last non-punctuation child is in the head line and it takes no
+    /// `Determiner` child.
+    pub undetermined_head_final: bool,
 }
 
 impl ChildSlot {
@@ -866,6 +869,7 @@ pub(crate) fn resolve(
             conjoined: false,
             leaves: 0,
             head_final: false,
+            bare_head: true,
             final_preposition: None,
             final_adjunct: None,
             omitted_complement: 0,
@@ -958,6 +962,10 @@ pub(crate) struct Summary {
     /// dependent of it: its last child is in the head line and itself ends in
     /// its head (a leaf does).
     pub head_final: bool,
+    /// It ends in its head, undetermined (and, for a coordination, every
+    /// conjunct does): no `Determiner` stands on its head line, and its last
+    /// child is in the head line and itself `bare_head`.
+    pub bare_head: bool,
     /// The preposition of the Preposition Phrase dependent it ends in, through
     /// its head line, when that preposition closes some `unextended` child.
     pub final_preposition: Option<Lexeme>,
@@ -982,10 +990,11 @@ pub(crate) struct Summary {
     /// through its head or a coordination's first conjunct, as a mask
     /// (`LeafFacts::forms`).
     pub head_forms: u16,
-    /// It is a coordination whose conjuncts omit unlike Complements, the last
-    /// conjunct's `omitted_complement`: a Preposition Phrase right after it
-    /// may be a dependent of the whole coordination, which cannot share it as
-    /// a Complement (*the type and amount of mana*), but of no other host.
+    /// It is a coordination of undetermined bare-head phrases whose conjuncts
+    /// omit unlike Complements, the last conjunct's `omitted_complement`: a
+    /// Preposition Phrase right after it may be a dependent of the whole
+    /// coordination, which cannot share it as a Complement (*the type and
+    /// amount of mana*), but of no other host.
     pub unlike_omissions: bool,
     /// The preposition and complement frame heading a Preposition Phrase.
     pub preposition: Option<(Lexeme, usize)>,
@@ -1229,6 +1238,9 @@ pub(crate) struct State {
     /// The last head-line child so far ends in its head
     /// (`Production::track_head_final`).
     pub head_final: bool,
+    /// Every head-line child so far is `Summary::bare_head`
+    /// (`Production::track_head_final`).
+    bare_head: bool,
     /// The preposition of the Preposition Phrase dependent the last child
     /// so far ends in (`Summary::final_preposition`).
     final_preposition: Option<Lexeme>,
@@ -1429,7 +1441,10 @@ impl Production {
             return;
         }
         match child {
-            ChildView::Node(summary) => next.head_final = summary.head_final,
+            ChildView::Node(summary) => {
+                next.head_final = summary.head_final;
+                next.bare_head &= summary.bare_head;
+            }
             ChildView::Leaf(..) => next.head_final = true,
             ChildView::Punct => {}
         }
@@ -2031,6 +2046,8 @@ impl Production {
                 && matches!(self.rhs[0], Symbol::Cat { category, .. } if category == self.lhs)
                 && (1..count).all(|at| punct(at) || roles[at] == ChildRole::Adjunct),
             ends_in_head_line: children.last().is_some_and(|&at| self.head_line[at]),
+            undetermined_head_final: children.last().is_some_and(|&at| self.head_line[at])
+                && !roles.contains(&ChildRole::Determiner),
         };
         let mut slots = std::mem::take(&mut self.slots);
         for (at, slot) in slots.iter_mut().enumerate() {
@@ -2405,6 +2422,7 @@ impl Production {
             },
             leaves: state.leaves,
             head_final: state.head_final && self.shape.ends_in_head_line,
+            bare_head: state.bare_head && self.shape.undetermined_head_final,
             final_preposition: state.final_preposition,
             final_adjunct: state.final_adjunct,
             ellipsis: match self.omission {
@@ -2418,6 +2436,7 @@ impl Production {
                 state.omitted_complement
             },
             unlike_omissions: coordinated
+                && state.bare_head
                 && state.unlike_omissions
                 && state.omitted_complement != 0,
             preposition: if coordinated && state.mixed_prepositions {
