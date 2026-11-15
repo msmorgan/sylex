@@ -44,7 +44,8 @@ core
   say what a clause means are its Rust types, built by assembly and written in no `.syl` file.
   It is the home of the Discourse Representation Structure and of reference resolution.
 - **A pragmatics step** ranks the readings semantics leaves (§5).
-- Lowering compiles a meaning to core, as it compiles the checked expanded tree today.
+- Lowering compiles a meaning to core, where `architecture.md` has it compile the checked
+  expanded tree.
 
 The **surface term** is what `architecture.md` calls the resolved term: it is what is stored,
 recovered and rendered, and it is canonical. Nothing between it and core is serialized, as
@@ -93,9 +94,13 @@ types of the meaning (§3).
 **Templates and Definitions are surface to surface.** A body is a surface term over the
 declaration's parameters. Expansion is unchanged: it substitutes a Template's parameters, wraps
 a Definition's body in its Reference Scope under its Deed, keeps every call and parameter
-boundary, and reads each argument once, in printed order (`syl.md` §4, §5). The rules rows under
-`plugins/builtin/rules/` are surface terms too, written as the clauses the Comprehensive Rules
-state.
+boundary, and reads each argument once, in printed order (`syl.md` §4, §5).
+
+**Rules rows are not text a card prints.** A row under `plugins/builtin/rules/` is a record
+(`scope` and `confer`, or `when` and `then`) at sorts such as `Conferral` that say what the row
+does in the game, and its body uses words no card prints (`asEvent`, `stateBasedActionsChecked`).
+Those sorts and words are rules data and are not put to the test above. What the clauses inside
+a row are written as is open (§7).
 
 **`cargo xtask dsl check` checks surface form only**: that names resolve at their expected
 sorts, that arguments are bound as `syl.md` §2 says, and the structural refusals of
@@ -191,7 +196,7 @@ concern (SKETCH):
     keyword_ability flying = { pragmatics = { preferHostTypes = [creature] }, … }
     subtype vehicle        = { pragmatics = { mimicTypes = [creature] }, … }
 
-A preference is an exception to a default. For a trailing modifier over a coordination the
+The step's design is `docs/design/pragmatics.md`. A preference is an exception to a default. For a trailing modifier over a coordination the
 default is the whole coordination, and `flying`'s preferred host narrows it on *Broken Wings*.
 It is a step of its own, outside semantics, because it encodes what a card is likely to mean and
 not what its words can mean.
@@ -224,10 +229,13 @@ and the shared phrase stand as written. These parts of it are replaced by §2 an
 claimed: `syl-clause-and-imperative`, `syl-continuous-effect-subject`,
 `syl-passive-participle-and-trigger-events`, `syl-would-operator-and-replacement-clauses`,
 `syl-lookback-operator-and-holds`, `syl-deontic-verb-phrase-operators`, `syl-event-gate`,
-`syl-replacement-stated-as-clause` and `english-syl-term-recovery`. The tickets before them in
-the graph do not depend on this spec: the rest of the spine, the spelling tickets,
-`syl-nominal-descriptions`, `syl-damage-and-life-noun-phrases`, `syl-counters-noun-phrase`,
-`syl-verb-phrase-sort-name`, `syl-definition-actor-parameter` and `syl-misnamed-declarations`.
+`syl-replacement-stated-as-clause` and `english-syl-term-recovery`. That list is not complete:
+every other planned ticket that writes a declaration or a card at `StaticSpec`, `Condition`,
+`GameEvent` or `Replacement`, or names `does`, `did` or `replace` (`syl-spelling-forms-and-runs`
+labels the verb forms of `does` and `did`), is read against this spec before it is claimed.
+These do not depend on it: `syl-spelling-conventions`, `syl-nominal-descriptions`,
+`syl-damage-and-life-noun-phrases`, `syl-counters-noun-phrase`, `syl-verb-phrase-sort-name`,
+`syl-definition-actor-parameter` and `syl-misnamed-declarations`.
 
 **In the glossaries**: **Static Spec** and the other entries for what a clause means describe
 types of the meaning; new entries name the surface term and the three outcomes of §3.
@@ -252,8 +260,8 @@ types of the meaning; new entries name the surface term and the three outcomes o
    the corpus gives the list.
 4. **How candidates of one class are told apart for storing** (§4 step 5): the fixed rule is not
    chosen. The Reading's Ranking Key is one candidate for it.
-5. **The names.** The glossary uses "surface" for the realized text of a Reading
-   (`docs/contexts/oracle-english/CONTEXT.md`), which a surface term is not. The crate names of
+5. **The names.** The glossary's **Realization** is "Producing the surface text of a Reading"
+   (`docs/contexts/oracle-english/CONTEXT.md`), and a surface term is not that text. The crate names of
    §1, "surface term" against today's "resolved term", and a name for the meaning are to be
    settled against both glossaries.
 6. **Sentences that depend on an earlier one.** "If the player does, untap that creature."
