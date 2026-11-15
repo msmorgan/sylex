@@ -60,6 +60,36 @@ same sentence states the zones the ability functions from [CR#113.6b].
 "After you roll a die" does not make a triggered ability, which uses "when", "whenever" or "at"
 [CR#113.3c]. It is a modifier applied before the roll's result is final [CR#706.2,706.2a].
 
+### Goblin Kites
+
+> {R}: Target creature you control with toughness 2 or less gains flying until end of turn. Flip a
+> coin at the beginning of the next end step. If you lose the flip, sacrifice that creature.
+
+The second sentence makes a delayed triggered ability whose trigger word does not begin it
+[CR#603.7]. The third sentence has no timing words of its own, yet it belongs to that delayed
+ability's effect: there is no flip to lose until the ability resolves [CR#608.2c].
+
+### Deliver Unto Evil
+
+> Choose up to four target cards in your graveyard. If you control a Bolas planeswalker, return
+> those cards to your hand. Otherwise, an opponent chooses two of them. Leave the chosen cards in
+> your graveyard and put the rest into your hand.
+> Exile Deliver Unto Evil.
+
+The sentence after the "Otherwise" sentence belongs to the "Otherwise" branch: there are chosen
+cards and a rest only when an opponent chose [CR#608.2c]. Advice from the Fae has the same shape
+("Otherwise, put one of them into your hand. Then put the rest on the bottom of your library in
+any order.") and there the last sentence follows both branches. Only what the sentence says tells
+the two apart.
+
+### Hunter's Blowgun
+
+> Equipped creature gets +1/+1.
+> Equipped creature has deathtouch during your turn. Otherwise, it has reach.
+
+"Otherwise" answers "during your turn", a time phrase inside a static ability [CR#604.1], with no
+"if" before it. Which keyword the creature has changes as the turn does [CR#611.3a].
+
 ## Costs and actions
 
 ### Hotshot Mechanic
@@ -83,6 +113,62 @@ happens [CR#701.12a], and it does nothing if one player controls both permanents
 
 "Artifact" without "card" would ordinarily mean a permanent on the battlefield [CR#109.2]; in craft
 materials it also matches an artifact card in a graveyard [CR#702.167a,702.167b].
+
+### Frankenstein's Monster
+
+> As this creature enters, exile X creature cards from your graveyard. If you can't, put this
+> creature into its owner's graveyard instead of onto the battlefield. For each creature card
+> exiled this way, this creature enters with a +2/+0, +1/+1, or +0/+2 counter on it.
+
+Three counter kinds share one printed word "counter", and a replacement effect [CR#614.1c] has
+the creature enter with one of the three for each exiled card. The +2/+0 counter [CR#122.1a] is
+printed nowhere else, and here it never stands directly before "counter".
+
+## Events and their participants
+
+### Curtain of Light
+
+> Cast this spell only during combat after blockers are declared.
+> Target unblocked attacking creature becomes blocked. (This spell works on creatures that can't
+> be blocked.)
+> Draw a card.
+
+The creature becomes blocked with no creature blocking it [CR#509.1h]. That triggers "becomes
+blocked" abilities [CR#509.3c] but not "becomes blocked by a creature" ones [CR#509.3d], so being
+blocked is not having a blocker.
+
+### Dream Fighter
+
+> Whenever this creature blocks or becomes blocked by a creature, this creature and that creature
+> phase out.
+
+"A creature" is printed once and belongs to both verbs: the ability triggers once for each
+creature this one blocks and once for each creature that blocks it [CR#509.3b,509.3d], and "that
+creature" is that one. With "blocks" read alone, the first half would trigger once each combat
+[CR#509.3a] and name no creature. Mirror Shield's granted "Whenever a creature with deathtouch
+blocks or becomes blocked by this creature" would then trigger on any block by such a creature.
+
+### Impact Resonance
+
+> Impact Resonance deals X damage divided as you choose among any number of target creatures, where
+> X is the greatest amount of damage dealt by a source to a permanent or player this turn.
+
+X is a maximum over the turn's damage, taken for each source and each recipient apart: a source
+that dealt 5 damage to each of six recipients makes X 5, by the card's ruling. The damage is
+divided, so the division is announced as the spell is cast [CR#601.2d], and the ruling fixes X
+then ("Once the value of X is determined, it won't change"), though an X that text defines may
+otherwise change while the spell is on the stack [CR#107.3c].
+
+### Bringer of the Last Gift
+
+> Flying
+> When this creature enters, if you cast it, each player sacrifices all other creatures they
+> control. Then each player returns all creature cards from their graveyard that weren't put there
+> this way to the battlefield.
+
+"This way" usually picks out what an effect acted on. Here it is negated: the second sentence
+returns every creature card except the ones the first sentence's sacrifice put there, which the
+effect can find [CR#400.7j] and must tell from the cards already in the graveyard.
 
 ## Effects that talk about themselves
 
@@ -178,7 +264,9 @@ supplies both the reduction and its own floor.
 > Each one then blocks all creatures the other was blocking.
 
 The CR never defines "could block" (nor "could have blocked"); it defines only the declaration of
-blockers [CR#509.1g].
+blockers [CR#509.1g]. General Jarkeld prints the attacking side of the same test, "If each of those
+creatures could be blocked by all creatures that the other is blocked by", which the CR does not
+define either.
 
 ### Biomancer's Familiar
 
