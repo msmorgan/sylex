@@ -98,6 +98,7 @@ pub enum FillSpec {
     HollowToInf,
     BareInf,
     Gerund,
+    PastPart,
     KeywordPhrase,
     /// A quoted granted ability (*a token with "This token can't block."*;
     /// [CR#113.1a]). Its one preposition holder is *with*, beside the verbs
@@ -120,6 +121,7 @@ pub enum Catenation {
     ToInf,
     BareInf,
     Gerund,
+    PastPart,
 }
 
 /// A Subcategorization Frame as authored, in active voice only.

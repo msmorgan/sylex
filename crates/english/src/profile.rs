@@ -29,6 +29,7 @@ use sylex_syntax::frames::Frame;
 use sylex_syntax::frames::FrameFamily;
 use sylex_syntax::frames::PrepositionFrame;
 use sylex_syntax::frames::SlotFill;
+use sylex_syntax::frames::SlotRelation;
 use sylex_vocabulary::LexicalEnvironment;
 
 use crate::corpus::UnitKind;
@@ -925,8 +926,8 @@ fn clause(tokens: &[Tok<'_>], baseline: bool, families: &mut BTreeSet<Family>) {
         {
             families.insert(PREDICATIVE);
         }
-        // A bare-infinitival or gerund-participial complement; *to*
-        // infinitivals are found by *to*.
+        // A bare-infinitival, gerund-participial or past-participial
+        // complement; *to* infinitivals are found by *to*.
         let bare_complement = t.alts().iter().any(|a| {
             a.lexeme.is_some_and(|l| l.category == Category::Verb)
                 && a.frames.iter().any(|f| {
@@ -939,14 +940,47 @@ fn clause(tokens: &[Tok<'_>], baseline: bool, families: &mut BTreeSet<Family>) {
                         .any(|s| matches!(s.fill, SlotFill::BareInf | SlotFill::Gerund))
                 })
         });
+        let past_part_complement = t.alts().iter().any(|a| {
+            a.lexeme.is_some_and(|l| l.category == Category::Verb)
+                && a.frames.iter().any(|f| {
+                    matches!(
+                        f.family,
+                        FrameFamily::Catenative | FrameFamily::ComplexCatenative
+                    ) && f.slots.iter().any(|s| s.fill == SlotFill::PastPart)
+                })
+        });
         if !nominal_context
-            && bare_complement
+            && (bare_complement || past_part_complement)
             && (i + 1..tokens.len())
                 .take_while(|&j| !(tokens[j].is_punct(',') || tokens[j].is_punct('.')))
                 .any(|j| {
-                    (bare_verb(&tokens[j], WordForm::Plain)
-                        || bare_verb(&tokens[j], WordForm::GerundParticiple))
-                        && !tokens[j - 1].is(Category::Subordinator, "to")
+                    (bare_complement
+                        && (bare_verb(&tokens[j], WordForm::Plain)
+                            || bare_verb(&tokens[j], WordForm::GerundParticiple))
+                        && !tokens[j - 1].is(Category::Subordinator, "to"))
+                        // A past-participial complement stands after an
+                        // intervening Object (`j > i + 1`, ending in a nominal
+                        // or pronoun), not after a granted keyword before an
+                        // adjunct clause (*Swordsworn Cavalier*'s *has first
+                        // strike as long as another Knight entered ...*), is a
+                        // lexical verb with a passivizable Object frame (not
+                        // intransitive *died* on *Gimli, Mournful Avenger*),
+                        // and takes no bare nominal Object of its own.
+                        || (past_part_complement
+                            && j > i + 1
+                            && !tokens[i + 1].only_class(&[Class::KeywordAbility])
+                            && (tokens[j - 1].nominal() || tokens[j - 1].has(Category::Pronoun))
+                            && bare_verb(&tokens[j], WordForm::PastParticiple)
+                            && tokens[j].alts().iter().any(|a| {
+                                !a.auxiliary
+                                    && a.frames.iter().any(|f| {
+                                        !f.active_only
+                                            && f.slots
+                                                .iter()
+                                                .any(|s| s.relation == SlotRelation::Object)
+                                    })
+                            })
+                            && !tokens.get(j + 1).is_some_and(Tok::nominal))
                 })
         {
             families.insert(CATENATIVE);

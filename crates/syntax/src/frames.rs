@@ -22,7 +22,8 @@ pub enum FrameFamily {
     Catenative,
     /// An object and a predicative complement, as in *turn it face up*.
     ComplexTransitive,
-    /// An object and a non-finite complement, as in *cause you to sacrifice*.
+    /// An object and a non-finite complement, as in *cause you to sacrifice*
+    /// or *have counters put on it*.
     ComplexCatenative,
     /// A content clause, as in *decide whether to flip again*.
     ContentClause,
@@ -108,6 +109,7 @@ pub enum SlotFill {
     HollowToInf,
     BareInf,
     Gerund,
+    PastPart,
     KeywordPhrase,
     QuotedAbility,
     /// A word cited rather than used, as *left or right* in *choose left or
@@ -171,6 +173,7 @@ pub enum SlotKind {
     HollowToInf,
     BareInf,
     Gerund,
+    PastPart,
     KeywordPhrase,
     QuotedAbility,
     Mention,
@@ -208,6 +211,7 @@ impl SlotFill {
             Self::HollowToInf => SlotKind::HollowToInf,
             Self::BareInf => SlotKind::BareInf,
             Self::Gerund => SlotKind::Gerund,
+            Self::PastPart => SlotKind::PastPart,
             Self::KeywordPhrase => SlotKind::KeywordPhrase,
             Self::QuotedAbility => SlotKind::QuotedAbility,
             Self::Mention => SlotKind::Mention,
@@ -305,7 +309,10 @@ impl Frame {
                 shape[..],
                 [
                     (Object, SlotFill::NP),
-                    (Complement, SlotFill::ToInf | SlotFill::BareInf)
+                    (
+                        Complement,
+                        SlotFill::ToInf | SlotFill::BareInf | SlotFill::PastPart
+                    )
                 ]
             ),
             FrameFamily::ContentClause => {

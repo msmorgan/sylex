@@ -10,5 +10,4 @@
 +VerbPhrase put target nonland permanent on top of its owner's library => PrepositionPhrase "on top of its owner's library" as Complement of put; !PrepositionPhrase "on top of its owner's library" as Adjunct of put
 +VerbPhrase put target artifact or enchantment on the bottom of its owner's library => PrepositionPhrase "on the bottom of its owner's library" as Complement of put; !PrepositionPhrase "on the bottom of its owner's library" as Adjunct of put
 + Whenever a +1/+1 counter is put on this creature, you may draw a card.
-+ This creature can't have counters put on it.
 + Put two +1/+1 counters on target creature and two +1/+1 counters on another target creature. => NounPhrase "two +1/+1 counters" as Object of put; NounPhrase "two +1/+1 counters"#2 as Object of put; PrepositionPhrase "on target creature" as Complement of put; PrepositionPhrase "on another target creature" as Complement of put

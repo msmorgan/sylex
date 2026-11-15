@@ -492,6 +492,7 @@ fn catenation(catenation: Catenation) -> SlotFill {
         Catenation::ToInf => SlotFill::ToInf,
         Catenation::BareInf => SlotFill::BareInf,
         Catenation::Gerund => SlotFill::Gerund,
+        Catenation::PastPart => SlotFill::PastPart,
     }
 }
 
@@ -543,6 +544,7 @@ impl Resolver<'_> {
             FillSpec::HollowToInf => SlotFill::HollowToInf,
             FillSpec::BareInf => SlotFill::BareInf,
             FillSpec::Gerund => SlotFill::Gerund,
+            FillSpec::PastPart => SlotFill::PastPart,
             FillSpec::KeywordPhrase => SlotFill::KeywordPhrase,
             FillSpec::QuotedAbility => SlotFill::QuotedAbility,
             FillSpec::Mention => SlotFill::Mention,

@@ -1,0 +1,13 @@
+# Complex-catenative "have" with an Object noun phrase and a passive past-participial verb phrase Complement (CGEL, Ch. 14 §5.4, p. 1236, [41iii]; §5.6.2, p. 1245, [60ii])
++ This creature can't have counters put on it. => NounPhrase "counters" as Object of have; VerbPhrase "put on it" as Complement of have; PrepositionPhrase "on it" as Complement of put
++ At the beginning of your end step, each player may put two +1/+1 counters on a creature they control. Goad each creature that had counters put on it this way. => NounPhrase "counters" as Object of have; VerbPhrase "put on it" as Complement of have || NounPhrase "counters" as Object of have; VerbPhrase "put on it this way" as Complement of have; NounPhrase "this way" as Adjunct of put
++ Put a +1/+1 counter on target creature you control, then double the number of +1/+1 counters on each creature that had a +1/+1 counter put on it this way. => NounPhrase "a +1/+1 counter"#2 as Object of have; VerbPhrase "put on it" as Complement of have || NounPhrase "a +1/+1 counter"#2 as Object of have; VerbPhrase "put on it this way" as Complement of have; NounPhrase "this way" as Adjunct of put
++ Until end of turn, if damage would be dealt to any creature, you may have that damage dealt to you instead. => NounPhrase "that damage" as Object of have; VerbPhrase "dealt to you" as Complement of have || NounPhrase "that damage" as Object of have; VerbPhrase "dealt to you instead" as Complement of have
++ Creatures your opponents control can't have +1/+1 counters put on them. => NounPhrase "+1/+1 counters" as Object of have; VerbPhrase "put on them" as Complement of have
++ If an opponent had three or more cards put into their graveyard from anywhere this turn, you may pay {0} rather than pay this spell's mana cost. => NounPhrase "three or more cards" as Object of have; VerbPhrase "put into their graveyard from anywhere" as Complement of have || NounPhrase "three or more cards" as Object of have; VerbPhrase "put into their graveyard from anywhere this turn" as Complement of have
+# from: Melira's Keepers
++VerbPhrase have counters put on it => NounPhrase "counters" as Object of have; VerbPhrase "put on it" as Complement of have
+# from: Melira's Keepers
+*VerbPhrase have counters been put on it
+# from: Blood of the Martyr
+*VerbPhrase have that damage deals to you

@@ -489,9 +489,9 @@ category SetOffClause : Clause
 category VerblessClause : Clause
 category AbsoluteClause : Clause
 // Subjectless non-finite Complements: a to-infinitival is a Clause, a bare
-// infinitival or gerund-participial its Verb Phrase. None passes up a
-// predicative Gap (*can't be __*); one is shared only inside it (*can't be
-// and become legendary*).
+// infinitival, gerund-participial or past-participial its Verb Phrase. None
+// passes up a predicative Gap (*can't be __*); one is shared only inside it
+// (*can't be and become legendary*).
 category ToInf : Clause { gap, closed_gaps: [Pred] }
 // Its object Gap is filled by the Subject of the verb selecting it.
 category HollowInf : Clause
@@ -513,6 +513,10 @@ category PerfectComplement : VerbPhrase [VerbForm, Voice, VerbKind] {
     function,
 }
 category Gerund : VerbPhrase [Number, Person, VerbForm, Voice] { gap }
+category PastPart : VerbPhrase [VerbForm, Voice] {
+    gap,
+    closed_gaps: [Pred],
+}
 // A gerund-participial Clause with its Subject, in Oracle a Subject only.
 category GerundClause : Clause
 category QuotedAbility
@@ -703,6 +707,7 @@ slot ToInf = ToInf
 slot HollowToInf = HollowInf
 slot BareInf = BareInf
 slot Gerund = Gerund
+slot PastPart = PastPart
 slot QuotedAbility = QuotedAbility
 slot Mention = Mention
 
@@ -1217,6 +1222,12 @@ InfinitivalComplement: ToInf -> Clause { transparent: [head] } where head.Clause
 BareInfinitival: BareInf -> VerbPhrase { transparent: [head] } where head.VerbForm = Plain
 GerundParticipial: Gerund -> VerbPhrase { transparent: [head] }
     where head.VerbForm = GerundParticiple
+// A bare passive participle phrase, never headed by *been* (*can't have
+// counters put on it*; CGEL 14§5.6.2:1245 [60ii]).
+PastParticipial: PastPart -> VerbPhrase { transparent: [head] }
+    where head.VerbForm = PastParticiple,
+          head.Voice = Passive,
+          head.VerbKind != Auxiliary
 // *This spell costs {1} to cast* (CGEL 14§6.3(c):1250).
 HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
     where head.VerbForm = Plain,

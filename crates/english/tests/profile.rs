@@ -198,6 +198,8 @@ fn reviewed_misplacements_stay_fixed() {
         ),
         ("to cast spells", 2),
         ("Have target opponent discard a card.", 2),
+        // from: Blood of the Martyr
+        ("Have it dealt to you.", 2),
         ("all permanents target player controls", 3),
         ("while tapped", 4),
         ("while red", 4),
@@ -265,5 +267,33 @@ fn the_targeting_marker_is_no_postmodified_host_or_asyndetic_attribute() {
     ] {
         let (found, families) = profile(&env, UnitKind::Line, text);
         assert_eq!(found, stratum, "{text}: {families:?}");
+    }
+}
+
+#[test]
+fn past_participial_catenative_excludes_granted_keywords_and_intransitives() {
+    let env = LexicalEnvironment::load().unwrap();
+    // *Melira's Keepers* and *Blood of the Martyr*.
+    for text in [
+        "This creature can't have counters put on it.",
+        "Until end of turn, if damage would be dealt to any creature, you may have that damage dealt to you instead.",
+    ] {
+        let (_, families) = profile(&env, UnitKind::Line, text);
+        assert!(
+            families.contains(&"CatenativeComplement"),
+            "{text}: {families:?}"
+        );
+    }
+    // *Swordsworn Cavalier* (*has* + granted keyword + *as long as* clause) and
+    // *Gimli, Mournful Avenger* (intransitive *died*).
+    for text in [
+        "This creature has first strike as long as another Knight entered the battlefield under your control this turn.",
+        "Gimli has indestructible as long as two or more creatures died under your control this turn.",
+    ] {
+        let (_, families) = profile(&env, UnitKind::Line, text);
+        assert!(
+            !families.contains(&"CatenativeComplement"),
+            "{text}: {families:?}"
+        );
     }
 }

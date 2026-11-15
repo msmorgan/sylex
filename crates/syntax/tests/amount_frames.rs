@@ -186,6 +186,14 @@ fn complex_and_clausal_frames_have_their_family_shape() {
             true,
         ),
         (
+            r"(family: ComplexCatenative, slots: [(relation: Object, fill: NP), (relation: Complement, fill: PastPart)])",
+            true,
+        ),
+        (
+            r"(family: Catenative, slots: [(relation: Complement, fill: PastPart)])",
+            false,
+        ),
+        (
             r"(family: ComplexCatenative, slots: [(relation: Object, fill: NP), (relation: Complement, fill: Gerund)])",
             false,
         ),
