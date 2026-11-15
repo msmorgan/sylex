@@ -32,11 +32,11 @@ recover to one term and one of them does not round-trip.
 ## Done when
 
 - The open question is answered.
-- `sylex_syl` parses and formats `inner`, and resolving a Tail's host follows the Tail notation in
-  `docs/design/spelling.md`.
+- `sylex_spelling` parses `inner` and every `spelling` this ticket writes, and resolving a
+  Tail's host follows the Tail notation in `docs/design/spelling.md`.
 - Every "for each" and "equal to" wording that in-scope text prints in more than one placement
   has a Template for each; the landing lists them with a card for each.
-- `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_syl` and
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_spelling` and
   `cargo test -p xtask` pass.
 
 ## Not in scope
@@ -47,5 +47,6 @@ recover to one term and one of them does not round-trip.
 
 ## Pointers
 
-`docs/design/spelling.md` (Tails, the notation); `plugins/builtin/templates/amount/forEach.syl`;
+`docs/design/spelling.md` (Tails, the notation); `crates/spelling/`;
+`plugins/builtin/templates/amount/forEach.syl`;
 `crates/english/grammar/english.fug` (the distributive adjunct's attachment).

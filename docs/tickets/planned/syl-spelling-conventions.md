@@ -47,6 +47,8 @@ ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every 
 - Every `<name>` Hole under `plugins/` is written `$name`, with a `~` tie where a declared affix
   abuts it (`landwalk`, `typecycling`, `non`), and `fromTop` and `fromBottom` write their ordinal
   `$n@Ordinal`; no spelling under `plugins/` contains `~th`.
+- `cargo xtask dsl check` parses every `spelling` under `plugins/` with `sylex_spelling`
+  (`syl-spelling-optional-segments`) and refuses one it cannot parse, with a negative test.
 - In separate corpus commits: every spelling follows the three inflection cases, and every
   `TODO(spelling)` whose wording needs no optional or repeated segment is resolved, either written
   or replaced by the specific missing wording.
@@ -62,10 +64,10 @@ ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every 
 
 Writing the optional parts and list Holes `TODO(spelling)` markers need:
 `syl-spelling-optional-segments`. Form labels other than the ordinal, `Counting`, the `one`
-Template, `*` run Holes and `<.>` joins: `syl-spelling-forms-and-runs`. The spelling crate
-itself.
+Template, `*` run Holes and `<.>` joins: `syl-spelling-forms-and-runs`. Recovering a term and
+spelling one out, the rest of the spelling crate.
 
 ## Pointers
 
 `docs/design/spelling.md` §1 and §7, `docs/design/syl.md` §2,
-`docs/design/lexicon.md` §1, `crates/syl/`.
+`docs/design/lexicon.md` §1, `crates/spelling/`, `crates/xtask/src/dsl_check.rs`.
