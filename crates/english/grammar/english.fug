@@ -448,7 +448,7 @@ category Interleaved [PastTime, NonPastTime] { function }
 // The Adjunct function before a passive's Internalised Complement only, the
 // *by* phrase (CGEL 4§3.2.1:241); an admission gate (english.md §6), see
 // InterleavedManner.
-category InternalisedInterleaved { function }
+category InternalizedInterleaved { function }
 // The Adjunct function in central position between *be* or a copula and
 // its Complement (*is still on top of your library*, *become no longer
 // suspected*; english.md §3).
@@ -1280,7 +1280,7 @@ InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
 // before *into your hand* instead of *revealed*'s (*Put all creature cards
 // revealed this way into your hand*, Beast Hunt). The gate also refuses
 // *deals 3 damage this way to any target*.
-InterleavedManner: InternalisedInterleaved -> NounPhrase { cost: 0 } where head.NounKind := Manner
+InterleavedManner: InternalizedInterleaved -> NounPhrase { cost: 0 } where head.NounKind := Manner
 // An end adverb before a later Complement (*divided evenly among*);
 // InterleavedSupplement, a comma-set participial one (*deals half X damage,
 // rounded down, to any target*).
@@ -3124,7 +3124,7 @@ valence VerbPhrase {
         head.AdjectivalPassive != Lexical, head.VerbKind != Auxiliary,
     ],
     interleaved: Interleaved,
-    interleaved_internalised: InternalisedInterleaved,
+    interleaved_internalised: InternalizedInterleaved,
     central: CentralAdjunct,
     central_heads: BeVerb,
     central_families: [Copular],
