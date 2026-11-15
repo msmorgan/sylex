@@ -12,6 +12,7 @@ not settled. The others describe the current design.
 - [Semantics](semantics.md) (DRAFT): reference resolution, Definitions, Templates and the action-clause spine.
 - [Syl](syl.md) (DRAFT): the `.syl` data language.
 - [Spelling](spelling.md) (DRAFT): the spelling grammar: Constructions, substitution and its two closed rules, its three extensions and the round trip between Readings and resolved terms.
+- [Pragmatics](pragmatics.md) (DRAFT): choosing among the meanings a card's text can have: defaults, preferences stated on declarations, and why the stored term decides.
 - [Core](core.md): the compiled core that the engine executes.
 - [Engine](engine.md): the engine's laws.
 - [English](english.md): the English grammar and parser: crate split, Catalog constraint, admission, ranking and the round-trip contract.
