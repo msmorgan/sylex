@@ -854,7 +854,7 @@ GroupedArabicDeterminer: NumericalDeterminer -> Numeral(Arabic(true)) where $.Co
 NegativeAdjective: AdjectivePhrase -> prefix:Lex(Affix) AdjectivePhrase where $.Polarity = Negative
 LabelledModalHeader: Document -> label:Class(AbilityWord) '—':Free ModalHeader
 // A flavor word carries its own dash (*Trick Arrows — Whenever ..., choose
-// one —*), as in FlavorLabelledAbility.
+// one —*), as in FlavorLabeledAbility.
 FlavorLabelledModalHeader: Document -> label:Lex(FlavorWord) ModalHeader
 ChapterModalHeader: Document -> chapters:Chapters '—':Free ModalHeader
 
@@ -909,7 +909,7 @@ LabelledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability
 // offering the choice [CR#607.2m]; the bullet is part of it [CR#614.12c].
 // Never a mode: no instruction to choose options precedes it [CR#700.2].
 AnchoredAbility: Ability -> '•':Free label:Class(AnchorWord) '—':Free Ability
-FlavorLabelledAbility: Ability -> label:Lex(FlavorWord) Ability
+FlavorLabeledAbility: Ability -> label:Lex(FlavorWord) Ability
 NominalMode: Mode -> '•':Free Nominal '.'
 NounPhraseMode: Mode -> '•':Free NounPhrase '.'
 // A keyword whose em-dash cost ends in its own period, then its instruction

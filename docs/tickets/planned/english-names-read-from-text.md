@@ -85,7 +85,7 @@ The Flavor Word is the precedent for a span no list holds. `flavor_word_matches`
 (`crates/lexicon/src/analysis.rs`) proposes it by shape: from a line start, past a bullet, up to
 the first " —" that is not after chapter numerals. Analysis keeps it only if it is title-cased and
 no label registered in the Card Scope spells it (`stands_in`). The grammar admits
-`Lex(FlavorWord)` only at the head of an ability or mode (`FlavorLabelledAbility`,
+`Lex(FlavorWord)` only at the head of an ability or mode (`FlavorLabeledAbility`,
 `FlavorLabelledModalHeader`, `LabelledCostedMode`). Its value is the string
 (`LexicalReading::FlavorWord { label }`), not a Lexeme. A name fits the same route with three
 differences. Its end is not fixed by punctuation, so the shape rule has to choose it. It stands
@@ -205,7 +205,7 @@ in the middle of a sentence at several positions. And it is used again after its
   `analyze_source_scoped`), `crates/lexicon/src/scope.rs`.
 - `crates/english/grammar/english.fug`: `Name`, `NameComplement`, `NamedParameter`,
   `ProperName`, `NamePremodifier`, `ProperPossessor`, `OtherCardNameComplement`,
-  `NounPhraseSupplement`, `FlavorLabelledAbility`.
+  `NounPhraseSupplement`, `FlavorLabeledAbility`.
 - `crates/vocabulary/src/lib.rs` (`introduced_names`),
   `crates/vocabulary/src/schema.rs`, `crates/english/src/profile.rs` (`introduced_name` skeleton
   class), `crates/syntax/src/reading.rs` (admission's `stands_in`).

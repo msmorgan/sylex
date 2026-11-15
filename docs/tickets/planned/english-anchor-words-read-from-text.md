@@ -99,7 +99,7 @@ holds the label.
   `crates/vocabulary/src/schema.rs`.
 - `crates/lexicon/src/analysis.rs` (`ItalicHead`, `stands_in`, `flavor_word_matches`),
   `crates/lexicon/src/scope.rs` (`CardScope`).
-- `crates/english/grammar/english.fug` (`AnchorWord`, `AnchoredAbility`, `FlavorLabelledAbility`,
+- `crates/english/grammar/english.fug` (`AnchorWord`, `AnchoredAbility`, `FlavorLabeledAbility`,
   `ModeBullet`), `crates/english/src/census.rs` (`run`, `cleave_texts`),
   `crates/english/src/profile.rs`, `crates/english/src/judgment.rs`,
   `crates/english/judgments/anchored_abilities.txt`.
