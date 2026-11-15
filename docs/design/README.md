@@ -9,7 +9,7 @@ A doc marked DRAFT is directional: it describes where the design is heading, and
 not settled. The others describe the current design.
 
 - [Architecture](architecture.md): the layers of the system and how they connect.
-- [Semantics](semantics.md) (DRAFT): reference resolution, Definitions, Templates and the action-clause spine.
+- [Semantics](semantics.md) (DRAFT): reference resolution, Definitions, Templates, the action-clause spine, and how a term is read into its meaning and a card's text into a stored term.
 - [Syl](syl.md) (DRAFT): the `.syl` data language.
 - [Spelling](spelling.md) (DRAFT): the spelling grammar: Constructions, substitution and its two closed rules, its three extensions and the round trip between Readings and surface terms.
 - [Pragmatics](pragmatics.md) (DRAFT): choosing among the meanings a card's text can have: defaults, preferences stated on declarations, and why the stored term decides.

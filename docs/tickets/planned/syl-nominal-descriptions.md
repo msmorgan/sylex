@@ -120,9 +120,9 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   Recommendation: the Templates, one per construction, each with its card as caller.
 - **Two well-sorted trees for one nominal.** "Artifact or enchantment you control" is
   `nominal(or([artifact, enchantment]), post = [youControl])` or
-  `or([artifact, nominal(enchantment, post = [youControl])])`, and nothing in the design docs picks
-  between well-sorted candidates (`spelling.md`, on what spelling leaves to meaning). Recommendation:
-  the owner rules which attachment canon writes, and `spelling.md` says how recovery picks.
+  `or([artifact, nominal(enchantment, post = [youControl])])`, and choosing between well-sorted
+  candidates is the pragmatics step's (`docs/design/pragmatics.md` §4). Recommendation: canon
+  writes the attachment each card means, read from its Oracle text.
 - **Consumers that are not descriptions.** Eight classes of declaration take a `Predicate` for a
   phrase that is no description:
   1. spend purposes: `toCast`, `toTurnFaceUp`, `toActivate` (`syl-tocast-noun-phrase`);

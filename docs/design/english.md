@@ -160,7 +160,7 @@ must pass. So a template difference is never grounds for correcting a card's
 text; an Editorial Correction
 ([`corrections.txt`](../../crates/english/corrections.txt)) is only for an
 error in the text. A Reading that is grammatical but wrong for the rules is not the
-grammar's to reject either. The layers above resolve it by meaning
+grammar's to reject either. The layers above resolve it, by meaning and then by likelihood
 ([Architecture](architecture.md), "Spelling is a construction grammar"). Why:
 a grammar that enforced templating would refuse any card, custom content
 included, whose wording departs from current templates, and it would decide
@@ -191,7 +191,7 @@ removes a Reading, and no Reading is right or wrong because of where it ranks.
 A Judgment asserts grammaticality, never a rank. Where the endorsed Reading
 ranks is reported but never gated, and no ranking work is done to move a
 Reading up. Why: ranking that decided anything would be disambiguation by rank,
-and the architecture resolves ambiguity by meaning alone
+and the architecture resolves ambiguity above this layer
 ([Architecture](architecture.md), "Spelling is a construction grammar").
 
 The key is purely structural. Its components (glossary, "Ranking Key") are
@@ -286,7 +286,7 @@ merging after parsing would mean building them first.
 
 **Wrong analyses.** A Corpus Unit is read when a correct analysis is among its
 Readings. A grammatical Reading beside the intended one is tolerated, and
-meaning disambiguates it above (§4). An ungrammatical Reading is not: a newly
+the layers above disambiguate it (§4). An ungrammatical Reading is not: a newly
 admitted one is a defect, never a gain. A unit whose Readings are all known to
 be wrong is not covered. Why: coverage counts what the layers above can use, and they can use a
 unit only if its forest holds the right analysis.

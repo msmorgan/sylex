@@ -17,7 +17,7 @@ exercised and is not a goal.
 
 ## What it is not
 
-- **Not permanent.** Hand-authoring is a stage. A card's resolved term is to be compiled from its
+- **Not permanent.** Hand-authoring is a stage. A card's surface term is to be compiled from its
   Oracle text by recovery ([architecture](../../docs/design/architecture.md), "Authority, canon
   and artifact"). When recovery exists, these files are what its output is compared against, and
   then it replaces them.

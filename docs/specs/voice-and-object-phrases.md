@@ -649,7 +649,6 @@ In the design docs, a follow-up edit for the tickets that build this:
 | `syl.md` §4 | a Definition's body and its parameters | an `action` Definition's body is clauses and reads `$actor` (§4) |
 | `semantics.md` §2.3 | "the `actor` word still reads the innermost Actor" | a Definition's body reads `$actor` |
 | `semantics.md` §4.8 | "A lookback is `did(subj, action, within)`" | the operator `did(phrase, within)` under `holds` or in a postmodifier (§8) |
-| `architecture.md`, `spelling.md` §5 | "Meaning resolves the ambiguity, never rank or rule order"; "a card with more is reported, never stored as a choice" | candidates the term rules leave go to a pragmatics step (§9) |
 | `syl.md` §4 | "a passive `by(np)` reads the patient before `np`" | removed |
 | `spelling.md` §1 | "its Subject selects the voice" | `done` selects the passive |
 | `spelling.md` §2, §4, §6, §7, §9, §10 | passive subject promotion, its notation and "Which passive a term prints" | removed; §3 |

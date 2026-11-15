@@ -228,8 +228,8 @@ and it stays an adjunct of its one sentence.
   a delayed trigger's point after its action is not yet declared (`atNext`'s `TODO(spelling)`).
 
 The rule does not choose a run's length. Recovery yields a candidate for each run the Hole can
-hold that starts at the dependent's sentence, and a candidate the checker or the discourse
-reading refuses drops out (§5). 30 of the 371 lines that print a delayed trigger clause after its
+hold that starts at the dependent's sentence, and a candidate semantics refuses drops
+out (§5). 30 of the 371 lines that print a delayed trigger clause after its
 effect print a further sentence after it, and other fronted dependents are followed by more
 sentences too: "As long as …," on 16 lines, "Until end of turn," on 33 and "If <condition>," on
 524. Where the dependent's Construction has a Hole that holds a run, each such line has a
@@ -484,7 +484,7 @@ created token's description becomes a nominal (§2) instead is the open question
 Definition's ([`.syl`](syl.md) §4), and a Template still adds no meaning
 ([Semantics](semantics.md) §3). Spelling relates Readings to the surface term, before
 expansion; the copying and rearranging a body does to its parameters happens after, where no
-wording is involved. The discourse reading still reads the expanded tree in printed order, with
+wording is involved. Semantics still reads the expanded tree in printed order, with
 a Tail read where it is printed (§3.2).
 
 **Spelling chooses nothing.** Spelling is many-to-many. Recovery yields every surface term
@@ -698,7 +698,7 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
 
 Why the skeleton rule: it is the round trip of §6 as one check, in place of a rule on each
 construct. It is a check on the `spelling` alone. Two sorts whose wordings overlap can still
-give recovery two candidates, and meaning chooses between those (§5).
+give recovery two candidates, and semantics and pragmatics choose between those (§5).
 
 **What the notation does not say is a Template, or a change to the declaration.** Apart from
 `Counting`'s 1 (above), it has no part chosen by a value and no omission governed by a value

@@ -13,8 +13,8 @@ term back as English (`architecture.md`, "Spelling is a construction grammar"). 
 each Template's and Definition's `spelling`, so it needs the spelling conventions
 (`syl-spelling-conventions`) and the optional and repeated segments
 (`syl-spelling-optional-segments`) that fill the 168 `TODO(spelling)` markers. Nothing maps a
-`sylex_english` Reading to a `.syl` term yet, and the resolved tree it would target does not exist
-yet either.
+`sylex_english` Reading to a `.syl` term yet, and the Rust structures it would build do not
+exist yet either.
 
 Recovery does not wait for the rest of step 6 (`cleanup-step6-syl`). It reads whichever
 declarations have a wording when it runs, so its report changes as the corpus is reshaped.
@@ -22,19 +22,20 @@ declarations have a wording when it runs, so its report changes as the corpus is
 ## Done when
 
 - For a canon card, recovery reads the Packed Forest of its Oracle text and yields candidate
-  surface terms built from the builtin Templates and Definitions; candidates that discourse or
-  the checker refuses drop out.
+  surface terms built from the builtin Primitives, Templates and Definitions; candidates that
+  semantics refuses drop out, and one it does not understand is reported as that
+  (`docs/design/semantics.md` §7).
 - Every canon card's recovery is run and reported: one surviving candidate that matches the
   card's `.syl` file, a mismatch, no candidate, or more than one candidate. A card with more than
   one is reported with each candidate; recovery chooses none, by rank or otherwise, and stores no
   choice.
-- No check exists yet: recovery has no code, and the resolved tree it targets arrives with step 7.
+- No check exists yet: recovery has no code, and the Rust structures it builds arrive with step 7.
   The landing names the command that runs recovery and reports its results.
 
 ## Not in scope
 
-- Choosing among the candidates the checker and discourse leave: a pragmatics step, which is not
-  designed.
+- Choosing among the candidates the checker and discourse leave: the pragmatics step
+  (`docs/design/pragmatics.md`).
 
 ## Pointers
 

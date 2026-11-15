@@ -57,7 +57,7 @@ and `would` as an operator.
 - *Worship* and *Trinisphere* are in `plugins/canon/cards/`, each a clause whose subject carries
   the `would` relative, checked against its Oracle text.
 - That each of these clauses is a replacement, and the damage ones a redirection [CR#614.9], is
-  lowering's reading and not checkable until the engine reads `.syl`; the landing shows each
+  semantics' reading (`docs/design/semantics.md` §6) and not checkable until it exists; the landing shows each
   term.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

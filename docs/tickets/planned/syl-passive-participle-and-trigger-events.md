@@ -77,8 +77,7 @@ and the tickets after it the other words that take a `Subject`.
 - `docs/design/semantics.md` §2.1, §4.2 and §4.4, `docs/design/syl.md` §4,
   `docs/design/spelling.md` §1, §2, §4, §5, §6, §7, §9 and §10 and
   `docs/design/architecture.md` say what the spec's §10 table gives for each: `done` selects the
-  passive, nothing describes passive subject promotion or a `Subject` that carries voice, and the
-  candidates the term rules leave go to a pragmatics step. `semantics.md` §4.1's table has the
+  passive, and nothing describes passive subject promotion or a `Subject` that carries voice. `semantics.md` §4.1's table has the
   trigger row of the spec's §1 table. The glossary entries **Subject**, **Actor** and **Patient**
   (`docs/contexts/game-model/CONTEXT.md`) are rewritten as the spec's §10 says.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
