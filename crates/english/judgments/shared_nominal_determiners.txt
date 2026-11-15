@@ -1,0 +1,17 @@
+# Coordinated determiner-plus-premodifier sequences sharing one nominal head (CGEL, Ch. 5 §14.4, p. 449, [23iii]; Ch. 15 §4.4(d), p. 1344, [25])
++ <card=Balthor the Defiled> {B}{B}{B}, Exile Balthor: Each player returns all black and all red creature cards from their graveyard to the battlefield. => NounPhrase "all black and all red creature cards from their graveyard" head card as Object of return; DeterminerPhrase "all"#1 as Determiner of card; AdjectivePhrase "black" as Modifier of card; DeterminerPhrase "all"#2 as Determiner of card; AdjectivePhrase "red" as Modifier of card; Nominal "creature cards from their graveyard" head card; Nominal "creature cards" head card; PrepositionPhrase "from their graveyard" as Modifier of card || NounPhrase "all black and all red creature cards" head card as Object of return; DeterminerPhrase "all"#1 as Determiner of card; AdjectivePhrase "black" as Modifier of card; DeterminerPhrase "all"#2 as Determiner of card; AdjectivePhrase "red" as Modifier of card; Nominal "creature cards" head card; PrepositionPhrase "from their graveyard" as Adjunct of return; !AdjectivePhrase "black" as Modifier of all; !DeterminerPhrase "all black"
+# from: Balthor the Defiled
++ Each player returns all black and all red creature cards to the battlefield. => NounPhrase "all black and all red creature cards" head card as Object of return; DeterminerPhrase "all"#1 as Determiner of card; AdjectivePhrase "black" as Modifier of card; DeterminerPhrase "all"#2 as Determiner of card; AdjectivePhrase "red" as Modifier of card; Nominal "creature cards" head card; Nominal "creature" as Modifier of card; !AdjectivePhrase "black" as Modifier of all; !DeterminerPhrase "all black"
+# from: Balthor the Defiled
++NounPhrase all black and all red creature cards => NounPhrase "all black and all red creature cards" head card; DeterminerPhrase "all"#1 as Determiner of card; AdjectivePhrase "black" as Modifier of card; DeterminerPhrase "all"#2 as Determiner of card; AdjectivePhrase "red" as Modifier of card; Nominal "creature cards" head card; Nominal "creature" as Modifier of card; !AdjectivePhrase "black" as Modifier of all; !DeterminerPhrase "all black"
+# from: Balthor the Defiled
++ Each player returns all tapped and all attacking creatures to their owners' hands. => NounPhrase "all tapped and all attacking creatures" head creature as Object of return; DeterminerPhrase "all"#1 as Determiner of creature; AdjectivePhrase "tapped" as Modifier of creature; DeterminerPhrase "all"#2 as Determiner of creature; VerbPhrase "attacking" as Modifier of creature; Nominal "creatures" head creature; !AdjectivePhrase "tapped" as Modifier of all; !DeterminerPhrase "all tapped"; readings 1
+# A noun premodifier does not close a shared-nominal determiner conjunct, so coordinated noun phrases with the same head noun do not double it
++ <card=Warpath> Warpath deals 3 damage to each blocking creature and each blocked creature. => NounPhrase "each blocking creature and each blocked creature" as Complement of to; NounPhrase "each blocking creature" head creature; NounPhrase "each blocked creature" head creature; readings 1
+# Each conjunct's determiner agrees in Number with the shared nominal
+# from: Balthor the Defiled
+*NounPhrase all black and all red creature card
+# from: Balthor the Defiled
+*NounPhrase a black and a red creature cards
+# from: Balthor the Defiled
+*NounPhrase all black and a red creature cards

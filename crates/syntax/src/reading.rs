@@ -1265,13 +1265,19 @@ impl CompiledGrammar {
             .get(&node.production)
             .map(|&p| &self.productions[p]);
         // A Cluster's dependents bear their functions in the phrase whose
-        // head the coordination of Clusters shares; a coordination passes
-        // that phrase down to its Clusters.
-        let cluster_host = clustered.filter(|_| production.is_some_and(|p| p.cluster.is_some()));
-        let pass = |name: &Ident| match production {
-            Some(p) if p.clusters.is_some_and(|(at, _)| p.names[at] == *name) => Some(index),
-            Some(p) if p.cluster.is_some() => None,
-            _ => clustered,
+        // head the coordination of Clusters shares; a coordination or an
+        // inner `cluster` passes that phrase down to its Clusters.
+        let is_cluster =
+            production.is_some_and(|p| p.cluster.is_some() || self.category_cluster[p.lhs]);
+        let cluster_host = clustered.filter(|_| is_cluster);
+        let pass = |role: ChildRole| {
+            if role == ChildRole::Clusters {
+                Some(index)
+            } else if is_cluster && role != ChildRole::Cluster {
+                None
+            } else {
+                clustered
+            }
         };
         // The head of a function Category bears its function in its phrase.
         let wraps = self.function_categories.contains(&node.category);
@@ -1299,9 +1305,9 @@ impl CompiledGrammar {
                 self.gap_sites(child, gap, &mut at, &mut sites);
             }
             if wraps && role == ChildRole::Head {
-                self.locate(child, parent, function, pass(&name), out);
+                self.locate(child, parent, function, pass(role), out);
             } else {
-                self.locate(child, Some(index), Some(name), pass(&name), out);
+                self.locate(child, Some(index), Some(name), pass(role), out);
             }
             if let Some(host) = cluster_host {
                 // A function Category's head bears it too.
@@ -1580,11 +1586,12 @@ pub struct Constituent {
     pub head: Option<LexemeId>,
     pub gap: Gap,
     /// The other functions it bears, each with the preorder index of the
-    /// phrase it bears it in: a dependent of a Complement Cluster bears its
-    /// function in the phrase whose head the Clusters share, a Complement
-    /// shared by Right Node Raising fills each conjunct's Gap (*draw and
-    /// discard [cards]*, *be and become [legendary]*), and a Modifier
-    /// postposed out of an Object modifies that Object.
+    /// phrase it bears it in: a dependent of a Cluster (`CategoryDecl::cluster`
+    /// or `ClustersDecl`) bears its function in the phrase whose head the
+    /// Clusters share, a Complement shared by Right Node Raising fills each
+    /// conjunct's Gap (*draw and discard [cards]*, *be and become
+    /// [legendary]*), and a Modifier postposed out of an Object modifies that
+    /// Object.
     pub also: Vec<(Ident, usize)>,
 }
 

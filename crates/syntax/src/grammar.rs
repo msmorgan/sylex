@@ -102,6 +102,12 @@ pub struct CategoryDecl {
     /// in the same phrase too.
     #[serde(default)]
     pub function: bool,
+    /// Whether a Constituent of this Category is a Cluster of dependents
+    /// coordinated in a phrase whose head they share (`Constituent::also`),
+    /// as `ComplementCluster` is after a verb and `NominalCluster` is before
+    /// a nominal (CGEL, Ch. 15 §4.3, p. 1341; §4.4(d), p. 1344).
+    #[serde(default)]
+    pub cluster: bool,
 }
 
 /// One authored Production.
@@ -158,6 +164,11 @@ pub struct CategoryDecl {
 ///   applies to (`compile.rs`, `dependents`); no Production names a child so.
 /// - `object`, `shared`: the Reading functions of postposed Modifiers
 ///   (`object`) and of Right Node Raising (`shared`) (`reading.rs`, `locate`).
+/// - `clusters`, `cluster`: a coordination of dependent Clusters
+///   (`CategoryDecl::cluster`, `ClustersDecl`) whose dependents bear their
+///   functions in this phrase (`clusters`), and an inner Cluster whose
+///   dependents bear their functions in the same phrase as its mother
+///   Cluster (`cluster`) (`reading.rs`, `locate`).
 /// - The dependent functions `subject`, `object`, `indirect_object`,
 ///   `complement`, `predicative_complement`, `adjunct`, `modifier`,
 ///   `determiner` and `supplement`: a head line does not run through one while

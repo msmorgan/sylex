@@ -413,6 +413,10 @@ your graveyard*).
 Parallel sequences of Preposition Phrase Adjuncts, coordinated after a verb
 with no Complement.
 
+**Nominal Cluster**:
+Parallel sequences of a Determiner and one or more premodifying Modifiers,
+coordinated before a shared Nominal (*all black and all red creature cards*).
+
 **Word-Part Coordination**:
 A Coordination of Compound Nouns' first bases sharing the last Conjunct's head
 word, as in *a +1/+1, first strike, or vigilance counter*.

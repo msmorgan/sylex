@@ -190,7 +190,6 @@ category Header
 category RowHeader
 category Chapters
 category IndexedNominal [Number]
-category NominalModifier
 category ChoiceQuantity [Number]
 category Sentence
 category Sentences
@@ -336,6 +335,24 @@ category PositionPhrase : AdjectivePhrase
 // and a coordination of such (*one or more*).
 category FusableDeterminer : DeterminerPhrase [Number, Countability, NounKind]
 category FusedQuantity : DeterminerPhrase [Number, Countability]
+// A determiner with its own premodifiers in a delayed right constituent
+// coordination over one shared nominal (*[all black and all red] creature
+// cards*, Balthor the Defiled; CGEL 5§14.4:449, 15§4.4(d):1344), the
+// coordination, and one premodifier. Each Cluster's determiner and
+// premodifiers bear their functions in the shared nominal's Noun Phrase
+// (`cluster`). NominalModifier is an admission gate (english.md §6): it
+// restates BareNominal's premodifiers without NounPremodifier, which keeps
+// *each blocking creature and each blocked creature* (Warpath) from *[each
+// blocking creature and each blocked] creature* and *a creature card and/or a
+// land card* (Green Sun's Twilight) from *[a creature card and/or a land]
+// card*.
+category NominalModifier { function }
+category NominalCluster [
+    Number, Countability, DeterminativeDistribution,
+] { cluster }
+category NominalClusters : NominalCluster [
+    Number, ConjunctNumber, Countability, DeterminativeDistribution,
+]
 // A determinative's Complement has a Number of its own (*all but one*).
 category DeterminerPhrase [
     Number, Countability, DeterminativeDistribution, NounKind, ComplementKind,
@@ -2450,6 +2467,63 @@ Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [he
           determiner.ComplementKind != PP,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
+// Coordinated determiners each with its own premodifiers over one shared
+// nominal (*[all black and all red] creature cards*; CGEL 5§14.4:449,
+// 15§4.4(d):1344). Each Cluster agrees with the shared nominal through
+// ConjunctNumber, while the Noun Phrase takes the coordination's resolved
+// Number (*a black and a red creature* is plural; *each black and each red
+// creature* is singular, CGEL 5§18.4:508).
+SharedNominalDetermined: NounPhrase -> clusters:NominalClusters Nominal {
+    transparent: [head],
+    unshared: [Number],
+}
+    where $.DeterminativeDistribution = clusters.DeterminativeDistribution,
+          $.Determination = Overt,
+          $.Case = Plain,
+          $.Person = Third,
+          clusters.Countability = head.Countability,
+          clusters.ConjunctNumber = head.Number,
+          $.Number = clusters.Number
+DeterminedCluster: NominalCluster ->
+    determiner:DeterminerPhrase modifier:NominalModifier
+    where determiner.DeterminativeDistribution != Independent,
+          determiner.ComplementKind != PP,
+          $.Number = determiner.Number,
+          $.Countability = determiner.Countability,
+          $.DeterminativeDistribution = determiner.DeterminativeDistribution
+ComparativeCountCluster: NominalCluster ->
+    determiner:DeterminerPhrase modifier:NominalModifier
+    where determiner.ComplementKind = PP,
+          determiner.ObliqueDetermination = Bare,
+          determiner.Countability = Count,
+          $.Countability = Count,
+          $.Number = determiner.ObliqueNumber
+ComparativeMassCluster: NominalCluster ->
+    determiner:DeterminerPhrase modifier:NominalModifier
+    where determiner.ComplementKind = PP,
+          determiner.ObliqueKind != FiniteClause,
+          determiner.ObliqueDetermination = Bare,
+          determiner.Countability := Mass,
+          $.Countability = Mass,
+          $.Number = Singular
+MaximumCluster: NominalCluster ->
+    determiner:Selected(PrepositionPhrase, Up) modifier:NominalModifier
+    where determiner.Determination = Bare,
+          $.Number = determiner.Number,
+          $.Countability = Count
+StackedCluster: NominalCluster ->
+    cluster:NominalCluster modifier:NominalModifier
+    where $.Number = cluster.Number,
+          $.Countability = cluster.Countability,
+          $.DeterminativeDistribution = cluster.DeterminativeDistribution
+AdjectivalNominalModifier: NominalModifier -> AdjectivePhrase
+    where head.ComplementKind = Intransitive,
+          head.AdjectivePosition != Predicative
+ParticipialNominalModifier: NominalModifier -> Participle
+AttributedNominalModifier: NominalModifier -> Attributes
+MeasureNominalModifier: NominalModifier -> Measure
+KeywordNominalModifier: NominalModifier -> KeywordPhrase
+    where head.KeywordForm = Bare
 // A distributive determiner over an *and*-coordination of singular nominals
 // is singular (*each creature and planeswalker you control gets ...*), as a
 // coordination of Noun Phrases each with *each* is (CGEL 5§18.4:508). Number
@@ -3734,6 +3808,41 @@ coordination DeterminerPhrase {
 }
     where first.DeterminativeDistribution != Targeting,
           last.DeterminativeDistribution != Targeting
+coordination NominalClusters {
+    coordinators: And,
+    unshared: [ConjunctNumber, DeterminativeDistribution],
+    conjunct: NominalCluster,
+}
+    where !(first.DeterminativeDistribution = Distributive & last.DeterminativeDistribution = Distributive),
+          $.Number = Plural,
+          $.ConjunctNumber = first.Number
+coordination NominalClusters {
+    coordinators: And,
+    unshared: [ConjunctNumber],
+    conjunct: NominalCluster,
+}
+    where first.DeterminativeDistribution := Distributive,
+          last.DeterminativeDistribution := Distributive,
+          $.ConjunctNumber = $.Number
+coordination NominalClusters {
+    coordinators: AndOr,
+    unshared: [ConjunctNumber, DeterminativeDistribution],
+    conjunct: NominalCluster,
+}
+    where $.ConjunctNumber = Plural,
+          $.Number = Plural
+coordination NominalClusters {
+    coordinators: AndOr,
+    unshared: [Number, ConjunctNumber, DeterminativeDistribution],
+    conjunct: NominalCluster,
+}
+    where $.ConjunctNumber = Singular
+coordination NominalClusters {
+    coordinators: Alternative,
+    unshared: [ConjunctNumber, DeterminativeDistribution],
+    conjunct: NominalCluster,
+}
+    where $.ConjunctNumber = $.Number
 // Numbers alone are an Amount coordination (*X is 2 or 3*), never also
 // a fused quantity over them (english.md §8).
 coordination FusedQuantity {

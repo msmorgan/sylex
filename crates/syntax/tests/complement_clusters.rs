@@ -345,3 +345,86 @@ fn a_joint_exclusion_on_a_slot_moves_into_the_cluster() {
     assert_eq!(count("Give card to player and cards to player."), 0);
     assert_eq!(count("Give cards to player and card to player."), 0);
 }
+
+#[test]
+fn authored_nominal_clusters_record_functions_in_shared_nominal_phrase() {
+    // Derived from Balthor the Defiled (*all black and all red creature cards*,
+    // CGEL, Ch. 15 §4.4(d), p. 1344, [25]): each conjunct's determiner and
+    // stacked premodifiers bear their functions in the NounPhrase whose
+    // nominal head the coordination shares.
+    let core = || Source {
+        kind: SourceKind::Core,
+        path: "tests/complement_clusters.rs".to_owned(),
+        owner: "test".to_owned(),
+    };
+    let lexicon = Lexicon::new([
+        Lexeme::invariant("d:all", "all", Category::Determinative, core()),
+        Lexeme::invariant("a:tapped", "tapped", Category::Adjective, core()),
+        Lexeme::invariant("a:black", "black", Category::Adjective, core()),
+        Lexeme::invariant("a:red", "red", Category::Adjective, core()),
+        Lexeme::noun("n:card", "card", vec![Countability::Count], core()),
+        Lexeme::invariant("c:and", "and", Category::Coordinator, core()),
+    ])
+    .unwrap();
+    let source = r#"
+        root NounPhrase
+        category DeterminerPhrase
+        category AdjectivePhrase
+        category NominalModifier { function }
+        category NominalCluster { cluster }
+        category NominalClusters : NominalCluster
+        category Nominal
+        category NounPhrase
+        class Coordinator = ["c:and"]
+        Det: DeterminerPhrase -> Lex(Determinative)
+        Adj: AdjectivePhrase -> Lex(Adjective)
+        Mod: NominalModifier -> AdjectivePhrase
+        Head: Nominal -> Lex(Noun)
+        DeterminedCluster: NominalCluster -> determiner:DeterminerPhrase modifier:NominalModifier
+        StackedCluster: NominalCluster -> cluster:NominalCluster modifier:NominalModifier
+        SharedNominal: NounPhrase -> clusters:NominalClusters Nominal
+        coordination NominalClusters { coordinators: Coordinator, conjunct: NominalCluster }
+    "#;
+    let grammar = CompiledGrammar::bind(
+        &Grammar::from_fug_str(source).unwrap(),
+        &lexicon,
+        &FrameCatalog::default(),
+    )
+    .unwrap();
+    let text = "all tapped black and all red cards";
+    let found = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
+    assert_eq!(found.len(), 1);
+    let (realized, constituents) = grammar.constituents(&found[0], &lexicon).unwrap();
+    let np = constituents
+        .iter()
+        .position(|c| c.category.as_str() == "NounPhrase")
+        .unwrap();
+    assert_eq!(
+        constituents[np].head.map(|id| id.as_str()),
+        Some("n:card")
+    );
+    let determiners: Vec<_> = constituents
+        .iter()
+        .filter(|c| c.category.as_str() == "DeterminerPhrase")
+        .collect();
+    assert_eq!(determiners.len(), 2);
+    for det in determiners {
+        assert_eq!(&realized[det.span.clone()], "all");
+        assert_eq!(det.also, [(dpsi::Ident::new("determiner"), np)]);
+    }
+    let modifiers: Vec<_> = constituents
+        .iter()
+        .filter(|c| c.category.as_str() == "AdjectivePhrase")
+        .collect();
+    assert_eq!(modifiers.len(), 3);
+    for (adj, expected) in modifiers.iter().zip(["tapped", "black", "red"]) {
+        assert_eq!(&realized[adj.span.clone()], expected);
+        assert_eq!(adj.also, [(dpsi::Ident::new("modifier"), np)]);
+    }
+    for cluster in constituents
+        .iter()
+        .filter(|c| c.category.as_str() == "NominalCluster")
+    {
+        assert_eq!(cluster.head, None);
+    }
+}

@@ -102,6 +102,8 @@ pub struct CompiledGrammar {
     pub(crate) category_features: Vec<Vec<usize>>,
     /// Each Category's mask of the Gaps it may contain (`Gap::bit`).
     pub(crate) category_gap: Vec<u16>,
+    /// Whether each Category builds a dependent Cluster (`CategoryDecl::cluster`).
+    pub(crate) category_cluster: Vec<bool>,
     /// Categories that name a function (`CategoryDecl::function`).
     pub(crate) function_categories: BTreeSet<Ident>,
     /// The Categories of Linked Conjuncts: the `link` of a coordination
@@ -801,6 +803,7 @@ impl<'a> Binder<'a> {
             }
             category_gap.push(mask);
         }
+        let category_cluster = declared.values().map(|c| c.cluster).collect();
         let function_categories = declared
             .iter()
             .filter(|(_, c)| c.function)
@@ -1062,6 +1065,7 @@ impl<'a> Binder<'a> {
                 categories,
                 category_features,
                 category_gap,
+                category_cluster,
                 function_categories,
                 link_categories: BTreeSet::new(),
                 features,
@@ -2824,6 +2828,9 @@ impl<'a> Binder<'a> {
             .category_features
             .push(self.out.category_features[target].clone());
         self.out.category_gap.push(self.out.category_gap[target]);
+        self.out
+            .category_cluster
+            .push(self.out.category_cluster[target]);
         self.out.by_lhs.push(Vec::new());
         category
     }
@@ -3782,13 +3789,7 @@ impl<'a> Binder<'a> {
                 {
                     continue;
                 }
-                let category = self.out.categories.len();
-                self.out.categories.push(self.out.categories[draft.lhs]);
-                self.out
-                    .category_features
-                    .push(self.out.category_features[draft.lhs].clone());
-                self.out.category_gap.push(self.out.category_gap[draft.lhs]);
-                self.out.by_lhs.push(Vec::new());
+                let category = self.private_category(draft.lhs);
                 let symbol = |category, host| Symbol::Cat {
                     category,
                     host,

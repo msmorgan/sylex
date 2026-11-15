@@ -270,6 +270,10 @@ pub(crate) enum ChildRole {
     Object,
     /// The shared child of Right Node Raising.
     Shared,
+    /// A coordination of dependent Clusters sharing this phrase's head.
+    Clusters,
+    /// An inner Cluster whose dependents share its mother Cluster's host.
+    Cluster,
     Coordinator,
     Marker,
     Subject,
@@ -295,6 +299,8 @@ impl ChildRole {
             "supplement" => Self::Supplement,
             "object" => Self::Object,
             "shared" => Self::Shared,
+            "clusters" => Self::Clusters,
+            "cluster" => Self::Cluster,
             "coordinator" => Self::Coordinator,
             "marker" => Self::Marker,
             "subject" => Self::Subject,
