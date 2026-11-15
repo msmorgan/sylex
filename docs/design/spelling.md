@@ -6,17 +6,17 @@ This document is directional. It describes the spelling grammar the project is a
 the design is not settled: read it for the intended shape, not as a contract the code keeps.
 §10 lists what is known to be open, and the rest is not fixed either.
 
-The spelling layer relates Readings to resolved terms ([Architecture](architecture.md), "The
-layers"). Recovery reads the Packed Forest of a card's text and assembles the resolved terms
-whose wording matches it; spelling a resolved term yields a Reading for the English layer to
+The spelling layer relates Readings to surface terms ([Architecture](architecture.md), "The
+layers"). Recovery reads the Packed Forest of a card's text and assembles the surface terms
+whose wording matches it; spelling a surface term yields a Reading for the English layer to
 realize. One grammar serves both directions, and this document says what kind of grammar it is.
 Its data is the `spelling` field of each `.syl` declaration ([`.syl`](syl.md) §2). The terms
 Construction, Hole, Tail and Factoring are the
 [glossary's](../contexts/oracle-english/CONTEXT.md).
 
 The grammar is a synchronous grammar of substitution, with two closed rules (§2) and three
-closed extensions (§3). It has no adjunction. The resolved term is its derivation (§4), and it
-changes nothing in the English grammar, in the shape of the resolved term or in what expansion
+closed extensions (§3). It has no adjunction. The surface term is its derivation (§4), and it
+changes nothing in the English grammar, in the shape of the surface term or in what expansion
 means (§5).
 
 ## 1. Constructions
@@ -25,10 +25,10 @@ A Construction is one declaration's wording paired with the call it spells. Ever
 that carries a `spelling` is one: a Template, a Definition, and a Primitive too, since a
 primitive is where a constructor's spelling attaches ([`.syl`](syl.md) §1). The wording is one
 fixed fragment of English structure, a tree whose frontier carries Holes, one for each parameter
-the wording prints. The call is one node of the resolved term, with those parameters as its
+the wording prints. The call is one node of the surface term, with those parameters as its
 arguments.
 
-A Construction pairs wording with the call, not with the call's body. The resolved term keeps
+A Construction pairs wording with the call, not with the call's body. The surface term keeps
 the call, and what the call expands to is expansion's business (§5). Why: a body may use a
 parameter several times, as `bushido` raises both power and toughness by its one count, and
 may rearrange its parameters freely. If the pairing reached into the body, every such body would
@@ -420,9 +420,9 @@ Where the text repeats the phrase, the term does too. Ancient Craving prints "Yo
 cards and you lose 3 life" and Ambition's Cost "You draw three cards and lose 3 life", and
 those are two terms: two Handoffs in sequence, and one Handoff over two Actions in sequence.
 
-## 4. The resolved term is the derivation
+## 4. The surface term is the derivation
 
-The resolved term stays a plain tree of calls, and that tree is the derivation: each call is one
+The surface term stays a plain tree of calls, and that tree is the derivation: each call is one
 Construction, and where it stands says what it was combined with. Nothing records a derivation
 beside the term.
 
@@ -470,7 +470,7 @@ that holds a run against a span of sibling sentences (§2), which reads the gram
 `SentenceSequence` as flat and adds no node to it. The grammar still names no Catalog item and
 carries no meaning ([English](english.md) §1–2).
 
-**The shape of the resolved term.** A term is a tree of calls with named and positional
+**The shape of the surface term.** A term is a tree of calls with named and positional
 arguments, lists and records. The two closed rules, Tails and Factoring are relations between
 that tree and a Reading. None of them adds a kind of node, and `.syl` gains no syntax outside the
 `spelling` string. Only a declaration carries a `spelling`, so every part of a card's `text`
@@ -482,15 +482,16 @@ created token's description becomes a nominal (§2) instead is the open question
 
 **What expansion means.** Expansion substitutes a Template's parameters and wraps a
 Definition's ([`.syl`](syl.md) §4), and a Template still adds no meaning
-([Semantics](semantics.md) §3). Spelling relates Readings to the resolved term, before
+([Semantics](semantics.md) §3). Spelling relates Readings to the surface term, before
 expansion; the copying and rearranging a body does to its parameters happens after, where no
 wording is involved. The discourse reading still reads the expanded tree in printed order, with
 a Tail read where it is printed (§3.2).
 
-**Meaning still disambiguates.** Spelling is many-to-many. Recovery yields every resolved term
-whose wording matches some Reading in the forest, and a candidate the checker or the discourse
-reading refuses drops out ([Architecture](architecture.md), "Spelling is a construction
-grammar"). Nothing in this document chooses among candidates by rank or by rule order.
+**Spelling chooses nothing.** Spelling is many-to-many. Recovery yields every surface term
+whose wording matches some Reading in the forest. Semantics refuses the candidates that have no
+meaning, and a pragmatics step ranks what is left ([Architecture](architecture.md), "Spelling is
+a construction grammar"; [Semantics](semantics.md) §7). Nothing in this document chooses among
+candidates.
 
 ## 6. The round trip
 
@@ -802,7 +803,7 @@ where in the list `T` stands, against printed order (§3.1) and the round trip (
 that fixes its position, such as "an element that prints only a Tail stands last", would settle
 it; none is stated.
 
-**A wording with several Readings.** Spelling a resolved term yields a Reading, and a
+**A wording with several Readings.** Spelling a surface term yields a Reading, and a
 Construction is one fragment (§1), but a `spelling`'s fixed words can parse in several ways, and
 the notation cannot say which. "Exile all cards from target player's graveyard." gets two
 Readings: "from target player's graveyard" postmodifies "cards" in one and is an adjunct of the

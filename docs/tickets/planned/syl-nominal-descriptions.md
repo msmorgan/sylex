@@ -255,7 +255,7 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 
 ## Pointers
 
-- `docs/design/spelling.md` (substitution, optional and list Holes, the resolved term as the
+- `docs/design/spelling.md` (substitution, optional and list Holes, the surface term as the
   derivation, the notation, rejected alternatives); `docs/design/syl.md` §2, §3, §5;
   `docs/design/semantics.md` §2.4, §4.5
 - `plugins/builtin/coercions/`, `plugins/builtin/primitives/noun/`,

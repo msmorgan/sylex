@@ -118,7 +118,7 @@ many of those tokens are created instead" each print them as one (spec §6).
 
 ## Pointers
 
-`docs/design/spelling.md` (the resolved term as the derivation, records, the notation); `plugins/builtin/templates/noun/{creatureToken,
+`docs/design/spelling.md` (the surface term as the derivation, records, the notation); `plugins/builtin/templates/noun/{creatureToken,
 creatureTokenOf,artifactCreatureToken}.syl`; `plugins/builtin/primitives/noun/written.syl`;
 `plugins/builtin/templates/action/{createTappedToken,createTappedAttacking}.syl`;
 `docs/evidence/syl-token-records-to-templates/`.

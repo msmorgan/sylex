@@ -192,3 +192,61 @@ agree.
 The elements of a list are read in printed order too: a conjunction's conjuncts and a sequence's
 steps stand in the order the text prints them, so "basic land" is
 `and([hasSupertype(basic), isLand])`.
+
+## 6. What a Surface Term Says
+
+**A sort names a kind of phrase.** `Clause`, `VerbPhrase`, `NounPhrase`, `Nominal` and its
+modifier sorts, `Amount`, a determiner, a duration phrase, a Turn Point are kinds of phrase. So
+are the sorts of words and symbols a card prints: a card type, a color, a mana symbol, a counter
+kind. A sort that says what a phrase does in the game is no kind of phrase and is not a sort of
+the term language.
+
+The test for one sort: two terms that differ only in standing at it or at another sort print the
+same words in the same structure. `clause(you, did(attack, within = thisTurn))` prints "you
+attacked this turn" whether it stands where a condition or an event is wanted, so `Condition`
+and `GameEvent` fail the test. `VerbPhrase` and `Clause` pass it: one prints a subject and the
+other does not.
+
+**A clause stands bare wherever the text prints one.** The words that today make an event, a
+condition or a static statement out of a clause go, and the word that prints the surrounding
+construction takes the clause:
+
+| Card | Text | With the scaffolding sorts | Without them |
+|---|---|---|---|
+| *Grollub* | "Whenever this creature is dealt damage, …" | `whenever(does(thisCreature, be(done(…))), …)` | `whenever(clause(thisCreature, be(done(…))), …)` |
+| *Mardu Hordechief* | "if you attacked this turn" | `holds(you, did(attack, within = thisTurn))` | `clause(you, did(attack, within = thisTurn))` |
+| *Glorious Anthem* | "Creatures you control get +1/+1." | `static(clause(…, getsPt(…)))`, through a coercion from `Clause` to `StaticSpec` | `static(clause(…, getsPt(…)))`, `static` taking a `Clause` |
+
+So these are not built: `does`, `holds`, the coercion from `Clause` to `StaticSpec`, and a
+`replace` declared at two sorts. `StaticSpec`, `GameEvent`, `Condition` and `Replacement` are
+types of the meaning ([`semantics.md`](./semantics.md) §6).
+
+**A surface term still says more than a Reading.** It is not the parse written another way:
+
+- It names which word of the game each printed word is. A Reading has the verb "counter" with a
+  frame; the term has the primitive `counter`, and a keyword's Definition where the card prints
+  the keyword.
+- Its arguments are named roles, not complement positions, and the same roles in every voice and
+  verb form (`voice-and-object-phrases.md` §3).
+- It holds no inflection, agreement, case or punctuation, which the English layer derives
+  (`spelling.md` §1).
+- A fixed wording is one Template call, and its body is the surface term the wording abbreviates.
+- Attachment and bracketing are explicit, so two Readings of one sentence are two terms.
+
+**Templates and Definitions are surface to surface.** A body is a surface term over the
+declaration's parameters. Expansion is unchanged: it substitutes a Template's parameters, wraps
+a Definition's body in its Reference Scope under its Deed, keeps every call and parameter
+boundary, and reads each argument once, in printed order (§4, §5).
+
+**Rules rows are not text a card prints.** A row under `plugins/builtin/rules/` is a record
+(`scope` and `confer`, or `when` and `then`) at sorts such as `Conferral` that say what the row
+does in the game, and its body uses words no card prints (`asEvent`, `stateBasedActionsChecked`).
+Those sorts and words are rules data and are not put to the test above. What the clauses inside
+a row are written as is open ([`semantics.md`](./semantics.md) §8).
+
+**`cargo xtask dsl check` checks surface form only**: that names resolve at their expected sorts,
+that arguments are bound as §2 says, and the structural refusals of `voice-and-object-phrases.md`
+§9 that concern silent words (`subject` under `done`, `_` under `shared`, `$actor` in an `action`
+Definition). The event gate and "a replacement's event is a `would` clause" are not surface form.
+Semantics refuses them ([`semantics.md`](./semantics.md) §6). Until it exists, the sorts that say
+what a clause means stay as scaffolding, and `cargo xtask dsl check` refuses by them.

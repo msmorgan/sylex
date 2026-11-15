@@ -17,9 +17,14 @@ has four steps:
 1. Parse the `.syl` files ([`syl.md`](./syl.md) §2).
 2. Resolve names by expected sort, and expand Templates and Definitions ([`syl.md`](./syl.md)
    §3–§4).
-3. Build a Discourse Representation Structure from the expanded term, resolve every reference
-   against it (§2), and check the term against the action-clause spine (§4).
-4. Lower the term to the engine's core.
+3. Read the expanded term: classify each clause, build a Discourse Representation Structure,
+   resolve every reference against it (§2), and build the meaning (§6).
+4. Lower the meaning to the engine's core.
+
+The term says what the card prints and semantics decides what it means. That split is the
+direction: today the term language's own sorts (`GameEvent`, `Condition`, `StaticSpec`,
+`Replacement`) say what a clause means, and §4 describes the action-clause spine in those terms.
+They are scaffolding until the reading of §6 exists ([`syl.md`](./syl.md) §6).
 
 ## 1. Principles
 
@@ -459,3 +464,123 @@ patients are read as they were when the event happened, through the zone change'
   ([CR#704.5m,704.5q]).
 - An ability's text publishes its choices, cost results and introduced objects to the abilities
   after it, never what its trigger event names ([CR#607.1]).
+
+## 6. Reading a Term
+
+Semantics takes the expanded surface tree and gives a meaning or a refusal. It is one reading
+in four steps, each needing only what the steps before it give.
+
+1. **Classification.** Each clause is classified from where it stands and the words it holds,
+   with no reference resolved:
+   - the clause of a trigger is an event pattern, and it must name one event (the event gate of
+     §4.6, read through `done`, `be`, Templates and coordinations);
+   - a clause under "if", "as long as" or "unless" is a condition, a state or a lookback;
+   - a static ability's clause is a continuous effect, a deontic rule, a replacement effect, a
+     cost statement or one of the other static statements, by its verb phrase;
+   - a clause whose verb phrase is a `would`, with its consequent under `instead`, is a
+     replacement effect [CR#614.1a], and so is a clause whose subject carries a `would` relative
+     (`voice-and-object-phrases.md` §8);
+   - a `subject` under `done` is given the role of the slot it stands in, and a `done` call's
+     performer is its `by` or nobody;
+   - a clause states what holds or states a deed, which decides the force of its indefinite
+     subject (`voice-and-object-phrases.md` §5).
+2. **Boxes.** Each classified clause and operator opens its boxes (§2.2): a
+   trigger, a conditional and a replacement are duplex, a single-clause replacement among them;
+   `cant`, `must`, `can`, a negation and an "otherwise" are negated or modal; a distributive
+   opens a loop. A counting subject is read inside its operator's box.
+3. **References.** Every mention introduces a Referent or resolves to one, in printed order, by
+   the accessibility rules of §2.4. A Definition's body is read in its own
+   Reference Scope and exports its outcomes to the caller (§2.3), so *Cursed
+   Windbreaker*'s "manifest dread, then attach this Equipment to that creature" reads the
+   creature that the Definition of manifest dread puts onto the battlefield.
+4. **Construction.** The meaning is built from the classified clauses and resolved references:
+   an event with its subject and Action, a Static Spec, a Replacement. It is today's expanded
+   tree as Rust values, and lowering reads it. Where the Comprehensive Rules distinguish two
+   structures the meaning does too (§1 item 5(a)).
+
+**A distinct cue in the English is a distinct word in the term.** Classification reads
+primitives and positions, never which Template a card calls, since a Template adds no meaning
+(`architecture.md`, design principle 3). So "instead" is a primitive, and an intervening "if"
+keeps its own slot after the trigger condition [CR#603.4]: each is printed structure that
+classification needs.
+
+**Why one layer.** Which box a clause opens depends on what the clause is, reference resolution
+needs the boxes, and the meaning needs resolved references, since an event pattern's subject is
+a Referent. A reference step in a crate of its own would have to restate what each clause and
+operator means.
+
+**Each step answers one of three ways** for a term or a part of one: it is accepted; it is
+refused, with the rule that refuses it; or it is not understood, because semantics has no rule
+for the construction yet. Only a refusal says a reading is wrong. A term that is not understood
+is reported as that, and is never dropped as though it had been refused (§7).
+
+## 7. From Text to a Stored Term
+
+1. **Recovery** gives the set of candidate surface terms whose wording matches a Reading in the
+   card's Packed Forest. Candidates are not one per Reading: one Reading gives several where
+   Constructions word alike, and several Readings give one term, which is one candidate.
+2. **Semantics** reads each candidate. A candidate it refuses at any step drops out. A candidate
+   it does not understand stays, marked, and a card with one stores no term by this pipeline:
+   it has no meaning to class or rank, and the right reading may be the one not understood.
+3. **Candidates with one meaning are one class.** Two surface terms that assemble to the same
+   meaning differ in nothing the game can see.
+4. **Pragmatics ranks the classes** when more than one is left ([`pragmatics.md`](./pragmatics.md)).
+5. **The top class's term is stored** as the card's `.syl`. Within a class the term is chosen by
+   a fixed rule, so the same text always stores the same term.
+
+**The stored term is the decision, and rank only proposes it.** Reading a stored term runs
+semantics and never pragmatics. A wrong choice is corrected by editing the file. What is checked
+for every card is that its stored term is among the candidates recovery gives for its text, that
+semantics accepts it, and that it spells back to the analyzed text (`architecture.md`, "Exact
+round trip"); where it ranks is reported and gates nothing, as a Reading's rank gates nothing
+(`english.md` §5).
+
+**The report** for a card gives the number of candidates at each step, the rule that refused
+each dropped candidate, each candidate that was not understood, and, where pragmatics chose,
+the preference that decided. Two classes that pragmatics ranks equal are reported as a tie, and
+no term is stored for that card until an author picks one.
+
+Recovery enumerates candidates here. `spelling.md` §8 calls a Construction that makes recovery
+enumerate trees a defect; that sentence is about cost, and whether the candidate sets are small
+enough to enumerate is measured on the corpus before anything is packed.
+
+## 8. Open
+
+1. **Which sorts are kinds of phrase.** [`syl.md`](./syl.md) §6 gives the test and applies it to
+   the four sorts the voice spec worked around. `plugins/builtin/` declares words at more than a
+   hundred sorts, among them `Conferral`, `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
+   `Timing` and `TriggerCondition`, and none of those has been put to the test. Each is either a
+   kind of phrase the text prints or a classification that moves into the meaning.
+2. **Which word holds a replacement's two clauses.** *Phytohydra* prints "If damage would be
+   dealt to this creature, put that many +1/+1 counters on it instead." With `instead` a
+   primitive (§6), either the sentence's "if" is the ordinary conditional word and classification
+   reads the replacement off the `would` and the `instead`, or `replace` stays a word of its
+   own for this wording.
+3. **The pragmatics defaults and the form of the data.** [`pragmatics.md`](./pragmatics.md) names
+   one default and two preferences. The list of ambiguities that reach pragmatics, the default for
+   each, what a preference may say, and what `mimicTypes` does are not designed; the first run of
+   §7 over the corpus gives the list.
+4. **How candidates of one class are told apart for storing** (§7 step 5): the fixed rule is not
+   chosen (item 8).
+5. **A name for the meaning.** What semantics builds has no name of its own yet.
+6. **Sentences that depend on an earlier one.** "If the player does, untap that creature."
+   (*Apathy*) and the other follow-ups of `voice-and-object-phrases.md` §13 items 6 and 7 are
+   ordinary sentences at the surface, and what links each to the choice or deed it follows is
+   reference resolution's. Which Referent an optional deed introduces for "does" and "do" to
+   read is not designed.
+7. **Words that meet at one sort.** A name is unique at its sort (`syl.md` §3), and clauses that
+   stood at `Condition`, `GameEvent`, `StaticSpec` and `Replacement` stand at `Clause`. `doIf`
+   is declared at `Action` and at `Replacement`, `replace` at `Action` and at `StaticSpec`,
+   `nthOccurrence` at three sorts and `or` at ten. Each set that meets is one word, where its
+   members print alike and differ only in what they mean, or needs names that tell its members
+   apart. None has been examined.
+8. **When two meanings are the same** (§7 step 3). Equality has to ignore the identities
+   reference resolution allocates and keep printed order; it is not defined. The fixed rule of
+   §7 step 5 cannot be the Reading's Ranking Key alone, since two terms from one Reading share
+   it.
+9. **What a rules row's clauses are written as** ([`syl.md`](./syl.md) §6), and what replaces
+   `Condition` and `Action` in the record fields that hold a clause (`SbaRule`, a trigger's
+   intervening condition, a deontic rule's Unless Condition).
+10. **A Definition's meaning.** A Definition's sorts are checked once, at its declaration, and its
+   references in each context that expands it (§3). Whether classification runs on a
+   body once or at each call is not settled.

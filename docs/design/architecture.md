@@ -13,10 +13,10 @@ Oracle text
     ⇅   English      parse / realize
 Reading
     ⇅   spelling     recover / spell       construction grammar, many-to-many
-resolved term                              stored; keeps Template and Definition calls
-    │   expansion
+surface term                               stored; keeps Template and Definition calls
+    │   semantics    one way: classify, boxes, references, build
     ▼
-expanded tree                              primitives; read by discourse
+meaning                                    never stored; every reference resolved
     │   lowering     one-way compile
     ▼
 core
@@ -36,8 +36,8 @@ round-trip laws carry the system's exact round trip at this layer
 ([English](english.md) §7; the crate split and the Catalog constraint are in
 §1–2).
 
-**Spelling** relates Readings to resolved terms. Recovery reads the Packed Forest
-and assembles the resolved terms whose spellings match it. Spelling a resolved
+**Spelling** relates Readings to surface terms. Recovery reads the Packed Forest
+and assembles the surface terms whose spellings match it. Spelling a surface
 term yields a Reading for the English layer to realize. Its data is not kept
 apart: every `.syl` declaration carries its `lexical` and `spelling` fields
 beside its meaning ([`.syl`](syl.md) §2), so a word's wording
@@ -45,23 +45,35 @@ and its meaning are one fact with one source. Spelling coverage is therefore
 ingestion coverage: a card recovers when every phrase it prints has a spelling.
 [Spelling](spelling.md) is the grammar's design.
 
-**Semantics** is the card language: `.syl` declarations under `plugins/`.
-Primitives, Templates, Definitions and rules rows (state-based actions, and
-rules such as damage to a player causing that much life loss) live in
-`plugins/builtin/`, and cards live in `plugins/canon/`. A Template is printed wording over other
+**The card language** is `.syl`: declarations under `plugins/`. Primitives,
+Templates, Definitions and rules rows (state-based actions, and rules such as
+damage to a player causing that much life loss) live in `plugins/builtin/`, and
+cards live in `plugins/canon/`. A Template is printed wording over other
 declarations and adds no meaning; a Definition is vocabulary the rules define,
 such as a keyword action or ability, checked on its own
-([Semantics](semantics.md) §3). There are two levels. The **resolved term**
-is a card's `.syl` with each name resolved by expected sort; it keeps its
-Template and Definition calls, follows the card's English phrase by phrase, and
-is what is stored, recovered and rendered. **Expanding** those calls yields the
-**expanded tree** of primitives. The discourse reading reads the expanded tree
-in printed order against a Discourse Representation Structure, which resolves
-every reference and checks that the card is a faithful reading of its text
-([Semantics](semantics.md), from the overview through §4, and
-[`.syl`](syl.md)). `sylex_syl` parses `.syl`.
+([Semantics](semantics.md) §3). A card's **surface term** is its `.syl` with
+each name resolved by expected sort. It keeps its Template and Definition
+calls, follows the card's English phrase by phrase, and is what is stored,
+recovered and rendered. It says which words and constructions the card prints,
+and its sorts name kinds of phrase ([`.syl`](syl.md) §6). `sylex_syl` parses
+`.syl` and nothing else; `sylex_surface` holds the structures the primitives
+build, the registry of declarations and name resolution.
 
-**Lowering** compiles a checked expanded tree, every reference in it resolved,
+**Semantics** reads a surface term and decides what it means. **Expanding** the
+term's calls yields the **expanded tree** of primitives, and semantics reads
+that tree in printed order: it classifies each clause as an event, a condition,
+a static statement or a replacement, builds a Discourse Representation
+Structure, resolves every reference against it, and builds the **meaning**. A
+term that has no meaning is refused here, and a meaning is never stored
+([Semantics](semantics.md) §2 and §6). `sylex_semantics` is its crate.
+
+The split between the two is the direction and not yet the code. Until
+`sylex_semantics` exists, sorts of the term language (`GameEvent`, `Condition`,
+`StaticSpec`, `Replacement`) say what a clause means and `cargo xtask dsl check`
+refuses by them. They are scaffolding, which comes out when semantics makes the
+same refusals ([Semantics](semantics.md) §6).
+
+**Lowering** compiles a meaning, every reference in it resolved,
 into core, in one direction only.
 It does all the rearrangement a surface-faithful tree leaves undone: it gathers
 a spell's targets into its announcement, turns each resolved reference into an
@@ -90,8 +102,8 @@ Three forms have three roles, and the roles never trade places.
 - **Oracle text is the authoritative input.** For an existing Magic card, the
   rules text is the source. The other printed characteristics (name, mana cost,
   type line, power and toughness) arrive beside it as structured data. When a
-  card's resolved term and its text disagree, the term is wrong.
-- **The resolved term is the canonical meaning.** Recovery compiles the text
+  card's surface term and its text disagree, the term is wrong.
+- **The surface term is the canonical meaning.** Recovery compiles the text
   into it once; spelling renders it, and lowering compiles its expansion.
   Storing it caches a compilation worth doing once across some thirty thousand
   cards. It does not make the stored file a second authority.
@@ -106,7 +118,7 @@ core's expression vocabulary as plain data. They are engine configuration, not
 card content, and sit outside this pipeline.
 
 The authoring interface for custom content stays open. A plugin may accept
-prose, `.syl`, or both, as long as every path produces the same checked resolved
+prose, `.syl`, or both, as long as every path produces the same checked surface
 term before rendering or lowering.
 
 ## Two-way above, one-way below
@@ -137,25 +149,28 @@ govern the whole run. Three closed extensions cover more: optional and list
 Holes, a Tail printed away from its Hole, and Factoring of what a coordination's arms share
 ([Spelling](spelling.md) §2–3). What these do not yet cover is open
 ([Spelling](spelling.md) §10). A derivation builds both sides at once, so the
-same grammar recovers a resolved term from a Reading and spells a resolved term
-as English, and the resolved term is that derivation: nothing records it beside the term
+same grammar recovers a surface term from a Reading and spells a surface term
+as English, and the surface term is that derivation: nothing records it beside the term
 ([Spelling](spelling.md) §4). It is not a bijection: several terms may word
 identically, and one sentence has several grammatical Readings, which the
-parser keeps rather than choosing ([English](english.md) §4). Meaning
-resolves the ambiguity, never rank or rule order: recovery expands each
-candidate and reads its discourse, and a candidate the checker or discourse
-refuses drops out. The goal is exactly one surviving candidate per card; a card
-with more is reported, never stored as a choice.
+parser keeps rather than choosing ([English](english.md) §4). Semantics
+and pragmatics resolve the ambiguity, never rule order. Recovery gives every
+candidate term, and semantics drops each one it refuses. Where more than one
+meaning is left, a pragmatics step ranks them and the top one is stored
+([Pragmatics](pragmatics.md)). The stored term is the decision: reading it
+never ranks anything, and what is checked for every card is that its stored
+term is among the candidates of its text, that semantics accepts it and that it
+spells back to the text ([Semantics](semantics.md) §7).
 
 ## Exact round trip
 
 The goal is an exact round trip over the analyzed Oracle text, the text English
 analysis produces with reminder text removed
 ([Lexicon](lexicon.md) §1): it goes
-to its resolved term and back to the identical analyzed text. That is what
+to its surface term and back to the identical analyzed text. That is what
 faithful means here, and it is the easy, visible demonstration that the system
 works: a card whose rendering is not its own text has a wrong term, found
-without playing a game. The identical text comes back because the resolved term
+without playing a game. The identical text comes back because the surface term
 keeps the Template call that carries each wording and writes each list in its
 printed order, so two wordings with the same meaning differ in which Template a
 card calls or in the order of a list's elements, never in a flag stored beside
@@ -175,7 +190,7 @@ the term ([Spelling](spelling.md) §4, §6).
    expansion, or a record of how an author happened to write an equivalent
    term. What the printed text chooses is not decoration (see
    [Exact round trip](#exact-round-trip)). The result is small enough that
-   someone who knows the card, rather than the compiler, can read its resolved
+   someone who knows the card, rather than the compiler, can read its surface
    term and see where a translation went wrong; that debuggability is part of
    the representation's contract. Core is the opposite case: it is generated,
    so its verbosity costs nothing, and a printer is its debugging aid. Why: what
@@ -202,8 +217,9 @@ the term ([Spelling](spelling.md) §4, §6).
    target" [CR#115.4] is a Template that expands to a disjunction over
    creatures, planeswalkers, battles and players. The cost is overgeneration:
    the primitives can build terms no card prints. That is tolerated, because the
-   spelling boundary refuses a term that has no English, as an authoring-time
-   error rather than unsoundness in the model.
+   spelling boundary refuses a term that has no English and semantics a term
+   that has no meaning, each as an authoring-time error rather than unsoundness
+   in the model.
 5. **Check the open corpus; test the closed mapping.** The mistakes worth ruling
    out (a reference resolved to the wrong antecedent, a sort that does not fit,
    a card that misreads its text) are made in recovery and authoring, over a
@@ -219,7 +235,7 @@ the term ([Spelling](spelling.md) §4, §6).
 Semantics and core began as one grammar and are meant to drift apart in named
 directions. Each form spends its explicitness on what its consumer needs.
 
-- **Semantics drifts toward English constructions.** A card's resolved term
+- **Semantics drifts toward English constructions.** A card's surface term
   follows its English phrase by phrase, and nothing is hoisted
   ([Semantics](semantics.md) §1, item 1). What English leaves implicit,
   such as bracketing and attachment, is made explicit. Reference stays

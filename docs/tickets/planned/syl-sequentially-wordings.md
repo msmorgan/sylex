@@ -36,7 +36,7 @@ of the sequences and lands first, so the steps this ticket spells are the printe
   `sequentially` is declared at `Clause`, for a sequence of sentences, and at `VerbPhrase`, for
   verb phrases under one subject (`syl-clause-and-imperative`). It stays the one expansion at
   each sort, and each printed wording is its own Template over it, never one Template with a
-  parameter that carries only wording (`spelling.md`, on the resolved term as the derivation); a
+  parameter that carries only wording (`spelling.md`, on the surface term as the derivation); a
   join is fixed in the wording, never chosen by a parameter. "And" and "then" between steps are
   two Templates, `$steps<and>` and `$steps<then>`.
 - A verb-phrase coordination under one subject is one `clause` over a Template of the steps at
@@ -98,7 +98,7 @@ of the sequences and lands first, so the steps this ticket spells are the printe
 ## Pointers
 
 - `docs/design/spelling.md` (a Hole that holds a run and the run rule in §2, shared material
-  at a coordination, the resolved term as the derivation, the round trip, the notation);
+  at a coordination, the surface term as the derivation, the round trip, the notation);
   `docs/design/syl.md` §5
 - `plugins/builtin/primitives/action/sequentially.syl`;
   `plugins/canon/cards/{Duneblast,Cloudshift,Agate-Blade Assassin,Bonus Round,Juxtapose}.syl`
