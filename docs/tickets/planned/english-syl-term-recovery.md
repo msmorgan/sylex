@@ -12,7 +12,7 @@ with semantic structure, so the same grammar recovers a resolved term from a Rea
 term back as English (`architecture.md`, "Spelling is a construction grammar"). Recovery reads
 each Template's and Definition's `spelling`, so it needs the spelling conventions
 (`syl-spelling-conventions`) and the optional and repeated segments
-(`syl-spelling-optional-segments`) that fill the 151 `TODO(spelling)` markers. Nothing maps a
+(`syl-spelling-optional-segments`) that fill the 168 `TODO(spelling)` markers. Nothing maps a
 `sylex_english` Reading to a `.syl` term yet, and the resolved tree it would target does not exist
 yet either.
 

@@ -7,7 +7,7 @@ needs: [syl-at-turn-point, cleanup-step6-spine, syl-number-snapshot]
 ## Why
 
 A `spelling` string can't say that a part is printed only when an argument is given, or once per
-list entry, so most of the 167 `TODO(spelling)` markers, all under `plugins/builtin/`, stand
+list entry, so most of the 168 `TODO(spelling)` markers, all under `plugins/builtin/`, stand
 where a spelling needs one (re-count when claimed; `putInto`'s "Omit the origin phrase when from
 is anywhere" is typical). Without it,
 wordings that differ only by such a part become near-duplicate Template families: `enters…`,

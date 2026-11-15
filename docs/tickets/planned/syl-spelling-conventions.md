@@ -8,7 +8,7 @@ needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, sy
 
 `spelling` strings are to be parsed through the English grammar with typed holes, but
 today they inflect verbs inconsistently, they still write a Hole `<name>` (777 Holes on 594
-`spelling` lines), and 167 `TODO(spelling)` markers, all under `plugins/builtin/`, stand where a
+`spelling` lines), and 168 `TODO(spelling)` markers, all under `plugins/builtin/`, stand where a
 spelling is missing, many carrying generated text instead of a reason.
 
 Two narrower tickets rewrite spellings this ticket also normalizes, and land first:
