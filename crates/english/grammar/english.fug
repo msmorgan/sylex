@@ -362,8 +362,10 @@ category AdjectivePhrase [
     Determination, AdjectivePosition, Voice, ComplementKind, Grade, Polarity, QualityHead,
 ] { gap }
 category AdverbPhrase [AdjunctPosition]
-// The predicative Complement function; its head bears it too.
-category Predicative { function }
+// The predicative Complement function; its head bears it too, and a Gap
+// passes through an adjectival predicative (*blocks or becomes blocked by
+// a creature*, Dream Fighter; CGEL 15§4.4:1344).
+category Predicative { gap, function }
 // Unlike categories coordinated as a depictive Adjunct (*onto the
 // battlefield tapped and attacking*; CGEL 15§3.2:1326–1329), and each
 // conjunct.
@@ -3075,7 +3077,8 @@ NominalPredicative: Predicative -> NounPhrase
           !(head.Determination = Bare & head.Countability = Mass & head.NounDistribution = HeadOnly)
 // A predicative Preposition Phrase could also modify a nominal.
 PrepositionalPredicative: Predicative -> Hosted(PrepositionPhrase, Nominal)
-AdjectivalPredicative: Predicative -> AdjectivePhrase where head.AdjectivePosition != Attributive
+AdjectivalPredicative: Predicative -> AdjectivePhrase { transparent: [head] }
+    where head.AdjectivePosition != Attributive
 
 // A central Preposition Phrase adjunct (*may instead draw a card*). An
 // imperative's front position is the Clause schema's.

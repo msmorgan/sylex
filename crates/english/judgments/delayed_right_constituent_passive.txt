@@ -5,7 +5,6 @@
 + <card=Kiora, the Crashing Wave> Until your next turn, prevent all damage that would be dealt to and dealt by target permanent an opponent controls. => NounPhrase "target permanent an opponent controls"; RelativeClause "an opponent controls" gap "permanent"
 + <card=Statecraft> Prevent all combat damage that would be dealt to and dealt by creatures you control. => NounPhrase "creatures you control"; RelativeClause "you control" gap "creatures"
 # complete controls
-+ Whenever this creature blocks or becomes blocked by a creature, destroy that creature.
 # from: Protector of the Crown
 + All damage that would be dealt to you is dealt to this creature instead.
 + Prevent all combat damage that would be dealt to this creature.

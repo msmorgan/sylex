@@ -1,6 +1,8 @@
 //! Right Node Raising set off by commas (`raising_delimiter`: *some amount
-//! of, or all of, the mana*, Illusionary Mask), and a Preposition Phrase that
-//! passes up no Gap from inside its Complement (`closed_complement`).
+//! of, or all of, the mana*, Illusionary Mask), a Preposition Phrase that
+//! passes up no Gap from inside its Complement (`closed_complement`), and a
+//! Gap reaching a Shared Complement through an Adjectival Passive's `by`
+//! phrase (*blocks or becomes blocked by a creature*, Dream Fighter).
 
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
@@ -159,4 +161,88 @@ fn a_closed_complement_is_a_preposition_s() {
         format!("{error:?}").contains("closed_complement"),
         "{error:?}"
     );
+}
+
+#[test]
+fn an_adjectival_passive_passes_a_gap_through_its_by_phrase() {
+    let core = || Source {
+        kind: SourceKind::Core,
+        path: "tests/raising_gaps.rs".to_owned(),
+        owner: "test".to_owned(),
+    };
+    let lexicon = Lexicon::new([
+        Lexeme::verb("v:block", "block", core()),
+        Lexeme::verb("v:become", "become", core()),
+        Lexeme::noun("n:creature", "creature", vec![Countability::Count], core()),
+        Lexeme::invariant("c:or", "or", Category::Coordinator, core()),
+        Lexeme::invariant("p:by", "by", Category::Preposition, core()),
+    ])
+    .unwrap();
+    let frames = FrameCatalog::from_ron_str(
+        r#"(
+            frames: {
+                "v:block": [(family: Monotransitive, slots: [(relation: Object, fill: NP)])],
+                "v:become": [(family: Copular, slots: [(relation: PredicativeComplement, fill: Pred)])],
+            },
+            prepositions: {
+                "p:by": [(complement: NP, hosts: ComplementOnly)],
+            },
+        )"#,
+    )
+    .unwrap();
+    let parse_count = |adjective_gap: &str, predicative_gap: &str| -> usize {
+        let source = format!(
+            r#"
+                root Sentence
+                feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+                feature Voice = Active | Passive
+                category Sentence
+                category VerbPhrase [VerbForm, Voice] {{ gap }}
+                category Predicative {{ {predicative_gap}function }}
+                category AdjectivePhrase [Voice] {adjective_gap}
+                category PrepositionPhrase {{ gap }}
+                category NounPhrase {{ gap }}
+                slot NP = NounPhrase
+                slot PP = PrepositionPhrase
+                slot Pred = Predicative
+                word By = "p:by"
+                word Or = "c:or"
+                Statement: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Finite
+                AdjectivalPredicative: Predicative -> AdjectivePhrase {{ transparent: [head] }}
+                Bare: NounPhrase -> Lex(Noun)
+                valence VerbPhrase {{
+                    head: Verb,
+                    active: [$.Voice = Active],
+                    passive: By,
+                    verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+                    prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+                    adjectival: AdjectivePhrase,
+                    adjectival_passive: [head.VerbForm = PastParticiple, $.Voice = Passive],
+                }}
+                valence PrepositionPhrase {{ head: Preposition }}
+                coordination VerbPhrase {{ coordinators: Or }}
+            "#
+        );
+        let grammar =
+            CompiledGrammar::bind(&Grammar::from_fug_str(&source).unwrap(), &lexicon, &frames)
+                .unwrap();
+        let text = "Blocks or becomes blocked by creature.";
+        let readings = grammar.parse(&lexicon, text).readings().collect::<Vec<_>>();
+        for reading in &readings {
+            assert_eq!(
+                grammar.admit(reading, &lexicon, &sylex_lexicon::CardScope::default()),
+                Ok(()),
+                "{text}"
+            );
+            assert_eq!(grammar.realize(reading, &lexicon).unwrap(), text);
+        }
+        readings.len()
+    };
+
+    // With both `Predicative` and `AdjectivePhrase` carrying a Gap, the shared
+    // right-hand NP fills `blocks`'s Object and the adjectival passive's `by`
+    // Complement; closing either Category blocks propagation.
+    assert_eq!(parse_count("{ gap }", "gap, "), 1);
+    assert_eq!(parse_count("", "gap, "), 0);
+    assert_eq!(parse_count("{ gap }", ""), 0);
 }

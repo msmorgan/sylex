@@ -3447,8 +3447,9 @@ impl<'a> Binder<'a> {
     }
 
     /// The Adjectival Passives of a frame whose passive leaves no Complement:
-    /// the participle, with or without its `by` phrase, each with the
-    /// schema's `adjectival_passive` equations.
+    /// the participle, with or without its `by` phrase (the Internalized
+    /// Complement, gap-transparent when `category` carries a Gap), each with
+    /// the schema's `adjectival_passive` equations.
     fn adjectival_passive(
         &self,
         category: &str,
@@ -3467,7 +3468,7 @@ impl<'a> Binder<'a> {
             draft.child("head", Symbol::Leaf(Test::Frame(frame)), GapRule::Closed);
             if agent {
                 draft.internalized =
-                    Some(draft.child("complement", self.slot_symbol(by_pp)?, GapRule::Closed));
+                    Some(draft.child("complement", self.slot_symbol(by_pp)?, GapRule::Transparent));
             }
             self.equations(&mut draft, equations)?;
             drafts.push(draft);
