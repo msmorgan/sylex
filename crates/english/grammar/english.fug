@@ -920,7 +920,7 @@ KeywordFollowedBySentences: Ability -> first:KeywordLineItem rest:Sentences
 NamePremodifier: BareNominal -> modifier:Name BareNominal
 ModeBullet: Mode -> '•':Free Ability
 PlusCostedMode: Mode -> '+':Free:Spoken cost:Cost '—':Free ModeEffect
-LabelledCostedMode: Mode -> '•':Free label:Lex(FlavorWord) cost:Cost '—':Free ModeEffect
+LabeledCostedMode: Mode -> '•':Free label:Lex(FlavorWord) cost:Cost '—':Free ModeEffect
 PawprintMode: Mode -> quantity:Pawprints '—':Free ModeEffect
 SinglePawprint: Pawprints -> Class(Pawprint)
 PawprintSequence: Pawprints -> first:Class(Pawprint) rest:Attached(Pawprints, Suffix)
