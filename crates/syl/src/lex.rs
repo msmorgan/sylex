@@ -91,7 +91,7 @@ pub fn lex(file: FileId, source: &str) -> Result<Vec<Token>, Error> {
     let mut tokens = Vec::new();
     let mut i = 0;
     let mut newlines = 0usize;
-    while i < bytes.len() {
+    while let Some(c) = source[i..].chars().next() {
         let b = bytes[i];
         match b {
             b'\n' => {
@@ -199,7 +199,6 @@ pub fn lex(file: FileId, source: &str) -> Result<Vec<Token>, Error> {
                 TokenKind::Word(Ident::new(&source[start..i]))
             }
             _ => {
-                let c = source[i..].chars().next().unwrap_or_default();
                 return Err(Error::new(
                     span(start, i + c.len_utf8()),
                     ErrorKind::UnexpectedChar(c),
