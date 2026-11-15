@@ -1,0 +1,1 @@
+primitive totaling(axis: ProjAxis, comparator: Comparator, bound: Amount): SliceCount = Totaling
