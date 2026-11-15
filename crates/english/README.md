@@ -463,7 +463,8 @@ Reading expands on `Settled spine:`; while choices remain (or under
 its alternative count or child-split difference. Then come the forks
 (`ForkForest::forks`), each named by its kind and word, with whether it is
 conditional and its aliases, and under it each option's exact Derivation count
-and answer (an alias's answer after `=`). A word is printed `"surface"#N`, its
+and answer, then under each option one line per alias in the header's order,
+the alias's name and its answer. A word is printed `"surface"#N`, its
 surface and 1-based occurrence. Options are in the forks' order, never ranked:
 the survey decides nothing
 ([english.md](../../docs/design/english.md) §4, §5).
@@ -483,15 +484,16 @@ cargo xtask english forestwalk --card 'Crook of Condemnation' --line 1 --limit 2
 (`ForkForest::pick`, `ForkForest::exclude`), enumerating no Reading, so a unit
 of any size narrows. A selector is one argument, `KIND "surface"#N ANSWER`: a
 fork's name as the survey prints it (an alias's too) and, after it, one
-option's answer without its count or any ` = ` alias answer (an alias's answer
-for an alias's name). The occurrence is always written, a governor's too; a
-bare `"surface"` is an error, for a surface that occurs once as well. A
+option's answer without its count; the line the survey prints under an option
+for an alias is a whole selector. The occurrence is always written, a
+governor's too; a bare `"surface"` is an error, for a surface that occurs once
+as well. A
 selector begins with a lowercase `lexical`, `dependency` or `frame` and names
 grammar child names (`adjunct`, `first`), which keeps it apart from a
 judgment's assertions (`Category "surface" as Function of lemma`). Steps apply
 in the order written, `--pick` and `--exclude` interleaved, and each prints the
 Derivations left; then the survey prints the narrowed forest. A selector that
-names no word, fork or option of the unit, a copied ` = ` alias tail, an option
+names no word, fork or option of the unit, an option
 an earlier step has removed, and a step that leaves no Derivation are errors
 naming the selector.
 

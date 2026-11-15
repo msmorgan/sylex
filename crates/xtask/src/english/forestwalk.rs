@@ -595,7 +595,9 @@ fn child_text(child: &SettledChild, tokens: &[char]) -> String {
 }
 
 /// A fork's lines: its name, whether it is conditional and its aliases,
-/// then each option with its Derivations.
+/// then each option with its Derivations and answer, and under it one line
+/// per alias in the header's order: the alias's name and its answer, a whole
+/// selector.
 fn fork_lines(fork: &Fork, total: u128, output: &mut dyn Write) -> Result<()> {
     let mut line = format!("  {}", fork_name(fork.kind, &fork.word));
     if fork.conditional {
@@ -620,15 +622,21 @@ fn fork_lines(fork: &Fork, total: u128, output: &mut dyn Write) -> Result<()> {
         .max()
         .expect("a fork has options");
     for option in &fork.options {
-        let mut line = format!(
+        writeln!(
+            output,
             "    {:>width$}  {}",
             option.derivations,
             answer(&option.answer)
-        );
-        for alias in &option.aliases {
-            line = format!("{line} = {}", answer(alias));
+        )?;
+        for ((kind, word), alias) in fork.aliases.iter().zip(&option.aliases) {
+            writeln!(
+                output,
+                "    {:width$}    {} {}",
+                "",
+                fork_name(*kind, word),
+                answer(alias)
+            )?;
         }
-        writeln!(output, "{line}")?;
     }
     Ok(())
 }

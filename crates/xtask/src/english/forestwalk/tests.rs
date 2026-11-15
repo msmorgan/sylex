@@ -640,41 +640,44 @@ fn limit_zero_folds_a_single_reading_and_still_isolates_assertions() {
     );
 }
 
+/// *Remove Enchantments*' `lexical "attached"#1` fork has the alias
+/// `dependency "to"#2`: each option prints that alias's answer on its own line
+/// under it, in the header's order, a whole selector that `--pick` narrows by.
 #[test]
-fn an_aliased_selector_answer_with_equals_names_the_single_answer() {
-    let full = "adj:attached Invariant = complement of AdjectivePhrase \"attached\"#1";
-    let primary = survey(&[
-        "--card",
-        "Remove Enchantments",
-        "--line",
-        "1",
-        "--pick",
-        &format!("lexical \"attached\"#1 {full}"),
-    ])
-    .unwrap_err();
+fn an_aliased_fork_prints_each_alias_answer_on_its_own_selector_line() {
+    let card = ["--card", "Remove Enchantments", "--line", "1"];
+    let output = survey(&card).unwrap();
+    let lines: Vec<&str> = output.lines().collect();
+    let header = lines
+        .iter()
+        .position(|l| l.starts_with("  lexical \"attached\"#1"))
+        .unwrap_or_else(|| panic!("no attached fork: {output}"));
     assert!(
-        primary.contains(
-            "` = ` separates aliased answers on one survey line; for lexical \"attached\"#1 \
-             alone, write `adj:attached Invariant`"
-        ),
-        "{primary}"
+        lines[header].ends_with(", aliases: dependency \"to\"#2"),
+        "{output}"
     );
-    let alias = survey(&[
-        "--card",
-        "Remove Enchantments",
-        "--line",
-        "1",
-        "--pick",
-        &format!("dependency \"to\"#2 {full}"),
-    ])
-    .unwrap_err();
-    assert!(
-        alias.contains(
-            "` = ` separates aliased answers on one survey line; for dependency \"to\"#2 alone, \
-             write `complement of AdjectivePhrase \"attached\"#1`"
-        ),
-        "{alias}"
-    );
+    let mut aliased = 0;
+    let mut at = header + 1;
+    while at < lines.len() && lines[at].starts_with("    ") {
+        let option = lines[at];
+        assert!(!option.contains(" = "), "{output}");
+        let column = option.find(char::is_alphabetic).unwrap();
+        let alias = lines[at + 1];
+        let indent = " ".repeat(column + 2);
+        let selector = alias
+            .strip_prefix(indent.as_str())
+            .unwrap_or_else(|| panic!("alias line `{alias}` is not indented to {column}+2"));
+        assert!(selector.starts_with("dependency \"to\"#2 "), "{output}");
+        let count = option[..column].trim();
+        let picked = survey(&[card[0], card[1], card[2], card[3], "--pick", selector]).unwrap();
+        assert!(
+            picked.contains(&format!("Derivations: {count}\n")),
+            "`{selector}` should leave {count} Derivations:\n{picked}"
+        );
+        aliased += 1;
+        at += 2;
+    }
+    assert!(aliased >= 2, "{output}");
 }
 
 #[test]

@@ -9,10 +9,11 @@
 //! `KIND` is `lexical`, `dependency` or `frame`; the word is `"surface"#N`,
 //! its surface and 1-based occurrence, the occurrence always written
 //! ([`ForkWord`]); `ANSWER` is the option as an option line prints it, without
-//! its count or any ` = ` alias answer (an alias's answer for an alias's
-//! name). The kind and word end at
-//! the occurrence, so the answer is everything after it: it need not be parsed,
-//! and is matched against the answers the survey prints for that question.
+//! its count. An alias's answer is printed on a line under the option, already
+//! led by the alias's own `KIND "surface"#N`, so that line is a selector as
+//! printed. The kind and word end at the occurrence, so the answer is
+//! everything after it: it need not be parsed, and is matched against the
+//! answers the survey prints for that question.
 //!
 //! Selectors are kept apart from the `=>` assertions of a judgment: they begin
 //! with a lowercase kind and name grammar child names (`adjunct`, `first`),
@@ -79,9 +80,10 @@ impl Args for Steps {
                     "Keep the Derivations that give a fork's option (repeatable). A selector is \
                      one argument, `KIND \"surface\"#N ANSWER`: a fork's name as the survey \
                      prints it (an alias's too) and one option's answer after it, without its \
-                     count or any ` = ` alias answer (an alias's answer for an alias's name), as \
-                     in `--pick 'dependency \"from\"#1 modifier of Nominal \"spells\"#1'`. Steps \
-                     apply in the order written, `--pick` and `--exclude` alike.",
+                     count, as in `--pick 'dependency \"from\"#1 modifier of Nominal \"spells\"#1'`. \
+                     The line the survey prints under an option for an alias is a whole \
+                     selector, to pass as printed. Steps apply in the order written, `--pick` \
+                     and `--exclude` alike.",
                 ),
         )
         .arg(
@@ -353,17 +355,6 @@ impl Selector {
         };
         let Some((printed, answer)) = question.options.iter().find(|(p, _)| *p == self.answer)
         else {
-            if self.answer.contains(" = ")
-                && let Some(single) = self
-                    .answer
-                    .split(" = ")
-                    .find(|part| question.options.iter().any(|(p, _)| p == part))
-            {
-                anyhow::bail!(
-                    "`{flag} {text}`: ` = ` separates aliased answers on one survey line; for \
-                     {name} alone, write `{single}`"
-                );
-            }
             let options: Vec<String> = question
                 .options
                 .iter()
