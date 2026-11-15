@@ -3597,7 +3597,7 @@ impl<'a> Binder<'a> {
         Ok(drafts)
     }
 
-    fn internalised_orders(draft: &Draft) -> Vec<Draft> {
+    fn internalized_orders(draft: &Draft) -> Vec<Draft> {
         let mut ordered = Vec::new();
         // The internalised Complement (CGEL, Ch. 16 §10.1.1, pp. 1428–1429)
         // is a PP Complement like the Frame's own, so it can precede a later
@@ -3705,7 +3705,7 @@ impl<'a> Binder<'a> {
         // past an interleaved Adjunct: it has no order of its own.
         let mut unordered = BTreeSet::new();
         for draft in drafts {
-            ordered.extend(Self::internalised_orders(&draft));
+            ordered.extend(Self::internalized_orders(&draft));
             let pp = |c: &Child| {
                 matches!(
                     c.symbol,
