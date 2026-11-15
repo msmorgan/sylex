@@ -3818,10 +3818,10 @@ impl<'a> Binder<'a> {
                 };
                 // Before the Internalised Complement, its own Adjunct
                 // Category interleaves too.
-                let before_internalised =
+                let before_internalized =
                     internalised.filter(|_| draft.internalised == Some(split));
                 for (adjunct, suffix) in std::iter::once((adjunct, ""))
-                    .chain(before_internalised.map(|c| (c, "/internalised")))
+                    .chain(before_internalized.map(|c| (c, "/internalised")))
                 {
                     let segment = format!("prefix{split}{suffix}");
                     out.extend(self.interleaved_dependent(
