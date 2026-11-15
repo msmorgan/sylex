@@ -106,7 +106,6 @@
     // *damage marked on it*
     (lemma: "mark", frames: [TransitiveWithPP(["on"])]),
     (lemma: "match", frames: [Intransitive]),
-    (lemma: "modify", frames: [Monotransitive]),
     // The source `from` PP is an adjunct, as with *put*.
     (lemma: "move", frames: [Monotransitive, Prepositional(["to"]), TransitiveWithPP(["onto"])]),
     (lemma: "mulligan", frames: [Intransitive]),
