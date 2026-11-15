@@ -530,7 +530,7 @@ struct Draft {
     /// Coordinators a serial tail admits for correlatives only, which a
     /// plain serial coordination may not end with.
     foreign_coordinators: Vec<Lexeme>,
-    /// A derived passive's Internalised Complement.
+    /// A derived passive's Internalized Complement.
     internalized: Option<usize>,
     /// A non-verbal head's bare phrase, which omits its head's Complements.
     omits_complement: bool,
@@ -605,7 +605,7 @@ enum CentralSite {
 
 /// A Valence schema's passive derivations.
 struct PassiveDecl<'d> {
-    /// The Closed Word marking the Internalised Complement.
+    /// The Closed Word marking the Internalized Complement.
     by: &'d str,
     /// Equations on every verbal passive.
     verbal: &'d [Equation],
@@ -1633,7 +1633,7 @@ impl<'a> Binder<'a> {
     }
 
     /// Adds a Valence schema's `internalized` equations to a derived passive
-    /// with an Internalised Complement, the child they call `internalized`.
+    /// with an Internalized Complement, the child they call `internalized`.
     fn internalized_equations(
         &self,
         draft: &mut Draft,
@@ -3168,7 +3168,7 @@ impl<'a> Binder<'a> {
             if let (Some(passive), true) = (passive, head == LexicalCategory::Verb)
                 && matches!(slots.first(), Some(SlotFill::NP))
             {
-                // The Internalised Complement is a `by` Preposition Phrase.
+                // The Internalized Complement is a `by` Preposition Phrase.
                 let by_pp = SlotFill::PP(vec![self.out.lexeme_id(self.word(passive.by)?)], None);
                 for agent in [false, true] {
                     let mut rest: Vec<&SlotFill> = slots[1..].to_vec();
@@ -3478,7 +3478,7 @@ impl<'a> Binder<'a> {
     /// One frame's phrase and, when `gappable`, a variant per extracted NP
     /// slot. `slots` are the frame's slots from `first_slot` on (a passive
     /// drops the Object), plus a trailing `by` Preposition Phrase, the
-    /// Internalised Complement, when `agent` is set. `heavy_shift` is the
+    /// Internalized Complement, when `agent` is set. `heavy_shift` is the
     /// schema's (`valence_order`).
     #[expect(clippy::too_many_arguments, reason = "one internal call shape")]
     fn valence_family(
@@ -3543,7 +3543,7 @@ impl<'a> Binder<'a> {
                 if Some(i) == gap {
                     continue;
                 }
-                // The Internalised Complement strands its preposition too
+                // The Internalized Complement strands its preposition too
                 // (*the creature that damage was dealt by*).
                 if Some(i) == agent_slot {
                     draft.internalized = Some(draft.child(
@@ -3579,7 +3579,7 @@ impl<'a> Binder<'a> {
                     _ => Gap::NP,
                 };
                 // The Gap stands in its slot's place: every later slot,
-                // the Internalised Complement included, follows it (*named
+                // the Internalized Complement included, follows it (*named
                 // __ Thinking Cap*). An Object Gap before only Preposition
                 // Phrase Complements may stand in the shifted Object's place
                 // after them instead (`valence_order`): *[put __ into your
@@ -3816,7 +3816,7 @@ impl<'a> Binder<'a> {
                     HostKind::Nominal => "modifier",
                     _ => "adjunct",
                 };
-                // Before the Internalised Complement, its own Adjunct
+                // Before the Internalized Complement, its own Adjunct
                 // Category interleaves too.
                 let before_internalized =
                     internalized.filter(|_| draft.internalized == Some(split));
@@ -5003,7 +5003,7 @@ fn cluster_shapes(frames: &[Frame]) -> Vec<u16> {
 }
 
 /// The Adjunct Categories a Valence schema interleaves before its later
-/// Complements: one before any of them, and one only before an Internalised
+/// Complements: one before any of them, and one only before an Internalized
 /// Complement.
 #[derive(Clone, Copy)]
 struct Interleaving<'a> {
@@ -5445,19 +5445,19 @@ pub(crate) struct FrameVariant {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Alternation {
     Active,
-    /// A verbal or prepositional passive, `by` with its Internalised
+    /// A verbal or prepositional passive, `by` with its Internalized
     /// Complement.
     Passive {
         by: bool,
     },
-    /// An Adjectival Passive, `by` with its Internalised Complement.
+    /// An Adjectival Passive, `by` with its Internalized Complement.
     Adjectival {
         by: bool,
     },
 }
 
 impl Alternation {
-    /// Whether it has an Internalised Complement: a passive with *by*.
+    /// Whether it has an Internalized Complement: a passive with *by*.
     pub(crate) fn by(self) -> bool {
         matches!(
             self,

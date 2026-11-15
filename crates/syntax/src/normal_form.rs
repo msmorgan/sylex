@@ -68,7 +68,7 @@ pub(crate) struct NormalForms {
 /// (`frame_name`) followed by the variant.
 #[derive(Debug, Clone)]
 struct FrameLink {
-    /// The variant is a passive with its Internalised Complement (`+by`).
+    /// The variant is a passive with its Internalized Complement (`+by`).
     passive_by: bool,
     /// Each frame that extends the Production's by one last `PP`
     /// Complement slot naming no Complement kind, ascending, with the

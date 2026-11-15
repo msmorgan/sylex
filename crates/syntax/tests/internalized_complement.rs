@@ -1,7 +1,7 @@
-//! A Valence schema's `internalized` equations constrain the Internalised
+//! A Valence schema's `internalized` equations constrain the Internalized
 //! Complement of every derived passive: with them, *reduced by 2* is only the
 //! `PP[by]` extent its frame selects, and *reduced by Zombies* keeps its
-//! Internalised Complement (CGEL,
+//! Internalized Complement (CGEL,
 //! Ch. 8 §5.2, p. 692; Ch. 16 §10.1.1, p. 1428).
 
 use sylex_lexicon::Category;

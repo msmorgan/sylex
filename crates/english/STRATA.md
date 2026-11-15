@@ -124,7 +124,7 @@ Preposition Phrases that could modify a nominal (*face down*, *of the chosen
 type*). Locatives after `be` and `remain` are Locative Complements, not
 predicatives. Passives carry their `by` phrase as a Complement; it is *by* plus
 a Noun Phrase. A selected *by* extent (*reduced by {2}*, *increased by two*) is
-also an Internalised Complement Reading, which semantics rejects by type.
+also an Internalized Complement Reading, which semantics rejects by type.
 Adjectival Passives come from frames whose passive leaves no other Complement;
 they are predicative Complements only.
 

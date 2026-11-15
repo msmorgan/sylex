@@ -459,7 +459,7 @@ pub enum SchemaDecl {
     ///   frame only (never of the objective predicative of *turn it face up*);
     ///   the extracting verb is a free word, never a reduced clitic (CGEL, Ch.
     ///   18 §6.2.1, p. 1615);
-    /// - with `passive`, verbal passives with and without the Internalised
+    /// - with `passive`, verbal passives with and without the Internalized
     ///   Complement, which may also precede later selected Preposition Phrase
     ///   Complements (*dealt by a source to a player*) and strands its
     ///   preposition like any other, and a `Prepositional` frame's passive,
@@ -490,7 +490,7 @@ pub enum SchemaDecl {
         #[serde(default)]
         active: Vec<Equation>,
         /// Derive passive phrases from active verb frames, naming the Closed
-        /// Word that marks the Internalised Complement (verbs only).
+        /// Word that marks the Internalized Complement (verbs only).
         #[serde(default)]
         passive: Option<Ident>,
         /// Equations on every derived verbal passive, over `$` and the lexical
@@ -503,7 +503,7 @@ pub enum SchemaDecl {
         /// `passive`.
         #[serde(default)]
         prepositional_passive: Vec<Equation>,
-        /// Equations on the Internalised Complement of every derived
+        /// Equations on the Internalized Complement of every derived
         /// passive, over the child `internalized`: what its Preposition
         /// Phrase may contain (CGEL, Ch. 16 §10.1.1, p. 1428).
         #[serde(default)]
@@ -519,7 +519,7 @@ pub enum SchemaDecl {
         /// Adjunct category permitted before a selected PP or shifted Object.
         #[serde(default)]
         interleaved: Option<Ident>,
-        /// Adjunct category permitted only before the Internalised Complement
+        /// Adjunct category permitted only before the Internalized Complement
         /// of a passive, a non-core Complement (CGEL, Ch. 4 §3.2.1, p. 241),
         /// beside the `interleaved` one.
         #[serde(default)]

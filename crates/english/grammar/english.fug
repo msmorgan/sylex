@@ -445,7 +445,7 @@ category AdjunctCoordination : PredicateAdjunct [ComplementKind, PastTime, NonPa
 category Adverbial { function }
 // The Adjunct function before a selected Complement or shifted Object.
 category Interleaved [PastTime, NonPastTime] { function }
-// The Adjunct function before a passive's Internalised Complement only, the
+// The Adjunct function before a passive's Internalized Complement only, the
 // *by* phrase (CGEL 4§3.2.1:241); an admission gate (english.md §6), see
 // InterleavedManner.
 category InternalizedInterleaved { function }
@@ -1273,7 +1273,7 @@ PositionAdjunct: PredicateAdjunct -> filler:PositionPhrase where $.ComplementKin
 InterleavedRelative: InterleavedModifier -> RelativeClause { cost: 0 }
 InterleavedPreposition: Interleaved -> PrepositionPhrase { cost: 0 }
 InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
-// A manner Noun Phrase before a passive's Internalised Complement (*weren't
+// A manner Noun Phrase before a passive's Internalized Complement (*weren't
 // chosen this way by any player*, Raiding Party). Before any later
 // Complement, *this way* would also attach to the higher verb wherever an
 // Object ends in a participle or relative clause: an Adjunct of *put*
