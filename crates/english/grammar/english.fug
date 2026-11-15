@@ -87,9 +87,15 @@ feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity
 feature Variable = Cited
 // The NounKind of a head's *of* oblique.
 feature ObliqueNounKind = Ordinary | Temporal | Manner | Numeric | Quantity
-feature Determination = Bare | Overt
+feature Determination = Bare | Mixed | Overt
 // The Determination of a determinative's Complement (*than one*).
-feature ObliqueDetermination = Bare | Overt
+feature ObliqueDetermination = Bare | Mixed | Overt
+// Privative: a Noun Phrase headed by a personal pronoun (CGEL 5§10.2:429–430)
+// or serving as a proper name (5§2:328, 5§20.3–20.4:520–521), neither of
+// which takes integrated nominal postmodifiers; a coordination carries it
+// whenever any conjunct does, so no nominal postmodifier scopes over one
+// (15§1.3.4:1286).
+feature Postmodification = Closed
 // The DeterminativeDistribution of a determinative's Complement's
 // Noun Phrase (*all but [the highest roll]*).
 feature ObliqueDistribution =
@@ -264,6 +270,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 category NounPhrase [
     Variable, Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution, QuantityKind,
+    Postmodification,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
 // (*three times*; 8§9:713–716).
@@ -2197,6 +2204,26 @@ FloatedEachCoordinationPostmodifier: NounPhrase ->
     coordinated: [head],
 }
     where head.Number != Singular
+// A Preposition Phrase postmodifier over a whole coordination of Noun Phrases
+// (*[up to one target instant card and/or up to one target sorcery card] from
+// your graveyard*, Finale of Promise; *[Your opponents and permanents your
+// opponents control] with hexproof*, Kaya, Bane of the Dead; CGEL
+// 15§1.3.4:1285–1286). An uncoordinated Noun Phrase has its Nominal's site
+// (`coordinated`), and an all-bare coordination (*[Artifact cards and red
+// creature cards] in your hand*, Tannuk, Steadfast Second) has the Nominal
+// coordination's (`head.Determination != Bare`; english.md §8). Excluding
+// `Postmodification = Closed` is an admission gate (english.md §6): personal
+// pronouns (CGEL 5§10.2:429–430) and proper names (5§20.3–20.4:520–521) take
+// no integrated nominal postmodifiers, so none scopes over a coordination
+// with one (*[you or a planeswalker you control] with at least one creature*,
+// Trove of Temptation; *[Shadow the Hedgehog or another creature you control]
+// with flash or haste*, Shadow the Hedgehog).
+CoordinatedNounPhrasePostmodifier: NounPhrase ->
+    NounPhrase modifier:Hosted(PrepositionPhrase, Nominal) {
+    coordinated: [head],
+}
+    where head.Determination != Bare,
+          head.Postmodification != Closed
 // *Any number of target players may each search ...*.
 AuxiliaryFloatedEach: VerbPhrase -> adjunct:Class(FloatingQuantifier) VerbPhrase {
     cost: 2,
@@ -2452,6 +2479,7 @@ ProperName: NounPhrase -> Name
     where $.NounKind = Ordinary,
           $.Countability = Count,
           $.Determination = Bare,
+          $.Postmodification = Closed,
           $.Case = Plain,
           $.Person = Third
 // Excluding `FreeChoice` is an admission gate (english.md §6): it keeps *any number
@@ -2687,6 +2715,7 @@ BarePlural: NounPhrase -> Nominal { uncoordinated: [head] }
 Pronoun: NounPhrase -> Lex(Pronoun)
     where $.NounKind = Ordinary,
           $.Determination = Bare,
+          $.Postmodification = Closed,
           head.Case != Genitive,
           head.PronounKind != Existential | Relative,
           head.Inflection = Invariant
@@ -2697,6 +2726,7 @@ Pronoun: NounPhrase -> Lex(Pronoun)
 IndependentGenitive: NounPhrase -> Lex(Pronoun) { unshared: [Number, Person, Case] }
     where $.NounKind = Ordinary,
           $.Determination = Bare,
+          $.Postmodification = Closed,
           $.Case = Plain,
           head.Inflection = IndependentGenitive,
           $.Person = Third
@@ -3569,17 +3599,20 @@ coordination Clause {
           last.VerbForm = Plain,
           $.VerbForm = Plain
 // The last conjunct gives Case and Countability (*them and all other
-// creatures*), and the coordination is determined only if it is, so *all
-// artifacts and enchantments* has no predeterminer over coordinated bare
-// Noun Phrases. After a determined Noun Phrase a bare mass one is no
-// conjunct: the determiner scopes over both (*its power and toughness*).
+// creatures*), and Determination is `Overt` when every conjunct is, `Bare`
+// when every conjunct is, and `Mixed` when they differ, so *all artifacts and
+// enchantments* has no predeterminer over coordinated bare Noun Phrases while
+// a mixed coordination (*Your opponents and permanents your opponents control
+// with hexproof*) keeps its own wide postmodifier site. After a determined
+// Noun Phrase a bare mass one is no conjunct: the determiner scopes over both
+// (*its power and toughness*).
 // *And* is plural, singular between distributive ones; *or* has its
 // conjuncts' Number.
 coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination -> Bare],
+    resolve: [Determination -> Mixed],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           $.Number = Plural,
@@ -3591,7 +3624,7 @@ coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, FirstConjunctNumber],
     proximate: [Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination -> Bare],
+    resolve: [Determination -> Mixed],
 }
     where $.Number = Singular,
           $.Person = Third,
@@ -3605,7 +3638,7 @@ coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Person, Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination -> Bare],
+    resolve: [Determination -> Mixed],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           last.Number := Plural,
@@ -3614,7 +3647,7 @@ coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Person, Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination -> Bare],
+    resolve: [Determination -> Mixed],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           last.Number = Singular
@@ -3628,7 +3661,7 @@ coordination NounPhrase {
     raising_delimiter: ',',
     unshared: [DeterminativeDistribution, FirstConjunctNumber],
     proximate: [Number, Person, Case, NounKind, Countability, NounDistribution],
-    resolve: [Determination -> Bare],
+    resolve: [Determination -> Mixed],
 }
     where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
           first.NounKind != Numeric | Quantity,

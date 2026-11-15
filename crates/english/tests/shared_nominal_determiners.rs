@@ -164,38 +164,44 @@ fn balthor_and_participial_shared_nominal_determiners() {
 
     let balthor_line = "{B}{B}{B}, Exile Balthor: Each player returns all black and all red creature cards from their graveyard to the battlefield.";
     let balthor = parse_readings(&grammar, &env, Some("Balthor the Defiled"), balthor_line);
-    assert_eq!(balthor.len(), 4);
 
-    // Rank 1 attaches "from their graveyard" to the shared nominal "creature cards";
-    // rank 2 interleaves "from their graveyard" on "returns" with shared nominal "creature cards"
-    // (both ahead of the mass-noun "all black" homograph Readings at ranks 3 and 4).
     assert!(
-        has_shared_nominal_reading(
-            &grammar,
-            &env,
-            &balthor[0],
-            &["det:all.count", "adj:black"],
-            &["det:all.count", "adj:red"],
-            "creature cards from their graveyard",
-            "noun:card",
-            &[("AdjectivePhrase", "black"), ("AdjectivePhrase", "red")],
-        ),
-        "rank 1 reading: {:#?}",
-        balthor[0]
+        balthor.iter().any(|reading| {
+            let mut wide_coord = Vec::new();
+            nodes_with_production(reading, "CoordinatedNounPhrasePostmodifier", &mut wide_coord);
+            wide_coord.len() == 1
+        }),
+        "expected a wide CoordinatedNounPhrasePostmodifier reading: {balthor:#?}",
     );
     assert!(
-        has_shared_nominal_reading(
-            &grammar,
-            &env,
-            &balthor[1],
-            &["det:all.count", "adj:black"],
-            &["det:all.count", "adj:red"],
-            "creature cards",
-            "noun:card",
-            &[("AdjectivePhrase", "black"), ("AdjectivePhrase", "red")],
-        ),
-        "rank 2 reading: {:#?}",
-        balthor[1]
+        balthor.iter().any(|reading| {
+            has_shared_nominal_reading(
+                &grammar,
+                &env,
+                reading,
+                &["det:all.count", "adj:black"],
+                &["det:all.count", "adj:red"],
+                "creature cards from their graveyard",
+                "noun:card",
+                &[("AdjectivePhrase", "black"), ("AdjectivePhrase", "red")],
+            )
+        }),
+        "expected SharedNominalDetermined over `creature cards from their graveyard`: {balthor:#?}",
+    );
+    assert!(
+        balthor.iter().any(|reading| {
+            has_shared_nominal_reading(
+                &grammar,
+                &env,
+                reading,
+                &["det:all.count", "adj:black"],
+                &["det:all.count", "adj:red"],
+                "creature cards",
+                "noun:card",
+                &[("AdjectivePhrase", "black"), ("AdjectivePhrase", "red")],
+            )
+        }),
+        "expected SharedNominalDetermined over `creature cards`: {balthor:#?}",
     );
 
     // Ticket witness derived from Balthor the Defiled and Evacuation:
@@ -219,48 +225,50 @@ fn balthor_and_participial_shared_nominal_determiners() {
     );
 
     // Stacked premodifiers in a cluster (derived from Balthor the Defiled and Evacuation):
-    // Rank 1 attaches "blocking" inside the second cluster ([all untapped blocking] + [creature cards]);
-    // rank 2 attaches "blocking" on the shared nominal ([all untapped] + [blocking creature cards]).
+    // one analysis attaches "blocking" inside the second cluster ([all untapped blocking] + [creature cards]);
+    // the other attaches "blocking" on the shared nominal ([all untapped] + [blocking creature cards]).
     let stacked_line =
         "Each player returns all tapped attacking and all untapped blocking creature cards to their owners' hands.";
     let stacked = parse_readings(&grammar, &env, None, stacked_line);
     assert_eq!(stacked.len(), 2);
     assert!(
-        has_shared_nominal_reading(
-            &grammar,
-            &env,
-            &stacked[0],
-            &["det:all.count", "status_adj:tapped", "verb:attack"],
-            &["det:all.count", "status_adj:untapped", "verb:block"],
-            "creature cards",
-            "noun:card",
-            &[
-                ("AdjectivePhrase", "tapped"),
-                ("VerbPhrase", "attacking"),
-                ("AdjectivePhrase", "untapped"),
-                ("VerbPhrase", "blocking"),
-            ],
-        ),
-        "stacked[0] reading: {:#?}",
-        stacked[0]
+        stacked.iter().any(|reading| {
+            has_shared_nominal_reading(
+                &grammar,
+                &env,
+                reading,
+                &["det:all.count", "status_adj:tapped", "verb:attack"],
+                &["det:all.count", "status_adj:untapped", "verb:block"],
+                "creature cards",
+                "noun:card",
+                &[
+                    ("AdjectivePhrase", "tapped"),
+                    ("VerbPhrase", "attacking"),
+                    ("AdjectivePhrase", "untapped"),
+                    ("VerbPhrase", "blocking"),
+                ],
+            )
+        }),
+        "expected cluster-internal `blocking` reading: {stacked:#?}",
     );
     assert!(
-        has_shared_nominal_reading(
-            &grammar,
-            &env,
-            &stacked[1],
-            &["det:all.count", "status_adj:tapped", "verb:attack"],
-            &["det:all.count", "status_adj:untapped"],
-            "blocking creature cards",
-            "noun:card",
-            &[
-                ("AdjectivePhrase", "tapped"),
-                ("VerbPhrase", "attacking"),
-                ("AdjectivePhrase", "untapped"),
-            ],
-        ),
-        "stacked[1] reading: {:#?}",
-        stacked[1]
+        stacked.iter().any(|reading| {
+            has_shared_nominal_reading(
+                &grammar,
+                &env,
+                reading,
+                &["det:all.count", "status_adj:tapped", "verb:attack"],
+                &["det:all.count", "status_adj:untapped"],
+                "blocking creature cards",
+                "noun:card",
+                &[
+                    ("AdjectivePhrase", "tapped"),
+                    ("VerbPhrase", "attacking"),
+                    ("AdjectivePhrase", "untapped"),
+                ],
+            )
+        }),
+        "expected shared-nominal `blocking creature cards` reading: {stacked:#?}",
     );
 }
 

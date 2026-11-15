@@ -5,3 +5,4 @@
 + Choose black or red. => NounPhrase "black"; NounPhrase "red"; !Nominal "black or red"
 + Destroy all creatures and lands. => Nominal "creatures and lands"
 + Untap creatures and lands you control. => Nominal "creatures and lands"
++ <card=Tannuk, Steadfast Second> Artifact cards and red creature cards in your hand have warp {2}{R}. => Nominal "Artifact cards and red creature cards"; Nominal "Artifact cards and red creature cards in your hand"; !NounPhrase "Artifact cards and red creature cards"

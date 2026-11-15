@@ -18,3 +18,5 @@
 # A coordination of Noun Phrases is determined only when every conjunct is, and countable when its last conjunct is
 + Destroy all artifacts and enchantments. => !NounPhrase "artifacts and enchantments"; Nominal "artifacts and enchantments" || NounPhrase "all artifacts"; NounPhrase "enchantments"
 # Not a `*` entry: attributive *double* (*double damage*) premodifies the nominal; what is excluded is the multiplier over a coordination of bare Noun Phrases
+# A Preposition Phrase postmodifier over a mixed coordination of determined and bare Noun Phrases (CGEL, Ch. 15 §1.3.4, pp. 1285–1286)
++ <card=Kaya, Bane of the Dead> Your opponents and permanents your opponents control with hexproof can be the targets of spells and abilities you control as though they didn't have hexproof. => NounPhrase "Your opponents and permanents your opponents control with hexproof" as Subject of can; NounPhrase "Your opponents and permanents your opponents control"; NounPhrase "Your opponents"; NounPhrase "permanents your opponents control"; PrepositionPhrase "with hexproof"

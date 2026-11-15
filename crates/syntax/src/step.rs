@@ -444,6 +444,11 @@ pub(crate) struct Shape {
     /// every later child is an Adjunct: a post-verbal Adjunct's host, which
     /// an auxiliary Verb Phrase never is (`Summary::auxiliary`).
     pub post_adjunct_host: bool,
+    /// Its first child is the head of a Production of its own Category that
+    /// leaves a coordination a coordination (`Summary::coordinated`): a
+    /// post-adjunct host, or a post-dependent that itself requires a
+    /// coordination (`ChildSlot::coordinated`).
+    pub keeps_coordination: bool,
     /// Its last non-punctuation child is in the head line.
     pub ends_in_head_line: bool,
     /// Its last non-punctuation child is in the head line and it takes no
@@ -1013,11 +1018,10 @@ pub(crate) struct Summary {
     /// The coordinator of a coordination, or the identity of the Linked
     /// Coordination that stands for one.
     pub coordinator: Option<CoordinatorId>,
-    /// It is a coordination, or a post-adjunct host's Production
-    /// (`Production::post_adjunct_host`) over one: a dependent after a
-    /// coordination leaves it a coordination for the `coordinated` and
-    /// `uncoordinated` children (*[draw a card and discard a card] at …* is
-    /// not an uncoordinated Verb Phrase).
+    /// It is a coordination, or a post-dependent Production over one that
+    /// leaves it a coordination (`Shape::keeps_coordination`) for the
+    /// `coordinated` and `uncoordinated` children (*[draw a card and discard a
+    /// card] at …* is not an uncoordinated Verb Phrase).
     pub coordinated: bool,
     /// It is a coordination, or its head is one, through head children: a
     /// coordinated phrase is heavy (`Weight::Postposable`).
@@ -2030,6 +2034,16 @@ impl Production {
                 })
                 .or_else(|| children.first().copied())
         };
+        let post_head_of_lhs = self.head == Some(0)
+            && self.coordinator.is_none()
+            && count > 1
+            && matches!(self.rhs[0], Symbol::Cat { category, .. } if category == self.lhs);
+        let post_adjunct_host =
+            post_head_of_lhs && (1..count).all(|at| punct(at) || roles[at] == ChildRole::Adjunct);
+        let keeps_coordination = post_adjunct_host
+            || (post_head_of_lhs
+                && self.slots[0].coordinated
+                && (1..count).all(|at| punct(at) || roles[at].is_unselected()));
         let shape = Shape {
             head_line_child,
             frame_production: self.frame.is_some() || children.len() == 1,
@@ -2040,11 +2054,8 @@ impl Production {
                         .host_check
                         .is_some_and(|(host, adjunct, _)| adjunct < host)),
             hosts_comma_set_dependent: self.head == Some(0) && count > 2 && comma(1),
-            post_adjunct_host: self.head == Some(0)
-                && self.coordinator.is_none()
-                && count > 1
-                && matches!(self.rhs[0], Symbol::Cat { category, .. } if category == self.lhs)
-                && (1..count).all(|at| punct(at) || roles[at] == ChildRole::Adjunct),
+            post_adjunct_host,
+            keeps_coordination,
             ends_in_head_line: children.last().is_some_and(|&at| self.head_line[at]),
             undetermined_head_final: children.last().is_some_and(|&at| self.head_line[at])
                 && !roles.contains(&ChildRole::Determiner),
@@ -2316,7 +2327,7 @@ impl Production {
                 if self.head == Some(position) {
                     next.headed_link = summary.link;
                 }
-                if self.post_adjunct_host(position) {
+                if position == 0 && self.shape.keeps_coordination {
                     next.coordinated_head = summary.coordinated;
                 }
                 next.internal_comma |= summary.internal_comma;
