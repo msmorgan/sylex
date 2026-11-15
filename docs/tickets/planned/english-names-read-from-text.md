@@ -86,7 +86,7 @@ The Flavor Word is the precedent for a span no list holds. `flavor_word_matches`
 the first " —" that is not after chapter numerals. Analysis keeps it only if it is title-cased and
 no label registered in the Card Scope spells it (`stands_in`). The grammar admits
 `Lex(FlavorWord)` only at the head of an ability or mode (`FlavorLabeledAbility`,
-`FlavorLabelledModalHeader`, `LabelledCostedMode`). Its value is the string
+`FlavorLabeledModalHeader`, `LabelledCostedMode`). Its value is the string
 (`LexicalReading::FlavorWord { label }`), not a Lexeme. A name fits the same route with three
 differences. Its end is not fixed by punctuation, so the shape rule has to choose it. It stands
 in the middle of a sentence at several positions. And it is used again after its introduction.

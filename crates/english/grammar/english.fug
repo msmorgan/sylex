@@ -855,7 +855,7 @@ NegativeAdjective: AdjectivePhrase -> prefix:Lex(Affix) AdjectivePhrase where $.
 LabelledModalHeader: Document -> label:Class(AbilityWord) '—':Free ModalHeader
 // A flavor word carries its own dash (*Trick Arrows — Whenever ..., choose
 // one —*), as in FlavorLabeledAbility.
-FlavorLabelledModalHeader: Document -> label:Lex(FlavorWord) ModalHeader
+FlavorLabeledModalHeader: Document -> label:Lex(FlavorWord) ModalHeader
 ChapterModalHeader: Document -> chapters:Chapters '—':Free ModalHeader
 
 CompleteKeywordPhrase: KeywordPhrase -> KeywordParameters
