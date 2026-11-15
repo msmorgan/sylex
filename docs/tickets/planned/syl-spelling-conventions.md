@@ -7,7 +7,7 @@ needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, sy
 ## Why
 
 `spelling` strings are to be parsed through the English grammar with typed holes, but
-today they inflect verbs inconsistently, they still write a Hole `<name>` (777 Holes on 594
+today they inflect verbs inconsistently, they still write a Hole `<name>` (784 Holes on 601
 `spelling` lines), and 168 `TODO(spelling)` markers, all under `plugins/builtin/`, stand where a
 spelling is missing, many carrying generated text instead of a reason.
 

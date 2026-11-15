@@ -713,7 +713,7 @@ things are known limits:
   tokens" prints a word for an empty list of colors.
 - **A Tail between two of its host's adjuncts.** Only the two placements exist.
 
-The declarations under `plugins/` still write a Hole `<name>`: 776 Holes on 593 `spelling`
+The declarations under `plugins/` still write a Hole `<name>`: 784 Holes on 601 `spelling`
 lines, three of which need a tie (`landwalk`, `typecycling` and `non`) and two an ordinal
 (`fromTop` and `fromBottom`, "$n@Ordinal from …"). No declaration writes a form label, a `*` or
 a `<.>` join yet. The `syl-spelling-conventions` ticket migrates the Holes, and
