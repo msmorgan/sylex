@@ -85,7 +85,7 @@ fn each_unit_takes_the_highest_stratum_of_its_families() {
             UnitKind::Line,
             "Landfall — Whenever a land you control enters, you gain 1 life.",
             4,
-            "LabelledAbility",
+            "LabeledAbility",
         ),
         (
             UnitKind::Line,
@@ -152,7 +152,7 @@ fn a_flavor_word_label_is_not_a_vocabulary_gap() {
     let env = LexicalEnvironment::load().unwrap();
     let (stratum, families) = profile(&env, UnitKind::Line, "Fathomless descent — Draw a card.");
     assert_eq!(stratum, 1, "{families:?}");
-    assert!(families.contains(&"LabelledAbility"));
+    assert!(families.contains(&"LabeledAbility"));
 }
 
 #[test]

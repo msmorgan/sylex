@@ -904,7 +904,7 @@ VerbalCost: NonManaCost -> VerbPhrase where head.VerbForm = Plain
 CompositeNonManaCost: NonManaCost -> first:Symbols ',' rest:NonManaCost
 NonManaCost: Cost -> NonManaCost
 ActivatedAbility: Ability -> cost:ActivationCost ':' effect:Effect
-LabelledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability
+LabeledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability
 // *• Khans — ...*: an ability under an Anchor Word, after the ability
 // offering the choice [CR#607.2m]; the bullet is part of it [CR#614.12c].
 // Never a mode: no instruction to choose options precedes it [CR#700.2].

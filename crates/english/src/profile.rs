@@ -53,7 +53,7 @@ const fn family(stratum: Stratum, name: &'static str) -> Family {
 // Stratum 0: card frame, headers and non-clausal lines.
 pub const TYPE_LINE: Family = family(0, "TypeLine");
 pub const KEYWORD_LINE: Family = family(0, "KeywordLine");
-pub const LABEL: Family = family(0, "LabelledAbility");
+pub const LABEL: Family = family(0, "LabeledAbility");
 pub const KEYWORD_DASH: Family = family(0, "KeywordDashCost");
 pub const MODAL_HEADER: Family = family(0, "ModalHeader");
 pub const MODE_BULLET: Family = family(0, "ModeBullet");
