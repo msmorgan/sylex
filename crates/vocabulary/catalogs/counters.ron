@@ -8,6 +8,7 @@
     (kind: "+1/+0", rule: "[CR#122.1a]"),
     (kind: "+1/+1", rule: "[CR#122.1a]"),
     (kind: "+1/+2", rule: "[CR#122.1a]"),
+    (kind: "+2/+0", rule: "[CR#122.1a]"),
     (kind: "+2/+2", rule: "[CR#122.1a]"),
     (kind: "-0/-1", rule: "[CR#122.1a]"),
     (kind: "-0/-2", rule: "[CR#122.1a]"),
