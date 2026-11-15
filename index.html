@@ -3,17 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>deckmaste.rs — MTG Rules Engine and Oracle Text Compiler</title>
+<title>sylex.rs — MTG Rules Engine and Oracle Text Compiler</title>
 <meta name="description" content="A typed rules engine and Oracle-text compiler for Magic: The Gathering, by Michael Morgan.">
 <meta name="author" content="Michael Morgan">
-<link rel="canonical" href="https://deckmaste.rs/">
+<link rel="canonical" href="https://sylex.rs/">
 
 <!-- Open Graph -->
-<meta property="og:title" content="deckmaste.rs — MTG Rules Engine and Oracle Text Compiler">
+<meta property="og:title" content="sylex.rs — MTG Rules Engine and Oracle Text Compiler">
 <meta property="og:description" content="A typed rules engine and Oracle-text compiler for Magic: The Gathering, by Michael Morgan.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://deckmaste.rs/">
-<meta property="og:image" content="https://deckmaste.rs/assets/tui-demo.webp">
+<meta property="og:url" content="https://sylex.rs/">
+<meta property="og:image" content="https://sylex.rs/assets/tui-demo.webp">
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -277,7 +277,7 @@
   <header>
     <div class="header-top">
       <div class="brand">
-        <h1>deckmaste<span class="accent-dot">.rs</span></h1>
+        <h1>sylex<span class="accent-dot">.rs</span></h1>
         <div class="mana-pills" title="Magic: The Gathering WUBRG Colors">
           <span class="mana-pip w"></span>
           <span class="mana-pip u"></span>
@@ -287,16 +287,16 @@
         </div>
       </div>
       <nav class="nav">
-        <a href="https://github.com/msmorgan/deckmaste.rs" target="_blank" rel="noopener">github</a>
-        <a href="https://github.com/msmorgan/deckmaste.rs/blob/main/docs/guided_tour.md" target="_blank" rel="noopener">guided tour</a>
-        <a href="https://github.com/msmorgan/deckmaste.rs#readme" target="_blank" rel="noopener">readme</a>
+        <a href="https://github.com/msmorgan/sylex" target="_blank" rel="noopener">github</a>
+        <a href="https://github.com/msmorgan/sylex/blob/main/docs/guided_tour.md" target="_blank" rel="noopener">guided tour</a>
+        <a href="https://github.com/msmorgan/sylex#readme" target="_blank" rel="noopener">readme</a>
       </nav>
     </div>
 
     <div class="maxim"># Reading the card explains the card.</div>
 
     <p class="intro-text">
-      <strong>deckmaste.rs</strong> tests the long-standing intuition that Oracle text can serve as an executable source language for Magic: it builds the whole path — parser, typed intermediate form, rules engine — and measures, card by card, where recovery holds and where it fails.
+      <strong>sylex.rs</strong> tests the long-standing intuition that Oracle text can serve as an executable source language for Magic: it builds the whole path — parser, typed intermediate form, rules engine — and measures, card by card, where recovery holds and where it fails.
     </p>
     <p class="intro-subtext">
       A rules engine should scale with the number of distinct semantic constructions in Magic, not the number of cards. Every construction is implemented once, as shared rules machinery; a card is a composition of constructions, never its own code. Oracle templating enforces that economy in the text; the engine mirrors it in code.
@@ -322,9 +322,9 @@
       <div class="diagram-wrapper">
         <pre>Oracle text
     ⇅ parse / render
-deckmaste_english
+sylex_english
     ⇅ recover / spell
-deckmaste_semantics ── lower ──► deckmaste_core
+sylex_semantics ── lower ──► sylex_core
   canonical typed IR              engine AST</pre>
       </div>
 
@@ -364,8 +364,8 @@ deckmaste_semantics ── lower ──► deckmaste_core
 
     <section class="panel">
       <h2>try it</h2>
-      <pre><span class="prompt">$ </span>git clone https://github.com/msmorgan/deckmaste.rs
-<span class="prompt">$ </span>cd deckmaste.rs
+      <pre><span class="prompt">$ </span>git clone https://github.com/msmorgan/sylex
+<span class="prompt">$ </span>cd sylex
 <span class="prompt">$ </span>cargo run</pre>
       <p style="color: var(--fg-muted);">
         <code>cargo run</code> launches the interactive terminal client: a hotseat game with a live board across every zone, where you drive priority, targeting, attackers and blockers, ability activations, and mana payment from the keyboard. On first run it downloads the source snapshot and generates the demo corpus; subsequent runs reuse those local files.
@@ -378,8 +378,8 @@ deckmaste_semantics ── lower ──► deckmaste_core
 
   <footer>
     <p>
-      deckmaste.rs — by <a href="https://github.com/msmorgan" target="_blank" rel="author noopener">Michael Morgan</a> · <a href="https://github.com/msmorgan/deckmaste.rs" target="_blank" rel="noopener">github</a><br>
-      deckmaste.rs is licensed under <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank" rel="noopener">PolyForm Noncommercial 1.0.0</a>.<br>
+      sylex.rs — by <a href="https://github.com/msmorgan" target="_blank" rel="author noopener">Michael Morgan</a> · <a href="https://github.com/msmorgan/sylex" target="_blank" rel="noopener">github</a><br>
+      sylex.rs is licensed under <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/" target="_blank" rel="noopener">PolyForm Noncommercial 1.0.0</a>.<br>
       Unofficial Fan Content permitted under the <a href="https://company.wizards.com/en/legal/fancontentpolicy" target="_blank" rel="noopener">Wizards of the Coast Fan Content Policy</a>; not approved or endorsed by Wizards. Magic: The Gathering is a trademark of Wizards of the Coast LLC.
     </p>
   </footer>

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://deckmaste.rs/sitemap.xml
+Sitemap: https://sylex.rs/sitemap.xml
