@@ -1634,7 +1634,7 @@ impl<'a> Binder<'a> {
 
     /// Adds a Valence schema's `internalised` equations to a derived passive
     /// with an Internalised Complement, the child they call `internalised`.
-    fn internalised_equations(
+    fn internalized_equations(
         &self,
         draft: &mut Draft,
         equations: &[Equation],
@@ -2546,7 +2546,7 @@ impl<'a> Binder<'a> {
                     *closed_complement,
                 )?;
                 for draft in &mut drafts {
-                    self.internalised_equations(draft, internalised)?;
+                    self.internalized_equations(draft, internalised)?;
                 }
                 self.slot_agreement(phrase, &mut drafts, agree)?;
                 let central = match derivations.central {
