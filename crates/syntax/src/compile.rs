@@ -2519,7 +2519,7 @@ impl<'a> Binder<'a> {
                 cost,
                 internalised,
                 interleaved,
-                interleaved_internalised,
+                interleaved_internalized,
                 heavy_shift,
                 shifted_object,
                 postposed,
@@ -2583,7 +2583,7 @@ impl<'a> Binder<'a> {
                 };
                 let interleaved = Interleaving {
                     adjunct: interleaved.as_deref(),
-                    internalised: interleaved_internalised.as_deref(),
+                    internalised: interleaved_internalized.as_deref(),
                 };
                 let shifted = heavy_shift.then_some(shifted_object.as_slice());
                 let mut ordered = self.valence_order(drafts.clone(), interleaved, shifted, host)?;

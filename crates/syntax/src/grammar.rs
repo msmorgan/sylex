@@ -523,7 +523,7 @@ pub enum SchemaDecl {
         /// of a passive, a non-core Complement (CGEL, Ch. 4 §3.2.1, p. 241),
         /// beside the `interleaved` one.
         #[serde(default)]
-        interleaved_internalised: Option<Ident>,
+        interleaved_internalized: Option<Ident>,
         /// Function Category of an Adjunct in central position between a
         /// verb and its first Complement (*is [still] on top of your
         /// library*, *is [still] a land*), derived from a frame of

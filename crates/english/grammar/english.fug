@@ -3124,7 +3124,7 @@ valence VerbPhrase {
         head.AdjectivalPassive != Lexical, head.VerbKind != Auxiliary,
     ],
     interleaved: Interleaved,
-    interleaved_internalised: InternalizedInterleaved,
+    interleaved_internalized: InternalizedInterleaved,
     central: CentralAdjunct,
     central_heads: BeVerb,
     central_families: [Copular],
