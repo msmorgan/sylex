@@ -370,23 +370,43 @@ fn negative_and_extreme_integers() {
 
 #[test]
 fn string_escapes_are_unescaped() {
-    let file = ok(r#"template t: X { body = "say \"hi\" \\ bye" }"#);
+    let file = ok(r#"template t: X { body = "say \"hi\" \\ bye\nnext" }"#);
     let Shape::Header(named) = &file.declarations().next().unwrap().shape else {
         panic!("named");
     };
     let field = named.body.as_ref().unwrap().nodes().next().unwrap();
     assert_eq!(
         field.value.kind,
-        ValueKind::String(r#"say "hi" \ bye"#.to_owned())
+        ValueKind::String("say \"hi\" \\ bye\nnext".to_owned())
     );
+}
+
+#[test]
+fn typed_newline_in_string_is_read_as_line_break() {
+    let file = ok("template t: X { body = \"first\nsecond\" }");
+    let Shape::Header(named) = &file.declarations().next().unwrap().shape else {
+        panic!("named");
+    };
+    let field = named.body.as_ref().unwrap().nodes().next().unwrap();
+    assert_eq!(field.value.kind, ValueKind::String("first\nsecond".to_owned()));
 }
 
 #[test]
 fn bad_strings_are_errors() {
     check_err(
-        r#"card { name = "a\nb" }"#,
-        &ErrorKind::UnsupportedEscape('n'),
-        r"\n",
+        r#"card { name = "a\tb" }"#,
+        &ErrorKind::UnsupportedEscape('t'),
+        r"\t",
+    );
+    check_err(
+        r#"card { name = "a\rb" }"#,
+        &ErrorKind::UnsupportedEscape('r'),
+        r"\r",
+    );
+    check_err(
+        r#"card { name = "a\0b" }"#,
+        &ErrorKind::UnsupportedEscape('0'),
+        r"\0",
     );
     check_err(
         "card { name = \"abc",

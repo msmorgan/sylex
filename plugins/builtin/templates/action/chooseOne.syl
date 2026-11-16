@@ -1,7 +1,5 @@
 # "Choose one — <first>; or <second>."
 template chooseOne(first: VerbPhrase, second: VerbPhrase): VerbPhrase {
-  spelling = "Choose one —
-• $first
-• $second",
+  spelling = "Choose one —\n• $first\n• $second",
   body = chooseModes(exactly(1), [mode(none, none, $first), mode(none, none, $second)])
 }

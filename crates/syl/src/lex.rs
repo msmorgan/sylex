@@ -84,7 +84,7 @@ fn is_word_continue(b: u8) -> bool {
 /// On a character no token can start with, a `-` not followed by a digit, a
 /// `$` not directly followed by a word, a word containing `.`, an integer that
 /// is malformed, non-canonical or out of `i64` range, an unterminated string,
-/// or an escape other than `\"` and `\\`.
+/// or an escape other than `\"`, `\\` and `\n`.
 pub fn lex(file: FileId, source: &str) -> Result<Vec<Token>, Error> {
     let bytes = source.as_bytes();
     let span = |start: usize, end: usize| Span::new(file, start, end);
@@ -139,13 +139,18 @@ pub fn lex(file: FileId, source: &str) -> Result<Vec<Token>, Error> {
                                     ErrorKind::UnterminatedString,
                                 ));
                             };
-                            if escaped != '"' && escaped != '\\' {
-                                return Err(Error::new(
-                                    span(i, i + 1 + escaped.len_utf8()),
-                                    ErrorKind::UnsupportedEscape(escaped),
-                                ));
-                            }
-                            text.push(escaped);
+                            let unescaped = match escaped {
+                                '"' => '"',
+                                '\\' => '\\',
+                                'n' => '\n',
+                                _ => {
+                                    return Err(Error::new(
+                                        span(i, i + 1 + escaped.len_utf8()),
+                                        ErrorKind::UnsupportedEscape(escaped),
+                                    ));
+                                }
+                            };
+                            text.push(unescaped);
                             i += 2;
                         }
                         c => {

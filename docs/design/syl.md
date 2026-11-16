@@ -105,9 +105,8 @@ location is not stated by the declaration, and it can disagree with what the dec
   `spelling` and meaning (`primitiveKeyword(firstStrike)`) are on its Template at `Ability` (§3).
 - **A string has three escapes**: `\"` for a quotation mark, `\\` for a backslash and `\n` for a
   line break. Any other is refused. The lexer also reads a line break typed in a string, and the
-  printer writes every line break as `\n`, so a string has one written form once formatted.
-  `sylex_syl`'s lexer reads the first two today, and `syl-spelling-optional-segments` adds the
-  third, which a `spelling` needs for the join that puts each mode on its own line. Why: a line
+  printer writes every line break as `\n`, so a string has one written form once formatted,
+  including the line-break join that puts each mode of a `spelling` on its own line. Why: a line
   break typed inside a string is ugly and easy to miss.
 - **A `spelling` is written in the notation of [`spelling.md`](./spelling.md) §7**, where a Hole
   is `$name`, the sigil that reads the same parameter in `body`.

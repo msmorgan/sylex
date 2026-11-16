@@ -324,15 +324,19 @@ fn elements<T>(items: &[Item<T>], mut node: impl FnMut(&T) -> (String, Layout)) 
         .collect()
 }
 
-/// A string literal, with `"` and `\` escaped.
+/// A string literal, with `"`, `\` and line breaks escaped.
 fn string(text: &str) -> String {
     let mut out = String::with_capacity(text.len() + 2);
     out.push('"');
     for c in text.chars() {
-        if matches!(c, '"' | '\\') {
-            out.push('\\');
+        match c {
+            '"' | '\\' => {
+                out.push('\\');
+                out.push(c);
+            }
+            '\n' => out.push_str("\\n"),
+            _ => out.push(c),
         }
-        out.push(c);
     }
     out.push('"');
     out
@@ -361,12 +365,9 @@ struct Printer<'s> {
 
 impl Printer<'_> {
     fn text(&mut self, text: &str) {
+        debug_assert!(!text.contains('\n'));
         self.out.push_str(text);
-        // A string literal may hold a raw newline.
-        match text.rfind('\n') {
-            Some(at) => self.col = width(&text[at + 1..]),
-            None => self.col += width(text),
-        }
+        self.col += width(text);
     }
 
     fn newline(&mut self, indent: usize) {

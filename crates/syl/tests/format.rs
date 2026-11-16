@@ -576,6 +576,18 @@ fn parameters_strings_and_integers() {
 }
 
 #[test]
+fn line_breaks_in_strings_print_as_escape() {
+    assert_eq!(
+        fmt("card { s = \"Choose one —\n• $first\n• $second\" }"),
+        "card {\n  s = \"Choose one —\\n• $first\\n• $second\"\n}\n"
+    );
+    assert_eq!(
+        fmt("card { s = \"Choose one —\\n• $first\\n• $second\" }"),
+        "card {\n  s = \"Choose one —\\n• $first\\n• $second\"\n}\n"
+    );
+}
+
+#[test]
 fn a_nameless_call_card() {
     let long = word(40);
     assert_eq!(

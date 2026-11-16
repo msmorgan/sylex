@@ -41,7 +41,7 @@ pub enum ErrorKind {
     IntegerOutOfRange,
     #[error("unterminated string literal")]
     UnterminatedString,
-    #[error("unsupported string escape {0:?}; only \\\" and \\\\ are allowed")]
+    #[error("unsupported string escape {0:?}; only \\\", \\\\ and \\n are allowed")]
     UnsupportedEscape(char),
     #[error("expected {expected}, found {found}")]
     Expected {
