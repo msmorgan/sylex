@@ -15,6 +15,9 @@ pub struct Kind {
     /// The sort a declaration of this kind declares its name at; `None` when
     /// the header writes it (`primitive`, `template`, `coercion`).
     pub sort: Option<&'static str>,
+    /// Implicit parameters resolved in this kind's block without being written
+    /// in its header (`$actor` on `action`, `syl.md` §4).
+    pub implicit: &'static [(&'static str, &'static str)],
     /// The fields its block may write.
     pub fields: &'static [FieldSpec],
     /// A second sort its name is declared at (`syl.md` §3).
@@ -92,6 +95,7 @@ const fn kind(word: &'static str, sort: &'static str, fields: &'static [FieldSpe
         word,
         form: Form::Block,
         sort: Some(sort),
+        implicit: &[],
         fields,
         secondary: None,
         catalog: false,
@@ -158,6 +162,7 @@ pub const KINDS: &[Kind] = &[
         )
     },
     Kind {
+        implicit: &[("actor", "NounPhrase")],
         secondary: Some(Secondary {
             sort: "Deed",
             unless: &[("ofAbility", None), ("deed", Some("none"))],

@@ -7,7 +7,8 @@
 //!
 //! It is expansion-lite (`docs/design/syl.md` §4). It reads what
 //! [`crate::dsl_check`]'s resolver resolved and substitutes each Template and
-//! Definition call by its body with the arguments in place, fills declared
+//! Definition call by its body with the arguments in place, binds an `action`
+//! Definition's implicit `$actor` to the call's performer, fills declared
 //! defaults and applies coercions. It keeps one kind of boundary: a
 //! [`Node::Mark`] where a Definition was entered, carrying the Deed its
 //! declaration states, possibly none. Template, parameter-binding and coercion
@@ -190,8 +191,25 @@ fn role(kind: &str) -> anyhow::Result<Role> {
     })
 }
 
-/// The parameters' values inside a body.
-type Env = BTreeMap<String, Node>;
+/// A parameter's binding inside a body.
+#[derive(Clone)]
+enum Binding<'a> {
+    /// An expanded value: `$actor`, a coercion's input, an earlier primitive
+    /// parameter, or a free parameter in `term` or `fields`.
+    Node(Node),
+    /// A parameter's argument or default, with the scope and performer at the
+    /// site that supplied it. A `VerbPhrase` parameter has no subject of its
+    /// own, so it takes the performer where the body places it.
+    Deferred {
+        value: &'a Value,
+        sort: SortKey,
+        env: Env<'a>,
+        performer: Node,
+    },
+}
+
+/// The parameters' bindings inside a body.
+type Env<'a> = BTreeMap<String, Binding<'a>>;
 
 /// Expands values against one check's resolutions.
 pub struct Expander<'c, 'a> {
@@ -216,22 +234,23 @@ impl<'c, 'a> Expander<'c, 'a> {
     /// A Template's body with each parameter free.
     pub fn term(&self, name: &str, sort: &str) -> anyhow::Result<Node> {
         let decl = self.declaration(name, sort)?;
-        self.value(body(decl)?, &free(decl))
+        self.value(body(decl)?, &free(decl), &ambient_performer())
     }
 
     /// A card's expansion.
-    pub(crate) fn card(&self, decl: &Decl<'_>) -> anyhow::Result<Node> {
+    pub(crate) fn card(&self, decl: &Decl<'a>) -> anyhow::Result<Node> {
         let Shape::Value(value) = &decl.declaration.shape else {
             bail!("a card is a value");
         };
-        self.value(value, &Env::new())
+        self.value(value, &Env::new(), &ambient_performer())
     }
 
     /// Each field of a declaration's block but its metadata, expanded with
     /// each parameter free.
     #[cfg(test)]
-    pub(crate) fn fields(&self, decl: &Decl<'_>) -> anyhow::Result<Vec<(String, Node)>> {
+    pub(crate) fn fields(&self, decl: &Decl<'a>) -> anyhow::Result<Vec<(String, Node)>> {
         let env = free(decl);
+        let performer = ambient_performer();
         let Some(block) = decl.block() else {
             return Ok(Vec::new());
         };
@@ -240,7 +259,7 @@ impl<'c, 'a> Expander<'c, 'a> {
             .filter(|field| !sylex_syl::METADATA_FIELDS.contains(&field.name.ident.as_str()))
             .map(|field| {
                 let name = field.name.ident.as_str().to_owned();
-                self.value(&field.value, &env)
+                self.value(&field.value, &env, &performer)
                     .with_context(|| format!("field `{name}`"))
                     .map(|node| (name, node))
             })
@@ -279,14 +298,35 @@ impl<'c, 'a> Expander<'c, 'a> {
         }
     }
 
-    /// Expands `value`, whose parameters read `env`.
-    pub(crate) fn value(&self, value: &Value, env: &Env) -> anyhow::Result<Node> {
+    /// Expands `value`, whose parameters read `env`, under `performer`.
+    fn value(
+        &self,
+        value: &'a Value,
+        env: &Env<'a>,
+        performer: &Node,
+    ) -> anyhow::Result<Node> {
         let node = match &value.kind {
             ValueKind::Parameter(name) => {
                 let name = name.ident.as_str();
-                env.get(name)
-                    .cloned()
+                match env
+                    .get(name)
                     .ok_or_else(|| anyhow!("`${name}` reads no parameter"))?
+                {
+                    Binding::Node(node) => node.clone(),
+                    Binding::Deferred {
+                        value,
+                        sort,
+                        env,
+                        performer: caller_performer,
+                    } => {
+                        let active = if is_verb_phrase_sort(sort) {
+                            performer
+                        } else {
+                            caller_performer
+                        };
+                        self.value(value, env, active)?
+                    }
+                }
             }
             ValueKind::String(text) => Node::String(text.clone()),
             ValueKind::Integer(number) => Node::Integer(*number),
@@ -294,21 +334,11 @@ impl<'c, 'a> Expander<'c, 'a> {
                 items
                     .iter()
                     .filter_map(Item::node)
-                    .map(|item| self.value(item, env))
+                    .map(|item| self.value(item, env, performer))
                     .collect::<anyhow::Result<_>>()?,
             ),
-            ValueKind::Record(record) => {
-                let mut fields: Vec<(String, Node)> = record
-                    .nodes()
-                    .map(|field| {
-                        let node = self.value(&field.value, env)?;
-                        Ok((field.name.ident.as_str().to_owned(), node))
-                    })
-                    .collect::<anyhow::Result<_>>()?;
-                fields.sort_by(|a, b| a.0.cmp(&b.0));
-                Node::Record(fields)
-            }
-            ValueKind::Call(call) => self.call(call, env)?,
+            ValueKind::Record(record) => self.record(record, env, performer)?,
+            ValueKind::Call(call) => self.call(call, env, performer)?,
         };
         let Some(index) = self.checked.resolutions.coerced(value) else {
             return Ok(node);
@@ -317,10 +347,44 @@ impl<'c, 'a> Expander<'c, 'a> {
         let [param] = coercion.params.as_slice() else {
             bail!("a coercion has one parameter");
         };
-        self.value(body(coercion)?, &Env::from([(param.name.clone(), node)]))
+        self.value(
+            body(coercion)?,
+            &Env::from([(param.name.clone(), Binding::Node(node))]),
+            performer,
+        )
     }
 
-    fn call(&self, call: &Call, env: &Env) -> anyhow::Result<Node> {
+    fn record(
+        &self,
+        record: &'a sylex_syl::Record,
+        env: &Env<'a>,
+        performer: &Node,
+    ) -> anyhow::Result<Node> {
+        let mut fields: Vec<(String, Node)> = Vec::new();
+        if let Some(subj_field) = record.nodes().find(|f| f.name.ident == "subj") {
+            let subj = self.value(&subj_field.value, env, performer)?;
+            let clause_performer = subject_performer(&subj)?;
+            fields.push(("subj".to_owned(), subj));
+            for field in record.nodes().filter(|f| f.name.ident != "subj") {
+                let name = field.name.ident.as_str();
+                let active = if name == "action" {
+                    &clause_performer
+                } else {
+                    performer
+                };
+                fields.push((name.to_owned(), self.value(&field.value, env, active)?));
+            }
+        } else {
+            for field in record.nodes() {
+                let node = self.value(&field.value, env, performer)?;
+                fields.push((field.name.ident.as_str().to_owned(), node));
+            }
+        }
+        fields.sort_by(|a, b| a.0.cmp(&b.0));
+        Ok(Node::Record(fields))
+    }
+
+    fn call(&self, call: &'a Call, env: &Env<'a>, performer: &Node) -> anyhow::Result<Node> {
         let word = call.head.ident.as_str();
         if word == "none" && call.is_bare() {
             return Ok(Node::None);
@@ -349,35 +413,50 @@ impl<'c, 'a> Expander<'c, 'a> {
                     let constructor = header(decl)?
                         .constructor
                         .ok_or_else(|| anyhow!("primitive `{word}` names no constructor"))?;
-                    let mut args = self.bind(call, decl, env)?;
+                    let constructor_name = constructor.ident.as_str();
+                    let args = self.primitive_args(
+                        call,
+                        decl,
+                        constructor_name,
+                        &sort_name,
+                        env,
+                        performer,
+                    )?;
                     Node::Call {
-                        constructor: constructor.ident.as_str().to_owned(),
+                        constructor: constructor_name.to_owned(),
                         word: word.to_owned(),
                         sort: sort_name,
-                        args: decl
-                            .params
-                            .iter()
-                            .map(|param| args.remove(&param.name).expect("every parameter bound"))
-                            .collect(),
+                        args,
                     }
                 }
-                Role::Template => self.value(body(decl)?, &self.bind(call, decl, env)?)?,
-                Role::Definition => Node::Mark {
-                    definition: word.to_owned(),
-                    sort: sort_name,
-                    deed: Self::deed(decl)?,
-                    body: Box::new(self.value(body(decl)?, &self.bind(call, decl, env)?)?),
-                },
+                Role::Template => {
+                    let callee = self.bind(call, decl, env, performer)?;
+                    self.value(body(decl)?, &callee, performer)?
+                }
+                Role::Definition => {
+                    let mut callee = self.bind(call, decl, env, performer)?;
+                    for (implicit, _) in decl.kind.implicit {
+                        callee.insert((*implicit).to_owned(), Binding::Node(performer.clone()));
+                    }
+                    let inner_performer = if sort_name == "Ability" {
+                        ambient_performer()
+                    } else {
+                        performer.clone()
+                    };
+                    Node::Mark {
+                        definition: word.to_owned(),
+                        sort: sort_name,
+                        deed: Self::deed(decl)?,
+                        body: Box::new(self.value(body(decl)?, &callee, &inner_performer)?),
+                    }
+                }
             })
         };
         expand().with_context(|| format!("expanding `{word}` at `{sort}`"))
     }
 
-    /// Each parameter of `decl` bound to its argument in `call`, expanded in
-    /// the caller's `env`, or to its default, expanded where `decl` declares
-    /// it, reading the parameters before it.
-    fn bind(&self, call: &Call, decl: &Decl<'_>, env: &Env) -> anyhow::Result<Env> {
-        let mut written: Vec<Option<&Value>> = vec![None; decl.params.len()];
+    fn written_args<'b>(&self, call: &'b Call, arity: usize) -> anyhow::Result<Vec<Option<&'b Value>>> {
+        let mut written = vec![None; arity];
         for arg in call.args.iter().filter_map(Item::node) {
             let index = self
                 .checked
@@ -386,22 +465,154 @@ impl<'c, 'a> Expander<'c, 'a> {
                 .ok_or_else(|| anyhow!("an argument of `{}` binds nothing", call.head.ident))?;
             written[index] = Some(&arg.value);
         }
+        Ok(written)
+    }
+
+    /// Expands a primitive's arguments in declaration order, updating the
+    /// active performer across `Instruct`, `Subject`-bearing primitives and
+    /// `Ability` roots.
+    fn primitive_args(
+        &self,
+        call: &'a Call,
+        decl: &Decl<'a>,
+        constructor: &str,
+        sort_name: &str,
+        env: &Env<'a>,
+        performer: &Node,
+    ) -> anyhow::Result<Vec<Node>> {
+        let base = if sort_name == "Ability" {
+            ambient_performer()
+        } else {
+            performer.clone()
+        };
+        let written = self.written_args(call, decl.params.len())?;
+        if constructor == "Instruct" && sort_name == "VerbPhrase" {
+            let [Some(subj_val), Some(action_val)] = written.as_slice() else {
+                bail!("`instruct` takes `subj` and `action`");
+            };
+            let subj = self.value(subj_val, env, &base)?;
+            let action = self.value(action_val, env, &subj)?;
+            return Ok(vec![subj, action]);
+        }
+        let header_params: Vec<_> = header(decl)?.params.iter().filter_map(Item::node).collect();
+        let subj_clause = decl
+            .params
+            .iter()
+            .position(|param| param.sort == SortKey::table("Subject"))
+            .map(|index| -> anyhow::Result<(usize, Node, Node)> {
+                let value = written[index]
+                    .ok_or_else(|| anyhow!("`{}` has no `Subject` argument", call.head.ident))?;
+                let subj = self.value(value, env, &base)?;
+                let clause_performer = subject_performer(&subj)?;
+                Ok((index, subj, clause_performer))
+            })
+            .transpose()?;
         let mut callee = Env::new();
-        for (param, written) in header(decl)?
+        let mut out = Vec::with_capacity(decl.params.len());
+        for (index, ((param, slot), written)) in header_params
+            .into_iter()
+            .zip(&decl.params)
+            .zip(written)
+            .enumerate()
+        {
+            let name = param.name.ident.as_str();
+            let node = if let Some((subj_index, subj, _)) = &subj_clause
+                && index == *subj_index
+            {
+                subj.clone()
+            } else {
+                let active = match &subj_clause {
+                    Some((_, _, clause_performer))
+                        if is_verb_phrase_sort(&slot.sort)
+                            || slot.sort == SortKey::table("DeonticMods") =>
+                    {
+                        clause_performer
+                    }
+                    _ => &base,
+                };
+                match (written, &param.default) {
+                    (Some(value), _) => self.value(value, env, active)?,
+                    (None, Some(default)) => self.value(default, &callee, active)?,
+                    (None, None) => bail!("`${name}` has no argument and no default"),
+                }
+            };
+            callee.insert(name.to_owned(), Binding::Node(node.clone()));
+            out.push(node);
+        }
+        Ok(out)
+    }
+
+    /// Each parameter of `decl` bound to its argument in `call`, in the
+    /// caller's `env`, or to its default, reading the parameters before it.
+    fn bind(
+        &self,
+        call: &'a Call,
+        decl: &Decl<'a>,
+        env: &Env<'a>,
+        performer: &Node,
+    ) -> anyhow::Result<Env<'a>> {
+        let written = self.written_args(call, decl.params.len())?;
+        let mut callee = Env::new();
+        for ((param, slot), written) in header(decl)?
             .params
             .iter()
             .filter_map(Item::node)
+            .zip(&decl.params)
             .zip(written)
         {
             let name = param.name.ident.as_str();
-            let node = match (written, &param.default) {
-                (Some(value), _) => self.value(value, env)?,
-                (None, Some(default)) => self.value(default, &callee)?,
+            let binding = match (written, &param.default) {
+                (Some(value), _) => Binding::Deferred {
+                    value,
+                    sort: slot.sort.clone(),
+                    env: env.clone(),
+                    performer: performer.clone(),
+                },
+                (None, Some(default)) => Binding::Deferred {
+                    value: default,
+                    sort: slot.sort.clone(),
+                    env: callee.clone(),
+                    performer: performer.clone(),
+                },
                 (None, None) => bail!("`${name}` has no argument and no default"),
             };
-            callee.insert(name.to_owned(), node);
+            callee.insert(name.to_owned(), binding);
         }
         Ok(callee)
+    }
+}
+
+/// The performer of an instruction or unplaced verb phrase before a Handoff or
+/// `Subject` names one.
+fn ambient_performer() -> Node {
+    Node::Call {
+        constructor: "Actor".to_owned(),
+        word: "actor".to_owned(),
+        sort: "NounPhrase".to_owned(),
+        args: Vec::new(),
+    }
+}
+
+fn is_verb_phrase_sort(sort: &SortKey) -> bool {
+    *sort == SortKey::table("VerbPhrase")
+        || *sort == SortKey::table("Option(VerbPhrase)")
+        || *sort == SortKey::table("List(VerbPhrase)")
+}
+
+fn subject_performer(subj: &Node) -> anyhow::Result<Node> {
+    match subj {
+        Node::Call {
+            constructor,
+            sort,
+            args,
+            ..
+        } if sort == "Subject" => match (constructor.as_str(), args.as_slice()) {
+            ("Actor" | "By", [np]) => Ok(np.clone()),
+            ("Any", []) => Ok(Node::UnnamedPerformer),
+            (other, _) => bail!("unexpected Subject constructor `{other}`"),
+        },
+        Node::Param(name) => Ok(Node::Param(format!("{name}.actor"))),
+        other => bail!("expected a Subject node, got {other}"),
     }
 }
 
@@ -417,10 +628,15 @@ fn body<'a>(decl: &Decl<'a>) -> anyhow::Result<&'a Value> {
         .ok_or_else(|| anyhow!("{} has no body to expand", decl.label()))
 }
 
-/// Each of `decl`'s parameters, free.
-fn free(decl: &Decl<'_>) -> Env {
+/// Each of `decl`'s parameters, explicit and implicit, free.
+fn free<'a>(decl: &Decl<'a>) -> Env<'a> {
     decl.params
         .iter()
-        .map(|param| (param.name.clone(), Node::Param(param.name.clone())))
+        .map(|param| param.name.clone())
+        .chain(decl.kind.implicit.iter().map(|(name, _)| (*name).to_owned()))
+        .map(|name| {
+            let param = Node::Param(name.clone());
+            (name, Binding::Node(param))
+        })
         .collect()
 }

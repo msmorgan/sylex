@@ -388,7 +388,9 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
     let mut params: Vec<Slot> = Vec::new();
     for param in header.params.iter().filter_map(Item::node) {
         let param_name = param.name.ident.as_str();
-        if params.iter().any(|p| p.name == param_name) {
+        if params.iter().any(|p| p.name == param_name)
+            || kind.implicit.iter().any(|(name, _)| *name == param_name)
+        {
             return refuse(
                 param.name.span,
                 RefusalKind::DuplicateParameter(param_name.to_owned()),
@@ -514,8 +516,15 @@ fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
     }
     for kind in KINDS {
         let secondary = kind.secondary.map(|secondary| secondary.sort);
+        let implicit = kind.implicit.iter().map(|(_, sort)| *sort);
         let fields = kind.fields.iter().filter_map(|field| field.sort);
-        for sort in kind.sort.into_iter().chain(secondary).chain(fields) {
+        for sort in kind
+            .sort
+            .into_iter()
+            .chain(secondary)
+            .chain(implicit)
+            .chain(fields)
+        {
             add(&SortKey::table(sort), &mut consumed);
         }
     }
@@ -662,7 +671,20 @@ fn resolve(
             }
         }
     }
-    let params = &decl.params;
+    let block_params: Vec<Slot> = match &decl.declaration.shape {
+        Shape::Header(_) => decl
+            .params
+            .iter()
+            .cloned()
+            .chain(decl.kind.implicit.iter().map(|(name, sort)| Slot {
+                name: (*name).to_owned(),
+                sort: SortKey::table(sort),
+                optional: false,
+                default: None,
+            }))
+            .collect(),
+        Shape::Value(_) => Vec::new(),
+    };
     Resolver {
         registry,
         coercions,
@@ -670,7 +692,7 @@ fn resolve(
         refusals,
         edges,
         record,
-        params,
+        params: &block_params,
         ring,
     }
     .body(decl);
@@ -1056,8 +1078,9 @@ mod tests {
         let known = known_sorts(&decls, &registry);
         let mut written = Vec::new();
         for kind in KINDS {
+            let implicit = kind.implicit.iter().map(|(_, sort)| *sort);
             let fields = kind.fields.iter().filter_map(|field| field.sort);
-            written.extend(kind.sort.into_iter().chain(fields));
+            written.extend(kind.sort.into_iter().chain(implicit).chain(fields));
             written.extend(kind.secondary.map(|secondary| secondary.sort));
         }
         for record in RECORDS {

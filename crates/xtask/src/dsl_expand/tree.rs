@@ -33,6 +33,9 @@ pub enum Node {
     /// A parameter left free, so an opaque value: a test's `X`, or a
     /// declaration's own parameter when its body is expanded alone.
     Param(String),
+    /// An unnamed performer: an agentless passive names nobody
+    /// (`docs/specs/voice-and-object-phrases.md` §4).
+    UnnamedPerformer,
     String(String),
     Integer(i64),
     List(Vec<Node>),
@@ -67,6 +70,7 @@ impl Node {
                 Node::Record(fields) => out.extend(fields.iter().map(|(_, node)| node)),
                 Node::Word { .. }
                 | Node::Param(_)
+                | Node::UnnamedPerformer
                 | Node::String(_)
                 | Node::Integer(_)
                 | Node::None => {}
@@ -115,6 +119,7 @@ impl Node {
             ),
             Node::Word { .. }
             | Node::Param(_)
+            | Node::UnnamedPerformer
             | Node::String(_)
             | Node::Integer(_)
             | Node::None => self.clone(),
@@ -159,6 +164,7 @@ impl Node {
                 out.push('$');
                 out.push_str(name);
             }
+            Node::UnnamedPerformer => out.push_str("<unnamed>"),
             Node::String(text) => write!(out, "{text:?}").expect("writing to a String"),
             Node::Integer(number) => write!(out, "{number}").expect("writing to a String"),
             Node::List(items) => {
@@ -252,6 +258,7 @@ impl Node {
             }
             Node::Word { .. }
             | Node::Param(_)
+            | Node::UnnamedPerformer
             | Node::String(_)
             | Node::Integer(_)
             | Node::None => out.push_str(&flat),

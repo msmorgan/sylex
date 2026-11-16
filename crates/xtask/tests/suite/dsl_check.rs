@@ -1715,3 +1715,86 @@ fn shared_verb_declarations_and_lexical_verb_references_are_checked() {
         ]
     );
 }
+
+const ACTOR_PREAMBLE: &str = "\
+    primitive you: NounPhrase = You\n\
+    primitive see(who: NounPhrase, opt: Option(NounPhrase) = none): VerbPhrase = See\n\
+    primitive count(n: Nat): VerbPhrase = Count\n\
+    primitive spell(action: VerbPhrase): Ability = Spell\n\
+    primitive single(face: Characteristics): Card = Single\n";
+
+#[test]
+fn an_action_definition_resolves_its_implicit_actor_parameter() {
+    let valid = format!(
+        "{ACTOR_PREAMBLE}\
+         action act {{ body = see($actor, opt = $actor) }}\n\
+         template callAct: VerbPhrase {{ body = act }}"
+    );
+    assert_eq!(kinds(&valid), []);
+
+    let invalid = format!(
+        "{ACTOR_PREAMBLE}\
+         action badSort {{ body = count($actor) }}\n\
+         action badDefault(who: NounPhrase = $actor) {{ body = see($who) }}\n\
+         action redeclared(actor: NounPhrase) {{ body = see($actor) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [
+            (RefusalKind::DuplicateParameter(s("actor")), s("actor")),
+            (
+                RefusalKind::ParameterSort {
+                    name: s("actor"),
+                    sort: s("NounPhrase"),
+                    expected: s("Nat"),
+                },
+                s("$actor"),
+            ),
+            (RefusalKind::UnknownParameter(s("actor")), s("$actor")),
+        ]
+    );
+}
+
+#[test]
+fn actor_parameter_in_a_template_is_refused() {
+    let source = format!(
+        "{ACTOR_PREAMBLE}\
+         template t: VerbPhrase {{ body = see($actor) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(RefusalKind::UnknownParameter(s("actor")), s("$actor"))]
+    );
+}
+
+#[test]
+fn actor_parameter_in_another_declaration_kind_is_refused() {
+    let source = format!(
+        "{ACTOR_PREAMBLE}\
+         primitive yes: Predicate = Yes\n\
+         primitive always: Condition = Always\n\
+         ability kw {{ body = [spell(see($actor))] }}\n\
+         ability_word aw {{ body = spell(see($actor)) }}\n\
+         sba rule {{ body = {{ scope = yes, when = always, then = see($actor) }} }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (RefusalKind::UnknownParameter(s("actor")), s("$actor")),
+            (RefusalKind::UnknownParameter(s("actor")), s("$actor")),
+            (RefusalKind::UnknownParameter(s("actor")), s("$actor")),
+        ]
+    );
+}
+
+#[test]
+fn actor_parameter_in_a_card_is_refused() {
+    let source = format!(
+        "{ACTOR_PREAMBLE}\
+         card single({{ text = [spell(see($actor))] }})"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(RefusalKind::UnknownParameter(s("actor")), s("$actor"))]
+    );
+}

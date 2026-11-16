@@ -412,6 +412,7 @@ fn an_observation_has_no_instruction_and_no_other_participant() {
             for node in expansion.descendants() {
                 let offends = match node {
                     Node::Call { word, .. } if word == INSTRUCT_WORD => true,
+                    Node::UnnamedPerformer => true,
                     Node::Call { sort, .. } | Node::Word { sort, .. } => {
                         sort == PARTICIPANT_SORT && !is_subject_word(node)
                     }
