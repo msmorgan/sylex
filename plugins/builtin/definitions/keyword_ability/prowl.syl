@@ -5,7 +5,7 @@ ability prowl(cost: Cost) {
   spelling = "prowl $cost",
   body = [
     static(
-      onlyIfSo(
+      onlyIf(
         altCost(payingInstead($cost), this),
         did(
           actor(a(and([shares(subtype(creature), share, thisSpell), youControl]))),
