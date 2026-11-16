@@ -1,1 +1,3 @@
+# Creating a copy of an object in the named `zone`, as paradigm's "create a copy of this object in
+# exile" does [CR#702.192a], distinct from `fromStack` [CR#707.10] and `fromCardZone` [CR#707.12].
 primitive inZone(zone: Zone): CopySort = InZone

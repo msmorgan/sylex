@@ -1,1 +1,3 @@
+# Copying a card so it may be cast: creates the copy in the zone the copied object is currently in
+# [CR#707.12], distinct from `fromStack` [CR#707.10] and `inZone` [CR#702.192a].
 primitive fromCardZone: CopySort = FromCardZone
