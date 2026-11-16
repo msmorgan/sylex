@@ -152,8 +152,8 @@ fn named_header_with_sort_and_no_body() {
 #[test]
 fn named_header_with_every_part() {
     check(
-        "primitive actionSearch(scope: Location, for: Option(List(Cost)) = none): Action = Search { lexical = {} }",
-        "primitive actionSearch(scope: Location; for: Option(List(Cost)) = none): Action = Search {lexical = {}}",
+        "primitive searchZone(scope: Location, for: Option(List(Cost)) = none): VerbPhrase = Search { lexical = {} }",
+        "primitive searchZone(scope: Location; for: Option(List(Cost)) = none): VerbPhrase = Search {lexical = {}}",
     );
 }
 

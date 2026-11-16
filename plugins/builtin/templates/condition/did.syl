@@ -1,4 +1,4 @@
 # "if <subj> <action>ed <within>": a condition always reads a written span.
 template did(subj: Subject, action: VerbPhrase, within: LookbackSpan): Condition {
-  body = conditionDid({subj = $subj, action = $action, within = $within})
+  body = happened({subj = $subj, action = $action, within = $within})
 }

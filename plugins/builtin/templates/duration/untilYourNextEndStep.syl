@@ -1,5 +1,5 @@
 # "until your next end step"
 template untilYourNextEndStep: Duration {
   spelling = "until your next end step",
-  body = durationBetween(none, reached(beginningOf(endStep, you, nextTime)))
+  body = between(end = reached(beginningOf(endStep, you, nextTime)))
 }

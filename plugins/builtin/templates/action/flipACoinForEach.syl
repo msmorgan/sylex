@@ -4,5 +4,5 @@ template flipACoinForEach(
   call: Option(FlipCall) = none,
   outcome: Option(CoinFace) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by call, outcome.
-  body = actionFlipCoins(per($each), $call, $outcome)
+  body = flipCoins(per($each), call = $call, outcome = $outcome)
 }

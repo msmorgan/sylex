@@ -708,7 +708,7 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
   expression over words and sorts, and no sequence may match it in two ways. Two optional
   parts that each hold only a bare Hole of one sort are the case it catches, since one printed
   phrase would recover as either argument. No `spelling` under `plugins/` is refused by it
-  today; `durationBetween`, whose `start` and `end` are both `Option(GameEvent)`, is a
+  today; `between` at `Duration`, whose `start` and `end` are both `Option(GameEvent)`, is a
   declaration that needs a fixed word beside each to pass.
 - **A lone list would word as its element.** Where the `spelling` outside optional parts is one
   list Hole and an element can stand at the result sort, a list of one words exactly as its

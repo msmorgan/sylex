@@ -9,6 +9,6 @@ template doUnlessKeywordCost(
   spelling = "$action unless you pay $whose's $keyword cost",
   body = withContinuation(
     optional,
-    actionPay(payment($cost), once, paid, $whose, $keyword),
+    pay(payment($cost), once, whose = $whose, keyword = $keyword),
     ifNot = $action)
 }

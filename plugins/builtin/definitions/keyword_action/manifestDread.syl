@@ -11,6 +11,6 @@ action manifestDread {
   spelling = "manifest dread",
   body = sequentially([
       expose(lookAt, cards(slice(top, 2, libraryOf(actor)))),
-      manifest(someOf(exactly(1), them)),
+      manifest(partOf(exactly(1), them)),
       putInto(theRest, graveyard)])
 }

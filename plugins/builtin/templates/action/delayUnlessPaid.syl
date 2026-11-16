@@ -17,5 +17,5 @@ template delayUnlessPaid(
           $cost,
           establish(cant(actor(delayedTrigger), trigger)),
           player = $player),
-        duration = durationBetween(none, $event))])
+        duration = between(end = $event))])
 }

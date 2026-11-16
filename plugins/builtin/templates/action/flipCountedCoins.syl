@@ -1,8 +1,8 @@
 # "flip <count> coins [and win/lose] [showing <outcome>]"
-template flipCoins(
+template flipCountedCoins(
   count: Amount = anyAmount,
   call: Option(FlipCall) = none,
   outcome: Option(CoinFace) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by call, outcome.
-  body = actionFlipCoins(count($count), $call, $outcome)
+  body = flipCoins(count($count), call = $call, outcome = $outcome)
 }

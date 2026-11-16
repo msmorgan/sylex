@@ -8,7 +8,7 @@ card singleFaced({
         does(
           actor(a(isPlayer)),
           pay(
-            anyCost,
+            payment(anyCost),
             once,
             outcome = unpaid,
             whose = thisEnchantment,

@@ -1,0 +1,2 @@
+# An event matching `clause` happened within its span [CR#608.2i].
+primitive happened(clause: DidClause): Condition = Did

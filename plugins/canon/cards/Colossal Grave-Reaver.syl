@@ -13,6 +13,6 @@ card singleFaced({
             counted(orMore(1), and([isCard, isCreature])),
             yourGraveyard,
             from = yourLibrary)),
-        putOntoBattlefield(someOf(exactly(1), them)))],
+        putOntoBattlefield(partOf(exactly(1), them)))],
     power = 7,
     toughness = 6})

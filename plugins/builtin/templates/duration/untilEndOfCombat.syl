@@ -1,5 +1,5 @@
 # "until end of combat"
 template untilEndOfCombat: Duration {
   spelling = "until end of combat",
-  body = durationBetween(none, endOf(combat, none, current))
+  body = between(end = endOf(combat, none, current))
 }

@@ -31,4 +31,6 @@ card singleFaced({
         beginningOfPossessed(controllerOf(enchanted(creature)), upkeep),
         instruct(
           that(player),
-          may(pay(mana([generic(1), pip(black)]), once), ifDid = untap(that(creature)))))]})
+          may(
+            pay(payment(mana([generic(1), pip(black)])), once),
+            ifDid = untap(that(creature)))))]})

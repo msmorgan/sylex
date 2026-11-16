@@ -5,5 +5,5 @@ template loseCounters(
   amount: Amount,
   agent: NounPhrase = you): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by kind.
-  body = actionRemoveCounters(exactlyOf($amount), $kind, $agent)
+  body = removeCounters(exactlyOf($amount), $kind, $agent)
 }

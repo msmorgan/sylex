@@ -1,0 +1,5 @@
+# "N of <group>"
+template partOf(quantity: Quantity, group: NounPhrase): NounPhrase {
+  spelling = "$quantity of $group",
+  body = someOf(counted($quantity), $group)
+}

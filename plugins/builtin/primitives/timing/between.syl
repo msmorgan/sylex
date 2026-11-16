@@ -1,0 +1,4 @@
+# A duration bounded by optional starting and ending events.
+primitive between(
+  start: Option(GameEvent) = none,
+  end: Option(GameEvent) = none): Duration = Between

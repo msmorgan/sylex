@@ -1,0 +1,10 @@
+# "pay <cost>": the actor pays the given cost, carrying out its instructions [CR#118.1]. A cost
+# that is itself one plain payment ("Pay 5 life", `payLife`) is paid by making that payment once
+# (`Cost.payment`), not by paying a payment.
+# TODO(spelling): Include or omit the clauses supplied by whose, keyword.
+primitive pay(
+  cost: Cost,
+  times: PayTimes,
+  outcome: PaymentOutcome = paid,
+  whose: Option(NounPhrase) = none,
+  keyword: Option(KeywordLabel) = none): VerbPhrase = Pay

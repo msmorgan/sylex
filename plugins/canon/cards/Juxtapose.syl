@@ -48,4 +48,4 @@ card singleFaced({
                         max,
                         stat(manaValue),
                         and([isPermanent, controlledBy(that(player))]))]))),
-              instruct(controllerOf(them), choose(someOf(exactly(1), them))))]))]})
+              instruct(controllerOf(them), choose(partOf(exactly(1), them))))]))]})

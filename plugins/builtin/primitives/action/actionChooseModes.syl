@@ -1,2 +1,0 @@
-# Choose modes from the given modal choices.
-primitive actionChooseModes(quantity: Quantity, modes: List(Mode)): VerbPhrase = ChooseModes

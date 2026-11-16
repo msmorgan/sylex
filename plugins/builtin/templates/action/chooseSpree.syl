@@ -3,5 +3,5 @@
 template chooseSpree(modes: List(Mode)): VerbPhrase {
   # TODO(spelling): Include or omit each mode's cost clause. Format and coordinate the modes list
   # entries, including the empty case.
-  body = actionChooseModes(orMore(1), $modes)
+  body = chooseModes(orMore(1), $modes)
 }

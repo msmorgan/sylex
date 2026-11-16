@@ -9,7 +9,7 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), attack),
         may(
-          pay(mana([generic(5), pip(red), pip(red)]), once),
+          pay(payment(mana([generic(5), pip(red), pip(red)])), once),
           ifDid = sequentially(
             [untap(allOf(and([isCreature, isAttacking]))), additionalPhase(combat, none, 1)])))],
     power = 5,

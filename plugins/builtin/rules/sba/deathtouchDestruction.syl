@@ -10,6 +10,6 @@ sba deathtouchDestruction {
         did(
           by(a(and([isSource, hasKeyword(theKeyword(deathtouch))]))),
           dealDamage(recipient = this),
-          within(durationBetween(stateBasedActionsChecked, now)))]),
+          within(between(start = stateBasedActionsChecked, end = now)))]),
     then = destroy(this)}
 }

@@ -1,5 +1,5 @@
 # "until end of turn"
 template untilEndOfTurn: Duration {
   spelling = "until end of turn",
-  body = durationBetween(none, endOf(turn, none, current))
+  body = between(end = endOf(turn, none, current))
 }

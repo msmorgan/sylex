@@ -1,0 +1,5 @@
+# "<performer> flips <count> coin(s)" [CR#705.1].
+primitive flipCoins(
+  count: FlipScope,
+  call: Option(FlipCall) = none,
+  outcome: Option(CoinFace) = none): VerbPhrase = FlipCoins

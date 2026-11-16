@@ -1,0 +1,5 @@
+# "increase or decrease the result by <amount>"
+template increaseOrDecreaseResult(amount: Amount): VerbPhrase {
+  spelling = "increase or decrease the result by $amount",
+  body = shiftResult([up($amount), down($amount)])
+}

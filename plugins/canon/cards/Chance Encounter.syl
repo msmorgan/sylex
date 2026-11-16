@@ -6,7 +6,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(you), flipCoins(call = wins)),
+        does(actor(you), flipCountedCoins(call = wins)),
         putCounters(1, printedKind(luckCounter), thisEnchantment)),
       at(
         beginningOfYour(upkeep),

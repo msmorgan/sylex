@@ -3,5 +3,5 @@
 # coerced to `perform (payLife amount)`, one payment of that life.
 template payLife(amount: Amount = anyAmount): VerbPhrase {
   spelling = "pay $amount life",
-  body = pay(perform(loseLife($amount)), once)
+  body = pay(payment(perform(loseLife($amount))), once)
 }

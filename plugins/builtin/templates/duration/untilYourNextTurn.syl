@@ -1,5 +1,5 @@
 # "until your next turn"
 template untilYourNextTurn: Duration {
   spelling = "until your next turn",
-  body = durationBetween(none, reached(beginningOf(turn, you, nextTime)))
+  body = between(end = reached(beginningOf(turn, you, nextTime)))
 }

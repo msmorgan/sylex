@@ -1,5 +1,5 @@
 # "this combat"
 template thisCombat: Duration {
   spelling = "this combat",
-  body = durationBetween(reached(beginningOf(combat, none, current)), now)
+  body = between(start = reached(beginningOf(combat, none, current)), end = now)
 }

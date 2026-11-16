@@ -17,7 +17,7 @@ card singleFaced({
               thereAre(
                 counted(orMore(2), and([isPlayer, tiedFor(min, playerStat(lifeTotal), isPlayer)]))),
               sequentially([
-                  choose(someOf(exactly(1), themPlayers)),
+                  choose(partOf(exactly(1), themPlayers)),
                   gainControl(thisCreature, controller = that(player))]))]))],
     power = 4,
     toughness = 4})
