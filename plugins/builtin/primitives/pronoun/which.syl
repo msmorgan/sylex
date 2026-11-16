@@ -1,2 +1,4 @@
 # The participant described by the nearest enclosing lookback (`NounPhrase.which`).
-primitive which: NounPhrase = Which
+primitive which: NounPhrase = Which {
+  spelling = "^"
+}
