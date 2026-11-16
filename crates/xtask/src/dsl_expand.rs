@@ -184,8 +184,8 @@ fn role(kind: &str) -> anyhow::Result<Role> {
         "primitive" => Role::Primitive,
         "template" | "coercion" | "ability_word" => Role::Template,
         "action" | "ability" | "token" => Role::Definition,
-        "counter" | "designation" | "subtype" | "card_type" | "supertype" | "relation" | "sba"
-        | "conferral" => Role::Named,
+        "counter" | "designation" | "subtype" | "card_type" | "supertype" | "relation"
+        | "verb" | "sba" | "conferral" => Role::Named,
         other => bail!("a `{other}` declaration has no word to call"),
     })
 }

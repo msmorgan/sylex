@@ -1,0 +1,6 @@
+# Shared head verb of "faces a dilemma" [CR#700.17] and "face a villainous
+# choice" [CR#701.55a,701.55c]. Neither is plain English: *face* means nothing
+# on its own.
+verb face {
+  lexical = {lemma = "face", frames = [Monotransitive, TransitiveWithComplement(SetOffClause)]}
+}

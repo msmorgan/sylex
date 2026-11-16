@@ -1629,3 +1629,89 @@ fn valid_spellings_and_unspelled_declarations_pass_and_invalid_spellings_are_ref
         ]
     );
 }
+
+#[test]
+fn shared_verb_declarations_and_lexical_verb_references_are_checked() {
+    let valid = format!(
+        "{COLORS}\
+         verb face {{\n\
+           lexical = {{lemma = \"face\", frames = [Monotransitive]}}\n\
+         }}\n\
+         template a: Color {{\n\
+           lexical = {{verbs = [face]}},\n\
+           body = white\n\
+         }}\n\
+         template b: Color {{\n\
+           lexical = {{verbs = [face]}},\n\
+           body = blue\n\
+         }}"
+    );
+    assert_eq!(kinds(&valid), []);
+
+    assert_eq!(
+        RefusalKind::InvalidSharedVerb(s("empty")).to_string(),
+        "shared verb `empty` needs a `lexical` record with a non-empty `lemma` and `frames`"
+    );
+
+    let invalid = format!(
+        "{COLORS}\
+         verb empty {{}}\n\
+         verb face {{\n\
+           lexical = {{lemma = \"face\", frames = [Monotransitive]}}\n\
+         }}\n\
+         primitive fakeVerb: Verb = FakeVerb\n\
+         template nonRecordLexical: Color {{\n\
+           lexical = \"bad\",\n\
+           body = white\n\
+         }}\n\
+         template nonListVerbs: Color {{\n\
+           lexical = {{verbs = \"bad\"}},\n\
+           body = white\n\
+         }}\n\
+         template badInlineVerb: Color {{\n\
+           lexical = {{verbs = [{{lemma = 1, frames = [Monotransitive]}}]}},\n\
+           body = white\n\
+         }}\n\
+         template wrongSort: Color {{\n\
+           lexical = {{verbs = [white]}},\n\
+           body = white\n\
+         }}\n\
+         template duplicateInline: Color {{\n\
+           lexical = {{verbs = [{{lemma = \"face\", frames = [Monotransitive]}}]}},\n\
+           body = blue\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [
+            (
+                RefusalKind::ReservedConstructor(s("Verb.FakeVerb")),
+                s("FakeVerb")
+            ),
+            (
+                RefusalKind::InvalidSharedVerb(s("empty")),
+                s("verb empty {}")
+            ),
+            (RefusalKind::LexicalNotRecord, s("\"bad\"")),
+            (RefusalKind::LexicalVerbsNotList, s("\"bad\"")),
+            (
+                RefusalKind::InvalidLexicalVerb,
+                s("{lemma = 1, frames = [Monotransitive]}")
+            ),
+            (
+                RefusalKind::UnknownWord {
+                    word: s("white"),
+                    sort: s("Verb")
+                },
+                s("white")
+            ),
+            (
+                RefusalKind::DuplicateSharedVerb {
+                    lemma: s("face"),
+                    verb: s("face")
+                },
+                s("\"face\"")
+            ),
+        ]
+    );
+}

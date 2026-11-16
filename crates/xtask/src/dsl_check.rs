@@ -266,6 +266,7 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     let registry = register(&decls, &mut refusals);
     unknown_sorts(&decls, &known_sorts(&decls, &registry), &mut refusals);
     let coercions = coercion::coercions(&decls, &registry, &mut refusals);
+    let shared_verbs = shared_verb_lemmas(&decls, &mut refusals);
     let mut edges = vec![Vec::new(); decls.len()];
     let mut resolutions = Resolutions::default();
     for (decl, edges) in decls.iter().zip(&mut edges) {
@@ -273,6 +274,7 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
             decl,
             &registry,
             &coercions,
+            &shared_verbs,
             &mut refusals,
             edges,
             &mut resolutions,
@@ -558,11 +560,83 @@ fn is_bare(value: &Value, word: &str) -> bool {
     matches!(&value.kind, ValueKind::Call(call) if call.is_bare() && call.head.ident == word)
 }
 
+/// Returns the non-empty `lemma` string and its span when `record` defines a
+/// non-empty string `lemma` and a non-empty `frames` list.
+fn verb_record_lemma(record: &Record) -> Option<(&str, Span)> {
+    let mut written = BTreeSet::new();
+    for field in record.nodes() {
+        if !written.insert(field.name.ident.as_str()) {
+            return None;
+        }
+    }
+    let lemma = record.nodes().find(|f| f.name.ident == "lemma")?;
+    let ValueKind::String(text) = &lemma.value.kind else {
+        return None;
+    };
+    if text.is_empty() {
+        return None;
+    }
+    let frames = record.nodes().find(|f| f.name.ident == "frames")?;
+    let ValueKind::List(items) = &frames.value.kind else {
+        return None;
+    };
+    if !items.iter().any(|i| i.node().is_some()) {
+        return None;
+    }
+    Some((text.as_str(), lemma.value.span))
+}
+
+/// Collects the lemmas of `verb` declarations (lowercase lemma -> declaration
+/// name), refusing a `verb` declaration without a `lexical` record defining a
+/// non-empty `lemma` and `frames`, or two `verb` declarations for the same
+/// lemma.
+fn shared_verb_lemmas(
+    decls: &[Decl<'_>],
+    refusals: &mut Vec<Refusal>,
+) -> BTreeMap<String, String> {
+    let mut lemmas: BTreeMap<String, String> = BTreeMap::new();
+    for decl in decls.iter().filter(|d| d.kind.word == "verb") {
+        let name = decl.name.as_deref().expect("a verb declaration has a name");
+        let Some(lexical) = decl.field("lexical") else {
+            refusals.push(Refusal {
+                span: decl.declaration.span,
+                kind: RefusalKind::InvalidSharedVerb(name.to_owned()),
+            });
+            continue;
+        };
+        let ValueKind::Record(record) = &lexical.kind else {
+            // `Resolver::lexical` refuses non-record `lexical` across all declarations.
+            continue;
+        };
+        let Some((lemma, span)) = verb_record_lemma(record) else {
+            refusals.push(Refusal {
+                span: lexical.span,
+                kind: RefusalKind::InvalidSharedVerb(name.to_owned()),
+            });
+            continue;
+        };
+        let key = lemma.to_lowercase();
+        if let Some(existing) = lemmas.get(&key) {
+            refusals.push(Refusal {
+                span,
+                kind: RefusalKind::DuplicateSharedVerb {
+                    lemma: lemma.to_owned(),
+                    verb: existing.clone(),
+                },
+            });
+        } else {
+            lemmas.insert(key, name.to_owned());
+        }
+    }
+    lemmas
+}
+
 /// Resolves one declaration's parameter defaults and block or value.
 fn resolve(
     decl: &Decl<'_>,
     registry: &Registry,
     coercions: &[Coercion],
+    shared_verbs: &BTreeMap<String, String>,
     refusals: &mut Vec<Refusal>,
     edges: &mut Vec<usize>,
     record: &mut Resolutions,
@@ -577,6 +651,7 @@ fn resolve(
                 Resolver {
                     registry,
                     coercions,
+                    shared_verbs,
                     refusals: &mut *refusals,
                     edges: &mut *edges,
                     record: &mut *record,
@@ -591,6 +666,7 @@ fn resolve(
     Resolver {
         registry,
         coercions,
+        shared_verbs,
         refusals,
         edges,
         record,
@@ -613,6 +689,7 @@ enum FieldHost {
 struct Resolver<'r> {
     registry: &'r Registry,
     coercions: &'r [Coercion],
+    shared_verbs: &'r BTreeMap<String, String>,
     refusals: &'r mut Vec<Refusal>,
     /// The dependency nodes the declaration reaches.
     edges: &'r mut Vec<usize>,
@@ -669,7 +746,7 @@ impl Resolver<'_> {
             if host == FieldHost::DeclarationBlock && METADATA_FIELDS.contains(&name) {
                 match name {
                     "spelling" => self.spelling(&field.value),
-                    "lexical" => {}
+                    "lexical" => self.lexical(&field.value),
                     other => unreachable!("unhandled metadata field `{other}`"),
                 }
                 continue;
@@ -711,6 +788,61 @@ impl Resolver<'_> {
             | ValueKind::Call(_)
             | ValueKind::Parameter(_) => {
                 self.refuse(value.span, RefusalKind::SpellingNotString);
+            }
+        }
+    }
+
+    /// Checks `lexical` metadata: requires a record, refuses duplicate fields,
+    /// and when `verbs` is present, checks shared `verb` references and inline
+    /// verb entries (`lemma`, `frames`, and shared-verb disjointness).
+    fn lexical(&mut self, value: &Value) {
+        let ValueKind::Record(record) = &value.kind else {
+            self.refuse(value.span, RefusalKind::LexicalNotRecord);
+            return;
+        };
+        let mut written = BTreeSet::new();
+        for field in record.nodes() {
+            let name = field.name.ident.as_str();
+            if !written.insert(name) {
+                self.refuse(
+                    field.name.span,
+                    RefusalKind::DuplicateField(name.to_owned()),
+                );
+            }
+        }
+        let Some(verbs) = record
+            .nodes()
+            .find(|f| f.name.ident == "verbs")
+            .map(|f| &f.value)
+        else {
+            return;
+        };
+        let ValueKind::List(items) = &verbs.kind else {
+            self.refuse(verbs.span, RefusalKind::LexicalVerbsNotList);
+            return;
+        };
+        let verb_sort = SortKey::named("Verb");
+        for item in items.iter().filter_map(Item::node) {
+            match &item.kind {
+                ValueKind::Record(entry) => match verb_record_lemma(entry) {
+                    None => self.refuse(item.span, RefusalKind::InvalidLexicalVerb),
+                    Some((lemma, span)) => {
+                        if let Some(verb) = self.shared_verbs.get(&lemma.to_lowercase()) {
+                            self.refuse(
+                                span,
+                                RefusalKind::DuplicateSharedVerb {
+                                    lemma: lemma.to_owned(),
+                                    verb: verb.clone(),
+                                },
+                            );
+                        }
+                    }
+                },
+                ValueKind::Call(_)
+                | ValueKind::String(_)
+                | ValueKind::Integer(_)
+                | ValueKind::List(_)
+                | ValueKind::Parameter(_) => self.value(item, &verb_sort),
             }
         }
     }

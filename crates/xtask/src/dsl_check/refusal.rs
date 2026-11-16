@@ -155,6 +155,16 @@ pub enum RefusalKind {
     SpellingNotString,
     #[error("invalid `spelling`: {0}")]
     InvalidSpelling(sylex_spelling::ErrorKind),
+    #[error("shared verb `{0}` needs a `lexical` record with a non-empty `lemma` and `frames`")]
+    InvalidSharedVerb(String),
+    #[error("`lexical` must be a record")]
+    LexicalNotRecord,
+    #[error("`lexical.verbs` must be a list")]
+    LexicalVerbsNotList,
+    #[error("inline verb in `lexical.verbs` needs a non-empty string `lemma` and non-empty `frames`")]
+    InvalidLexicalVerb,
+    #[error("inline verb `{lemma}` in `lexical` duplicates shared `verb {verb}`")]
+    DuplicateSharedVerb { lemma: String, verb: String },
     #[error("dependency cycle: {}", .0.join(" -> "))]
     Cycle(Vec<String>),
 }

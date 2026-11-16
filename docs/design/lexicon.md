@@ -101,8 +101,12 @@ vocabulary, so a finer split of either side adds nothing.
 
 **Every game word is a `.syl` declaration** of its own sort under `plugins/`,
 its `lexical` field beside its spelling and meaning ([Syl](syl.md) §1–2):
-*Khans* is `khans.syl`, of the AnchorWord sort. Why: a word's wording and
-meaning are one fact, so they have one source and cannot drift apart.
+*Khans* is `khans.syl`, of the AnchorWord sort. A Catalog verb that means
+nothing on its own and is shared across phrases (*face* [CR#700.17,701.55],
+*beam* [CR#702.196]) is a `verb` declaration (`Verb`) carrying only `lexical`,
+which each declaration using the verb names in its `lexical`. Why: a word's
+wording and meaning are one fact, so they have one source and cannot drift
+apart; where two phrases share a head verb, neither owns the Lexeme.
 
 **The core lexicon is only ordinary English**: the closed classes and the
 open-class words Oracle uses as plain English (*other*, *top*), plus the

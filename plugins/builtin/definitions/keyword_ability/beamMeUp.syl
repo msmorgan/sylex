@@ -4,10 +4,7 @@
 # instead of putting it anywhere else any time it would leave the stack" [CR#702.196a]. The
 # creature returned for that cost is beamed up [CR#702.196b].
 ability beamMeUp(cost: Cost) {
-  lexical = {
-    lemma = "beam me up",
-    parameters = [[Cost]],
-    verbs = [{lemma = "beam", frames = [TransitiveWithPP(["up"])]}]},
+  lexical = {lemma = "beam me up", parameters = [[Cost]], verbs = [beam]},
   spelling = "beam me up $cost",
   body = [
     static(

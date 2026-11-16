@@ -3,6 +3,7 @@
 # [CR#702.196b]. It is done by returning, so "can't be beamed up" forbids that return and no
 # other. Named apart from `beamMeUp`, the keyword ability.
 action beamUp(subject: NounPhrase) {
+  lexical = {verbs = [beam]},
   ofAbility = beamMeUp,
   spelling = "beam $subject up",
   body = returnToHand($subject)

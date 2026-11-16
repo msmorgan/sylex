@@ -2,5 +2,6 @@
 # spell or ability, so "faced a dilemma this turn" looks back over those choices and "each dilemma
 # you've faced this turn" counts the spells and abilities they chose modes for [CR#700.17].
 primitive faceDilemma: VerbPhrase = FaceDilemma {
+  lexical = {verbs = [face]},
   spelling = "faces a dilemma"
 }

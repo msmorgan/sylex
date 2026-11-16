@@ -20,8 +20,8 @@ pub struct Kind {
     /// A second sort its name is declared at (`syl.md` §3).
     pub secondary: Option<Secondary>,
     /// A catalog declaration (a counter, designation, subtype, card type,
-    /// supertype, relation or top-level rules row) is registered before any
-    /// body is read, so a reference to one is no dependency edge.
+    /// supertype, relation, shared verb or top-level rules row) is registered
+    /// before any body is read, so a reference to one is no dependency edge.
     pub catalog: bool,
 }
 
@@ -231,6 +231,7 @@ pub const KINDS: &[Kind] = &[
         &[field("name", "String"), CONFERS],
     ),
     catalog("relation", "RelationLabel", &[]),
+    catalog("verb", "Verb", &[]),
     record_body("token", "DefinedToken"),
     // A top-level rules row is a catalog declaration, so card text can name
     // it as it names a keyword: the "legend rule" [CR#205.4d].

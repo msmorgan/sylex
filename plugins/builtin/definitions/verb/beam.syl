@@ -1,0 +1,5 @@
+# Shared head verb of "beam me up [cost]" [CR#702.196a] and "beam <subject> up"
+# [CR#702.196b]. Neither is plain English: *beam* means nothing on its own.
+verb beam {
+  lexical = {lemma = "beam", frames = [TransitiveWithPP(["up"])]}
+}
