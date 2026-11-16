@@ -8,7 +8,7 @@ card singleFaced({
     subtypes = [monkey, pirate],
     text = [
       whenever(
-        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
+        does(actor(shortenedName), dealDamage(kind = combat, recipient = a(player))),
         sequentially([
             create(1, defined(treasureToken)),
             exile(slice(top, 1, libraryOf(that(player)))),

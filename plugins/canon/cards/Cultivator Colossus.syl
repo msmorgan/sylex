@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [plant, beast],
     text = [
       trample,
-      static(definesPt(thisCreature, countOf(nominal(land, post = [youControl])))),
+      static(definesPt(ownName, countOf(nominal(land, post = [youControl])))),
       when(
         does(actor(thisCreature), enter),
         may(

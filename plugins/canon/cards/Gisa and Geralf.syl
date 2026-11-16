@@ -5,7 +5,7 @@ card singleFaced({
     types = [creature],
     subtypes = [human, wizard],
     text = [
-      when(does(actor(thisCreature), enter), mill(4)),
+      when(does(actor(ownName), enter), mill(4)),
       static(
         can(
           actor(you),

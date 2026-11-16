@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       flying,
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(shortenedName), attack),
         sequentially([
             doForEach(eachPlayer, choose(target(nominal(permanent, post = [controlledBy(they)])))),
             instruct(those(player), sacrifice(those(permanent))),

@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       spell(
         dealDivided(
-          this,
+          ownName,
           3,
           targets(oneTwoOrThree, nominal(creature, post = [hasKeyword(theKeyword(flying))]))))]})

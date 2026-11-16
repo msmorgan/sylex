@@ -11,7 +11,7 @@ card singleFaced({
       flying,
       vigilance,
       whenever(
-        or([does(actor(thisCreature), attack), does(actor(thisCreature), block)]),
+        or([does(actor(shortenedName), attack), does(actor(shortenedName), block)]),
         sequentially([
             may(attachTo(counted(anyNumber, nominal(aura, post = [in(battlefield)])), it)),
             may(

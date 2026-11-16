@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(4)],
     types = [artifact, creature],
     subtypes = [golem],
-    text = [static(definesQuality(thisCreature, sets, colored(every)))],
+    text = [static(definesQuality(ownName, sets, colored(every)))],
     power = 3,
     toughness = 3})

@@ -12,7 +12,7 @@ card singleFaced({
               tap(counted(anyNumber, nominal(pre = [untapped], creature, post = [youControl]))))))),
       spell(
         instruct(
-          this,
+          ownName,
           dealDamage(
             amount = times(
               3,

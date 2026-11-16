@@ -15,6 +15,6 @@ card singleFaced({
               up(0),
               duration = untilEndOfTurn),
             scry(1)])),
-      when(does(actor(thisCreature), die), may(putInto(it, fromTop(5, library))))],
+      when(does(actor(shortenedName), die), may(putInto(it, fromTop(5, library))))],
     power = 3,
     toughness = 3})

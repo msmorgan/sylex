@@ -6,4 +6,6 @@ card singleFaced({
       spell(
         sequentially([
             destroy(target(or([artifact, enchantment]))),
-            instruct(this, dealDamage(amount = 2, recipient = controllerOf(that(permanent))))]))]})
+            instruct(
+              ownName,
+              dealDamage(amount = 2, recipient = controllerOf(that(permanent))))]))]})

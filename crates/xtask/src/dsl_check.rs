@@ -25,6 +25,7 @@ mod cycles;
 mod nominal;
 mod refusal;
 pub(crate) mod schema;
+mod self_name;
 mod sort;
 mod spelling;
 
@@ -197,6 +198,8 @@ pub(crate) struct Decl<'a> {
     pub(crate) name: Option<String>,
     pub(crate) sort: SortKey,
     pub(crate) params: Vec<Slot>,
+    /// Whether this declaration stands in the builtin bundle.
+    pub(crate) in_builtin: bool,
     /// Whether this is the Ring exception's file.
     ring: bool,
 }
@@ -252,11 +255,12 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
         declarations: BTreeMap::new(),
     };
     for bundle in bundles {
+        let in_builtin = std::ptr::eq(*bundle, builtin);
         for file in bundle.files().values() {
             summary.files += 1;
-            let ring = std::ptr::eq(*bundle, builtin) && file.path == ring_file;
+            let ring = in_builtin && file.path == ring_file;
             for declaration in file.ast.declarations() {
-                match header(declaration, ring) {
+                match header(declaration, in_builtin, ring) {
                     Ok(decl) => {
                         *summary.declarations.entry(decl.kind.word).or_default() += 1;
                         decls.push(decl);
@@ -297,6 +301,9 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     }
     nominal::check(&decls, &registry, &resolutions, acyclic, &mut refusals);
     if refusals.is_empty() {
+        self_name::check(&decls, &registry, &resolutions, &mut refusals);
+    }
+    if refusals.is_empty() {
         return Ok(Checked {
             summary,
             decls,
@@ -318,7 +325,7 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
 }
 
 /// Checks a declaration's kind, name, sort and parameters.
-fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
+fn header(declaration: &Declaration, in_builtin: bool, ring: bool) -> Result<Decl<'_>, Refusal> {
     let refuse = |span, kind| Err(Refusal { span, kind });
     let word = declaration.kind.ident.as_str();
     let Some(kind) = KINDS.iter().find(|kind| kind.word == word) else {
@@ -333,6 +340,7 @@ fn header(declaration: &Declaration, ring: bool) -> Result<Decl<'_>, Refusal> {
         name,
         sort,
         params,
+        in_builtin,
         ring,
     };
     let header = match (&declaration.shape, kind.form) {
@@ -1084,11 +1092,17 @@ mod tests {
         let plugins = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
         let builtin = Bundle::load(plugins.join("builtin"), FileId(0)).unwrap();
         let canon = Bundle::load(plugins.join("canon"), builtin.next_file_id()).unwrap();
-        let decls: Vec<Decl<'_>> = [&builtin, &canon]
+        let decls: Vec<Decl<'_>> = [(true, &builtin), (false, &canon)]
             .into_iter()
-            .flat_map(|bundle| bundle.files().values())
-            .flat_map(|file| file.ast.declarations())
-            .map(|declaration| header(declaration, false).expect("the plugins' headers pass"))
+            .flat_map(|(in_builtin, bundle)| {
+                bundle
+                    .files()
+                    .values()
+                    .flat_map(|file| file.ast.declarations())
+                    .map(move |declaration| {
+                        header(declaration, in_builtin, false).expect("the plugins' headers pass")
+                    })
+            })
             .collect();
         let registry = register(&decls, &mut Vec::new());
         let known = known_sorts(&decls, &registry);

@@ -9,9 +9,9 @@ card singleFaced({
       protection(hasColor(white)),
       whenever(
         does(actor(anOpponent), discard(a(card))),
-        putCounters(1, printedKind(p1p1Counter), thisCreature)),
+        putCounters(1, printedKind(p1p1Counter), shortenedName)),
       when(
-        does(actor(thisCreature), enter),
+        does(actor(shortenedName), enter),
         if = keywordCostPaid(it, kicker),
         instruct(target(opponent), discard(countedAtRandom(exactly(2), card))))],
     power = 2,

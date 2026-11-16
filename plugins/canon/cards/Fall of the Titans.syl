@@ -6,5 +6,5 @@ card singleFaced({
       surge(mana([variable, pip(red)])),
       spell(
         instruct(
-          this,
+          ownName,
           dealDamage(amount = letter(x), recipient = eachOf(targets(upTo(2), anyTarget)))))]})

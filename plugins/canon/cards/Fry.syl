@@ -6,7 +6,7 @@ card singleFaced({
       static(cant(any, counter(thisSpell))),
       spell(
         instruct(
-          this,
+          ownName,
           dealDamage(
             amount = 5,
             recipient = target(

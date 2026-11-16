@@ -1593,6 +1593,9 @@ fn valid_spellings_and_unspelled_declarations_pass_and_invalid_spellings_are_ref
         "{COLORS}\
          primitive unspelled: Color = Unspelled\n\
          primitive gap: Color = Gap {{ spelling = \"^\" }}\n\
+         primitive ownName: NounPhrase = OwnName {{ spelling = \"#\" }}\n\
+         template shortenedName: NounPhrase {{ spelling = \"##\", body = ownName }}\n\
+         primitive see(who: NounPhrase): Color = See\n\
          template tied(p: Color): Color {{ spelling = \"non~$p\", body = $p }}\n\
          template ord(n: Nat): Nat {{ spelling = \"$n@Ordinal\", body = $n }}\n\
          template opt(a: Color, b: Option(Color) = none): Color {{\n\
@@ -1607,6 +1610,7 @@ fn valid_spellings_and_unspelled_declarations_pass_and_invalid_spellings_are_ref
          template untied(p: Color): Color {{ spelling = \"non$p\", body = $p }}\n\
          template badForm(n: Nat): Nat {{ spelling = \"$n@Plural\", body = $n }}\n\
          template badGap: Color {{ spelling = \"cast ^\", body = white }}\n\
+         template badHash: Color {{ spelling = \"cast #\", body = white }}\n\
          template notString: Color {{ spelling = 1, body = white }}"
     );
     assert_eq!(
@@ -1623,6 +1627,10 @@ fn valid_spellings_and_unspelled_declarations_pass_and_invalid_spellings_are_ref
             (
                 RefusalKind::InvalidSpelling(sylex_spelling::ErrorKind::GapNotWholeSpelling),
                 s("\"cast ^\"")
+            ),
+            (
+                RefusalKind::InvalidSpelling(sylex_spelling::ErrorKind::UnexpectedMark('#')),
+                s("\"cast #\"")
             ),
             (RefusalKind::SpellingNotString, s("1")),
         ]
@@ -2706,6 +2714,171 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
             (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
             (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
             (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+        ]
+    );
+}
+
+#[test]
+fn own_name_and_shortened_name_are_refused_in_builtin() {
+    let source = "\
+        primitive ownName: NounPhrase = OwnName { spelling = \"#\" }\n\
+        template shortenedName: NounPhrase { spelling = \"##\", body = ownName }\n\
+        primitive see(who: NounPhrase): VerbPhrase = See\n\
+        template badOwn: VerbPhrase { body = see(ownName) }\n\
+        template badShort: VerbPhrase { body = see(shortenedName) }\n\
+        template badDefault(who: NounPhrase = ownName): VerbPhrase { body = see($who) }\n";
+    assert_eq!(
+        refusals(&[("a.syl", source)]),
+        [
+            (RefusalKind::OwnNameInBuiltin(s("ownName")), s("ownName")),
+            (
+                RefusalKind::OwnNameInBuiltin(s("shortenedName")),
+                s("shortenedName")
+            ),
+            (RefusalKind::OwnNameInBuiltin(s("ownName")), s("ownName")),
+        ]
+    );
+}
+
+#[test]
+fn shortened_name_requires_a_face_with_a_shortened_name() {
+    let builtin_src = "\
+        primitive true: Bool = True\n\
+        primitive false: Bool = False\n\
+        supertype legendary { name = \"Legendary\" }\n\
+        card_type creature { name = \"Creature\", permanentType = true }\n\
+        card_type land { name = \"Land\", permanentType = true }\n\
+        card_type sorcery { name = \"Sorcery\", permanentType = false }\n\
+        primitive ownName: NounPhrase = OwnName { spelling = \"#\" }\n\
+        template shortenedName: NounPhrase { spelling = \"##\", body = ownName }\n\
+        primitive spell(who: NounPhrase): Ability = Spell\n\
+        primitive bandAt(n: Nat): LevelRange = BandAt\n\
+        primitive singleFaced(face: Characteristics): Card = SingleFaced\n\
+        primitive transforming(front: Characteristics, back: Characteristics): Card = Transforming\n\
+        primitive leveler(inner: Characteristics, bands: List(LevelBand)): Card = Leveler\n\
+        primitive sharedLineSplit(\n\
+          shared: Characteristics,\n\
+          left: SharedLineHalf,\n\
+          right: SharedLineHalf): Card = SharedLineSplit\n";
+    let builtin = bundle("builtin", FileId(0), &[("builtin.syl", builtin_src)]);
+
+    let valid_canon = "\
+        card singleFaced({\n\
+          name = \"Grizzly Bears\",\n\
+          types = [creature],\n\
+          text = [spell(ownName)] })\n\
+        card singleFaced({\n\
+          name = \"Urza's Ruinous Blast\",\n\
+          supertypes = [legendary],\n\
+          types = [sorcery],\n\
+          text = [spell(ownName)] })\n\
+        card singleFaced({\n\
+          name = \"Urza, Lord High Artificer\",\n\
+          supertypes = [legendary],\n\
+          types = [creature],\n\
+          text = [spell(ownName), spell(shortenedName)] })\n\
+        card singleFaced({\n\
+          name = \"Tor Wauki the Younger\",\n\
+          supertypes = [legendary],\n\
+          types = [creature],\n\
+          text = [spell(shortenedName)] })\n\
+        card singleFaced({\n\
+          name = \"Captain James T. Kirk\",\n\
+          supertypes = [legendary],\n\
+          types = [creature],\n\
+          text = [spell(shortenedName)] })\n\
+        card transforming(\n\
+          { name = \"Civilized Scholar\", types = [creature], text = [spell(ownName)] },\n\
+          { name = \"Homicidal Brute, Unbound\", supertypes = [legendary], types = [creature], text = [spell(shortenedName)] })\n\
+        card leveler(\n\
+          { name = \"Kargan, Dragonlord\", supertypes = [legendary], types = [creature] },\n\
+          [{ range = bandAt(1), text = [spell(shortenedName)] }])\n\
+        card sharedLineSplit(\n\
+          { supertypes = [legendary], types = [creature] },\n\
+          { name = \"Alpha, the First\", text = [spell(shortenedName)] },\n\
+          { name = \"Omega\", text = [spell(ownName)] })\n";
+    let ok_bundle = bundle("canon", builtin.next_file_id(), &[("ok.syl", valid_canon)]);
+    check(&builtin, &[&ok_bundle]).unwrap_or_else(|e| panic!("expected ok, got: {e}"));
+
+    let invalid_canon = "\
+        card singleFaced({\n\
+          name = \"Grizzly Bears\",\n\
+          types = [creature],\n\
+          text = [spell(shortenedName)] })\n\
+        card singleFaced({\n\
+          name = \"Urza's Ruinous Blast\",\n\
+          supertypes = [legendary],\n\
+          types = [sorcery],\n\
+          text = [spell(shortenedName)] })\n\
+        card singleFaced({\n\
+          name = \"Progenitus\",\n\
+          supertypes = [legendary],\n\
+          types = [creature],\n\
+          text = [spell(shortenedName)] })\n\
+        card singleFaced({\n\
+          name = \"The First Sliver\",\n\
+          supertypes = [legendary],\n\
+          types = [creature],\n\
+          text = [spell(shortenedName)] })\n\
+        card singleFaced({\n\
+          name = \"The Grey Havens\",\n\
+          supertypes = [legendary],\n\
+          types = [land],\n\
+          text = [spell(shortenedName)] })\n\
+        card transforming(\n\
+          { name = \"Urza, Lord High Artificer\", supertypes = [legendary], types = [creature], text = [spell(shortenedName)] },\n\
+          { name = \"Construct\", types = [creature], text = [spell(shortenedName)] })\n\
+        card leveler(\n\
+          { name = \"Student of Warfare\", types = [creature] },\n\
+          [{ range = bandAt(1), text = [spell(shortenedName)] }])\n\
+        card sharedLineSplit(\n\
+          { supertypes = [legendary], types = [creature] },\n\
+          { name = \"Alpha, the First\", text = [spell(shortenedName)] },\n\
+          { name = \"Omega\", text = [spell(shortenedName)] })\n";
+    let bad_bundle = bundle(
+        "canon",
+        builtin.next_file_id(),
+        &[("bad.syl", invalid_canon)],
+    );
+    let Err(CheckError::Resolution { refusals, .. }) = check(&builtin, &[&bad_bundle]) else {
+        panic!("expected resolution refusals");
+    };
+    let got: Vec<RefusalKind> = refusals.into_iter().map(|r| r.kind).collect();
+    assert_eq!(
+        got,
+        [
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("Grizzly Bears"),
+            },
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("Urza's Ruinous Blast"),
+            },
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("Progenitus"),
+            },
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("The First Sliver"),
+            },
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("The Grey Havens"),
+            },
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("Construct"),
+            },
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("Student of Warfare"),
+            },
+            RefusalKind::ShortenedNameWithoutShortening {
+                word: s("shortenedName"),
+                face: s("Omega"),
+            },
         ]
     );
 }

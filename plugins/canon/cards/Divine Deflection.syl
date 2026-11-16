@@ -13,6 +13,6 @@ card singleFaced({
               preventDamage(
                 theNext(letter(x)),
                 also = instruct(
-                  this,
+                  ownName,
                   dealDamage(amount = thatMuch, recipient = target(anyTarget)))))),
           thisTurn))]})

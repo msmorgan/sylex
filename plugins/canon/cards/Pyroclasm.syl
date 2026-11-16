@@ -2,4 +2,4 @@ card singleFaced({
     name = "Pyroclasm",
     cost = [generic(1), pip(red)],
     types = [sorcery],
-    text = [spell(instruct(this, dealDamage(amount = 2, recipient = each(creature))))]})
+    text = [spell(instruct(ownName, dealDamage(amount = 2, recipient = each(creature))))]})

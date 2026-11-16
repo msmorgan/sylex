@@ -9,7 +9,7 @@ card singleFaced({
             draw(3),
             discard(a(nominal(card, post = [in(yourHand)]))),
             instruct(
-              this,
+              ownName,
               dealDamage(
                 amount = statOf(stat(manaValue), the(nominal(pre = [was(discard(which))], card))),
                 recipient = thatJoin))]))]})

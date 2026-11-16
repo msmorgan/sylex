@@ -9,5 +9,5 @@ card singleFaced({
             scry(3),
             reveal(topSlice(1)),
             instruct(
-              this,
+              ownName,
               dealDamage(amount = statOf(stat(manaValue), that(card)), recipient = thatJoin))]))]})

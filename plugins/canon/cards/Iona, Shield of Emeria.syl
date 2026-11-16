@@ -6,7 +6,7 @@ card singleFaced({
     subtypes = [angel],
     text = [
       flying,
-      static(entersChoosing(thisCreature, color)),
+      static(entersChoosing(shortenedName, color)),
       static(cant(actor(yourOpponents), cast(bare(nominal(spell, post = [ofChosen(color)])))))],
     power = 7,
     toughness = 7})

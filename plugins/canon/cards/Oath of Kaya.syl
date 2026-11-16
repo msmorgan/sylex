@@ -5,7 +5,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       when(
-        does(actor(this), enter),
+        does(actor(ownName), enter),
         sequentially(
           [instruct(it, dealDamage(amount = 3, recipient = target(anyTarget))), gainLife(3)])),
       whenever(
@@ -15,4 +15,4 @@ card singleFaced({
             defender = a(nominal(planeswalker, post = [youControl])),
             counted(orMore(1), creature))),
         sequentially(
-          [instruct(this, dealDamage(amount = 2, recipient = that(player))), gainLife(2)]))]})
+          [instruct(ownName, dealDamage(amount = 2, recipient = that(player))), gainLife(2)]))]})

@@ -13,9 +13,8 @@ card transforming({
           duration = untilEndOfTurn)),
       activated(
         loyaltySymbol(up(0)),
-        sequentially([
-            create(1, written(creatureToken(2, 2, [green], [wolf]))),
-            transform(thisPlaneswalker)]))],
+        sequentially(
+          [create(1, written(creatureToken(2, 2, [green], [wolf]))), transform(ownName)]))],
     loyalty = 3},
   {
     name = "Arlinn, Embraced by the Moon",
@@ -32,8 +31,8 @@ card transforming({
       activated(
         loyaltySymbol(down(1)),
         sequentially([
-            instruct(this, dealDamage(amount = 3, recipient = target(anyTarget))),
-            transform(thisPlaneswalker)])),
+            instruct(shortenedName, dealDamage(amount = 3, recipient = target(anyTarget))),
+            transform(shortenedName)])),
       activated(
         loyaltySymbol(down(6)),
         getEmblem([

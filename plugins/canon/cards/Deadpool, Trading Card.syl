@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       static(
         replace(
-          would(actor(thisCreature), enter),
+          would(actor(shortenedName), enter),
           alongside(may(exchangeTextBoxes(thisCreature, a(nominal(pre = [other], creature))))))),
       at(beginningOfYour(upkeep), loseLife(3)),
       activated(

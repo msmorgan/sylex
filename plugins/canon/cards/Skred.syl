@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         instruct(
-          this,
+          ownName,
           dealDamage(
             amount = countOf(nominal(pre = [snow], permanent, post = [youControl])),
             recipient = target(creature))))]})

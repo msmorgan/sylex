@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       haste,
       when(
-        does(actor(thisCreature), die),
+        does(actor(ownName), die),
         create(
           1,
           written({

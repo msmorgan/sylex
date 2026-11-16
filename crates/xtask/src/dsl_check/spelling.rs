@@ -14,6 +14,7 @@ use sylex_lexicon::Binding;
 use sylex_lexicon::Category;
 use sylex_spelling::Hole;
 use sylex_spelling::HoleKind;
+use sylex_spelling::OwnName;
 use sylex_spelling::Part;
 use sylex_spelling::Spelling;
 use sylex_spelling::Tail;
@@ -222,10 +223,7 @@ fn is_omissible(param: &Slot) -> bool {
 }
 
 fn is_list_or_option_list(sort: &SortKey) -> bool {
-    sort.option_inner()
-        .unwrap_or(sort)
-        .list_inner()
-        .is_some()
+    sort.option_inner().unwrap_or(sort).list_inner().is_some()
 }
 
 fn part_has_certain_material(part: &Part) -> bool {
@@ -257,7 +255,13 @@ fn collect_parts<'a>(
             Part::Optional(opt) => {
                 let opt_id = optionals.len();
                 optionals.push(false);
-                collect_parts(&opt.parts, opt.tail.as_ref(), Some(opt_id), holes, optionals);
+                collect_parts(
+                    &opt.parts,
+                    opt.tail.as_ref(),
+                    Some(opt_id),
+                    holes,
+                    optionals,
+                );
             }
         }
     }
@@ -272,7 +276,13 @@ fn collect_parts<'a>(
                 Part::Optional(opt) => {
                     let opt_id = optionals.len();
                     optionals.push(false);
-                    collect_parts(&opt.parts, opt.tail.as_ref(), Some(opt_id), holes, optionals);
+                    collect_parts(
+                        &opt.parts,
+                        opt.tail.as_ref(),
+                        Some(opt_id),
+                        holes,
+                        optionals,
+                    );
                 }
             }
         }
@@ -295,6 +305,8 @@ enum Atom {
     TailClose,
     /// `^`: the whole spelling of a Gap's word.
     Gap,
+    /// `#` or `##`: the whole spelling of an own-name word.
+    OwnName(OwnName),
 }
 
 #[derive(Debug, Clone)]
@@ -312,6 +324,7 @@ enum Regex {
 fn skeleton_is_ambiguous(spelling: &Spelling, params: &[Slot], coercions: &[Coercion]) -> bool {
     let regex = match spelling {
         Spelling::Gap(_) => Regex::Atom(Atom::Gap),
+        Spelling::OwnName(form, _) => Regex::Atom(Atom::OwnName(*form)),
         Spelling::Parts { parts, tail, .. } => {
             let mut seq = build_parts_regex(parts, params);
             if let Some(tail) = tail {
@@ -333,7 +346,11 @@ fn build_parts_regex(parts: &[Part], params: &[Slot]) -> Vec<Regex> {
     for part in parts {
         match part {
             Part::Text(text) => {
-                seq.extend(words_of_text(&text.text).into_iter().map(|w| Regex::Atom(Atom::Word(w))));
+                seq.extend(
+                    words_of_text(&text.text)
+                        .into_iter()
+                        .map(|w| Regex::Atom(Atom::Word(w))),
+                );
             }
             Part::Hole(hole) => {
                 let param = params
@@ -413,12 +430,13 @@ fn words_of_text(text: &str) -> Vec<String> {
 }
 
 fn atoms_overlap(left: &Atom, right: &Atom, coercions: &[Coercion]) -> bool {
-    match (left, right) {
-        (Atom::Word(a), Atom::Word(b)) => a == b,
-        (Atom::Sort(a), Atom::Sort(b)) => sorts_overlap(a, b, coercions),
-        (Atom::TailOpen(pa, ca), Atom::TailOpen(pb, cb)) => pa == pb && ca == cb,
-        (Atom::TailClose, Atom::TailClose) | (Atom::Gap, Atom::Gap) => true,
-        _ => false,
+    match left {
+        Atom::Word(a) => matches!(right, Atom::Word(b) if a == b),
+        Atom::Sort(a) => matches!(right, Atom::Sort(b) if sorts_overlap(a, b, coercions)),
+        Atom::TailOpen(pa, ca) => matches!(right, Atom::TailOpen(pb, cb) if pa == pb && ca == cb),
+        Atom::TailClose => matches!(right, Atom::TailClose),
+        Atom::Gap => matches!(right, Atom::Gap),
+        Atom::OwnName(a) => matches!(right, Atom::OwnName(b) if a == b),
     }
 }
 

@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       haste,
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(shortenedName), attack),
         if = exists(
           nominal(
             creature,

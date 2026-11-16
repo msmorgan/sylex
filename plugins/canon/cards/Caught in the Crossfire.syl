@@ -8,12 +8,12 @@ card singleFaced({
             plusMode(
               mana([generic(1)]),
               instruct(
-                this,
+                ownName,
                 dealDamage(amount = 2, recipient = each(nominal(pre = [outlaw], creature))))),
             plusMode(
               mana([generic(1)]),
               instruct(
-                this,
+                ownName,
                 dealDamage(
                   amount = 2,
                   recipient = each(nominal(pre = [non(outlaw)], creature)))))]))]})

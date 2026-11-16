@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       menace,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(shortenedName), enter),
         sequentially([
             instruct(target(opponent), lookAt(topSlice(3))),
             instruct(they, separateIntoPiles(them, 2, faces = [faceDown, faceUp])),

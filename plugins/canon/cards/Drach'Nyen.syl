@@ -5,7 +5,7 @@ card singleFaced({
     types = [artifact],
     subtypes = [equipment],
     text = [
-      when(does(actor(thisEquipment), enter), exile(targets(upTo(1), creature))),
+      when(does(actor(ownName), enter), exile(targets(upTo(1), creature))),
       static(
         conjunction([
             abilityGrant(equipped(creature), [menace]),

@@ -3,10 +3,10 @@ card singleFaced({
     supertypes = [legendary, snow],
     types = [land],
     text = [
-      static(entersWithCounters(thisLand, 10, iceCounter)),
-      activated(mana([generic(3)]), removeCounters(exactly(1), printedKind(iceCounter), thisLand)),
+      static(entersWithCounters(ownName, 10, iceCounter)),
+      activated(mana([generic(3)]), removeCounters(exactly(1), printedKind(iceCounter), ownName)),
       when(
-        stateHolds(not(is(thisLand, hasCounter(kind = iceCounter)))),
+        stateHolds(not(is(ownName, hasCounter(kind = iceCounter)))),
         doIfDone(
           sacrifice(it),
           ifDid = create(

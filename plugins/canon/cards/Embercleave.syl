@@ -11,7 +11,7 @@ card singleFaced({
           this,
           less(forEach(1, nominal(pre = [attacking], creature, post = [youControl]))))),
       when(
-        does(actor(thisEquipment), enter),
+        does(actor(ownName), enter),
         attachTo(it, target(nominal(creature, post = [youControl])))),
       static(
         conjunction([

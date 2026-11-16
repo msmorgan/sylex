@@ -14,7 +14,7 @@ card singleFaced({
             does(
               actor(a(nominal(pre = [creature], card, post = [in(yourGraveyard)]))),
               leave(from = yourGraveyard))]),
-        instruct(this, dealDamage(amount = 1, recipient = eachOpponent))),
+        instruct(shortenedName, dealDamage(amount = 1, recipient = eachOpponent))),
       activated(mana([generic(1), pip(black)]), instruct(eachPlayer, mill(1)))],
     power = 5,
     toughness = 4})

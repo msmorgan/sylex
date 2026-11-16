@@ -2,9 +2,9 @@
 //!
 //! This module checks the notation's syntax alone: Holes, `~` ties, `@Form`
 //! labels, `*` sentence-run marks, `#<…>` list joins, `< … >` optional parts,
-//! `%` Tails and the `^` Gap. Load rules that inspect a declaration's
-//! parameters, the lexicon or the English grammar live outside the notation
-//! parser.
+//! `%` Tails, `#` and `##` own-name tokens, and the `^` Gap. Load rules that
+//! inspect a declaration's parameters, the lexicon or the English grammar live
+//! outside the notation parser.
 
 /// A byte range within a `spelling` string.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -31,6 +31,9 @@ impl Span {
 pub enum Spelling {
     /// `^`: the whole `spelling` of a word that stands for a Gap.
     Gap(Span),
+    /// `#` or `##`: the whole `spelling` of an own-name word (`#` full, `##`
+    /// Shortened Name).
+    OwnName(OwnName, Span),
     /// `part* [tail]`: fixed text, Holes and optional parts, with an optional
     /// trailing Tail.
     Parts {
@@ -40,11 +43,21 @@ pub enum Spelling {
     },
 }
 
+/// Which form of the enclosing object's own name a [`Spelling::OwnName`]
+/// spells (`docs/design/spelling.md` §7).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum OwnName {
+    /// `#`: the full name (`[CR#201.5]`).
+    Full,
+    /// `##`: the Shortened Name (`[CR#201.5c]`).
+    Shortened,
+}
+
 impl Spelling {
     #[must_use]
     pub const fn span(&self) -> Span {
         match self {
-            Self::Gap(span) | Self::Parts { span, .. } => *span,
+            Self::Gap(span) | Self::OwnName(_, span) | Self::Parts { span, .. } => *span,
         }
     }
 }
@@ -94,10 +107,7 @@ pub enum HoleKind {
         suffix: Option<Affix>,
     },
     /// `"$" name "#<" join ">"`: a `List` parameter.
-    List {
-        join: Join,
-        join_span: Span,
-    },
+    List { join: Join, join_span: Span },
 }
 
 /// Bound letters tied to a [`Hole`] by `~`.
@@ -286,6 +296,12 @@ pub enum ErrorKind {
 pub fn parse(input: &str) -> Result<Spelling, Error> {
     if input == "^" {
         return Ok(Spelling::Gap(Span::new(0, 1)));
+    }
+    if input == "#" {
+        return Ok(Spelling::OwnName(OwnName::Full, Span::new(0, 1)));
+    }
+    if input == "##" {
+        return Ok(Spelling::OwnName(OwnName::Shortened, Span::new(0, 2)));
     }
     let mut parser = Parser { input, pos: 0 };
     let (parts, tail) = parser.sequence(false, None)?;
@@ -707,10 +723,7 @@ impl Parser<'_> {
             self.pos += c.len_utf8();
         }
         let category = &self.input[cat_start..self.pos];
-        let valid_category = category
-            .chars()
-            .next()
-            .is_some_and(char::is_uppercase)
+        let valid_category = category.chars().next().is_some_and(char::is_uppercase)
             && category.chars().all(is_letter);
         if !valid_category {
             let end = if self.pos > cat_start {

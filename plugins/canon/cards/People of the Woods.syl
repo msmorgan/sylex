@@ -3,5 +3,5 @@ card singleFaced({
     cost = [pip(green), pip(green)],
     types = [creature],
     subtypes = [human],
-    text = [static(definesToughness(thisCreature, countOf(nominal(forest, post = [youControl]))))],
+    text = [static(definesToughness(ownName, countOf(nominal(forest, post = [youControl]))))],
     power = 1})

@@ -9,8 +9,8 @@ card singleFaced({
       static(cant(actor(you), cast(this, from = not(yourGraveyard)))),
       static(
         asLongAs(
-          is(this, in(battlefield)),
+          is(shortenedName, in(battlefield)),
           can(actor(you), cast(bare(nominal(pre = [knight], spell)), from = yourGraveyard)))),
-      when(does(actor(thisCreature), die), loseLife(2))],
+      when(does(actor(shortenedName), die), loseLife(2))],
     power = 3,
     toughness = 3})

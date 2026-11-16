@@ -10,7 +10,7 @@ card split({
         sequentially([
             instruct(target(player), sacrifice(aTheirChoice(or([artifact, creature])))),
             instruct(
-              this,
+              ownName,
               dealDamage(
                 amount = statOf(stat(manaValue), that(permanent)),
                 recipient = that(player)))]))]},

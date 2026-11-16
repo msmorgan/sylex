@@ -9,7 +9,7 @@ card singleFaced({
     subtypes = [human, mutant, scout],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(shortenedName), enter),
         sequentially([
             gainControl(
               target(nominal(creature, post = [anOpponentControls])),

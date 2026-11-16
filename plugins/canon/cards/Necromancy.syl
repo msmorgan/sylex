@@ -13,7 +13,9 @@ card singleFaced({
                   addSubtype(it, aura),
                   abilityGrant(
                     it,
-                    [enchant(and([hasType(creature), did(by(this), putOntoBattlefield(which))]))])],
+                    [
+                      enchant(
+                        and([hasType(creature), did(by(ownName), putOntoBattlefield(which))]))])],
                 subject = it)),
             putOntoBattlefieldUnderYourControl(
               target(nominal(pre = [creature], card, post = [in(graveyard)]))),

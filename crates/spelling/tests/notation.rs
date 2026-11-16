@@ -8,6 +8,7 @@ use sylex_spelling::HoleKind;
 use sylex_spelling::Join;
 use sylex_spelling::Mark;
 use sylex_spelling::Optional;
+use sylex_spelling::OwnName;
 use sylex_spelling::Part;
 use sylex_spelling::Span;
 use sylex_spelling::Spelling;
@@ -25,6 +26,30 @@ fn kind_of(input: &str) -> ErrorKind {
 #[test]
 fn parses_gap() {
     assert_eq!(parse("^"), Ok(Spelling::Gap(Span::new(0, 1))));
+}
+
+#[test]
+fn parses_own_name_tokens_and_refuses_stray_hashes() {
+    assert_eq!(
+        parse("#"),
+        Ok(Spelling::OwnName(OwnName::Full, Span::new(0, 1)))
+    );
+    assert_eq!(
+        parse("##"),
+        Ok(Spelling::OwnName(OwnName::Shortened, Span::new(0, 2)))
+    );
+    for input in [
+        "###",
+        "# ",
+        " #",
+        "deals # damage",
+        "<#>",
+        "## ",
+        " ##",
+        "$a %Clause: #",
+    ] {
+        assert_eq!(kind_of(input), ErrorKind::UnexpectedMark('#'), "{input}");
+    }
 }
 
 #[test]
@@ -365,10 +390,7 @@ fn refuses_join_chosen_by_a_parameter_and_unknown_joins() {
         kind_of("$xs#<$name>"),
         ErrorKind::ParameterJoin("$name".to_owned())
     );
-    assert_eq!(
-        kind_of("$xs#<;>"),
-        ErrorKind::UnknownJoin(";".to_owned())
-    );
+    assert_eq!(kind_of("$xs#<;>"), ErrorKind::UnknownJoin(";".to_owned()));
     assert_eq!(
         kind_of("$xs#< and >"),
         ErrorKind::UnknownJoin(" and ".to_owned())
@@ -411,7 +433,15 @@ fn refuses_second_or_nested_tail() {
 
 #[test]
 fn refuses_gap_that_is_not_the_whole_spelling() {
-    for input in ["^ ", " ^", "cast ^", "^^", "<^>", "$a %Clause: ^", "$xs#<^>"] {
+    for input in [
+        "^ ",
+        " ^",
+        "cast ^",
+        "^^",
+        "<^>",
+        "$a %Clause: ^",
+        "$xs#<^>",
+    ] {
         assert_eq!(kind_of(input), ErrorKind::GapNotWholeSpelling, "{input}");
     }
 }

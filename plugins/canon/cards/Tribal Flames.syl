@@ -8,7 +8,7 @@ card singleFaced({
       domain(
         spell(
           sequentially([
-              instruct(this, dealDamage(amount = letter(x), recipient = target(anyTarget))),
+              instruct(ownName, dealDamage(amount = letter(x), recipient = target(anyTarget))),
               define(
                 x,
                 distinctCount(

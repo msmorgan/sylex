@@ -10,7 +10,7 @@ card singleFaced({
         sequentially([
             counter(target(nominal(pre = [creature], spell))),
             instruct(
-              thisSpell,
+              ownName,
               dealDamage(
                 amount = statOf(stat(power), that(spell)),
                 recipient = controllerOf(it)))]))]})

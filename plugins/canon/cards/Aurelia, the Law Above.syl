@@ -11,7 +11,8 @@ card singleFaced({
       whenever(does(actor(a(player)), attackWith(counted(orMore(3), creature))), draw(1)),
       whenever(
         does(actor(a(player)), attackWith(counted(orMore(5), creature))),
-        sequentially(
-          [instruct(this, dealDamage(amount = 3, recipient = eachOpponent)), gainLife(3)]))],
+        sequentially([
+            instruct(shortenedName, dealDamage(amount = 3, recipient = eachOpponent)),
+            gainLife(3)]))],
     power = 4,
     toughness = 4})

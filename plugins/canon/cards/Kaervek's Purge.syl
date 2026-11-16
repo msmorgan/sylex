@@ -9,7 +9,7 @@ card singleFaced({
             doIf(
               did(actor(that(creature)), die, thisWay),
               instruct(
-                this,
+                ownName,
                 dealDamage(
                   amount = powerOf(that(creature)),
                   recipient = controllerOf(that(creature)))))]))]})

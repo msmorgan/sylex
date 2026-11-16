@@ -8,14 +8,14 @@ card singleFaced({
     subtypes = [human, warrior],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(shortenedName), enter),
         sequentially([
             gainDesignation(target(opponent), monarch),
             establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
       static(
         onlyWhile(
           replace(
-            would(any, dealDamage(recipient = thisCreature)),
+            would(any, dealDamage(recipient = shortenedName)),
             instead(
               preventDamage(
                 allDamage,

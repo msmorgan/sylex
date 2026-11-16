@@ -16,7 +16,7 @@ card singleFaced({
           less(2))),
       whenever(
         does(
-          actor(or([thisCreature, a(nominal(pre = [other], sphinx, post = [youControl]))])),
+          actor(or([shortenedName, a(nominal(pre = [other], sphinx, post = [youControl]))])),
           enter),
         sequentially([
             reveal(topSlice(4)),

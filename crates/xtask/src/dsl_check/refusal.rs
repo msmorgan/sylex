@@ -213,12 +213,18 @@ pub enum RefusalKind {
     DuplicateSharedVerb { lemma: String, verb: String },
     #[error("`nominal` with neither `pre` nor `post` adds no modifier; write the head")]
     RedundantNominal,
-    #[error("`nominal` directly inside `nominal`; combine their `pre` and `post` lists on one `nominal`")]
+    #[error(
+        "`nominal` directly inside `nominal`; combine their `pre` and `post` lists on one `nominal`"
+    )]
     NestedNominal,
     #[error("`stacked` stands only as an arm of a `PreModifier` coordination")]
     UnplacedStacked,
     #[error("an Agreement postmodifier requires an enclosing plural group determiner")]
     AgreementWithoutGroup,
+    #[error("`{0}` stands only in a card face, never in builtin")]
+    OwnNameInBuiltin(String),
+    #[error("`{word}` requires a card face with a Shortened Name; `{face}` has none")]
+    ShortenedNameWithoutShortening { word: String, face: String },
     #[error("dependency cycle: {}", .0.join(" -> "))]
     Cycle(Vec<String>),
 }

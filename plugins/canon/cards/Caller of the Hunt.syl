@@ -8,5 +8,5 @@ card singleFaced({
         addedCost(this, mandatory, plusAdditional(perform(choose(a(quality(subtype(creature)))))))),
       static(
         definesPt(
-          thisCreature,
+          ownName,
           countOf(nominal(creature, post = [ofChosen(subtype(creature)), in(battlefield)]))))]})

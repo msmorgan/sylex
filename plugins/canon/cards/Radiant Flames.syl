@@ -5,4 +5,6 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        instruct(this, dealDamage(amount = colorsSpentToCast(this), recipient = each(creature))))]})
+        instruct(
+          ownName,
+          dealDamage(amount = colorsSpentToCast(this), recipient = each(creature))))]})

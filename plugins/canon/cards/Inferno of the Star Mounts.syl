@@ -11,7 +11,7 @@ card singleFaced({
       activated(
         mana([pip(red)]),
         triggerThisWay(
-          get(thisCreature, up(1), up(0), duration = untilEndOfTurn),
+          get(ownName, up(1), up(0), duration = untilEndOfTurn),
           stateHolds(compareAmt(powerOf(it), equal, 20)),
           instruct(it, dealDamage(amount = 20, recipient = target(anyTarget)))))],
     power = 6,

@@ -14,6 +14,6 @@ card singleFaced({
             anyAmount,
             printedKind(p1p1Counter),
             a(nominal(creature, post = [youControl])))),
-        instruct(thisCreature, dealDamage(amount = thatMuch, recipient = target(opponent))))],
+        instruct(ownName, dealDamage(amount = thatMuch, recipient = target(opponent))))],
     power = 3,
     toughness = 3})

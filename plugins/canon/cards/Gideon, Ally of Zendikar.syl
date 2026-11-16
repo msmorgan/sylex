@@ -10,7 +10,7 @@ card singleFaced({
         sequentially([
             establishThroughout(
               qualityChange(
-                thisPlaneswalker,
+                shortenedName,
                 sets,
                 bundle({
                     characteristics = {

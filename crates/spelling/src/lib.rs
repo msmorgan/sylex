@@ -14,6 +14,7 @@ pub use notation::HoleKind;
 pub use notation::Join;
 pub use notation::Mark;
 pub use notation::Optional;
+pub use notation::OwnName;
 pub use notation::Part;
 pub use notation::Span;
 pub use notation::Spelling;

@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       static(
         enters(
-          thisCreature,
+          shortenedName,
           [
             withCounters(
               1,
@@ -15,7 +15,7 @@ card singleFaced({
               fresh)])),
       whenever(
         does(actor(a(nominal(pre = [non(token)], creature, post = [youControl]))), enter),
-        if = is(thisCreature, hasCounter),
+        if = is(shortenedName, hasCounter),
         doForEachKind(
           counterKind,
           domain = thisCreature,

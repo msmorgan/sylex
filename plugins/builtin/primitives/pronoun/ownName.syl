@@ -1,0 +1,7 @@
+# The enclosing object's own full name [CR#201.5,201.5b]: on a card face, that face's name; on a
+# named token, the name its creating effect sets [CR#111.4]; inside an ability granted to another
+# object, semantics resolves whether it names the ability's bearer or the granting source
+# [CR#201.5a].
+primitive ownName: NounPhrase = OwnName {
+  spelling = "#"
+}

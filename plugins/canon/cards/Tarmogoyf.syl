@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       static(
         definesPowerAndToughness(
-          thisCreature,
+          ownName,
           distinctCount(cardType, allOf(nominal(card, post = [in(graveyard)]))),
           plus(distinctCount(cardType, allOf(nominal(card, post = [in(graveyard)]))), 1)))]})

@@ -14,4 +14,4 @@ card singleFaced({
         costShift(
           this,
           less(forEach(1, nominal(creature, post = [was(tap(which), within = thisWay)]))))),
-      spell(instruct(this, dealDamage(amount = 10, recipient = target(anyTarget))))]})
+      spell(instruct(ownName, dealDamage(amount = 10, recipient = target(anyTarget))))]})

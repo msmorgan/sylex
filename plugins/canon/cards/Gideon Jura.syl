@@ -10,7 +10,7 @@ card singleFaced({
         establishThroughout(
           must(
             actor(allOf(nominal(creature, post = [controlledBy(target(opponent))]))),
-            attack(defender = thisPlaneswalker)),
+            attack(defender = ownName)),
           duringNextTurnOf(that(player)))),
       activated(loyaltySymbol(down(2)), destroy(target(nominal(pre = [tapped], creature)))),
       activated(
@@ -18,7 +18,7 @@ card singleFaced({
         sequentially([
             establishThroughout(
               qualityChange(
-                thisPlaneswalker,
+                ownName,
                 sets,
                 bundle({
                     characteristics = {

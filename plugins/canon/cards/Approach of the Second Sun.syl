@@ -17,4 +17,4 @@ card singleFaced({
                       post = [named(printedName("Approach of the Second Sun"))]))),
                 within(thisGame))]),
           winGame,
-          otherwise = sequentially([putInto(this, fromTop(7, library)), gainLife(7)])))]})
+          otherwise = sequentially([putInto(ownName, fromTop(7, library)), gainLife(7)])))]})

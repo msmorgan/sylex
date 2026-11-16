@@ -10,7 +10,7 @@ card singleFaced({
         establishThroughout(
           replace(
             would(any, dealDamage(recipient = target(nominal(pre = [white], creature)))),
-            instead(redirectDamage(theNext(1), thisCreature))),
+            instead(redirectDamage(theNext(1), ownName))),
           thisTurn))],
     power = 2,
     toughness = 4})

@@ -6,7 +6,7 @@ card singleFaced({
     subtypes = [faerie, noble],
     text = [
       flying,
-      static(entersChoosing(thisCreature, number)),
+      static(entersChoosing(shortenedName, number)),
       whenever(
         does(
           actor(anOpponent),

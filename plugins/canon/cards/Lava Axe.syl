@@ -4,4 +4,6 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        instruct(this, dealDamage(amount = 5, recipient = target(or([planeswalker, player])))))]})
+        instruct(
+          ownName,
+          dealDamage(amount = 5, recipient = target(or([planeswalker, player])))))]})

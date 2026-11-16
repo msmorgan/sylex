@@ -1,0 +1,6 @@
+# The enclosing face's Shortened Name, treated as its full name [CR#201.5c] and computed by
+# `sylex_vocabulary::short_name`.
+template shortenedName: NounPhrase {
+  spelling = "##",
+  body = ownName
+}

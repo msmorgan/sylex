@@ -15,13 +15,13 @@ card singleFaced({
                 creature,
                 post = [
                   did(
-                    actor(thisCreature),
+                    actor(shortenedName),
                     dealDamage(recipient = which),
                     within = within(soFarThisTurn))]))),
           die),
-        putCounters(1, printedKind(p1p1Counter), thisCreature)),
+        putCounters(1, printedKind(p1p1Counter), shortenedName)),
       whenever(
-        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
+        does(actor(shortenedName), dealDamage(kind = combat, recipient = a(player))),
         may(draw(1)))],
     power = 5,
     toughness = 5})

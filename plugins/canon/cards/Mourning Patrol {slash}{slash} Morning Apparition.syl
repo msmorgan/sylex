@@ -14,6 +14,6 @@ card transforming({
     text = [
       flying,
       vigilance,
-      static(replace(would(any, putInto(thisCreature, graveyard)), instead(exile(it))))],
+      static(replace(would(any, putInto(ownName, graveyard)), instead(exile(it))))],
     power = 2,
     toughness = 1})

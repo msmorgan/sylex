@@ -3,7 +3,7 @@ card singleFaced({
     supertypes = [legendary],
     types = [land],
     text = [
-      when(does(actor(thisLand), enter), scry(1)),
+      when(does(actor(ownName), enter), scry(1)),
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
         tapSymbol,

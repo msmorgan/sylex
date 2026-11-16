@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            instruct(this, dealDamage(amount = 3, recipient = target(anyTarget))),
+            instruct(ownName, dealDamage(amount = 3, recipient = target(anyTarget))),
             establishThroughout(
               cant(
                 any,
