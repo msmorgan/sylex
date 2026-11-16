@@ -3,7 +3,7 @@
 template lookAndSortSlice(
   slice: NounPhrase,
   spill: Location,
-  spillRiders: List(MoveRider) = []): Action {
+  spillRiders: List(MoveRider) = []): VerbPhrase {
   # TODO(spelling): Format and coordinate the spillRiders list entries, including the empty case.
   body = sequentially([
       expose(lookAt, cards($slice)),

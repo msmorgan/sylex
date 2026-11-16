@@ -70,14 +70,14 @@ fn destroy_contains_die_with_its_subject_bound() {
         probe(
             "probeDestroy",
             &[("x", "NounPhrase")],
-            "Action",
+            "VerbPhrase",
             "destroy($x)",
         ),
-        probe("probeDie", &[], "Action", "die"),
+        probe("probeDie", &[], "VerbPhrase", "die"),
     ];
     with_probes(probes, |_, expander| {
-        let destroy = expander.term("probeDestroy", "Action").unwrap();
-        let die = bind_subject(&expander.term("probeDie", "Action").unwrap(), &x());
+        let destroy = expander.term("probeDestroy", "VerbPhrase").unwrap();
+        let die = bind_subject(&expander.term("probeDie", "VerbPhrase").unwrap(), &x());
         let Node::Mark {
             definition, body, ..
         } = &destroy
@@ -208,14 +208,14 @@ fn a_definition_call_is_one_mark_with_its_deed() {
             } else {
                 format!("{action}({})", reads.join(", "))
             };
-            probe(&probe_name(action), &params, "Action", &call)
+            probe(&probe_name(action), &params, "VerbPhrase", &call)
         })
         .collect();
     with_probes(probes, |checked, expander| {
         let mut failures = Vec::new();
         for (action, _) in &actions {
-            let expansion = expander.term(&probe_name(action), "Action").unwrap();
-            let decl = expander.declaration(action, "Action").unwrap();
+            let expansion = expander.term(&probe_name(action), "VerbPhrase").unwrap();
+            let decl = expander.declaration(action, "VerbPhrase").unwrap();
             let stated = stated_deed(decl);
             let Node::Mark {
                 definition,
@@ -282,7 +282,7 @@ fn named_deeds_are_carried_as_stated() {
             probe(
                 &format!("probeDeed_{action}"),
                 &[("x", "NounPhrase")],
-                "Action",
+                "VerbPhrase",
                 &format!("{action}($x)"),
             )
         })
@@ -290,7 +290,7 @@ fn named_deeds_are_carried_as_stated() {
     with_probes(probes, |_, expander| {
         for (action, deed) in expected {
             let expansion = expander
-                .term(&format!("probeDeed_{action}"), "Action")
+                .term(&format!("probeDeed_{action}"), "VerbPhrase")
                 .unwrap();
             let Node::Mark {
                 definition,
@@ -311,9 +311,9 @@ fn named_deeds_are_carried_as_stated() {
 #[test]
 fn an_omitted_argument_takes_its_default() {
     with_probes(
-        vec![probe("probeEnter", &[], "Action", "enter")],
+        vec![probe("probeEnter", &[], "VerbPhrase", "enter")],
         |_, expander| {
-            let expansion = expander.term("probeEnter", "Action").unwrap();
+            let expansion = expander.term("probeEnter", "VerbPhrase").unwrap();
             let Node::Call { word, args, .. } = &expansion else {
                 panic!("enter expands to no call:\n{expansion}");
             };
@@ -367,14 +367,24 @@ fn an_observation_has_no_instruction_and_no_other_participant() {
     ];
     let mut probes = Vec::new();
     for (word, params) in observations {
-        probes.push(probe(&format!("probeDefault_{word}"), &[], "Action", word));
+        probes.push(probe(
+            &format!("probeDefault_{word}"),
+            &[],
+            "VerbPhrase",
+            word,
+        ));
         if !params.is_empty() {
             let named: Vec<String> = params
                 .iter()
                 .map(|(name, _)| format!("{name} = ${name}"))
                 .collect();
             let term = format!("{word}({})", named.join(", "));
-            probes.push(probe(&format!("probeFree_{word}"), params, "Action", &term));
+            probes.push(probe(
+                &format!("probeFree_{word}"),
+                params,
+                "VerbPhrase",
+                &term,
+            ));
         }
     }
     let names: Vec<String> = probes
@@ -384,7 +394,7 @@ fn an_observation_has_no_instruction_and_no_other_participant() {
     with_probes(probes, |_, expander| {
         let mut failures = Vec::new();
         for name in names {
-            let expansion = expander.term(&name, "Action").unwrap();
+            let expansion = expander.term(&name, "VerbPhrase").unwrap();
             for node in expansion.descendants() {
                 let offends = match node {
                     Node::Call { word, .. } if word == INSTRUCT_WORD => true,

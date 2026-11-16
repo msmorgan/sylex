@@ -2,4 +2,4 @@
 primitive separateIntoPiles(
   group: NounPhrase,
   piles: Nat,
-  faces: List(PileFace) = []): Action = SeparateIntoPiles
+  faces: List(PileFace) = []): VerbPhrase = SeparateIntoPiles

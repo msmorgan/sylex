@@ -1,5 +1,5 @@
 # "turn <subject> face up"
-template turnFaceUp(subject: NounPhrase): Action {
+template turnFaceUp(subject: NounPhrase): VerbPhrase {
   spelling = "turn $subject face up",
   body = setStatus(faceUp, $subject)
 }

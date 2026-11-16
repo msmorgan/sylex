@@ -3,7 +3,7 @@ template get(
   subject: NounPhrase,
   powerValue: Delta(Amount),
   toughnessValue: Delta(Amount),
-  duration: Option(Duration) = none): Action {
+  duration: Option(Duration) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by duration.
   body = establish(getsPt($subject, $powerValue, $toughnessValue), duration = $duration)
 }

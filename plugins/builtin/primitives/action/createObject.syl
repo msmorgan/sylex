@@ -2,4 +2,4 @@
 primitive createObject(
   count: Amount,
   spec: CreationSpec,
-  under: Option(NounPhrase) = none): Action = CreateObject
+  under: Option(NounPhrase) = none): VerbPhrase = CreateObject

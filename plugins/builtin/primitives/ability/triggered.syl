@@ -6,5 +6,5 @@
 primitive triggered(
   condition: TriggerCondition,
   intervening: Option(Condition) = none,
-  action: Action,
+  action: VerbPhrase,
   limit: Option(UsageLimit) = none): Ability = Triggered

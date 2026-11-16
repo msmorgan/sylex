@@ -1,6 +1,6 @@
 # The accumulated magnitude of historical action events.
 template eventSum(
-  action: Action,
+  action: VerbPhrase,
   subj: Subject,
   within: Duration,
   timing: Option(Timing) = none): Amount {

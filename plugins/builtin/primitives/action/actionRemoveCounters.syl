@@ -2,4 +2,4 @@
 primitive actionRemoveCounters(
   quantity: Option(Quantity),
   kind: Option(CounterKindSource),
-  from: NounPhrase): Action = RemoveCounters
+  from: NounPhrase): VerbPhrase = RemoveCounters

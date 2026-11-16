@@ -1,6 +1,6 @@
 # Perform an action and select its continuation according to the continuation policy.
 primitive withContinuation(
   policy: ContinuationPolicy,
-  body: Action,
-  ifDid: Option(Action) = none,
-  ifNot: Option(Action) = none): Action = WithContinuation
+  body: VerbPhrase,
+  ifDid: Option(VerbPhrase) = none,
+  ifNot: Option(VerbPhrase) = none): VerbPhrase = WithContinuation

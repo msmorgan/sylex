@@ -435,7 +435,7 @@ are found over enumerated candidates or over a packed form is open (§6).
    read is not designed.
 5. **Words that meet at one sort.** A name is unique at its sort (`syl.md` §3), and clauses that
    stood at `Condition`, `GameEvent`, `StaticSpec` and `Replacement` stand at `Clause`. `doIf`
-   is declared at `Action` and at `Replacement`, `replace` at `Action` and at `StaticSpec`,
+   is declared at `VerbPhrase` and at `Replacement`, `replace` at `VerbPhrase` and at `StaticSpec`,
    `nthOccurrence` at three sorts and `or` at ten. Each set that meets is one word, where its
    members print alike and differ only in what they mean, or needs names that tell its members
    apart. None has been examined.
@@ -445,7 +445,7 @@ are found over enumerated candidates or over a packed form is open (§6).
    it.
 7. **Which rules data becomes clauses and which sorts stay as frames**
    ([`surface.md`](./surface.md) §4): a fair amount of the first and a fair few of the second,
-   declaration by declaration. With it, what replaces `Condition` and `Action` where a clause is
+   declaration by declaration. With it, what replaces `Condition` and `VerbPhrase` where a clause is
    held: `SbaRule`'s `when` and `then`, the `intervening` parameter of `triggered`, a deontic
    rule's Unless Condition.
 8. **Whether the four steps run once in order.** "The same is true for …" (*Soulflayer*) takes

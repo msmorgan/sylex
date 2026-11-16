@@ -1,2 +1,2 @@
 # An instant or sorcery's spell ability: `body`, as it resolves [CR#113.3a].
-primitive spell(action: Action, timing: Option(Timing) = none): Ability = Spell
+primitive spell(action: VerbPhrase, timing: Option(Timing) = none): Ability = Spell

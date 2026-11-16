@@ -1,4 +1,4 @@
 # Choose new targets for the subject.
-primitive chooseNewTargets(subject: NounPhrase): Action = ChooseNewTargets {
+primitive chooseNewTargets(subject: NounPhrase): VerbPhrase = ChooseNewTargets {
   spelling = "choose new targets for $subject"
 }

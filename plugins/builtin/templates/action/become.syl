@@ -2,7 +2,7 @@
 template become(
   subject: NounPhrase,
   added: CharacteristicBundle,
-  duration: Option(Duration) = none): Action {
+  duration: Option(Duration) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by duration.
   body = establish(qualityChange($subject, adds, bundle($added)), duration = $duration)
 }

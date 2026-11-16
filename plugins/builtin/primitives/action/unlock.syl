@@ -1,4 +1,4 @@
 # Unlock the specified door [CR#709.5f].
-primitive unlock(door: Door): Action = Unlock {
+primitive unlock(door: Door): VerbPhrase = Unlock {
   spelling = "unlock $door"
 }

@@ -1,5 +1,5 @@
 # "unattach <subject>"
-template unattach(subject: NounPhrase): Action {
+template unattach(subject: NounPhrase): VerbPhrase {
   spelling = "unattach $subject",
   body = attachment(unattached, $subject)
 }

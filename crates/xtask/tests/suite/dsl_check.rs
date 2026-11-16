@@ -439,7 +439,7 @@ fn a_supertype_is_a_catalog_declaration() {
 fn a_rules_row_writes_its_record_as_its_body() {
     let preamble = "primitive yes: Predicate = Yes\n\
                     primitive always: Condition = Always\n\
-                    primitive nothing: Action = Nothing\n";
+                    primitive nothing: VerbPhrase = Nothing\n";
     let source = format!(
         "{preamble}\
          sba a {{ body = {{ scope = yes, when = always, then = nothing }} }}\n\
@@ -473,7 +473,7 @@ fn a_rules_row_writes_its_record_as_its_body() {
 fn a_rules_row_is_a_nameable_catalog_declaration() {
     let preamble = "primitive yes: Predicate = Yes\n\
                     primitive always: Condition = Always\n\
-                    primitive nothing: Action = Nothing\n\
+                    primitive nothing: VerbPhrase = Nothing\n\
                     primitive property(spec: StaticSpec): Conferral = Property\n\
                     primitive exempt(rule: SbaRule): StaticSpec = Exempt\n\
                     primitive grants(rule: ConferralRule): StaticSpec = Grants\n";
@@ -655,7 +655,7 @@ fn two_declarations_at_one_name_and_sort_are_refused() {
              template item: Int { body = 2 }\n\
              ability kicker { }\n\
              template kicker: KeywordLabel { body = kicker }\n\
-             primitive nothing: Action = Nothing\n\
+             primitive nothing: VerbPhrase = Nothing\n\
              action scry { body = nothing }\n\
              template scry: Deed { body = scry }"
         ),
@@ -678,7 +678,7 @@ fn two_declarations_at_one_name_and_sort_are_refused() {
 
 #[test]
 fn an_action_declares_a_deed_unless_it_is_deedless() {
-    let preamble = "primitive nothing: Action = Nothing\nability crew { }\n";
+    let preamble = "primitive nothing: VerbPhrase = Nothing\nability crew { }\n";
     let source = format!(
         "{preamble}\
          action scry {{ body = nothing }}\n\
@@ -783,8 +783,8 @@ fn a_keyword_label_primitive_builds_only_its_own_name() {
     );
 }
 
-const RING: &str = "primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope\n\
-                    primitive nothing: Action = Nothing\n\
+const RING: &str = "primitive ownScope(deed: Option(Deed), body: VerbPhrase): VerbPhrase = OwnScope\n\
+                    primitive nothing: VerbPhrase = Nothing\n\
                     action theRingTemptsYou { body = ownScope(theRingTemptsYou, nothing) }";
 
 #[test]
@@ -796,31 +796,31 @@ fn only_the_rings_file_may_build_its_own_scope() {
             (ring, RING),
             (
                 "elsewhere.syl",
-                "template t: Action { body = ownScope(none, nothing) }"
+                "template t: VerbPhrase { body = ownScope(none, nothing) }"
             )
         ]),
         [(
-            RefusalKind::ReservedConstructor(s("Action.OwnScope")),
+            RefusalKind::ReservedConstructor(s("VerbPhrase.OwnScope")),
             s("ownScope")
         )]
     );
     // Elsewhere the declaration is refused; its calls are not refused again.
     assert_eq!(
         kinds(RING),
-        [RefusalKind::ReservedConstructor(s("Action.OwnScope"))]
+        [RefusalKind::ReservedConstructor(s("VerbPhrase.OwnScope"))]
     );
     // Only the builtin bundle's file is the Ring's.
     let builtin = bundle(
         "builtin",
         FileId(0),
-        &[("a.syl", "primitive nothing: Action = Nothing")],
+        &[("a.syl", "primitive nothing: VerbPhrase = Nothing")],
     );
     let other = bundle(
         "builtin",
         builtin.next_file_id(),
         &[(
             ring,
-            "primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope",
+            "primitive ownScope(deed: Option(Deed), body: VerbPhrase): VerbPhrase = OwnScope",
         )],
     );
     let Err(CheckError::Resolution { refusals, .. }) = check(&builtin, &[&other]) else {
@@ -828,7 +828,7 @@ fn only_the_rings_file_may_build_its_own_scope() {
     };
     assert_eq!(
         refusals[0].kind,
-        RefusalKind::ReservedConstructor(s("Action.OwnScope"))
+        RefusalKind::ReservedConstructor(s("VerbPhrase.OwnScope"))
     );
 }
 
@@ -1542,7 +1542,7 @@ fn a_nameless_header_on_a_named_kind_is_refused() {
 
 #[test]
 fn a_move_names_no_observation_point() {
-    let written = |action: &str| format!("template t: Action {{ body = {action} }}");
+    let written = |action: &str| format!("template t: VerbPhrase {{ body = {action} }}");
     // Whether a trigger looks back is derived [CR#603.10a..603.10f]; `move`
     // takes no point to write.
     assert_eq!(

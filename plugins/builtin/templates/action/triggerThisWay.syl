@@ -1,5 +1,5 @@
 # "<body>. When <event> this way, <trigger>" [CR#603.12]
-template triggerThisWay(body: Action, event: GameEvent, triggerBody: Action): Action {
+template triggerThisWay(body: VerbPhrase, event: GameEvent, triggerBody: VerbPhrase): VerbPhrase {
   spelling = "$body. When $event this way, $triggerBody.",
   body = triggerReflexively($body, $triggerBody, event = $event)
 }

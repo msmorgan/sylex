@@ -2,4 +2,4 @@
 # effect on the spell the mana is spent on [CR#106.6]. A restriction on what the mana can be spent
 # on is `spendOnly`.
 # TODO(spelling): The mode chooses cast, activation, or resolution wording.
-primitive whenSpentOn(mode: SpentMode, spell: NounPhrase, says: Action): ManaRider = OnSpent
+primitive whenSpentOn(mode: SpentMode, spell: NounPhrase, says: VerbPhrase): ManaRider = OnSpent

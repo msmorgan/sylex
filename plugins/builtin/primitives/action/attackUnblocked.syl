@@ -1,2 +1,2 @@
 # TODO(spelling): Include or omit the clauses supplied by defender.
-primitive attackUnblocked(defender: Option(NounPhrase)): Action = AttackUnblocked
+primitive attackUnblocked(defender: Option(NounPhrase)): VerbPhrase = AttackUnblocked

@@ -388,7 +388,7 @@ once in one of two ways:
   phrases under the one Construction that supplies their subject (not yet built, §2), and one
   `does` over an `or` of the Actions of "attacks or blocks" and of Chub Toad's "blocks or becomes
   blocked", `does(actor(thisCreature), or([block, becomeBlocked]))` (not yet built: no `or` stands
-  at `Action` under `plugins/builtin/`, the event gate refuses one (`semantics.md` §3.2,
+  at `VerbPhrase` under `plugins/builtin/`, the event gate refuses one (`semantics.md` §3.2,
   `surface.md` §7.5), `becomeBlocked` still takes its subject, and the
   `syl-shared-phrase-written-once` ticket settles both). The subject of Predator's Strike is no
   Handoff's, since a Handoff makes its subject the Actor and a creature that gets +3/+3 performs
@@ -571,7 +571,7 @@ agreement nor a governing word fixes it (§1). The forms are the lexicon's (`Num
   states it: *Approach of the Second Sun* prints one value both ways, "put Approach of the
   Second Sun into its owner's library seventh from the top and you gain 7 life", which is
   `fromTop`'s "$n@Ordinal from the top of $loc" and `gainLife`'s "gain $amount@Arabic life".
-- **A verb form on an `Action` Hole that nothing governs**: `Present`, `Preterite`,
+- **A verb form on a `VerbPhrase` Hole that nothing governs**: `Present`, `Preterite`,
   `PastParticiple` and `GerundParticiple`. After "can't" or "would" the verb is governed and
   nothing is written; in a clause whose Subject and Action are two Holes, nothing governs it, so
   `does` and `did` differ in their spelling, the first `@Present` ("this creature enters") and

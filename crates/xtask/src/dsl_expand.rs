@@ -63,7 +63,7 @@ enum What {
     /// A canon card, by its file's name (`Abrupt Decay`).
     Card { name: String },
     /// A term at a sort, its free values declared as parameters:
-    /// `term 'destroy($x)' --at Action --param x:NounPhrase`.
+    /// `term 'destroy($x)' --at VerbPhrase --param x:NounPhrase`.
     Term {
         term: String,
         /// The sort the term stands at.

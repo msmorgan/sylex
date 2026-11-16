@@ -3,6 +3,6 @@
 # [CR#603.12a].
 # TODO(spelling): Include or omit the clauses supplied by event.
 primitive triggerReflexively(
-  body: Action,
-  trigger: Action,
-  event: Option(GameEvent) = none): Action = TriggerReflexively
+  body: VerbPhrase,
+  trigger: VerbPhrase,
+  event: Option(GameEvent) = none): VerbPhrase = TriggerReflexively

@@ -1,2 +1,2 @@
 # A cost paid by performing an action.
-primitive perform(action: Action): Cost = Perform
+primitive perform(action: VerbPhrase): Cost = Perform

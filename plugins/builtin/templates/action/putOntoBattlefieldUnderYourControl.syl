@@ -1,7 +1,7 @@
 # "put <subject> [from <from>] onto the battlefield under your control"
 template putOntoBattlefieldUnderYourControl(
   subject: NounPhrase,
-  from: Location = anywhere): Action {
+  from: Location = anywhere): VerbPhrase {
   # TODO(spelling): Omit the origin phrase when from is anywhere; otherwise print 'from' and that
   # location.
   body = zoneChange($subject, battlefield, $from, [under(you)])

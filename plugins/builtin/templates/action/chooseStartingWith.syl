@@ -3,7 +3,7 @@ template chooseStartingWith(
   first: NounPhrase,
   chosen: NounPhrase,
   disclosure: Disclosure = openly,
-  when: Option(Timing) = none): Action {
+  when: Option(Timing) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by when.
   body = choose($chosen, disclosure = $disclosure, first = $first, when = $when)
 }

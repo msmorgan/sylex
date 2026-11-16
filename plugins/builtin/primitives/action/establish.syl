@@ -1,2 +1,2 @@
 # Put a Static Spec in force for the given duration.
-primitive establish(spec: StaticSpec, duration: Option(Duration) = none): Action = Establish
+primitive establish(spec: StaticSpec, duration: Option(Duration) = none): VerbPhrase = Establish

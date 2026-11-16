@@ -3,7 +3,7 @@
 # action's event, its subject a mention of its own read back from the action ("It can't be
 # regenerated"). A destroy with this rider is one no regeneration shield replaces
 # [CR#608.2c,701.19c].
-template doUnderProhibition(action: Action, forbidden: Action): Action {
+template doUnderProhibition(action: VerbPhrase, forbidden: VerbPhrase): VerbPhrase {
   spelling = "$action. $forbidden can't happen",
   body = sequentially(
     [$action, establish(cant(any, $forbidden), duration = modifiesPrecedingAction)])

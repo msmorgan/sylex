@@ -2,7 +2,7 @@
 template replaceNextEvent(
   clause: WouldClause,
   replacement: Replacement,
-  duration: Option(Duration)): Action {
+  duration: Option(Duration)): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by duration.
   body = establish(replace($clause, $replacement, use = nextTimeOnly), duration = $duration)
 }

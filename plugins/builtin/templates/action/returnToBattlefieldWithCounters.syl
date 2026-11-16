@@ -3,7 +3,7 @@ template returnToBattlefieldWithCounters(
   subject: NounPhrase,
   who: NounPhrase,
   amount: Amount,
-  kind: CounterKind): Action {
+  kind: CounterKind): VerbPhrase {
   spelling = "return $subject to the battlefield under $who's control with $amount $kind counters on it",
   body = zoneChange(
     $subject,

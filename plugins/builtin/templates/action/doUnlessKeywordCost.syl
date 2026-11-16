@@ -2,10 +2,10 @@
 # cost of `whose`, as cumulative upkeep's and echo's are [CR#702.24a,702.30a], so a trigger on paying
 # that cost and mana spendable only on it read this payment.
 template doUnlessKeywordCost(
-  action: Action,
+  action: VerbPhrase,
   cost: Cost,
   whose: NounPhrase,
-  keyword: KeywordLabel): Action {
+  keyword: KeywordLabel): VerbPhrase {
   spelling = "$action unless you pay $whose's $keyword cost",
   body = withContinuation(
     optional,

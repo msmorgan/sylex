@@ -5,7 +5,7 @@
 # cast each turn").
 template did(
   subj: Subject,
-  action: Action,
+  action: VerbPhrase,
   within: Option(LookbackSpan) = none,
   ordinal: Option(EventOrdinal) = none): Predicate {
   # TODO(spelling): Include or omit the clauses supplied by within, ordinal.

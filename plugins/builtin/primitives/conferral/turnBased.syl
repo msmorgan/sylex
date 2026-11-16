@@ -1,1 +1,1 @@
-primitive turnBased(part: TurnPart, then: Action): Conferral = TurnBased
+primitive turnBased(part: TurnPart, then: VerbPhrase): Conferral = TurnBased

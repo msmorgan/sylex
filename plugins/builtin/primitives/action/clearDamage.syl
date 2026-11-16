@@ -1,4 +1,4 @@
 # Remove marked damage from the subject.
-primitive clearDamage(subject: NounPhrase): Action = ClearDamage {
+primitive clearDamage(subject: NounPhrase): VerbPhrase = ClearDamage {
   spelling = "remove all damage marked on $subject"
 }

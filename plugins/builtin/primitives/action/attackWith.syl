@@ -2,4 +2,4 @@
 # TODO(spelling): Include or omit the clauses supplied by defender.
 primitive attackWith(
   attackers: NounPhrase,
-  defender: Option(NounPhrase) = none): Action = AttackWith
+  defender: Option(NounPhrase) = none): VerbPhrase = AttackWith

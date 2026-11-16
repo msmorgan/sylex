@@ -2,4 +2,4 @@
 primitive attachment(
   move: AttachMove,
   subject: NounPhrase,
-  host: Option(NounPhrase) = none): Action = Attachment
+  host: Option(NounPhrase) = none): VerbPhrase = Attachment

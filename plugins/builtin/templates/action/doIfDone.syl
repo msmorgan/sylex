@@ -1,8 +1,8 @@
 # "<body>. [If you do, <ifDid>.] [If you can't, <ifNot>.]": the body is required.
 template doIfDone(
-  body: Action,
-  ifDid: Option(Action) = none,
-  ifNot: Option(Action) = none): Action {
+  body: VerbPhrase,
+  ifDid: Option(VerbPhrase) = none,
+  ifNot: Option(VerbPhrase) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by ifDid, ifNot.
   body = withContinuation(required, $body, ifDid = $ifDid, ifNot = $ifNot)
 }

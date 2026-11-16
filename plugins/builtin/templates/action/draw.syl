@@ -1,5 +1,5 @@
 # "draw <amount> cards"
-template draw(amount: Amount): Action {
+template draw(amount: Amount): VerbPhrase {
   spelling = "draw $amount cards",
   body = drawCount(exactlyOf($amount))
 }

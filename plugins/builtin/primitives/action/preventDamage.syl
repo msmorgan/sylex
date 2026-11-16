@@ -5,4 +5,4 @@
 primitive preventDamage(
   cut: PreventCut,
   damage: Option(WouldClause) = none,
-  also: Option(Action) = none): Action = PreventDamage
+  also: Option(VerbPhrase) = none): VerbPhrase = PreventDamage

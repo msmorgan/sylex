@@ -4,7 +4,7 @@
 template preventAll(
   to: NounPhrase,
   duration: Option(Duration),
-  kind: Option(DamageKind) = none): Action {
+  kind: Option(DamageKind) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by duration, kind.
   body = establish(
     replace(

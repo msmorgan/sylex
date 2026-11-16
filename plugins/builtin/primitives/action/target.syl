@@ -1,4 +1,4 @@
 # "target <subject>": the act of targeting [CR#115.1].
-primitive target(subject: NounPhrase): Action = Target {
+primitive target(subject: NounPhrase): VerbPhrase = Target {
   spelling = "target $subject"
 }

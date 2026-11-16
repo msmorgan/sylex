@@ -1,5 +1,5 @@
 # "<subject> phases out" [CR#702.26b]
-template phaseOut: Action {
+template phaseOut: VerbPhrase {
   spelling = "phases out",
   body = setStatus(phasedOut, actor)
 }

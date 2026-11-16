@@ -1,5 +1,5 @@
 # "When <event> <duration>, <action>": a delayed trigger with a window.
-template delayWithin(event: GameEvent, duration: Duration, action: Action): Action {
+template delayWithin(event: GameEvent, duration: Duration, action: VerbPhrase): VerbPhrase {
   # TODO(spelling): The duration is printed after the event ("When you next cast … this turn",
   # Repeated Reverberation) or opens the sentence ("Until end of turn, whenever …", Bonus Round).
   body = delay($event, $action, duration = $duration)

@@ -2,11 +2,11 @@
 # act it permits [CR#608.2c] (`DeonticMods.rider`).
 template can(
   subj: Subject,
-  action: Action,
+  action: VerbPhrase,
   timing: Option(Timing) = none,
   asThough: Option(AsThough) = none,
   except: Option(DeonticExcept) = none,
-  rider: Option(Action) = none): StaticSpec {
+  rider: Option(VerbPhrase) = none): StaticSpec {
   # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, rider.
   body = staticSpecCan(
     $subj,

@@ -1,2 +1,2 @@
 # Repeat according to the specified repetition.
-primitive repeat(repetition: Repetition): Action = Repeat
+primitive repeat(repetition: Repetition): VerbPhrase = Repeat

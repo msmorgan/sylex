@@ -2,7 +2,7 @@
 # time the point comes [CR#603.7b].
 # TODO(spelling): The point is also printed after the action ("Put that card into your hand at the
 # beginning of your next end step", Necropotence).
-template atNext(point: TurnPoint, action: Action): Action {
+template atNext(point: TurnPoint, action: VerbPhrase): VerbPhrase {
   spelling = "At $point, $action.",
   body = delay(reached($point), $action)
 }

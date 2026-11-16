@@ -1,1 +1,1 @@
-primitive staticSpecCan(subj: Subject, action: Action, mods: DeonticMods): StaticSpec = Can
+primitive staticSpecCan(subj: Subject, action: VerbPhrase, mods: DeonticMods): StaticSpec = Can

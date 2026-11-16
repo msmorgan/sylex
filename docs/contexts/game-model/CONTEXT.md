@@ -90,9 +90,13 @@ What a bare "another" or "other" excludes when no "other than" is written.
 ## Actions
 
 **Action**:
-The bare infinitive verb phrase of one verb ("sacrifice a creature"). One Action serves every
-context: imperative, cost, trigger, replacement, prohibition, lookback and negative declarative
-("this effect doesn't remove this Aura").
+The verb phrase one verb's declaration builds ("sacrifice a creature"); its sort is `VerbPhrase`.
+One Action serves every context: imperative, cost, trigger, replacement, prohibition, lookback and
+negative declarative ("this effect doesn't remove this Aura").
+
+**Verb Phrase**:
+The sort `VerbPhrase`, named for the English grammar's Category of the same name: a verb phrase
+without its subject. It is the sort of Actions and the operators over them.
 
 **Instruction**:
 One executable step of core, the engine's AST. An Action is semantic and lowers to instructions.

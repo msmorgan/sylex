@@ -1,3 +1,6 @@
 # "When <event>, <body>" as a delayed trigger.
 # TODO(spelling): Include or omit the clauses supplied by duration.
-primitive delay(event: GameEvent, body: Action, duration: Option(Duration) = none): Action = Delay
+primitive delay(
+  event: GameEvent,
+  body: VerbPhrase,
+  duration: Option(Duration) = none): VerbPhrase = Delay

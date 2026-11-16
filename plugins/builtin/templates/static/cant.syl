@@ -6,7 +6,7 @@
 # unless that player controls …" [CR#205.4e].
 template cant(
   subj: Subject,
-  action: Action,
+  action: VerbPhrase,
   timing: Option(Timing) = none,
   asThough: Option(AsThough) = none,
   except: Option(DeonticExcept) = none,

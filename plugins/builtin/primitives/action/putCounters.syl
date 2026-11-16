@@ -2,6 +2,6 @@
 primitive putCounters(
   amount: Amount,
   kind: CounterKindSource,
-  on: NounPhrase): Action = PutCounters {
+  on: NounPhrase): VerbPhrase = PutCounters {
   spelling = "put $amount $kind counters on $on"
 }

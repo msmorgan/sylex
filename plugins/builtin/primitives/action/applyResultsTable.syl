@@ -3,4 +3,4 @@
 # `Quantity`, but it is a `RollWatch`, not a `Condition`, and declaration bodies are first-order
 # data with no higher-order parameters (`syl.md` §2), so no Template can turn each row into a
 # `doIf`.
-primitive applyResultsTable(rows: List(RollRow)): Action = ApplyResultsTable
+primitive applyResultsTable(rows: List(RollRow)): VerbPhrase = ApplyResultsTable

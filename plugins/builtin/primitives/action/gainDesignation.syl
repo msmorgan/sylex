@@ -2,4 +2,4 @@
 primitive gainDesignation(
   subject: NounPhrase,
   designation: DesignationLabel,
-  duration: Option(Duration) = none): Action = GainDesignation
+  duration: Option(Duration) = none): VerbPhrase = GainDesignation

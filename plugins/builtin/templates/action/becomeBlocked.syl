@@ -1,7 +1,7 @@
 # "<subject> becomes blocked": the Blocked status, which an effect can give an attacking creature
 # too, not a block by a particular creature [CR#509.1h,509.3c]. "Becomes blocked by <blocker>" stays
 # `block` with a `by` subject [CR#509.3d].
-template becomeBlocked(subject: NounPhrase): Action {
+template becomeBlocked(subject: NounPhrase): VerbPhrase {
   spelling = "$subject becomes blocked",
   body = combat($subject, participation(blocked))
 }

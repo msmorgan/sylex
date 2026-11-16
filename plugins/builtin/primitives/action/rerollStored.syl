@@ -2,4 +2,4 @@
 # for each, unstores the rerolled results and stores the new ones [CR#706.8b]. It is not
 # `rollDice` then `storeResults`: `rollDice` names the sides it rolls, while a reroll rolls the
 # kind each stored result noted, and nothing else unstores a result.
-primitive rerollStored(quantity: Quantity, whose: NounPhrase): Action = RerollStored
+primitive rerollStored(quantity: Quantity, whose: NounPhrase): VerbPhrase = RerollStored

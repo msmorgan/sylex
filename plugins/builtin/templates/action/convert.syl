@@ -2,7 +2,7 @@
 # [CR#701.28a,701.27a..701.27g]. Converting is transforming written with another verb: a "transforms into" trigger
 # sees either [CR#701.27f], and "can't transform" forbids either [CR#701.28g], so the word is this
 # Template's and the tree is `transform`'s.
-template convert(subject: NounPhrase): Action {
+template convert(subject: NounPhrase): VerbPhrase {
   lexical = {verbs = [{lemma = "convert", frames = [Monotransitive]}]},
   spelling = "convert $subject",
   body = transform($subject)

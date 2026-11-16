@@ -1,4 +1,4 @@
-template gainLife(amount: Amount): Action {
+template gainLife(amount: Amount): VerbPhrase {
   spelling = "gain $amount life",
   body = changeLife(up($amount))
 }

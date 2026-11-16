@@ -1,4 +1,4 @@
 # "draw up to N cards", "can't draw more than one card": a draw bounded by a Quantity.
-primitive drawCount(quantity: Quantity): Action = Draw {
+primitive drawCount(quantity: Quantity): VerbPhrase = Draw {
   spelling = "draw $quantity cards"
 }

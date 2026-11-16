@@ -8,7 +8,7 @@ template zoneChange(
   subject: NounPhrase,
   destination: Location,
   from: Location,
-  riders: List(MoveRider)): Action {
+  riders: List(MoveRider)): VerbPhrase {
   # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
   body = move($subject, $from, $destination, $riders)
 }

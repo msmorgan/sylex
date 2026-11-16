@@ -1,1 +1,1 @@
-primitive staticSpecMust(subj: Subject, action: Action, mods: DeonticMods): StaticSpec = Must
+primitive staticSpecMust(subj: Subject, action: VerbPhrase, mods: DeonticMods): StaticSpec = Must

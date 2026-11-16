@@ -1,2 +1,2 @@
 # Ignore the specified die-roll outcomes.
-primitive ignoreOutcomes(which: IgnoredOutcomes): Action = IgnoreOutcomes
+primitive ignoreOutcomes(which: IgnoredOutcomes): VerbPhrase = IgnoreOutcomes

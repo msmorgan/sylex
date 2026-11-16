@@ -167,9 +167,9 @@ pub const KINDS: &[Kind] = &[
         }),
         ..kind(
             "action",
-            "Action",
+            "VerbPhrase",
             &[
-                required("body", "Action"),
+                required("body", "VerbPhrase"),
                 // Step 6: explicit Deeds (a deed action kind) replace these
                 // three fields.
                 field("deed", "Option(String)"),
@@ -260,7 +260,7 @@ const EXPANSION_CONSTRUCTORS: &[(Option<&str>, &str)] = &[
     (None, "InCaller"),
     (Some("NounPhrase"), "FirstMention"),
     (Some("NounPhrase"), "LaterMention"),
-    (Some("Action"), "OwnScope"),
+    (Some("VerbPhrase"), "OwnScope"),
     (Some("Ability"), "Keyword"),
 ];
 
@@ -301,7 +301,7 @@ fn is_capitalized(name: &str, constructor: &str) -> bool {
 /// file may call it. `syl-ring-tempts-you-raw-scope` deletes this exception.
 pub const RING_EXCEPTION: (&str, &str) = (
     "definitions/keyword_action/theRingTemptsYou.syl",
-    "Action.OwnScope",
+    "VerbPhrase.OwnScope",
 );
 
 /// A record sort, written `{ field = value, ... }`: its fields, each with its
@@ -368,14 +368,14 @@ pub const RECORDS: &[RecordSort] = &[
             ("except", "Option(DeonticExcept)", true),
             ("cause", "Option(Causing)", true),
             ("unless", "Option(Condition)", true),
-            ("rider", "Option(Action)", true),
+            ("rider", "Option(VerbPhrase)", true),
         ],
     ),
     record(
         "DidClause",
         &[
             ("subj", "Subject", false),
-            ("action", "Action", false),
+            ("action", "VerbPhrase", false),
             ("within", "Option(LookbackSpan)", false),
             ("ordinal", "Option(EventOrdinal)", true),
         ],
@@ -410,7 +410,7 @@ pub const RECORDS: &[RecordSort] = &[
     record(
         "ManaSubstitute",
         &[
-            ("action", "Action", false),
+            ("action", "VerbPhrase", false),
             ("pays", "List(PipPaid)", false),
         ],
     ),
@@ -419,7 +419,7 @@ pub const RECORDS: &[RecordSort] = &[
         &[
             ("cost", "Option(Cost)", true),
             ("weight", "Option(Nat)", true),
-            ("action", "Action", false),
+            ("action", "VerbPhrase", false),
         ],
     ),
     record(
@@ -432,14 +432,17 @@ pub const RECORDS: &[RecordSort] = &[
     ),
     record(
         "RollRow",
-        &[("results", "Quantity", false), ("action", "Action", false)],
+        &[
+            ("results", "Quantity", false),
+            ("action", "VerbPhrase", false),
+        ],
     ),
     record(
         "SbaRule",
         &[
             ("scope", "Predicate", false),
             ("when", "Condition", false),
-            ("then", "Action", false),
+            ("then", "VerbPhrase", false),
         ],
     ),
     record(

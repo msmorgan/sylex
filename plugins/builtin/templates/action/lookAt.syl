@@ -1,4 +1,4 @@
-template lookAt(cards: NounPhrase): Action {
+template lookAt(cards: NounPhrase): VerbPhrase {
   spelling = "look at $cards",
   body = expose(lookAt, cards($cards))
 }

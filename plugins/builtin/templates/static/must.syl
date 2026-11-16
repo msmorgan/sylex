@@ -6,7 +6,7 @@
 # (`docs/design/semantics.md` §3.3).
 template must(
   subj: Subject,
-  action: Action,
+  action: VerbPhrase,
   timing: Option(Timing) = none,
   asThough: Option(AsThough) = none,
   except: Option(DeonticExcept) = none,

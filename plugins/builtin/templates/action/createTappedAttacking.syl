@@ -2,7 +2,7 @@
 template createTappedAttacking(
   count: Amount,
   token: CharacteristicBundle,
-  defender: Option(NounPhrase) = none): Action {
+  defender: Option(NounPhrase) = none): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by defender.
   body = create($count, written($token), riders = [entersAs(tapped), entersAttacking($defender)])
 }

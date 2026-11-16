@@ -3,6 +3,6 @@
 # `doesnt(actor(thisEffect), remove(thisAura))`, its own sentence beside the effect it talks about
 # [CR#702.16n].
 # TODO(spelling): Agree "doesn't" with the subject's number ("don't" after a plural).
-primitive doesnt(subj: Subject, action: Action): StaticSpec = Doesnt {
+primitive doesnt(subj: Subject, action: VerbPhrase): StaticSpec = Doesnt {
   spelling = "$subj doesn't $action"
 }

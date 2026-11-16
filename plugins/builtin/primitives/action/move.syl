@@ -6,4 +6,4 @@ primitive move(
   subject: NounPhrase,
   from: Location,
   to: Option(Location),
-  riders: List(MoveRider)): Action = Move
+  riders: List(MoveRider)): VerbPhrase = Move

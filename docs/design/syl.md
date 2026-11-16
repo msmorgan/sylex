@@ -37,7 +37,7 @@ constructor's spelling, adding printed wording, and adding vocabulary the rules 
 - **A primitive** is where a model constructor's spelling is attached. It is the one
   declaration that binds a word to a constructor, and it does the wrapping: its constructor
   clause, after its signature, names the constructor the word builds, capitalized and spelled
-  letter for letter as the Rust AST's variant name: `primitive activated(cost: Cost, action: Action):
+  letter for letter as the Rust AST's variant name: `primitive activated(cost: Cost, action: VerbPhrase):
   Ability = Activated { … }`. The clause is required even when it only capitalizes the
   primitive's own name (`primitive power: Stat = Power`). Every constructor and enum word a
   file uses has its primitive, and each constructor has exactly one, at its result sort. No

@@ -4,4 +4,4 @@ primitive copy(
   sort: CopySort,
   subject: NounPhrase,
   times: Amount,
-  exceptions: List(CopyExcept)): Action = Copy
+  exceptions: List(CopyExcept)): VerbPhrase = Copy

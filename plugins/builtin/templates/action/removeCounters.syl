@@ -2,7 +2,7 @@
 template removeCounters(
   quantity: Quantity,
   kind: Option(CounterKindSource),
-  from: NounPhrase): Action {
+  from: NounPhrase): VerbPhrase {
   # TODO(spelling): Include or omit the clauses supplied by kind.
   body = actionRemoveCounters($quantity, $kind, $from)
 }

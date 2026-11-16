@@ -89,7 +89,7 @@ action theRingTemptsYou {
       gainDesignation(that(creature), ringBearer)])
 }
 
-# Temporary: this primitive builds `Action.ownScope`, which `.syl` may not write
+# Temporary: this primitive builds `VerbPhrase.ownScope`, which `.syl` may not write
 # (`docs/design/syl.md` §4). Only this file may use it, through the validator's Ring exception
 # (`crates/xtask/src/dsl_check/schema.rs`); `syl-ring-tempts-you-raw-scope` deletes it.
-primitive ownScope(deed: Option(Deed), body: Action): Action = OwnScope
+primitive ownScope(deed: Option(Deed), body: VerbPhrase): VerbPhrase = OwnScope

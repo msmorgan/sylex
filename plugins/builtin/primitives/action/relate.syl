@@ -3,4 +3,4 @@
 primitive relate(
   subject: NounPhrase,
   label: RelationLabel,
-  counterpart: NounPhrase): Action = Relate
+  counterpart: NounPhrase): VerbPhrase = Relate

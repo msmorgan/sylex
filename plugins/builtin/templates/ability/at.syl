@@ -2,7 +2,7 @@
 template at(
   point: TurnPoint,
   if: Option(Condition) = none,
-  action: Action,
+  action: VerbPhrase,
   limit: Option(UsageLimit) = none): Ability {
   # TODO(spelling): Include or omit the clauses supplied by limit and if.
   spelling = "At $point, $action",

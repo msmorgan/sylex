@@ -182,7 +182,7 @@ impl Node {
         }
     }
 
-    /// `mark destroy: Action, deed "destroy"`.
+    /// `mark destroy: VerbPhrase, deed "destroy"`.
     fn mark_head(&self) -> String {
         let Node::Mark {
             definition,
