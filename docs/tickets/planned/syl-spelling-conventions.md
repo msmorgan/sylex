@@ -6,9 +6,9 @@ needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, sy
 
 ## Why
 
-`spelling` strings are to be parsed through the English grammar with typed holes, but
-today they inflect verbs inconsistently, and 168 `TODO(spelling)` markers, all under `plugins/builtin/`, stand where a
-spelling is missing, many carrying generated text instead of a reason.
+`spelling` strings are to be parsed through the English grammar with typed holes, but today they
+inflect verbs inconsistently, and 168 `TODO(spelling)` markers, all under `plugins/builtin/`, stand
+where a spelling is missing, many carrying generated text instead of a reason.
 
 Two narrower tickets rewrite spellings this ticket also normalizes, and land first:
 `syl-spelling-optional-segments` (the merged `enters…`, `activatedOnly…`, `prevent…` and
@@ -17,8 +17,8 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 ## Design
 
 The notation is settled in `docs/design/spelling.md` §7; where this ticket's text differs, §7
-governs. `syl-spelling-notation-crate` has already written every Hole `$name` and turned on the check
-that every `spelling` parses.
+governs. `syl-spelling-notation-crate` has already written every Hole `$name` and turned on the
+check that every `spelling` parses.
 
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
@@ -31,8 +31,7 @@ that every `spelling` parses.
     restructured here.
   - The subject is fixed inside the declaration and no hole decides agreement: the verb is
     written as printed. `controllerSacrifices` stays `"$subject's controller sacrifices it"`.
-- A spelling that parses in several ways is several Constructions (`spelling.md`, the notation's
-  load checks). A wording difference with the same meaning lives in which Template a card calls,
+- A wording difference with the same meaning lives in which Template a card calls,
   never in the AST.
 - A spelling's Holes stand in its declaration's parameter order, which is printed order, as
   arguments are written in declaration order (`syl.md` §2, §5); a spelling whose Hole order

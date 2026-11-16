@@ -28,8 +28,10 @@ parsed them.
 - `sylex_spelling` exists and parses the notation §7 states: Holes, ties, form labels, `*`,
   `#<…>` joins with the `#<.>` join included, `< … >` optional parts, `%` Tails and the `^` Gap.
   It refuses, each with a negative test: a form outside §7's set; a join chosen by a parameter
-  (`$xs#<$name>`); a Tail that is not last in its `spelling` or optional part; a Tail inside a
-  Tail; and a `^` that is not the whole `spelling`.
+  (`$xs#<$name>`); a second Tail in one `spelling` or optional part; a `^` that is
+  not the whole `spelling`; and a Hole that abuts a letter or digit with no tie. A Tail's
+  Category is read as one capitalized word; whether the English grammar has it is not checked
+  here.
 - Every `<name>` Hole under `plugins/` is written `$name` by a one-off script kept in
   `docs/evidence/`, which checks that each declaration's tree is unchanged apart from its
   `spelling`; the landing reports the counts it compared. A declared affix that abuts a Hole
@@ -42,8 +44,9 @@ parsed them.
   parsed.
 - No code under `crates/syl/` reads inside a `spelling`, and `cargo xtask dsl fmt` leaves every
   `spelling` as written.
-- `docs/design/spelling.md` no longer says the declarations still write a Hole `<name>` (§7) or
-  that no spelling crate exists (§8); `docs/design/syl.md` §2 no longer says the corpus still
+- `docs/design/spelling.md` no longer says the declarations still write a Hole `<name>`, that
+  `which` has no `spelling` or that no declaration writes a form label (§7), or that no spelling
+  crate exists (§8); `docs/design/syl.md` §2 no longer says the corpus still
   writes one; and `docs/design/architecture.md` says `sylex_spelling` parses the `spelling`
   notation, beside its sentence about `sylex_syl`.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_spelling`,

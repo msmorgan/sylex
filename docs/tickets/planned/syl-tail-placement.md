@@ -24,7 +24,7 @@ recover to one term and one of them does not round-trip.
 ## Done when
 
 - Every `spelling` this ticket writes parses with `sylex_spelling`, the ones marked `inner`
-  among them.
+  among them, and `forEach` is spelled with its Tail, "$per %VerbPhrase: for each $p".
 - Every "for each" and "equal to" wording that in-scope text prints in more than one placement
   has a Template for each; the landing lists them with a card for each.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_spelling` and

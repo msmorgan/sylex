@@ -19,43 +19,47 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
 - A coordinator word is its Template's, never a `coord` primitive's: the `and`, `or` and `andOr`
   Templates at `NounPhrase`, `Predicate` and `Location` are spelled `$xs#<and>`, `$xs#<or>` and
   `$xs#<and/or>` over their list, and the `or` at `TriggerCondition` `$conditions#<or>`.
-- A move's riders are not one list under one join. "Onto the battlefield tapped and attacking"
-  coordinates two with "and", "onto the battlefield tapped under their control" sets two side
-  by side, and no card prints "tapped attacking". They are depictives, and their wording waits
-  for that design (`docs/design/semantics.md` §6 item 13).
+- A move's riders are left unspelled. They are depictives, not one list under one join ("tapped
+  and attacking" beside "tapped under their control"), and their wording waits for that design
+  (`docs/design/semantics.md` §6 item 13).
 
 ## Open questions
 
 - **Modes printed one to a line.** `chooseModes` and `chooseSpree` ask for their modes as
-  lines, and no join of §7 prints a line break. Options: a join for a line break; or the modes
-  as a run of sentences, which `syl-spelling-forms-and-runs` writes. Recommendation: the owner
-  rules which, and until then both markers stay, naming this question.
+  lines, and no join of §7 prints a line break; `chooseOne` writes its line breaks and bullets
+  as fixed text over two Holes. Options: a join for a line break, added to §7; or the modes as a
+  run of sentences, which `syl-spelling-forms-and-runs` writes. Recommendation: the owner rules
+  which.
 
 ## Done when
 
-- The open question is answered.
+- The open question is answered. If the answer is a join, §7 states it and `chooseModes` and
+  `chooseSpree` are written with it; if it is a run, their markers stay and name
+  `syl-spelling-forms-and-runs`.
 - Every `TODO(spelling)` whose wording needs an optional part or a list's join is written with
   it and checked against a card's Oracle text, except the ones below, whose markers stay, each
   rewritten to name what it waits on:
   - a move's riders: the markers on `create`, `enter`, `returnTo`, `put`, `putOntoBattlefield`,
-    `zoneChange`, `returnToBattlefield`, `lookAndSortSlice` and `putInto` (re-run the search
-    when claimed). `putInto`'s origin phrase is written, "< from $from>";
+    `zoneChange`, `returnToBattlefield`, `lookAndSortSlice` and `putInto`, and on the rider
+    words themselves (`entersAttacking`, `inOrder`, `withCounters`); re-run the search when
+    claimed. `putInto`'s origin phrase is written, "< from $from>";
+  - a copy's exceptions (`asCopyOf`, `copy`, `copyOnStack`): `syl-copy-exceptions`;
   - a word for an empty list (`creatureToken`, `creatureTokenOf` and `artifactCreatureToken`
     want "colorless"), which §7 does not have: `syl-token-records-to-templates`;
-  - a part printed as a following sentence (`withCharacteristicEdits`):
-    `syl-spelling-forms-and-runs`.
-- Every list Hole states its join, the one its wording prints, checked against a card. Twelve
+  - a part printed as a sentence after the clause (`withCharacteristicEdits`, `addMana`'s
+    riders): `syl-spelling-forms-and-runs`.
+- Every list Hole states its join, the one its wording prints, checked against a card. Thirteen
   spellings write a list Hole with no join when this ticket is claimed (`abilityGrant`,
   `abilityLoss`, `alsoHas`, `byLabel`, `cantSpendOn`, `spendOnly`, both `symbols`,
-  `distinctChosenKinds`, and `enters`, `entersUnless` and `mayHaveEnter`; re-run the scan when
-  claimed). The last three hold a move's riders: their riders Hole is taken out and a marker
-  names the depictives design, so a term with riders has no wording by them.
+  `distinctChosenKinds`, `getEmblem`, and `enters`, `entersUnless` and `mayHaveEnter`; re-run the
+  scan when claimed). The last three hold a move's riders: their riders Hole is taken out and a
+  marker names the depictives design.
 - The coordinator Templates are spelled as Design states, the `or` at `TriggerCondition`
   replacing its `TODO(spelling)`, and no `coord` primitive has a `spelling`. `isOutlaw` keeps
   its own wording over an unspelled `coord(andOr, …)` in its body.
 - The near-duplicate Template families that differed only by an optional or repeated part are
   each one Template; the landing lists the merges.
-- The optional parts this ticket writes carry no form label, `*` or `#<.>` join.
+- No spelling this ticket writes carries a form label, `*` or `#<.>` join.
 - `docs/design/spelling.md` §7 no longer says the coordinator Templates have no spelling.
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

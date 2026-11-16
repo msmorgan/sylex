@@ -38,6 +38,12 @@ claimed). Oracle prints "one" where `Counting` prints the article (*Melira, the 
   that every declaration's tree is unchanged apart from its `spelling`, comments and the added
   `one` Template and card, and the landing reports the declaration count it compared.
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
+- `cargo xtask dsl check` refuses, with a negative test for each: a label where the position
+  admits only one form; a numeral form on a Hole that is not numeric; and a verb form or `*` on a
+  Hole that is not an `Action` (`spelling.md` §7).
+- The markers `syl-spelling-optional-segments` leaves for a part printed as a sentence after its
+  clause (`withCharacteristicEdits`, `addMana`'s riders) are each written, or rewritten to name
+  what the notation lacks.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
