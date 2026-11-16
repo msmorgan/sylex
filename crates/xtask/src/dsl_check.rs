@@ -25,6 +25,7 @@ mod cycles;
 mod refusal;
 pub(crate) mod schema;
 mod sort;
+mod spelling;
 
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
@@ -699,10 +700,10 @@ fn resolve(
 }
 
 /// Where a `{ ... }` field list stands.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum FieldHost {
+#[derive(Clone, Copy)]
+enum FieldHost<'a, 'd> {
     /// A declaration's `{ ... }` block, which may carry `lexical` and `spelling`.
-    DeclarationBlock,
+    DeclarationBlock(&'d Decl<'a>),
     /// A record value `{ ... }`, which carries only its record sort's fields.
     RecordValue,
 }
@@ -748,13 +749,12 @@ impl Resolver<'_> {
                 default: None,
             })
             .collect();
-        self.fields(block, &slots, &at, FieldHost::DeclarationBlock);
+        self.fields(block, &slots, &at, FieldHost::DeclarationBlock(decl));
     }
 
     /// Resolves a record's or block's fields against `slots`. On a
-    /// declaration's block, `lexical` is skipped and `spelling` is parsed with
-    /// [`sylex_spelling`].
-    fn fields(&mut self, record: &Record, slots: &[Slot], at: &str, host: FieldHost) {
+    /// declaration's block, `lexical` and `spelling` are checked as metadata.
+    fn fields(&mut self, record: &Record, slots: &[Slot], at: &str, host: FieldHost<'_, '_>) {
         let mut written = BTreeSet::new();
         for field in record.nodes() {
             let name = field.name.ident.as_str();
@@ -765,9 +765,11 @@ impl Resolver<'_> {
                 );
                 continue;
             }
-            if host == FieldHost::DeclarationBlock && METADATA_FIELDS.contains(&name) {
+            if let FieldHost::DeclarationBlock(decl) = host
+                && METADATA_FIELDS.contains(&name)
+            {
                 match name {
-                    "spelling" => self.spelling(&field.value),
+                    "spelling" => spelling::check(decl, &field.value, self.coercions, self.refusals),
                     "lexical" => self.lexical(&field.value),
                     other => unreachable!("unhandled metadata field `{other}`"),
                 }
@@ -793,23 +795,6 @@ impl Resolver<'_> {
                         at: at.to_owned(),
                     },
                 );
-            }
-        }
-    }
-
-    fn spelling(&mut self, value: &Value) {
-        match &value.kind {
-            ValueKind::String(text) => {
-                if let Err(error) = sylex_spelling::parse(text) {
-                    self.refuse(value.span, RefusalKind::InvalidSpelling(error.kind));
-                }
-            }
-            ValueKind::Integer(_)
-            | ValueKind::List(_)
-            | ValueKind::Record(_)
-            | ValueKind::Call(_)
-            | ValueKind::Parameter(_) => {
-                self.refuse(value.span, RefusalKind::SpellingNotString);
             }
         }
     }

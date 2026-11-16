@@ -155,6 +155,35 @@ pub enum RefusalKind {
     SpellingNotString,
     #[error("invalid `spelling`: {0}")]
     InvalidSpelling(sylex_spelling::ErrorKind),
+    #[error("invalid `spelling`: unknown parameter `${0}`")]
+    SpellingUnknownHole(String),
+    #[error("invalid `spelling`: Hole `${name}` states a join, but its sort is {sort}")]
+    SpellingJoinNotList { name: String, sort: String },
+    #[error("invalid `spelling`: Hole `${name}` at {sort} needs a `#<join>`")]
+    SpellingListWithoutJoin { name: String, sort: String },
+    #[error(
+        "invalid `spelling`: Hole `${name}` stands directly in an optional part, \
+         but parameter `{name}` at {sort} is not omissible"
+    )]
+    SpellingOptionalInomissible { name: String, sort: String },
+    #[error(
+        "invalid `spelling`: all Holes of `${0}` must stand in one optional part, \
+         or all outside every optional part"
+    )]
+    SpellingSplitParameter(String),
+    #[error("invalid `spelling`: an optional part directly holds no Hole")]
+    SpellingOptionalWithoutHole,
+    #[error(
+        "invalid `spelling`: outside every optional part there must be text, a Hole, \
+         a Tail or a Gap"
+    )]
+    SpellingNothingCertain,
+    #[error("invalid `spelling`: parameter `{name}` at {sort} has no Hole and is not omissible")]
+    SpellingUnprintedParameter { name: String, sort: String },
+    #[error("invalid `spelling`: skeleton is ambiguous")]
+    SpellingAmbiguousSkeleton,
+    #[error("invalid `spelling`: unknown bound {side} `{affix}` in lexicon")]
+    SpellingUnknownAffix { affix: String, side: &'static str },
     #[error("shared verb `{0}` needs a `lexical` record with a non-empty `lemma` and `frames`")]
     InvalidSharedVerb(String),
     #[error("`lexical` must be a record")]

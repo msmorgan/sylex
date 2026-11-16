@@ -604,21 +604,22 @@ print the article, as in *Melira, the Living Cure*'s "you get one poison counter
 Vapors*'s "chooses one card of each color", is the parameterless Template `one` at `Amount`,
 whose spelling is "one".
 
-**A list Hole is `$name#<join>`.** A `List` parameter must state its join and no other parameter
-may, so a list is visible at its Hole. The joins are a closed set: `#<>` juxtaposes the elements;
-`#<,>` separates them with commas and no coordinator; `#<.>` prints each element as a run of
-sentences (`*`, below) after the one before, so such a list needs no `*`; `#<and>`, `#<or>`,
-`#<and/or>` and `#<then>` coordinate them; and a line break as the join puts each element on a line
-of its own, as the modes of a modal ability are printed. A mode's bullet is the mode's own wording,
-"• $action", so it prints before the first mode too. No parameter chooses a join: a coordinator is
-printed by the Template that names it, as the Templates `and`, `or` and `andOr` print "and", "or"
-and "and/or" over the three `coord` primitives (at `NounPhrase`, `Predicate` and `Location`), which
-have no `spelling`. The
-commas of a coordination of three or more are the English layer's and are never written. One
-element prints alone, with no join. An element whose own wording prints nothing in place, having
-only a Tail, takes no part in the join. A `#<` directly after a Hole's name is only ever a join,
-and `%` only ever opens a Tail, so a Tail may follow a Hole with or without a space. A `~` is
-always a tie.
+**A list Hole is `$name#<join>`.** A `List` parameter, or an `Option` of one, must state its join
+and no other parameter may, so a list is visible at its Hole. The joins are a closed set: `#<>`
+juxtaposes the elements; `#<,>` separates them with commas and no coordinator; `#<.>` prints each
+element as a run of sentences (`*`, below) after the one before, so such a list needs no `*`;
+`#<and>`, `#<or>`, `#<and/or>` and `#<then>` coordinate them; and a line break as the join puts
+each element on a line of its own, as the modes of a modal ability are printed. A mode's bullet is
+the mode's own wording, "• $action", so it prints before the first mode too. No parameter chooses a
+join: a coordinator is printed by the Template that names it, as the Templates `and`, `or` and
+`andOr` print "and", "or" and "and/or" over the three `coord` primitives (at `NounPhrase`,
+`Predicate` and `Location`), which have no `spelling`. The commas of a coordination of three or
+more are the English layer's and are never written. One element prints alone, with no join; where
+the `spelling` outside optional parts is one list Hole and an element can stand at the result sort,
+a list of one words as its element, so that declaration spells lists of two or more only. An
+element whose own wording prints nothing in place, having only a Tail, takes no part in the join. A
+`#<` directly after a Hole's name is only ever a join, and `%` only ever opens a Tail, so a Tail
+may follow a Hole with or without a space. A `~` is always a tie.
 
 **A Hole a run of sentences may fill is `$name*`** (§2, the run rule). An unmarked Hole holds one
 phrase. `when`'s `action` Hole is `$action*`, and holds Boommobile's two sentences. The parts of
@@ -634,8 +635,8 @@ be omissible. It is printed when every governor differs from its absent value an
 does: "put $subject into $destination< from $from>". A term in which only some governors are
 supplied has no wording by that declaration. An optional part may hold another, which can print
 only when the outer one does. All the Holes of one parameter stand in one optional part, or all
-stand outside every one. An empty list is never printed by its Hole; it is spelled only as the
-absent value of an optional part.
+stand outside every one. An empty list is never printed by its Hole: it is spelled as the absent value of an optional part,
+or fixed at the empty list by a list parameter that has no Hole.
 
 **A Tail is `%Category: …` or `%inner Category: …`** (§3.2): "$per %VerbPhrase: for each $p". It
 has no closing mark: a Tail stands last among the parts beside it, so it runs to the end of the
@@ -686,6 +687,7 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
 
 **A `spelling` is refused at load** when it breaks a rule above, and also when:
 
+- **A Hole names no parameter of its declaration.**
 - **A parameter has no Hole and is not omissible.** A parameter with no Hole is fixed at its
   absent value by that `spelling`, and a term that supplies another value has no wording by it.
 - **An optional part directly holds no Hole.** Fixed words alone recover no argument. A Hole in
@@ -701,21 +703,24 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
   "tapped", a preposition phrase in "with flying" and a relative clause in "you control". A
   `spelling` whose in-place part parses in several ways names no one fragment, and which of them
   spelling prints is open (§10).
-- **Its skeleton is ambiguous.** Replace each Hole by its parameter's sort, counting two sorts
-  as one when a coercion or `Option` takes one to the other, each optional part by an optional,
-  and each list Hole by one or more of its sort with its join between. The result is a regular
-  expression over words and sorts, and no sequence may match it in two ways. Two optional
+- **Its skeleton is ambiguous.** Replace each Hole by its parameter's sort, with a tie's affix as
+  a word on its side of the sort, counting two sorts as one when a coercion or `Option` takes one
+  to the other, each optional part by an optional, each list Hole by one or more of its element's
+  sort with its join between, each Tail by a bracketed section keyed by its placement and host
+  Category around its own parts, and a Gap by its own single atom. The result is a regular
+  expression over words, sorts and markers, and no sequence may match it in two ways. Two optional
   parts that each hold only a bare Hole of one sort are the case it catches, since one printed
   phrase would recover as either argument. No `spelling` under `plugins/` is refused by it
   today; `between` at `Duration`, whose `start` and `end` are both `Option(GameEvent)`, is a
   declaration that needs a fixed word beside each to pass.
-- **A lone list would word as its element.** Where the `spelling` outside optional parts is one
-  list Hole and an element can stand at the result sort, a list of one words exactly as its
-  element, so that declaration spells lists of two or more only.
 
 Why the skeleton rule: it is the round trip of §6 as one check, in place of a rule on each
 construct. It is a check on the `spelling` alone. Two sorts whose wordings overlap can still
 give recovery two candidates, and semantics and pragmatics choose between those (§5).
+
+`cargo xtask dsl check` parses every `spelling` under `plugins/` with `sylex_spelling` and checks
+the declaration, sort, skeleton and lexicon bound-affix load rules; form-label refusals wait on
+`syl-spelling-forms-and-runs` and the English-variant check waits on `english-syl-term-recovery`.
 
 **What the notation does not say is a Template, or a change to the declaration.** Apart from
 `Counting`'s 1 (above), it has no part chosen by a value and no omission governed by a value
@@ -731,9 +736,9 @@ things are known limits:
   tokens" prints a word for an empty list of colors.
 - **A Tail between two of its host's adjuncts.** Only the two placements exist.
 
-`sylex_spelling` parses every `spelling` under `plugins/`. Only `fromTop` and `fromBottom`
-write a form label (`$n@Ordinal`), and no declaration writes another form label, a `*` or a
-`#<.>` join yet; the `syl-spelling-forms-and-runs` ticket writes them.
+Only `fromTop` and `fromBottom` write a form label (`$n@Ordinal`), and no declaration writes
+another form label, a `*` or a `#<.>` join yet; the `syl-spelling-forms-and-runs` ticket writes
+them.
 
 ## 8. Capacity and cost
 

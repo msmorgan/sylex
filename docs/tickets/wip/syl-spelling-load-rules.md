@@ -22,20 +22,14 @@ parts one printed phrase could fill, a list with no join.
   6. outside every optional part there is text, a Hole, a Tail or a Gap;
   7. a parameter with no Hole is omissible;
   8. the skeleton is unambiguous.
+- A tie's affix is checked against the bound forms the lexicon declares (`sylex_vocabulary`).
 - The rule that every variant is English needs the English grammar and is not checked here.
-
-## Open questions
-
-- **A tie's affix is a bound form the lexicon declares** (§7). It needs the lexicon, which no
-  ticket gives `cargo xtask dsl check`. Options: this ticket loads the lexicon and checks it; or
-  it waits for the spelling crate to read the lexicon. Recommendation: check it here if `dsl
-  check` can load the lexicon without a new dependency, and say so in the landing either way.
 
 ## Done when
 
-- The open question is answered.
-- `cargo xtask dsl check` refuses a `spelling` that breaks any of the eight rules, with a
-  negative test for each, and every declaration under `plugins/` passes.
+- `cargo xtask dsl check` refuses a `spelling` that breaks any of the eight rules or names an
+  undeclared bound affix, with a negative test for each, and every declaration under `plugins/`
+  passes.
 - Each declaration that breaks a rule when this ticket is claimed is resolved against its card's
   Oracle text or its rule's text, by changing its `spelling` or its parameters; the landing lists
   each with the rule it broke and what was done. Four have an unprinted parameter that is not

@@ -1798,3 +1798,311 @@ fn actor_parameter_in_a_card_is_refused() {
         [(RefusalKind::UnknownParameter(s("actor")), s("$actor"))]
     );
 }
+
+#[test]
+fn spelling_rule_1_hole_names_unknown_parameter() {
+    let source = format!(
+        "{ACTOR_PREAMBLE}\
+         template t(a: Nat = 1): Nat {{ spelling = \"draw $b\", body = $a }}\n\
+         action act {{ spelling = \"$actor acts\", body = see($actor) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (RefusalKind::SpellingUnknownHole(s("b")), s("\"draw $b\"")),
+            (
+                RefusalKind::SpellingUnknownHole(s("actor")),
+                s("\"$actor acts\"")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn spelling_rule_2_join_matches_list_sort() {
+    let source = format!(
+        "{COLORS}\
+         template okList(cs: List(Color)): List(Color) {{ spelling = \"$cs#<and>\", body = $cs }}\n\
+         template okOptList(cs: Option(List(Color)) = none): Option(List(Color)) {{\n\
+           spelling = \"colors< $cs#<or>>\",\n\
+           body = $cs\n\
+         }}\n\
+         template joinOnScalar(c: Color): Color {{ spelling = \"$c#<and>\", body = $c }}\n\
+         template listNoJoin(cs: List(Color)): List(Color) {{ spelling = \"$cs\", body = $cs }}\n\
+         template optListNoJoin(cs: Option(List(Color)) = none): Option(List(Color)) {{\n\
+           spelling = \"colors< $cs>\",\n\
+           body = $cs\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::SpellingJoinNotList {
+                    name: s("c"),
+                    sort: s("Color"),
+                },
+                s("\"$c#<and>\"")
+            ),
+            (
+                RefusalKind::SpellingListWithoutJoin {
+                    name: s("cs"),
+                    sort: s("List(Color)"),
+                },
+                s("\"$cs\"")
+            ),
+            (
+                RefusalKind::SpellingListWithoutJoin {
+                    name: s("cs"),
+                    sort: s("Option(List(Color))"),
+                },
+                s("\"colors< $cs>\"")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn spelling_rule_3_hole_in_optional_requires_omissible_parameter() {
+    let source = format!(
+        "{COLORS}\
+         template okDefault(c: Color = white): Color {{ spelling = \"pick< $c>\", body = $c }}\n\
+         template okOption(c: Option(Color)): Option(Color) {{ spelling = \"pick< $c>\", body = $c }}\n\
+         template okList(cs: List(Color)): List(Color) {{ spelling = \"pick< $cs#<and>>\", body = $cs }}\n\
+         template badRequired(c: Color): Color {{ spelling = \"pick< $c>\", body = $c }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::SpellingOptionalInomissible {
+                name: s("c"),
+                sort: s("Color"),
+            },
+            s("\"pick< $c>\"")
+        )]
+    );
+}
+
+#[test]
+fn spelling_rule_4_holes_of_one_parameter_share_one_scope() {
+    let source = format!(
+        "{COLORS}\
+         template okOutside(c: Color): Color {{ spelling = \"$c and $c\", body = $c }}\n\
+         template okSameOpt(c: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< $c or $c>\",\n\
+           body = $c\n\
+         }}\n\
+         template splitOutsideAndInside(c: Option(Color)): Option(Color) {{\n\
+           spelling = \"$c< or $c>\",\n\
+           body = $c\n\
+         }}\n\
+         template splitTwoOpts(c: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< first $c>< then $c>\",\n\
+           body = $c\n\
+         }}\n\
+         template splitNestedOpt(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< $a< and $b with $a>>\",\n\
+           body = $a\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::SpellingSplitParameter(s("c")),
+                s("\"$c< or $c>\"")
+            ),
+            (
+                RefusalKind::SpellingSplitParameter(s("c")),
+                s("\"pick< first $c>< then $c>\"")
+            ),
+            (
+                RefusalKind::SpellingSplitParameter(s("a")),
+                s("\"pick< $a< and $b with $a>>\"")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn spelling_rule_5_optional_part_must_directly_hold_a_hole() {
+    let source = format!(
+        "{COLORS}\
+         template okTailHole(c: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< %VerbPhrase: for $c>\",\n\
+           body = $c\n\
+         }}\n\
+         template fixedOnly: Color {{ spelling = \"white< mana>\", body = white }}\n\
+         template onlyNested(c: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< mana< of $c>>\",\n\
+           body = $c\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::SpellingOptionalWithoutHole,
+                s("\"white< mana>\"")
+            ),
+            (
+                RefusalKind::SpellingOptionalWithoutHole,
+                s("\"pick< mana< of $c>>\"")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn spelling_rule_6_something_outside_optionals_is_certain_to_print() {
+    let source = format!(
+        "{COLORS}\
+         template okTailOnly(c: Color): Color {{ spelling = \"%VerbPhrase: for $c\", body = $c }}\n\
+         template emptySpelling: Color {{ spelling = \"\", body = white }}\n\
+         template allOptional(a: Option(Color)): Option(Color) {{\n\
+           spelling = \"<from $a>\",\n\
+           body = $a\n\
+         }}\n\
+         template onlySpaceBetweenOptionals(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
+           spelling = \"<from $a> <until $b>\",\n\
+           body = $a\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (RefusalKind::SpellingNothingCertain, s("\"\"")),
+            (RefusalKind::SpellingNothingCertain, s("\"<from $a>\"")),
+            (
+                RefusalKind::SpellingNothingCertain,
+                s("\"<from $a> <until $b>\"")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn spelling_rule_7_unprinted_parameter_must_be_omissible() {
+    let source = format!(
+        "{COLORS}\
+         template okDefault(c: Color = white): Color {{ spelling = \"colored\", body = $c }}\n\
+         template okOption(c: Option(Color)): Option(Color) {{ spelling = \"colored\", body = $c }}\n\
+         template okList(cs: List(Color)): List(Color) {{ spelling = \"colored\", body = $cs }}\n\
+         template badUnprinted(c: Color): Color {{ spelling = \"colored\", body = $c }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::SpellingUnprintedParameter {
+                name: s("c"),
+                sort: s("Color"),
+            },
+            s("\"colored\"")
+        )]
+    );
+}
+
+#[test]
+fn spelling_rule_8_skeleton_must_be_unambiguous() {
+    let source = format!(
+        "{COLORS}\
+         primitive lit(n: Int): Amount = Lit\n\
+         coercion(n: Int): Amount {{ body = lit($n) }}\n\
+         template okDistinctWords(start: Option(Color), end: Option(Color)): Option(Color) {{\n\
+           spelling = \"<from $start >until< $end>\",\n\
+           body = $start\n\
+         }}\n\
+         template okDifferentSorts(c: Option(Color), n: Option(Nat)): Option(Color) {{\n\
+           spelling = \"pick< $c>< $n>\",\n\
+           body = $c\n\
+         }}\n\
+         template okTailSeparates(a: Color, b: Option(Color), c: Option(Color)): Color {{\n\
+           spelling = \"$a< $b> %VerbPhrase: <$c>\",\n\
+           body = $a\n\
+         }}\n\
+         template twoBareOptionals(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< $a>< $b>\",\n\
+           body = $a\n\
+         }}\n\
+         template coercedOptionals(a: Option(Int), b: Option(Amount)): Option(Amount) {{\n\
+           spelling = \"count< $a>< $b>\",\n\
+           body = $b\n\
+         }}\n\
+         template listAndOptionalSameJoin(cs: List(Color), extra: Option(Color)): List(Color) {{\n\
+           spelling = \"$cs#<and>< and $extra>\",\n\
+           body = $cs\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::SpellingAmbiguousSkeleton,
+                s("\"pick< $a>< $b>\"")
+            ),
+            (
+                RefusalKind::SpellingAmbiguousSkeleton,
+                s("\"count< $a>< $b>\"")
+            ),
+            (
+                RefusalKind::SpellingAmbiguousSkeleton,
+                s("\"$cs#<and>< and $extra>\"")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn spelling_tie_affix_must_be_a_declared_bound_form() {
+    let source = format!(
+        "{COLORS}\
+         template okNon(c: Color): Color {{ spelling = \"non~$c\", body = $c }}\n\
+         template okWalk(c: Color): Color {{ spelling = \"$c~walk\", body = $c }}\n\
+         template okCycling(c: Color): Color {{ spelling = \"$c~cycling\", body = $c }}\n\
+         template badPrefix(c: Color): Color {{ spelling = \"pre~$c\", body = $c }}\n\
+         template badSuffix(c: Color): Color {{ spelling = \"$c~able\", body = $c }}\n\
+         template wrongSidePrefix(c: Color): Color {{ spelling = \"walk~$c\", body = $c }}\n\
+         template wrongSideSuffix(c: Color): Color {{ spelling = \"$c~non\", body = $c }}\n\
+         template stemIsNotAffix(c: Color): Color {{ spelling = \"island~$c\", body = $c }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::SpellingUnknownAffix {
+                    affix: s("pre"),
+                    side: "prefix",
+                },
+                s("\"pre~$c\"")
+            ),
+            (
+                RefusalKind::SpellingUnknownAffix {
+                    affix: s("able"),
+                    side: "suffix",
+                },
+                s("\"$c~able\"")
+            ),
+            (
+                RefusalKind::SpellingUnknownAffix {
+                    affix: s("walk"),
+                    side: "prefix",
+                },
+                s("\"walk~$c\"")
+            ),
+            (
+                RefusalKind::SpellingUnknownAffix {
+                    affix: s("non"),
+                    side: "suffix",
+                },
+                s("\"$c~non\"")
+            ),
+            (
+                RefusalKind::SpellingUnknownAffix {
+                    affix: s("island"),
+                    side: "prefix",
+                },
+                s("\"island~$c\"")
+            ),
+        ]
+    );
+}
