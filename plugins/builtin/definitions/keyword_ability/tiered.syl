@@ -3,5 +3,5 @@
 ability tiered {
   lexical = {lemma = "tiered"},
   spelling = "tiered",
-  body = [static(modeChoice(setQuantity(oneThrough(1))))]
+  body = [static(modeChoice(setQuantity(exactly(1))))]
 }

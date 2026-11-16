@@ -1,0 +1,5 @@
+# "<low>—<high>": a results-table range.
+template rollRange(low: Nat, high: Nat): Quantity {
+  spelling = "$low—$high",
+  body = range(low = $low, high = $high)
+}

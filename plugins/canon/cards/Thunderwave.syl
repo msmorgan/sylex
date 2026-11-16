@@ -8,7 +8,7 @@ card singleFaced({
             rollDice(sides = sides(20)),
             applyResultsTable([
                 rollRow(
-                  oneThrough(9),
+                  rollRange(1, 9),
                   instruct(this, dealDamage(amount = 3, recipient = each(isCreature)))),
                 rollRow(
                   fromTo(10, 19),

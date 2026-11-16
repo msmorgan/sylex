@@ -25,7 +25,7 @@ ability suspend(amount: Amount, cost: Cost) {
       if = is(
         thisCard,
         and([in(exileZone), hasKeyword(theKeyword(suspend)), hasCounter(kind = timeCounter)])),
-      removeCounters(oneThrough(1), printedKind(timeCounter), thisCard)),
+      removeCounters(exactly(1), printedKind(timeCounter), thisCard)),
     when(
       does(any, removeCounters(theLast, printedKind(timeCounter), thisCard)),
       if = is(thisCard, in(exileZone)),

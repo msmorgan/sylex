@@ -1,0 +1,5 @@
+# "one or both"
+template oneOrBoth: Quantity {
+  spelling = "one or both",
+  body = range(low = 1, high = 2)
+}

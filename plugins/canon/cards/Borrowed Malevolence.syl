@@ -6,7 +6,7 @@ card singleFaced({
       escalate(mana([generic(2)])),
       spell(
         chooseModes(
-          oneThrough(2),
+          oneOrBoth,
           [
             mode(none, none, get(target(isCreature), up(1), up(1), duration = untilEndOfTurn)),
             mode(
