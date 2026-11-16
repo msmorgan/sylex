@@ -10,6 +10,7 @@ members = [
     "crates/core",
     "crates/upstream",
     "crates/syl",
+    "crates/spelling",
     "crates/engine",
     "v1/crates/features",
     "crates/syntax",
