@@ -19,7 +19,7 @@ of its owner's library", `onBottom` "on the bottom of its owner's library", `pla
 $pile"), pile positions without one (`topOf` "the top of $loc"), Position Phrases (`fromTop`
 "$n@Ordinal from the top of $loc"), and a participle (`exiledWith` "exiled with $source"). The
 declarations that take a `Location` add their own preposition: `putInto`'s doc comment reads
-"put $subject into $destination (from $from)", `play`'s "(from $from)", and `cardIn` is spelled
+"put $subject into $destination< from $from>", `play`'s "< from $from>", and `cardIn` is spelled
 "card in $zone". `putInto` and `play`'s `from` have no `spelling` yet, so the collisions below are
 in the composition the declarations imply, not in a string anything prints:
 

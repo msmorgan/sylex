@@ -38,7 +38,7 @@ of the sequences and lands first, so the steps this ticket spells are the printe
   each sort, and each printed wording is its own Template over it, never one Template with a
   parameter that carries only wording (`spelling.md`, on the surface term as the derivation); a
   join is fixed in the wording, never chosen by a parameter. "And" and "then" between steps are
-  two Templates, `$steps<and>` and `$steps<then>`.
+  two Templates, `$steps#<and>` and `$steps#<then>`.
 - A verb-phrase coordination under one subject is one `clause` over a Template of the steps at
   `VerbPhrase`, as `spelling.md` writes a shared subject (shared material at a coordination).
 - Separate sentences are a list Hole whose elements are runs of sentences (`spelling.md` §2, a

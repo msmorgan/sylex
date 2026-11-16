@@ -323,7 +323,7 @@ Three properties make the extension closed:
   for each other attacking Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your
   hand until end of turn". Both Tails attach to one verb phrase, so the Category alone does not
   tell them apart, and the two placements are two Templates (§4). The notation writes the
-  inside placement `<~inner Category: …>` (§7); which Templates need it is the
+  inside placement `%inner Category: …` (§7); which Templates need it is the
   `syl-tail-placement` ticket's to find.
 - **A Tail is read where it is printed.** Gaze of Adamaro "deals damage to target player equal
   to the number of cards in that player's hand": the amount is the declaration's first
@@ -600,10 +600,10 @@ Vapors*'s "chooses one card of each color", is the parameterless Template `one` 
 whose spelling is "one".
 
 **A list Hole is `$name#<join>`.** A `List` parameter must state its join and no other parameter
-may, so a list is visible at its Hole. The joins are a closed set: `<>` juxtaposes the elements;
-`<,>` separates them with commas and no coordinator; `<.>` prints each element as a run of
-sentences (`*`, below) after the one before, so such a list needs no `*`; `<and>`, `<or>`,
-`<and/or>` and `<then>` coordinate them. No parameter chooses a join: a coordinator is printed by
+may, so a list is visible at its Hole. The joins are a closed set: `#<>` juxtaposes the elements;
+`#<,>` separates them with commas and no coordinator; `#<.>` prints each element as a run of
+sentences (`*`, below) after the one before, so such a list needs no `*`; `#<and>`, `#<or>`,
+`#<and/or>` and `#<then>` coordinate them. No parameter chooses a join: a coordinator is printed by
 the Template that names it, as the Templates `and`, `or` and `andOr` print "and", "or" and
 "and/or" over the three `coord` primitives (at `NounPhrase`, `Predicate` and `Location`), which
 have no `spelling`. Under
@@ -611,8 +611,8 @@ have no `spelling`. Under
 either; the `syl-spelling-optional-segments` ticket writes them. The commas of a coordination of
 three or more are the English layer's and are never written. One element prints alone, with no
 join. An element whose own wording prints nothing in place, having only a Tail, takes no part in
-the join. A `<` directly after a Hole's name is only ever a join, and `<~` only ever opens a Tail,
-so a Tail may follow a Hole with or without a space. A `~` anywhere else, outside `<~`, is a tie.
+the join. A `#<` directly after a Hole's name is only ever a join, and `%` only ever opens a Tail,
+so a Tail may follow a Hole with or without a space. A `~` is always a tie.
 
 **A Hole a run of sentences may fill is `$name*`** (§2, the run rule). An unmarked Hole holds one
 phrase. `when`'s `action` Hole is `$action*`, and holds Boommobile's two sentences. The parts of
@@ -625,12 +625,11 @@ $timing.", follows the run's last.
 its sort is `Option(T)` or a list; its absent value is the default, else `none`, else the
 empty list. An optional part is governed by every parameter with a Hole directly in it, and
 each of those must be omissible. It is printed when every governor differs from its absent
-value and omitted when none does: "put $subject (from $from) onto the battlefield
-($riders<>)". A term in which only
-some governors are supplied has no wording by that declaration. An optional part may hold
-another, which can print only when the outer one does. All the Holes of one parameter stand in
-one optional part, or all stand outside every one. An empty list is never printed by its Hole;
-it is spelled only as the absent value of an optional part.
+value and omitted when none does: "put $subject< from $from> onto the battlefield<
+$riders#<>>". A term in which only some governors are supplied has no wording by that
+declaration. An optional part may hold another, which can print only when the outer one does. All
+the Holes of one parameter stand in one optional part, or all stand outside every one. An empty
+list is never printed by its Hole; it is spelled only as the absent value of an optional part.
 
 **A Tail is `%Category: …` or `%inner Category: …`** (§3.2): "$per %VerbPhrase: for each $p". It
 has no closing mark: a Tail stands last among the parts beside it, so it runs to the end of the
@@ -672,10 +671,10 @@ substitutes one phrase for each Hole where the Hole stands, and under passive su
 and in a run's later sentences the printed material stands elsewhere (§10).
 
 **No escape exists, because none is needed.** None of `$`, `~`, `@`, `*`, `^`, `#`, `%`, `<` and
-`>` occurs in any in-scope card's rules text ([Lexicon](lexicon.md) §1). A parenthesis is no
-mark: Oracle text uses parentheses for reminder text, which is removed before analysis, and a
-`spelling` writes none. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
-are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is no mark.
+`>` occurs in any in-scope card's rules text ([Lexicon](lexicon.md) §1). A parenthesis is no mark:
+Oracle text uses parentheses for reminder text, which is removed before analysis, and a `spelling`
+writes none. Square brackets and braces are Oracle's own characters, for cleave and for symbols,
+and are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is no mark.
 
 **A `spelling` is refused at load** when it breaks a rule above, and also when:
 
@@ -718,7 +717,7 @@ things are known limits:
 - **Coordinating whichever optional pieces are present.** Akul the Unrepentant prints "Activate
   only as a sorcery and only once each turn": "Activate" is printed if either restriction is
   there and "and" only if both are, and an optional part is all or none. One list of
-  restrictions with an `<and>` join says it; separate optional parameters do not.
+  restrictions with a `#<and>` join says it; separate optional parameters do not.
 - **A word for an absent value.** Angelic Aberration's "4/4 colorless Eldrazi Angel creature
   tokens" prints a word for an empty list of colors.
 - **A Tail between two of its host's adjuncts.** Only the two placements exist.
@@ -726,7 +725,7 @@ things are known limits:
 The declarations under `plugins/` still write a Hole `<name>`: 784 Holes on 601 `spelling`
 lines, three of which need a tie (`landwalk`, `typecycling` and `non`) and two an ordinal
 (`fromTop` and `fromBottom`, "$n@Ordinal from …"). No declaration writes a form label, a `*` or
-a `<.>` join yet. The `syl-spelling-conventions` ticket migrates the Holes, and
+a `#<.>` join yet. The `syl-spelling-conventions` ticket migrates the Holes, and
 `syl-spelling-forms-and-runs` writes the labels, marks and joins.
 
 ## 8. Capacity and cost

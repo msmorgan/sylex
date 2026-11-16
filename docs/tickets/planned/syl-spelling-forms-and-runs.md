@@ -7,7 +7,7 @@ needs: [syl-spelling-conventions]
 ## Why
 
 `docs/design/spelling.md` §7 states a Hole's printed form (`$name@Form`), a Hole a run of
-sentences may fill (`$name*`) and a list whose elements are each a run (`<.>`), and no spelling
+sentences may fill (`$name*`) and a list whose elements are each a run (`#<.>`), and no spelling
 under `plugins/` writes any of them. Without them a numeric Hole prints in no stated notation
 ("draw $amount cards" admits "draw 2 cards" and "draw a card" alike), `does` and `did` have the
 same spelling, and every `Action` Hole reads as one phrase, so no trigger's wording holds the
@@ -32,7 +32,7 @@ claimed). Oracle prints "one" where `Counting` prints the article (*Melira, the 
   `activatedOnlyDuring`'s `action`, and any other the run rule (`spelling.md` §2) covers. The
   landing lists each, with a card whose text fills it with more than one sentence or the reason
   none does.
-- A list Hole whose elements each print as a run is written with the `<.>` join and no `*`; the
+- A list Hole whose elements each print as a run is written with the `#<.>` join and no `*`; the
   landing lists them.
 - The corpus means the same before and after: a one-off script, kept in `docs/evidence/`, checks
   that every declaration's tree is unchanged apart from its `spelling`, comments and the added

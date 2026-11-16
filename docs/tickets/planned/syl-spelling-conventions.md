@@ -55,7 +55,7 @@ the check that every `spelling` parses.
 
 Writing the optional parts and list Holes `TODO(spelling)` markers need:
 `syl-spelling-optional-segments`. Form labels other than the ordinal, `Counting`, the `one`
-Template, `*` run Holes and `<.>` joins: `syl-spelling-forms-and-runs`. Recovering a term and
+Template, `*` run Holes and `#<.>` joins: `syl-spelling-forms-and-runs`. Recovering a term and
 spelling one out, the rest of the spelling crate.
 
 ## Pointers

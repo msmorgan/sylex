@@ -52,7 +52,7 @@ and the tickets after it the other words that take a `Subject`.
   the wrapper; the landing reports the counts it compared.
 - `deal`'s second passive has its Template `dealIndirect(recipient, damage)`, written only under
   `done`: *Grollub*'s event is `does(thisCreature, be(done(dealIndirect(subject, bare(damage)))))`.
-- `becomeBlocked(by: Option(NounPhrase) = none)`, worded "become blocked( by $by)", and `resolve`
+- `becomeBlocked(by: Option(NounPhrase) = none)`, worded "become blocked< by $by>", and `resolve`
   take no subject, and neither do `becomeBlocking`, `stopBlocking` and `phaseOutUntil`, which
   nothing calls. *Chub Toad*, `bushido`, `afflict`, `rampage`, `buyback`, `haunt`, `paradigm` and
   `rebound` are rewritten, and *Aisling Leprechaun*'s and *Inferno Elemental*'s

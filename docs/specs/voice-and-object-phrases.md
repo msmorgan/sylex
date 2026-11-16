@@ -302,7 +302,7 @@ regenerating a permanent [CR#701.19a,701.19c]. So *Matopi Golem*'s "When it rege
 is `regeneration` said of its subject. How the two are written is `syl-explicit-deeds`'s question.
 
 **"Becomes blocked" is one word with an optional agent**, `becomeBlocked(by = none)`, "become
-blocked( by $by)". Its two forms are two events, and an absent `by` is not "by anything": a
+blocked< by $by>". Its two forms are two events, and an absent `by` is not "by anything": a
 pattern watches what it writes (`semantics.md` §3.2).
 
 - Without `by`, the Blocked status begins: once each combat, and an effect can cause it with no

@@ -38,7 +38,7 @@ turn, where X is …" on the clause after "If you do,", past its duration.
 
 - One Template per host sort (`Clause`, `StaticSpec`, and the keyword-line item where a keyword
   prints "X, where X is …"), each taking its host and its letter definitions, worded
-  "$host, where $definitions<and>", added as a card needs it. The supplement stands at its host's
+  "$host, where $definitions#<and>", added as a card needs it. The supplement stands at its host's
   right edge, so the host is a Hole and the wording is substitution.
 - The `Clause` Template's host is the finite clause the supplement adjoins: a `clause` (*Aven
   Shrine*'s "that player gains X life", *Surrakar Spellblade*'s "you may draw X cards",
@@ -52,7 +52,7 @@ turn, where X is …" on the clause after "If you do,", past its duration.
   them onto the battlefield tapped, then shuffles." The Reading adjoins the supplement to the
   first verb-phrase conjunct ("searches their library for up to X basic land cards") inside the
   linked coordination, by an adjunct the grammar admits only on a non-final conjunct (`nonfinal`).
-  A standalone wording "$host, where $definitions<and>" at `VerbPhrase` is no English on its
+  A standalone wording "$host, where $definitions#<and>" at `VerbPhrase` is no English on its
   own, so the load check that every variant of a `spelling` parses would refuse it. Options: the
   load check parses a wording in the context its Category allows (a non-final conjunct); or the
   supplement is part of the coordination's Template, which takes the first step's definitions.
