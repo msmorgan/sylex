@@ -23,22 +23,16 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
   and attacking" beside "tapped under their control"), and their wording waits for that design
   (`docs/design/semantics.md` §6 item 13).
 - A list of modes takes the line-break join, written `$modes#<\n>` with the `.syl` string escape
-  for a line break, as the grammar's `Modes` joins its `Mode`s, and a
-  mode's bullet is the mode's own wording, with its cost clause an optional part.
-
-## Open questions
-
-- **Whether a string may still hold a typed line break once `\n` exists.** `chooseOne`'s
-  `spelling` holds two today. Options: the lexer still reads one and the printer writes every
-  line break in a string as `\n`, so `cargo xtask dsl fmt` rewrites it; the lexer refuses one;
-  or both forms stand. Recommendation: the printer writes `\n` and the lexer still reads a
-  typed one, so one value has one written form after formatting.
+  for a line break (the printer writes every line break in a string that way), as the grammar's
+  `Modes` joins its `Mode`s, and a mode's bullet is the mode's own wording, with its cost clause an
+  optional part.
 
 ## Done when
 
-- The open question is answered.
-- `sylex_syl`'s lexer reads `\n` in a string as a line break and still refuses any other new
-  escape, with a test for each, and `docs/design/syl.md` §2 no longer says the lexer lacks it.
+- `sylex_syl`'s lexer reads `\n` in a string as a line break, still reads a typed one and still
+  refuses any other new escape, and its printer writes every line break in a string as `\n`,
+  with a test for each. `cargo xtask dsl fmt` has rewritten `chooseOne`'s `spelling`, and
+  `docs/design/syl.md` §2 no longer says the lexer lacks the escape.
 - `chooseModes` and `chooseSpree` are spelled over their list of modes with the line-break join,
   and a mode's wording prints its bullet and, where it has one, its cost; each is checked
   against a modal card (*Cryptic Command*) and a spree card. The landing says whether
