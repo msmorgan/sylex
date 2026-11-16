@@ -11,7 +11,7 @@ card singleFaced({
                   rollRange(1, 9),
                   instruct(this, dealDamage(amount = 3, recipient = each(isCreature)))),
                 rollRow(
-                  fromTo(10, 19),
+                  rollRange(10, 19),
                   sequentially([
                       may(choose(a(isCreature))),
                       instruct(
