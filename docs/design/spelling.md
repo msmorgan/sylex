@@ -538,10 +538,11 @@ representation yet.
 
 A `spelling` is fixed words with markup, each mark with one job. `$` marks a Hole, `@` the printed
 form of its head word, `*` a Hole a run of sentences may fill, `~` ties a Hole to letters,
-angle brackets mark an optional part, `#< … >` a list's join, `%` a Tail, and `^` a Gap.
+angle brackets mark an optional part, `#< … >` a list's join, `%` a Tail, `#` and `##` an
+own-name word's full and Shortened Name forms, and `^` a Gap.
 
 ```
-spelling := gap | part* [tail]
+spelling := gap | own-name | part* [tail]
 part     := text | hole | optional
 hole     := [affix "~"] "$" name [mark] ["~" affix]   -- a parameter's argument
           | "$" name "#<" join ">"                    -- a List parameter
@@ -553,6 +554,7 @@ optional := "<" part* [tail] ">"                    -- not empty
 tail     := "%" ["inner "] Category ": " part+       -- last in its spelling or optional part;
                                                     -- holds no Tail, at any depth
 gap      := "^"                                     -- the whole spelling of a Gap's word
+own-name := "#" | "##"                              -- the whole spelling of an own-name word
 affix    := letter+
 text     := any characters except "$", "~", "@", "*", "^", "#", "%", "<" and ">"
 ```
@@ -680,6 +682,13 @@ is checked as English with the Gap in place. Once `_` is declared, every word a 
 hold has a `spelling`, except the promoted `subject` of a passive, which is no Gap (§2), and a
 declaration with no `spelling` is a word only a rule may use ([Semantics](semantics.md) §4).
 
+**An own-name word is `#` or `##`.** Each stands alone as the whole `spelling` of its word:
+`ownName` has `spelling = "#"` for the enclosing object's full name (a card face's name [CR#201.5],
+the name a creating effect sets on a named token [CR#111.4], or the granting source named inside a
+granted ability [CR#201.5a]), and `shortenedName` has `spelling = "##"` for its Shortened Name
+[CR#201.5c]. On the English side they stand for the enclosing object's own name Lexeme in its `Full`
+and `Shortened` forms ([Lexicon](lexicon.md) §6).
+
 **The notation does not yet express passive subject promotion (§2).** Nothing marks a
 context's Subject Hole and Action Hole as the pair the rule links, or which Action's parameter
 fills the promoted position. Until it does, a promoted Subject stands outside the check that a
@@ -702,8 +711,8 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
   absent value by that `spelling`, and a term that supplies another value has no wording by it.
 - **An optional part directly holds no Hole.** Fixed words alone recover no argument. A Hole in
   the part's own Tail counts as directly in it.
-- **Nothing is certain to print.** Outside every optional part there is text, a Hole, a Tail
-  or a Gap.
+- **Nothing is certain to print.** Outside every optional part there is text, a Hole, a Tail,
+  an own-name token or a Gap.
 - **A variant is not English.** Every variant, which is each consistent choice of optional
   parts with each list Hole at one, two and three elements, must parse under the English
   grammar: its in-place part at a Category its result sort is spelled as, and each Tail as a
@@ -717,7 +726,7 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
   a word on its side of the sort, counting two sorts as one when a coercion or `Option` takes one
   to the other, each optional part by an optional, each list Hole by one or more of its element's
   sort with its join between, each Tail by a bracketed section keyed by its placement and host
-  Category around its own parts, and a Gap by its own single atom. The result is a regular
+  Category around its own parts, and a Gap or own-name token by its own single atom. The result is a regular
   expression over words, sorts and markers, and no sequence may match it in two ways. Two optional
   parts that each hold only a bare Hole of one sort are the case it catches, since one printed
   phrase would recover as either argument. No `spelling` under `plugins/` is refused by it

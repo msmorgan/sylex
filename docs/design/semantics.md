@@ -214,6 +214,11 @@ eligible for bare `thatMuch`. `chosenNumber` is no numeric anaphor: it belongs t
 family (`theChoice`, `theLatestChoice`) and crosses ability boundaries on linked choice abilities
 ([CR#607.2d]).
 
+`ownName` (to which `shortenedName` expands, [CR#201.5c]) names the object whose characteristics
+hold the ability: a card face's object ([CR#201.5,201.5b]) or a named token whose creating effect
+set its name ([CR#111.4]). Inside an ability granted to another object, resolution determines from
+the enclosing grant whether `ownName` names the ability's bearer or the granting source ([CR#201.5a]).
+
 ### 2.5 The Contrast Anchor
 
 A bare printed "another" or "other" (`other`) excludes its Contrast Anchor, which need not be a
