@@ -527,13 +527,13 @@ representation yet.
 
 ## 7. The `spelling` notation
 
-A `spelling` is fixed words with markup, each mark with one job. `$` marks a Hole, `@` the
-printed form of its head word, `*` a Hole a run of sentences may fill, `~` ties a Hole to
-letters, parentheses mark an optional part, angle brackets a list's join, and `<~ … >` a Tail.
+A `spelling` is fixed words with markup, each mark with one job. `$` marks a Hole, `@` the printed
+form of its head word, `*` a Hole a run of sentences may fill, `~` ties a Hole to letters,
+parentheses mark an optional part, angle brackets a list's join, `<~ … >` a Tail, and `^` a Gap.
 
 ```
 spelling := part*
-part     := text | hole | optional | tail
+part     := text | hole | optional | tail | gap
 hole     := [affix "~"] "$" name [mark] ["~" affix]   -- a parameter's argument
           | "$" name "<" join ">"                     -- a List parameter
 mark     := "@" form | "*"
@@ -542,8 +542,9 @@ form     := "Cardinal" | "Arabic" | "Ordinal" | "Roman" | "Counting"
 join     := "" | "," | "." | "and" | "or" | "and/or" | "then"
 optional := "(" part+ ")"
 tail     := "<~" ["inner"] Category ":" part+ ">"
+gap      := "^"                                     -- no word; a Gap in the Reading
 affix    := letter+
-text     := any characters except "$", "~", "@", "*", "(", ")", "<" and ">"
+text     := any characters except "$", "~", "@", "*", "^", "(", ")", "<" and ">"
 ```
 
 **A Hole is `$name`**, the sigil that reads the same parameter in `body`
@@ -653,6 +654,14 @@ host's other trailing dependents. Tails that land at one edge print in the order
 and an argument printed at two Holes prints its Tail once. A Tail stands last among the parts
 beside it and holds no Tail.
 
+**A Gap is `^`.** A word that stands for a Gap is spelled with the mark and nothing else:
+`which`, the Gap of a relative clause, and `_`, the Gap a shared phrase fills, are each
+`spelling = "^"`. The mark prints no word. Where it stands, the Reading has a Gap of the
+Category its word's sort is spelled as (§1), and a wording that holds one is checked as English
+with the Gap in place. So every word a card's term may hold has a `spelling`, except the
+promoted `subject` of a passive, which is no Gap (§2), and a declaration with no `spelling` is
+a word only a rule may use ([Semantics](semantics.md) §4).
+
 **The notation does not yet express passive subject promotion (§2).** Nothing marks a
 context's Subject Hole and Action Hole as the pair the rule links, or which Action's parameter
 fills the promoted position. Until it does, a promoted Subject stands outside the check that a
@@ -660,9 +669,9 @@ variant is English (below), and so do the sentences of a run after its first: th
 substitutes one phrase for each Hole where the Hole stands, and under passive subject promotion
 and in a run's later sentences the printed material stands elsewhere (§10).
 
-**No escape exists, because none is needed.** None of `$`, `~`, `@`, `*`, `(`, `)`, `<` and `>`
-occurs in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `@`, `*`, `<` and `>`
-occur in no in-scope card's text at all, and every parenthesis is removed with reminder text: a
+**No escape exists, because none is needed.** None of `$`, `~`, `@`, `*`, `^`, `(`, `)`, `<` and
+`>` occurs in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `@`, `*`, `^`, `<` and
+`>` occur in no in-scope card's text at all, and every parenthesis is removed with reminder text: a
 parenthetical is reminder text even where it reminds the player of something other than a
 keyword's rule, as on Mistform Ultimus, and one inside an ability-word label has no rules
 meaning. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
@@ -673,8 +682,8 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
 - **A parameter has no Hole and is not omissible.** A parameter with no Hole is fixed at its
   absent value by that `spelling`, and a term that supplies another value has no wording by it.
 - **An optional part directly holds no Hole.** Fixed words alone recover no argument.
-- **Nothing is certain to print.** Outside every optional part there is text, a Hole or a
-  Tail.
+- **Nothing is certain to print.** Outside every optional part there is text, a Hole, a Tail
+  or a Gap.
 - **A variant is not English.** Every variant, which is each consistent choice of optional
   parts with each list Hole at one, two and three elements, must parse under the English
   grammar: its in-place part at a Category its result sort is spelled as, and each Tail as a

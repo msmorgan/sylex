@@ -355,8 +355,9 @@ that bound does most of the work, and the refusal above matters for a term writt
 
 Which words those are is read from the declarations. Every primitive has a declaration of its
 own, which is where a wording attaches ([`syl.md`](./syl.md) §1), so a word only a rule may use
-is one whose declaration has no `spelling` and which no rule of the spelling grammar places
-silently, as it places a Gap or a promoted subject. No separate list names them.
+is one whose declaration has no `spelling`. A word that stands for a Gap is spelled with the Gap
+mark (`spelling.md` §7), and the one word a card may hold that has no `spelling` is the promoted
+`subject` of a passive. No separate list names them.
 
 **Why one layer.** Which box a clause opens depends on what the clause is, reference resolution
 needs the boxes, and the meaning needs resolved references, since an event pattern's subject is
@@ -461,3 +462,9 @@ are found over enumerated candidates or over a packed form is open (§6).
 15. **Refusals that are lowering's today.** `voice-and-object-phrases.md` §6 has lowering refuse
     an object phrase a verb cannot read; a candidate refused only there is stored before it is
     refused.
+16. **Whether the Gap of a relative clause and the Gap a shared phrase fills are one word.**
+    `which` and `_` are both the Gap at `NounPhrase`, each spelled `^` (`spelling.md` §7), and
+    what fills each is decided by the construct around it. The grammar has other kinds of Gap
+    (`Gap` in `crates/syntax/src/step.rs`), which the term language writes with fixed-wording
+    Templates (`voice-and-object-phrases.md` §7). That at most one Gap of the right sort stands
+    in a phrase is a checker refusal today and could be a property of the Rust structures.

@@ -20,9 +20,9 @@ Written against the spine (`cleanup-step6-spine`).
 ## Design
 
 - The notation is settled in `docs/design/spelling.md` §7 (`$name` Holes, `$name@Form` printed
-  forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a join is nothing, `,`, `.`, `and`,
-  `or`, `and/or` or `then`, never chosen by a parameter), `( … )` optional parts,
-  `<~Category: …>` and `<~inner Category: …>` Tails) with its load rules; where this ticket's text
+  forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a join is nothing, `,`, `.`, `and`, `or`,
+  `and/or` or `then`, never chosen by a parameter), `( … )` optional parts, `<~Category: …>` and
+  `<~inner Category: …>` Tails, the `^` Gap mark) with its load rules; where this ticket's text
   differs, §7 governs.
 - The notation is parsed by a new crate, `sylex_spelling` (`crates/spelling/`), whose first
   module it is. `sylex_syl` parses the `.syl` language and nothing else: a `spelling` stays a
