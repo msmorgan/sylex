@@ -345,6 +345,10 @@ primitives and positions, never which Template a card calls, since a Template ad
 keeps its own slot after the trigger condition [CR#603.4]: each is printed structure that
 classification needs.
 
+A replacement is written with the ordinary conditional word: no word of its own marks the
+sentence, and classification reads the replacement off its `instead`. A Definition's body is
+classified at each call, in the expanded tree.
+
 **A word only a rule may use is refused in a card.** The rules are transcribed into surface form
 as cards are ([`surface.md`](./surface.md) §4), and some of their words name what no card prints
 (`asEvent`, `stateBasedActionsChecked`). No sort separates them from a card's words, so
@@ -416,66 +420,54 @@ are found over enumerated candidates or over a packed form is open (§6).
    than a hundred sorts, among them `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
    `Timing` and `TriggerCondition`, and none of those has been put to the test. Each is a kind of
    phrase the text prints, a classification that moves into the meaning, or part of the frame a
-   rule is written in ([`surface.md`](./surface.md) §4, and item 9).
-2. **Which word holds a replacement's two clauses.** *Phytohydra* prints "If damage would be
-   dealt to this creature, put that many +1/+1 counters on it instead." With `instead` a
-   primitive (§4), either the sentence's "if" is the ordinary conditional word and classification
-   reads the replacement off the `would` and the `instead`, or `replace` stays a word of its
-   own for this wording.
-3. **The pragmatics defaults and the form of the data.** [`pragmatics.md`](./pragmatics.md) §4
+   rule is written in ([`surface.md`](./surface.md) §4, and item 7).
+2. **The pragmatics defaults and the form of the data.** [`pragmatics.md`](./pragmatics.md) §4
    keeps four hypotheses for one kind of ambiguity and settles none. The list of ambiguities
    that reach pragmatics and the default for each come from the first run of §5 over the corpus.
    "This creature is tapped" under "as long as" (*Centaur Omenreader*) has a copular and a
    passive Reading, and no rule here or there picks.
-4. **How candidates of one class are told apart for storing** (§5 step 5): the fixed rule is not
-   chosen (item 8).
-5. **A name for the meaning.** What semantics builds has no name of its own yet.
-6. **Sentences that depend on an earlier one.** "If the player does, untap that creature."
+3. **How candidates of one class are told apart for storing** (§5 step 5): the fixed rule is not
+   chosen (item 6).
+4. **Sentences that depend on an earlier one.** "If the player does, untap that creature."
    (*Apathy*) and the other follow-ups of `voice-and-object-phrases.md` §13 items 6 and 7 are
    ordinary sentences at the surface, and what links each to the choice or deed it follows is
    reference resolution's. Which Referent an optional deed introduces for "does" and "do" to
    read is not designed.
-7. **Words that meet at one sort.** A name is unique at its sort (`syl.md` §3), and clauses that
+5. **Words that meet at one sort.** A name is unique at its sort (`syl.md` §3), and clauses that
    stood at `Condition`, `GameEvent`, `StaticSpec` and `Replacement` stand at `Clause`. `doIf`
    is declared at `Action` and at `Replacement`, `replace` at `Action` and at `StaticSpec`,
    `nthOccurrence` at three sorts and `or` at ten. Each set that meets is one word, where its
    members print alike and differ only in what they mean, or needs names that tell its members
    apart. None has been examined.
-8. **When two meanings are the same** (§5 step 3). Equality has to ignore the identities
+6. **When two meanings are the same** (§5 step 3). Equality has to ignore the identities
    reference resolution allocates and keep printed order; it is not defined. The fixed rule of
    §5 step 5 cannot be the Reading's Ranking Key alone, since two terms from one Reading share
    it.
-9. **Which rules data becomes clauses and which sorts stay as frames**
+7. **Which rules data becomes clauses and which sorts stay as frames**
    ([`surface.md`](./surface.md) §4): a fair amount of the first and a fair few of the second,
    declaration by declaration. With it, what replaces `Condition` and `Action` where a clause is
    held: `SbaRule`'s `when` and `then`, the `intervening` parameter of `triggered`, a deontic
    rule's Unless Condition.
-10. **A Definition's meaning.** A Definition's sorts are checked once, at its declaration, and its
-    references in each context that expands it ([`surface.md`](./surface.md) §6). Whether
-    classification runs on a body once or at each call is not settled.
-11. **Whether the four steps run once in order.** "The same is true for …" (*Soulflayer*) takes
-    its clause's kind from the sentence it refers to, so classification there waits on a
-    reference. A prevention's event and its "prevent 1 of that damage" are joined by a reference
-    (*Urza's Armor*), and a later sentence may read a Referent the event introduced. A `shared`
-    phrase's `_` is read before the phrase it stands for.
-12. **What a Definition's outcome is** (§2.3), which decides what its body exports: the creature
-    manifest dread puts onto the battlefield is chosen from the cards looked at, and §2.3 drops
-    partitive Referents.
-13. **An anaphor with more than one accessible Referent.** §2.4 says which Referents an anaphor
+8. **Whether the four steps run once in order.** "The same is true for …" (*Soulflayer*) takes
+   its clause's kind from the sentence it refers to, so classification there waits on a
+   reference. A prevention's event and its "prevent 1 of that damage" are joined by a reference
+   (*Urza's Armor*), and a later sentence may read a Referent the event introduced. A `shared`
+   phrase's `_` is read before the phrase it stands for.
+9. **What a Definition's outcome is** (§2.3), which decides what its body exports: the creature
+   manifest dread puts onto the battlefield is chosen from the cards looked at, and §2.3 drops
+   partitive Referents.
+10. **An anaphor with more than one accessible Referent.** §2.4 says which Referents an anaphor
     may read and not which it reads when several qualify. Two meanings that differ only in an
     antecedent are one surface term, so the stored term cannot carry the choice: it is made by a
     fixed rule in the reference step each time a term is read, and that rule is not designed.
-14. **Enumerated candidates or a packed form** (§5).
-15. **Refusals that are lowering's today.** `voice-and-object-phrases.md` §6 has lowering refuse
-    an object phrase a verb cannot read; a candidate refused only there is stored before it is
-    refused.
-16. **Whether the Gap of a relative clause and the Gap a shared phrase fills are one word.**
+11. **Enumerated candidates or a packed form** (§5).
+12. **Whether the Gap of a relative clause and the Gap a shared phrase fills are one word.**
     `which` and `_` are both the Gap at `NounPhrase`, each spelled `^` (`spelling.md` §7), and
     what fills each is decided by the construct around it. The grammar has other kinds of Gap
     (`Gap` in `crates/syntax/src/step.rs`), which the term language writes with fixed-wording
     Templates (`voice-and-object-phrases.md` §7). That at most one Gap of the right sort stands
     in a phrase is a checker refusal today and could be a property of the Rust structures.
-17. **Depictives.** "Put it onto the battlefield tapped and attacking", "enters tapped" and
+13. **Depictives.** "Put it onto the battlefield tapped and attacking", "enters tapped" and
     "attacks alone" each end in a predicative that describes the subject or object as the event
     happens, which the English grammar reads as a `Depictive`. The term language writes the ones
     on a move as a `riders` list at the sort `MoveRider`, whose words print as the description
@@ -484,14 +476,14 @@ are found over enumerated candidates or over a packed form is open (§6).
     means on each verb (an Entry Rider on an entering) is classification's. It belongs with the
     verb phrase's other unselected dependents (`voice-and-object-phrases.md` §13 item 1) and is
     not designed.
-18. **An anaphor whose antecedent is printed after it.** §1 item 2 says reading order does not
+14. **An anaphor whose antecedent is printed after it.** §1 item 2 says reading order does not
     limit the direction of reference, and §4 step 3 resolves each mention in printed order by
     the rules of §2.4, which say nothing of a later mention.
-19. **No way to correct an antecedent.** If the fixed rule of item 13 picks the wrong Referent
+15. **No way to correct an antecedent.** If the fixed rule of item 10 picks the wrong Referent
     on some card, the card's term cannot say so: it holds no labels, and pragmatics does not run
     on a stored term.
-20. **A stray candidate that is not understood.** Recovery gives every term the wording allows,
+16. **A stray candidate that is not understood.** Recovery gives every term the wording allows,
     and one of them that semantics has no rule for keeps a card from storing its right term
     (§5 step 2). Refusing what is not understood instead would drop real constructions.
-21. **Boxes for modes.** §2.2 has no box for `chooseModes`: a mode is neither a branch that
+17. **Boxes for modes.** §2.2 has no box for `chooseModes`: a mode is neither a branch that
     closes nor top-level text.

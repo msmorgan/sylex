@@ -8,9 +8,9 @@ needs: [cleanup-step6-surface, syl-shared-phrase-written-once, syl-replacement-s
 
 `docs/design/semantics.md` §4 says how a surface term is read into its meaning: classify each
 clause, open its boxes, resolve its references, build the meaning. Nothing has run it. Its §6
-already lists what the steps as written leave unsettled (items 11 to 13), and taking the
+already lists what the steps as written leave unsettled (items 8 to 10), and taking the
 sorts that say what a clause means out of the term language makes several names meet at one sort
-(item 7). Building `sylex_semantics` on that design untested commits to it, and removing the
+(item 5). Building `sylex_semantics` on that design untested commits to it, and removing the
 scaffolding sorts from the corpus first commits harder. A slice that is thrown away tests both
 on the real declarations once the surface gate, the shared phrase and the clause-form
 replacements have landed.
@@ -33,8 +33,7 @@ replacements have landed.
   design-doc edits the findings force.
 - What the slice does not test it does not decide. Crate boundaries, the sorts beyond the names
   that meet, the pragmatics data and recovery get the crudest stub that lets the cards be read,
-  and the findings list each stub as not decided. How a replacement's two clauses are held
-  (`semantics.md` §6 item 2) is one of them: a replacement is written both ways.
+  and the findings list each stub as not decided.
 
 ## Done when
 

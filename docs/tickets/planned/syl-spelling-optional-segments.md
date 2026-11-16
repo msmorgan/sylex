@@ -23,8 +23,8 @@ Written against the spine (`cleanup-step6-spine`).
 - The notation is settled in `docs/design/spelling.md` §7 (`$name` Holes, `$name@Form` printed
   forms, `$name*` run Holes, `~` ties, `$xs#<join>` lists, `< … >` optional parts, `%Category: …`
   Tails, the `^` Gap mark); where this ticket's text differs, §7 governs. The parser built here
-  checks the notation's syntax. §7's load rules that need a declaration or the English grammar
-  are checked by no ticket yet.
+  checks the notation's syntax, and `cargo xtask dsl check` the load rules that need only the
+  declaration.
 - The notation is parsed by a new crate, `sylex_spelling` (`crates/spelling/`), whose first
   module it is. `sylex_syl` parses the `.syl` language and nothing else: a `spelling` stays a
   string to it. `cargo xtask dsl check` parses every `spelling` with it, once this
@@ -46,6 +46,11 @@ Written against the spine (`cleanup-step6-spine`).
   from …" become "$n@Ordinal from …", and no spelling under `plugins/` contains `~th`.
 - `cargo xtask dsl check` parses every `spelling` under `plugins/` with `sylex_spelling` and
   refuses one it cannot parse, with a negative test.
+- `cargo xtask dsl check` also refuses, with a negative test for each, the load rules of §7 that
+  need only the declaration: a Hole that names no parameter of its declaration; a parameter
+  that has no Hole and is not omissible; an ambiguous skeleton; and a lone list that would word
+  as its element. The rule that every variant is English needs the English grammar and is not
+  checked here.
 - `docs/design/spelling.md` §8 says what the spelling crate holds, where it says no spelling
   crate exists, and `docs/design/architecture.md` says `sylex_spelling` parses the `spelling`
   notation, beside its sentence that `sylex_syl` parses `.syl`.
@@ -55,7 +60,7 @@ Written against the spine (`cleanup-step6-spine`).
   with "and", "onto the battlefield tapped under their control" sets two side by side, and no
   line prints "tapped attacking", so a riders list is not one list under one join. They are
   depictives, which the design of a verb phrase's dependents replaces
-  (`docs/design/semantics.md` §6 item 17). `putInto`'s marker and the markers of the Templates
+  (`docs/design/semantics.md` §6 item 13). `putInto`'s marker and the markers of the Templates
   over it stay, each rewritten to name that as what it waits on.
 - The notation has no mark for the Holes of the words that take a `Subject` and a verb phrase
   (`does`, `would`, `did`, `cant`, `must`, `can`, `gatedBy`, `doesnt`), whose `Subject` selects
@@ -85,7 +90,7 @@ Written against the spine (`cleanup-step6-spine`).
 ## Not in scope
 
 The wording of a move's riders ("tapped and attacking", "under your control"): the depictives
-design (`docs/design/semantics.md` §6 item 17).
+design (`docs/design/semantics.md` §6 item 13).
 
 The other spelling conventions (verb inflection): `syl-spelling-conventions`.
 

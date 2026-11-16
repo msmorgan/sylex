@@ -452,8 +452,8 @@ do not select things the way "creature" does:
   verb phrase is the event pattern. `prevent` over such a phrase is a prevention effect
   [CR#615.1a]: it covers all such damage under "all", and is a shield of N under "the next N"
   [CR#615.7].
-- A verb whose lowering cannot read the phrase it is given refuses it. Nothing in the sort
-  system does; lowering refuses it.
+- A verb that cannot read the phrase it is given refuses it. Nothing in the sort system does;
+  semantics refuses it (`docs/design/semantics.md` §4), and until semantics exists nothing does.
 
 **The numeral's notation follows the head.** Oracle prints "3 damage" and "3 life" but "three
 +1/+1 counters" and "two cards". A Hole's notation is stated by its own wording
