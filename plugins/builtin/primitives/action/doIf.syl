@@ -2,5 +2,4 @@
 primitive doIf(
   condition: Condition,
   action: VerbPhrase,
-  otherwise: Option(VerbPhrase) = none,
-  postposed: Bool = false): VerbPhrase = DoIf
+  otherwise: Option(VerbPhrase) = none): VerbPhrase = DoIf

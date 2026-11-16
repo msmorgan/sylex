@@ -1,12 +1,12 @@
 # "<action> if <condition>" ("counter target spell if its mana value is X"): the conditional
-# action with its condition printed after it (`postposed`): the condition reads the action's
-# targets and its mentions of earlier referents as the clause ranks them ("the creature you control
-# gets +2/+1 until end of turn if it's a Knight"), but nothing the action would choose or create
-# as it resolves [CR#601.2c,608.2c].
+# action with its condition printed after it: in printed read order (`syl.md` §5), the condition
+# reads the action's targets and its mentions of earlier referents as the clause ranks them ("the
+# creature you control gets +2/+1 until end of turn if it's a Knight"), but nothing the action
+# would choose or create as it resolves [CR#601.2c,608.2c].
 template doOnlyIf(
   action: VerbPhrase,
   condition: Condition,
   otherwise: Option(VerbPhrase) = none): VerbPhrase {
   spelling = "$action if $condition<. Otherwise, $otherwise>",
-  body = doIf($condition, $action, otherwise = $otherwise, postposed = true)
+  body = doIf($condition, $action, otherwise = $otherwise)
 }
