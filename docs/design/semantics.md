@@ -235,8 +235,7 @@ since a "can't" outranks anything that allows the thing ([CR#101.2]).
   matches the event ([CR#603.2c,715.2b]).
 - **`remove` is no event head.** What it names, an effect taking an attachment off its host by
   way of a state-based action ([CR#704.5m,704.5n]), is no one event, so `remove` names no Deed
-  and is refused here. It is written in a negative declarative, "this effect doesn't remove this
-  Aura" ([CR#702.16n]).
+  and is refused here. How it is written is [`surface.md`](./surface.md) §7.6.
 
 ### 3.3 Static Statements
 
@@ -292,10 +291,6 @@ patients are read as they were when the event happened, through the zone change'
 
 ### 3.5 Standing Mechanisms
 
-- `getsPt` carries both printed deltas ("+X/+0"), because spelling must render them back
-  ([CR#613.4c]).
-- A word replacement accepts only the replaceable word sorts, so a card name is unrepresentable
-  ([CR#612.2a]).
 - Splice is a reveal made as the spell is cast, not a replacement of the cast ([CR#702.47b]).
 - Subtype and counter state-based actions are Conferrals on their definitions
   ([CR#704.5m,704.5q]).
@@ -397,8 +392,8 @@ are found over enumerated candidates or over a packed form is open (§6).
    it to the four sorts the voice spec worked around. `plugins/builtin/` declares words at more
    than a hundred sorts, among them `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
    `Timing` and `TriggerCondition`, and none of those has been put to the test. Each is a kind of
-   phrase the text prints, a classification that moves into the meaning, or rules data, which stays
-   ([`surface.md`](./surface.md) §4).
+   phrase the text prints, a classification that moves into the meaning, or part of the frame a
+   rule is written in ([`surface.md`](./surface.md) §4, and item 9).
 2. **Which word holds a replacement's two clauses.** *Phytohydra* prints "If damage would be
    dealt to this creature, put that many +1/+1 counters on it instead." With `instead` a
    primitive (§4), either the sentence's "if" is the ordinary conditional word and classification

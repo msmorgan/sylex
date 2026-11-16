@@ -3,8 +3,16 @@
 ## Status: DRAFT
 
 This document is directional. It describes what a surface term may say: the stored `.syl` term
-of a card, which follows the card's English and says nothing about what its words do in the
-game. The design is not settled, and [`semantics.md`](./semantics.md) §6 lists what is open.
+of a card, which follows the card's English and does not say which of its clauses is an event, a
+condition, a static statement or a replacement. The design is not settled, and
+[`semantics.md`](./semantics.md) §6 lists what is open.
+
+A surface term has a meaning, and has it indirectly. The Comprehensive Rules are transcribed
+into surface form the same way a card's text is: a keyword's Definition is the rule that defines
+the keyword, written as a surface term. Every word that can be defined in terms of other words
+is, by a Template or a Definition, down to the primitives. Semantics takes it from there: it
+reads the expanded term and gives the primitives and the places a clause stands their meaning
+([`semantics.md`](./semantics.md) §4).
 
 - **Companions:** [`syl.md`](./syl.md), the language a surface term is written in, and
   [`semantics.md`](./semantics.md), how a surface term is read into its meaning.
@@ -13,8 +21,9 @@ The words a surface term is built from are designed in `docs/specs/voice-and-obj
 (the clause, the verb phrase and its operators, the object phrases) and in the planned tickets
 that build them. §6 and §7 say what Definitions, Templates and the action-clause spine are in
 today's term language, where the sorts that say what a clause means are still in it (§2). They
-were written when the term stated its own meaning, so they still say what some words mean
-beside how they are written, and the tickets that build the clause and voice words rewrite them.
+were written when the term classified its own clauses, so they still say what some statements
+mean beside how they are written, and the tickets that build the clause and voice words
+rewrite them.
 
 ## 1. A Sort Names a Kind of Phrase
 
@@ -70,12 +79,13 @@ declaration's parameters. Expansion is unchanged: it substitutes a Template's pa
 a Definition's body in its Reference Scope under its Deed, keeps every call and parameter
 boundary, and reads each argument once, in printed order ([`syl.md`](./syl.md) §4, §5).
 
-**Rules data is not text a card prints.** A state-based action or a conferral is a record (an
-`SbaRule`'s `scope`, `when` and `then`; a `ConferralRule`'s `scope` and `confer`), a declaration's
-`confers` field holds `Conferral` values, and some Definition bodies use words no card prints
-(`asEvent` in `lifelink`, `stateBasedActionsChecked`). Their sorts say what the data does in the
-game and stay. Where the line between rules data and printed text runs, what keeps a card from
-calling a rules-only word, and what the clauses inside rules data are written as are open
+**The rules are transcribed as cards are.** A Definition's body, a state-based action and a
+conferral state a rule of the Comprehensive Rules in surface form. Today a state-based action
+and a conferral are records (an `SbaRule`'s `scope`, `when` and `then`; a `ConferralRule`'s
+`scope` and `confer`), a declaration's `confers` field holds `Conferral` values, and some bodies
+use words no card prints (`asEvent` in `lifelink`, `stateBasedActionsChecked`). How much of that
+becomes clauses as a rule states them, which of those sorts stay as the frame a rule is written
+in, and what keeps a card from calling a rules-only word are open
 ([`semantics.md`](./semantics.md) §6).
 
 ## 5. What Is Checked at the Surface
@@ -269,7 +279,15 @@ effect are [`semantics.md`](./semantics.md) §3.3.
   - `withRiders`: the entering happens with Entry Riders.
 - **A negative declarative** `doesnt(subj, action)` says what its Subject does not do. It is no
   deontic rule and takes no modifiers. "This effect doesn't remove this Aura" is
-  `doesnt(actor(thisEffect), remove(thisAura))`, written as the card prints it: its own Static
-  Spec beside the spec it talks about, the two joined by `conjunction` in one static ability.
-  Which consequence of the effect it exempts, an Aura put into its owner's graveyard or Equipment
-  unattached ([CR#704.5m,704.5n]), is the engine's ([CR#702.16n]).
+  `doesnt(actor(thisEffect), remove(thisAura))`, written as the card prints it: its own Static Spec
+  beside the spec it talks about, the two joined by `conjunction` in one static ability. Which
+  consequence of the effect it exempts, an Aura put into its owner's graveyard or Equipment
+  unattached ([CR#704.5m,704.5n]), is the engine's ([CR#702.16n]). `remove` is written only here:
+  it is no event head ([`semantics.md`](./semantics.md) §3.2).
+
+### 7.7 What a Term Holds for Spelling
+
+- `getsPt` carries both printed deltas ("+X/+0"), because spelling must render them back
+  ([CR#613.4c]).
+- A word replacement accepts only the replaceable word sorts, so a card name is unrepresentable
+  ([CR#612.2a]).
