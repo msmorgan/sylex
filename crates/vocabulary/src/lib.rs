@@ -55,6 +55,7 @@ use crate::schema::Subtypes;
 use crate::schema::Token;
 use crate::schema::TurnPart;
 use crate::schema::Types;
+use crate::schema::VerbDecl;
 use crate::schema::VerbEntry;
 pub use crate::shortening::AttestedShortenings;
 pub use crate::shortening::short_name;
@@ -74,7 +75,7 @@ pub enum SourceError {
 
 /// Every data file of this crate, by path: embedded at build time in release
 /// and wasm builds, read at run time in dev builds ([`data_text!`]).
-static FILES: [(&str, LazyLock<String>); 20] = [
+static FILES: [(&str, LazyLock<String>); 21] = [
     (CLOSED_CLASS, data_text!("lexicon/english/closed_class.ron")),
     (PREPOSITIONS, data_text!("lexicon/english/prepositions.ron")),
     (VERBS, data_text!("lexicon/english/verbs.ron")),
@@ -83,6 +84,7 @@ static FILES: [(&str, LazyLock<String>); 20] = [
     (ADVERBS, data_text!("lexicon/english/adverbs.ron")),
     (TYPES, data_text!("catalogs/types.ron")),
     (SUBTYPES, data_text!("catalogs/subtypes.ron")),
+    (CATALOG_VERBS, data_text!("catalogs/verbs.ron")),
     (KEYWORD_ACTIONS, data_text!("catalogs/keyword_actions.ron")),
     (
         KEYWORD_ABILITIES,
@@ -111,6 +113,7 @@ const ADJECTIVES: &str = "lexicon/english/adjectives.ron";
 const ADVERBS: &str = "lexicon/english/adverbs.ron";
 const TYPES: &str = "catalogs/types.ron";
 const SUBTYPES: &str = "catalogs/subtypes.ron";
+const CATALOG_VERBS: &str = "catalogs/verbs.ron";
 const KEYWORD_ACTIONS: &str = "catalogs/keyword_actions.ron";
 /// The class of a Keyword Lexeme whose face has its bracketed text removable:
 /// [`schema::KeywordAbility::bracketed_text_removable`].
@@ -155,6 +158,7 @@ pub struct Sources {
     pub adverbs: Vec<AdverbEntry>,
     pub types: Types,
     pub subtypes: Subtypes,
+    pub catalog_verbs: Vec<VerbEntry>,
     pub keyword_actions: Vec<KeywordAction>,
     pub keyword_abilities: Vec<KeywordAbility>,
     pub ability_words: Vec<AbilityWord>,
@@ -218,6 +222,7 @@ impl Sources {
             adverbs: parse(ADVERBS)?,
             types: parse(TYPES)?,
             subtypes: parse(SUBTYPES)?,
+            catalog_verbs: parse(CATALOG_VERBS)?,
             keyword_actions: parse(KEYWORD_ACTIONS)?,
             keyword_abilities: parse(KEYWORD_ABILITIES)?,
             ability_words: parse(ABILITY_WORDS)?,
@@ -664,15 +669,22 @@ impl Sources {
         Ok(())
     }
 
-    /// Keyword actions and keyword abilities, with their variants, verbs,
-    /// Bound Keyword Surfaces and stems.
+    /// Shared catalog verbs, keyword actions and keyword abilities, with their
+    /// variants, verbs, Bound Keyword Surfaces and stems.
     fn keywords(&self, builder: &mut Builder) -> Result<(), SourceError> {
         let catalog = |path: &str, owner: &str| source(SourceKind::Catalog, path, owner);
+        let mut shared_verbs = SharedVerbs::build(&self.catalog_verbs, builder)?;
         for action in &self.keyword_actions {
             let owner = action.rule.number();
-            for verb in &action.verbs {
-                let id = format!("action:{}", verb.lemma);
-                builder.verb(&id, verb, catalog(KEYWORD_ACTIONS, owner))?;
+            let entry_label = format!("keyword action `{}` ({owner})", action.name);
+            for decl in &action.verbs {
+                shared_verbs.resolve(
+                    builder,
+                    decl,
+                    &entry_label,
+                    "action",
+                    catalog(KEYWORD_ACTIONS, owner),
+                )?;
             }
             for adjective in &action.adjectives {
                 builder.adjective(
@@ -690,6 +702,7 @@ impl Sources {
         let mut stems = std::collections::BTreeSet::new();
         for ability in &self.keyword_abilities {
             let owner = ability.rule.number();
+            let entry_label = format!("keyword ability `{}` ({owner})", ability.name);
             let lemmas = std::iter::once(&ability.lemma)
                 .chain(ability.variants.iter().map(|variant| &variant.lemma));
             for lemma in lemmas {
@@ -729,9 +742,14 @@ impl Sources {
                 let id = format!("keyword_det:{}", entry.lemma);
                 builder.determinative(&id, entry, catalog(KEYWORD_ABILITIES, owner));
             }
-            for verb in &ability.verbs {
-                let id = format!("keyword_verb:{}", verb.lemma);
-                builder.verb(&id, verb, catalog(KEYWORD_ABILITIES, owner))?;
+            for decl in &ability.verbs {
+                shared_verbs.resolve(
+                    builder,
+                    decl,
+                    &entry_label,
+                    "keyword_verb",
+                    catalog(KEYWORD_ABILITIES, owner),
+                )?;
             }
             for decl in &ability.nouns {
                 let entry = decl.entry();
@@ -751,6 +769,7 @@ impl Sources {
                 }
             }
         }
+        shared_verbs.check_all_used()?;
         for stem in stems {
             let id = format!("stem:{stem}");
             builder.push(bound(
@@ -949,6 +968,86 @@ impl Sources {
             .flat_map(|family| self.subtypes.get(family).into_iter().flatten())
             .map(|decl| decl.entry().lemma.to_lowercase())
             .collect()
+    }
+}
+
+/// Tracks the shared Catalog verbs declared in `catalogs/verbs.ron` and which
+/// keyword entries name them.
+struct SharedVerbs<'a> {
+    declared: std::collections::BTreeMap<String, &'a str>,
+    used: std::collections::BTreeSet<String>,
+}
+
+impl<'a> SharedVerbs<'a> {
+    fn build(verbs: &'a [VerbEntry], builder: &mut Builder) -> Result<Self, SourceError> {
+        let mut declared = std::collections::BTreeMap::new();
+        for verb in verbs {
+            let key = verb.lemma.to_lowercase();
+            if let Some(&existing) = declared.get(&key) {
+                return Err(SourceError::Invalid(format!(
+                    "shared verb `{}` in {CATALOG_VERBS} duplicates `{existing}`",
+                    verb.lemma
+                )));
+            }
+            let id = format!("catalog_verb:{}", verb.lemma);
+            builder.verb(&id, verb, source(SourceKind::Catalog, CATALOG_VERBS, &id))?;
+            declared.insert(key, verb.lemma.as_str());
+        }
+        Ok(Self {
+            declared,
+            used: std::collections::BTreeSet::new(),
+        })
+    }
+
+    fn resolve(
+        &mut self,
+        builder: &mut Builder,
+        decl: &VerbDecl,
+        entry_label: &str,
+        prefix: &str,
+        src: sylex_lexicon::Source,
+    ) -> Result<(), SourceError> {
+        match decl {
+            VerbDecl::Shared(lemma) => {
+                let key = lemma.to_lowercase();
+                let Some(&declared) = self.declared.get(&key) else {
+                    return Err(SourceError::Invalid(format!(
+                        "{entry_label} names shared verb `{lemma}`, which is not declared in \
+                         {CATALOG_VERBS}"
+                    )));
+                };
+                if declared != lemma {
+                    return Err(SourceError::Invalid(format!(
+                        "{entry_label} names shared verb `{lemma}`, which is spelled `{declared}` \
+                         in {CATALOG_VERBS}"
+                    )));
+                }
+                self.used.insert(key);
+            }
+            VerbDecl::Entry(verb) => {
+                if let Some(&declared) = self.declared.get(&verb.lemma.to_lowercase()) {
+                    return Err(SourceError::Invalid(format!(
+                        "{entry_label} declares verb `{}`, which is already a shared verb \
+                         `{declared}` in {CATALOG_VERBS}",
+                        verb.lemma
+                    )));
+                }
+                let id = format!("{prefix}:{}", verb.lemma);
+                builder.verb(&id, verb, src)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn check_all_used(&self) -> Result<(), SourceError> {
+        for (key, lemma) in &self.declared {
+            if !self.used.contains(key) {
+                return Err(SourceError::Invalid(format!(
+                    "shared verb `{lemma}` in {CATALOG_VERBS} is named by no keyword entry"
+                )));
+            }
+        }
+        Ok(())
     }
 }
 

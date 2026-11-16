@@ -29,7 +29,8 @@ vocabulary, all hand-authored RON embedded at build time.
 | `lexicon/english/adverbs.ron` | `adv:` |
 | `catalogs/types.ron` | `type:`, `supertype:` |
 | `catalogs/subtypes.ron` | `subtype:` |
-| `catalogs/keyword_actions.ron` | `action:` |
+| `catalogs/verbs.ron` | `catalog_verb:` |
+| `catalogs/keyword_actions.ron` | `action:`, `action_adj:` |
 | `catalogs/keyword_abilities.ron` | `keyword:`, `keyword:…:bound`, `stem:`, `keyword_verb:`, `keyword_det:`, `keyword_noun:` |
 | `catalogs/ability_words.ron` | `ability_word:` |
 | `catalogs/counters.ron` | `counter:` |
@@ -58,7 +59,10 @@ read from `data/scryfall/oracle-cards.jsonl`.
 - **A game word** goes in its catalog, citing the rule that defines it
   (`rule: "[CR#701.8]"`). The verbs, nouns and determinatives a keyword
   ability's rule defines (*cycle*, *crew*, *equipped*) are declared under that
-  keyword in `keyword_abilities.ron`, never in the core lexicon.
+  keyword in `keyword_abilities.ron`, never in the core lexicon. A Catalog verb
+  that means nothing on its own and is shared across phrases (*face*, *beam*)
+  goes in `catalogs/verbs.ron`, and the keyword entries that use it name its
+  lemma in `verbs`.
 - **An adjective** goes in `adjectives.ron`, unless a keyword action
   defines it (*transformed*, in `keyword_actions.ron`) or it names a status
   (*tapped*, in `statuses.ron`).

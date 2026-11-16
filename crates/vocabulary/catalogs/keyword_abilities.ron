@@ -388,11 +388,9 @@
     (rule: "[CR#702.193]", name: "Power-up", lemma: "power-up", parameters: [[DashAbility]]),
     (rule: "[CR#702.194]", name: "Teamwork", lemma: "teamwork", parameters: [[Amount]]),
     (rule: "[CR#702.195]", name: "Storied", lemma: "storied"),
-    // A creature returned to pay a beam me up cost is "beamed up" [CR#702.196b].
+    // Shares `beam` (`catalogs/verbs.ron`) with "can't be beamed up" [CR#702.196b].
     (rule: "[CR#702.196]", name: "Beam me up", lemma: "beam me up", parameters: [[Cost]],
-        verbs: [
-            (lemma: "beam", frames: [TransitiveWithPP(["up"])]),
-        ],
+        verbs: ["beam"],
     ),
     // One of the Case's "two special keyword abilities" [CR#720.3]; its own keyword, not a variant
     // of Solved [CR#702.169].

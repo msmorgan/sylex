@@ -7,6 +7,7 @@ use sylex_vocabulary::schema::AnchorWord;
 use sylex_vocabulary::schema::FrameSpec;
 use sylex_vocabulary::schema::NounDecl;
 use sylex_vocabulary::schema::ScopedName;
+use sylex_vocabulary::schema::VerbDecl;
 use sylex_vocabulary::schema::VerbEntry;
 
 fn verb(lemma: &str, frames: Vec<FrameSpec>) -> VerbEntry {
@@ -37,14 +38,66 @@ fn rejects(sources: &Sources, reason: &str) {
 #[test]
 fn a_catalog_word_is_never_core_vocabulary() {
     let mut sources = Sources::load().unwrap();
-    let action = sources.keyword_actions[0].verbs[0].clone();
-    sources.verbs.push(action);
+    let VerbDecl::Entry(action) = &sources.keyword_actions[0].verbs[0] else {
+        panic!("expected inline keyword action verb");
+    };
+    sources.verbs.push((**action).clone());
+    rejects(&sources, "must not also be core vocabulary");
+
+    let mut sources = Sources::load().unwrap();
+    let shared = sources.catalog_verbs[0].clone();
+    sources.verbs.push(shared);
     rejects(&sources, "must not also be core vocabulary");
 
     let mut sources = Sources::load().unwrap();
     let card_type = sources.types.card_types[0].clone();
     sources.nouns.push(card_type);
     rejects(&sources, "must not also be core vocabulary");
+}
+
+#[test]
+fn shared_catalog_verbs_are_declared_once_and_named_by_keywords() {
+    let mut sources = Sources::load().unwrap();
+    sources.keyword_actions[0]
+        .verbs
+        .push(VerbDecl::Shared("frobnicate".to_owned()));
+    rejects(&sources, "is not declared in catalogs/verbs.ron");
+
+    let mut sources = Sources::load().unwrap();
+    sources.keyword_abilities[0]
+        .verbs
+        .push(VerbDecl::Shared("frobnicate".to_owned()));
+    rejects(&sources, "is not declared in catalogs/verbs.ron");
+
+    let mut sources = Sources::load().unwrap();
+    sources.keyword_actions[0]
+        .verbs
+        .push(VerbDecl::Entry(Box::new(verb(
+            "face",
+            vec![FrameSpec::Monotransitive],
+        ))));
+    rejects(&sources, "already a shared verb `face`");
+
+    let mut sources = Sources::load().unwrap();
+    sources.keyword_abilities[0]
+        .verbs
+        .push(VerbDecl::Entry(Box::new(verb(
+            "beam",
+            vec![FrameSpec::Monotransitive],
+        ))));
+    rejects(&sources, "already a shared verb `beam`");
+
+    let mut sources = Sources::load().unwrap();
+    sources
+        .catalog_verbs
+        .push(verb("Face", vec![FrameSpec::Intransitive]));
+    rejects(&sources, "duplicates `face`");
+
+    let mut sources = Sources::load().unwrap();
+    sources
+        .catalog_verbs
+        .push(verb("frobnicate", vec![FrameSpec::Intransitive]));
+    rejects(&sources, "is named by no keyword entry");
 }
 
 #[test]

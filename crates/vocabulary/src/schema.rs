@@ -650,6 +650,15 @@ pub enum SubtypeFamily {
 /// `catalogs/subtypes.ron` [CR#205.3].
 pub type Subtypes = BTreeMap<SubtypeFamily, Vec<NounDecl>>;
 
+/// A verb a keyword catalog entry uses: its own [`VerbEntry`], or the lemma of
+/// a shared Catalog verb declared in `catalogs/verbs.ron`.
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
+#[serde(untagged)]
+pub enum VerbDecl {
+    Shared(String),
+    Entry(Box<VerbEntry>),
+}
+
 /// A CR-enumerated catalog item realized by one or more Lexemes.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -659,7 +668,7 @@ pub struct KeywordAction {
     /// The CR's name for it, such as `Destroy`.
     pub name: String,
     #[serde(default)]
-    pub verbs: Vec<VerbEntry>,
+    pub verbs: Vec<VerbDecl>,
     /// Nouns that realize it: the instruction *Monstrosity 3* [CR#701.37a],
     /// or *the Ring* that tempts you [CR#701.54a].
     #[serde(default)]
@@ -742,9 +751,10 @@ pub struct KeywordAbility {
     /// *megamorph* [CR#702.37b], *partner—Friends forever* [CR#702.124i].
     #[serde(default)]
     pub variants: Vec<KeywordVariant>,
-    /// Verbs the rule defines for acting with the keyword: *cycle*, *crew*.
+    /// Verbs the rule defines for acting with the keyword (*cycle*, *crew*),
+    /// or shared Catalog verbs from `catalogs/verbs.ron` (*beam*).
     #[serde(default)]
-    pub verbs: Vec<VerbEntry>,
+    pub verbs: Vec<VerbDecl>,
     /// Nouns the rule defines for the ability or its cost: *its {W} kicker*
     /// [CR#702.33f], *the gift was promised* [CR#702.174k].
     #[serde(default)]

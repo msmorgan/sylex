@@ -176,3 +176,62 @@ fn a_modal_preterite_has_no_tense() {
         );
     }
 }
+
+#[test]
+fn shared_catalog_verbs_belong_to_neither_keyword_entry() {
+    use sylex_lexicon::Category;
+    use sylex_lexicon::SourceKind;
+
+    let env = LexicalEnvironment::load().unwrap();
+    for (lemma, expected_id) in [("face", "catalog_verb:face"), ("beam", "catalog_verb:beam")] {
+        let verbs: Vec<_> = env
+            .lexicon
+            .lexemes()
+            .values()
+            .filter(|l| l.category == Category::Verb && l.lemma == lemma)
+            .collect();
+        assert_eq!(verbs.len(), 1, "{lemma}: {verbs:?}");
+        let verb = verbs[0];
+        assert_eq!(verb.id.as_str(), expected_id);
+        assert_eq!(verb.source.kind, SourceKind::Catalog);
+        assert_eq!(verb.source.path, "catalogs/verbs.ron");
+        assert_eq!(verb.source.owner, expected_id);
+    }
+
+    for (text, word, expected_id) in [
+        (
+            "Whenever you face a dilemma, draw a card.",
+            "face",
+            "catalog_verb:face",
+        ),
+        (
+            "Target opponent faces a villainous choice — They discard a card, or you draw a card.",
+            "faces",
+            "catalog_verb:face",
+        ),
+        ("Creatures can't be beamed up.", "beamed", "catalog_verb:beam"),
+    ] {
+        let analyzed = env.lexicon.analyze(text);
+        let verbal: std::collections::BTreeSet<_> = analyzed
+            .matches
+            .iter()
+            .filter(|m| {
+                let surface: String = analyzed.tokens[m.start..m.end].iter().collect();
+                surface == word
+            })
+            .filter_map(|m| match &m.reading {
+                LexicalReading::Word(v)
+                    if env.lexicon.lexemes()[&v.lexeme].category == Category::Verb =>
+                {
+                    Some(v.lexeme.as_str().to_owned())
+                }
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            verbal,
+            std::collections::BTreeSet::from([expected_id.to_owned()]),
+            "{text}"
+        );
+    }
+}
