@@ -3,7 +3,12 @@ card split({
     cost = [generic(1), pip(white)],
     types = [instant],
     text = [
-      spell(get(allOf(and([isCreature, youControl])), up(1), up(1), duration = untilEndOfTurn)),
+      spell(
+        get(
+          allOf(nominal(creature, post = [youControl])),
+          up(1),
+          up(1),
+          duration = untilEndOfTurn)),
       fuse]},
   {
     name = "Loss",
@@ -12,7 +17,7 @@ card split({
     text = [
       spell(
         get(
-          allOf(and([isCreature, opponentsControl])),
+          allOf(nominal(creature, post = [opponentsControl])),
           down(1),
           down(1),
           duration = untilEndOfTurn)),

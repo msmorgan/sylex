@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(any, dealDamage(recipient = a(isCreature))),
+        does(any, dealDamage(recipient = a(creature))),
         instruct(
           thisEnchantment,
           dealDamage(amount = thatMuch, recipient = controllerOf(that(creature)))))]})

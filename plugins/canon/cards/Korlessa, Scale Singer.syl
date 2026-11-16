@@ -6,6 +6,6 @@ card singleFaced({
     subtypes = [dragon, bard],
     text = [
       static(visibility(lookAt, you, topOfLibrary)),
-      static(can(actor(you), cast(bare(and([isSpell, hasSubtype(dragon)])), from = onTop)))],
+      static(can(actor(you), cast(bare(nominal(pre = [dragon], spell)), from = onTop)))],
     power = 1,
     toughness = 4})

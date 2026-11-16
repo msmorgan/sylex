@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         replace(
-          would(actor(a(isSource)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+          would(actor(a(source)), dealDamage(recipient = a(or([permanent, player])))),
           instead(instruct(it, dealDamage(amount = half(down, thatMuch), recipient = thatJoin)))))],
     power = 4,
     toughness = 5})

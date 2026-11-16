@@ -9,5 +9,5 @@ card singleFaced({
         addMana(
           counted(1, ofAnyColor(sameColor)),
           riders = spendOnlyToCastAnd(
-            and([isCreature, isSpell, ofChosen(subtype(creature))]),
+            and([hasType(creature), isSpell, ofChosen(subtype(creature))]),
             establish(cant(any, counter(that(spell)))))))]})

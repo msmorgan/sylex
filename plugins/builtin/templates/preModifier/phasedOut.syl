@@ -1,0 +1,4 @@
+template phasedOut: PreModifier {
+  spelling = "phased-out",
+  body = hasStatus(phasedOut)
+}

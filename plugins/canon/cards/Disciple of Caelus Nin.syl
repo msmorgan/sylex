@@ -11,8 +11,12 @@ card singleFaced({
         sequentially([
             instruct(
               eachPlayer,
-              chooseStartingWith(you, counted(upTo(5), and([isPermanent, controlledBy(they)])))),
-            instruct(allOf(and([isPermanent, otherThan(thisCreature), notChosen])), phaseOut)])),
-      static(cant(actor(bare(isPermanent)), phaseIn))],
+              chooseStartingWith(
+                you,
+                counted(upTo(5), nominal(permanent, post = [controlledBy(they)])))),
+            instruct(
+              allOf(nominal(permanent, post = [otherThan(thisCreature), notChosen])),
+              phaseOut)])),
+      static(cant(actor(bare(permanent)), phaseIn))],
     power = 3,
     toughness = 4})

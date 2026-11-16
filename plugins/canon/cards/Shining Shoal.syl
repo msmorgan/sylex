@@ -8,13 +8,18 @@ card singleFaced({
         altCost(
           payingInstead(
             perform(
-              exile(a(and([hasColor(white), hasManaValue(equal, letter(x)), in(yourHand)]))))),
+              exile(
+                a(
+                  nominal(
+                    pre = [white],
+                    card,
+                    post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
           this)),
       spell(
         establishThroughout(
           replace(
             would(
-              actor(aYourChoice(isSource)),
-              dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
-            instead(redirectDamage(theNext(letter(x)), target(isAnyTarget)))),
+              actor(aYourChoice(source)),
+              dealDamage(recipient = andOr([you, allOf(nominal(creature, post = [youControl]))]))),
+            instead(redirectDamage(theNext(letter(x)), target(anyTarget)))),
           thisTurn))]})

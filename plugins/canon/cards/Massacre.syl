@@ -6,7 +6,7 @@ card singleFaced({
       static(
         if(
           and([
-              exists(and([isLand, hasSubtype(plains), anOpponentControls])),
-              exists(and([isLand, hasSubtype(swamp), youControl]))]),
+              exists(nominal(plains, post = [anOpponentControls])),
+              exists(nominal(swamp, post = [youControl]))]),
           can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
-      spell(get(allOf(isCreature), down(2), down(2), duration = untilEndOfTurn))]})
+      spell(get(allOf(creature), down(2), down(2), duration = untilEndOfTurn))]})

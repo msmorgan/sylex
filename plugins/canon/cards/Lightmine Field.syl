@@ -4,9 +4,9 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(counted(orMore(1), isCreature)), attack),
+        does(actor(counted(orMore(1), creature)), attack),
         instruct(
           thisEnchantment,
           dealDamage(
-            amount = countOf(and([isCreature, isAttacking])),
+            amount = countOf(nominal(pre = [attacking], creature)),
             recipient = eachOf(those(creature)))))]})

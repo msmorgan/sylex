@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), die),
-        if = not(is(it, hasSubtype(demon))),
+        if = not(is(it, noun(a(demon)))),
         returnToBattlefield(
           it,
           riders = [

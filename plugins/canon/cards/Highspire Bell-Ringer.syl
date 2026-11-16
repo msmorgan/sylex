@@ -7,14 +7,7 @@ card singleFaced({
       flying,
       static(
         costShift(
-          the(
-            and([
-                isSpell,
-                did(
-                  actor(you),
-                  cast(which),
-                  within = thisObject,
-                  ordinal = {ordinal = nth(2), per = turn})])),
+          the(ordinalRelative(nth(2), spell, actor(you), cast(which), per = turn)),
           less(1)))],
     power = 1,
     toughness = 4})

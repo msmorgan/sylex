@@ -1,0 +1,5 @@
+# "permanent" as a premodifier ("permanent card", "permanent spell") [CR#110.4..110.4b].
+template permanent: PreModifier {
+  spelling = "permanent",
+  body = or([artifact, battle, creature, enchantment, land, planeswalker])
+}

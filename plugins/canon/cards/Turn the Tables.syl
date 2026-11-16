@@ -7,5 +7,5 @@ card singleFaced({
         establishThroughout(
           replace(
             would(any, dealDamage(kind = combat, recipient = you)),
-            instead(redirectDamage(allDamage, target(and([isCreature, isAttacking]))))),
+            instead(redirectDamage(allDamage, target(nominal(pre = [attacking], creature))))),
           thisTurn))]})

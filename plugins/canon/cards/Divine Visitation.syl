@@ -9,7 +9,7 @@ card singleFaced({
             any,
             createObject(
               anyAmount,
-              token(copyOf(counted(orMore(1), and([isCreature, isToken]))), []),
+              token(copyOf(counted(orMore(1), nominal(pre = [creature], token))), []),
               under = you)),
           instead(
             create(

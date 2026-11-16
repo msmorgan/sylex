@@ -1,0 +1,24 @@
+card singleFaced({
+    name = "Acclaimed Contender",
+    cost = [generic(2), pip(white)],
+    types = [creature],
+    subtypes = [human, knight],
+    text = [
+      when(
+        does(actor(thisCreature), enter),
+        if = exists(nominal(pre = [other], knight, post = [youControl])),
+        sequentially([
+            lookAt(topSlice(5)),
+            may(
+              sequentially([
+                  reveal(
+                    fromAmong(
+                      exactly(1),
+                      nominal(
+                        pre = [or([knight, aura, equipment, stacked([legendary, artifact])])],
+                        card),
+                      them)),
+                  putInto(that(card), hand)])),
+            putInto(theRest, onBottom, riders = [inOrder(randomOrder)])]))],
+    power = 3,
+    toughness = 3})

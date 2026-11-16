@@ -11,7 +11,7 @@ token bloodToken {
           compound([
               mana([generic(1)]),
               tapSymbol,
-              perform(discard(a(cardIn(yourHand)))),
+              perform(discard(a(nominal(card, post = [in(yourHand)])))),
               perform(sacrifice(thisToken))]),
           draw(1))]}}
 }

@@ -11,15 +11,17 @@ card singleFaced({
     subtypes = [goblin, artificer, ally],
     text = [
       whenever(
-        does(actor(or([thisCreature, a(and([hasSubtype(ally), youControl, isOther]))])), enter),
+        does(
+          actor(or([thisCreature, a(nominal(pre = [other], ally, post = [youControl]))])),
+          enter),
         sequentially([
-            may(destroy(target(isArtifact))),
+            may(destroy(target(artifact))),
             doIf(
               did(actor(that(artifact)), putInto(subject, graveyard), thisWay),
               instruct(
                 thisCreature,
                 dealDamage(
-                  amount = countOf(and([hasSubtype(ally), youControl])),
+                  amount = countOf(nominal(ally, post = [youControl])),
                   recipient = controllerOf(that(artifact)))))]))],
     power = 2,
     toughness = 2})

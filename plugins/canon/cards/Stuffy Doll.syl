@@ -5,10 +5,12 @@ card singleFaced({
     subtypes = [construct],
     text = [
       indestructible,
-      static(entryChoice(thisCreature, a(isPlayer))),
+      static(entryChoice(thisCreature, a(player))),
       whenever(
         does(any, dealDamage(recipient = thisCreature)),
-        instruct(it, dealDamage(amount = thatMuch, recipient = the(isChosenPlayer)))),
+        instruct(
+          it,
+          dealDamage(amount = thatMuch, recipient = the(nominal(pre = [chosen], player))))),
       activated(tapSymbol, instruct(thisCreature, dealDamage(amount = 1, recipient = itself)))],
     power = 0,
     toughness = 1})

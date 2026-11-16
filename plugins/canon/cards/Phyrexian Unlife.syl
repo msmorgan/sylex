@@ -14,6 +14,6 @@ card singleFaced({
         asLongAs(
           compareAmt(lifeTotalOf(you), atMost, 0),
           asThough(
-            by(a(isSource)),
+            by(a(source)),
             dealDamage(recipient = you),
             holds(is(thatSource, hasKeyword(theKeyword(infect)))))))]})

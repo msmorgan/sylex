@@ -4,10 +4,12 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(doesntUntap(enchanted(creature), controllerOf(enchanted(creature)))),
       at(
         beginningOfPossessed(controllerOf(enchanted(creature)), upkeep),
         instruct(
           that(player),
-          may(discard(aAtRandom(cardIn(handOf(that(player))))), ifDid = untap(that(creature)))))]})
+          may(
+            discard(aAtRandom(nominal(card, post = [in(handOf(that(player)))]))),
+            ifDid = untap(that(creature)))))]})

@@ -1,0 +1,5 @@
+# "<action>ed [<within>]", the passive with no agent over `did(any, …)` [CR#607.2a,607.1,608.2c].
+template was(action: VerbPhrase, within: Option(LookbackSpan) = none): Predicative {
+  spelling = "$action< $within>",
+  body = did(any, $action, within = $within)
+}

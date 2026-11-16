@@ -4,4 +4,4 @@ card singleFaced({
     types = [instant],
     text = [
       static(cant(any, counter(thisSpell))),
-      spell(counter(target(and([isSpell, non(isCreature)]))))]})
+      spell(counter(target(nominal(pre = [non(creature)], spell))))]})

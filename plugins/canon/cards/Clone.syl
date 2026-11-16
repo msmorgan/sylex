@@ -3,6 +3,10 @@ card singleFaced({
     cost = [generic(3), pip(blue)],
     types = [creature],
     subtypes = [shapeshifter],
-    text = [static(mayHaveEnter(thisCreature, [asCopyOf(a(isCreature), [])]))],
+    text = [
+      static(
+        mayHaveEnter(
+          thisCreature,
+          [asCopyOf(a(nominal(creature, post = [in(battlefield)])), [])]))],
     power = 0,
     toughness = 0})

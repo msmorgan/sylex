@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       at(
         beginningOfYour(upkeep),
-        destroy(target(and([isCreature, hasCounter(kind = m1m1Counter)]))))]})
+        destroy(target(nominal(creature, post = [hasCounter(kind = m1m1Counter)]))))]})

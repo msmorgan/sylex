@@ -8,7 +8,7 @@ card singleFaced({
       activated(
         mana([pip(blue)]),
         establishThroughout(
-          qualityChange(target(isPermanent), adds, colored(colors([blue]))),
+          qualityChange(target(permanent), adds, colored(colors([blue]))),
           untilEndOfTurn))],
     power = 1,
     toughness = 1})

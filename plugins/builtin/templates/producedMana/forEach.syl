@@ -1,7 +1,7 @@
 # "<produced> for each <p>", with no count printed before the mana ("{G} for each creature you
 # control", "{B} or {G} for each permanent destroyed this way"). Expands to `counted` with a per of
 # 1, so any choice inside `produced` is still made once per mana.
-template forEach(produced: ProducedMana, p: Predicate): ProducedMana {
+template forEach(produced: ProducedMana, p: Nominal): ProducedMana {
   spelling = "$produced %VerbPhrase: for each $p",
   body = counted(forEach(1, $p), $produced)
 }

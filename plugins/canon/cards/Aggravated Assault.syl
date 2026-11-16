@@ -6,6 +6,6 @@ card singleFaced({
       activatedOnlyDuring(
         mana([generic(3), pip(red), pip(red)]),
         sequentially([
-            untap(allOf(and([isCreature, youControl]))),
+            untap(allOf(nominal(creature, post = [youControl]))),
             additionalPhase(combat, mainPhase, 1, followedBy = mainPhase)]),
         asSorcery)]})

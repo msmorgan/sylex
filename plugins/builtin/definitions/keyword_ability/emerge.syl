@@ -10,11 +10,11 @@ ability emerge(cost: Cost) {
         actor(you),
         cast(
           thisSpell,
-          altCost = payingInstead(compound([$cost, perform(sacrifice(a(isCreature)))]))))),
+          altCost = payingInstead(compound([$cost, perform(sacrifice(a(creature)))]))))),
     static(
       if(
         keywordCostPaid(thisSpell, emerge),
         costShift(
           thisSpell,
-          less(statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature])))))))]
+          less(statOf(stat(manaValue), the(nominal(pre = [was(sacrifice(which))], creature)))))))]
 }

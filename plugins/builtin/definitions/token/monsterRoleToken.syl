@@ -8,7 +8,7 @@ token monsterRoleToken {
       types = [enchantment],
       subtypes = [aura, role],
       text = [
-        enchant(isCreature),
+        enchant(hasType(creature)),
         static(
           conjunction([
               getsPt(enchanted(creature), up(1), up(1)),

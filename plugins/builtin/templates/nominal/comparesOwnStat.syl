@@ -1,0 +1,10 @@
+# "<domain> with <stat> <comparator> <bound>": the stat of `member`, the member itself unless written.
+template comparesOwnStat(
+  domain: Nominal,
+  stat: Stat,
+  comparator: Comparator,
+  bound: Amount,
+  member: NounPhrase = ownMember): Nominal {
+  spelling = "$domain with $stat $comparator $bound",
+  body = compareOver($domain, statOf(stat($stat), $member), $comparator, $bound)
+}

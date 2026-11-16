@@ -1,0 +1,6 @@
+# A quality noun with its domain: "a color other than blue".
+template qualityFrom(sort: QualitySort, domain: ChoiceDomain): Nominal {
+  # TODO(spelling): `domain` places modifiers before or after `$sort` ("basic land type" vs
+  # "creature type other than Wall"); waits on `syl-kind-axis-one-word`.
+  body = qualityNoun($sort, domain = $domain)
+}

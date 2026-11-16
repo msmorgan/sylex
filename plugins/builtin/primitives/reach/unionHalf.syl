@@ -1,1 +1,1 @@
-primitive unionHalf(word: NounWord): Reach = UnionHalf
+primitive unionHalf(word: Nominal): Reach = UnionHalf

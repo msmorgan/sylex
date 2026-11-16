@@ -6,7 +6,7 @@ card singleFaced({
       triggered(
         and([
             at(beginningOfYour(upkeep)),
-            whenever(does(actor(you), cast(a(and([isSpell, hasColor(green)])))))]),
+            whenever(does(actor(you), cast(a(nominal(pre = [green], spell)))))]),
         putCounters(1, printedKind(chargeCounter), thisArtifact)),
       activated(
         compound([tapSymbol, perform(sacrifice(thisArtifact))]),

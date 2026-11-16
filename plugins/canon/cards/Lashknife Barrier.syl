@@ -6,6 +6,8 @@ card singleFaced({
       when(does(actor(thisEnchantment), enter), draw(1)),
       static(
         replace(
-          would(actor(a(isSource)), dealDamage(recipient = a(and([isCreature, youControl])))),
+          would(
+            actor(a(source)),
+            dealDamage(recipient = a(nominal(creature, post = [youControl])))),
           instead(
             instruct(it, dealDamage(amount = minus(thatMuch, 1), recipient = that(creature))))))]})

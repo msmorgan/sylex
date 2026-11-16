@@ -4,6 +4,4 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        establishThroughout(
-          partSkip(target(isOpponent), combat),
-          duringNextTurnOf(that(player))))]})
+        establishThroughout(partSkip(target(opponent), combat), duringNextTurnOf(that(player))))]})

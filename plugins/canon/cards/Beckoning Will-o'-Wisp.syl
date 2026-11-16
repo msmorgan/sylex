@@ -8,7 +8,10 @@ card singleFaced({
       flavorWord("Lure the Unwary", at(beginningOfYour(combat), choose(anOpponent))),
       static(
         getsPt(
-          allOf(and([isCreature, inCombat(attackerOf, counterpart = the(isChosenPlayer))])),
+          allOf(
+            nominal(
+              creature,
+              post = [inCombat(attackerOf, counterpart = the(nominal(pre = [chosen], player)))])),
           up(1),
           up(0)))],
     power = 1,

@@ -22,6 +22,7 @@
 mod call;
 mod coercion;
 mod cycles;
+mod nominal;
 mod refusal;
 pub(crate) mod schema;
 mod sort;
@@ -281,7 +282,9 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     for (decl, edges) in decls.iter().zip(&mut edges) {
         resolve(decl, &tables, &mut refusals, edges, &mut resolutions);
     }
-    for cycle in cycles::cycles(&edges) {
+    let found_cycles = cycles::cycles(&edges);
+    let acyclic = found_cycles.is_empty();
+    for cycle in found_cycles {
         // A cycle names a declaration by its name, a nameless one by its label.
         let name = |i: usize| match &decls[i].name {
             Some(name) => name.clone(),
@@ -292,6 +295,7 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
             kind: RefusalKind::Cycle(cycle.into_iter().map(name).collect()),
         });
     }
+    nominal::check(&decls, &registry, &resolutions, acyclic, &mut refusals);
     if refusals.is_empty() {
         return Ok(Checked {
             summary,

@@ -5,8 +5,8 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            destroy(each(and([non(isLand), isPermanent, hasManaValue(atMost, 2)]))),
+            destroy(each(nominal(pre = [non(land)], permanent, post = [hasManaValue(atMost, 2)]))),
             addMana(
               forEach(
                 or([symbols([pip(black)]), symbols([pip(green)])]),
-                and([isPermanent, was(destroy(which), within = thisWay)])))]))]})
+                nominal(permanent, post = [was(destroy(which), within = thisWay)])))]))]})

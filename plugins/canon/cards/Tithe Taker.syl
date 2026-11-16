@@ -10,15 +10,19 @@ card singleFaced({
           turn,
           conjunction([
               costShift(
-                allOf(and([isSpell, did(actor(yourOpponents), cast(which), within = thisObject)])),
-                more(1)),
-              costShift(
                 allOf(
-                  and([
-                      abilityHead(anyActivated),
-                      did(actor(yourOpponents), activate(which), within = thisObject),
-                      not(isManaAbility)])),
-                more(1))]))),
+                  nominal(
+                    spell,
+                    post = [did(actor(yourOpponents), cast(which), within = thisObject)])),
+                more(1)),
+              onlyUnless(
+                costShift(
+                  allOf(
+                    nominal(
+                      ability,
+                      post = [did(actor(yourOpponents), activate(which), within = thisObject)])),
+                  more(1)),
+                is(them, noun(a(manaAbility))))]))),
       afterlife(1)],
     power = 2,
     toughness = 1})

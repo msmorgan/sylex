@@ -2,4 +2,4 @@ card singleFaced({
     name = "Mindlock Orb",
     cost = [generic(3), pip(blue)],
     types = [artifact],
-    text = [static(cant(actor(bare(isPlayer)), search(libraries)))]})
+    text = [static(cant(actor(bare(player)), search(libraries)))]})

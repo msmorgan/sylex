@@ -1,0 +1,4 @@
+# A card or token on the battlefield [CR#110.1].
+primitive permanent: Nominal = Permanent {
+  spelling = "permanent"
+}

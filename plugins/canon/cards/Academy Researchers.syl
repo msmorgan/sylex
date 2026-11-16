@@ -11,7 +11,7 @@ card singleFaced({
         does(actor(thisCreature), enter),
         may(
           putOntoBattlefieldAttachedTo(
-            a(and([hasSubtype(aura), cardIn(yourHand)])),
+            a(nominal(pre = [aura], card, post = [in(yourHand)])),
             thisCreature)))],
     power = 2,
     toughness = 2})

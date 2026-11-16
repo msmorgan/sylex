@@ -8,7 +8,9 @@ card sharedLineSplit(
         does(actor(you), unlock(thisDoor)),
         instruct(
           thisRoom,
-          dealDamage(amount = 4, recipient = target(and([isCreature, anOpponentControls])))))]},
+          dealDamage(
+            amount = 4,
+            recipient = target(nominal(creature, post = [anOpponentControls])))))]},
   {
     name = "Shattered Yard",
     cost = [generic(4), pip(red)],

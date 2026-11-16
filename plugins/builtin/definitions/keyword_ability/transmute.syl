@@ -11,11 +11,12 @@ ability transmute(cost: Cost) {
           search(
             yourLibrary,
             for = a(
-              and([
-                  isCard,
+              nominal(
+                card,
+                post = [
                   hasManaValue(
                     equal,
-                    statOf(stat(manaValue), the(and([was(discard(which)), isCard]))))]))),
+                    statOf(stat(manaValue), the(nominal(pre = [was(discard(which))], card))))]))),
           reveal(that(card)),
           putInto(it, hand),
           shuffle]),

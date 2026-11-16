@@ -10,7 +10,10 @@ ability awaken(amount: Amount, cost: Cost) {
       doIf(
         keywordCostPaid(this, awaken),
         sequentially([
-            putCounters($amount, printedKind(p1p1Counter), target(and([isLand, youControl]))),
+            putCounters(
+              $amount,
+              printedKind(p1p1Counter),
+              target(nominal(land, post = [youControl]))),
             establish(
               characteristicChange(
                 that(land),

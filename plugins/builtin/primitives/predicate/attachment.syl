@@ -1,4 +1,0 @@
-primitive attachment(
-  side: AttachmentSide,
-  counterpart: Option(NounPhrase) = none,
-  word: Option(AttachWord) = none): Predicate = Attachment

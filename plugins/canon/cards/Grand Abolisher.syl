@@ -9,13 +9,13 @@ card singleFaced({
           you,
           turn,
           conjunction([
-              cant(actor(yourOpponents), cast(bare(isSpell))),
+              cant(actor(yourOpponents), cast(bare(spell))),
               cant(
                 actor(yourOpponents),
                 activate(
                   allOf(
-                    and([
-                        abilityHead(anyActivated),
-                        abilityOf(allOf(or([isArtifact, isCreature, isEnchantment])))]))))])))],
+                    nominal(
+                      abilityHead(anyActivated),
+                      post = [ofSource(allOf(or([artifact, creature, enchantment])))]))))])))],
     power = 2,
     toughness = 2})

@@ -1,0 +1,2 @@
+# Coordination of nominals (`and` or `or` takes the union of their domains).
+primitive coord(coordinator: Coordinator, items: List(Nominal)): Nominal = Coordination

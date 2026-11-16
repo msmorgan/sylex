@@ -2,4 +2,4 @@ card singleFaced({
     name = "Wrath of God",
     cost = [generic(2), pip(white), pip(white)],
     types = [sorcery],
-    text = [spell(doUnderProhibition(destroy(allOf(isCreature)), regeneration(them)))]})
+    text = [spell(doUnderProhibition(destroy(allOf(creature)), regeneration(them)))]})

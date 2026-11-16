@@ -9,11 +9,13 @@ card singleFaced({
             sequentially([
                 sacrifice(
                   each(
-                    and(
-                      [isPermanent, isOther, named(printedName("Sheltered Valley")), youControl]))),
+                    nominal(
+                      pre = [other],
+                      permanent,
+                      post = [named(printedName("Sheltered Valley")), youControl]))),
                 putOntoBattlefield(thisLand)])))),
       at(
         beginningOfYour(upkeep),
-        if = compareAmt(countOf(and([isLand, youControl])), atMost, 3),
+        if = compareAmt(countOf(nominal(land, post = [youControl])), atMost, 3),
         gainLife(1)),
       activated(tapSymbol, addMana(symbols([colorlessPip])))]})

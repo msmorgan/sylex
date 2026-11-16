@@ -7,7 +7,7 @@ card singleFaced({
       spell(
         establishThroughout(
           replace(
-            would(any, dealDamage(recipient = target(isAnyTarget))),
+            would(any, dealDamage(recipient = target(anyTarget))),
             instead(preventDamage(theNext(3), also = gainLife(preventedThisWay)))),
           thisTurn)),
       splice(hasSubtype(arcane), mana([generic(1), pip(white)]))]})

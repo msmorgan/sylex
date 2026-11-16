@@ -10,10 +10,10 @@ ability storied {
         and([
             compareAmt(
               countOf(
-                and([
-                    isPermanent,
-                    youControl,
-                    andOr([isArtifact, hasSubtype(saga), hasSupertype(legendary)])])),
+                nominal(
+                  pre = [andOr([artifact, saga, legendary])],
+                  permanent,
+                  post = [youControl])),
               atLeast,
               3),
             not(is(you, hasDesignation(enduringStory)))]),

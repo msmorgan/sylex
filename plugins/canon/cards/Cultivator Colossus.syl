@@ -5,9 +5,9 @@ card singleFaced({
     subtypes = [plant, beast],
     text = [
       trample,
-      static(definesPt(thisCreature, countOf(and([isLand, youControl])))),
+      static(definesPt(thisCreature, countOf(nominal(land, post = [youControl])))),
       when(
         does(actor(thisCreature), enter),
         may(
-          putOntoBattlefieldTapped(a(and([isLand, in(yourHand)]))),
+          putOntoBattlefieldTapped(a(nominal(pre = [land], card, post = [in(yourHand)]))),
           ifDid = sequentially([draw(1), repeat(again)])))]})

@@ -1,6 +1,6 @@
 # "if there are <subject>", as "three or more lands with the same name", "if two or more creatures
 # are tied for least toughness": a counted or coordinated indefinite, published for the consequent;
-# coordinated indefinites (`and([a(A), a(B)])`) witness each arm independently unless `isOther` is
+# coordinated indefinites (`and([a(A), a(B)])`) witness each arm independently unless `other` is
 # written.
 primitive thereAre(subject: NounPhrase): Condition = Exists {
   spelling = "if there be $subject"

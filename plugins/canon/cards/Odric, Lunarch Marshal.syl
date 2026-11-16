@@ -11,11 +11,11 @@ card singleFaced({
           doOnlyIf(
             establishThroughout(
               keywordGrant(
-                allOf(and([isCreature, youControl])),
+                allOf(nominal(creature, post = [youControl])),
                 thatKeyword,
-                and([isCreature, youControl, hasKeyword(thatKeyword)])),
+                and([hasType(creature), youControl, hasKeyword(thatKeyword)])),
               untilEndOfTurn),
-            exists(and([isCreature, youControl, hasKeyword(thatKeyword)])))),
+            exists(nominal(creature, post = [youControl, hasKeyword(thatKeyword)])))),
         [
           theKeyword(firstStrike),
           theKeyword(flying),

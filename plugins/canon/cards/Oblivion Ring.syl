@@ -5,9 +5,9 @@ card singleFaced({
     text = [
       when(
         does(actor(thisEnchantment), enter),
-        exile(target(and([non(isLand), isPermanent, isOther])))),
+        exile(target(nominal(pre = [other, non(land)], permanent)))),
       when(
         does(actor(thisEnchantment), leave),
         returnToBattlefield(
-          the(cardIn(exiledWith(thisEnchantment))),
+          the(nominal(card, post = [in(exiledWith(thisEnchantment))])),
           riders = [underControlOf(ownerOf(it))]))]})

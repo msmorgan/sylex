@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            destroy(target(isCreature)),
+            destroy(target(creature)),
             doIf(
               did(actor(that(creature)), die, thisWay),
               instruct(

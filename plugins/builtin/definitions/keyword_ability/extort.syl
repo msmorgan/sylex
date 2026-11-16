@@ -6,7 +6,7 @@ ability extort {
   spelling = "extort",
   body = [
     whenever(
-      does(actor(you), cast(a(isSpell))),
+      does(actor(you), cast(a(spell))),
       may(
         pay(payment(mana([hybridPip(white, black)])), once),
         ifDid = sequentially([instruct(eachOpponent, loseLife(1)), gainLife(thatMuch)])))]

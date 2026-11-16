@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         establishThroughout(
           replace(
-            would(actor(aYourChoice(isSource)), dealDamage),
+            would(actor(aYourChoice(source)), dealDamage),
             instead(redirectDamage(allDamage, controllerOf(thatSource))),
             use = nextTimeOnly),
           thisTurn))]})

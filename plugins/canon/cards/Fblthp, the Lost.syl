@@ -14,6 +14,6 @@ card singleFaced({
                 did(actor(it), enter(from = yourLibrary), triggering),
                 is(it, was(cast(which, from = yourLibrary), within = thisObject))]),
             instead(draw(2))))),
-      when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
+      when(does(actor(a(spell)), target(this)), shuffleInto(this))],
     power = 1,
     toughness = 1})

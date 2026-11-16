@@ -1,5 +1,5 @@
 # "N <p> from among <group>"
-template fromAmong(quantity: Quantity, p: Predicate, group: NounPhrase): NounPhrase {
+template fromAmong(quantity: Quantity, p: Nominal, group: NounPhrase): NounPhrase {
   spelling = "$quantity $p from among $group",
   body = someOf(counted($quantity), description = $p, $group)
 }

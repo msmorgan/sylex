@@ -3,4 +3,4 @@ card singleFaced({
     cost = [generic(5), pip(black), pip(black)],
     types = [sorcery],
     text = [
-      spell(instruct(eachPlayer, setLife(aggregateAll(min, playerStat(lifeTotal), isPlayer))))]})
+      spell(instruct(eachPlayer, setLife(aggregateAll(min, playerStat(lifeTotal), player))))]})

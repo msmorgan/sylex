@@ -13,10 +13,10 @@ card singleFaced({
         addMana(
           counted(
             1,
-            ofAnyColorAmong(allOf(and([hasSupertype(legendary), isPermanent, youControl])))))),
+            ofAnyColorAmong(allOf(nominal(pre = [legendary], permanent, post = [youControl])))))),
       activated(
         compound([mana([generic(3)]), tapSymbol, perform(exile(thisLand))]),
         gain(
-          target(and([hasSupertype(legendary), isCreature])),
+          target(nominal(pre = [legendary], creature)),
           [hexproof, indestructible],
           duration = untilEndOfTurn))]})

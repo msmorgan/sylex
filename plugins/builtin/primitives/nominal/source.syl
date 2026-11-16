@@ -1,0 +1,4 @@
+# A source of an ability or damage [CR#109.2c,113.7].
+primitive source: Nominal = Source {
+  spelling = "source"
+}

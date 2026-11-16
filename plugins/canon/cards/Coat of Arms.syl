@@ -5,5 +5,11 @@ card singleFaced({
     text = [
       static(
         getsBoth(
-          each(isCreature),
-          up(forEach(1, and([isCreature, isOther, shares(subtype(creature), share, it)])))))]})
+          each(creature),
+          up(
+            forEach(
+              1,
+              nominal(
+                pre = [other],
+                creature,
+                post = [in(battlefield), shares(subtype(creature), share, it)])))))]})

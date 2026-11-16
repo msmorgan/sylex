@@ -9,8 +9,9 @@ card singleFaced({
           would(
             actor(
               a(
-                and([
-                    isCreature,
+                nominal(
+                  creature,
+                  post = [
                     did(
                       actor(thisCreature),
                       dealDamage(recipient = which),
@@ -19,6 +20,6 @@ card singleFaced({
           instead(exile(it)))),
       activated(
         tapSymbol,
-        instruct(thisCreature, dealDamage(amount = 1, recipient = target(isAnyTarget))))],
+        instruct(thisCreature, dealDamage(amount = 1, recipient = target(anyTarget))))],
     power = 1,
     toughness = 2})

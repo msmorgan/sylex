@@ -6,6 +6,6 @@ subtype equipment {
   types = [artifact],
   name = "Equipment",
   confers = [
-    property(mayBeAttachedTo(thisEquipment, allOf(isCreature))),
+    property(mayBeAttachedTo(thisEquipment, allOf(creature))),
     stateBased(not(isAttached(thisEquipment)), attachment(unattached, thisEquipment))]
 }

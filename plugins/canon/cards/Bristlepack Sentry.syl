@@ -7,7 +7,7 @@ card singleFaced({
       defender,
       static(
         asLongAs(
-          exists(and([isCreature, youControl, hasPower(atLeast, 4)])),
+          exists(nominal(creature, post = [youControl, hasPower(atLeast, 4)])),
           can(
             actor(thisCreature),
             attack,

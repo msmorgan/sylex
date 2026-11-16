@@ -9,7 +9,7 @@ card singleFaced({
         chooseModes(
           upTo(2),
           [
-            mode(returnToHand(target(and([isArtifact, isCard])), from = yourGraveyard)),
-            mode(returnToHand(target(and([isCreature, isCard])), from = yourGraveyard)),
-            mode(returnToHand(target(and([isEnchantment, isCard])), from = yourGraveyard)),
-            mode(returnToHand(target(and([isLand, isCard])), from = yourGraveyard))]))]})
+            mode(returnToHand(target(nominal(pre = [artifact], card)), from = yourGraveyard)),
+            mode(returnToHand(target(nominal(pre = [creature], card)), from = yourGraveyard)),
+            mode(returnToHand(target(nominal(pre = [enchantment], card)), from = yourGraveyard)),
+            mode(returnToHand(target(nominal(pre = [land], card)), from = yourGraveyard))]))]})

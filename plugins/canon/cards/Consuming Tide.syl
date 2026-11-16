@@ -5,13 +5,15 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            instruct(eachPlayer, choose(a(and([isPermanent, non(isLand), controlledBy(they)])))),
-            returnToHand(allOf(and([isPermanent, non(isLand), notChosen]))),
+            instruct(
+              eachPlayer,
+              choose(a(nominal(pre = [non(land)], permanent, post = [controlledBy(they)])))),
+            returnToHand(allOf(nominal(pre = [non(land)], permanent, post = [notChosen]))),
             doForEach(
               each(
                 compareOver(
-                  isOpponent,
-                  countOf(cardIn(handOf(they))),
+                  opponent,
+                  countOf(nominal(card, post = [in(handOf(they))])),
                   greater,
-                  countOf(cardIn(yourHand)))),
+                  countOf(nominal(card, post = [in(yourHand)])))),
               draw(1))]))]})

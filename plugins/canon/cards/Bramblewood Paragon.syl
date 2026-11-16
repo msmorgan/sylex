@@ -6,12 +6,12 @@ card singleFaced({
     text = [
       static(
         entersWithAdditionalCounters(
-          each(and([isCreature, hasSubtype(warrior), youControl, isOther])),
+          each(nominal(pre = [other, warrior], creature, post = [youControl])),
           1,
           p1p1Counter)),
       static(
         abilityGrant(
-          each(and([isCreature, youControl, hasCounter(kind = p1p1Counter)])),
+          each(nominal(creature, post = [youControl, hasCounter(kind = p1p1Counter)])),
           [trample]))],
     power = 2,
     toughness = 2})

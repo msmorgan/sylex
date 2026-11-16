@@ -8,7 +8,7 @@ card singleFaced({
       static(
         can(
           actor(you),
-          cast(bare(and([isSpell, isArtifact]))),
+          cast(bare(nominal(pre = [artifact], spell))),
           asThough = asThoughHadFlash(them)))],
     power = 2,
     toughness = 2})

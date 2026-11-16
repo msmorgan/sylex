@@ -11,6 +11,6 @@ ability equip(cost: Cost) {
   body = [
     activatedOnlyDuring(
       $cost,
-      attachTo(thisPermanent, target(and([isCreature, youControl]))),
+      attachTo(thisPermanent, target(nominal(creature, post = [youControl]))),
       asSorcery)]
 }

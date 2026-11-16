@@ -6,7 +6,7 @@ action waterbend(cost: Cost) {
     withSubstitute(
       $cost,
       substitute(
-        tap(a(and([isUntapped, or([isArtifact, isCreature]), actorControls]))),
+        tap(a(nominal(pre = [untapped], or([artifact, creature]), post = [actorControls]))),
         [generic])),
     once)
 }

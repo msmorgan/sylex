@@ -10,7 +10,7 @@ card singleFaced({
       static(
         asLongAs(
           is(this, in(battlefield)),
-          can(actor(you), cast(bare(and([isSpell, hasSubtype(knight)])), from = yourGraveyard)))),
+          can(actor(you), cast(bare(nominal(pre = [knight], spell)), from = yourGraveyard)))),
       when(does(actor(thisCreature), die), loseLife(2))],
     power = 3,
     toughness = 3})

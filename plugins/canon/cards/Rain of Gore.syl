@@ -6,6 +6,6 @@ card singleFaced({
       static(
         replace(
           causedBy(
-            bySource(a(or([isSpell, abilityHead(anyOnStack)]))),
+            bySource(a(or([spell, abilityHead(anyOnStack)]))),
             would(actor(controllerOf(it)), gainLife(anyAmount))),
           instead(instruct(that(player), loseLife(thatMuch)))))]})

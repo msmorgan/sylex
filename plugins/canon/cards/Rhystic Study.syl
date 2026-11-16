@@ -4,5 +4,5 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(anOpponent), cast(a(isSpell))),
+        does(actor(anOpponent), cast(a(spell))),
         instruct(that(player), doUnless(mana([generic(1)]), instruct(you, may(draw(1))))))]})

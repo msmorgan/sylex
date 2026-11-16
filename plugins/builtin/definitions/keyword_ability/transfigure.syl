@@ -11,10 +11,10 @@ ability transfigure(cost: Cost) {
           search(
             yourLibrary,
             for = a(
-              and([
-                  isCard,
-                  isCreature,
-                  hasManaValue(equal, statOf(stat(manaValue), thisPermanent))]))),
+              nominal(
+                pre = [creature],
+                card,
+                post = [hasManaValue(equal, statOf(stat(manaValue), thisPermanent))]))),
           putOntoBattlefield(that(card)),
           shuffle]),
       asSorcery)]

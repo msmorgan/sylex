@@ -6,7 +6,10 @@ action discover(amount: Amount) {
       exile(
         run(
           top,
-          and([non(isLand), compare(atMost, $amount, [stat(manaValue)])]),
+          nominal(
+            pre = [non(land)],
+            permanent,
+            post = [compare(atMost, $amount, [stat(manaValue)])]),
           libraryOf($actor))),
       withContinuation(
         optional,

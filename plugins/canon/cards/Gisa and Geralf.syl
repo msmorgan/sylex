@@ -9,9 +9,7 @@ card singleFaced({
       static(
         can(
           actor(you),
-          cast(
-            counted(exactly(1), and([isSpell, isCreature, hasSubtype(zombie)])),
-            from = yourGraveyard),
+          cast(counted(exactly(1), nominal(pre = [zombie, creature], spell)), from = yourGraveyard),
           timing = onEachOfYourTurns))],
     power = 4,
     toughness = 4})

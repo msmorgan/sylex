@@ -3,4 +3,4 @@ card singleFaced({
     cost = [pip(red)],
     types = [enchantment],
     subtypes = [aura],
-    text = [enchant(isCreature), static(must(actor(enchanted(creature)), attack))]})
+    text = [enchant(hasType(creature)), static(must(actor(enchanted(creature)), attack))]})

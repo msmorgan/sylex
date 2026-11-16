@@ -2,4 +2,4 @@ card singleFaced({
     name = "Death Ward",
     cost = [pip(white)],
     types = [instant],
-    text = [spell(regenerate(target(isCreature)))]})
+    text = [spell(regenerate(target(creature)))]})

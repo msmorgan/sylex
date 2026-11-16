@@ -3,9 +3,9 @@ card singleFaced({
     cost = [generic(4)],
     types = [artifact],
     text = [
-      activated(mana([generic(3)]), exile(target(and([isCreature, youControl])))),
+      activated(mana([generic(3)]), exile(target(nominal(creature, post = [youControl])))),
       activated(
         perform(sacrifice(thisArtifact)),
         returnToBattlefield(
-          each(and([isCreature, cardIn(exiledWith(thisArtifact))])),
+          each(nominal(pre = [creature], card, post = [in(exiledWith(thisArtifact))])),
           riders = [underControlOf(you)]))]})

@@ -6,5 +6,5 @@ card singleFaced({
       activated(
         compound([mana([generic(2)]), tapSymbol]),
         sequentially([
-            copyOnStack(target(and([abilityHead(anyTriggered), youControl]))),
-            may(chooseNewTargets(that(copied(ability))))]))]})
+            copyOnStack(target(nominal(abilityHead(anyTriggered), post = [youControl]))),
+            may(chooseNewTargets(that(nominal(pre = [copied], ability))))]))]})

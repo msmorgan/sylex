@@ -1,0 +1,4 @@
+template and(conjuncts: List(Predicative)): Predicative {
+  spelling = "$conjuncts#<and>",
+  body = coord(and, $conjuncts)
+}

@@ -1,0 +1,2 @@
+# Rule-only bridge from a `Predicate` quality into `PreModifier`.
+primitive hasQuality(quality: Predicate): PreModifier = HasQuality

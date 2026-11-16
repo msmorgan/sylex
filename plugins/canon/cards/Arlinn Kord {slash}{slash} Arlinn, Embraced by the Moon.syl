@@ -8,7 +8,7 @@ card transforming({
       activated(
         loyaltySymbol(up(1)),
         establishFor(
-          targets(upTo(1), isCreature),
+          targets(upTo(1), creature),
           [getsPt(it, up(2), up(2)), abilityGrant(it, [vigilance, haste])],
           duration = untilEndOfTurn)),
       activated(
@@ -26,22 +26,20 @@ card transforming({
       activated(
         loyaltySymbol(up(1)),
         establishFor(
-          allOf(and([isCreature, youControl])),
+          allOf(nominal(creature, post = [youControl])),
           [getsPt(them, up(1), up(1)), abilityGrant(them, [trample])],
           duration = untilEndOfTurn)),
       activated(
         loyaltySymbol(down(1)),
         sequentially([
-            instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))),
+            instruct(this, dealDamage(amount = 3, recipient = target(anyTarget))),
             transform(thisPlaneswalker)])),
       activated(
         loyaltySymbol(down(6)),
         getEmblem([
             static(
               abilityGrant(
-                allOf(and([isCreature, youControl])),
+                allOf(nominal(creature, post = [youControl])),
                 [
                   haste,
-                  activated(
-                    tapSymbol,
-                    dealDamageOwnPower(thisCreature, target(isAnyTarget)))]))]))]})
+                  activated(tapSymbol, dealDamageOwnPower(thisCreature, target(anyTarget)))]))]))]})

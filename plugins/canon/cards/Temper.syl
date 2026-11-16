@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         establishThroughout(
           replace(
-            would(any, dealDamage(recipient = target(isCreature))),
+            would(any, dealDamage(recipient = target(creature))),
             instead(
               preventDamage(
                 theNext(letter(x)),

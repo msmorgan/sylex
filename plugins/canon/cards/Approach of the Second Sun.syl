@@ -9,7 +9,12 @@ card singleFaced({
               is(this, was(cast(which, from = yourHand), within = thisObject)),
               did(
                 actor(you),
-                cast(a(and([isSpell, isOther, named(printedName("Approach of the Second Sun"))]))),
+                cast(
+                  a(
+                    nominal(
+                      pre = [other],
+                      spell,
+                      post = [named(printedName("Approach of the Second Sun"))]))),
                 within(thisGame))]),
           winGame,
           otherwise = sequentially([putInto(this, fromTop(7, library)), gainLife(7)])))]})

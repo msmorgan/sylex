@@ -4,9 +4,12 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(controlGrant(you, enchanted(creature))),
       activatedBy(
-        perform(repeatTimes(sequentially([choose(a(cardIn(hand))), discard(that(card))]), 2)),
+        perform(
+          repeatTimes(
+            sequentially([choose(a(nominal(card, post = [in(hand)]))), discard(that(card))]),
+            2)),
         sequentially([instruct(controllerOf(thisAura), sacrifice(it)), instruct(they, draw(2))]),
         yourOpponents)]})

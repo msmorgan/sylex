@@ -8,7 +8,7 @@ ability madness(cost: Cost) {
   body = [
     static(
       replace(
-        would(actor(a(isPlayer)), discard(thisCard)),
+        would(actor(a(player)), discard(thisCard)),
         instead(discard(thisCard, destination = exile)))),
     when(
       causes(byEvent(does(any, discard(thisCard))), does(any, exileFrom(thisCard, hand))),

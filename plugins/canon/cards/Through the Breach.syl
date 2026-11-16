@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       spell(
         may(
-          putOntoBattlefield(a(and([isCreature, cardIn(yourHand)]))),
+          putOntoBattlefield(a(nominal(pre = [creature], card, post = [in(yourHand)]))),
           ifDid = sequentially([
               gain(that(creature), [haste]),
               atNext(beginningOfNext(endStep), sacrifice(that(creature)))]))),

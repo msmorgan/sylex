@@ -17,6 +17,6 @@ card singleFaced({
           cant(
             actor(you),
             loseLife(anyAmount),
-            causedBy = byEvent(does(actor(a(isSource)), dealDamage(recipient = you))))))],
+            causedBy = byEvent(does(actor(a(source)), dealDamage(recipient = you))))))],
     power = 5,
     toughness = 5})

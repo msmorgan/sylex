@@ -1,0 +1,5 @@
+# "opponent": an opponent of you [CR#102.2,102.3].
+template opponent: Nominal {
+  spelling = "opponent",
+  body = opponentOf(you)
+}

@@ -5,11 +5,11 @@ action amass(subtype: Subtype, count: Amount) {
   lexical = {verbs = [{lemma = "amass", frames = [TransitiveAmount, Monotransitive]}]},
   body = sequentially([
       doIf(
-        not(exists(and([hasSubtype(army), isCreature, actorControls]))),
+        not(exists(nominal(pre = [army], creature, post = [actorControls]))),
         create(1, written(creatureToken(0, 0, [black], [$subtype, army])))),
-      choose(a(and([hasSubtype(army), isCreature, actorControls]))),
+      choose(a(nominal(pre = [army], creature, post = [actorControls]))),
       putCounters($count, printedKind(p1p1Counter), that(creature)),
       doIf(
-        not(is(it, hasSubtype($subtype))),
+        not(is(it, noun(a($subtype)))),
         become(it, {characteristics = {subtypes = [$subtype]}}))])
 }

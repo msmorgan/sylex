@@ -14,7 +14,7 @@ card singleFaced({
               chosenKind([p1p1Counter, firstStrikeCounter, vigilanceCounter]),
               fresh)])),
       whenever(
-        does(actor(a(and([isNontoken, and([isCreature, youControl])]))), enter),
+        does(actor(a(nominal(pre = [non(token)], creature, post = [youControl]))), enter),
         if = is(thisCreature, hasCounter),
         doForEachKind(
           counterKind,

@@ -6,4 +6,6 @@ card singleFaced({
       spell(
         sequentially([
             exile(topSlice(1)),
-            doIf(is(it, isPermanentCard), may(putOntoBattlefield(it), ifDid = repeat(again)))]))]})
+            doIf(
+              is(it, noun(a(nominal(pre = [permanent], card)))),
+              may(putOntoBattlefield(it), ifDid = repeat(again)))]))]})

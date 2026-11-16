@@ -10,6 +10,6 @@ card singleFaced({
       spell(
         may(
           cast(
-            target(and([isInstantOrSorcery, isCard])),
+            target(nominal(pre = [or([instant, sorcery])], card)),
             from = graveyardOf(anOpponent),
             altCost = withoutPaying)))]})

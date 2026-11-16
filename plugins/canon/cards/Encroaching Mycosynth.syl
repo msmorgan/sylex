@@ -6,12 +6,12 @@ card singleFaced({
       static(
         qualityChange(
           and([
-              allOf(and([isPermanent, non(isLand), youControl])),
+              allOf(nominal(pre = [non(land)], permanent, post = [youControl])),
+              allOf(nominal(pre = [permanent], spell, post = [youControl])),
               allOf(
-                and([
-                    or([isArtifact, isBattle, isCreature, isEnchantment, isPlaneswalker]),
-                    isSpell,
-                    youControl])),
-              allOf(and([isCard, isPermanentCard, non(isLand), youOwn, not(in(battlefield))]))]),
+                nominal(
+                  pre = [non(land), permanent],
+                  card,
+                  post = [youOwn, not(in(battlefield))]))]),
           adds,
           bundle({characteristics = {types = [artifact]}})))]})

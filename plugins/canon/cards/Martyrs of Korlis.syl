@@ -6,9 +6,9 @@ card singleFaced({
     text = [
       static(
         asLongAs(
-          is(thisCreature, isUntapped),
+          is(thisCreature, untapped),
           replace(
-            would(by(allOf(isArtifact)), dealDamage(recipient = you)),
+            would(by(allOf(artifact)), dealDamage(recipient = you)),
             instead(redirectDamage(allDamage, thisCreature)))))],
     power = 1,
     toughness = 6})

@@ -1,0 +1,3 @@
+primitive hasTypeIgnoringTypeChanges(type: CardType): Predicative = HasTypeIgnoringTypeChanges {
+  spelling = "$type, ignoring any type-changing effects that would affect it"
+}

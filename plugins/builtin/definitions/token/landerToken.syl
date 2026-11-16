@@ -11,7 +11,7 @@ token landerToken {
         activated(
           compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisToken))]),
           sequentially([
-              search(yourLibrary, for = a(and([isLand, hasSupertype(basic)]))),
+              search(yourLibrary, for = a(nominal(pre = [basic], land))),
               putOntoBattlefieldTapped(it),
               shuffle]))]}}
 }

@@ -1,0 +1,4 @@
+# An emblem.
+primitive emblem: Nominal = Emblem {
+  spelling = "emblem"
+}

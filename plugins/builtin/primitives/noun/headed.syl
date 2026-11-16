@@ -1,4 +1,4 @@
 # `subject` named by a Head Noun: "<subject> as a <head>".
-primitive headed(subject: NounPhrase, head: NounWord): NounPhrase = Headed {
+primitive headed(subject: NounPhrase, head: Nominal): NounPhrase = Headed {
   spelling = "$subject as a $head"
 }

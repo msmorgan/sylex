@@ -6,6 +6,6 @@ ability exalted {
   spelling = "exalted",
   body = [
     whenever(
-      does(actor(you), attackWith(counted(exactly(1), and([isCreature, youControl])))),
+      does(actor(you), attackWith(counted(exactly(1), nominal(creature, post = [youControl])))),
       get(that(creature), up(1), up(1), duration = untilEndOfTurn))]
 }

@@ -1,1 +1,0 @@
-primitive subtype(subtype: Subtype): NounWord = Subtype

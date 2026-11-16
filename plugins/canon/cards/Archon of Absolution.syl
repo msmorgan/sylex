@@ -8,8 +8,8 @@ card singleFaced({
       protection(hasColor(white)),
       static(
         gatedBy(
-          actor(allOf(isCreature)),
-          attack(defender = or([you, allOf(and([isPlaneswalker, youControl]))])),
+          actor(allOf(creature)),
+          attack(defender = or([you, allOf(nominal(planeswalker, post = [youControl]))])),
           scaledGenericMana(times(1, groupSize))))],
     power = 3,
     toughness = 2})

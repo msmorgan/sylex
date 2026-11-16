@@ -408,13 +408,13 @@ fn a_supertype_is_a_catalog_declaration() {
     assert_eq!(
         refusals(&[(
             "a.syl",
-            "primitive yes: Predicate = Yes\n\
-             primitive has(supertype: Supertype): Predicate = HasSupertype\n\
+            "primitive yes: Nominal = Yes\n\
+             primitive has(supertype: Supertype): Nominal = HasSupertype\n\
              supertype legendary { name = \"Legendary\", confers = [] }\n\
              supertype basic\n\
              supertype world { permanentType = yes }\n\
              primitive snow: Supertype = Snow\n\
-             template t: Predicate { body = has(legendary) }"
+             template t: Nominal { body = has(legendary) }"
         )]),
         [
             (RefusalKind::MissingBlock(s("supertype")), s("basic")),
@@ -437,7 +437,7 @@ fn a_supertype_is_a_catalog_declaration() {
 /// way: never directly in the block.
 #[test]
 fn a_rules_row_writes_its_record_as_its_body() {
-    let preamble = "primitive yes: Predicate = Yes\n\
+    let preamble = "primitive yes: Nominal = Yes\n\
                     primitive always: Condition = Always\n\
                     primitive nothing: VerbPhrase = Nothing\n";
     let source = format!(
@@ -471,7 +471,7 @@ fn a_rules_row_writes_its_record_as_its_body() {
 /// constructor at its sort.
 #[test]
 fn a_rules_row_is_a_nameable_catalog_declaration() {
-    let preamble = "primitive yes: Predicate = Yes\n\
+    let preamble = "primitive yes: Nominal = Yes\n\
                     primitive always: Condition = Always\n\
                     primitive nothing: VerbPhrase = Nothing\n\
                     primitive property(spec: StaticSpec): Conferral = Property\n\
@@ -544,11 +544,11 @@ fn a_token_declares_its_characteristics_and_any_back_face() {
 fn a_defined_tokens_subtypes_are_read_by_a_predicate_over_the_token() {
     assert_eq!(
         kinds(
-            "primitive hasSubtypesOf(token: DefinedToken): Predicate = HasSubtypesOf\n\
-             primitive yes: Predicate = Yes\n\
+            "primitive hasSubtypesOf(token: DefinedToken): Nominal = HasSubtypesOf\n\
+             primitive yes: Nominal = Yes\n\
              token jaceToken { body = { characteristics = {} } }\n\
-             template a: Predicate { body = hasSubtypesOf(jaceToken) }\n\
-             template b: Predicate { body = hasSubtypesOf(yes) }\n\
+             template a: Nominal { body = hasSubtypesOf(jaceToken) }\n\
+             template b: Nominal { body = hasSubtypesOf(yes) }\n\
              primitive subtypeOf(token: DefinedToken): Subtype = SubtypeOf"
         ),
         [
@@ -1064,7 +1064,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                  triggered(\n\
                    and([\n\
                      at(beginningOfYour(upkeep)),\n\
-                     whenever(does(actor(you), cast(a(and([isSpell, hasColor(black)])))))]),\n\
+                     whenever(does(actor(you), cast(a(nominal(pre = [black], spell)))))]),\n\
                    putCounters(lit(1), printedKind(chargeCounter), thisArtifact))]})\n\
              card singleFaced({\n\
                name = \"Minsc & Boo, Timeless Heroes\",\n\
@@ -1103,7 +1103,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                      when(\n\
                        does(\n\
                          actor(enchanted(player)),\n\
-                         attack(defender = or([you, a(and([isPlaneswalker, youControl]))]))))]),\n\
+                         attack(defender = or([you, a(nominal(planeswalker, post = [youControl]))]))))]),\n\
                    sacrifice(thisAura))]})\n\
              card singleFaced({\n\
                name = \"Bartered Cow\",\n\
@@ -1123,14 +1123,13 @@ fn joined_trigger_conditions_are_one_disjunction() {
     );
 }
 
-/// The three builtin coercions over their primitives, with a consumer of
-/// `NounWord` so the sort is known.
-const COERCIONS: &str = "primitive type(type: CardType): NounWord = Type\n\
-     primitive subtype(subtype: Subtype): NounWord = Subtype\n\
+/// Three coercions over their primitives.
+const COERCIONS: &str = "primitive type(type: CardType): Nominal = Type\n\
+     primitive subtype(subtype: Subtype): Nominal = Subtype\n\
      primitive lit(value: Int): Amount = Literal\n\
-     primitive noun(word: NounWord): Predicate = Noun\n\
-     coercion(type: CardType): NounWord { body = type($type) }\n\
-     coercion(subtype: Subtype): NounWord { body = subtype($subtype) }\n\
+     primitive noun(word: Nominal): Condition = Noun\n\
+     coercion(type: CardType): Nominal { body = type($type) }\n\
+     coercion(subtype: Subtype): Nominal { body = subtype($subtype) }\n\
      coercion(value: Int): Amount { body = lit($value) }\n\
      primitive true: Bool = True\n\
      card_type creature { permanentType = true }\n\
@@ -1140,15 +1139,15 @@ const COERCIONS: &str = "primitive type(type: CardType): NounWord = Type\n\
 fn a_coercion_applies_at_a_sort_mismatch() {
     let source = format!(
         "{COERCIONS}\
-         template word: NounWord {{ body = creature }}\n\
-         template sub: NounWord {{ body = goblin }}\n\
+         template word: Nominal {{ body = creature }}\n\
+         template sub: Nominal {{ body = goblin }}\n\
          template int: Amount {{ body = -2 }}\n\
-         template param(t: CardType): NounWord {{ body = $t }}\n\
-         template items: List(NounWord) {{ body = [creature, goblin] }}\n\
-         template wrapped: NounWord {{ body = type(creature) }}\n\
+         template param(t: CardType): Nominal {{ body = $t }}\n\
+         template items: List(Nominal) {{ body = [creature, goblin] }}\n\
+         template wrapped: Nominal {{ body = type(creature) }}\n\
          template literal: Amount {{ body = lit(3) }}\n\
          template own: Int {{ body = 3 }}\n\
-         template arg: Predicate {{ body = noun(goblin) }}"
+         template arg: Condition {{ body = noun(goblin) }}"
     );
     assert_eq!(kinds(&source), []);
 }
@@ -1160,7 +1159,7 @@ fn a_named_argument_equal_to_its_default_through_a_coercion_is_refused() {
     let source = format!(
         "{COERCIONS}\
          template amt(x: Int, n: Amount = lit(0)): Int {{ body = $x }}\n\
-         template noun(x: Int, w: NounWord = creature): Int {{ body = $x }}\n\
+         template noun(x: Int, w: Nominal = creature): Int {{ body = $x }}\n\
          template bare: Int {{ body = amt(1, n = 0) }}\n\
          template wrapped: Int {{ body = noun(1, w = type(creature)) }}\n\
          template other: Int {{ body = amt(1, n = 1) }}\n\
@@ -1246,9 +1245,9 @@ fn a_default_reading_an_unbound_parameter_is_no_callers_parameter() {
 fn a_coercion_composes_with_option() {
     let source = format!(
         "{COERCIONS}\
-         template word: Option(NounWord) {{ body = creature }}\n\
+         template word: Option(Nominal) {{ body = creature }}\n\
          template int: Option(Amount) {{ body = 2 }}\n\
-         template param(t: Subtype): Option(NounWord) {{ body = $t }}\n\
+         template param(t: Subtype): Option(Nominal) {{ body = $t }}\n\
          template omitted: Option(Amount) {{ body = none }}"
     );
     assert_eq!(kinds(&source), []);
@@ -1281,12 +1280,12 @@ fn a_value_no_coercion_reaches_is_refused() {
 
 #[test]
 fn a_coercion_is_one_hop() {
-    // `CardType` to `NounWord` to `Predicate`: refused at load, and a card
-    // type at `Predicate` is not coerced twice.
+    // `CardType` to `Nominal` to `Condition`: refused at load, and a card
+    // type at `Condition` is not coerced twice.
     let source = format!(
         "{COERCIONS}\
-         coercion(word: NounWord): Predicate {{ body = noun($word) }}\n\
-         template t: Predicate {{ body = creature }}"
+         coercion(word: Nominal): Condition {{ body = noun($word) }}\n\
+         template t: Condition {{ body = creature }}"
     );
     assert_eq!(
         refusals(&[("a.syl", &source)]),
@@ -1294,23 +1293,23 @@ fn a_coercion_is_one_hop() {
             (
                 RefusalKind::ChainedCoercion {
                     from: s("CardType"),
-                    via: s("NounWord"),
-                    to: s("Predicate")
+                    via: s("Nominal"),
+                    to: s("Condition")
                 },
-                s("coercion(word: NounWord): Predicate { body = noun($word) }")
+                s("coercion(word: Nominal): Condition { body = noun($word) }")
             ),
             (
                 RefusalKind::ChainedCoercion {
                     from: s("Subtype"),
-                    via: s("NounWord"),
-                    to: s("Predicate")
+                    via: s("Nominal"),
+                    to: s("Condition")
                 },
-                s("coercion(word: NounWord): Predicate { body = noun($word) }")
+                s("coercion(word: Nominal): Condition { body = noun($word) }")
             ),
             (
                 RefusalKind::UnknownWord {
                     word: s("creature"),
-                    sort: s("Predicate")
+                    sort: s("Condition")
                 },
                 s("creature")
             ),
@@ -1346,7 +1345,7 @@ fn a_word_at_two_from_sorts_of_one_target_is_refused_with_no_call_site() {
             RefusalKind::AmbiguousWord {
                 word: s("creature"),
                 sorts: vec![s("CardType"), s("Subtype")],
-                target: s("NounWord")
+                target: s("Nominal")
             },
             s("subtype creature { types = [creature] }")
         )]
@@ -1356,16 +1355,16 @@ fn a_word_at_two_from_sorts_of_one_target_is_refused_with_no_call_site() {
 #[test]
 fn a_word_at_a_target_and_at_a_sort_coerced_into_it_is_refused_with_no_call_site() {
     // A leftover head-noun Template beside its card type.
-    let source = format!("{COERCIONS}template creature: NounWord {{ body = type(creature) }}");
+    let source = format!("{COERCIONS}template creature: Nominal {{ body = type(creature) }}");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [(
             RefusalKind::AmbiguousWord {
                 word: s("creature"),
-                sorts: vec![s("CardType"), s("NounWord")],
-                target: s("NounWord")
+                sorts: vec![s("CardType"), s("Nominal")],
+                target: s("Nominal")
             },
-            s("template creature: NounWord { body = type(creature) }")
+            s("template creature: Nominal { body = type(creature) }")
         )]
     );
 }
@@ -1392,19 +1391,19 @@ fn an_integer_literal_reaching_a_target_from_int_and_nat_is_refused_with_no_call
 
 #[test]
 fn a_record_literal_reaching_a_target_from_two_record_sorts_is_refused_with_no_call_site() {
-    let source = "primitive ordinalOf(o: EventOrdinal): Predicate = OrdinalOf\n\
-         primitive faceDownOf(f: FaceDown): Predicate = FaceDownOf\n\
-         coercion(o: EventOrdinal): Predicate { body = ordinalOf($o) }\n\
-         coercion(f: FaceDown): Predicate { body = faceDownOf($f) }";
+    let source = "primitive ordinalOf(o: EventOrdinal): Condition = OrdinalOf\n\
+         primitive faceDownOf(f: FaceDown): Condition = FaceDownOf\n\
+         coercion(o: EventOrdinal): Condition { body = ordinalOf($o) }\n\
+         coercion(f: FaceDown): Condition { body = faceDownOf($f) }";
     assert_eq!(
         refusals(&[("a.syl", source)]),
         [(
             RefusalKind::AmbiguousLiteral {
                 literal: s("a record"),
                 sorts: vec![s("EventOrdinal"), s("FaceDown")],
-                target: s("Predicate")
+                target: s("Condition")
             },
-            s("coercion(f: FaceDown): Predicate { body = faceDownOf($f) }")
+            s("coercion(f: FaceDown): Condition { body = faceDownOf($f) }")
         )]
     );
 }
@@ -1426,12 +1425,12 @@ fn a_word_at_two_sorts_no_coercion_joins_is_no_ambiguity() {
 fn a_malformed_coercion_is_refused() {
     let source = format!(
         "{COERCIONS}\
-         template article: NounWord {{ body = type(creature) }}\n\
+         template article: Nominal {{ body = type(creature) }}\n\
          coercion(a: Int, b: Int): Amount {{ body = lit($a) }}\n\
          coercion(a: Int = 1): Amount {{ body = lit($a) }}\n\
-         coercion(a: CardType): NounWord {{ body = article }}\n\
-         template articleOf(t: CardType): NounWord {{ body = type($t) }}\n\
-         coercion(a: CardType): NounWord {{ body = articleOf($a) }}\n\
+         coercion(a: CardType): Nominal {{ body = article }}\n\
+         template articleOf(t: CardType): Nominal {{ body = type($t) }}\n\
+         coercion(a: CardType): Nominal {{ body = articleOf($a) }}\n\
          coercion(a: Nat): Amount {{ body = lit(1) }}\n\
          coercion named(a: Int): Amount {{ body = lit($a) }}\n\
          coercion(a: Int): Amount\n\
@@ -1446,8 +1445,8 @@ fn a_malformed_coercion_is_refused() {
             RefusalKind::MissingHeader(s("coercion")),
             RefusalKind::CoercionParameters,
             RefusalKind::CoercionParameters,
-            RefusalKind::CoercionBody(s("NounWord")),
-            RefusalKind::CoercionBody(s("NounWord")),
+            RefusalKind::CoercionBody(s("Nominal")),
+            RefusalKind::CoercionBody(s("Nominal")),
             RefusalKind::CoercionBody(s("Amount")),
             RefusalKind::MissingField {
                 field: s("body"),
@@ -1467,19 +1466,19 @@ fn a_card_written_as_a_header_without_a_name_is_refused() {
 
 #[test]
 fn a_word_at_an_option_of_a_target_and_at_a_from_sort_is_refused_with_no_call_site() {
-    // At an `Option(NounWord)` position the `Option` declaration would be
+    // At an `Option(Nominal)` position the `Option` declaration would be
     // found before the coercion from `CardType` is tried.
     let source =
-        format!("{COERCIONS}template creature: Option(NounWord) {{ body = type(creature) }}");
+        format!("{COERCIONS}template creature: Option(Nominal) {{ body = type(creature) }}");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [(
             RefusalKind::AmbiguousWord {
                 word: s("creature"),
-                sorts: vec![s("CardType"), s("Option(NounWord)")],
-                target: s("Option(NounWord)")
+                sorts: vec![s("CardType"), s("Option(Nominal)")],
+                target: s("Option(Nominal)")
             },
-            s("template creature: Option(NounWord) { body = type(creature) }")
+            s("template creature: Option(Nominal) { body = type(creature) }")
         )]
     );
 }
@@ -1488,10 +1487,10 @@ fn a_word_at_an_option_of_a_target_and_at_a_from_sort_is_refused_with_no_call_si
 fn a_list_literal_reaching_a_target_from_two_list_sorts_is_refused_with_no_call_site() {
     let source = format!(
         "{COERCIONS}\
-         primitive ofTypes(types: List(CardType)): Predicate = OfTypes\n\
-         primitive ofSubtypes(subtypes: List(Subtype)): Predicate = OfSubtypes\n\
-         coercion(t: List(CardType)): Predicate {{ body = ofTypes($t) }}\n\
-         coercion(t: List(Subtype)): Predicate {{ body = ofSubtypes($t) }}"
+         primitive ofTypes(types: List(CardType)): Condition = OfTypes\n\
+         primitive ofSubtypes(subtypes: List(Subtype)): Condition = OfSubtypes\n\
+         coercion(t: List(CardType)): Condition {{ body = ofTypes($t) }}\n\
+         coercion(t: List(Subtype)): Condition {{ body = ofSubtypes($t) }}"
     );
     assert_eq!(
         refusals(&[("a.syl", &source)]),
@@ -1499,9 +1498,9 @@ fn a_list_literal_reaching_a_target_from_two_list_sorts_is_refused_with_no_call_
             RefusalKind::AmbiguousLiteral {
                 literal: s("a list"),
                 sorts: vec![s("List(CardType)"), s("List(Subtype)")],
-                target: s("Predicate")
+                target: s("Condition")
             },
-            s("coercion(t: List(Subtype)): Predicate { body = ofSubtypes($t) }")
+            s("coercion(t: List(Subtype)): Condition { body = ofSubtypes($t) }")
         )]
     );
 }
@@ -1771,7 +1770,7 @@ fn actor_parameter_in_a_template_is_refused() {
 fn actor_parameter_in_another_declaration_kind_is_refused() {
     let source = format!(
         "{ACTOR_PREAMBLE}\
-         primitive yes: Predicate = Yes\n\
+         primitive yes: Nominal = Yes\n\
          primitive always: Condition = Always\n\
          ability kw {{ body = [spell(see($actor))] }}\n\
          ability_word aw {{ body = spell(see($actor)) }}\n\
@@ -2106,7 +2105,6 @@ fn spelling_tie_affix_must_be_a_declared_bound_form() {
         ]
     );
 }
-
 #[test]
 fn triggered_refuses_a_bare_when_whenever_or_at_condition() {
     assert_eq!(
@@ -2431,7 +2429,7 @@ fn coordination_templates_refuse_fewer_than_two_items() {
     assert_eq!(
         plugin_refusals(
             "template okPred: Predicate {\n\
-               body = and([isCreature, or([isTapped, isAttacking])])\n\
+               body = and([hasType(creature), or([hasColor(white), hasColor(blue)])])\n\
              }\n\
              template okCond(a: Condition, b: Condition, c: Condition): Condition {\n\
                body = and([$a, or([$b, $c])])\n\
@@ -2443,7 +2441,7 @@ fn coordination_templates_refuse_fewer_than_two_items() {
     assert_eq!(
         plugin_refusals(
             "template pred0: Predicate { body = and([]) }\n\
-             template pred1: Predicate { body = andOr([isCreature]) }\n\
+             template nom1: Nominal { body = andOr([creature]) }\n\
              template np1: NounPhrase { body = or([you]) }\n\
              template loc1: Location { body = and([hand]) }\n\
              template est1: VerbPhrase { body = establishFor(it, [getsPt(it, up(1), up(1))]) }"
@@ -2459,10 +2457,10 @@ fn coordination_templates_refuse_fewer_than_two_items() {
             (
                 RefusalKind::SingleItemCoordination {
                     word: s("andOr"),
-                    sort: s("Predicate"),
-                    instead: s("isCreature"),
+                    sort: s("Nominal"),
+                    instead: s("creature"),
                 },
-                s("andOr([isCreature])")
+                s("andOr([creature])")
             ),
             (
                 RefusalKind::SingleItemCoordination {
@@ -2488,6 +2486,226 @@ fn coordination_templates_refuse_fewer_than_two_items() {
                 },
                 s("establishFor(it, [getsPt(it, up(1), up(1))])")
             ),
+        ]
+    );
+}
+
+const NOMINAL_PREAMBLE: &str = "\
+    primitive and: Coordinator = And\n\
+    primitive or: Coordinator = Or\n\
+    primitive white: PreModifier = White\n\
+    primitive black: PreModifier = Black\n\
+    primitive tapped: PreModifier = Tapped\n\
+    primitive youControl: PostModifier = YouControl\n\
+    primitive card: Nominal = Card\n\
+    primitive creature: Nominal = Creature\n\
+    primitive zombie: Nominal = Zombie\n\
+    primitive nominal(pre: List(PreModifier) = [], head: Nominal, post: List(PostModifier) = []): Nominal = Nominal\n\
+    primitive coord(coordinator: Coordinator, items: List(Nominal)): Nominal = Coordination\n\
+    template or(disjuncts: List(Nominal)): Nominal { body = coord(or, $disjuncts) }\n\
+    primitive coord(coordinator: Coordinator, items: List(PreModifier)): PreModifier = Coordination\n\
+    template or(disjuncts: List(PreModifier)): PreModifier { body = coord(or, $disjuncts) }\n\
+    template andOr(disjuncts: List(PreModifier)): PreModifier { body = or($disjuncts) }\n\
+    template stacked(modifiers: List(PreModifier)): PreModifier { body = coord(and, $modifiers) }\n\
+    primitive non(p: PreModifier): PreModifier = Non\n";
+
+#[test]
+fn nominal_allows_coordinated_heads_and_refuses_bare_and_nested_nominals() {
+    let valid = format!(
+        "{NOMINAL_PREAMBLE}\
+         template preOnly: Nominal {{ body = nominal(pre = [white], creature) }}\n\
+         template postOnly: Nominal {{ body = nominal(creature, post = [youControl]) }}\n\
+         template both: Nominal {{ body = nominal(pre = [white], creature, post = [youControl]) }}\n\
+         template coordHead: Nominal {{\n\
+           body = nominal(\n\
+             or([nominal(pre = [white], creature), nominal(pre = [black], zombie)]),\n\
+             post = [youControl])\n\
+         }}"
+    );
+    assert_eq!(kinds(&valid), []);
+
+    let invalid = format!(
+        "{NOMINAL_PREAMBLE}\
+         template bare: Nominal {{ body = nominal(creature) }}\n\
+         template emptyPre: Nominal {{ body = nominal(pre = [], creature) }}\n\
+         template emptyPost: Nominal {{ body = nominal(creature, post = []) }}\n\
+         template nestedPre: Nominal {{ body = nominal(pre = [white], nominal(pre = [tapped], creature)) }}\n\
+         template nestedPost: Nominal {{ body = nominal(nominal(pre = [white], creature), post = [youControl]) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [
+            (
+                RefusalKind::RedundantDefault {
+                    word: s("nominal"),
+                    argument: s("pre"),
+                },
+                s("pre = []")
+            ),
+            (
+                RefusalKind::RedundantDefault {
+                    word: s("nominal"),
+                    argument: s("post"),
+                },
+                s("post = []")
+            ),
+            (RefusalKind::RedundantNominal, s("nominal(creature)")),
+            (
+                RefusalKind::RedundantNominal,
+                s("nominal(pre = [], creature)")
+            ),
+            (
+                RefusalKind::RedundantNominal,
+                s("nominal(creature, post = [])")
+            ),
+            (
+                RefusalKind::NestedNominal,
+                s("nominal(pre = [tapped], creature)")
+            ),
+            (
+                RefusalKind::NestedNominal,
+                s("nominal(pre = [white], creature)")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn stacked_requires_two_elements_inside_a_premodifier_coordination() {
+    let valid = format!(
+        "{NOMINAL_PREAMBLE}\
+         template inOr: Nominal {{\n\
+           body = nominal(pre = [or([white, stacked([tapped, black])])], card)\n\
+         }}\n\
+         template inAndOr: Nominal {{\n\
+           body = nominal(pre = [andOr([white, stacked([tapped, black])])], card)\n\
+         }}\n\
+         template inCoord: Nominal {{\n\
+           body = nominal(pre = [coord(or, [white, stacked([tapped, black, white])])], card)\n\
+         }}"
+    );
+    assert_eq!(kinds(&valid), []);
+
+    let invalid = format!(
+        "{NOMINAL_PREAMBLE}\
+         template empty: Nominal {{ body = nominal(pre = [or([white, stacked([])])], card) }}\n\
+         template single: Nominal {{ body = nominal(pre = [or([white, stacked([black])])], card) }}\n\
+         template directInPre: Nominal {{ body = nominal(pre = [stacked([white, black])], card) }}\n\
+         template underNon: Nominal {{ body = nominal(pre = [or([white, non(stacked([tapped, black]))])], card) }}\n\
+         template nestedInStacked: Nominal {{ body = nominal(pre = [or([white, stacked([tapped, stacked([black, white])])])], card) }}\n\
+         template standalone: PreModifier {{ body = stacked([white, black]) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("stacked"),
+                    sort: s("PreModifier"),
+                },
+                s("stacked([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("stacked"),
+                    sort: s("PreModifier"),
+                    instead: s("black"),
+                },
+                s("stacked([black])")
+            ),
+            (RefusalKind::UnplacedStacked, s("stacked([white, black])")),
+            (RefusalKind::UnplacedStacked, s("stacked([tapped, black])")),
+            (RefusalKind::UnplacedStacked, s("stacked([black, white])")),
+            (RefusalKind::UnplacedStacked, s("stacked([white, black])")),
+        ]
+    );
+}
+
+#[test]
+fn agreement_postmodifier_requires_a_plural_group_determiner() {
+    let preamble = format!(
+        "{NOMINAL_PREAMBLE}\
+         primitive cardName: QualitySort = CardName\n\
+         primitive differ: Agreement = Differ\n\
+         primitive agree(axis: QualitySort, agreement: Agreement): PostModifier = Agree\n\
+         template withDifferentNames: PostModifier {{ body = agree(cardName, differ) }}\n\
+         primitive one: Plurality = One\n\
+         primitive many: Plurality = Many\n\
+         primitive unmarked: ChoiceMode = Unmarked\n\
+         primitive lit(value: Int): Amount = Literal\n\
+         coercion(value: Int): Amount {{ body = lit($value) }}\n\
+         primitive range(low: Option(Nat) = none, high: Option(Nat) = none): Quantity = Range\n\
+         primitive exactlyOf(amount: Amount): Quantity = ExactlyOf\n\
+         primitive all: DetPhrase = All\n\
+         primitive each: DetPhrase = Each\n\
+         primitive a(mode: ChoiceMode): DetPhrase = A\n\
+         primitive the(plur: Plurality = one): DetPhrase = The\n\
+         primitive count(quantity: Quantity, mode: Option(ChoiceMode)): DetPhrase = Count\n\
+         primitive target(quantity: Quantity): DetPhrase = Target\n\
+         primitive described(determiner: DetPhrase, nominal: Nominal): NounPhrase = Described\n\
+         template a(n: Nominal): NounPhrase {{ body = described(a(unmarked), $n) }}\n\
+         template each(n: Nominal): NounPhrase {{ body = described(each, $n) }}\n\
+         template the(n: Nominal): NounPhrase {{ body = described(the, $n) }}\n\
+         template thePlural(n: Nominal): NounPhrase {{ body = described(the(plur = many), $n) }}\n\
+         template allOf(n: Nominal): NounPhrase {{ body = described(all, $n) }}\n\
+         template counted(q: Quantity, n: Nominal): NounPhrase {{ body = described(count($q, none), $n) }}\n\
+         template target(n: Nominal): NounPhrase {{ body = described(target(range(low = 1, high = 1)), $n) }}\n\
+         template targets(q: Quantity, n: Nominal): NounPhrase {{ body = described(target($q), $n) }}\n\
+         primitive whole: SliceCount = Whole\n\
+         primitive sliceCounted(quantity: Quantity): SliceCount = Counted\n\
+         primitive someOf(count: SliceCount, description: Option(Nominal) = none, group: NounPhrase): NounPhrase = SomeOf\n\
+         primitive numberOf(group: NounPhrase): Amount = CountOf\n\
+         template countOf(n: Nominal): Amount {{ body = numberOf(described(all, $n)) }}\n\
+         template forEach(per: Amount, n: Nominal): Amount {{ body = countOf($n) }}\n\
+         primitive didDiscard(group: NounPhrase): PostModifier = DidDiscard\n\
+         primitive always: Condition = Always\n\
+         primitive nothing: VerbPhrase = Nothing\n"
+    );
+
+    let valid = format!(
+        "{preamble}\
+         template okAny: NounPhrase {{ body = counted(range(low = 0), nominal(card, post = [withDifferentNames])) }}\n\
+         template okTwo: NounPhrase {{ body = counted(exactlyOf(2), nominal(card, post = [withDifferentNames])) }}\n\
+         template okUpToSix: NounPhrase {{ body = targets(range(high = 6), nominal(creature, post = [withDifferentNames])) }}\n\
+         template okAll: NounPhrase {{ body = allOf(nominal(card, post = [withDifferentNames])) }}\n\
+         template okPluralThe: NounPhrase {{ body = thePlural(nominal(card, post = [withDifferentNames])) }}\n\
+         template okWholeSlice(g: NounPhrase): NounPhrase {{\n\
+           body = someOf(whole, description = nominal(card, post = [withDifferentNames]), $g)\n\
+         }}\n\
+         template okNestedInSingular: NounPhrase {{\n\
+           body = a(nominal(creature, post = [didDiscard(counted(exactlyOf(2), nominal(card, post = [withDifferentNames])))]))\n\
+         }}"
+    );
+    assert_eq!(kinds(&valid), []);
+
+    let invalid = format!(
+        "{preamble}\
+         template badA: NounPhrase {{ body = a(nominal(card, post = [withDifferentNames])) }}\n\
+         template badEach: NounPhrase {{ body = each(nominal(card, post = [withDifferentNames])) }}\n\
+         template badThe: NounPhrase {{ body = the(nominal(card, post = [withDifferentNames])) }}\n\
+         template badTarget: NounPhrase {{ body = target(nominal(creature, post = [withDifferentNames])) }}\n\
+         template badUpToOne: NounPhrase {{ body = targets(range(high = 1), nominal(creature, post = [withDifferentNames])) }}\n\
+         template badCountOne: NounPhrase {{ body = counted(exactlyOf(1), nominal(card, post = [withDifferentNames])) }}\n\
+         template badSliceOne(g: NounPhrase): NounPhrase {{\n\
+           body = someOf(sliceCounted(exactlyOf(1)), description = nominal(card, post = [withDifferentNames]), $g)\n\
+         }}\n\
+         template badForEach: Amount {{ body = forEach(1, nominal(card, post = [withDifferentNames])) }}\n\
+         sba badRule {{\n\
+           body = {{ scope = nominal(creature, post = [withDifferentNames]), when = always, then = nothing }}\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
         ]
     );
 }

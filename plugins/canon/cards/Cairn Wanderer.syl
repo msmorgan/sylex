@@ -8,11 +8,12 @@ card singleFaced({
       alsoForKeywords(
         static(
           asLongAs(
-            exists(and([isCreature, in(graveyard), hasKeyword(thatKeyword)])),
+            exists(
+              nominal(pre = [creature], card, post = [in(graveyard), hasKeyword(thatKeyword)])),
             keywordGrant(
               thisCreature,
               thatKeyword,
-              and([isCreature, in(graveyard), hasKeyword(thatKeyword)])))),
+              and([hasType(creature), in(graveyard), hasKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(fear),

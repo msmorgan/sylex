@@ -19,7 +19,7 @@ card singleFaced({
       when(
         chapterMark([3]),
         get(
-          allOf(and([hasSubtype(knight), youControl])),
+          allOf(nominal(knight, post = [youControl])),
           up(2),
           up(1),
           duration = untilEndOfTurn))]})

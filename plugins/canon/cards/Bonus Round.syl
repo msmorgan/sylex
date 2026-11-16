@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         delayWithin(
-          does(actor(a(isPlayer)), cast(a(and([isInstantOrSorcery, isSpell])))),
+          does(actor(a(player)), cast(a(nominal(pre = [or([instant, sorcery])], spell)))),
           untilEndOfTurn,
           sequentially([
               instruct(that(player), copyOnStack(it)),

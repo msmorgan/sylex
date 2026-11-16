@@ -8,7 +8,7 @@ card singleFaced({
           would(actor(thisArtifact), enter),
           instead(
             may(
-              discard(a(and([isLand, in(yourHand)]))),
+              discard(a(nominal(pre = [land], card, post = [in(yourHand)]))),
               ifDid = putOntoBattlefield(thisArtifact),
               ifNot = putInto(it, graveyard))))),
       activated(tapSymbol, addMana(counted(1, ofAnyColor(sameColor))))]})

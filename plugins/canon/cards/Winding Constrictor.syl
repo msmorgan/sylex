@@ -8,7 +8,10 @@ card singleFaced({
         replace(
           would(
             any,
-            putCounters(anyAmount, anyKind, a(and([or([isArtifact, isCreature]), youControl])))),
+            putCounters(
+              anyAmount,
+              anyKind,
+              a(nominal(or([artifact, creature]), post = [youControl])))),
           instead(putCounters(plus(thatMuch, 1), thoseCounters, that(permanent))))),
       static(
         replace(

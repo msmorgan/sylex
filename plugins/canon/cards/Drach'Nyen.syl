@@ -5,10 +5,12 @@ card singleFaced({
     types = [artifact],
     subtypes = [equipment],
     text = [
-      when(does(actor(thisEquipment), enter), exile(targets(upTo(1), isCreature))),
+      when(does(actor(thisEquipment), enter), exile(targets(upTo(1), creature))),
       static(
         conjunction([
             abilityGrant(equipped(creature), [menace]),
             getsPt(equipped(creature), up(letter(x)), up(0)),
-            letterDefinition(x, powerOf(the(in(exiledWith(thisEquipment)))))])),
+            letterDefinition(
+              x,
+              powerOf(the(nominal(card, post = [in(exiledWith(thisEquipment))]))))])),
       equip(mana([generic(2)]))]})

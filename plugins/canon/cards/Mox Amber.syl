@@ -11,4 +11,7 @@ card singleFaced({
             1,
             ofAnyColorAmong(
               allOf(
-                and([hasSupertype(legendary), or([isCreature, isPlaneswalker]), youControl]))))))]})
+                nominal(
+                  pre = [legendary],
+                  and([creature, planeswalker]),
+                  post = [youControl]))))))]})

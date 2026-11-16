@@ -6,4 +6,7 @@ card singleFaced({
     text = [
       static(
         addedCost(this, mandatory, plusAdditional(perform(choose(a(quality(subtype(creature)))))))),
-      static(definesPt(thisCreature, countOf(and([isCreature, ofChosen(subtype(creature))]))))]})
+      static(
+        definesPt(
+          thisCreature,
+          countOf(nominal(creature, post = [ofChosen(subtype(creature)), in(battlefield)]))))]})

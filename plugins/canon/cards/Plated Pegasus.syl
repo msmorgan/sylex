@@ -8,7 +8,7 @@ card singleFaced({
       flying,
       static(
         replace(
-          would(actor(a(isSpell)), dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+          would(actor(a(spell)), dealDamage(recipient = a(or([permanent, player])))),
           instead(preventDamage(ofThatDamage(1)))))],
     power = 1,
     toughness = 2})

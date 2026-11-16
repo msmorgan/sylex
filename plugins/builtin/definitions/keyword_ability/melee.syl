@@ -12,11 +12,12 @@ ability melee {
         up(
           forEach(
             1,
-            and([
-                isOpponent,
+            nominal(
+              opponent,
+              post = [
                 did(
                   actor(you),
-                  attackWith(defender = which, a(isCreature)),
+                  attackWith(defender = which, a(creature)),
                   within = within(thisCombat))]))),
         duration = untilEndOfTurn))]
 }

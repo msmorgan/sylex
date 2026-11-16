@@ -11,11 +11,16 @@ ability champion(subject: Predicate) {
     when(
       does(actor(thisPermanent), enter),
       may(
-        pay(payment(perform(exile(a(and([$subject, youControl, isOther]))))), once),
+        pay(
+          payment(
+            perform(
+              exile(
+                a(nominal(pre = [other, hasQuality($subject)], permanent, post = [youControl]))))),
+          once),
         ifNot = sacrifice(thisPermanent))),
     when(
       does(actor(thisPermanent), leave),
       returnToBattlefield(
-        the(and([was(exile(which)), isCard])),
+        the(nominal(pre = [was(exile(which))], card)),
         riders = [underControlOf(ownerOf(it))]))]
 }

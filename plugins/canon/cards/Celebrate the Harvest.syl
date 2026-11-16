@@ -7,7 +7,7 @@ card singleFaced({
         sequentially([
             search(
               yourLibrary,
-              for = counted(upToOf(letter(x)), and([isLand, hasSupertype(basic)]))),
-            define(x, distinctCount(value(power), allOf(and([isCreature, youControl])))),
+              for = counted(upToOf(letter(x)), nominal(pre = [basic, land], card))),
+            define(x, distinctCount(value(power), allOf(nominal(creature, post = [youControl])))),
             putOntoBattlefieldTapped(those(card)),
             shuffle]))]})

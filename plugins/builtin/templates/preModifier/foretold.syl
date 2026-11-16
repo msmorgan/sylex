@@ -1,0 +1,4 @@
+template foretold: PreModifier {
+  spelling = "foretold",
+  body = hasDesignation(foretold)
+}

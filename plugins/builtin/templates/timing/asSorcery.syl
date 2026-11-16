@@ -6,5 +6,5 @@ template asSorcery: Timing {
   body = and([
       whileTrue(hasPriority(you)),
       inPart(mainPhase, you, current),
-      whileTrue(not(exists(in(stack))))])
+      whileTrue(not(exists(stackObject)))])
 }

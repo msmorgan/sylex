@@ -9,10 +9,15 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), within = thisObject)])),
+            nominal(
+              pre = [sphinx],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           less(2))),
       whenever(
-        does(actor(or([thisCreature, a(and([hasSubtype(sphinx), youControl, isOther]))])), enter),
+        does(
+          actor(or([thisCreature, a(nominal(pre = [other], sphinx, post = [youControl]))])),
+          enter),
         sequentially([
             reveal(topSlice(4)),
             instruct(anOpponent, separateIntoPiles(them, 2)),

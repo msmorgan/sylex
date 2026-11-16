@@ -13,6 +13,6 @@ action fightEachOther(pair: NounPhrase) {
   permanent = performs,
   spelling = "$pair fight each other",
   body = doIf(
-    is($pair, isCreature),
+    is($pair, noun(a(creature))),
     instruct(eachOf($pair), dealDamage(amount = powerOf(it), recipient = theOther)))
 }

@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(entersChoosing(thisEnchantment, cardName)),
-      activated(mana([pip(blue)]), counter(target(and([isSpell, named(chosenName)]))))]})
+      activated(mana([pip(blue)]), counter(target(nominal(spell, post = [named(chosenName)]))))]})

@@ -2,5 +2,4 @@ card singleFaced({
     name = "Omniscience",
     cost = [generic(7), pip(blue), pip(blue), pip(blue)],
     types = [enchantment],
-    text = [
-      static(can(actor(you), cast(bare(isSpell), from = yourHand, altCost = withoutPaying)))]})
+    text = [static(can(actor(you), cast(bare(spell), from = yourHand, altCost = withoutPaying)))]})

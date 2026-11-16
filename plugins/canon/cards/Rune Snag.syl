@@ -5,10 +5,12 @@ card singleFaced({
     text = [
       spell(
         instruct(
-          controllerOf(target(isSpell)),
+          controllerOf(target(spell)),
           doUnless(
             compound([
                 mana([generic(2)]),
                 scaledGenericMana(
-                  forEach(2, and([named(printedName("Rune Snag")), in(graveyard)])))]),
+                  forEach(
+                    2,
+                    nominal(card, post = [named(printedName("Rune Snag")), in(graveyard)])))]),
             instruct(you, counter(it)))))]})

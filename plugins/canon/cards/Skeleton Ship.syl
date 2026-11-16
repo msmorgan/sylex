@@ -5,9 +5,7 @@ card singleFaced({
     types = [creature],
     subtypes = [skeleton],
     text = [
-      when(
-        stateHolds(not(exists(and([isLand, hasSubtype(island), youControl])))),
-        sacrifice(thisCreature)),
-      activated(tapSymbol, putCounters(1, printedKind(m1m1Counter), target(isCreature)))],
+      when(stateHolds(not(exists(nominal(island, post = [youControl])))), sacrifice(thisCreature)),
+      activated(tapSymbol, putCounters(1, printedKind(m1m1Counter), target(creature)))],
     power = 0,
     toughness = 3})

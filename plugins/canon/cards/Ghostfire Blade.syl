@@ -9,8 +9,9 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([
-                abilityHead(keyword(equip)),
-                abilityOf(this),
-                targeting(a(and([isCreature, isColorless])), someTarget)])),
+            nominal(
+              abilityHead(keyword(equip)),
+              post = [
+                ofSource(this),
+                targeting(a(nominal(pre = [colorless], creature)), someTarget)])),
           less(2)))]})

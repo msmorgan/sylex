@@ -6,7 +6,7 @@ ability evolve {
   spelling = "evolve",
   body = [
     whenever(
-      does(actor(a(and([isCreature, youControl]))), enter),
+      does(actor(a(nominal(creature, post = [youControl]))), enter),
       if = or([
           compareAmt(powerOf(that(creature)), greater, powerOf(thisCreature)),
           compareAmt(toughnessOf(that(creature)), greater, toughnessOf(thisCreature))]),

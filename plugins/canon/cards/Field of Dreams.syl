@@ -3,4 +3,4 @@ card singleFaced({
     cost = [pip(blue)],
     supertypes = [world],
     types = [enchantment],
-    text = [static(visibility(reveal, bare(isPlayer), topOfLibrary))]})
+    text = [static(visibility(reveal, bare(player), topOfLibrary))]})

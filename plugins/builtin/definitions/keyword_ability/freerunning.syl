@@ -12,8 +12,11 @@ ability freerunning(cost: Cost) {
         did(
           actor(
             a(
-              and(
-                [isCreature, or([hasSubtype(assassin), hasDesignation(commander)]), youControl]))),
-          dealDamage(kind = combat, recipient = a(isPlayer)),
+              nominal(
+                or([
+                    nominal(pre = [assassin], creature),
+                    nominal(creature, post = [hasDesignation(commander)])]),
+                post = [youControl]))),
+          dealDamage(kind = combat, recipient = a(player)),
           within(soFarThisTurn))))]
 }

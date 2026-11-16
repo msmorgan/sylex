@@ -1,0 +1,5 @@
+# "with different names"
+template withDifferentNames: PostModifier {
+  spelling = "with different names",
+  body = agree(cardName, differ)
+}

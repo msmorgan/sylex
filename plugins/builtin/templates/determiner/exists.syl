@@ -1,6 +1,6 @@
 # "if there is a …", "if you control a …": the indefinite is published for the consequent
 # (`semantics.md` §2.2, box 2).
-template exists(p: Predicate): Condition {
+template exists(p: Nominal): Condition {
   spelling = "there is a $p",
   body = thereAre(described(a(unmarked), $p))
 }

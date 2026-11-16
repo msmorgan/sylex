@@ -11,7 +11,7 @@ card singleFaced({
       static(
         replace(
           would(
-            actor(a(and([isCreature, isOther]))),
+            actor(a(nominal(pre = [other], creature))),
             dealDamage(kind = combat, recipient = equipped(creature))),
           instead(
             instruct(

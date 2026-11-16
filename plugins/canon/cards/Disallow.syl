@@ -3,4 +3,4 @@ card singleFaced({
     cost = [generic(1), pip(blue), pip(blue)],
     types = [instant],
     text = [
-      spell(counter(target(or([isSpell, abilityHead(anyActivated), abilityHead(anyTriggered)]))))]})
+      spell(counter(target(or([spell, abilityHead(anyActivated), abilityHead(anyTriggered)]))))]})

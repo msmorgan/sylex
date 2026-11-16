@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [shapeshifter],
     text = [
       whenever(
-        does(actor(a(and([isCreature, isOther]))), enter),
+        does(actor(a(nominal(pre = [other], creature))), enter),
         establish(copyChange(thisCreature, that(creature), exceptions = [exceptThisAbility])))],
     power = 0,
     toughness = 1})

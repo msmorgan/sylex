@@ -1,6 +1,5 @@
 # How long an object has continuously satisfied `predicate`, as "has had the world supertype for
 # the shortest amount of time" [CR#704.5k]: a projection `superlative` compares across objects.
 # It is not a timestamp, since a permanent can gain the world supertype after it enters.
-# TODO(spelling): Printing "has had <predicate> for" with the predicate as a noun phrase waits on
-# `syl-nominal-descriptions`.
+# TODO(spelling): Printing "has had <predicate> for" with the predicate as a noun phrase.
 primitive heldFor(predicate: Predicate): ProjAxis = HeldFor

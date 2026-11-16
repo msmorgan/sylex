@@ -1,4 +1,0 @@
-template isInstant: Predicate {
-  spelling = "instant",
-  body = hasType(instant)
-}

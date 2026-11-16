@@ -8,8 +8,8 @@ card singleFaced({
         does(
           any,
           transform(
-            a(and([isPermanent, youControl])),
-            into = and([isCreature, not(hasSubtype(human))]))),
+            a(nominal(permanent, post = [youControl])),
+            into = and([hasType(creature), not(hasSubtype(human))]))),
         create(1, written(creatureToken(2, 2, [green], [wolf]))))],
     power = 5,
     toughness = 4})

@@ -1,0 +1,4 @@
+# "of <source>": restricts an ability Nominal to abilities whose source is `source` [CR#113.7].
+primitive ofSource(source: NounPhrase): PostModifier = AbilityOf {
+  spelling = "of $source"
+}

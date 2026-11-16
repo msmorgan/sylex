@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         entersWithAdditionalCounters(
-          each(and([isCreature, hasSubtype(wizard), youControl, isOther])),
+          each(nominal(pre = [other, wizard], creature, post = [youControl])),
           1,
           p1p1Counter)),
       activated(
@@ -16,7 +16,7 @@ card singleFaced({
               removeCounters(
                 exactly(1),
                 printedKind(p1p1Counter),
-                a(and([isCreature, youControl]))))]),
+                a(nominal(creature, post = [youControl]))))]),
         draw(1))],
     power = 2,
     toughness = 2})

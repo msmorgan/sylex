@@ -17,7 +17,7 @@ card flip({
       protection(hasColor(red)),
       static(
         replace(
-          would(actor(a(and([isSource, hasColor(red)]))), dealDamage(recipient = a(isPlayer))),
+          would(actor(a(nominal(pre = [red], source))), dealDamage(recipient = a(player))),
           instead(
             instruct(it, dealDamage(amount = plus(thatMuch, 1), recipient = that(player))))))],
     power = 2,

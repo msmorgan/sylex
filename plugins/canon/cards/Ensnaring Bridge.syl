@@ -5,5 +5,9 @@ card singleFaced({
     text = [
       static(
         cant(
-          actor(allOf(and([isCreature, hasPower(greater, countOf(cardIn(yourHand)))]))),
+          actor(
+            allOf(
+              nominal(
+                creature,
+                post = [hasPower(greater, countOf(nominal(card, post = [in(yourHand)])))]))),
           attack))]})

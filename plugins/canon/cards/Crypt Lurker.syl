@@ -7,7 +7,9 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         may(
-          chooseOne(sacrifice(a(isCreature)), discard(a(and([isCreature, in(yourHand)])))),
+          chooseOne(
+            sacrifice(a(creature)),
+            discard(a(nominal(pre = [creature], card, post = [in(yourHand)])))),
           ifDid = draw(1)))],
     power = 3,
     toughness = 4})

@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [human, artificer],
     text = [
       whenever(
-        does(actor(counted(orMore(1), and([isArtifact, youControl]))), enter),
+        does(actor(counted(orMore(1), nominal(artifact, post = [youControl]))), enter),
         instruct(thisCreature, dealDamage(amount = groupSize, recipient = eachOpponent)))],
     power = 3,
     toughness = 1})

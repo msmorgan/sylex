@@ -1,5 +1,5 @@
 # "<quantity> of <group>": a counted slice of a named group.
 primitive someOf(
   count: SliceCount,
-  description: Option(Predicate) = none,
+  description: Option(Nominal) = none,
   group: NounPhrase): NounPhrase = SomeOf

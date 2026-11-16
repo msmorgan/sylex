@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(3), pip(blue)],
     types = [creature],
     subtypes = [faerie, rogue],
-    text = [flying, static(visibility(reveal, bare(isPlayer), topOfLibrary))],
+    text = [flying, static(visibility(reveal, bare(player), topOfLibrary))],
     power = 1,
     toughness = 3})

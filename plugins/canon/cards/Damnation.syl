@@ -2,4 +2,4 @@ card singleFaced({
     name = "Damnation",
     cost = [generic(2), pip(black), pip(black)],
     types = [sorcery],
-    text = [spell(doUnderProhibition(destroy(allOf(isCreature)), regeneration(them)))]})
+    text = [spell(doUnderProhibition(destroy(allOf(creature)), regeneration(them)))]})

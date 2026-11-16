@@ -4,4 +4,5 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        establish(controlGrant(you, target(and([isCreature, hasManaValue(equal, letter(x))])))))]})
+        establish(
+          controlGrant(you, target(nominal(creature, post = [hasManaValue(equal, letter(x))])))))]})

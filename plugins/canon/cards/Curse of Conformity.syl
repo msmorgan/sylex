@@ -9,7 +9,10 @@ card singleFaced({
         conjunction([
             getsBase(
               allOf(
-                and([isCreature, non(hasSupertype(legendary)), controlledBy(enchanted(player))])),
+                nominal(
+                  pre = [non(legendary)],
+                  creature,
+                  post = [controlledBy(enchanted(player))])),
               3,
               3),
             qualityChange(them, loses, everyTypeOf(creature))]))]})

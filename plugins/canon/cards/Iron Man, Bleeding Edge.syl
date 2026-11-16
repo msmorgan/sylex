@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       flying,
       whenever(
-        does(actor(you), cast(a(and([isArtifact, isSpell])))),
+        does(actor(you), cast(a(nominal(pre = [artifact], spell)))),
         doOnlyOnceEachTurn(may(copyOnStack(it, exceptions = [isntLegendary]))))],
     power = 3,
     toughness = 5})

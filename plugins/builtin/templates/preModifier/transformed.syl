@@ -1,0 +1,4 @@
+template transformed: PreModifier {
+  spelling = "transformed",
+  body = currentFace(back)
+}

@@ -6,8 +6,8 @@ card singleFaced({
       spell(
         delayWithin(
           or([
-              does(actor(you), cast(a(and([isInstant, isSpell])))),
-              does(actor(you), cast(a(and([isSorcery, isSpell])))),
+              does(actor(you), cast(a(nominal(pre = [instant], spell)))),
+              does(actor(you), cast(a(nominal(pre = [sorcery], spell)))),
               does(actor(you), activate(a(abilityHead(loyalty))))]),
           thisTurn,
           sequentially(

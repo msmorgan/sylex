@@ -6,6 +6,6 @@ card singleFaced({
       static(entersChoosing(thisEnchantment, subtype(creature))),
       static(
         qualityChange(
-          allOf(and([isCreature, youControl])),
+          allOf(nominal(creature, post = [youControl])),
           adds,
           chosenQuality(ofChosen(subtype(creature)))))]})

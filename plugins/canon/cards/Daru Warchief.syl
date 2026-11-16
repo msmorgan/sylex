@@ -7,8 +7,11 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([hasSubtype(soldier), isSpell, did(actor(you), cast(which), within = thisObject)])),
+            nominal(
+              pre = [soldier],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           less(1))),
-      static(getsPt(allOf(and([hasSubtype(soldier), isCreature, youControl])), up(1), up(2)))],
+      static(getsPt(allOf(nominal(pre = [soldier], creature, post = [youControl])), up(1), up(2)))],
     power = 1,
     toughness = 1})

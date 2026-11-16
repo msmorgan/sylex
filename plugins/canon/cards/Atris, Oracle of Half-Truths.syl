@@ -9,7 +9,7 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            instruct(target(isOpponent), lookAt(topSlice(3))),
+            instruct(target(opponent), lookAt(topSlice(3))),
             instruct(they, separateIntoPiles(them, 2, faces = [faceDown, faceUp])),
             putInto(onePile, hand),
             putInto(theOther, graveyard)]))],

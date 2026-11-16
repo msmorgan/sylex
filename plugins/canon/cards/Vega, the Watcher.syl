@@ -9,7 +9,11 @@ card singleFaced({
       whenever(
         does(
           actor(you),
-          cast(a(and([isSpell, not(was(cast(which, from = yourHand), within = thisObject))])))),
+          cast(
+            a(
+              nominal(
+                spell,
+                post = [not(was(cast(which, from = yourHand), within = thisObject))])))),
         draw(1))],
     power = 2,
     toughness = 2})

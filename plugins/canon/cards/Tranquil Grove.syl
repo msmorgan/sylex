@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       activated(
         mana([generic(1), pip(green), pip(green)]),
-        destroy(allOf(and([isEnchantment, isOther]))))]})
+        destroy(allOf(nominal(pre = [other], enchantment))))]})

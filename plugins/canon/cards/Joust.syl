@@ -12,9 +12,13 @@ card singleFaced({
         sequentially([
             choose(
               and([
-                  target(and([isCreature, youControl])),
-                  target(and([isCreature, youDontControl]))])),
+                  target(nominal(creature, post = [youControl])),
+                  target(nominal(creature, post = [youDontControl]))])),
             doOnlyIf(
-              get(the(and([isCreature, youControl])), up(2), up(1), duration = untilEndOfTurn),
-              is(it, hasSubtype(knight))),
+              get(
+                the(nominal(creature, post = [youControl])),
+                up(2),
+                up(1),
+                duration = untilEndOfTurn),
+              is(it, noun(a(knight)))),
             fightEachOther(those(creature))]))]})

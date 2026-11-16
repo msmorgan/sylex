@@ -1,0 +1,21 @@
+card singleFaced({
+    name = "Death's Oasis",
+    cost = [pip(white), pip(black), pip(green)],
+    types = [enchantment],
+    text = [
+      whenever(
+        does(actor(a(nominal(pre = [non(token)], creature, post = [youControl]))), die),
+        sequentially([
+            mill(2),
+            returnToHand(
+              a(
+                nominal(
+                  pre = [creature],
+                  card,
+                  post = [
+                    hasLesserManaValueThan(the(nominal(creature, post = [did(actor(which), die)]))),
+                    in(yourGraveyard)])),
+              from = yourGraveyard)])),
+      activated(
+        compound([mana([generic(1)]), perform(sacrifice(thisEnchantment))]),
+        gainLife(aggregateAll(max, stat(manaValue), nominal(creature, post = [youControl]))))]})

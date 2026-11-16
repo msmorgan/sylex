@@ -10,6 +10,8 @@ ability webSlinging(cost: Cost) {
         cast(
           thisSpell,
           altCost = payingInstead(
-            compound(
-              [$cost, perform(returnToHand(a(and([isCreature, isTapped, youControl]))))])))))]
+            compound([
+                $cost,
+                perform(
+                  returnToHand(a(nominal(pre = [tapped], creature, post = [youControl]))))])))))]
 }

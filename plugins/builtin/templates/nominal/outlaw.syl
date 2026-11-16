@@ -1,0 +1,5 @@
+# "outlaw": an Assassin, Mercenary, Pirate, Rogue, and/or Warlock permanent [CR#700.12,700.12a].
+template outlaw: Nominal {
+  spelling = "outlaw",
+  body = andOr([assassin, mercenary, pirate, rogue, warlock])
+}

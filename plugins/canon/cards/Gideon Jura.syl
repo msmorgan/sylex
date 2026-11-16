@@ -9,10 +9,10 @@ card singleFaced({
         loyaltySymbol(up(2)),
         establishThroughout(
           must(
-            actor(allOf(and([isCreature, controlledBy(target(isOpponent))]))),
+            actor(allOf(nominal(creature, post = [controlledBy(target(opponent))]))),
             attack(defender = thisPlaneswalker)),
           duringNextTurnOf(that(player)))),
-      activated(loyaltySymbol(down(2)), destroy(target(and([isCreature, isTapped])))),
+      activated(loyaltySymbol(down(2)), destroy(target(nominal(pre = [tapped], creature)))),
       activated(
         loyaltySymbol(up(0)),
         sequentially([

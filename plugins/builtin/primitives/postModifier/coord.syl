@@ -1,0 +1,1 @@
+primitive coord(coordinator: Coordinator, items: List(PostModifier)): PostModifier = Coordination

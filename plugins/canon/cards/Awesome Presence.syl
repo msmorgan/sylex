@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         gatedBy(
           any,
@@ -12,4 +12,6 @@ card singleFaced({
           scaledGenericMana(
             forEach(
               3,
-              and([isCreature, controlledBy(they), inCombat(blockerOf, counterpart = it)])))))]})
+              nominal(
+                creature,
+                post = [controlledBy(they), inCombat(blockerOf, counterpart = it)])))))]})

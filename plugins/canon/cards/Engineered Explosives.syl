@@ -9,7 +9,7 @@ card singleFaced({
         compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]),
         destroy(
           each(
-            and([
-                isPermanent,
-                non(isLand),
-                hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]})
+            nominal(
+              pre = [non(land)],
+              permanent,
+              post = [hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]})

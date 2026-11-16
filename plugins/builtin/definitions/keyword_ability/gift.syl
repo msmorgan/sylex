@@ -12,6 +12,9 @@ ability gift(promise: VerbPhrase) {
       when(
         does(actor(thisPermanent), enter),
         if = keywordCostPaid(this, gift),
-        instruct(the(isChosenPlayer), $promise)),
-      spell(doIf(keywordCostPaid(this, gift), instruct(the(isChosenPlayer), $promise))))]
+        instruct(the(nominal(pre = [chosen], player)), $promise)),
+      spell(
+        doIf(
+          keywordCostPaid(this, gift),
+          instruct(the(nominal(pre = [chosen], player)), $promise))))]
 }

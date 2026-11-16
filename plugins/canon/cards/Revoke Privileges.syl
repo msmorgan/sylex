@@ -4,9 +4,9 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         conjunction([
             cant(actor(enchanted(creature)), attack),
             cant(actor(enchanted(creature)), block),
-            cant(actor(enchanted(creature)), crew(allOf(hasSubtype(vehicle))))]))]})
+            cant(actor(enchanted(creature)), crew(allOf(vehicle)))]))]})

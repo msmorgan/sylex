@@ -6,9 +6,10 @@ action bolster(amount: Amount) {
   body = sequentially([
       choose(
         a(
-          and([
-              isCreature,
+          nominal(
+            creature,
+            post = [
               actorControls,
-              superlative(min, stat(toughness), and([isCreature, actorControls]))]))),
+              superlative(min, stat(toughness), nominal(creature, post = [actorControls]))]))),
       putCounters($amount, printedKind(p1p1Counter), that(creature))])
 }

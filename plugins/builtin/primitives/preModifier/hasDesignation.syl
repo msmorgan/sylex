@@ -1,0 +1,1 @@
+primitive hasDesignation(designation: DesignationLabel): PreModifier = HasDesignation

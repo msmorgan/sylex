@@ -4,12 +4,12 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         conjunction([
             conjunction([
                 getsPt(enchanted(creature), up(1), up(1)),
-                abilityGrant(enchanted(creature), [protection(isEnchantment)])],
+                abilityGrant(enchanted(creature), [protection(hasType(enchantment))])],
               subject = enchanted(creature)),
             doesnt(actor(thisEffect), remove(thisAura))])),
-      activated(perform(sacrifice(thisAura)), destroy(target(isEnchantment)))]})
+      activated(perform(sacrifice(thisAura)), destroy(target(enchantment)))]})

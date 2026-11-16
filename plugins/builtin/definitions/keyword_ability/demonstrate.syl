@@ -11,6 +11,6 @@ ability demonstrate {
         sequentially([copyOnStack(thisSpell), may(chooseNewTargets(that(copy)))]),
         ifDid = sequentially([
             choose(anOpponent),
-            instruct(the(isChosenPlayer), copyOnStack(thisSpell)),
-            instruct(the(isChosenPlayer), may(chooseNewTargets(that(copy))))])))]
+            instruct(the(nominal(pre = [chosen], player)), copyOnStack(thisSpell)),
+            instruct(the(nominal(pre = [chosen], player)), may(chooseNewTargets(that(copy))))])))]
 }

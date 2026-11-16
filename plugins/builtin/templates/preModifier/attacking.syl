@@ -1,0 +1,4 @@
+template attacking: PreModifier {
+  spelling = "attacking",
+  body = inCombat(attackerOf)
+}

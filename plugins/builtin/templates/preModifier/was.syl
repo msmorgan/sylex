@@ -1,0 +1,6 @@
+# Attributive participial lookback before the head ("the exiled card", "the sacrificed creature")
+# [CR#607.2a].
+template was(action: VerbPhrase): PreModifier {
+  spelling = "$action",
+  body = predicateDid({subj = any, action = $action, within = none})
+}

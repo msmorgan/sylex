@@ -6,7 +6,7 @@ card transforming({
     text = [
       at(
         beginningOfEach(upkeep),
-        if = not(was(cast(a(isSpell)), within(lastTurn))),
+        if = not(was(cast(a(spell)), within(lastTurn))),
         transform(thisCreature))],
     power = 3,
     toughness = 2},
@@ -18,7 +18,7 @@ card transforming({
       whenever(
         does(any, transform(thisCreature, into = named(printedName("Werewolf Ransacker")))),
         sequentially([
-            may(destroy(target(isArtifact))),
+            may(destroy(target(artifact))),
             doIf(
               did(actor(that(artifact)), putInto(subject, graveyard), thisWay),
               instruct(
@@ -27,7 +27,7 @@ card transforming({
       at(
         beginningOfEach(upkeep),
         if = compareAmt(
-          aggregateOver(max, isPlayer, eventCount(actor(they), cast(a(isSpell)), lastTurn)),
+          aggregateOver(max, player, eventCount(actor(they), cast(a(spell)), lastTurn)),
           atLeast,
           2),
         transform(thisCreature))],

@@ -5,15 +5,15 @@ card singleFaced({
     subtypes = [gargoyle],
     text = [
       flying,
-      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
-      static(cant(any, cast(bare(and([isSpell, named(chosenName)]))))),
+      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(hasType(land))))),
+      static(cant(any, cast(bare(nominal(spell, post = [named(chosenName)]))))),
       static(
         cant(
           any,
           activate(
             allOf(
-              and([
-                  abilityHead(anyActivated),
-                  abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
+              nominal(
+                abilityHead(anyActivated),
+                post = [ofSource(allOf(nominal(source, post = [named(chosenName)])))])))))],
     power = 3,
     toughness = 3})

@@ -7,6 +7,12 @@ card singleFaced({
       static(
         altCost(
           payingInstead(
-            perform(exile(a(and([hasColor(red), hasManaValue(equal, letter(x)), in(yourHand)]))))),
+            perform(
+              exile(
+                a(
+                  nominal(
+                    pre = [red],
+                    card,
+                    post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
           this)),
-      spell(get(target(isCreature), up(letter(x)), up(0), duration = untilEndOfTurn))]})
+      spell(get(target(creature), up(letter(x)), up(0), duration = untilEndOfTurn))]})

@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isLand),
+      enchant(hasType(land)),
       static(entersChoosing(thisAura, color)),
       static(qualityChange(enchanted(land), sets, chosenQuality(ofChosen(color)))),
       whenever(

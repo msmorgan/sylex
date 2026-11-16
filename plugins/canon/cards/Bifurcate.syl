@@ -8,8 +8,10 @@ card singleFaced({
             search(
               yourLibrary,
               for = a(
-                and([
-                    isPermanentCard,
-                    shares(cardName, share, target(and([isCreature, isNontoken])))]))),
+                nominal(
+                  pre = [permanent],
+                  card,
+                  post = [
+                    shares(cardName, share, target(nominal(pre = [non(token)], creature)))]))),
             putOntoBattlefield(that(card)),
             shuffle]))]})

@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       static(
         entersWithAdditionalCounters(
-          each(and([isCreature, isNontoken, youControl, isOther])),
+          each(nominal(pre = [other, non(token)], creature, post = [youControl])),
           1,
           p1p1Counter)),
       activated(
@@ -17,9 +17,10 @@ card singleFaced({
             define(
               x,
               countOf(
-                and([
-                    isNontoken,
-                    isCreature,
+                nominal(
+                  pre = [non(token)],
+                  creature,
+                  post = [
                     youControl,
                     did(actor(which), enter, within = within(soFarThisTurn))])))]))],
     power = 2,

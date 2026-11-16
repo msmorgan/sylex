@@ -11,7 +11,7 @@ card singleFaced({
           riders = [
             whenSpentOn(
               affectsIt,
-              a(and([isCreature, isSpell])),
+              a(nominal(pre = [creature], spell)),
               gain(becomes(that(spell)), [haste], duration = untilEndOfTurn))]))],
     power = 2,
     toughness = 1})

@@ -10,5 +10,6 @@ ability landwalk(quality: Predicate) {
     static(
       onlyWhile(
         cant(any, block(attacker = thisCreature)),
-        exists(and([isLand, $quality, controlledBy(defendingPlayer)]))))]
+        exists(
+          nominal(pre = [hasQuality($quality)], land, post = [controlledBy(defendingPlayer)]))))]
 }

@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [human, wizard],
     text = [
-      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
-      static(cant(any, cast(bare(and([isSpell, named(chosenName)])))))],
+      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(hasType(land))))),
+      static(cant(any, cast(bare(nominal(spell, post = [named(chosenName)])))))],
     power = 2,
     toughness = 2})

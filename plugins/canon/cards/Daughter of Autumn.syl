@@ -9,7 +9,7 @@ card singleFaced({
         mana([pip(white)]),
         establishThroughout(
           replace(
-            would(any, dealDamage(recipient = target(and([isCreature, hasColor(white)])))),
+            would(any, dealDamage(recipient = target(nominal(pre = [white], creature)))),
             instead(redirectDamage(theNext(1), thisCreature))),
           thisTurn))],
     power = 2,

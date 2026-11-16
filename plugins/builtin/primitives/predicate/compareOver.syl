@@ -1,5 +1,0 @@
-primitive compareOver(
-  domain: Predicate,
-  measure: Amount,
-  comparator: Comparator,
-  bound: Amount): Predicate = CompareOver

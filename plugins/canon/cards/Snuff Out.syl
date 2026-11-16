@@ -5,9 +5,9 @@ card singleFaced({
     text = [
       static(
         if(
-          exists(and([isLand, hasSubtype(swamp), youControl])),
+          exists(nominal(swamp, post = [youControl])),
           altCost(payingInstead(perform(payLife(amount = 4))), this))),
       spell(
         doUnderProhibition(
-          destroy(target(and([isCreature, non(hasColor(black))]))),
+          destroy(target(nominal(pre = [non(black)], creature))),
           regeneration(it)))]})

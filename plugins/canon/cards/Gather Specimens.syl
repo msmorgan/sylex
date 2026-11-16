@@ -6,6 +6,6 @@ card singleFaced({
       spell(
         establishThroughout(
           replace(
-            would(actor(a(isCreature)), enter(riders = [underControlOf(anOpponent)])),
+            would(actor(a(creature)), enter(riders = [underControlOf(anOpponent)])),
             instead(instruct(it, enter(riders = [underControlOf(you)])))),
           thisTurn))]})

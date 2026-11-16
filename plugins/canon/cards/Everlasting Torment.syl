@@ -10,10 +10,10 @@ card singleFaced({
     cost = [generic(2), hybridPip(black, red)],
     types = [enchantment],
     text = [
-      static(cant(actor(bare(isPlayer)), gainLife(anyAmount))),
+      static(cant(actor(bare(player)), gainLife(anyAmount))),
       static(cant(any, preventDamage(allDamage, damage = would(any, dealDamage)))),
       static(
         asThough(
-          by(a(isSource)),
+          by(a(source)),
           dealDamage,
           holds(is(thatSource, hasKeyword(theKeyword(wither))))))]})

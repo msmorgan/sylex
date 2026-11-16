@@ -9,7 +9,9 @@ card singleFaced({
         sequentially([
             choose(
               target(
-                and([isOpponent, compare(greater, lifeTotalOf(you), [playerStat(lifeTotal)])])),
+                nominal(
+                  opponent,
+                  post = [compare(greater, lifeTotalOf(you), [playerStat(lifeTotal)])])),
               when = whileDoing(does(actor(you), activate(thisAbility)))),
             instruct(thisCreature, dealDamage(amount = 2, recipient = that(player)))]))],
     power = 1,

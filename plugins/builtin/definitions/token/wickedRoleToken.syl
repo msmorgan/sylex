@@ -9,7 +9,7 @@ token wickedRoleToken {
       types = [enchantment],
       subtypes = [aura, role],
       text = [
-        enchant(isCreature),
+        enchant(hasType(creature)),
         static(getsPt(enchanted(creature), up(1), up(1))),
         when(
           does(any, putInto(thisToken, graveyard, from = battlefield)),

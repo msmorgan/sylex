@@ -7,13 +7,13 @@ card singleFaced({
         beginningOfYour(upkeep),
         if = exists(
           compareOver(
-            isOpponent,
-            countOf(and([isLand, controlledBy(they)])),
+            opponent,
+            countOf(nominal(land, post = [controlledBy(they)])),
             greater,
-            countOf(and([isLand, youControl])))),
+            countOf(nominal(land, post = [youControl])))),
         may(
           sequentially([
-              search(yourLibrary, for = counted(upTo(3), and([isLand, hasSupertype(basic)]))),
+              search(yourLibrary, for = counted(upTo(3), nominal(pre = [basic, land], card))),
               reveal(those(card)),
               putInto(those(card), hand),
               shuffle])))]})

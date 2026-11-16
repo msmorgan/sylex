@@ -9,9 +9,10 @@ ability cascade {
           exile(
             run(
               top,
-              and([
-                  non(isLand),
-                  compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)])]),
+              nominal(
+                pre = [non(land)],
+                card,
+                post = [compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)])]),
               libraryOf(you))),
           may(
             cast(
@@ -20,8 +21,9 @@ ability cascade {
               altCost = withoutPaying)),
           move(
             allOf(
-              and([
-                  isCard,
+              nominal(
+                card,
+                post = [
                   was(exile(which), within = thisWay),
                   not(was(cast(which), within = thisWay))])),
             anywhere,

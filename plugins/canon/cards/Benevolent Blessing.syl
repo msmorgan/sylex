@@ -8,7 +8,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       flash,
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(entersChoosing(thisAura, color)),
       static(
         conjunction([
@@ -16,8 +16,4 @@ card singleFaced({
             doesnt(
               actor(thisEffect),
               remove(
-                bare(
-                  and([
-                      or([hasSubtype(aura), hasSubtype(equipment)]),
-                      youControl,
-                      attachedTo(it)]))))]))]})
+                bare(nominal(or([aura, equipment]), post = [youControl, attachedTo(it)]))))]))]})

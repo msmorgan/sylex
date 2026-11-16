@@ -1,0 +1,4 @@
+# A teammate of `who` [CR#102.3].
+primitive teammateOf(who: NounPhrase): Nominal = TeammateOf {
+  spelling = "teammate of $who"
+}

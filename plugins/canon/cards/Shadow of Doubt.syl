@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            establishThroughout(cant(actor(bare(isPlayer)), search(libraries)), thisTurn),
+            establishThroughout(cant(actor(bare(player)), search(libraries)), thisTurn),
             draw(1)]))]})

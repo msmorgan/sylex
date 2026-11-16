@@ -8,7 +8,9 @@ card singleFaced({
       whenever(
         does(
           actor(equipped(creature)),
-          attack(defender = a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
+          attack(
+            defender = a(
+              nominal(player, post = [superlative(max, playerStat(lifeTotal), player)])))),
         createTappedAttacking(
           1,
           {

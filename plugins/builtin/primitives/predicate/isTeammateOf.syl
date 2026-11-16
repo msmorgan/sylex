@@ -1,4 +1,0 @@
-# "a teammate of <who>" [CR#102.3].
-primitive isTeammateOf(who: NounPhrase): Predicate = IsTeammateOf {
-  spelling = "a teammate of $who"
-}

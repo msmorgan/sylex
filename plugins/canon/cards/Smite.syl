@@ -2,4 +2,4 @@ card singleFaced({
     name = "Smite",
     cost = [pip(white)],
     types = [instant],
-    text = [spell(destroy(target(and([isCreature, isBlocked]))))]})
+    text = [spell(destroy(target(nominal(pre = [blocked], creature))))]})

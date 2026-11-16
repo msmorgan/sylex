@@ -7,13 +7,13 @@ card singleFaced({
       flying,
       static(
         entersWithAdditionalCounters(
-          each(and([isCreature, hasSubtype(rogue), youControl, isOther])),
+          each(nominal(pre = [other, rogue], creature, post = [youControl])),
           1,
           p1p1Counter)),
       whenever(
         does(
-          actor(a(and([isCreature, youControl, hasCounter(kind = p1p1Counter)]))),
-          dealDamage(kind = combat, recipient = a(isPlayer))),
-        instruct(that(player), discard(a(cardIn(hand)))))],
+          actor(a(nominal(creature, post = [youControl, hasCounter(kind = p1p1Counter)]))),
+          dealDamage(kind = combat, recipient = a(player))),
+        instruct(that(player), discard(a(nominal(card, post = [in(hand)])))))],
     power = 1,
     toughness = 1})

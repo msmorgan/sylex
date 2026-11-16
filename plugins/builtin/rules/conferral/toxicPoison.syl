@@ -6,9 +6,9 @@
 # counters once.
 conferral toxicPoison {
   body = {
-    scope = and([isCreature, hasKeyword(theKeyword(toxic))]),
+    scope = nominal(creature, post = [hasKeyword(theKeyword(toxic))]),
     confer = property(
       asEvent(
-        does(actor(this), dealDamage(kind = combat, recipient = a(isPlayer))),
+        does(actor(this), dealDamage(kind = combat, recipient = a(player))),
         putCounters(totalToxicValue(this), printedKind(poison), that(player))))}
 }

@@ -9,11 +9,15 @@ card singleFaced({
           doOnlyIf(
             establishThroughout(
               keywordGrant(
-                allOf(and([isCreature, youControl])),
+                allOf(nominal(creature, post = [youControl])),
                 thatKeyword,
-                and([isCreature, in(yourGraveyard), hasKeyword(thatKeyword)])),
+                and([hasType(creature), in(yourGraveyard), hasKeyword(thatKeyword)])),
               untilEndOfTurn),
-            exists(and([isCreature, in(yourGraveyard), hasKeyword(thatKeyword)])))),
+            exists(
+              nominal(
+                pre = [creature],
+                card,
+                post = [in(yourGraveyard), hasKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(firstStrike),

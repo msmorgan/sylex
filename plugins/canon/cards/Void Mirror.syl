@@ -4,6 +4,6 @@ card singleFaced({
     types = [artifact],
     text = [
       whenever(
-        does(actor(a(isPlayer)), cast(a(isSpell))),
+        does(actor(a(player)), cast(a(spell))),
         if = noColoredManaSpentToCast(it),
         counter(that(spell)))]})

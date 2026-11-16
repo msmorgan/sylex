@@ -6,4 +6,7 @@ card singleFaced({
       spell(
         exile(
           target(
-            and([isCreature, superlative(max, stat(power), and([isCreature, isPermanent]))]))))]})
+            nominal(
+              creature,
+              post = [
+                superlative(max, stat(power), nominal(creature, post = [in(battlefield)]))]))))]})

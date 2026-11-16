@@ -9,5 +9,6 @@ ability mentor {
       putCounters(
         1,
         printedKind(p1p1Counter),
-        target(and([isCreature, isAttacking, hasPower(less, powerOf(thisCreature))]))))]
+        target(
+          nominal(pre = [attacking], creature, post = [hasPower(less, powerOf(thisCreature))]))))]
 }

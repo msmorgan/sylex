@@ -10,9 +10,10 @@ action timeTravel {
         counted(
           anyNumber,
           andOr([
-              and([isPermanent, actorControls, hasCounter(kind = timeCounter)]),
-              and([
-                  isCard,
+              nominal(permanent, post = [actorControls, hasCounter(kind = timeCounter)]),
+              nominal(
+                card,
+                post = [
                   in(exileZone),
                   ownedBy($actor),
                   hasKeyword(theKeyword(suspend)),

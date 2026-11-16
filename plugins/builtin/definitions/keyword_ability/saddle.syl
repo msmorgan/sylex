@@ -12,7 +12,7 @@ ability saddle(amount: Amount) {
       perform(
         tap(
           withTotal(
-            allOf(and([isUntapped, and([isCreature, youControl, isOther])])),
+            allOf(nominal(pre = [other, untapped], creature, post = [youControl])),
             stat(power),
             atLeast,
             $amount))),

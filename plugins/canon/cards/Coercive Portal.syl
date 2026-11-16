@@ -10,6 +10,7 @@ card singleFaced({
               instruct(eachPlayer, voteStartingWith(you, byLabel(["carnage", "homage"]))),
               doIf(
                 getsMoreVotes("carnage"),
-                sequentially(
-                  [sacrifice(thisArtifact), destroy(allOf(and([isPermanent, non(isLand)])))])),
+                sequentially([
+                    sacrifice(thisArtifact),
+                    destroy(allOf(nominal(pre = [non(land)], permanent)))])),
               doIf(getsMoreVotesOrTied("homage"), draw(1))])))]})

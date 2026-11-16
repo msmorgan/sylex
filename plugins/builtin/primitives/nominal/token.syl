@@ -1,0 +1,4 @@
+# A token (the token test alone; zone-change subjects test departed tokens) [CR#111.1,111.7].
+primitive token: Nominal = Token {
+  spelling = "token"
+}

@@ -7,7 +7,8 @@ card singleFaced({
         beginningOfYour(upkeep),
         destroy(
           target(
-            and([
-                isPermanent,
-                non(isLand),
-                superlative(min, stat(manaValue), and([isPermanent, non(isLand)]))]))))]})
+            nominal(
+              pre = [non(land)],
+              permanent,
+              post = [
+                superlative(min, stat(manaValue), nominal(pre = [non(land)], permanent))]))))]})

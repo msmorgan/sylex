@@ -7,6 +7,6 @@ card singleFaced({
     text = [
       activated(
         compound([mana([pip(green), pip(blue)]), tapSymbol]),
-        doubleCounters(target(or([isArtifact, isCreature, isLand]))))],
+        doubleCounters(target(or([artifact, creature, land]))))],
     power = 1,
     toughness = 4})

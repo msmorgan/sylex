@@ -9,7 +9,7 @@ card singleFaced({
           payingInstead(
             compound([
                 perform(payLife(amount = 6)),
-                perform(sacrifice(counted(exactly(3), and([isCreature, hasColor(black)]))))])),
+                perform(sacrifice(counted(exactly(3), nominal(pre = [black], creature))))])),
           this)),
       flying,
       trample],

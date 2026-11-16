@@ -13,9 +13,9 @@ ability beamMeUp(cost: Cost) {
         cast(
           this,
           from = yourGraveyard,
-          resulting = isInstantOrSorcery,
+          resulting = or([hasType(instant), hasType(sorcery)]),
           altCost = payingInstead(
-            compound([$cost, perform(beamUp(a(and([isCreature, youControl]))))]))))),
+            compound([$cost, perform(beamUp(a(nominal(creature, post = [youControl]))))]))))),
     static(
       replace(
         would(actor(thisSpell), leave(from = stack)),

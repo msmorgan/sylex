@@ -1,3 +1,0 @@
-primitive player: NounWord = Player {
-  spelling = "player"
-}

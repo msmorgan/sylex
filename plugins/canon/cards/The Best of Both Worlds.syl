@@ -8,16 +8,16 @@ card singleFaced({
     text = [
       when(
         chapterMark([1]),
-        assimilate(target(and([non(isArtifact), isCreature, anOpponentControls])))),
+        assimilate(target(nominal(pre = [non(artifact)], creature, post = [anOpponentControls])))),
       when(
         chapterMark([2]),
         get(
-          allOf(and([isArtifact, isCreature, youControl])),
+          allOf(nominal(pre = [artifact], creature, post = [youControl])),
           up(2),
           up(2),
           duration = untilEndOfTurn)),
       when(
         chapterMark([3]),
         sequentially([
-            exile(the(and([hasSubtype(borg), did(by(thisSaga), assimilate(which))]))),
+            exile(the(nominal(borg, post = [did(by(thisSaga), assimilate(which))]))),
             returnToBattlefield(it, riders = [underControlOf(ownerOf(it))])]))]})

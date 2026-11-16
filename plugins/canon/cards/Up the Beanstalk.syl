@@ -6,5 +6,6 @@ card singleFaced({
       triggered(
         and([
             when(does(actor(this), enter)),
-            whenever(does(actor(you), cast(a(and([isSpell, hasManaValue(atLeast, 5)])))))]),
+            whenever(
+              does(actor(you), cast(a(nominal(spell, post = [hasManaValue(atLeast, 5)])))))]),
         draw(1))]})

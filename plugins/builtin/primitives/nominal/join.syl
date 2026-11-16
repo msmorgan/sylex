@@ -1,0 +1,2 @@
+# A melded or merged object join.
+primitive join: Nominal = Join

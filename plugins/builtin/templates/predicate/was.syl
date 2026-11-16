@@ -1,9 +1,0 @@
-# "<action>ed [<within>]", the passive with no agent over `did(any, …)`: with `within = none`, an
-# attributive Participial Description ("the exiled card"), which alone reaches a linked ability's
-# objects [CR#607.2a]; with `within = thisWay`, "each creature destroyed this way", reading only the
-# enclosing ability's earlier text [CR#607.1,608.2c]; or with a turn span, "creatures that were
-# dealt damage this turn".
-template was(action: VerbPhrase, within: Option(LookbackSpan) = none): Predicate {
-  spelling = "$action< $within>",
-  body = did(any, $action, within = $within)
-}

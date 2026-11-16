@@ -5,7 +5,9 @@ card singleFaced({
     subtypes = [spirit],
     text = [
       whenever(
-        does(actor(counted(orMore(1), cardIn(yourGraveyard))), leave(from = yourGraveyard)),
+        does(
+          actor(counted(orMore(1), nominal(card, post = [in(yourGraveyard)]))),
+          leave(from = yourGraveyard)),
         instruct(this, dealDamage(amount = 1, recipient = eachOpponent)))],
     power = 4,
     toughness = 3})

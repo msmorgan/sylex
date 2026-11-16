@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       static(getsPt(equipped(creature), up(4), up(0))),
       whenever(
-        does(any, attachment(attached, thisEquipment, host = a(isCreature))),
+        does(any, attachment(attached, thisEquipment, host = a(creature))),
         tap(that(creature))),
       equip(mana([generic(2)]))]})

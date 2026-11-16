@@ -6,7 +6,7 @@ card flip({
     text = [
       at(
         beginningOfEach(endStep),
-        if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))),
+        if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), aura))),
         flip(it))],
     power = 2,
     toughness = 3},
@@ -19,7 +19,7 @@ card flip({
       activated(
         mana([generic(1)]),
         attachTo(
-          target(and([hasSubtype(aura), attachedTo(a(isCreature))])),
-          a(and([isCreature, isOther]))))],
+          target(nominal(aura, post = [attachedTo(a(creature))])),
+          a(nominal(pre = [other], creature))))],
     power = 4,
     toughness = 5})

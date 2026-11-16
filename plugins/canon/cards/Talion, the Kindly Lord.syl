@@ -12,8 +12,9 @@ card singleFaced({
           actor(anOpponent),
           cast(
             a(
-              and([
-                  isSpell,
+              nominal(
+                spell,
+                post = [
                   compare(
                     equal,
                     chosenNumber,

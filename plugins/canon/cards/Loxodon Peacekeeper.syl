@@ -11,11 +11,14 @@ card singleFaced({
         beginningOfYour(upkeep),
         sequentially([
             gainControl(
-              controller = the(and([isPlayer, superlative(min, playerStat(lifeTotal), isPlayer)])),
+              controller = the(
+                nominal(player, post = [superlative(min, playerStat(lifeTotal), player)])),
               thisCreature),
             doIf(
               thereAre(
-                counted(orMore(2), and([isPlayer, tiedFor(min, playerStat(lifeTotal), isPlayer)]))),
+                counted(
+                  orMore(2),
+                  nominal(player, post = [tiedFor(min, playerStat(lifeTotal), player)]))),
               sequentially([
                   choose(partOf(exactly(1), themPlayers)),
                   gainControl(controller = that(player), thisCreature)]))]))],

@@ -5,4 +5,7 @@ card singleFaced({
     text = [
       static(entersChoosing(thisEnchantment, subtype(creature))),
       static(
-        getsPt(allOf(and([isCreature, youControl, ofChosen(subtype(creature))])), up(1), up(1)))]})
+        getsPt(
+          allOf(nominal(creature, post = [youControl, ofChosen(subtype(creature))])),
+          up(1),
+          up(1)))]})

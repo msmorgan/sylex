@@ -6,6 +6,13 @@ card singleFaced({
     text = [
       static(entersChoosing(thisCreature, number)),
       static(
-        cant(any, cast(bare(and([isSpell, non(isCreature), hasManaValue(equal, chosenNumber)])))))],
+        cant(
+          any,
+          cast(
+            bare(
+              nominal(
+                pre = [non(creature)],
+                spell,
+                post = [hasManaValue(equal, chosenNumber)])))))],
     power = 2,
     toughness = 2})

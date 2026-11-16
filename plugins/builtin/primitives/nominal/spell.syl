@@ -1,0 +1,4 @@
+# A spell on the stack [CR#109.2b,112.1].
+primitive spell: Nominal = Spell {
+  spelling = "spell"
+}

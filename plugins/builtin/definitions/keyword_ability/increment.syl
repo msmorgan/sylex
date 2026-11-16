@@ -6,9 +6,9 @@ ability increment {
   spelling = "increment",
   body = [
     whenever(
-      does(actor(you), cast(a(isSpell))),
+      does(actor(you), cast(a(spell))),
       if = and([
-          is(thisPermanent, isCreature),
+          is(thisPermanent, noun(a(creature))),
           or([
               compareAmt(manaValueSpentToCast(that(spell)), greater, powerOf(thisCreature)),
               compareAmt(manaValueSpentToCast(that(spell)), greater, toughnessOf(thisCreature))])]),

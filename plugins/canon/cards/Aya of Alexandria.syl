@@ -9,8 +9,8 @@ card singleFaced({
       lifelink,
       whenever(
         does(
-          actor(a(and([isHistoric, isCreature, youControl]))),
-          dealDamage(kind = combat, recipient = a(isPlayer))),
+          actor(a(nominal(pre = [historic], creature, post = [youControl]))),
+          dealDamage(kind = combat, recipient = a(player))),
         create(
           1,
           written({

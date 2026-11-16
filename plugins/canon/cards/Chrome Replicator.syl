@@ -7,8 +7,12 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         if = thereAre(
-          withTheSameName(
-            counted(orMore(2), and([isPermanent, non(isLand), isNontoken, youControl])))),
+          counted(
+            orMore(2),
+            nominal(
+              pre = [non(land), non(token)],
+              permanent,
+              post = [youControl, withTheSameName]))),
         create(
           1,
           written({

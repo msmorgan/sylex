@@ -11,8 +11,8 @@ card singleFaced({
         sequentially([
             choose(
               and([
-                  target(and([isCreature, youControl])),
-                  target(and([isCreature, anOpponentControls]))])),
+                  target(nominal(creature, post = [youControl])),
+                  target(nominal(creature, post = [anOpponentControls]))])),
             instruct(
               eachOf(those(creature)),
               dealDamage(amount = toughnessOf(it), recipient = theOther))]))]})

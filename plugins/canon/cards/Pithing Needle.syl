@@ -9,7 +9,7 @@ card singleFaced({
           any,
           activate(
             allOf(
-              and([
-                  abilityHead(anyActivated),
-                  abilityOf(allOf(and([isSource, named(chosenName)])))]))),
-          unless = is(them, isManaAbility)))]})
+              nominal(
+                abilityHead(anyActivated),
+                post = [ofSource(allOf(nominal(source, post = [named(chosenName)])))]))),
+          unless = is(them, noun(a(manaAbility)))))]})

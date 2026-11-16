@@ -7,7 +7,10 @@ card singleFaced({
       whenever(
         does(
           any,
-          putInto(counted(orMore(1), cardIn(yourGraveyard)), exileZone, from = yourGraveyard)),
+          putInto(
+            counted(orMore(1), nominal(card, post = [in(yourGraveyard)])),
+            exileZone,
+            from = yourGraveyard)),
         putCounters(groupSize, printedKind(p1p1Counter), thisCreature))],
     power = 4,
     toughness = 4})

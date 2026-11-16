@@ -8,7 +8,8 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            searchLibraryOrGraveyard(a(and([isArtifact, hasManaValue(atMost, 2)]))),
+            searchLibraryOrGraveyard(
+              a(nominal(pre = [artifact], card, post = [hasManaValue(atMost, 2)]))),
             reveal(it),
             putInto(it, hand),
             doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],

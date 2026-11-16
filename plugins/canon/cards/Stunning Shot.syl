@@ -8,6 +8,6 @@ card singleFaced({
             putCounters(
               2,
               printedKind(p1p1Counter),
-              targets(upTo(1), and([isCreature, youControl]))),
-            tap(targets(upTo(1), and([isCreature, anOpponentControls]))),
+              targets(upTo(1), nominal(creature, post = [youControl]))),
+            tap(targets(upTo(1), nominal(creature, post = [anOpponentControls]))),
             putCounters(1, printedKind(stunCounter), it)]))]})

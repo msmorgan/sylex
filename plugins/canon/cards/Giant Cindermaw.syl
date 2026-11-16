@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(2), pip(red)],
     types = [creature],
     subtypes = [dinosaur, beast],
-    text = [trample, static(cant(actor(bare(isPlayer)), gainLife(anyAmount)))],
+    text = [trample, static(cant(actor(bare(player)), gainLife(anyAmount)))],
     power = 4,
     toughness = 3})

@@ -1,0 +1,5 @@
+# "ability of <source>" [CR#113.7].
+template abilityOf(source: NounPhrase): Nominal {
+  spelling = "ability of $source",
+  body = nominal(ability, post = [ofSource($source)])
+}

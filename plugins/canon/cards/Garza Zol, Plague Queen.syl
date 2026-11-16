@@ -11,8 +11,9 @@ card singleFaced({
         does(
           actor(
             a(
-              and([
-                  isCreature,
+              nominal(
+                creature,
+                post = [
                   did(
                     actor(thisCreature),
                     dealDamage(recipient = which),
@@ -20,7 +21,7 @@ card singleFaced({
           die),
         putCounters(1, printedKind(p1p1Counter), thisCreature)),
       whenever(
-        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(isPlayer))),
+        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
         may(draw(1)))],
     power = 5,
     toughness = 5})

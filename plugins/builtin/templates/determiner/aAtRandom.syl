@@ -1,5 +1,5 @@
 # "a … at random"
-template aAtRandom(p: Predicate): NounPhrase {
+template aAtRandom(p: Nominal): NounPhrase {
   spelling = "a $p at random",
   body = described(a(atRandom), $p)
 }

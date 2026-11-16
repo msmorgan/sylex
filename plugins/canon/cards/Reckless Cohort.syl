@@ -8,6 +8,6 @@ card singleFaced({
         must(
           actor(thisCreature),
           attack,
-          unless = exists(and([isOther, hasSubtype(ally), youControl]))))],
+          unless = exists(nominal(pre = [other], ally, post = [youControl]))))],
     power = 2,
     toughness = 2})

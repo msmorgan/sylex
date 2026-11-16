@@ -4,11 +4,11 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(and([or([isArtifact, isCreature]), youControl])),
+      enchant(and([or([hasType(artifact), hasType(creature)]), youControl])),
       static(
         replace(
           nthOccurrence(
             nth(1),
-            would(by(you), createObject(anyAmount, token(copyOf(counted(orMore(1), isToken)), []))),
+            would(by(you), createObject(anyAmount, token(copyOf(counted(orMore(1), token)), []))),
             per = turn),
           instead(may(create(groupSize, copyOf(enchanted(permanent)))))))]})

@@ -1,4 +1,4 @@
 template anOpponent: NounPhrase {
   spelling = "an opponent",
-  body = a(isOpponent)
+  body = a(opponent)
 }

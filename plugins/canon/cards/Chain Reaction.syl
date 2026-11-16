@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            instruct(this, dealDamage(amount = letter(x), recipient = each(isCreature))),
-            define(x, countOf(isCreature))]))]})
+            instruct(this, dealDamage(amount = letter(x), recipient = each(creature))),
+            define(x, countOf(nominal(creature, post = [in(battlefield)])))]))]})

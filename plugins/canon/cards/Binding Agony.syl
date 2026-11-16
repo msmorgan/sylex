@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       whenever(
         does(any, dealDamage(recipient = enchanted(creature))),
         instruct(

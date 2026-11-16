@@ -9,9 +9,11 @@ card singleFaced({
               mana([generic(1)]),
               instruct(
                 this,
-                dealDamage(amount = 2, recipient = each(and([isCreature, isOutlaw]))))),
+                dealDamage(amount = 2, recipient = each(nominal(pre = [outlaw], creature))))),
             plusMode(
               mana([generic(1)]),
               instruct(
                 this,
-                dealDamage(amount = 2, recipient = each(and([isCreature, non(isOutlaw)])))))]))]})
+                dealDamage(
+                  amount = 2,
+                  recipient = each(nominal(pre = [non(outlaw)], creature)))))]))]})

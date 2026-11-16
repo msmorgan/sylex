@@ -1,5 +1,5 @@
 # TODO(spelling): `domain` places modifiers before or after `$sort` ("basic land type" vs "color
-# other than red"); waits on `syl-nominal-descriptions` and `syl-kind-axis-one-word`.
+# other than red"); waits on `syl-kind-axis-one-word`.
 primitive ofYourChoice(
   sort: QualitySort,
   domain: Option(ChoiceDomain) = none): Predicate = OfYourChoice

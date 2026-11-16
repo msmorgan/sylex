@@ -2,4 +2,4 @@ card singleFaced({
     name = "Disarm",
     cost = [pip(blue)],
     types = [instant],
-    text = [spell(unattach(allOf(and([hasSubtype(equipment), attachedTo(target(isCreature))]))))]})
+    text = [spell(unattach(allOf(nominal(equipment, post = [attachedTo(target(creature))]))))]})

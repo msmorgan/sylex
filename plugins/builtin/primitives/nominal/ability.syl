@@ -1,0 +1,4 @@
+# An ability.
+primitive ability: Nominal = Ability {
+  spelling = "ability"
+}

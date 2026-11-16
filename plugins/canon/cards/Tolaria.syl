@@ -8,7 +8,7 @@ card singleFaced({
         tapSymbol,
         establishThroughout(
           abilityLoss(
-            target(isCreature),
+            target(creature),
             [written(banding), abilities(anyIn({word = bandsWithOther}))]),
           untilEndOfTurn),
         duringPart(upkeep))]})

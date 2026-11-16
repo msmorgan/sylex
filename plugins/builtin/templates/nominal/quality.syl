@@ -1,0 +1,4 @@
+template quality(sort: QualitySort): Nominal {
+  spelling = "$sort",
+  body = qualityNoun($sort)
+}

@@ -6,4 +6,7 @@ card singleFaced({
       spell(
         sequentially([
             choose(a(quality(subtype(creature)))),
-            draw(forEach(1, and([isPermanent, youControl, ofChosen(subtype(creature))])))]))]})
+            draw(
+              forEach(
+                1,
+                nominal(permanent, post = [youControl, ofChosen(subtype(creature))])))]))]})

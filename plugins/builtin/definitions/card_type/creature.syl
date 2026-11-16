@@ -22,7 +22,8 @@ card_type creature {
     property(
       cant(
         any,
-        activate(allOf(and([abilityHead(anyActivated), abilityOf(this), tapOrUntapInCost]))),
+        activate(
+          allOf(nominal(abilityHead(anyActivated), post = [ofSource(this), tapOrUntapInCost]))),
         unless = controlledSinceTheirTurnBegan(this))),
     damageResult(markDamage(amount = thatMuch, this)),
     stateBased(compareAmt(toughnessOf(this), atMost, 0), putInto(this, graveyard)),

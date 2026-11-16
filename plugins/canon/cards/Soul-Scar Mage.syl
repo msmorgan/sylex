@@ -8,8 +8,10 @@ card singleFaced({
       static(
         replace(
           would(
-            actor(a(and([isSource, youControl]))),
-            dealDamage(kind = noncombat, recipient = a(and([isCreature, anOpponentControls])))),
+            actor(a(nominal(source, post = [youControl]))),
+            dealDamage(
+              kind = noncombat,
+              recipient = a(nominal(creature, post = [anOpponentControls])))),
           instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))],
     power = 1,
     toughness = 2})

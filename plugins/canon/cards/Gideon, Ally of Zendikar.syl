@@ -27,5 +27,5 @@ card singleFaced({
         create(1, written(creatureToken(2, 2, [white], [knight, ally])))),
       activated(
         loyaltySymbol(down(4)),
-        getEmblem([static(getsPt(allOf(and([isCreature, youControl])), up(1), up(1)))]))],
+        getEmblem([static(getsPt(allOf(nominal(creature, post = [youControl])), up(1), up(1)))]))],
     loyalty = 4})

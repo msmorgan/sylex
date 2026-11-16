@@ -1,0 +1,5 @@
+# "<who> controls"
+template controlledBy(who: NounPhrase): PostModifier {
+  spelling = "$who control",
+  body = hasPossessor(controller, $who)
+}

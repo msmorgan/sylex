@@ -5,7 +5,9 @@ card singleFaced({
     subtypes = [shapeshifter],
     text = [
       whenever(
-        does(actor(you), cast(a(and([isSpell, hasColor(red), hasColor(white)])))),
+        does(
+          actor(you),
+          cast(a(nominal(spell, post = [thatIsBoth(hasColor(red), hasColor(white))])))),
         establishThroughout(
           conjunction([getsBase(thisCreature, 4, 2), abilityGrant(thisCreature, [firstStrike])]),
           untilEndOfTurn))],

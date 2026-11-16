@@ -4,9 +4,9 @@ card singleFaced({
     types = [creature],
     subtypes = [human, cleric],
     text = [
-      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
+      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(hasType(land))))),
       whenever(
-        does(actor(anOpponent), cast(a(and([isSpell, named(chosenName)])))),
+        does(actor(anOpponent), cast(a(nominal(spell, post = [named(chosenName)])))),
         sequentially([instruct(they, loseLife(3)), draw(1)]))],
     power = 3,
     toughness = 2})

@@ -4,4 +4,5 @@ card singleFaced({
     types = [instant],
     text = [
       static(cant(any, counter(thisSpell))),
-      spell(destroy(target(and([isPermanent, non(isLand), hasManaValue(atMost, 3)]))))]})
+      spell(
+        destroy(target(nominal(pre = [non(land)], permanent, post = [hasManaValue(atMost, 3)]))))]})

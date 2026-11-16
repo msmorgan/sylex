@@ -7,7 +7,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       asThoughFlashSacrificedAtCleanup,
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(entersChoosing(thisAura, color)),
       static(
         conjunction([

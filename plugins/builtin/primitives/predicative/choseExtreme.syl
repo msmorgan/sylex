@@ -1,0 +1,1 @@
+primitive choseExtreme(op: AggregateOp): Predicative = ChoseExtreme

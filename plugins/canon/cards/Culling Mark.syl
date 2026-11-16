@@ -2,4 +2,4 @@ card singleFaced({
     name = "Culling Mark",
     cost = [generic(2), pip(green)],
     types = [sorcery],
-    text = [spell(establishThroughout(must(actor(target(isCreature)), block), thisTurn))]})
+    text = [spell(establishThroughout(must(actor(target(creature)), block), thisTurn))]})

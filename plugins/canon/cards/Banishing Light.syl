@@ -6,5 +6,5 @@ card singleFaced({
       when(
         does(actor(thisEnchantment), enter),
         exileUntil(
-          target(and([non(isLand), isPermanent, anOpponentControls])),
+          target(nominal(pre = [non(land)], permanent, post = [anOpponentControls])),
           does(actor(thisEnchantment), leave)))]})

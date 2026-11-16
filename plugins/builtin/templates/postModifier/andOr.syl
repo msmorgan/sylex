@@ -1,0 +1,4 @@
+template andOr(disjuncts: List(PostModifier)): PostModifier {
+  spelling = "$disjuncts#<and/or>",
+  body = or($disjuncts)
+}

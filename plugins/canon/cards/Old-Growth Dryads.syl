@@ -10,7 +10,7 @@ card singleFaced({
           eachOpponent,
           may(
             sequentially([
-                search(libraryOf(they), for = a(and([isLand, hasSupertype(basic)]))),
+                search(libraryOf(they), for = a(nominal(pre = [basic, land], card))),
                 putOntoBattlefieldTapped(it),
                 shuffle]))))],
     power = 3,

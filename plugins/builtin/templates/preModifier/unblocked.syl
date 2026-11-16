@@ -1,0 +1,4 @@
+template unblocked: PreModifier {
+  spelling = "unblocked",
+  body = inCombat(unblocked)
+}

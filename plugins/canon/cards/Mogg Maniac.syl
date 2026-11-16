@@ -8,6 +8,6 @@ card singleFaced({
         does(any, dealDamage(recipient = thisCreature)),
         instruct(
           it,
-          dealDamage(amount = thatMuch, recipient = target(or([isPlaneswalker, isOpponent])))))],
+          dealDamage(amount = thatMuch, recipient = target(or([planeswalker, opponent])))))],
     power = 1,
     toughness = 1})

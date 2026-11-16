@@ -1,0 +1,4 @@
+template attachedBy(word: AttachWord, by: NounPhrase): Predicative {
+  spelling = "$word by $by",
+  body = attachment(host, counterpart = $by, word = $word)
+}

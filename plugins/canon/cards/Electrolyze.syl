@@ -2,4 +2,4 @@ card singleFaced({
     name = "Electrolyze",
     cost = [generic(1), pip(blue), pip(red)],
     types = [instant],
-    text = [spell(sequentially([dealDivided(this, 2, targets(oneOrTwo, isAnyTarget)), draw(1)]))]})
+    text = [spell(sequentially([dealDivided(this, 2, targets(oneOrTwo, anyTarget)), draw(1)]))]})

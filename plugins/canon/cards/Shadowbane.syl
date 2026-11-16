@@ -7,8 +7,8 @@ card singleFaced({
         establishThroughout(
           replace(
             would(
-              actor(aYourChoice(isSource)),
-              dealDamage(recipient = andOr([you, allOf(and([isCreature, youControl]))]))),
+              actor(aYourChoice(source)),
+              dealDamage(recipient = andOr([you, allOf(nominal(creature, post = [youControl]))]))),
             instead(
               preventDamage(
                 allDamage,
@@ -16,7 +16,7 @@ card singleFaced({
                   was(
                     preventDamage(
                       allDamage,
-                      damage = would(actor(a(and([isSource, hasColor(black)]))), dealDamage)),
+                      damage = would(actor(a(nominal(pre = [black], source))), dealDamage)),
                     thisWay),
                   gainLife(thatMuch)))),
             use = nextTimeOnly),

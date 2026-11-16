@@ -1,6 +1,5 @@
 # "<subject>'s <keyword> cost was paid", read back.
 template paidCostRead(subject: NounPhrase, which: LinkSource, window: Option(Duration)): Amount {
-  # TODO(spelling): Premodifier wordings such as "kicked" (*Merfolk Falconer*) wait on
-  # `syl-nominal-descriptions`.
+  # TODO(spelling): Premodifier wordings such as "kicked" (*Merfolk Falconer*) are unspelled here.
   body = paid($subject, readback($which, $window))
 }

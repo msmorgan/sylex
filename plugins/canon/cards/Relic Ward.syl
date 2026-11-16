@@ -5,5 +5,5 @@ card singleFaced({
     subtypes = [aura],
     text = [
       asThoughFlashSacrificedAtCleanup,
-      enchant(isArtifact),
+      enchant(hasType(artifact)),
       static(abilityGrant(enchanted(artifact), [shroud]))]})

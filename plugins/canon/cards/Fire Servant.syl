@@ -6,7 +6,9 @@ card singleFaced({
     text = [
       static(
         replace(
-          would(actor(a(and([isInstantOrSorcery, hasColor(red), youControl]))), dealDamage),
+          would(
+            actor(a(nominal(pre = [red], or([instant, sorcery]), post = [youControl]))),
+            dealDamage),
           instead(instruct(it, dealDamage(amount = times(2, thatMuch))))))],
     power = 4,
     toughness = 3})

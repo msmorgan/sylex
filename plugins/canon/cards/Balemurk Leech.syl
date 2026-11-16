@@ -7,8 +7,8 @@ card singleFaced({
       eerie(
         triggered(
           and([
-              whenever(does(actor(a(and([isEnchantment, youControl]))), enter)),
-              whenever(does(actor(you), fullyUnlock(a(hasSubtype(room)))))]),
+              whenever(does(actor(a(nominal(enchantment, post = [youControl]))), enter)),
+              whenever(does(actor(you), fullyUnlock(a(room))))]),
           instruct(eachOpponent, loseLife(1))))],
     power = 2,
     toughness = 2})

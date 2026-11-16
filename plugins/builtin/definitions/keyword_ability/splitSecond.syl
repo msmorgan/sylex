@@ -8,8 +8,10 @@ ability splitSecond {
       asLongAs(
         is(thisSpell, in(stack)),
         conjunction([
-            cant(actor(bare(isPlayer)), cast(bare(anotherSpell))),
+            cant(actor(bare(player)), cast(bare(nominal(pre = [other], spell)))),
             cant(
-              actor(bare(isPlayer)),
-              activate(allOf(and([abilityHead(anyActivated), non(isManaAbility)]))))])))]
+              actor(bare(player)),
+              activate(
+                allOf(
+                  nominal(pre = [non(hasQuality(isManaAbility))], abilityHead(anyActivated)))))])))]
 }

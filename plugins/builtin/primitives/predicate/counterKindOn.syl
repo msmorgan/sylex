@@ -1,3 +1,0 @@
-primitive counterKindOn(subject: NounPhrase): Predicate = CounterKindOn {
-  spelling = "kind of counter on $subject"
-}

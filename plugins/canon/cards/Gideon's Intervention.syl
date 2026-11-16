@@ -4,10 +4,10 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(entersChoosing(thisEnchantment, cardName)),
-      static(cant(actor(yourOpponents), cast(bare(and([isSpell, named(chosenName)]))))),
+      static(cant(actor(yourOpponents), cast(bare(nominal(spell, post = [named(chosenName)]))))),
       static(
         replace(
           would(
-            by(allOf(and([isSource, named(chosenName)]))),
-            dealDamage(recipient = and([you, allOf(and([isPermanent, youControl]))]))),
+            by(allOf(nominal(source, post = [named(chosenName)]))),
+            dealDamage(recipient = and([you, allOf(nominal(permanent, post = [youControl]))]))),
           instead(preventDamage(allDamage))))]})

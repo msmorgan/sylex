@@ -9,8 +9,8 @@ card singleFaced({
       doubleStrike,
       indestructible,
       whenever(
-        does(by(you), putCounters(anyAmount, anyKind, a(and([isCreature, isOther])))),
-        if = is(it, not(hasSubtype(kree))),
+        does(by(you), putCounters(anyAmount, anyKind, a(nominal(pre = [other], creature)))),
+        if = is(it, not(noun(a(kree)))),
         may(putCounters(thatMuch, thoseCounters, this)))],
     power = 4,
     toughness = 4})

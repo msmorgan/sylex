@@ -7,9 +7,15 @@ card singleFaced({
       static(
         altCost(
           payingInstead(
-            perform(exile(a(and([hasColor(blue), hasManaValue(equal, letter(x)), in(yourHand)]))))),
+            perform(
+              exile(
+                a(
+                  nominal(
+                    pre = [blue],
+                    card,
+                    post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
           this)),
       spell(
         doOnlyIf(
-          counter(target(isSpell)),
+          counter(target(spell)),
           compareAmt(statOf(stat(manaValue), it), equal, letter(x))))]})

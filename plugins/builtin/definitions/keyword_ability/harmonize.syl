@@ -17,13 +17,16 @@ ability harmonize(cost: Cost) {
             compound([
                 $cost,
                 perform(
-                  tap(counted(upTo(1), and([isUntapped, and([isCreature, youControl])]))))]))))),
+                  tap(
+                    counted(
+                      upTo(1),
+                      nominal(pre = [untapped], creature, post = [youControl]))))]))))),
     static(
       if(
         keywordCostPaid(thisSpell, harmonize),
         costShift(
           thisSpell,
-          generic(down(powerOf(the(and([was(tap(which)), isCreature])))), none)))),
+          generic(down(powerOf(the(nominal(pre = [was(tap(which))], creature)))), none)))),
     static(
       replace(
         would(actor(thisSpell), leave(from = stack)),

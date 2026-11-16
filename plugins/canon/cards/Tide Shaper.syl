@@ -9,11 +9,11 @@ card singleFaced({
         does(actor(thisCreature), enter),
         if = keywordCostPaid(it, kicker),
         establish(
-          qualityChange(target(isLand), sets, bundle({characteristics = {subtypes = [island]}})),
+          qualityChange(target(land), sets, bundle({characteristics = {subtypes = [island]}})),
           duration = forAsLongAs(is(thisCreature, in(battlefield))))),
       static(
         onlyWhile(
           getsPt(thisCreature, up(1), up(1)),
-          exists(and([hasSubtype(island), opponentsControl]))))],
+          exists(nominal(island, post = [opponentsControl]))))],
     power = 1,
     toughness = 1})

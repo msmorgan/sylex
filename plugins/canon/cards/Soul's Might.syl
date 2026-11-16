@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            putCounters(letter(x), printedKind(p1p1Counter), target(isCreature)),
+            putCounters(letter(x), printedKind(p1p1Counter), target(creature)),
             define(x, powerOf(that(creature)))]))]})

@@ -9,7 +9,8 @@ card adventurer({
       static(
         cant(
           actor(thisCreature),
-          block(attacker = allOf(and([isCreature, not(hasKeyword(theKeyword(flying)))])))))],
+          block(
+            attacker = allOf(nominal(creature, post = [not(hasKeyword(theKeyword(flying)))])))))],
     power = 3,
     toughness = 1},
   {
@@ -17,4 +18,6 @@ card adventurer({
     cost = [generic(1), pip(blue)],
     types = [instant],
     subtypes = [adventure],
-    text = [spell(returnToHand(target(and([non(isLand), isPermanent, anOpponentControls]))))]})
+    text = [
+      spell(
+        returnToHand(target(nominal(pre = [non(land)], permanent, post = [anOpponentControls]))))]})

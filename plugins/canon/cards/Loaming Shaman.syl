@@ -6,6 +6,8 @@ card singleFaced({
     text = [
       when(
         does(actor(thisCreature), enter),
-        instruct(target(isPlayer), shuffleInto(targets(anyNumber, cardIn(graveyardOf(they))))))],
+        instruct(
+          target(player),
+          shuffleInto(targets(anyNumber, nominal(card, post = [in(graveyardOf(they))])))))],
     power = 3,
     toughness = 2})

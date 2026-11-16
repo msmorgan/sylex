@@ -5,7 +5,13 @@ card singleFaced({
     subtypes = [saga],
     text = [
       when(chapterMark([1]), create(2, written(creatureToken(1, 1, [white], [ally])))),
-      when(chapterMark([2]), may(discard(a(cardIn(yourHand))), ifDid = draw(1))),
+      when(
+        chapterMark([2]),
+        may(discard(a(nominal(card, post = [in(yourHand)]))), ifDid = draw(1))),
       when(
         chapterMark([3]),
-        get(allOf(and([isCreature, youControl])), up(1), up(0), duration = untilEndOfTurn))]})
+        get(
+          allOf(nominal(creature, post = [youControl])),
+          up(1),
+          up(0),
+          duration = untilEndOfTurn))]})

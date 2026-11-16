@@ -34,8 +34,8 @@ fn word(n: usize) -> String {
 #[test]
 fn a_header_without_a_name_hugs_its_kind_word() {
     assert_eq!(
-        fmt("coercion ( type : CardType ) : NounWord { body = type($type) }"),
-        "coercion(type: CardType): NounWord {\n  body = type($type)\n}\n"
+        fmt("coercion ( type : CardType ) : Nominal { body = type($type) }"),
+        "coercion(type: CardType): Nominal {\n  body = type($type)\n}\n"
     );
 }
 
@@ -203,10 +203,10 @@ fn a_sole_record_argument_hugs_the_call() {
     assert_eq!(
         fmt(
             "card split({ left = { name = \"Fire\", cost = [1, red], text = [spell(dealDamage(2))] }, \
-             right = { name = \"Ice\", cost = [1, blue], text = [spell(tap(target(isPermanent)))] } })"
+             right = { name = \"Ice\", cost = [1, blue], text = [spell(tap(target(permanent)))] } })"
         ),
         "card split({\n    left = {name = \"Fire\", cost = [1, red], text = [spell(dealDamage(2))]},\n    \
-         right = {name = \"Ice\", cost = [1, blue], text = [spell(tap(target(isPermanent)))]}})\n"
+         right = {name = \"Ice\", cost = [1, blue], text = [spell(tap(target(permanent)))]}})\n"
     );
 }
 

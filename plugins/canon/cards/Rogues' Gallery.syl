@@ -8,5 +8,7 @@ card singleFaced({
           color,
           color,
           returnToHand(
-            targets(upTo(1), and([isCreature, ofChosen(color), in(yourGraveyard)])),
+            targets(
+              upTo(1),
+              nominal(pre = [creature], card, post = [ofChosen(color), in(yourGraveyard)])),
             from = yourGraveyard)))]})

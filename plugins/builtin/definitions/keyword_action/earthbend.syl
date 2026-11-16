@@ -6,7 +6,7 @@ action earthbend(amount: Amount) {
   body = sequentially([
       establish(
         characteristicChange(
-          target(and([isLand, actorControls])),
+          target(nominal(land, post = [actorControls])),
           [
             typeLine(adds, {types = [creature]}),
             stat(power, set(0)),

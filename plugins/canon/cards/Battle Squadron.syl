@@ -3,4 +3,6 @@ card singleFaced({
     cost = [generic(3), pip(red), pip(red)],
     types = [creature],
     subtypes = [goblin],
-    text = [flying, static(definesPt(thisCreature, countOf(and([isCreature, youControl]))))]})
+    text = [
+      flying,
+      static(definesPt(thisCreature, countOf(nominal(creature, post = [youControl]))))]})

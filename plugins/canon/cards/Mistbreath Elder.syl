@@ -7,7 +7,7 @@ card singleFaced({
       at(
         beginningOfYour(upkeep),
         doIfDone(
-          returnToHand(a(and([isCreature, youControl, isOther]))),
+          returnToHand(a(nominal(pre = [other], creature, post = [youControl]))),
           ifDid = putCounters(1, printedKind(p1p1Counter), thisCreature),
           ifNot = may(returnToHand(thisCreature))))],
     power = 2,

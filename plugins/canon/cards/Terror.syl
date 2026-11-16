@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         doUnderProhibition(
-          destroy(target(and([isCreature, non(isArtifact), non(hasColor(black))]))),
+          destroy(target(nominal(pre = [non(artifact), non(black)], creature))),
           regeneration(it)))]})

@@ -3,6 +3,6 @@ card singleFaced({
     cost = [pip(blue)],
     types = [creature],
     subtypes = [bird],
-    text = [flying, whenever(does(actor(you), cast(a(and([isHistoric, isSpell])))), scry(1))],
+    text = [flying, whenever(does(actor(you), cast(a(nominal(pre = [historic], spell)))), scry(1))],
     power = 1,
     toughness = 1})

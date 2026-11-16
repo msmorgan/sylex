@@ -1,4 +1,0 @@
-template isArtifact: Predicate {
-  spelling = "artifact",
-  body = hasType(artifact)
-}

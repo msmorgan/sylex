@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       trample,
       static(entersTapped(thisCreature)),
-      cumulativeUpkeep(perform(sacrifice(a(isLand))))],
+      cumulativeUpkeep(perform(sacrifice(a(land))))],
     power = 11,
     toughness = 11})

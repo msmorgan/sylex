@@ -10,7 +10,7 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            gainDesignation(target(isOpponent), monarch),
+            gainDesignation(target(opponent), monarch),
             establishThroughout(cant(actor(you), gainDesignation(you, monarch)), thisTurn)])),
       static(
         onlyWhile(

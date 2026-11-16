@@ -1,5 +1,0 @@
-# Rule-only helper inside keyword-action Definitions ("… <performer> controls"); no card term
-# calls it (`docs/design/spelling.md` §7).
-template actorControls: Predicate {
-  body = hasPossessor(controller, actor)
-}

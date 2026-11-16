@@ -9,18 +9,20 @@ card singleFaced({
             applyResultsTable([
                 rollRow(
                   rollRange(1, 9),
-                  instruct(this, dealDamage(amount = 3, recipient = each(isCreature)))),
+                  instruct(this, dealDamage(amount = 3, recipient = each(creature)))),
                 rollRow(
                   rollRange(10, 19),
                   sequentially([
-                      may(choose(a(isCreature))),
+                      may(choose(a(creature))),
                       instruct(
                         this,
-                        dealDamage(amount = 3, recipient = each(and([isCreature, notChosen]))))])),
+                        dealDamage(
+                          amount = 3,
+                          recipient = each(nominal(creature, post = [notChosen]))))])),
                 rollRow(
                   exactly(20),
                   instruct(
                     this,
                     dealDamage(
                       amount = 6,
-                      recipient = each(and([isCreature, opponentsControl])))))])]))]})
+                      recipient = each(nominal(creature, post = [opponentsControl])))))])]))]})

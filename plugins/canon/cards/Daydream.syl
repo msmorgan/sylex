@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            exile(target(and([isCreature, youControl]))),
+            exile(target(nominal(creature, post = [youControl]))),
             returnToBattlefieldWithCounters(that(card), ownerOf(that(card)), 1, p1p1Counter)])),
       flashback(mana([generic(2), pip(white)]))]})

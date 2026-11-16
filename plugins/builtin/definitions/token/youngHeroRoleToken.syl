@@ -9,7 +9,7 @@ token youngHeroRoleToken {
       types = [enchantment],
       subtypes = [aura, role],
       text = [
-        enchant(isCreature),
+        enchant(hasType(creature)),
         static(
           abilityGrant(
             enchanted(creature),

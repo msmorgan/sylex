@@ -5,7 +5,7 @@
 # exile is its owner [CR#109.5].
 conferral plottedCardCast {
   body = {
-    scope = and([isCard, hasDesignation(plotted), in(exileZone)]),
+    scope = nominal(pre = [plotted], card, post = [in(exileZone)]),
     confer = ability(
       static(
         onlyUnless(

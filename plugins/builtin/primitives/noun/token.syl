@@ -1,3 +1,0 @@
-primitive token: NounWord = Token {
-  spelling = "token"
-}

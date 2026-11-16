@@ -7,8 +7,8 @@ card singleFaced({
       static(
         if(
           and([
-              exists(and([isLand, hasSubtype(plains), anOpponentControls])),
-              exists(and([isLand, hasSubtype(mountain), youControl]))]),
+              exists(nominal(plains, post = [anOpponentControls])),
+              exists(nominal(mountain, post = [youControl]))]),
           can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
       haste],
     power = 1,

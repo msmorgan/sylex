@@ -3,7 +3,11 @@ card singleFaced({
     cost = [generic(1), pip(black), pip(red)],
     types = [enchantment],
     text = [
-      static(partScope(you, turn, abilityGrant(allOf(and([isOutlaw, youControl])), [firstStrike]))),
+      static(
+        partScope(
+          you,
+          turn,
+          abilityGrant(allOf(nominal(outlaw, post = [youControl])), [firstStrike]))),
       whenever(
         does(actor(you), commitCrime),
         create(
@@ -17,7 +21,7 @@ card singleFaced({
                   activatedOnlyDuring(
                     tapSymbol,
                     get(
-                      target(and([isCreature, youControl])),
+                      target(nominal(creature, post = [youControl])),
                       up(1),
                       up(0),
                       duration = untilEndOfTurn),

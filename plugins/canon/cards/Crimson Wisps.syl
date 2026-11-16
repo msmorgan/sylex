@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         sequentially([
             establishFor(
-              target(isCreature),
+              target(creature),
               [qualityChange(it, sets, colored(colors([red]))), abilityGrant(it, [haste])],
               duration = untilEndOfTurn),
             draw(1)]))]})

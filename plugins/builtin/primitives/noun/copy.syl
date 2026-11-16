@@ -1,3 +1,0 @@
-primitive copy: NounWord = Copy {
-  spelling = "copy"
-}

@@ -5,6 +5,9 @@ card singleFaced({
     subtypes = [golem],
     text = [
       static(
-        visibility(lookAt, you, objects(allOf(and([isCreature, isFaceDown, youDontControl])))))],
+        visibility(
+          lookAt,
+          you,
+          objects(allOf(nominal(pre = [faceDown], creature, post = [youDontControl])))))],
     power = 1,
     toughness = 2})

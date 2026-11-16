@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       static(entryChoice(thisArtifact, anOpponent)),
       at(
-        beginningOfPossessed(the(isChosenPlayer), upkeep),
+        beginningOfPossessed(the(nominal(pre = [chosen], player)), upkeep),
         sequentially([
             instruct(thisArtifact, dealDamage(amount = letter(x), recipient = that(player))),
-            define(x, minus(countOf(cardIn(handOf(they))), 4))]))]})
+            define(x, minus(countOf(nominal(card, post = [in(handOf(they))])), 4))]))]})

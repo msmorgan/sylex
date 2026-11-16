@@ -20,8 +20,8 @@ card singleFaced({
               doIf(
                 thereAre(
                   and([
-                      a(and([isInstant, cardIn(yourGraveyard)])),
-                      a(and([isSorcery, cardIn(yourGraveyard)]))])),
+                      a(nominal(pre = [instant], card, post = [in(yourGraveyard)])),
+                      a(nominal(pre = [sorcery], card, post = [in(yourGraveyard)]))])),
                 instead(
                   sequentially([
                       putInto(partOf(exactly(2), them), hand),

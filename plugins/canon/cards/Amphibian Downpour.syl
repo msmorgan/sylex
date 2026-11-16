@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       flash,
       storm,
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         conjunction([
             allAbilityLoss(enchanted(creature)),

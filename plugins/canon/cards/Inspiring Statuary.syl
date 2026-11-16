@@ -5,5 +5,9 @@ card singleFaced({
     text = [
       static(
         abilityGrant(
-          allOf(and([non(isArtifact), isSpell, did(actor(you), cast(which), within = thisObject)])),
+          allOf(
+            nominal(
+              pre = [non(artifact)],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           [improvise]))]})

@@ -19,10 +19,10 @@ ability partnerWith(quality: Predicate) {
     when(
       does(actor(thisPermanent), enter),
       instruct(
-        target(isPlayer),
+        target(player),
         may(
           sequentially([
-              search(libraryOf(actor), for = a(and([isCard, $quality]))),
+              search(libraryOf(actor), for = a(nominal(pre = [hasQuality($quality)], card))),
               reveal(it),
               putInto(it, hand),
               shuffle]))))]

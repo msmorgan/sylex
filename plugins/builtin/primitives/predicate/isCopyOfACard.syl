@@ -1,3 +1,0 @@
-primitive isCopyOfACard: Predicate = IsCopyOfACard {
-  spelling = "copy of a card"
-}

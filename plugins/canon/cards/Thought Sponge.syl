@@ -8,7 +8,7 @@ card singleFaced({
       static(
         entersWithCounters(
           thisCreature,
-          aggregateOver(max, isOpponent, eventCount(actor(they), draw(anyAmount), soFarThisTurn)),
+          aggregateOver(max, opponent, eventCount(actor(they), draw(anyAmount), soFarThisTurn)),
           p1p1Counter)),
       when(does(actor(thisCreature), die), draw(powerOf(it)))],
     power = 1,

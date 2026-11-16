@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       flying,
       whenever(
-        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(isPlayer))),
-        unlock(doorOf(locked, targets(upTo(1), and([hasSubtype(room), youControl])))))],
+        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
+        unlock(doorOf(locked, targets(upTo(1), nominal(room, post = [youControl])))))],
     power = 3,
     toughness = 3})

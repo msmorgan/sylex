@@ -8,8 +8,9 @@ card singleFaced({
         static(
           asLongAs(
             exists(
-              and([
-                  isCreature,
+              nominal(
+                creature,
+                post = [
                   anOpponentControls,
                   hasKeyword(thatKeyword),
                   not(named(printedName("Escaped Shapeshifter")))])),
@@ -17,7 +18,7 @@ card singleFaced({
               thisCreature,
               thatKeyword,
               and([
-                  isCreature,
+                  hasType(creature),
                   anOpponentControls,
                   hasKeyword(thatKeyword),
                   not(named(printedName("Escaped Shapeshifter")))])))),

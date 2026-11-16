@@ -10,14 +10,15 @@ ability myriad {
       does(actor(thisCreature), attack),
       sequentially([
           doForEach(
-            each(and([isOpponent, otherThan(defendingPlayer)])),
+            each(nominal(opponent, post = [otherThan(defendingPlayer)])),
             may(
               create(
                 1,
                 copyOf(thisCreature),
                 riders = [
                   entersAs(tapped),
-                  entersAttacking(or([they, a(and([isPlaneswalker, controlledBy(they)]))]))]))),
+                  entersAttacking(
+                    or([they, a(nominal(planeswalker, post = [controlledBy(they)]))]))]))),
           doIf(
             compareAmt(numberOf(thoseTokens), atLeast, 1),
             atNext(endOfCombat, exile(thoseTokens)))]))]

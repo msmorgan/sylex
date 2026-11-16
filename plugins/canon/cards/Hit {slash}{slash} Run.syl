@@ -8,7 +8,7 @@ card split({
     text = [
       spell(
         sequentially([
-            instruct(target(isPlayer), sacrifice(aTheirChoice(or([isArtifact, isCreature])))),
+            instruct(target(player), sacrifice(aTheirChoice(or([artifact, creature])))),
             instruct(
               this,
               dealDamage(
@@ -21,7 +21,7 @@ card split({
     text = [
       spell(
         get(
-          bare(and([isAttacking, isCreature, youControl])),
-          up(forEach(1, and([isAttacking, isCreature, isOther]))),
+          bare(nominal(pre = [attacking], creature, post = [youControl])),
+          up(forEach(1, nominal(pre = [other, attacking], creature))),
           up(0),
           duration = untilEndOfTurn))]})

@@ -3,4 +3,4 @@ card singleFaced({
     cost = [pip(white)],
     types = [instant],
     subtypes = [arcane],
-    text = [spell(preventAll(by = by(allOf(isCreature)), duration = thisTurn))]})
+    text = [spell(preventAll(by = by(allOf(creature)), duration = thisTurn))]})

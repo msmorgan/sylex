@@ -7,6 +7,6 @@ card singleFaced({
         sequentially([
             draw(3),
             putInto(
-              counted(exactly(2), cardIn(yourHand)),
+              counted(exactly(2), nominal(card, post = [in(yourHand)])),
               topOf(yourLibrary),
               riders = [inOrder(anyOrder)])]))]})

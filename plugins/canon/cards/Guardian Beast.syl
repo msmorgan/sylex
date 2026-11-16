@@ -9,14 +9,14 @@ card singleFaced({
       static(
         conjunction([
             asLongAs(
-              is(thisCreature, isUntapped),
+              is(thisCreature, untapped),
               conjunction([
-                  cant(any, attachTo(a(hasSubtype(aura)), them)),
+                  cant(any, attachTo(a(aura), them)),
                   abilityGrant(them, [indestructible]),
-                  cant(actor(bare(and([isPlayer, isOther]))), gainControlOf(them))],
-                subject = bare(and([non(isCreature), isArtifact, youControl])))),
+                  cant(actor(bare(nominal(pre = [other], player))), gainControlOf(them))],
+                subject = bare(nominal(pre = [non(creature)], artifact, post = [youControl])))),
             doesnt(
               actor(thisEffect),
-              remove(bare(and([hasSubtype(aura), attachedTo(those(artifact))]))))]))],
+              remove(bare(nominal(aura, post = [attachedTo(those(artifact))]))))]))],
     power = 2,
     toughness = 4})

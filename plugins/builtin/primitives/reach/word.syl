@@ -1,1 +1,1 @@
-primitive word(word: NounWord): Reach = Word
+primitive word(word: Nominal): Reach = Word

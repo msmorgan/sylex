@@ -13,15 +13,15 @@ card singleFaced({
       whenever(
         or([does(actor(thisCreature), attack), does(actor(thisCreature), block)]),
         sequentially([
-            may(attachTo(counted(anyNumber, and([hasSubtype(aura), in(battlefield)])), it)),
+            may(attachTo(counted(anyNumber, nominal(aura, post = [in(battlefield)])), it)),
             may(
               putOntoBattlefieldAttachedTo(
                 counted(
                   anyNumber,
-                  and([
-                      hasSubtype(aura),
-                      cardIn(andOr([yourGraveyard, yourHand])),
-                      couldEnchant(it)])),
+                  nominal(
+                    pre = [aura],
+                    card,
+                    post = [couldEnchant(it), in(andOr([yourGraveyard, yourHand]))])),
                 it))]))],
     power = 5,
     toughness = 5})

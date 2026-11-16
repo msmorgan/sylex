@@ -8,6 +8,6 @@ card singleFaced({
       static(
         onlyWhile(
           getsPt(thisCreature, up(2), up(2)),
-          exists(and([hasSubtype(garruk), youControl]))))],
+          exists(nominal(garruk, post = [youControl]))))],
     power = 4,
     toughness = 4})

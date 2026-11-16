@@ -8,9 +8,9 @@ card singleFaced({
         compound([mana([generic(3)]), tapSymbol]),
         sequentially([
             choose(a(quality(cardName))),
-            reveal(aAtRandom(cardIn(yourHand))),
+            reveal(aAtRandom(nominal(card, post = [in(yourHand)]))),
             doIf(
               is(that(card), named(chosenName)),
-              instruct(thisCreature, dealDamage(amount = 2, recipient = target(isAnyTarget))))]))],
+              instruct(thisCreature, dealDamage(amount = 2, recipient = target(anyTarget))))]))],
     power = 1,
     toughness = 1})

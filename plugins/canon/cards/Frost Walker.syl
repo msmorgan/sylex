@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       when(
-        does(actor(a(or([isSpell, abilityHead(anyOnStack)]))), target(thisCreature)),
+        does(actor(a(or([spell, abilityHead(anyOnStack)]))), target(thisCreature)),
         sacrifice(it))],
     power = 4,
     toughness = 1})

@@ -10,6 +10,9 @@ ability soulshift(amount: Amount) {
       may(
         returnToHand(
           target(
-            and([isCard, hasSubtype(spirit), hasManaValue(atMost, $amount), in(yourGraveyard)])),
+            nominal(
+              pre = [spirit],
+              card,
+              post = [hasManaValue(atMost, $amount), in(yourGraveyard)])),
           from = yourGraveyard)))]
 }

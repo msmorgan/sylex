@@ -10,5 +10,5 @@ card singleFaced({
                 eachPlayer,
                 voteStartingWith(
                   you,
-                  byCandidate(a(and([isPermanent, non(isLand), youDontControl]))))),
-              exile(allOf(and([isPermanent, withMostVotes])))])))]})
+                  byCandidate(a(nominal(pre = [non(land)], permanent, post = [youDontControl]))))),
+              exile(allOf(nominal(permanent, post = [withMostVotes])))])))]})

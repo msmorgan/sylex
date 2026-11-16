@@ -10,4 +10,4 @@ card singleFaced({
           dealDamage(
             amount = 5,
             recipient = target(
-              and([or([isCreature, isPlaneswalker]), or([hasColor(white), hasColor(blue)])])))))]})
+              nominal(pre = [or([white, blue])], or([creature, planeswalker]))))))]})

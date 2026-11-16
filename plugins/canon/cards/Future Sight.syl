@@ -6,5 +6,5 @@ card singleFaced({
       static(visibility(reveal, you, topOfLibrary)),
       static(
         conjunction([
-            can(actor(you), play(allOf(isLand), from = onTop)),
-            can(actor(you), cast(bare(isSpell), from = onTop))]))]})
+            can(actor(you), play(allOf(land), from = onTop)),
+            can(actor(you), cast(bare(spell), from = onTop))]))]})

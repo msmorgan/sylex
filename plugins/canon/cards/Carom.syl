@@ -7,7 +7,7 @@ card singleFaced({
         sequentially([
             establishThroughout(
               replace(
-                would(any, dealDamage(recipient = target(isCreature))),
-                instead(redirectDamage(theNext(1), target(and([isCreature, isOther]))))),
+                would(any, dealDamage(recipient = target(creature))),
+                instead(redirectDamage(theNext(1), target(nominal(pre = [other], creature))))),
               thisTurn),
             draw(1)]))]})

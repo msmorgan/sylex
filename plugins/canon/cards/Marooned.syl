@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(or([isArtifact, isCreature])),
+      enchant(or([hasType(artifact), hasType(creature)])),
       when(
         does(actor(thisAura), enter),
         may(pay(payment(mana([generic(3)])), once), ifDid = tap(enchanted(permanent)))),

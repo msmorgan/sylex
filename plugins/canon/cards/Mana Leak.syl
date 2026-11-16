@@ -7,5 +7,5 @@ card singleFaced({
     text = [
       spell(
         instruct(
-          controllerOf(target(isSpell)),
+          controllerOf(target(spell)),
           doUnless(mana([generic(3)]), instruct(you, counter(it)))))]})

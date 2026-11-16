@@ -6,6 +6,6 @@ card singleFaced({
       spell(
         sequentially([
             establishThroughout(
-              can(actor(you), play(counted(additional(exactly(1)), isLand))),
+              can(actor(you), play(counted(additional(exactly(1)), land))),
               thisTurn),
             draw(1)]))]})

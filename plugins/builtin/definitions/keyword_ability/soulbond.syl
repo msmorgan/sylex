@@ -12,14 +12,14 @@ ability soulbond {
       does(actor(thisCreature), enter),
       if = and([
           is(thisCreature, and([youControl, not(related(paired))])),
-          exists(and([and([isCreature, youControl, isOther]), not(related(paired))]))]),
+          exists(nominal(pre = [other], creature, post = [youControl, not(related(paired))]))]),
       may(
         relate(
           thisCreature,
           paired,
-          a(and([and([isCreature, youControl, isOther]), not(related(paired))]))))),
+          a(nominal(pre = [other], creature, post = [youControl, not(related(paired))]))))),
     whenever(
-      does(actor(a(and([isCreature, youControl, isOther]))), enter),
+      does(actor(a(nominal(pre = [other], creature, post = [youControl]))), enter),
       if = and([
           is(thisCreature, and([youControl, not(related(paired))])),
           is(that(creature), and([youControl, not(related(paired))]))]),

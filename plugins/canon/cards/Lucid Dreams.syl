@@ -4,5 +4,8 @@ card singleFaced({
     types = [sorcery],
     text = [
       spell(
-        sequentially(
-          [draw(letter(x)), define(x, distinctCount(cardType, allOf(cardIn(yourGraveyard))))]))]})
+        sequentially([
+            draw(letter(x)),
+            define(
+              x,
+              distinctCount(cardType, allOf(nominal(card, post = [in(yourGraveyard)]))))]))]})

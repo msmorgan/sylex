@@ -3,4 +3,6 @@ card singleFaced({
     cost = [generic(3), pip(white)],
     types = [enchantment],
     subtypes = [aura],
-    text = [enchant(isPermanent), static(abilityGrant(enchanted(permanent), [indestructible]))]})
+    text = [
+      enchant(in(battlefield)),
+      static(abilityGrant(enchanted(permanent), [indestructible]))]})

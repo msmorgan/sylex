@@ -6,4 +6,5 @@ card singleFaced({
     cost = [generic(2), pip(blue)],
     types = [sorcery],
     text = [
-      spell(instruct(target(isPlayer), gainControl(target(and([isPermanent, youControl])))))]})
+      spell(
+        instruct(target(player), gainControl(target(nominal(permanent, post = [youControl])))))]})

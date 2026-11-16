@@ -6,6 +6,6 @@ ability absorb(amount: Amount) {
   body = [
     static(
       replace(
-        would(actor(a(isSource)), dealDamage(recipient = thisCreature)),
+        would(actor(a(source)), dealDamage(recipient = thisCreature)),
         instead(preventDamage(ofThatDamage($amount)))))]
 }

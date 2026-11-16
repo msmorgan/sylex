@@ -14,7 +14,7 @@ card singleFaced({
             mode(
               establish(
                 qualityChange(
-                  target(and([isCreature, youControl])),
+                  target(nominal(creature, post = [youControl])),
                   sets,
                   bundle({
                       characteristics = {
@@ -26,7 +26,7 @@ card singleFaced({
             mode(
               establish(
                 qualityChange(
-                  target(and([isCreature, youControl])),
+                  target(nominal(creature, post = [youControl])),
                   sets,
                   bundle({
                       characteristics = {
@@ -38,7 +38,7 @@ card singleFaced({
             mode(
               establish(
                 qualityChange(
-                  target(and([isCreature, youControl])),
+                  target(nominal(creature, post = [youControl])),
                   sets,
                   bundle({
                       characteristics = {

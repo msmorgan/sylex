@@ -7,7 +7,9 @@ card singleFaced({
       whenever(
         does(
           actor(thisCreature),
-          attack(defender = a(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])))),
+          attack(
+            defender = a(
+              nominal(player, post = [superlative(max, playerStat(lifeTotal), player)])))),
         establishThroughout(cant(any, block(attacker = it)), thisTurn))],
     power = 2,
     toughness = 3})

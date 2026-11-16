@@ -13,8 +13,8 @@ action empowerJace(amount: Amount) {
   spelling = "empower Jace $amount",
   body = sequentially([
       doIf(
-        not(exists(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
+        not(exists(nominal(pre = [jace, planeswalker], token, post = [actorControls]))),
         create(1, defined(jaceToken))),
-      choose(a(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),
+      choose(a(nominal(pre = [jace, planeswalker], token, post = [actorControls]))),
       putCounters($amount, printedKind(loyaltyCounter), it)])
 }

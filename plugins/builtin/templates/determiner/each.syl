@@ -1,5 +1,5 @@
 # "each …"
-template each(p: Predicate): NounPhrase {
+template each(p: Nominal): NounPhrase {
   spelling = "each $p",
   body = described(each, $p)
 }

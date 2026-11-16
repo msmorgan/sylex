@@ -7,5 +7,5 @@ card singleFaced({
         create(
           1,
           copyOf(
-            target(and([isCreature, youControl])),
+            target(nominal(creature, post = [youControl])),
             exceptions = [alsoHas([flying]), isntLegendary])))]})

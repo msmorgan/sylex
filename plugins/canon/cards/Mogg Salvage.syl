@@ -6,7 +6,7 @@ card singleFaced({
       static(
         if(
           and([
-              exists(and([isLand, hasSubtype(island), anOpponentControls])),
-              exists(and([isLand, hasSubtype(mountain), youControl]))]),
+              exists(nominal(island, post = [anOpponentControls])),
+              exists(nominal(mountain, post = [youControl]))]),
           can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
-      spell(destroy(target(isArtifact)))]})
+      spell(destroy(target(artifact)))]})

@@ -7,9 +7,13 @@ card singleFaced({
     text = [
       whenever(
         or([
-            does(actor(a(and([isCreature, isOther]))), die),
-            does(any, putInto(a(and([isCard, isCreature])), graveyard, from = not(battlefield))),
-            does(actor(a(and([isCreature, in(yourGraveyard)]))), leave(from = yourGraveyard))]),
+            does(actor(a(nominal(pre = [other], creature))), die),
+            does(
+              any,
+              putInto(a(nominal(pre = [creature], card)), graveyard, from = not(battlefield))),
+            does(
+              actor(a(nominal(pre = [creature], card, post = [in(yourGraveyard)]))),
+              leave(from = yourGraveyard))]),
         instruct(this, dealDamage(amount = 1, recipient = eachOpponent))),
       activated(mana([generic(1), pip(black)]), instruct(eachPlayer, mill(1)))],
     power = 5,

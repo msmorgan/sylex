@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       static(
         entersWithAdditionalCounters(
-          each(and([isCreature, youControl, non(hasSubtype(human)), isOther])),
+          each(nominal(pre = [other, non(human)], creature, post = [youControl])),
           1,
           p1p1Counter))],
     power = 3,

@@ -1,4 +1,0 @@
-template isCreature: Predicate {
-  spelling = "creature",
-  body = hasType(creature)
-}

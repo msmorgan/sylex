@@ -6,5 +6,9 @@ card singleFaced({
       spell(
         destroy(
           and([
-              target(isArtifact),
-              allOf(and([isArtifact, shares(cardName, share, that(artifact)), isOther]))])))]})
+              target(artifact),
+              allOf(
+                nominal(
+                  pre = [other],
+                  artifact,
+                  post = [shares(cardName, share, that(artifact))]))])))]})

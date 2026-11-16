@@ -8,8 +8,9 @@ card singleFaced({
         mana([pip(black)]),
         instruct(
           target(
-            and([
-                isPlayer,
+            nominal(
+              player,
+              post = [
                 did(
                   actor(thisCreature),
                   dealDamage(recipient = which),

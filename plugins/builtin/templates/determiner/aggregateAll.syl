@@ -1,5 +1,5 @@
 # "the greatest power among …s": the domain ranged over is all of them, closed after it.
-template aggregateAll(op: AggregateOp, axis: ProjAxis, p: Predicate): Amount {
+template aggregateAll(op: AggregateOp, axis: ProjAxis, p: Nominal): Amount {
   spelling = "the $op $axis among $p",
   body = aggregate($op, $axis, described(all, $p))
 }

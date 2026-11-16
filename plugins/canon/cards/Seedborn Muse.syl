@@ -3,6 +3,10 @@ card singleFaced({
     cost = [generic(3), pip(green), pip(green)],
     types = [creature],
     subtypes = [spirit],
-    text = [static(untapDuring(allOf(youControl), each(isOtherPlayer)))],
+    text = [
+      static(
+        untapDuring(
+          allOf(nominal(permanent, post = [youControl])),
+          each(nominal(pre = [other], player))))],
     power = 2,
     toughness = 4})

@@ -1,5 +1,5 @@
 # "the <p> [from] among <group>": every member the description picks.
-template allFromAmong(p: Predicate, group: NounPhrase): NounPhrase {
+template allFromAmong(p: Nominal, group: NounPhrase): NounPhrase {
   spelling = "the $p from among $group",
   body = someOf(whole, description = $p, $group)
 }

@@ -1,0 +1,4 @@
+template transformed: Predicative {
+  spelling = "transformed",
+  body = currentFace(back)
+}

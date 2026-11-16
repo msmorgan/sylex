@@ -8,8 +8,9 @@ card singleFaced({
       haste,
       whenever(
         does(
-          actor(a(isPlayer)),
-          cast(a(and([isSpell, was(cast(which, from = graveyard), within = thisObject)])))),
+          actor(a(player)),
+          cast(
+            a(nominal(spell, post = [was(cast(which, from = graveyard), within = thisObject)])))),
         instruct(thisCreature, dealDamage(amount = 3, recipient = that(player))))],
     power = 2,
     toughness = 2})

@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       menace,
       whenever(
-        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(isPlayer))),
+        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
         additionalStep(upkeep, none, thatMuch))],
     power = 2,
     toughness = 5})

@@ -1,0 +1,3 @@
+primitive hasDesignation(
+  designation: DesignationLabel,
+  holder: Option(NounPhrase) = none): PostModifier = HasDesignation

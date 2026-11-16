@@ -8,7 +8,7 @@ card singleFaced({
         tapSymbol,
         establishThroughout(
           qualityChange(
-            target(and([isLand, youControl])),
+            target(nominal(land, post = [youControl])),
             sets,
             chosenQuality(ofYourChoice(subtype(land), domain = basicTypesOnly))),
           untilEndOfTurn))],

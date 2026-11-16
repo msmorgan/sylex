@@ -4,5 +4,9 @@
 ability hexproof {
   lexical = {lemma = "hexproof", parameters = [[], [Quality(Some("from"))]]},
   spelling = "hexproof",
-  body = [static(cant(by(allOf(and([in(stack), opponentsControl]))), target(this)))]
+  body = [
+    static(
+      cant(
+        by(allOf(nominal(or([spell, abilityHead(anyOnStack)]), post = [opponentsControl]))),
+        target(this)))]
 }

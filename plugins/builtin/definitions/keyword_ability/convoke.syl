@@ -10,6 +10,6 @@ ability convoke {
       paySubstitute(
         thisSpell,
         {
-          action = tap(a(and([isUntapped, isCreature, youControl]))),
+          action = tap(a(nominal(pre = [untapped], creature, post = [youControl]))),
           pays = [generic, ofColor(colorOf(that(creature)))]}))]
 }

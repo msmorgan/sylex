@@ -12,12 +12,16 @@ ability ripple(amount: Amount) {
         reveal(slice(top, $amount, libraryOf(you))),
         ifDid = sequentially([
             cast(
-              someOf(counted(anyNumber), description = shares(cardName, share, this), those(card)),
+              someOf(
+                counted(anyNumber),
+                description = nominal(card, post = [shares(cardName, share, this)]),
+                those(card)),
               altCost = withoutPaying),
             move(
               allOf(
-                and([
-                    isCard,
+                nominal(
+                  card,
+                  post = [
                     was(reveal(which), within = thisWay),
                     not(was(cast(which), within = thisWay))])),
               anywhere,

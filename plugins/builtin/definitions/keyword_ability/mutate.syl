@@ -15,7 +15,7 @@ ability mutate(cost: Cost) {
         choiceWasTaken(thisSpell, byKeyword(mutate)),
         addsTarget(
           thisSpell,
-          and([isCreature, not(hasSubtype(human)), ownedBy(ownerOf(thisSpell))])))),
+          nominal(pre = [non(human)], creature, post = [ownedBy(ownerOf(thisSpell))])))),
     static(
       replace(
         would(actor(thisSpell), enter),
@@ -23,6 +23,6 @@ ability mutate(cost: Cost) {
           choiceWasTaken(thisSpell, byKeyword(mutate)),
           instead(
             chooseOne(
-              merge(thisSpell, the(was(target(which))), top),
-              merge(thisSpell, the(was(target(which))), bottom))))))]
+              merge(thisSpell, the(nominal(pre = [was(target(which))], creature)), top),
+              merge(thisSpell, the(nominal(pre = [was(target(which))], creature)), bottom))))))]
 }

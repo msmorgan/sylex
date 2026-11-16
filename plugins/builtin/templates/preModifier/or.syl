@@ -1,0 +1,4 @@
+template or(disjuncts: List(PreModifier)): PreModifier {
+  spelling = "$disjuncts#<or>",
+  body = coord(or, $disjuncts)
+}

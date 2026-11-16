@@ -6,11 +6,11 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([
-                or([isArtifact, isEnchantment]),
-                isSpell,
-                did(actor(yourOpponents), cast(which), within = thisObject)])),
+            nominal(
+              pre = [or([artifact, enchantment])],
+              spell,
+              post = [did(actor(yourOpponents), cast(which), within = thisObject)])),
           more(2))),
       activated(
         perform(sacrifice(thisEnchantment)),
-        destroy(target(or([isArtifact, isEnchantment]))))]})
+        destroy(target(or([artifact, enchantment]))))]})

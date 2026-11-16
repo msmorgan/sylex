@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       trample,
       whenever(
-        does(actor(you), cast(a(and([isSpell, targeting(thisCreature, someTarget)])))),
+        does(actor(you), cast(a(nominal(spell, post = [targeting(thisCreature, someTarget)])))),
         draw(1))],
     power = 4,
     toughness = 4})

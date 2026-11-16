@@ -10,8 +10,10 @@ ability hexproofFrom(quality: Predicate) {
       cant(
         by(
           allOf(
-            and([
-                or([and([isSpell, $quality]), abilityOf(allOf(and([isSource, $quality])))]),
-                opponentsControl]))),
+            nominal(
+              or([
+                  nominal(pre = [hasQuality($quality)], spell),
+                  abilityOf(allOf(nominal(pre = [hasQuality($quality)], source)))]),
+              post = [opponentsControl]))),
         target(thisPermanent)))]
 }

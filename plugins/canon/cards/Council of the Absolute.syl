@@ -4,12 +4,18 @@ card singleFaced({
     types = [creature],
     subtypes = [human, advisor],
     text = [
-      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(not(or([isCreature, isLand]))))),
-      static(cant(actor(yourOpponents), cast(bare(and([isSpell, named(chosenName)]))))),
+      static(
+        entersChoosingFrom(
+          thisCreature,
+          cardName,
+          nameOfCard(not(or([hasType(creature), hasType(land)]))))),
+      static(cant(actor(yourOpponents), cast(bare(nominal(spell, post = [named(chosenName)]))))),
       static(
         costShift(
           allOf(
-            and([isSpell, named(chosenName), did(actor(you), cast(which), within = thisObject)])),
+            nominal(
+              spell,
+              post = [named(chosenName), did(actor(you), cast(which), within = thisObject)])),
           less(2)))],
     power = 2,
     toughness = 4})

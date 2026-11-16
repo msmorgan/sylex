@@ -1,0 +1,4 @@
+# A player in the game [CR#102.1].
+primitive player: Nominal = Player {
+  spelling = "player"
+}

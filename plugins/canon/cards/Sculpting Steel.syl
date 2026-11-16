@@ -2,4 +2,8 @@ card singleFaced({
     name = "Sculpting Steel",
     cost = [generic(3)],
     types = [artifact],
-    text = [static(mayHaveEnter(thisArtifact, [asCopyOf(a(isArtifact), [])]))]})
+    text = [
+      static(
+        mayHaveEnter(
+          thisArtifact,
+          [asCopyOf(a(nominal(artifact, post = [in(battlefield)])), [])]))]})

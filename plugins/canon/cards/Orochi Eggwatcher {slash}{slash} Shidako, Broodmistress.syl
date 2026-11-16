@@ -9,7 +9,7 @@ card flip({
         sequentially([
             create(1, written(creatureToken(1, 1, [green], [snake]))),
             doIf(
-              compareAmt(countOf(and([isCreature, youControl])), atLeast, 10),
+              compareAmt(countOf(nominal(creature, post = [youControl])), atLeast, 10),
               flip(thisCreature))]))],
     power = 1,
     toughness = 1},
@@ -20,7 +20,7 @@ card flip({
     subtypes = [snake, shaman],
     text = [
       activated(
-        compound([mana([pip(green)]), perform(sacrifice(a(isCreature)))]),
-        get(target(isCreature), up(3), up(3), duration = untilEndOfTurn))],
+        compound([mana([pip(green)]), perform(sacrifice(a(creature)))]),
+        get(target(creature), up(3), up(3), duration = untilEndOfTurn))],
     power = 3,
     toughness = 3})

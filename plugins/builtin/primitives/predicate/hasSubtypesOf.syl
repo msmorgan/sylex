@@ -1,4 +1,0 @@
-# Rule-only helper: has every subtype a Defined Token declares, so a rule written over "a
-# <subtype> token" reads the subtype from the token's declaration ("a Jace planeswalker token",
-# [CR#701.71a]); no card term calls it (`docs/design/spelling.md` §7).
-primitive hasSubtypesOf(token: DefinedToken): Predicate = HasSubtypesOf

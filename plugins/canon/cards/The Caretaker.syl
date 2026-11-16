@@ -11,7 +11,9 @@ card singleFaced({
         beginningOfEach(endStep),
         if = did(actor(you), faceDilemma, within(soFarThisTurn)),
         sequentially([
-            instruct(target(isOpponent), exile(run(top, non(isLand), libraryOf(they)))),
+            instruct(
+              target(opponent),
+              exile(run(top, nominal(pre = [non(land)], card), libraryOf(they)))),
             may(cast(that(card), altCost = withoutPaying))]))],
     power = 5,
     toughness = 6})

@@ -1,7 +1,7 @@
-# "<subject> is <predicate>" ("if it's a creature", "if this permanent isn't renowned" under
+# "<subject> is <predicative>" ("if it's a creature", "if this permanent isn't renowned" under
 # `not`, "an instant card and a sorcery card are in your graveyard"): the condition that `subject`
-# matches `predicate`. Over `coord(and, …)`, each arm matches `predicate` independently, so
-# `and([a(A), a(B)])` admits one object matching both unless `isOther` is written.
-primitive is(subject: NounPhrase, predicate: Predicate): Condition = Matches {
-  spelling = "$subject be $predicate"
+# matches `predicative`. Over `coord(and, …)`, each arm matches `predicative` independently, so
+# `and([a(A), a(B)])` admits one object matching both unless `other` is written.
+primitive is(subject: NounPhrase, predicative: Predicative): Condition = Is {
+  spelling = "$subject be $predicative"
 }

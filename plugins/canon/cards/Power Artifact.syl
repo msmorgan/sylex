@@ -4,8 +4,8 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isArtifact),
+      enchant(hasType(artifact)),
       static(
         costShift(
-          allOf(and([abilityHead(anyActivated), abilityOf(enchanted(artifact))])),
+          allOf(nominal(abilityHead(anyActivated), post = [ofSource(enchanted(artifact))])),
           less(2, floor = 1)))]})

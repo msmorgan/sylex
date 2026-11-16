@@ -1,0 +1,5 @@
+# "an opponent controls"
+template anOpponentControls: PostModifier {
+  spelling = "an opponent controls",
+  body = controlledBy(anOpponent)
+}

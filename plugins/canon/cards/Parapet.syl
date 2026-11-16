@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       asThoughFlashSacrificedAtCleanup,
-      static(getsPt(allOf(and([isCreature, youControl])), up(0), up(1)))]})
+      static(getsPt(allOf(nominal(creature, post = [youControl])), up(0), up(1)))]})

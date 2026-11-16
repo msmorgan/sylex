@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         establishThroughout(
           conjunction([
-              allAbilityLoss(target(isCreature)),
+              allAbilityLoss(target(creature)),
               qualityChange(
                 it,
                 sets,

@@ -1,0 +1,3 @@
+# "with the <op> number": each player whose secretly chosen number is the `op` of the numbers
+# chosen, ties included (Menacing Ogre: "each player with the highest number").
+primitive choseExtreme(op: AggregateOp): PostModifier = ChoseExtreme

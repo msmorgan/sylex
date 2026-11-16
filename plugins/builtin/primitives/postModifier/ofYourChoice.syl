@@ -1,0 +1,5 @@
+# TODO(spelling): `domain` places modifiers before or after `$sort` ("basic land type" vs "color
+# other than red"); waits on `syl-kind-axis-one-word`.
+primitive ofYourChoice(
+  sort: QualitySort,
+  domain: Option(ChoiceDomain) = none): PostModifier = OfYourChoice

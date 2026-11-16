@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         instruct(
-          controllerOf(target(isSpell)),
+          controllerOf(target(spell)),
           doUnless(
-            scaledGenericMana(forEach(1, cardIn(yourGraveyard))),
+            scaledGenericMana(forEach(1, nominal(card, post = [in(yourGraveyard)]))),
             instruct(you, counter(it)))))]})

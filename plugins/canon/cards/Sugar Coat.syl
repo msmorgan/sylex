@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       flash,
-      enchant(or([isCreature, hasSubtype(food)])),
+      enchant(or([hasType(creature), hasSubtype(food)])),
       static(
         conjunction([
             qualityChange(

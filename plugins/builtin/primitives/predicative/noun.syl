@@ -1,0 +1,6 @@
+# A predicative noun phrase ("is a land", "is another creature", "are mana abilities") (`english.fug`
+# `NominalPredicative`). In predicative position, [CR#109.2]'s implicit permanent domain does not
+# apply: a type word tests the characteristic alone, and "card" or "permanent" adds that class.
+primitive noun(phrase: NounPhrase): Predicative = NominalPredicative {
+  spelling = "$phrase"
+}

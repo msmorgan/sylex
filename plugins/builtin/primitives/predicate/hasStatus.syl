@@ -1,3 +1,0 @@
-primitive hasStatus(status: Status): Predicate = HasStatus {
-  spelling = "$status"
-}

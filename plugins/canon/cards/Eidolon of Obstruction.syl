@@ -8,7 +8,9 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([abilityHead(loyalty), abilityOf(allOf(and([isPlaneswalker, opponentsControl])))])),
+            nominal(
+              abilityHead(loyalty),
+              post = [ofSource(allOf(nominal(planeswalker, post = [opponentsControl])))])),
           more(1)))],
     power = 2,
     toughness = 1})

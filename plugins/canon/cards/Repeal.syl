@@ -5,5 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            returnToHand(target(and([non(isLand), isPermanent, hasManaValue(equal, letter(x))]))),
+            returnToHand(
+              target(
+                nominal(pre = [non(land)], permanent, post = [hasManaValue(equal, letter(x))]))),
             draw(1)]))]})

@@ -6,4 +6,4 @@ card singleFaced({
       activatedOnlyIf(
         compound([mana([generic(3)]), tapSymbol]),
         draw(1),
-        exists(and([isCreature, youControl, hasPower(atLeast, 4)])))]})
+        exists(nominal(creature, post = [youControl, hasPower(atLeast, 4)])))]})

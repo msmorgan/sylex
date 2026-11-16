@@ -8,9 +8,9 @@ ability backup(amount: Amount) {
     when(
       does(actor(thisCreature), enter),
       sequentially([
-          putCounters($amount, printedKind(p1p1Counter), target(isCreature)),
+          putCounters($amount, printedKind(p1p1Counter), target(creature)),
           doIf(
-            is(that(creature), and([isCreature, isOther])),
+            is(that(creature), noun(a(nominal(pre = [other], creature)))),
             establishThroughout(
               abilityGrantSelected(that(creature), printedAfter(backup), thisCreature),
               untilEndOfTurn))]))]

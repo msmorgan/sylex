@@ -10,5 +10,5 @@ ability modular(count: Amount) {
         putCounters(
           countersOn(p1p1Counter, thisPermanent),
           printedKind(p1p1Counter),
-          target(and([isArtifact, isCreature])))))]
+          target(nominal(pre = [artifact], creature)))))]
 }

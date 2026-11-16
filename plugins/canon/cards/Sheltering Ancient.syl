@@ -7,6 +7,9 @@ card singleFaced({
       trample,
       cumulativeUpkeep(
         perform(
-          putCounters(1, printedKind(p1p1Counter), a(and([isCreature, anOpponentControls])))))],
+          putCounters(
+            1,
+            printedKind(p1p1Counter),
+            a(nominal(creature, post = [anOpponentControls])))))],
     power = 5,
     toughness = 5})

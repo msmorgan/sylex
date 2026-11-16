@@ -4,4 +4,6 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        preventAll(to = and([you, allOf(and([isPermanent, youControl]))]), duration = thisTurn))]})
+        preventAll(
+          to = and([you, allOf(nominal(permanent, post = [youControl]))]),
+          duration = thisTurn))]})

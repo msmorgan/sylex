@@ -4,7 +4,7 @@ card singleFaced({
     types = [kindred, enchantment],
     subtypes = [treefolk, aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         conjunction([
             qualityChange(

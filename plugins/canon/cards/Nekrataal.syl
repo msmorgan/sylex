@@ -8,7 +8,7 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         doUnderProhibition(
-          destroy(target(and([isCreature, non(isArtifact), not(hasColor(black))]))),
+          destroy(target(nominal(pre = [non(artifact), non(black)], creature))),
           regeneration(that(creature))))],
     power = 2,
     toughness = 1})

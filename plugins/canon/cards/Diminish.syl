@@ -2,4 +2,4 @@ card singleFaced({
     name = "Diminish",
     cost = [pip(blue)],
     types = [instant],
-    text = [spell(establishThroughout(getsBase(target(isCreature), 1, 1), untilEndOfTurn))]})
+    text = [spell(establishThroughout(getsBase(target(creature), 1, 1), untilEndOfTurn))]})

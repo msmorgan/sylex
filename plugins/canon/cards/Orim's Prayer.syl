@@ -4,5 +4,5 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(counted(orMore(1), isCreature)), attack(defender = you)),
-        gainLife(forEach(1, and([isAttacking, isCreature]))))]})
+        does(actor(counted(orMore(1), creature)), attack(defender = you)),
+        gainLife(forEach(1, nominal(pre = [attacking], creature))))]})

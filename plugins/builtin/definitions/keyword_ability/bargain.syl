@@ -13,7 +13,7 @@ ability bargain {
             sacrifice(
               a(
                 or([
-                    and([isArtifact, isPermanent]),
-                    and([isEnchantment, isPermanent]),
-                    isToken])))))))]
+                    nominal(pre = [artifact], permanent),
+                    nominal(pre = [enchantment], permanent),
+                    token])))))))]
 }

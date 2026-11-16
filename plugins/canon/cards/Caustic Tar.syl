@@ -4,8 +4,8 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isLand),
+      enchant(hasType(land)),
       static(
         abilityGrant(
           enchanted(land),
-          [activated(tapSymbol, instruct(target(isPlayer), loseLife(3)))]))]})
+          [activated(tapSymbol, instruct(target(player), loseLife(3)))]))]})

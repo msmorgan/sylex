@@ -1,0 +1,4 @@
+# A color as a PreModifier: the bare color test [CR#105.1].
+coercion(color: Color): PreModifier {
+  body = hasColor($color)
+}

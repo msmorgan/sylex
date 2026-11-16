@@ -6,7 +6,7 @@ card singleFaced({
       imprint(
         when(
           does(actor(thisArtifact), enter),
-          may(exile(a(and([non(isArtifact), non(isLand), cardIn(yourHand)])))))),
+          may(exile(a(nominal(pre = [non(artifact), non(land)], card, post = [in(yourHand)])))))),
       activated(
         tapSymbol,
-        addMana(counted(1, ofAnyColorOf(the(and([was(exile(which)), isCard]))))))]})
+        addMana(counted(1, ofAnyColorOf(the(nominal(pre = [was(exile(which))], card))))))]})

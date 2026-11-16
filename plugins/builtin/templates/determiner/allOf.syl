@@ -1,5 +1,5 @@
 # "all …"
-template allOf(p: Predicate): NounPhrase {
+template allOf(p: Nominal): NounPhrase {
   spelling = "all $p",
   body = described(all, $p)
 }

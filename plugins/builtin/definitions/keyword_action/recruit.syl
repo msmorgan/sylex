@@ -5,8 +5,8 @@ action recruit {
   spelling = "recruit",
   body = sequentially([
       draw(1),
-      discard(a(cardIn(handOf($actor)))),
+      discard(a(nominal(card, post = [in(handOf($actor))]))),
       doIf(
-        not(is(the(and([isCard, was(discard(which), within = thisWay)])), isLand)),
+        not(is(the(nominal(card, post = [was(discard(which), within = thisWay)])), noun(a(land)))),
         create(1, written(creatureToken(1, 1, [white], [human, soldier]))))])
 }

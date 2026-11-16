@@ -8,7 +8,7 @@ card singleFaced({
         establishThroughout(
           replace(
             would(
-              actor(aYourChoice(and([isCreature, isUnblocked]))),
+              actor(aYourChoice(nominal(pre = [unblocked], creature))),
               dealDamage(kind = combat, recipient = you)),
             instead(preventDamage(allBut(1))),
             use = nextTimeOnly),

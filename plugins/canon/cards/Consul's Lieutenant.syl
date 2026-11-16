@@ -10,7 +10,7 @@ card singleFaced({
         does(actor(thisCreature), attack),
         if = is(it, hasDesignation(renowned)),
         get(
-          allOf(and([isCreature, isAttacking, youControl, isOther])),
+          allOf(nominal(pre = [other, attacking], creature, post = [youControl])),
           up(1),
           up(1),
           duration = untilEndOfTurn))],

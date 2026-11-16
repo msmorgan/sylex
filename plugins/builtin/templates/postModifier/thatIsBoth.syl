@@ -1,0 +1,5 @@
+# "that's both <left> and <right>" (*Battlegate Mimic*).
+template thatIsBoth(left: PostModifier, right: PostModifier): PostModifier {
+  spelling = "that be both $left and $right",
+  body = coord(and, [$left, $right])
+}

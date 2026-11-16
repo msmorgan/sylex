@@ -5,6 +5,8 @@ card singleFaced({
     subtypes = [imp],
     text = [
       flying,
-      whenever(does(actor(counted(orMore(1), and([isPermanent, youControl]))), leave), scry(1))],
+      whenever(
+        does(actor(counted(orMore(1), nominal(permanent, post = [youControl]))), leave),
+        scry(1))],
     power = 2,
     toughness = 1})

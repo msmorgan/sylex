@@ -1,0 +1,4 @@
+template non(p: PreModifier): PreModifier {
+  spelling = "non~$p",
+  body = not($p)
+}

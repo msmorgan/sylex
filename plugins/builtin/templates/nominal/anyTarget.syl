@@ -1,0 +1,4 @@
+# "any target": a creature, planeswalker, battle, or player [CR#115.4].
+template anyTarget: Nominal {
+  body = or([creature, planeswalker, battle, player])
+}

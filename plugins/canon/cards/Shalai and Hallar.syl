@@ -10,7 +10,10 @@ card singleFaced({
       whenever(
         does(
           any,
-          putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
-        instruct(thisCreature, dealDamage(amount = thatMuch, recipient = target(isOpponent))))],
+          putCounters(
+            anyAmount,
+            printedKind(p1p1Counter),
+            a(nominal(creature, post = [youControl])))),
+        instruct(thisCreature, dealDamage(amount = thatMuch, recipient = target(opponent))))],
     power = 3,
     toughness = 3})

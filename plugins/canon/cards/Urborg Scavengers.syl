@@ -7,7 +7,7 @@ card singleFaced({
       whenever(
         or([does(actor(thisCreature), enter), does(actor(thisCreature), attack)]),
         sequentially([
-            exile(target(cardIn(graveyard))),
+            exile(target(nominal(card, post = [in(graveyard)]))),
             putCounters(1, printedKind(p1p1Counter), thisCreature)])),
       alsoForKeywords(
         static(
@@ -16,7 +16,7 @@ card singleFaced({
               thisCreature,
               thatKeyword,
               and([in(exiledWith(it)), hasKeyword(thatKeyword)])),
-            exists(and([in(exiledWith(it)), hasKeyword(thatKeyword)])))),
+            exists(nominal(card, post = [in(exiledWith(it)), hasKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(firstStrike),

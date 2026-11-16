@@ -13,7 +13,7 @@ card singleFaced({
       static(definesQuality(thisCreature, adds, chosenQuality(ofChosen(subtype(creature))))),
       static(
         entersWithAdditionalCounters(
-          each(and([isCreature, youControl, ofChosen(subtype(creature)), isOther])),
+          each(nominal(pre = [other], creature, post = [youControl, ofChosen(subtype(creature))])),
           1,
           p1p1Counter))],
     power = 2,

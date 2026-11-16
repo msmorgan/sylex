@@ -13,6 +13,6 @@ designation monarch {
     ability(at(beginningOfPossessed(theMonarch, endStep), instruct(that(player), draw(1)))),
     ability(
       whenever(
-        does(actor(a(isCreature)), dealDamage(kind = combat, recipient = theMonarch)),
+        does(actor(a(creature)), dealDamage(kind = combat, recipient = theMonarch)),
         gainDesignation(controllerOf(it), monarch)))]
 }

@@ -4,11 +4,14 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [shapeshifter],
     text = [
-      imprint(activated(mana([generic(1)]), exile(target(and([isCreature, in(yourGraveyard)]))))),
+      imprint(
+        activated(
+          mana([generic(1)]),
+          exile(target(nominal(pre = [creature], card, post = [in(yourGraveyard)]))))),
       alsoForKeywords(
         static(
           asLongAs(
-            exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
+            exists(nominal(card, post = [in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
             keywordGrant(
               thisCreature,
               thatKeyword,

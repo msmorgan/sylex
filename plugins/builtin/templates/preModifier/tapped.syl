@@ -1,0 +1,4 @@
+template tapped: PreModifier {
+  spelling = "tapped",
+  body = hasStatus(tapped)
+}

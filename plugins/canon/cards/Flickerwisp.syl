@@ -8,7 +8,7 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            exile(target(and([isPermanent, isOther]))),
+            exile(target(nominal(pre = [other], permanent))),
             atNext(
               beginningOfNext(endStep),
               returnToBattlefield(that(card), riders = [underControlOf(ownerOf(it))]))]))],

@@ -5,6 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            establish(abilityGrant(allOf(and([isCreature, youControl])), [indestructible])),
+            establish(
+              abilityGrant(allOf(nominal(creature, post = [youControl])), [indestructible])),
             extraTurn(1),
             atNext(beginningOfThatTurns(endStep), loseGame)]))]})

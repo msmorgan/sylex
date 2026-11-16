@@ -7,13 +7,17 @@ card singleFaced({
     text = [
       static(
         can(
-          by(allOf(and([or([isSpell, abilityHead(anyOnStack)]), youControl]))),
-          target(allOf(and([isCreature, opponentsControl, hasKeyword(theKeyword(hexproof))]))),
+          by(allOf(nominal(or([spell, abilityHead(anyOnStack)]), post = [youControl]))),
+          target(
+            allOf(nominal(creature, post = [opponentsControl, hasKeyword(theKeyword(hexproof))]))),
           asThough = holds(is(them, not(hasKeyword(theKeyword(hexproof))))))),
       activated(
         compound([mana([generic(3)]), perform(sacrifice(thisArtifact))]),
         sequentially([
-            gain(allOf(and([isCreature, youControl])), [hexproof], duration = untilEndOfTurn),
+            gain(
+              allOf(nominal(creature, post = [youControl])),
+              [hexproof],
+              duration = untilEndOfTurn),
             establishThroughout(
-              cant(any, block(attacker = allOf(and([isCreature, youControl])))),
+              cant(any, block(attacker = allOf(nominal(creature, post = [youControl])))),
               thisTurn)]))]})

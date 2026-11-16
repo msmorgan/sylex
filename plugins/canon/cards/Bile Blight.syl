@@ -6,8 +6,12 @@ card singleFaced({
       spell(
         get(
           and([
-              target(isCreature),
-              allOf(and([isCreature, shares(cardName, share, that(creature)), isOther]))]),
+              target(creature),
+              allOf(
+                nominal(
+                  pre = [other],
+                  creature,
+                  post = [shares(cardName, share, that(creature))]))]),
           down(3),
           down(3),
           duration = untilEndOfTurn))]})

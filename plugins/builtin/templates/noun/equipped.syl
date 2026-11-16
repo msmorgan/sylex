@@ -1,5 +1,5 @@
 # "equipped <w>"
-template equipped(w: NounWord): NounPhrase {
+template equipped(w: Nominal): NounPhrase {
   spelling = "equipped $w",
   body = attachHost(equipped, $w)
 }

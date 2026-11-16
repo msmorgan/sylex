@@ -8,7 +8,9 @@ card singleFaced({
         chapterMark([1]),
         instruct(
           this,
-          dealDamage(amount = 4, recipient = target(and([isCreature, anOpponentControls]))))),
+          dealDamage(
+            amount = 4,
+            recipient = target(nominal(creature, post = [anOpponentControls]))))),
       when(
         chapterMark([2, 3, 4, 5]),
         sequentially(

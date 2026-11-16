@@ -1,0 +1,3 @@
+primitive named(source: NameSource): Predicative = Named {
+  spelling = "named $source"
+}

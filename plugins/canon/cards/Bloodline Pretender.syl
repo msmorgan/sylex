@@ -7,7 +7,10 @@ card singleFaced({
       changeling,
       static(entersChoosing(thisCreature, subtype(creature))),
       whenever(
-        does(actor(a(and([isCreature, youControl, isOther, ofChosen(subtype(creature))]))), enter),
+        does(
+          actor(
+            a(nominal(pre = [other], creature, post = [youControl, ofChosen(subtype(creature))]))),
+          enter),
         putCounters(1, printedKind(p1p1Counter), thisCreature))],
     power = 2,
     toughness = 2})

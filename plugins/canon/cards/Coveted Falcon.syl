@@ -10,17 +10,17 @@ card singleFaced({
       flying,
       whenever(
         does(actor(thisCreature), attack),
-        gainControl(target(and([isPermanent, youOwn, not(youControl)])))),
+        gainControl(target(nominal(permanent, post = [youOwn, youDontControl])))),
       disguise(mana([generic(1), pip(blue)])),
       when(
         does(any, turnFaceUp(thisCreature)),
         sequentially([
             instruct(
-              target(isOpponent),
-              gainControl(targets(anyNumber, and([isPermanent, youControl])))),
+              target(opponent),
+              gainControl(targets(anyNumber, nominal(permanent, post = [youControl])))),
             draw(
               forEach(
                 eventTally(actor(they), gainControlOf(those(permanent)), thisWay, events),
-                isPermanent))]))],
+                permanent))]))],
     power = 1,
     toughness = 4})

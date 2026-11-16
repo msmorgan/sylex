@@ -8,7 +8,7 @@ card singleFaced({
       at(
         beginningOfYour(upkeep),
         doUnless(
-          scaledGenericMana(forEach(1, and([isCreature, youControl, isOther]))),
+          scaledGenericMana(forEach(1, nominal(pre = [other], creature, post = [youControl]))),
           sacrifice(thisCreature)))],
     power = 3,
     toughness = 4})

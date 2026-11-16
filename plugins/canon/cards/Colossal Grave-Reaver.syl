@@ -10,7 +10,7 @@ card singleFaced({
         does(
           any,
           putInto(
-            counted(orMore(1), and([isCard, isCreature])),
+            counted(orMore(1), nominal(pre = [creature], card)),
             yourGraveyard,
             from = yourLibrary)),
         putOntoBattlefield(partOf(exactly(1), them)))],

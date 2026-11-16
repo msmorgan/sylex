@@ -7,6 +7,6 @@ card singleFaced({
     text = [
       flying,
       static(entersChoosing(thisCreature, color)),
-      static(cant(actor(yourOpponents), cast(bare(and([isSpell, ofChosen(color)])))))],
+      static(cant(actor(yourOpponents), cast(bare(nominal(spell, post = [ofChosen(color)])))))],
     power = 7,
     toughness = 7})

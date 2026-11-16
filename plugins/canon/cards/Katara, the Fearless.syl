@@ -8,7 +8,10 @@ card singleFaced({
       static(
         additionalTriggers(
           triggers(
-            a(and([abilityHead(anyTriggered), abilityOf(a(and([hasSubtype(ally), youControl])))]))),
+            a(
+              nominal(
+                abilityHead(anyTriggered),
+                post = [ofSource(a(nominal(ally, post = [youControl])))]))),
           exactly(1)))],
     power = 3,
     toughness = 3})

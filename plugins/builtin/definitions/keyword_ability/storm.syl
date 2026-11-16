@@ -11,8 +11,8 @@ ability storm {
           copyOnStack(
             thisSpell,
             times = eventCount(
-              actor(a(isPlayer)),
-              cast(a(and([isSpell, isOther]))),
+              actor(a(player)),
+              cast(a(nominal(pre = [other], spell))),
               earlierThisTurn)),
           may(chooseNewTargets(those(copy)))]))]
 }

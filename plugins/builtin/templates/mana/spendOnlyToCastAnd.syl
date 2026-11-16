@@ -4,5 +4,5 @@
 # ("Spend this mana only to cast $spell, and $says.", *Cavern of Souls*) waits on
 # `syl-tocast-noun-phrase`.
 template spendOnlyToCastAnd(spell: Predicate, says: VerbPhrase): List(ManaRider) {
-  body = [spendOnly([toCast($spell)]), whenSpentOn(affectsIt, a($spell), $says)]
+  body = [spendOnly([toCast($spell)]), whenSpentOn(affectsIt, a(matching($spell)), $says)]
 }

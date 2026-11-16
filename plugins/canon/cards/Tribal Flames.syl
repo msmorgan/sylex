@@ -8,7 +8,9 @@ card singleFaced({
       domain(
         spell(
           sequentially([
-              instruct(this, dealDamage(amount = letter(x), recipient = target(isAnyTarget))),
+              instruct(this, dealDamage(amount = letter(x), recipient = target(anyTarget))),
               define(
                 x,
-                distinctCount(subtype(land, basicOnly), allOf(and([isLand, youControl]))))])))]})
+                distinctCount(
+                  subtype(land, basicOnly),
+                  allOf(nominal(land, post = [youControl]))))])))]})

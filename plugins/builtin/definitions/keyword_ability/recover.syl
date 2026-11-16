@@ -6,7 +6,7 @@ ability recover(cost: Cost) {
   spelling = "recover $cost",
   body = [
     when(
-      does(any, putInto(a(isCreature), yourGraveyard, from = battlefield)),
+      does(any, putInto(a(creature), yourGraveyard, from = battlefield)),
       may(
         pay(payment($cost), once),
         ifDid = returnToHand(this, from = yourGraveyard),

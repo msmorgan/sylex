@@ -8,6 +8,6 @@ card singleFaced({
         sequentially([
             reveal(topSlice(1)),
             doIf(
-              is(it, shares(cardName, share, a(cardIn(yourGraveyard)))),
+              is(it, shares(cardName, share, a(nominal(card, post = [in(yourGraveyard)])))),
               putInto(it, graveyard),
               otherwise = draw(1))]))]})

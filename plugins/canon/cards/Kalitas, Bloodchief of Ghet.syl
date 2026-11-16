@@ -13,7 +13,7 @@ card singleFaced({
       activated(
         compound([mana([pip(black), pip(black), pip(black)]), tapSymbol]),
         sequentially([
-            destroy(target(isCreature)),
+            destroy(target(creature)),
             doIf(
               did(actor(that(creature)), die, thisWay),
               create(

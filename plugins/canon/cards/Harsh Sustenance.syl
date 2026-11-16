@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            instruct(this, dealDamage(amount = letter(x), recipient = target(isAnyTarget))),
+            instruct(this, dealDamage(amount = letter(x), recipient = target(anyTarget))),
             gainLife(letter(x)),
-            define(x, countOf(and([isCreature, youControl])))]))]})
+            define(x, countOf(nominal(creature, post = [youControl])))]))]})

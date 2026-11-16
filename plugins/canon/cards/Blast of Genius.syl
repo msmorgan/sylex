@@ -5,11 +5,11 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            choose(target(isAnyTarget)),
+            choose(target(anyTarget)),
             draw(3),
-            discard(a(cardIn(yourHand))),
+            discard(a(nominal(card, post = [in(yourHand)]))),
             instruct(
               this,
               dealDamage(
-                amount = statOf(stat(manaValue), the(and([was(discard(which)), isCard]))),
+                amount = statOf(stat(manaValue), the(nominal(pre = [was(discard(which))], card))),
                 recipient = thatJoin))]))]})

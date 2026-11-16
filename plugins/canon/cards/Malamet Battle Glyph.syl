@@ -7,9 +7,9 @@ card singleFaced({
         sequentially([
             choose(
               and([
-                  target(and([isCreature, youControl])),
-                  target(and([isCreature, youDontControl]))])),
+                  target(nominal(creature, post = [youControl])),
+                  target(nominal(creature, post = [youDontControl]))])),
             doIf(
-              did(actor(the(and([isCreature, youControl]))), enter, within(soFarThisTurn)),
+              did(actor(the(nominal(creature, post = [youControl]))), enter, within(soFarThisTurn)),
               putCounters(1, printedKind(p1p1Counter), it)),
             fightEachOther(those(creature))]))]})

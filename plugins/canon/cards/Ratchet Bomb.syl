@@ -8,7 +8,7 @@ card singleFaced({
         compound([tapSymbol, perform(sacrifice(thisArtifact))]),
         destroy(
           each(
-            and([
-                non(isLand),
-                isPermanent,
-                hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]})
+            nominal(
+              pre = [non(land)],
+              permanent,
+              post = [hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]})

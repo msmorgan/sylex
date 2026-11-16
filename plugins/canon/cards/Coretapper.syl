@@ -4,9 +4,9 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [myr],
     text = [
-      activated(tapSymbol, putCounters(1, printedKind(chargeCounter), target(isArtifact))),
+      activated(tapSymbol, putCounters(1, printedKind(chargeCounter), target(artifact))),
       activated(
         perform(sacrifice(thisCreature)),
-        putCounters(2, printedKind(chargeCounter), target(isArtifact)))],
+        putCounters(2, printedKind(chargeCounter), target(artifact)))],
     power = 1,
     toughness = 1})

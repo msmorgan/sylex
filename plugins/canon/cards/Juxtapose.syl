@@ -11,41 +11,52 @@ card singleFaced({
         sequentially([
             exchangeControl(
               the(
-                and([
-                    isCreature,
+                nominal(
+                  creature,
+                  post = [
                     controlledBy(you),
-                    superlative(max, stat(manaValue), and([isCreature, controlledBy(you)]))])),
-              the(
-                and([
-                    isCreature,
-                    controlledBy(target(isPlayer)),
                     superlative(
                       max,
                       stat(manaValue),
-                      and([isCreature, controlledBy(target(isPlayer))]))]))),
+                      nominal(creature, post = [controlledBy(you)]))])),
+              the(
+                nominal(
+                  creature,
+                  post = [
+                    controlledBy(target(player)),
+                    superlative(
+                      max,
+                      stat(manaValue),
+                      nominal(creature, post = [controlledBy(target(player))]))]))),
             exchangeControl(
               the(
-                and([
-                    isArtifact,
+                nominal(
+                  artifact,
+                  post = [
                     controlledBy(you),
-                    superlative(max, stat(manaValue), and([isArtifact, controlledBy(you)]))])),
+                    superlative(
+                      max,
+                      stat(manaValue),
+                      nominal(artifact, post = [controlledBy(you)]))])),
               the(
-                and([
-                    isArtifact,
+                nominal(
+                  artifact,
+                  post = [
                     controlledBy(that(player)),
                     superlative(
                       max,
                       stat(manaValue),
-                      and([isArtifact, controlledBy(that(player))]))]))),
+                      nominal(artifact, post = [controlledBy(that(player))]))]))),
             doIf(
               thereAre(
                 counted(
                   orMore(2),
-                  and([
-                      isPermanent,
-                      controlledBy(a(isPlayer)),
+                  nominal(
+                    permanent,
+                    post = [
+                      controlledBy(a(player)),
                       tiedFor(
                         max,
                         stat(manaValue),
-                        and([isPermanent, controlledBy(that(player))]))]))),
+                        nominal(permanent, post = [controlledBy(that(player))]))]))),
               instruct(controllerOf(them), choose(partOf(exactly(1), them))))]))]})

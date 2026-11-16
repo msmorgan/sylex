@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            sacrifice(counted(anyNumber, isLand)),
-            search(yourLibrary, for = counted(upToOf(groupSize), isLand)),
+            sacrifice(counted(anyNumber, land)),
+            search(yourLibrary, for = counted(upToOf(groupSize), nominal(pre = [land], card))),
             putOntoBattlefieldTapped(them),
             shuffle]))]})

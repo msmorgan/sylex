@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            destroy(target(or([isArtifact, isEnchantment]))),
+            destroy(target(or([artifact, enchantment]))),
             instruct(this, dealDamage(amount = 2, recipient = controllerOf(that(permanent))))]))]})

@@ -15,10 +15,10 @@ ability hideaway(amount: Amount) {
           move(theRest, anywhere, onBottom, [inOrder(randomOrder)]),
           establishThroughout(
             conjunction([
-                visibility(lookAt, you, objects(the(and([was(exile(which)), isCard])))),
+                visibility(lookAt, you, objects(the(nominal(pre = [was(exile(which))], card)))),
                 visibility(
                   lookAt,
                   controllerOf(thisPermanent),
-                  objects(the(and([was(exile(which)), isCard]))))]),
-            forAsLongAs(is(the(and([was(exile(which)), isCard])), in(exileZone))))]))]
+                  objects(the(nominal(pre = [was(exile(which))], card))))]),
+            forAsLongAs(is(the(nominal(pre = [was(exile(which))], card)), in(exileZone))))]))]
 }

@@ -4,11 +4,11 @@ card singleFaced({
     types = [enchantment],
     text = [
       when(
-        does(actor(a(and([isCreature, youControl]))), enter),
+        does(actor(a(nominal(creature, post = [youControl]))), enter),
         sequentially([
             gainLife(1),
             doIf(
-              not(is(thisEnchantment, isCreature)),
+              not(is(thisEnchantment, noun(a(creature)))),
               become(
                 it,
                 {

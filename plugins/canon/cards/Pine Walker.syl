@@ -5,6 +5,8 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       morph(mana([generic(4), pip(green)])),
-      whenever(does(any, turnFaceUp(a(and([isCreature, youControl])))), untap(that(creature)))],
+      whenever(
+        does(any, turnFaceUp(a(nominal(creature, post = [youControl])))),
+        untap(that(creature)))],
     power = 5,
     toughness = 5})

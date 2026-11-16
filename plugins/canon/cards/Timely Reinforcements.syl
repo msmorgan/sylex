@@ -8,7 +8,7 @@ card singleFaced({
             doIf(compareAmt(lifeTotalOf(you), less, lifeTotalOf(anOpponent)), gainLife(6)),
             doIf(
               compareAmt(
-                countOf(and([isCreature, youControl])),
+                countOf(nominal(creature, post = [youControl])),
                 less,
-                countOf(and([isCreature, anOpponentControls]))),
+                countOf(nominal(creature, post = [anOpponentControls]))),
               create(3, written(creatureToken(1, 1, [white], [soldier]))))]))]})

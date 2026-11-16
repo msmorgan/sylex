@@ -11,7 +11,7 @@ card singleFaced({
           riders = [
             whenSpentOn(
               affectsIt,
-              a(and([non(hasSubtype(human)), isCreature, isSpell])),
+              a(nominal(pre = [non(human), creature], spell)),
               establish(entersWithAdditionalCounters(becomes(that(spell)), 1, p1p1Counter)))]))],
     power = 2,
     toughness = 2})

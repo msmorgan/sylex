@@ -1,0 +1,4 @@
+# Bare supertype test [CR#205.4a].
+primitive hasSupertype(supertype: Supertype): PreModifier = HasSupertype {
+  spelling = "$supertype"
+}

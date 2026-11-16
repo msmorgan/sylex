@@ -9,7 +9,7 @@ card singleFaced({
           would(
             actor(you),
             pay(
-              whose = allOf(and([isPermanent, youControl])),
+              whose = allOf(nominal(permanent, post = [youControl])),
               keyword = echo,
               payment(anyCost),
               once)),

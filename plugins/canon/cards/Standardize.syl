@@ -7,5 +7,5 @@ card singleFaced({
         sequentially([
             choose(a(qualityFrom(subtype(creature), typeOtherThan(wall)))),
             establishThroughout(
-              qualityChange(each(isCreature), sets, chosenQuality(ofChosen(subtype(creature)))),
+              qualityChange(each(creature), sets, chosenQuality(ofChosen(subtype(creature)))),
               untilEndOfTurn)]))]})

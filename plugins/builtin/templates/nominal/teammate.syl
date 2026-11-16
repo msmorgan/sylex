@@ -1,0 +1,5 @@
+# "teammate": a teammate of you [CR#102.3].
+template teammate: Nominal {
+  spelling = "teammate",
+  body = teammateOf(you)
+}

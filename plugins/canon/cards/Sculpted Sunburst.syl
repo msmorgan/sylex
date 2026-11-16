@@ -8,16 +8,16 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            choose(a(and([isCreature, youControl]))),
+            choose(a(nominal(creature, post = [youControl]))),
             instruct(
               eachOpponent,
               choose(
                 a(
                   comparesOwnStat(
-                    and([isCreature, controlledBy(they)]),
+                    nominal(creature, post = [controlledBy(they)]),
                     power,
                     atMost,
                     powerOf(it))))),
             doIf(
-              did(actor(you), choose(a(isCreature)), thisWay),
-              exile(each(and([isCreature, notChosen]))))]))]})
+              did(actor(you), choose(a(creature)), thisWay),
+              exile(each(nominal(creature, post = [notChosen]))))]))]})

@@ -14,8 +14,8 @@ card singleFaced({
                 thereAre(
                   counted(
                     orMore(2),
-                    and([isPlayer, tiedFor(max, playerStat(lifeTotal), isPlayer)]))),
+                    nominal(player, post = [tiedFor(max, playerStat(lifeTotal), player)]))),
                 drawGame,
                 otherwise = instruct(
-                  the(and([isPlayer, superlative(max, playerStat(lifeTotal), isPlayer)])),
+                  the(nominal(player, post = [superlative(max, playerStat(lifeTotal), player)])),
                   winGame)))]))]})

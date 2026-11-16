@@ -1,0 +1,4 @@
+# Bare color test [CR#105.1].
+primitive hasColor(color: Color): PreModifier = ColorIs {
+  spelling = "$color"
+}

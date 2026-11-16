@@ -7,14 +7,16 @@ card singleFaced({
         does(actor(thisEnchantment), enter),
         instruct(
           it,
-          dealDamage(amount = 3, recipient = target(and([isCreature, anOpponentControls]))))),
+          dealDamage(
+            amount = 3,
+            recipient = target(nominal(creature, post = [anOpponentControls]))))),
       whenever(
-        does(actor(counted(orMore(1), isCreature)), die),
+        does(actor(counted(orMore(1), creature)), die),
         sequentially([
             mill(1),
             putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
             triggerReflexively(
               doOnlyIf(sacrifice(it), compareAmt(countersOn(bloodstainCounter, it), atLeast, 5)),
               returnToHand(
-                target(and([isCreature, isCard, in(yourGraveyard)])),
+                target(nominal(pre = [creature], card, post = [in(yourGraveyard)])),
                 from = yourGraveyard))]))]})

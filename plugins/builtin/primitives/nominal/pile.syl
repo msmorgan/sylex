@@ -1,0 +1,4 @@
+# A pile of cards.
+primitive pile: Nominal = Pile {
+  spelling = "pile"
+}

@@ -6,7 +6,11 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(and([isArtifact, isSpell, did(actor(you), cast(which), within = thisObject)])),
+          allOf(
+            nominal(
+              pre = [artifact],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           less(1)))],
     power = 3,
     toughness = 2})

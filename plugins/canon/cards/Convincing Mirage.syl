@@ -4,6 +4,6 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isLand),
+      enchant(hasType(land)),
       static(entersChoosingFrom(thisAura, subtype(land), basicTypesOnly)),
       static(qualityChange(enchanted(land), sets, chosenQuality(ofChosen(subtype(land)))))]})

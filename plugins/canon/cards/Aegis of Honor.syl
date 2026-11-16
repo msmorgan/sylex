@@ -7,7 +7,7 @@ card singleFaced({
         mana([generic(1)]),
         establishThroughout(
           replace(
-            would(actor(a(isInstantOrSorcery)), dealDamage(recipient = you)),
+            would(actor(a(or([instant, sorcery]))), dealDamage(recipient = you)),
             instead(redirectDamage(allDamage, controllerOf(it))),
             use = nextTimeOnly),
           thisTurn))]})

@@ -1,0 +1,5 @@
+# "<p> and/or <q>": union of domains.
+template andOr(disjuncts: List(Nominal)): Nominal {
+  spelling = "$disjuncts#<and/or>",
+  body = or($disjuncts)
+}

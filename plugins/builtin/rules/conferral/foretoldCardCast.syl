@@ -5,7 +5,7 @@
 # foretold gives it [CR#702.143d]; "you" on a card in exile is its owner [CR#109.5].
 conferral foretoldCardCast {
   body = {
-    scope = and([isCard, hasDesignation(foretold), in(exileZone)]),
+    scope = nominal(pre = [foretold], card, post = [in(exileZone)]),
     confer = ability(
       static(
         onlyUnless(

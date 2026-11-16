@@ -13,12 +13,12 @@ card singleFaced({
           does(actor(thisVehicle), attack),
           sequentially([
               faceAVillainousChoice(
-                instruct(defendingPlayer, sacrifice(a(isCreature))),
+                instruct(defendingPlayer, sacrifice(a(creature))),
                 gainControl(
-                  target(and([isCreature, controlledBy(defendingPlayer)])),
+                  target(nominal(creature, post = [controlledBy(defendingPlayer)])),
                   duration = untilEndOfTurn)),
               doIf(
-                did(actor(you), gainControlOf(a(isCreature)), thisWay),
+                did(actor(you), gainControlOf(a(creature)), thisWay),
                 sequentially([tap(it), becomeAttacking(it, defendingPlayer)]))]))),
       crew(2)],
     power = 3,

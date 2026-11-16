@@ -4,4 +4,7 @@ card singleFaced({
     types = [artifact],
     text = [
       static(entersChoosing(thisArtifact, subtype(creature))),
-      static(costShift(allOf(and([isCreature, isSpell, ofChosen(subtype(creature))])), less(2)))]})
+      static(
+        costShift(
+          allOf(nominal(pre = [creature], spell, post = [ofChosen(subtype(creature))])),
+          less(2)))]})

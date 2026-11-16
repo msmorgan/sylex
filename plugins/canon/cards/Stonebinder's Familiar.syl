@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       whenever(
         timed(
-          does(any, putInto(counted(orMore(1), isCard), exileZone)),
+          does(any, putInto(counted(orMore(1), card), exileZone)),
           duringPart(whose = you, turn)),
         putCounters(1, printedKind(p1p1Counter), thisCreature),
         limit = oncePerTurn)],

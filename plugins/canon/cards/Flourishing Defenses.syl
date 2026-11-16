@@ -4,5 +4,5 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(any, putCounters(1, printedKind(m1m1Counter), a(isCreature))),
+        does(any, putCounters(1, printedKind(m1m1Counter), a(creature))),
         may(create(1, written(creatureToken(1, 1, [green], [elf, warrior])))))]})

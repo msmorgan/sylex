@@ -211,6 +211,14 @@ pub enum RefusalKind {
     InvalidLexicalVerb,
     #[error("inline verb `{lemma}` in `lexical` duplicates shared `verb {verb}`")]
     DuplicateSharedVerb { lemma: String, verb: String },
+    #[error("`nominal` with neither `pre` nor `post` adds no modifier; write the head")]
+    RedundantNominal,
+    #[error("`nominal` directly inside `nominal`; combine their `pre` and `post` lists on one `nominal`")]
+    NestedNominal,
+    #[error("`stacked` stands only as an arm of a `PreModifier` coordination")]
+    UnplacedStacked,
+    #[error("an Agreement postmodifier requires an enclosing plural group determiner")]
+    AgreementWithoutGroup,
     #[error("dependency cycle: {}", .0.join(" -> "))]
     Cycle(Vec<String>),
 }

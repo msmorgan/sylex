@@ -1,5 +1,5 @@
 # "a … of their choice", the chooser being the last-mentioned player.
-template aTheirChoice(p: Predicate): NounPhrase {
+template aTheirChoice(p: Nominal): NounPhrase {
   spelling = "a $p of their choice",
   body = described(a(theirChoice), $p)
 }

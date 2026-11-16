@@ -8,8 +8,7 @@ card singleFaced({
           this,
           mandatory,
           plusAdditional(
-            perform(tap(counted(anyNumber, and([isCreature, youControl, isUntapped]))))))),
+            perform(
+              tap(counted(anyNumber, nominal(pre = [untapped], creature, post = [youControl]))))))),
       spell(
-        instruct(
-          this,
-          dealDamage(amount = times(3, groupSize), recipient = target(isAnyTarget))))]})
+        instruct(this, dealDamage(amount = times(3, groupSize), recipient = target(anyTarget))))]})

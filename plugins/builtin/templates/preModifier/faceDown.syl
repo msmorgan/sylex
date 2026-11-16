@@ -1,0 +1,4 @@
+template faceDown: PreModifier {
+  spelling = "face-down",
+  body = hasStatus(faceDown)
+}

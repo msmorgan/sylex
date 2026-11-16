@@ -1,1 +1,1 @@
-primitive addsTarget(subject: NounPhrase, description: Predicate): StaticSpec = AddsTarget
+primitive addsTarget(subject: NounPhrase, description: Nominal): StaticSpec = AddsTarget

@@ -5,5 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            copyOnStack(target(and([isInstantOrSorcery, isSpell])), exceptions = [isColor(red)]),
+            copyOnStack(
+              target(nominal(pre = [or([instant, sorcery])], spell)),
+              exceptions = [isColor(red)]),
             may(chooseNewTargets(that(copy)))]))]})

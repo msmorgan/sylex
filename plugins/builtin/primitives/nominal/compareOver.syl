@@ -1,0 +1,5 @@
+primitive compareOver(
+  domain: Nominal,
+  measure: Amount,
+  comparator: Comparator,
+  bound: Amount): Nominal = CompareOver

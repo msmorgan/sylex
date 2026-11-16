@@ -4,6 +4,6 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         replace(would(by(enchanted(creature)), dealDamage), instead(preventDamage(allDamage))))]})

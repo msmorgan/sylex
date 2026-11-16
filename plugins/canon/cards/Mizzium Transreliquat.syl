@@ -5,8 +5,7 @@ card singleFaced({
     text = [
       activated(
         mana([generic(3)]),
-        establishThroughout(copyChange(thisArtifact, target(isArtifact)), untilEndOfTurn)),
+        establishThroughout(copyChange(thisArtifact, target(artifact)), untilEndOfTurn)),
       activated(
         mana([generic(1), pip(blue), pip(red)]),
-        establish(
-          copyChange(thisArtifact, target(isArtifact), exceptions = [exceptThisAbility])))]})
+        establish(copyChange(thisArtifact, target(artifact), exceptions = [exceptThisAbility])))]})

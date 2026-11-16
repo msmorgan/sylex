@@ -7,8 +7,8 @@ card singleFaced({
       static(
         qualityChange(
           and([
-              allOf(and([isCreature, youControl])),
-              allOf(and([isCreature, isSpell, youControl])),
-              allOf(and([isCard, isCreature, youOwn, not(in(battlefield))]))]),
+              allOf(nominal(creature, post = [youControl])),
+              allOf(nominal(pre = [creature], spell, post = [youControl])),
+              allOf(nominal(pre = [creature], card, post = [youOwn, not(in(battlefield))]))]),
           adds,
           chosenQuality(ofChosen(subtype(creature)))))]})

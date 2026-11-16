@@ -4,5 +4,5 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isPermanent),
+      enchant(in(battlefield)),
       at(beginningOfYour(firstMain), addMana(matchingManaCostOf(enchanted(permanent))))]})

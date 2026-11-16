@@ -12,7 +12,7 @@ ability flashback(cost: Cost) {
         cast(
           this,
           from = yourGraveyard,
-          resulting = isInstantOrSorcery,
+          resulting = or([hasType(instant), hasType(sorcery)]),
           altCost = payingInstead($cost)))),
     static(
       replace(

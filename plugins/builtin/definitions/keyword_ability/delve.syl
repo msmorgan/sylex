@@ -5,5 +5,8 @@ ability delve {
   lexical = {lemma = "delve"},
   spelling = "delve",
   body = [
-    static(paySubstitute(thisSpell, {action = exile(a(cardIn(yourGraveyard))), pays = [generic]}))]
+    static(
+      paySubstitute(
+        thisSpell,
+        {action = exile(a(nominal(card, post = [in(yourGraveyard)]))), pays = [generic]}))]
 }

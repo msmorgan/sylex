@@ -1,0 +1,3 @@
+primitive hasCounter(kind: Option(CounterKind) = none): PostModifier = HasCounters {
+  spelling = "with a< $kind> counter on it"
+}

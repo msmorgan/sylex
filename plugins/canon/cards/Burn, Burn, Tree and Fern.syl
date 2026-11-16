@@ -8,6 +8,8 @@ card singleFaced({
         chapterMark([1]),
         instruct(
           this,
-          dealDamage(amount = 6, recipient = target(and([isCreature, anOpponentControls]))))),
-      when(chapterMark([2]), destroy(target(and([isArtifact, anOpponentControls])))),
+          dealDamage(
+            amount = 6,
+            recipient = target(nominal(creature, post = [anOpponentControls]))))),
+      when(chapterMark([2]), destroy(target(nominal(artifact, post = [anOpponentControls])))),
       when(chapterMark([3, 4]), addMana(symbols([pip(red)])))]})

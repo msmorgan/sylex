@@ -3,6 +3,6 @@
 # (`infect`) [CR#702.90b].
 conferral playerDamageLifeLoss {
   body = {
-    scope = isPlayer,
+    scope = player,
     confer = property(asEvent(does(any, dealDamage(recipient = you)), loseLife(thatMuch)))}
 }

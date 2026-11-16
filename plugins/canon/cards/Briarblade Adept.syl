@@ -7,7 +7,7 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), attack),
         get(
-          target(and([isCreature, opponentsControl])),
+          target(nominal(creature, post = [opponentsControl])),
           down(1),
           down(1),
           duration = untilEndOfTurn)),

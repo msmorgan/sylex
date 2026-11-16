@@ -4,6 +4,8 @@ action behold(quality: Predicate) {
   lexical = {verbs = [{lemma = "behold", past = "beheld", frames = [Monotransitive]}]},
   spelling = "behold $quality",
   body = chooseOne(
-    expose(reveal, cards(a(and([isCard, $quality, in(handOf($actor))])))),
-    choose(a(and([$quality, isPermanent, actorControls]))))
+    expose(
+      reveal,
+      cards(a(nominal(pre = [hasQuality($quality)], card, post = [in(handOf($actor))])))),
+    choose(a(nominal(pre = [hasQuality($quality)], permanent, post = [actorControls]))))
 }

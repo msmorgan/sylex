@@ -7,7 +7,7 @@ card singleFaced({
       static(entersChoosingFrom(thisCreature, subtype(land), basicTypesOnly)),
       static(
         qualityChange(
-          allOf(and([isLand, youControl])),
+          allOf(nominal(land, post = [youControl])),
           adds,
           chosenQuality(ofChosen(subtype(land)))))],
     power = 1,

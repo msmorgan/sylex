@@ -8,7 +8,7 @@ card singleFaced({
             choose(a(quality(cardName))),
             establishThroughout(
               conjunction([
-                  cant(any, cast(bare(and([isSpell, named(chosenName)])))),
-                  cant(any, play(allOf(and([isLand, named(chosenName)]))))]),
+                  cant(any, cast(bare(nominal(spell, post = [named(chosenName)])))),
+                  cant(any, play(allOf(nominal(land, post = [named(chosenName)]))))]),
               untilYourNextTurn)])),
       spell(draw(1))]})

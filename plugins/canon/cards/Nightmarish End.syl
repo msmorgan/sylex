@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            get(target(isCreature), down(letter(x)), down(letter(x)), duration = untilEndOfTurn),
-            define(x, countOf(cardIn(yourHand)))]))]})
+            get(target(creature), down(letter(x)), down(letter(x)), duration = untilEndOfTurn),
+            define(x, countOf(nominal(card, post = [in(yourHand)])))]))]})

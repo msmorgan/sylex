@@ -8,10 +8,10 @@ card singleFaced({
       static(
         replace(
           would(actor(thisCreature), enter),
-          alongside(may(exchangeTextBoxes(thisCreature, a(and([isCreature, isOther]))))))),
+          alongside(may(exchangeTextBoxes(thisCreature, a(nominal(pre = [other], creature))))))),
       at(beginningOfYour(upkeep), loseLife(3)),
       activated(
         compound([mana([generic(3)]), perform(sacrifice(thisCreature))]),
-        instruct(each(isOtherPlayer), draw(1)))],
+        instruct(each(nominal(pre = [other], player)), draw(1)))],
     power = 5,
     toughness = 3})

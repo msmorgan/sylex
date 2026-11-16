@@ -6,11 +6,11 @@ action learn {
   lexical = {verbs = [{lemma = "learn", frames = [Intransitive]}]},
   spelling = "learn",
   body = sequentially([
-      may(discard(a(isCard)), ifDid = draw(1)),
+      may(discard(a(card)), ifDid = draw(1)),
       doIf(
-        not(exists(and([isCard, was(discard(which), within = thisWay)]))),
+        not(exists(nominal(card, post = [was(discard(which), within = thisWay)]))),
         may(
           sequentially([
-              reveal(a(and([isCard, hasSubtype(lesson), ownedBy($actor), outsideTheGame]))),
+              reveal(a(nominal(pre = [lesson], card, post = [ownedBy($actor), outsideTheGame]))),
               putInto(it, handOf($actor))])))])
 }

@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(2), pip(blue)],
     types = [creature],
     subtypes = [illusion],
-    text = [flying, static(visibility(reveal, bare(isPlayer), wholeHand))],
+    text = [flying, static(visibility(reveal, bare(player), wholeHand))],
     power = 1,
     toughness = 3})

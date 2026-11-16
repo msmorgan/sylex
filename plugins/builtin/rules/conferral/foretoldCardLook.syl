@@ -3,6 +3,6 @@
 # foretold. Its cast right is `foretoldCardCast`.
 conferral foretoldCardLook {
   body = {
-    scope = and([isCard, hasDesignation(foretold), in(exileZone)]),
+    scope = nominal(pre = [foretold], card, post = [in(exileZone)]),
     confer = ability(static(visibility(lookAt, you, objects(this))))}
 }

@@ -8,18 +8,20 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([
-                isSpell,
+            nominal(
+              spell,
+              post = [
                 did(actor(yourOpponents), cast(which), within = thisObject),
-                targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
+                targeting(a(nominal(merfolk, post = [youControl])), someTarget)])),
           more(2))),
       static(
         costShift(
           allOf(
-            and([
-                abilityHead(anyActivated),
+            nominal(
+              abilityHead(anyActivated),
+              post = [
                 did(actor(yourOpponents), activate(which), within = thisObject),
-                targeting(a(and([isCreature, hasSubtype(merfolk), youControl])), someTarget)])),
+                targeting(a(nominal(merfolk, post = [youControl])), someTarget)])),
           more(2)))],
     power = 2,
     toughness = 2})

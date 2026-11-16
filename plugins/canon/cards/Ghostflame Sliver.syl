@@ -3,6 +3,6 @@ card singleFaced({
     cost = [pip(black), pip(red)],
     types = [creature],
     subtypes = [sliver],
-    text = [static(qualityChange(allOf(hasSubtype(sliver)), sets, colored(colors([]))))],
+    text = [static(qualityChange(allOf(sliver), sets, colored(colors([]))))],
     power = 2,
     toughness = 2})

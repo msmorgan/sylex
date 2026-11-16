@@ -2,4 +2,6 @@ card singleFaced({
     name = "Reflecting Pool",
     types = [land],
     text = [
-      activated(tapSymbol, addMana(counted(1, ofTypeProducibleBy(a(and([isLand, youControl]))))))]})
+      activated(
+        tapSymbol,
+        addMana(counted(1, ofTypeProducibleBy(a(nominal(land, post = [youControl]))))))]})

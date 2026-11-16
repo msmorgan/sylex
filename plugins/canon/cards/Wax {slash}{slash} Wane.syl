@@ -2,9 +2,9 @@ card split({
     name = "Wax",
     cost = [pip(green)],
     types = [instant],
-    text = [spell(get(target(isCreature), up(2), up(2), duration = untilEndOfTurn))]},
+    text = [spell(get(target(creature), up(2), up(2), duration = untilEndOfTurn))]},
   {
     name = "Wane",
     cost = [pip(white)],
     types = [instant],
-    text = [spell(destroy(target(isEnchantment)))]})
+    text = [spell(destroy(target(enchantment)))]})

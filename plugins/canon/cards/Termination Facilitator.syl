@@ -6,17 +6,16 @@ card singleFaced({
     text = [
       activatedOnlyDuring(
         tapSymbol,
-        putCounters(1, printedKind(bountyCounter), target(or([isCreature, isPlaneswalker]))),
+        putCounters(1, printedKind(bountyCounter), target(or([creature, planeswalker]))),
         asSorcery),
       whenever(
         does(
           any,
           dealDamage(
             recipient = a(
-              and([
-                  or([isCreature, isPlaneswalker]),
-                  anOpponentControls,
-                  hasCounter(kind = bountyCounter)])))),
+              nominal(
+                or([creature, planeswalker]),
+                post = [anOpponentControls, hasCounter(kind = bountyCounter)])))),
         destroy(it))],
     power = 1,
     toughness = 3})

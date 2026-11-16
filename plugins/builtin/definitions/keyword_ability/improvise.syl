@@ -8,5 +8,7 @@ ability improvise {
     static(
       paySubstitute(
         thisSpell,
-        {action = tap(a(and([isUntapped, isArtifact, youControl]))), pays = [generic]}))]
+        {
+          action = tap(a(nominal(pre = [untapped], artifact, post = [youControl]))),
+          pays = [generic]}))]
 }

@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       spell(
         establishThroughout(
-          can(actor(you), cast(bare(isSpell)), asThough = asThoughHadFlash(them)),
+          can(actor(you), cast(bare(spell)), asThough = asThoughHadFlash(them)),
           thisTurn)),
       spell(draw(1))]})

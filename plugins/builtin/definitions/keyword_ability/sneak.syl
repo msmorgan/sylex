@@ -12,8 +12,10 @@ ability sneak(cost: Cost) {
         cast(
           thisSpell,
           altCost = payingInstead(
-            compound(
-              [$cost, perform(returnToHand(a(and([isCreature, isUnblocked, youControl]))))]))),
+            compound([
+                $cost,
+                perform(
+                  returnToHand(a(nominal(pre = [unblocked], creature, post = [youControl]))))]))),
         timing = and([asInstant, duringPart(whose = you, declareBlockers)]))),
     static(
       replace(
@@ -25,9 +27,11 @@ ability sneak(cost: Cost) {
               entersAs(tapped),
               entersAttacking(
                 the(
-                  and([
-                      or([isPlayer, isPlaneswalker, isBattle]),
+                  nominal(
+                    or([player, planeswalker, battle]),
+                    post = [
                       inCombat(
                         attackedBy,
-                        counterpart = the(and([was(returnToHand(which)), isCreature])))])))]))))]
+                        counterpart = the(
+                          nominal(pre = [was(returnToHand(which))], creature)))])))]))))]
 }

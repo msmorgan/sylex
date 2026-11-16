@@ -8,21 +8,22 @@ ability cipher {
   body = [
     spell(
       doIf(
-        is(this, isCard),
+        is(this, noun(a(card))),
         may(
-          sequentially(
-            [exile(thisSpell), relate(this, encodedOn, a(and([isCreature, youControl])))])))),
+          sequentially([
+              exile(thisSpell),
+              relate(this, encodedOn, a(nominal(creature, post = [youControl])))])))),
     static(
       abilityGrant(
         counterpart(encodedOn, this),
         [
           whenever(
-            does(actor(thisCreature), dealDamage(kind = combat, recipient = a(isPlayer))),
+            does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
             may(
               sequentially([
                   copy(
                     fromCardZone,
-                    the(and([isCard, related(encodedOn, counterpart = thisCreature)])),
+                    the(nominal(card, post = [related(encodedOn, counterpart = thisCreature)])),
                     1,
                     []),
                   may(cast(that(copy), altCost = withoutPaying))])))]))]

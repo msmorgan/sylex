@@ -5,8 +5,6 @@ card singleFaced({
       activated(
         compound([tapSymbol, perform(payLife(amount = 1)), perform(sacrifice(thisLand))]),
         sequentially([
-            search(
-              yourLibrary,
-              for = a(and([isCard, or([hasSubtype(plains), hasSubtype(island)])]))),
+            search(yourLibrary, for = a(nominal(pre = [or([plains, island])], card))),
             putOntoBattlefield(it),
             shuffle]))]})

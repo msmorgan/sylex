@@ -7,15 +7,17 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and(
-              [isSpell, hasSubtype(equipment), did(actor(you), cast(which), within = thisObject)])),
+            nominal(
+              pre = [equipment],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           less(1))),
       static(
         costShift(
           allOf(
-            and([
-                abilityHead(keyword(equip)),
-                did(actor(you), activate(which), within = thisObject)])),
+            nominal(
+              abilityHead(keyword(equip)),
+              post = [did(actor(you), activate(which), within = thisObject)])),
           less(1)))],
     power = 2,
     toughness = 2})

@@ -7,4 +7,4 @@ card singleFaced({
       spell(
         instruct(
           this,
-          dealDamage(amount = letter(x), recipient = eachOf(targets(upTo(2), isAnyTarget)))))]})
+          dealDamage(amount = letter(x), recipient = eachOf(targets(upTo(2), anyTarget)))))]})

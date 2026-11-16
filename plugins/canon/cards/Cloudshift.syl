@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            exile(target(and([isCreature, youControl]))),
+            exile(target(nominal(creature, post = [youControl]))),
             returnToBattlefield(that(card), riders = [underControlOf(you)])]))]})

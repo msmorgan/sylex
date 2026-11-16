@@ -2,9 +2,9 @@ card split({
     name = "Wear",
     cost = [generic(1), pip(red)],
     types = [instant],
-    text = [spell(destroy(target(isArtifact))), fuse]},
+    text = [spell(destroy(target(artifact))), fuse]},
   {
     name = "Tear",
     cost = [pip(white)],
     types = [instant],
-    text = [spell(destroy(target(isEnchantment))), fuse]})
+    text = [spell(destroy(target(enchantment))), fuse]})

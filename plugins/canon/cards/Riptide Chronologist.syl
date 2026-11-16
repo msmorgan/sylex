@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       activated(
         compound([mana([pip(blue)]), perform(sacrifice(thisCreature))]),
-        untap(allOf(and([isCreature, ofYourChoice(subtype(creature))]))))],
+        untap(allOf(nominal(creature, post = [ofYourChoice(subtype(creature))]))))],
     power = 1,
     toughness = 3})

@@ -1,0 +1,4 @@
+template plotted: PreModifier {
+  spelling = "plotted",
+  body = hasDesignation(plotted)
+}

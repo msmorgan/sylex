@@ -7,10 +7,10 @@ card singleFaced({
       reach,
       when(
         does(actor(thisCreature), enter),
-        instruct(it, dealDamage(amount = 2, recipient = target(isAnyTarget)))),
+        instruct(it, dealDamage(amount = 2, recipient = target(anyTarget)))),
       channel(
         activated(
           compound([mana([generic(1), pip(red)]), perform(discard(this))]),
-          instruct(it, dealDamage(amount = 2, recipient = target(isAnyTarget)))))],
+          instruct(it, dealDamage(amount = 2, recipient = target(anyTarget)))))],
     power = 2,
     toughness = 3})

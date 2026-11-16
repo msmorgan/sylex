@@ -6,6 +6,6 @@ card singleFaced({
       static(
         replace(
           would(
-            actor(a(and([isSpell, hasColor(red)]))),
-            dealDamage(recipient = a(or([isPermanent, isPlayer])))),
+            actor(a(nominal(pre = [red], spell))),
+            dealDamage(recipient = a(or([permanent, player])))),
           instead(instruct(it, dealDamage(amount = plus(thatMuch, 1), recipient = thatJoin)))))]})

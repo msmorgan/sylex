@@ -7,8 +7,11 @@ card singleFaced({
     text = [
       activated(
         loyaltySymbol(up(1)),
-        sequentially(
-          [scry(1), may(tap(a(and([isArtifact, isUntapped, youControl]))), ifDid = draw(1))])),
+        sequentially([
+            scry(1),
+            may(
+              tap(a(nominal(pre = [untapped], artifact, post = [youControl]))),
+              ifDid = draw(1))])),
       activated(
         loyaltySymbol(down(2)),
         sequentially([
@@ -25,10 +28,17 @@ card singleFaced({
       activated(
         loyaltySymbol(down(4)),
         getEmblem([
-            static(getsPt(allOf(and([isArtifact, isCreature, youControl])), up(1), up(1))),
+            static(
+              getsPt(
+                allOf(nominal(pre = [artifact], creature, post = [youControl])),
+                up(1),
+                up(1))),
             static(
               costShift(
                 allOf(
-                  and([isArtifact, isSpell, did(actor(you), cast(which), within = thisObject)])),
+                  nominal(
+                    pre = [artifact],
+                    spell,
+                    post = [did(actor(you), cast(which), within = thisObject)])),
                 less(1)))]))],
     loyalty = 3})

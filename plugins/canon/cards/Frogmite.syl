@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(4)],
     types = [artifact, creature],
     subtypes = [frog],
-    text = [affinity(isArtifact)],
+    text = [affinity(hasType(artifact))],
     power = 2,
     toughness = 2})

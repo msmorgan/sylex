@@ -1,0 +1,1 @@
+primitive legalAttachment(side: AttachmentSide, counterpart: NounPhrase): Nominal = LegalAttachment

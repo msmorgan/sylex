@@ -11,11 +11,10 @@ card prototype({
         sequentially([
             exile(
               target(
-                and([
-                    isInstantOrSorcery,
-                    isCard,
-                    hasManaValue(atMost, powerOf(thisCreature)),
-                    in(yourGraveyard)]))),
+                nominal(
+                  pre = [or([instant, sorcery])],
+                  card,
+                  post = [hasManaValue(atMost, powerOf(thisCreature)), in(yourGraveyard)]))),
             copy(fromCardZone, that(card), 1, []),
             may(cast(that(copy), altCost = withoutPaying))]))],
     power = 4,

@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            gainControl(target(or([isArtifact, isCreature])), duration = untilEndOfTurn),
+            gainControl(target(or([artifact, creature])), duration = untilEndOfTurn),
             untap(it),
             gain(it, [haste], duration = untilEndOfTurn)]))]})

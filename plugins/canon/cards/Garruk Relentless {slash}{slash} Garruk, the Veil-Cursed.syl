@@ -11,7 +11,7 @@ card transforming({
       activated(
         loyaltySymbol(up(0)),
         sequentially([
-            instruct(thisPlaneswalker, dealDamage(amount = 3, recipient = target(isCreature))),
+            instruct(thisPlaneswalker, dealDamage(amount = 3, recipient = target(creature))),
             dealDamageOwnPower(that(creature), thisPlaneswalker)])),
       activated(loyaltySymbol(up(0)), create(1, written(creatureToken(2, 2, [green], [wolf]))))],
     loyalty = 3},
@@ -36,14 +36,17 @@ card transforming({
       activated(
         loyaltySymbol(down(1)),
         doIfDone(
-          sacrifice(a(isCreature)),
-          ifDid = sequentially(
-            [search(yourLibrary, for = a(isCreature)), reveal(it), putInto(it, hand), shuffle]))),
+          sacrifice(a(creature)),
+          ifDid = sequentially([
+              search(yourLibrary, for = a(nominal(pre = [creature], card))),
+              reveal(it),
+              putInto(it, hand),
+              shuffle]))),
       activated(
         loyaltySymbol(down(3)),
         sequentially([
             establishFor(
-              allOf(and([isCreature, youControl])),
+              allOf(nominal(creature, post = [youControl])),
               [abilityGrant(them, [trample]), getsPt(them, up(letter(x)), up(letter(x)))],
               duration = untilEndOfTurn),
-            define(x, countOf(and([isCreature, in(yourGraveyard)])))]))]})
+            define(x, countOf(nominal(pre = [creature], card, post = [in(yourGraveyard)])))]))]})

@@ -2,4 +2,4 @@ card singleFaced({
     name = "Churning Eddy",
     cost = [generic(3), pip(blue)],
     types = [sorcery],
-    text = [spell(returnToHand(and([target(isCreature), target(isLand)])))]})
+    text = [spell(returnToHand(and([target(creature), target(land)])))]})

@@ -4,6 +4,6 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isLand),
+      enchant(hasType(land)),
       when(does(actor(thisAura), enter), draw(1)),
       static(qualityChange(enchanted(land), adds, everyTypeOf(basicLand)))]})

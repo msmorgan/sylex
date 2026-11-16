@@ -11,7 +11,12 @@ ability paradigm {
       doIf(
         not(
           was(
-            resolve(a(and([isSpell, isOther, youControl, shares(cardName, share, thisSpell)]))),
+            resolve(
+              a(
+                nominal(
+                  pre = [other],
+                  spell,
+                  post = [youControl, shares(cardName, share, thisSpell)]))),
             within(thisGame))),
         delayWithin(
           reached(beginningOfYour(firstMain)),

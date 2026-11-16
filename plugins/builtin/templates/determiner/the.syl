@@ -1,5 +1,5 @@
 # "the …"
-template the(p: Predicate): NounPhrase {
+template the(p: Nominal): NounPhrase {
   spelling = "the $p",
   body = described(the, $p)
 }

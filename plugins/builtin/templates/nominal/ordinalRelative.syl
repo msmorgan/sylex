@@ -1,0 +1,17 @@
+# "<ordinal> <head> <subj> <action> [each <per>]" (*Highspire Bell-Ringer*).
+template ordinalRelative(
+  ordinal: Ordinal,
+  head: Nominal,
+  subj: Subject,
+  action: VerbPhrase,
+  per: Option(Period) = none): Nominal {
+  spelling = "$ordinal $head $subj $action< each $per>",
+  body = nominal(
+    $head,
+    post = [
+      predicateDid({
+          subj = $subj,
+          action = $action,
+          within = thisObject,
+          ordinal = {ordinal = $ordinal, per = $per}})])
+}

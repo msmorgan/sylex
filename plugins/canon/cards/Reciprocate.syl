@@ -6,8 +6,9 @@ card singleFaced({
       spell(
         exile(
           target(
-            and([
-                isCreature,
+            nominal(
+              creature,
+              post = [
                 did(
                   actor(which),
                   dealDamage(recipient = you),

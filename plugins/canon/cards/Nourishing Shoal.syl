@@ -8,6 +8,11 @@ card singleFaced({
         altCost(
           payingInstead(
             perform(
-              exile(a(and([hasColor(green), hasManaValue(equal, letter(x)), in(yourHand)]))))),
+              exile(
+                a(
+                  nominal(
+                    pre = [green],
+                    card,
+                    post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
           this)),
       spell(gainLife(letter(x)))]})

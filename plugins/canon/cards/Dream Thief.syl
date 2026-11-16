@@ -9,9 +9,6 @@ card singleFaced({
         does(actor(thisCreature), enter),
         doOnlyIf(
           draw(1),
-          did(
-            actor(you),
-            cast(a(and([isSpell, hasColor(blue), isOther]))),
-            within(soFarThisTurn))))],
+          did(actor(you), cast(a(nominal(pre = [other, blue], spell))), within(soFarThisTurn))))],
     power = 2,
     toughness = 1})

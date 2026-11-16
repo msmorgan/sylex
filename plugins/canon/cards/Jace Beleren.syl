@@ -9,6 +9,6 @@ card singleFaced({
     subtypes = [jace],
     text = [
       activated(loyaltySymbol(up(2)), instruct(eachPlayer, draw(1))),
-      activated(loyaltySymbol(down(1)), instruct(target(isPlayer), draw(1))),
-      activated(loyaltySymbol(down(10)), instruct(target(isPlayer), mill(20)))],
+      activated(loyaltySymbol(down(1)), instruct(target(player), draw(1))),
+      activated(loyaltySymbol(down(10)), instruct(target(player), mill(20)))],
     loyalty = 3})

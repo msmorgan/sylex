@@ -5,10 +5,10 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            establishThroughout(abilityLoss(allOf(isCreature), [written(trample)]), untilEndOfTurn),
+            establishThroughout(abilityLoss(allOf(creature), [written(trample)]), untilEndOfTurn),
             establishThroughout(
               replace(
-                would(actor(a(isCreature)), dealDamage(kind = combat, recipient = a(isCreature))),
+                would(actor(a(creature)), dealDamage(kind = combat, recipient = a(creature))),
                 instead(
                   instruct(
                     it,

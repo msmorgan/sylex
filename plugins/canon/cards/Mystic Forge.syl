@@ -6,6 +6,6 @@ card singleFaced({
       static(visibility(lookAt, you, topOfLibrary)),
       static(
         conjunction([
-            can(actor(you), cast(bare(and([isSpell, isArtifact])), from = onTop)),
-            can(actor(you), cast(bare(and([isSpell, isColorless])), from = onTop))])),
+            can(actor(you), cast(bare(nominal(pre = [artifact], spell)), from = onTop)),
+            can(actor(you), cast(bare(nominal(pre = [colorless], spell)), from = onTop))])),
       activated(compound([tapSymbol, perform(payLife(amount = 1))]), exile(topSlice(1)))]})

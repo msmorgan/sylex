@@ -1,0 +1,5 @@
+# "mana ability"
+template manaAbility: Nominal {
+  spelling = "mana ability",
+  body = abilityHead(mana)
+}

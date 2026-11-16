@@ -1,5 +1,5 @@
 # "that <word>", e.g. `that(player)`.
-template that(w: NounWord): NounPhrase {
+template that(w: Nominal): NounPhrase {
   spelling = "that $w",
   body = pro(word($w), one)
 }

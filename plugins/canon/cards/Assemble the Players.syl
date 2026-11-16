@@ -7,5 +7,7 @@ card singleFaced({
       static(
         can(
           actor(you),
-          cast(counted(exactly(1), and([isSpell, isCreature, hasPower(atMost, 2)])), from = onTop),
+          cast(
+            counted(exactly(1), nominal(pre = [creature], spell, post = [hasPower(atMost, 2)])),
+            from = onTop),
           timing = eachTurn))]})

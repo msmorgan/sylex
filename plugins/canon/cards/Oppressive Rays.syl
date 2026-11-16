@@ -4,12 +4,12 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         conjunction([
             gatedBy(actor(enchanted(creature)), attack, mana([generic(3)])),
             gatedBy(actor(enchanted(creature)), block, mana([generic(3)]))])),
       static(
         costShift(
-          allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])),
+          allOf(nominal(abilityHead(anyActivated), post = [ofSource(enchanted(creature))])),
           more(3)))]})

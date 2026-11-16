@@ -4,13 +4,9 @@ card singleFaced({
     types = [creature],
     subtypes = [kor, artificer, ally],
     text = [
-      static(
-        getsPt(
-          allOf(and([and([isCreature, youControl]), isAttached(word = equipped)])),
-          up(1),
-          up(1))),
+      static(getsPt(allOf(nominal(pre = [equipped], creature, post = [youControl])), up(1), up(1))),
       whenever(
-        does(actor(a(and([and([isCreature, youControl]), isAttached(word = equipped)]))), die),
+        does(actor(a(nominal(pre = [equipped], creature, post = [youControl]))), die),
         draw(1))],
     power = 2,
     toughness = 2})

@@ -4,7 +4,10 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(a(isPlayer)), cast(a(isSpell))),
+        does(actor(a(player)), cast(a(spell))),
         sequentially([
             instruct(they, gainLife(letter(x))),
-            define(x, countOf(and([in(graveyard), shares(cardName, share, that(spell))])))]))]})
+            define(
+              x,
+              countOf(
+                nominal(card, post = [in(graveyard), shares(cardName, share, that(spell))])))]))]})

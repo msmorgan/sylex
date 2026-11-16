@@ -4,5 +4,7 @@ card singleFaced({
     types = [instant],
     text = [
       static(
-        altCost(payingInstead(perform(discard(a(and([hasSubtype(plains), in(yourHand)]))))), this)),
-      spell(destroy(target(or([isArtifact, isEnchantment]))))]})
+        altCost(
+          payingInstead(perform(discard(a(nominal(pre = [plains], card, post = [in(yourHand)]))))),
+          this)),
+      spell(destroy(target(or([artifact, enchantment]))))]})

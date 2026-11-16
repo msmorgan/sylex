@@ -1,0 +1,2 @@
+# Rule-only bridge from a `Predicate` quality into `Nominal` (e.g. `enchant` subject).
+primitive matching(predicate: Predicate): Nominal = Matching

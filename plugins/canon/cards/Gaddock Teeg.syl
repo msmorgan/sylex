@@ -5,7 +5,13 @@ card singleFaced({
     types = [creature],
     subtypes = [kithkin, advisor],
     text = [
-      static(cant(any, cast(bare(and([isSpell, non(isCreature), hasManaValue(atLeast, 4)]))))),
-      static(cant(any, cast(bare(and([isSpell, non(isCreature), manaCostHas(variable)])))))],
+      static(
+        cant(
+          any,
+          cast(bare(nominal(pre = [non(creature)], spell, post = [hasManaValue(atLeast, 4)]))))),
+      static(
+        cant(
+          any,
+          cast(bare(nominal(pre = [non(creature)], spell, post = [manaCostHas(variable)])))))],
     power = 2,
     toughness = 2})

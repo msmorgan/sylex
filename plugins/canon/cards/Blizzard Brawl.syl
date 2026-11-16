@@ -13,12 +13,15 @@ card singleFaced({
         sequentially([
             choose(
               and([
-                  target(and([isCreature, youControl])),
-                  target(and([isCreature, youDontControl]))])),
+                  target(nominal(creature, post = [youControl])),
+                  target(nominal(creature, post = [youDontControl]))])),
             doIf(
-              compareAmt(countOf(and([hasSupertype(snow), isPermanent, youControl])), atLeast, 3),
+              compareAmt(
+                countOf(nominal(pre = [snow], permanent, post = [youControl])),
+                atLeast,
+                3),
               establishFor(
-                the(and([isCreature, youControl])),
+                the(nominal(creature, post = [youControl])),
                 [getsPt(it, up(1), up(0)), abilityGrant(it, [indestructible])],
                 duration = untilEndOfTurn)),
             fightEachOther(those(creature))]))]})

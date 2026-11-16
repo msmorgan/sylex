@@ -1,6 +1,6 @@
 # "<performer> connives [N]" (`Definition`, [CR#701.50a,701.50d]): loops over
 # `"each nonland card discarded this way"`
-# (`allOf(and([non(isLand), isCard, was(discard(which), within = thisWay)]))`).
+# (`allOf(nominal(pre = [non(land)], card, post = [was(discard(which), within = thisWay)]))`).
 action connive(amount: Amount = 1) {
   lexical = {verbs = [{lemma = "connive", frames = [Intransitive, Amount]}]},
   permanent = performs,
@@ -9,8 +9,8 @@ action connive(amount: Amount = 1) {
     controllerOf($actor),
     sequentially([
         draw($amount),
-        discard(counted(exactlyOf($amount), isCard)),
+        discard(counted(exactlyOf($amount), card)),
         doForEach(
-          allOf(and([non(isLand), isCard, was(discard(which), within = thisWay)])),
+          allOf(nominal(pre = [non(land)], card, post = [was(discard(which), within = thisWay)])),
           putCounters(1, printedKind(p1p1Counter), $actor))]))
 }

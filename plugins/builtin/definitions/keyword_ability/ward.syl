@@ -5,7 +5,9 @@ ability ward(cost: Cost) {
   spelling = "ward $cost",
   body = [
     whenever(
-      does(by(a(and([in(stack), opponentsControl]))), target(thisPermanent)),
+      does(
+        by(a(nominal(or([spell, abilityHead(anyOnStack)]), post = [opponentsControl]))),
+        target(thisPermanent)),
       instruct(
         controllerOf(that(stackObject)),
         may(pay(payment($cost), once), ifNot = instruct(you, counter(that(stackObject))))))]

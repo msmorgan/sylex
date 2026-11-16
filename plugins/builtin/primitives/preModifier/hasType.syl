@@ -1,0 +1,4 @@
+# Bare card-type test, with no zone implied.
+primitive hasType(type: CardType): PreModifier = HasType {
+  spelling = "$type"
+}

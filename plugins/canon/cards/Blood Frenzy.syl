@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         sequentially([
             get(
-              target(and([isCreature, or([isAttacking, isBlocking])])),
+              target(nominal(pre = [or([attacking, blocking])], creature)),
               up(4),
               up(0),
               duration = untilEndOfTurn),

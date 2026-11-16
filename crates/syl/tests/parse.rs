@@ -203,8 +203,8 @@ fn shape_does_not_depend_on_kind_word() {
 #[test]
 fn a_header_may_omit_its_name() {
     check(
-        "coercion(type: CardType): NounWord { body = type($type) }",
-        "coercion(type: CardType): NounWord {body = type($type)}",
+        "coercion(type: CardType): Nominal { body = type($type) }",
+        "coercion(type: CardType): Nominal {body = type($type)}",
     );
     check("coercion: X", "coercion: X");
     let source = "coercion(a: A): X";

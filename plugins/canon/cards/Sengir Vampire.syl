@@ -9,8 +9,9 @@ card singleFaced({
         does(
           actor(
             a(
-              and([
-                  isCreature,
+              nominal(
+                creature,
+                post = [
                   did(
                     actor(thisCreature),
                     dealDamage(recipient = which),

@@ -4,12 +4,14 @@ card singleFaced({
     types = [creature],
     subtypes = [elf, knight],
     text = [
-      static(getsPt(allOf(and([isCreature, hasColor(green), youControl, isOther])), up(1), up(1))),
-      static(getsPt(allOf(and([isCreature, hasColor(white), youControl, isOther])), up(1), up(1))),
+      static(
+        getsPt(allOf(nominal(pre = [other, green], creature, post = [youControl])), up(1), up(1))),
+      static(
+        getsPt(allOf(nominal(pre = [other, white], creature, post = [youControl])), up(1), up(1))),
       static(
         replace(
           causedBy(
-            bySource(a(and([or([isSpell, abilityHead(anyOnStack)]), anOpponentControls]))),
+            bySource(a(nominal(or([spell, abilityHead(anyOnStack)]), post = [anOpponentControls]))),
             would(actor(you), discard(thisCard))),
           instead(putOntoBattlefield(it))))],
     power = 4,

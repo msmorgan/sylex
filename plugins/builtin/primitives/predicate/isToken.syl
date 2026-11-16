@@ -1,3 +1,0 @@
-primitive isToken: Predicate = IsToken {
-  spelling = "token"
-}

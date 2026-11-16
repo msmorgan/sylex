@@ -1,0 +1,4 @@
+# An ability of the given class ("mana ability", "activated ability", etc.).
+primitive abilityHead(class: AbilityClass): Nominal = AbilityHead {
+  spelling = "$class ability"
+}

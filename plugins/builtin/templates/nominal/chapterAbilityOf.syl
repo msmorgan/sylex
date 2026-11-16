@@ -1,0 +1,5 @@
+# "chapter ability of <saga>" [CR#715.2,715.2a]
+template chapterAbilityOf(saga: NounPhrase): Nominal {
+  spelling = "chapter ability of $saga",
+  body = nominal(ability, post = [ofSource($saga), compare(atLeast, 1, [chapter])])
+}

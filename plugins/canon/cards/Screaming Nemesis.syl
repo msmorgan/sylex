@@ -8,9 +8,11 @@ card singleFaced({
       whenever(
         does(any, dealDamage(recipient = thisCreature)),
         sequentially([
-            instruct(it, dealDamage(amount = thatMuch, recipient = target(isAnyOtherTarget))),
+            instruct(
+              it,
+              dealDamage(amount = thatMuch, recipient = target(nominal(pre = [other], anyTarget)))),
             doIf(
-              was(dealDamage(recipient = a(isPlayer)), thisWay),
+              was(dealDamage(recipient = a(player)), thisWay),
               establishThroughout(cant(actor(they), gainLife(anyAmount)), restOfGame))]))],
     power = 3,
     toughness = 3})

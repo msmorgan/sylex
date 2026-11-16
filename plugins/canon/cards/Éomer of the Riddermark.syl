@@ -9,10 +9,11 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), attack),
         if = exists(
-          and([
-              isCreature,
+          nominal(
+            creature,
+            post = [
               youControl,
-              superlative(max, stat(power), and([isCreature, isPermanent]))])),
+              superlative(max, stat(power), nominal(creature, post = [in(battlefield)]))])),
         create(1, written(creatureToken(1, 1, [white], [human, soldier]))))],
     power = 5,
     toughness = 4})

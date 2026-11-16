@@ -14,15 +14,18 @@
 # at once is the engine's.
 conferral phasingTurnBased {
   body = {
-    scope = isPermanent,
+    scope = permanent,
     confer = turnBased(
       untapStep,
       doIf(
         duringPart(whose = controllerOf(this), turn),
         doIf(
-          is(this, isPhasedOut),
+          is(this, phasedOut),
           doIf(
-            not(is(this, attachment(attachment, counterpart = a(and([isPermanent, isPhasedOut]))))),
+            not(
+              is(
+                this,
+                attachment(attachment, counterpart = a(nominal(pre = [phasedOut], permanent))))),
             setStatus(phasedIn, this)),
           otherwise = doIf(
             is(this, hasKeyword(theKeyword(phasing))),

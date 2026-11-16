@@ -1,3 +1,0 @@
-primitive isEmblem: Predicate = IsEmblem {
-  spelling = "emblem"
-}

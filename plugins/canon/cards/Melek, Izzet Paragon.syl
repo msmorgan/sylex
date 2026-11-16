@@ -6,9 +6,12 @@ card singleFaced({
     subtypes = [weird, wizard],
     text = [
       static(visibility(reveal, you, topOfLibrary)),
-      static(can(actor(you), cast(bare(and([isSpell, isInstantOrSorcery])), from = onTop))),
+      static(
+        can(actor(you), cast(bare(nominal(pre = [or([instant, sorcery])], spell)), from = onTop))),
       whenever(
-        does(actor(you), cast(a(and([isInstantOrSorcery, isSpell])), from = yourLibrary)),
+        does(
+          actor(you),
+          cast(a(nominal(pre = [or([instant, sorcery])], spell)), from = yourLibrary)),
         sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))],
     power = 2,
     toughness = 4})

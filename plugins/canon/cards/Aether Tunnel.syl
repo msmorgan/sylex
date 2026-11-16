@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         conjunction(
           [getsPt(enchanted(creature), up(1), up(0)), cant(any, block(attacker = it))]))]})

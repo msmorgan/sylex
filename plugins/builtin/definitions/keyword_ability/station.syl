@@ -5,9 +5,9 @@ ability station {
   spelling = "station",
   body = [
     activatedOnlyDuring(
-      perform(tap(a(and([isCreature, isOther, isUntapped, youControl])))),
+      perform(tap(a(nominal(pre = [other, untapped], creature, post = [youControl])))),
       putCounters(
-        powerOf(the(and([was(tap(which)), isCreature]))),
+        powerOf(the(nominal(pre = [was(tap(which))], creature))),
         printedKind(chargeCounter),
         thisPermanent),
       asSorcery)]

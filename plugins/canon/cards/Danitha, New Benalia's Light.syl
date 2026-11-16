@@ -12,7 +12,7 @@ card singleFaced({
         can(
           actor(you),
           cast(
-            counted(exactly(1), and([isSpell, or([hasSubtype(aura), hasSubtype(equipment)])])),
+            counted(exactly(1), nominal(pre = [or([aura, equipment])], spell)),
             from = yourGraveyard),
           timing = onEachOfYourTurns))],
     power = 2,

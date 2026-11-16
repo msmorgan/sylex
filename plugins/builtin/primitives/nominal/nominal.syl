@@ -1,0 +1,8 @@
+# A nominal description: its head, with any premodifiers before it and postmodifiers after it,
+# each list in printed order.
+primitive nominal(
+  pre: List(PreModifier) = [],
+  head: Nominal,
+  post: List(PostModifier) = []): Nominal = Nominal {
+  spelling = "<$pre#<> >$head< $post#<>>"
+}

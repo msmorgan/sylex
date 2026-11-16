@@ -6,7 +6,7 @@ ability flanking {
   body = [
     whenever(
       does(
-        by(a(and([isCreature, not(hasKeyword(theKeyword(flanking)))]))),
+        by(a(nominal(creature, post = [not(hasKeyword(theKeyword(flanking)))]))),
         block(attacker = thisCreature)),
       get(that(creature), down(1), down(1), duration = untilEndOfTurn))]
 }

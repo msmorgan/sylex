@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         dealDamageOwnPower(
-          target(and([isCreature, youControl])),
-          target(and([isCreature, youDontControl]))))]})
+          target(nominal(creature, post = [youControl])),
+          target(nominal(creature, post = [youDontControl]))))]})

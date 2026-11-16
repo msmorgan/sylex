@@ -14,7 +14,11 @@ card singleFaced({
                 voteStartingWith(
                   you,
                   byCandidate(
-                    a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
-              returnToHand(allOf(and([isCard, withMostVotes])))])))],
+                    a(
+                      nominal(
+                        pre = [or([artifact, creature, enchantment])],
+                        card,
+                        post = [in(yourGraveyard)]))))),
+              returnToHand(allOf(nominal(card, post = [withMostVotes])))])))],
     power = 3,
     toughness = 3})

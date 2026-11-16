@@ -1,0 +1,3 @@
+# TODO(spelling): `domain` places modifiers before or after `$sort` ("basic land type" vs
+# "creature type other than Wall"); waits on `syl-kind-axis-one-word`.
+primitive qualityNoun(sort: QualitySort, domain: Option(ChoiceDomain) = none): Nominal = QualityNoun

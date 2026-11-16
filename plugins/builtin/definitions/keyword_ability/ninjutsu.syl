@@ -10,14 +10,17 @@ ability ninjutsu(cost: Cost) {
       compound([
           $cost,
           perform(reveal(this)),
-          perform(returnToHand(a(and([isCreature, isAttacking, isUnblocked, youControl]))))]),
+          perform(
+            returnToHand(
+              a(nominal(pre = [unblocked, attacking], creature, post = [youControl]))))]),
       putOntoBattlefieldTappedAttacking(
         this,
         from = yourHand,
         defender = the(
-          and([
-              or([isPlayer, isPlaneswalker, isBattle]),
+          nominal(
+            or([player, planeswalker, battle]),
+            post = [
               inCombat(
                 attackedBy,
-                counterpart = the(and([was(returnToHand(which)), isCreature])))]))))]
+                counterpart = the(nominal(pre = [was(returnToHand(which))], creature)))]))))]
 }

@@ -8,9 +8,9 @@ card singleFaced({
       flying,
       vigilance,
       haste,
-      whenever(does(actor(a(isPlayer)), attackWith(counted(orMore(3), isCreature))), draw(1)),
+      whenever(does(actor(a(player)), attackWith(counted(orMore(3), creature))), draw(1)),
       whenever(
-        does(actor(a(isPlayer)), attackWith(counted(orMore(5), isCreature))),
+        does(actor(a(player)), attackWith(counted(orMore(5), creature))),
         sequentially(
           [instruct(this, dealDamage(amount = 3, recipient = eachOpponent)), gainLife(3)]))],
     power = 4,

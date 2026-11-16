@@ -8,6 +8,6 @@ card singleFaced({
           payingInstead(
             compound([
                 perform(payLife(amount = 1)),
-                perform(exile(a(and([hasColor(blue), in(yourHand)]))))])),
+                perform(exile(a(nominal(pre = [blue], card, post = [in(yourHand)]))))])),
           this)),
-      spell(counter(target(isSpell)))]})
+      spell(counter(target(spell)))]})

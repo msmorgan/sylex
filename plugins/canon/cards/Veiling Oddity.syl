@@ -8,7 +8,7 @@ card singleFaced({
       when(
         timed(
           does(any, removeCounters(theLast, printedKind(timeCounter), this)),
-          whileTrue(is(it, cardIn(exileZone)))),
-        establishThroughout(cant(any, block(attacker = allOf(isCreature))), thisTurn))],
+          whileTrue(is(it, in(exileZone)))),
+        establishThroughout(cant(any, block(attacker = allOf(creature))), thisTurn))],
     power = 2,
     toughness = 3})

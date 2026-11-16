@@ -6,8 +6,10 @@ card singleFaced({
       spell(
         returnToBattlefield(
           allOf(
-            and([
-                isPermanentCard,
+            nominal(
+              pre = [permanent],
+              card,
+              post = [
                 in(yourGraveyard),
                 was(
                   putInto(which, yourGraveyard, from = battlefield),

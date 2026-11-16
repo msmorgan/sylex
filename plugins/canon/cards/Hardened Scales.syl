@@ -7,5 +7,8 @@ card singleFaced({
         replace(
           would(
             any,
-            putCounters(anyAmount, printedKind(p1p1Counter), a(and([isCreature, youControl])))),
+            putCounters(
+              anyAmount,
+              printedKind(p1p1Counter),
+              a(nominal(creature, post = [youControl])))),
           instead(putCounters(plus(thatMuch, 1), printedKind(p1p1Counter), it))))]})

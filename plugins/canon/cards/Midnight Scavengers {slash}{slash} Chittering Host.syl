@@ -8,7 +8,8 @@ card transforming({
         does(actor(thisCreature), enter),
         may(
           returnToHand(
-            target(and([isCreature, in(yourGraveyard), hasManaValue(atMost, 3)])),
+            target(
+              nominal(pre = [creature], card, post = [hasManaValue(atMost, 3), in(yourGraveyard)])),
             from = yourGraveyard)))],
     power = 3,
     toughness = 3},
@@ -22,7 +23,7 @@ card transforming({
       when(
         does(actor(thisCreature), enter),
         establishFor(
-          allOf(and([isCreature, youControl, isOther])),
+          allOf(nominal(pre = [other], creature, post = [youControl])),
           [getsPt(them, up(1), up(0)), abilityGrant(them, [menace])],
           duration = untilEndOfTurn))],
     power = 5,

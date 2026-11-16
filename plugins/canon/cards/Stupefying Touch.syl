@@ -4,9 +4,10 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       when(does(actor(thisAura), enter), draw(1)),
       static(
         cant(
           any,
-          activate(allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])))))]})
+          activate(
+            allOf(nominal(abilityHead(anyActivated), post = [ofSource(enchanted(creature))])))))]})

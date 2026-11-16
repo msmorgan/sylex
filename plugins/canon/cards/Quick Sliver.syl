@@ -7,8 +7,8 @@ card singleFaced({
       flash,
       static(
         can(
-          actor(a(isPlayer)),
-          cast(bare(and([isSpell, hasSubtype(sliver)]))),
+          actor(a(player)),
+          cast(bare(nominal(pre = [sliver], spell))),
           asThough = asThoughHadFlash(them)))],
     power = 1,
     toughness = 1})

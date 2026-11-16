@@ -1,0 +1,3 @@
+primitive notChosen: PostModifier = NotChosen {
+  spelling = "not chosen"
+}

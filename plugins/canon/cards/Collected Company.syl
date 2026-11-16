@@ -7,5 +7,8 @@ card singleFaced({
         sequentially([
             lookAt(topSlice(6)),
             putOntoBattlefield(
-              fromAmong(upTo(2), and([isCreature, hasManaValue(atMost, 3)]), them)),
+              fromAmong(
+                upTo(2),
+                nominal(pre = [creature], card, post = [hasManaValue(atMost, 3)]),
+                them)),
             putInto(theRest, onBottom, riders = [inOrder(anyOrder)])]))]})

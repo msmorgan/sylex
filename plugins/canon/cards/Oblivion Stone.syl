@@ -5,9 +5,14 @@ card singleFaced({
     text = [
       activated(
         compound([mana([generic(4)]), tapSymbol]),
-        putCounters(1, printedKind(fateCounter), target(isPermanent))),
+        putCounters(1, printedKind(fateCounter), target(permanent))),
       activated(
         compound([mana([generic(5)]), tapSymbol, perform(sacrifice(thisArtifact))]),
         sequentially([
-            destroy(each(and([non(isLand), isPermanent, not(hasCounter(kind = fateCounter))]))),
-            removeAllCounters(printedKind(fateCounter), allOf(isPermanent))]))]})
+            destroy(
+              each(
+                nominal(
+                  pre = [non(land)],
+                  permanent,
+                  post = [not(hasCounter(kind = fateCounter))]))),
+            removeAllCounters(printedKind(fateCounter), allOf(permanent))]))]})

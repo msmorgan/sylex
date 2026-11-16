@@ -2,4 +2,4 @@ card singleFaced({
     name = "Stomp and Howl",
     cost = [generic(2), pip(green)],
     types = [sorcery],
-    text = [spell(destroy(and([target(isArtifact), target(isEnchantment)])))]})
+    text = [spell(destroy(and([target(artifact), target(enchantment)])))]})

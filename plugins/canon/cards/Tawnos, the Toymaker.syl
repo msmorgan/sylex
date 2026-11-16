@@ -6,9 +6,7 @@ card singleFaced({
     subtypes = [human, artificer],
     text = [
       whenever(
-        does(
-          actor(you),
-          cast(a(and([or([hasSubtype(beast), hasSubtype(bird)]), isCreature, isSpell])))),
+        does(actor(you), cast(a(nominal(pre = [or([beast, bird]), creature], spell)))),
         may(copyOnStack(it, exceptions = [isAlso(types = [artifact])])))],
     power = 3,
     toughness = 5})

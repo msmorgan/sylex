@@ -14,7 +14,7 @@ ability typecycling(quality: Predicate, cost: Cost) {
     activated(
       compound([$cost, perform(discard(this))]),
       sequentially([
-          search(yourLibrary, for = a(and([isCard, $quality]))),
+          search(yourLibrary, for = a(nominal(pre = [hasQuality($quality)], card))),
           reveal(it),
           putInto(it, hand),
           shuffle]))]

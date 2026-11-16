@@ -4,19 +4,25 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(and([isCreature, isCard, in(graveyard)])),
+      enchant(and([hasType(creature), isCard, in(graveyard)])),
       when(
         does(actor(thisAura), enter),
         if = is(it, in(battlefield)),
         sequentially([
             establish(
               conjunction([
-                  abilityLoss(it, [written(enchant(and([isCreature, isCard, in(graveyard)])))]),
+                  abilityLoss(
+                    it,
+                    [written(enchant(and([hasType(creature), isCard, in(graveyard)])))]),
                   abilityGrant(
                     it,
-                    [enchant(and([isCreature, did(by(thisAura), putOntoBattlefield(which))]))])],
+                    [
+                      enchant(
+                        and([hasType(creature), did(by(thisAura), putOntoBattlefield(which))]))])],
                 subject = it)),
-            returnToBattlefield(enchanted(ofType(card, creature)), riders = [underControlOf(you)]),
+            returnToBattlefield(
+              enchanted(nominal(pre = [creature], card)),
+              riders = [underControlOf(you)]),
             attachTo(thisAura, it),
             delay(
               does(actor(thisAura), leave),

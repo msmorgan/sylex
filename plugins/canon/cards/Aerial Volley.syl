@@ -7,4 +7,4 @@ card singleFaced({
         dealDivided(
           this,
           3,
-          targets(oneTwoOrThree, and([isCreature, hasKeyword(theKeyword(flying))]))))]})
+          targets(oneTwoOrThree, nominal(creature, post = [hasKeyword(theKeyword(flying))]))))]})

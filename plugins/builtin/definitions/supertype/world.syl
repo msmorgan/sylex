@@ -13,13 +13,10 @@ supertype world {
   confers = [
     stateBased(
       exists(
-        and([
-            isOther,
-            hasSupertype(world),
-            isPermanent,
-            superlative(
-              min,
-              heldFor(hasSupertype(world)),
-              and([hasSupertype(world), isPermanent]))])),
+        nominal(
+          pre = [other, world],
+          permanent,
+          post = [
+            superlative(min, heldFor(hasSupertype(world)), nominal(pre = [world], permanent))])),
       putInto(this, graveyard))]
 }

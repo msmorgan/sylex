@@ -3,5 +3,5 @@ card singleFaced({
     cost = [generic(1), pip(blue)],
     types = [enchantment],
     text = [
-      static(partSkip(bare(isPlayer), untapStep)),
+      static(partSkip(bare(player), untapStep)),
       at(beginningOfYour(upkeep), doUnless(mana([pip(blue)]), sacrifice(thisEnchantment)))]})

@@ -20,7 +20,7 @@ card singleFaced({
       activated(
         tapSymbol,
         get(
-          target(and([isCreature, hasSubtype(assemblyWorker)])),
+          target(nominal(pre = [assemblyWorker], creature)),
           up(1),
           up(1),
           duration = untilEndOfTurn))]})

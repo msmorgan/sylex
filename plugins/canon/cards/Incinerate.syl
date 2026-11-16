@@ -5,10 +5,13 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            instruct(this, dealDamage(amount = 3, recipient = target(isAnyTarget))),
+            instruct(this, dealDamage(amount = 3, recipient = target(anyTarget))),
             establishThroughout(
               cant(
                 any,
                 regeneration(
-                  a(and([isCreature, was(dealDamage(recipient = which), within = thisWay)])))),
+                  a(
+                    nominal(
+                      creature,
+                      post = [was(dealDamage(recipient = which), within = thisWay)])))),
               thisTurn)]))]})

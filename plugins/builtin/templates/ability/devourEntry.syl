@@ -2,16 +2,16 @@
 # noun `head`: "As this object enters, you may sacrifice any number of [quality] permanents. This
 # permanent enters with N +1/+1 counters on it for each [head] sacrificed this way." Devour counts
 # each creature [CR#702.82a], devour [quality] each permanent [CR#702.82c].
-template devourEntry(quality: Predicate, amount: Amount, head: Predicate): Ability {
+template devourEntry(quality: Predicate, amount: Amount, head: Nominal): Ability {
   spelling = "As this object enters, you may sacrifice any number of $quality permanents. This permanent enters with $amount +1/+1 counters on it for each $head sacrificed this way.",
   body = static(
     replace(
       would(actor(thisPermanent), enter),
       before(
-        may(devour(counted(anyNumber, and([$quality, in(battlefield)])))),
+        may(devour(counted(anyNumber, nominal(pre = [hasQuality($quality)], permanent)))),
         body = withRiders([
             withCounters(
-              forEach($amount, and([$head, was(sacrifice(which), within = thisWay)])),
+              forEach($amount, nominal($head, post = [was(sacrifice(which), within = thisWay)])),
               printedKind(p1p1Counter),
               fresh)]))))
 }

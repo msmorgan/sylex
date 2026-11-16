@@ -11,5 +11,5 @@ ability retrace {
         cast(
           this,
           from = yourGraveyard,
-          addedCost = plusAdditional(perform(discard(a(and([isCard, isLand]))))))))]
+          addedCost = plusAdditional(perform(discard(a(nominal(pre = [land], card))))))))]
 }

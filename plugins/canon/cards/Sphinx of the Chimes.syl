@@ -6,7 +6,11 @@ card singleFaced({
     text = [
       flying,
       activated(
-        perform(discard(withTheSameName(counted(exactly(2), and([non(isLand), in(yourHand)]))))),
+        perform(
+          discard(
+            counted(
+              exactly(2),
+              nominal(pre = [non(land)], card, post = [withTheSameName, in(yourHand)])))),
         draw(4))],
     power = 5,
     toughness = 6})

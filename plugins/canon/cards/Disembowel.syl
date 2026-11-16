@@ -2,4 +2,4 @@ card singleFaced({
     name = "Disembowel",
     cost = [variable, pip(black)],
     types = [instant],
-    text = [spell(destroy(target(and([isCreature, hasManaValue(equal, letter(x))]))))]})
+    text = [spell(destroy(target(nominal(creature, post = [hasManaValue(equal, letter(x))]))))]})

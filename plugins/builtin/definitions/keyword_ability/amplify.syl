@@ -13,10 +13,12 @@ ability amplify(amount: Amount) {
           reveal(
             counted(
               anyNumber,
-              and([cardIn(yourHand), shares(subtype(creature), share, thisPermanent)]))),
+              nominal(
+                card,
+                post = [in(yourHand), shares(subtype(creature), share, thisPermanent)]))),
           body = withRiders([
               withCounters(
-                forEach($amount, and([isCard, was(reveal(which), within = thisWay)])),
+                forEach($amount, nominal(card, post = [was(reveal(which), within = thisWay)])),
                 printedKind(p1p1Counter),
                 fresh)]))))]
 }

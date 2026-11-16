@@ -4,13 +4,13 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(entersChoosing(thisAura, color)),
       static(entersWithCounters(thisAura, 1, sleightCounter)),
       static(
         replace(
           would(
-            by(allOf(and([isSource, ofTheLastChosen(color)]))),
+            by(allOf(nominal(source, post = [ofTheLastChosen(color)]))),
             dealDamage(recipient = enchanted(creature))),
           instead(preventDamage(allDamage)))),
       activated(

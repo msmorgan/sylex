@@ -2,4 +2,4 @@ card singleFaced({
     name = "Eon Hub",
     cost = [generic(5)],
     types = [artifact],
-    text = [static(partSkip(bare(isPlayer), upkeep))]})
+    text = [static(partSkip(bare(player), upkeep))]})

@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(thisCreature), attack),
-        tap(target(and([isCreature, controlledBy(defendingPlayer)]))))],
+        tap(target(nominal(creature, post = [controlledBy(defendingPlayer)]))))],
     power = 3,
     toughness = 2})

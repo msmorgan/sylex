@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       whenever(
         does(
-          actor(a(isCreature)),
-          attack(defender = or([you, a(and([isPlaneswalker, youControl]))]))),
+          actor(a(creature)),
+          attack(defender = or([you, a(nominal(planeswalker, post = [youControl]))]))),
         instruct(controllerOf(that(creature)), loseLife(1)))]})

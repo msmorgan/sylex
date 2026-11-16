@@ -1,0 +1,5 @@
+# "legal object or player for <attachment> to enchant"
+template legalHostOf(attachment: NounPhrase): Nominal {
+  spelling = "legal object or player for $attachment to enchant",
+  body = legalAttachment(host, $attachment)
+}

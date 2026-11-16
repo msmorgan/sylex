@@ -4,14 +4,14 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [phyrexian, horror],
     text = [
-      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(isLand)))),
+      static(entersChoosingFrom(thisCreature, cardName, nameOfCard(non(hasType(land))))),
       static(
         cant(
           any,
           activate(
             allOf(
-              and([
-                  abilityHead(anyActivated),
-                  abilityOf(allOf(and([isSource, named(chosenName)])))])))))],
+              nominal(
+                abilityHead(anyActivated),
+                post = [ofSource(allOf(nominal(source, post = [named(chosenName)])))])))))],
     power = 2,
     toughness = 1})

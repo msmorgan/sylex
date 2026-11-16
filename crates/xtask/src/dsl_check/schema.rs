@@ -377,7 +377,7 @@ pub const RECORDS: &[RecordSort] = &[
     record(
         "ConferralRule",
         &[
-            ("scope", "Predicate", false),
+            ("scope", "Nominal", false),
             ("confer", "Conferral", false),
         ],
     ),
@@ -468,7 +468,7 @@ pub const RECORDS: &[RecordSort] = &[
     record(
         "SbaRule",
         &[
-            ("scope", "Predicate", false),
+            ("scope", "Nominal", false),
             ("when", "Condition", false),
             ("then", "VerbPhrase", false),
         ],

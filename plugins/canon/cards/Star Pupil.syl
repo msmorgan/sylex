@@ -11,6 +11,9 @@ card singleFaced({
           counterKind,
           domain = it,
           counterKind,
-          putCounters(statOf(boundCounter, it), thatKind, target(and([isCreature, youControl])))))],
+          putCounters(
+            statOf(boundCounter, it),
+            thatKind,
+            target(nominal(creature, post = [youControl])))))],
     power = 0,
     toughness = 0})

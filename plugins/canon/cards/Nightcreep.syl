@@ -6,9 +6,6 @@ card singleFaced({
       spell(
         establishThroughout(
           conjunction([
-              qualityChange(allOf(isCreature), sets, colored(colors([black]))),
-              qualityChange(
-                allOf(isLand),
-                sets,
-                bundle({characteristics = {subtypes = [swamp]}}))]),
+              qualityChange(allOf(creature), sets, colored(colors([black]))),
+              qualityChange(allOf(land), sets, bundle({characteristics = {subtypes = [swamp]}}))]),
           untilEndOfTurn))]})

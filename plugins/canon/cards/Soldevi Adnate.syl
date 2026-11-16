@@ -6,10 +6,10 @@ card singleFaced({
     text = [
       activated(
         compound(
-          [tapSymbol, perform(sacrifice(a(and([isCreature, or([hasColor(black), isArtifact])]))))]),
+          [tapSymbol, perform(sacrifice(a(nominal(pre = [or([black, artifact])], creature))))]),
         addMana(
           counted(
-            statOf(stat(manaValue), the(and([was(sacrifice(which)), isCreature]))),
+            statOf(stat(manaValue), the(nominal(pre = [was(sacrifice(which))], creature))),
             symbols([pip(black)]))))],
     power = 1,
     toughness = 2})

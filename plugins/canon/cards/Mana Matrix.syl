@@ -6,8 +6,8 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([
-                or([isInstant, isEnchantment]),
-                isSpell,
-                did(actor(you), cast(which), within = thisObject)])),
+            nominal(
+              pre = [or([instant, enchantment])],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           less(2)))]})

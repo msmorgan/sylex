@@ -2,4 +2,4 @@ card singleFaced({
     name = "Mind Bend",
     cost = [pip(blue)],
     types = [instant],
-    text = [spell(establish(textChange(target(isPermanent), replaceWord([color, landType]))))]})
+    text = [spell(establish(textChange(target(permanent), replaceWord([color, landType]))))]})

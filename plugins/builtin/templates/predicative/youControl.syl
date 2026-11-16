@@ -1,0 +1,4 @@
+template youControl: Predicative {
+  spelling = "you control",
+  body = controlledBy(you)
+}

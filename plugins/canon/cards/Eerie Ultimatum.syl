@@ -5,5 +5,7 @@ card singleFaced({
     text = [
       spell(
         returnToBattlefield(
-          withDifferentNames(counted(anyNumber, and([isPermanentCard, in(yourGraveyard)]))),
+          counted(
+            anyNumber,
+            nominal(pre = [permanent], card, post = [withDifferentNames, in(yourGraveyard)])),
           from = yourGraveyard))]})

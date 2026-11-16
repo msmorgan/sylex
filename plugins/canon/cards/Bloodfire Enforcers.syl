@@ -7,6 +7,8 @@ card singleFaced({
       static(
         onlyWhile(
           abilityGrant(thisCreature, [firstStrike, trample]),
-          is(and([a(and([isInstant, isCard])), a(and([isSorcery, isCard]))]), in(yourGraveyard))))],
+          is(
+            and([a(nominal(pre = [instant], card)), a(nominal(pre = [sorcery], card))]),
+            in(yourGraveyard))))],
     power = 5,
     toughness = 2})

@@ -1,0 +1,4 @@
+# A copy of a card or spell.
+primitive copy: Nominal = Copy {
+  spelling = "copy"
+}

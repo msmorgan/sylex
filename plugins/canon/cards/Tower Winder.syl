@@ -9,7 +9,8 @@ card singleFaced({
       when(
         does(actor(thisCreature), enter),
         sequentially([
-            searchLibraryOrGraveyard(a(named(printedName("Command Tower")))),
+            searchLibraryOrGraveyard(
+              a(nominal(card, post = [named(printedName("Command Tower"))]))),
             reveal(it),
             putInto(it, hand),
             doIf(did(actor(you), search(yourLibrary), thisWay), shuffle)]))],

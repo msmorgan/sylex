@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            gainLife(powerOf(target(isCreature))),
+            gainLife(powerOf(target(creature))),
             establishThroughout(
               replace(
                 would(actor(that(creature)), dealDamage),

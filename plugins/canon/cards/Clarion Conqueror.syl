@@ -10,8 +10,8 @@ card singleFaced({
           any,
           activate(
             allOf(
-              and([
-                  abilityHead(anyActivated),
-                  abilityOf(allOf(or([isArtifact, isCreature, isPlaneswalker])))])))))],
+              nominal(
+                abilityHead(anyActivated),
+                post = [ofSource(allOf(or([artifact, creature, planeswalker])))])))))],
     power = 3,
     toughness = 3})

@@ -8,9 +8,12 @@ card singleFaced({
       static(
         additionalTriggers(
           causes(
-            byEvent(does(actor(a(and([hasSubtype(wizard), youControl]))), enter)),
+            byEvent(does(actor(a(nominal(wizard, post = [youControl]))), enter)),
             triggers(
-              a(and([abilityHead(anyTriggered), abilityOf(a(and([isPermanent, youControl])))])))),
+              a(
+                nominal(
+                  abilityHead(anyTriggered),
+                  post = [ofSource(a(nominal(permanent, post = [youControl])))])))),
           exactly(1)))],
     power = 2,
     toughness = 1})

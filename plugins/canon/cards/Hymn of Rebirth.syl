@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         putOntoBattlefieldUnderYourControl(
-          target(and([isCreature, in(graveyard)])),
+          target(nominal(pre = [creature], card, post = [in(graveyard)])),
           from = graveyard))]})

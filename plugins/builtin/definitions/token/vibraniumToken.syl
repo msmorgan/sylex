@@ -12,5 +12,5 @@ token vibraniumToken {
           tapSymbol,
           addMana(
             symbols([colorlessPip]),
-            riders = [cantSpendOn([toCast(and([non(isArtifact), isSpell]))])]))]}}
+            riders = [cantSpendOn([toCast(and([non(hasType(artifact)), isSpell]))])]))]}}
 }

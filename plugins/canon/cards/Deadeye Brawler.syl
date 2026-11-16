@@ -7,7 +7,7 @@ card singleFaced({
       deathtouch,
       ascend,
       whenever(
-        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(isPlayer))),
+        does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
         if = is(you, hasDesignation(citysBlessing)),
         draw(1))],
     power = 2,

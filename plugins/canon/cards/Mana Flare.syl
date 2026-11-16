@@ -4,5 +4,5 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(a(isPlayer)), tapForMana(a(isLand))),
+        does(actor(a(player)), tapForMana(a(land))),
         instruct(that(player), addMana(counted(1, ofTypeProducedBy(that(land))))))]})

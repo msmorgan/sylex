@@ -6,7 +6,6 @@ card singleFaced({
       static(
         altCost(
           payingInstead(
-            perform(
-              returnToHand(counted(exactly(2), and([isLand, hasSubtype(island), youControl]))))),
+            perform(returnToHand(counted(exactly(2), nominal(island, post = [youControl]))))),
           this)),
       spell(draw(2))]})

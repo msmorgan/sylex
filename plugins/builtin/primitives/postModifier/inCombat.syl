@@ -1,0 +1,3 @@
+primitive inCombat(
+  relation: CombatRelation,
+  counterpart: Option(NounPhrase) = none): PostModifier = InCombat

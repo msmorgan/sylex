@@ -7,7 +7,10 @@ card singleFaced({
       static(
         costShift(
           allOf(
-            and([hasSubtype(cleric), isSpell, did(actor(you), cast(which), within = thisObject)])),
+            nominal(
+              pre = [cleric],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           lessColoredOnly(symbols([pip(white), pip(black)]))))],
     power = 2,
     toughness = 2})

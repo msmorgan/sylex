@@ -7,5 +7,8 @@ ability surge(cost: Cost) {
     static(
       onlyIf(
         altCost(payingInstead($cost), this),
-        did(actor(or([you, a(isTeammate)])), cast(a(anotherSpell)), within(soFarThisTurn))))]
+        did(
+          actor(or([you, a(teammate)])),
+          cast(a(nominal(pre = [other], spell))),
+          within(soFarThisTurn))))]
 }

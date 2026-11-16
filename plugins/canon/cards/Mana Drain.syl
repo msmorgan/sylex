@@ -8,7 +8,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            counter(target(isSpell)),
+            counter(target(spell)),
             atNext(
               beginningOf(mainPhase, you, nextTime),
               addMana(counted(statOf(stat(manaValue), that(spell)), symbols([colorlessPip]))))]))]})

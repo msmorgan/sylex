@@ -8,7 +8,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            counter(target(and([isCreature, isSpell]))),
+            counter(target(nominal(pre = [creature], spell))),
             instruct(
               thisSpell,
               dealDamage(

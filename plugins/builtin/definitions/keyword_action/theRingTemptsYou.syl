@@ -6,24 +6,31 @@ action theRingTemptsYou {
   spelling = "The Ring tempts you",
   body = sequentially([
       doIf(
-        not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy($actor)]))),
+        not(exists(nominal(emblem, post = [named(printedName("The Ring")), ownedBy($actor)]))),
         getEmblem(
           name = "The Ring",
           [
             static(
               characteristicChange(
-                allOf(and([hasDesignation(ringBearer), youControl])),
+                allOf(nominal(permanent, post = [hasDesignation(ringBearer), youControl])),
                 [typeLine(adds, {supertypes = [legendary]})])),
             static(
               cant(
                 by(
                   allOf(
-                    and([
-                        isCreature,
+                    nominal(
+                      creature,
+                      post = [
                         hasPower(
                           greater,
-                          powerOf(a(and([hasDesignation(ringBearer), youControl]))))]))),
-                block(attacker = allOf(and([hasDesignation(ringBearer), youControl]))))),
+                          powerOf(
+                            a(
+                              nominal(
+                                permanent,
+                                post = [hasDesignation(ringBearer), youControl]))))]))),
+                block(
+                  attacker = allOf(
+                    nominal(permanent, post = [hasDesignation(ringBearer), youControl]))))),
             static(
               asLongAs(
                 compareAmt(
@@ -32,7 +39,7 @@ action theRingTemptsYou {
                     ownScope(
                       theRingTemptsYou,
                       sequentially([
-                          choose(a(and([isCreature, actorControls]))),
+                          choose(a(nominal(creature, post = [actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     thisGame),
                   atLeast,
@@ -41,8 +48,11 @@ action theRingTemptsYou {
                   this,
                   [
                     whenever(
-                      does(actor(a(and([hasDesignation(ringBearer), youControl]))), attack),
-                      sequentially([draw(1), discard(a(cardIn(hand)))]))]))),
+                      does(
+                        actor(
+                          a(nominal(permanent, post = [hasDesignation(ringBearer), youControl]))),
+                        attack),
+                      sequentially([draw(1), discard(a(nominal(card, post = [in(hand)])))]))]))),
             static(
               asLongAs(
                 compareAmt(
@@ -51,7 +61,7 @@ action theRingTemptsYou {
                     ownScope(
                       theRingTemptsYou,
                       sequentially([
-                          choose(a(and([isCreature, actorControls]))),
+                          choose(a(nominal(creature, post = [actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     thisGame),
                   atLeast,
@@ -61,8 +71,10 @@ action theRingTemptsYou {
                   [
                     whenever(
                       does(
-                        by(a(isCreature)),
-                        block(attacker = a(and([hasDesignation(ringBearer), youControl])))),
+                        by(a(creature)),
+                        block(
+                          attacker = a(
+                            nominal(permanent, post = [hasDesignation(ringBearer), youControl])))),
                       atNext(endOfCombat, controllerSacrifices(that(creature))))]))),
             static(
               asLongAs(
@@ -72,7 +84,7 @@ action theRingTemptsYou {
                     ownScope(
                       theRingTemptsYou,
                       sequentially([
-                          choose(a(and([isCreature, actorControls]))),
+                          choose(a(nominal(creature, post = [actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
                     thisGame),
                   atLeast,
@@ -82,10 +94,11 @@ action theRingTemptsYou {
                   [
                     whenever(
                       does(
-                        actor(a(and([hasDesignation(ringBearer), youControl]))),
-                        dealDamage(kind = combat, recipient = a(isPlayer))),
+                        actor(
+                          a(nominal(permanent, post = [hasDesignation(ringBearer), youControl]))),
+                        dealDamage(kind = combat, recipient = a(player))),
                       instruct(eachOpponent, loseLife(3)))])))])),
-      choose(a(and([isCreature, actorControls]))),
+      choose(a(nominal(creature, post = [actorControls]))),
       gainDesignation(that(creature), ringBearer)])
 }
 

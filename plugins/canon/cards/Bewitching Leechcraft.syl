@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       when(does(actor(thisAura), enter), tap(enchanted(creature))),
       static(
         abilityGrant(

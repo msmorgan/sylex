@@ -1,0 +1,3 @@
+primitive withMostVotes: PostModifier = WithMostVotes {
+  spelling = "with the most votes or tied for most votes"
+}

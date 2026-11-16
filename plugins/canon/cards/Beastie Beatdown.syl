@@ -13,14 +13,20 @@ card singleFaced({
       spell(
         choose(
           and([
-              target(and([isCreature, youControl])),
-              target(and([isCreature, anOpponentControls]))]))),
+              target(nominal(creature, post = [youControl])),
+              target(nominal(creature, post = [anOpponentControls]))]))),
       delirium(
         spell(
           doIf(
-            compareAmt(distinctCount(cardType, allOf(cardIn(yourGraveyard))), atLeast, 4),
-            putCounters(2, printedKind(p1p1Counter), the(and([isCreature, youControl])))))),
+            compareAmt(
+              distinctCount(cardType, allOf(nominal(card, post = [in(yourGraveyard)]))),
+              atLeast,
+              4),
+            putCounters(
+              2,
+              printedKind(p1p1Counter),
+              the(nominal(creature, post = [youControl])))))),
       spell(
         dealDamageOwnPower(
-          the(and([isCreature, youControl])),
-          the(and([isCreature, anOpponentControls]))))]})
+          the(nominal(creature, post = [youControl])),
+          the(nominal(creature, post = [anOpponentControls]))))]})

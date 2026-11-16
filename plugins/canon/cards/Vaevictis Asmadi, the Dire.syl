@@ -9,12 +9,17 @@ card singleFaced({
       whenever(
         does(actor(thisCreature), attack),
         sequentially([
-            doForEach(eachPlayer, choose(target(and([isPermanent, controlledBy(they)])))),
+            doForEach(eachPlayer, choose(target(nominal(permanent, post = [controlledBy(they)])))),
             instruct(those(player), sacrifice(those(permanent))),
             doForEach(
-              each(and([isPlayer, did(actor(which), sacrifice(a(isPermanent)), within = thisWay)])),
+              each(
+                nominal(
+                  player,
+                  post = [did(actor(which), sacrifice(a(permanent)), within = thisWay)])),
               sequentially([
                   instruct(they, reveal(slice(top, 1, libraryOf(they)))),
-                  doIf(is(it, isPermanentCard), putOntoBattlefield(it))]))]))],
+                  doIf(
+                    is(it, noun(a(nominal(pre = [permanent], card)))),
+                    putOntoBattlefield(it))]))]))],
     power = 6,
     toughness = 6})

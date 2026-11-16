@@ -6,7 +6,7 @@ card singleFaced({
       cumulativeUpkeep(mana([generic(2)])),
       when(
         does(
-          actor(a(isPlayer)),
+          actor(a(player)),
           pay(
             outcome = unpaid,
             whose = thisEnchantment,
@@ -19,6 +19,6 @@ card singleFaced({
               dealDamage(
                 amount = letter(x),
                 recipient = and([
-                    target(or([isPlayer, isPlaneswalker])),
-                    each(and([isCreature, controlledBy(splitOverPlaneswalker)]))]))),
+                    target(or([player, planeswalker])),
+                    each(nominal(creature, post = [controlledBy(splitOverPlaneswalker)]))]))),
             define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]})

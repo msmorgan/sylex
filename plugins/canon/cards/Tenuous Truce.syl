@@ -14,10 +14,11 @@ card singleFaced({
               does(
                 actor(you),
                 attack(
-                  defender = or(
-                    [enchanted(opponent), a(and([isPlaneswalker, controlledBy(they)]))])))),
+                  defender = or([
+                      enchanted(opponent),
+                      a(nominal(planeswalker, post = [controlledBy(they)]))])))),
             when(
               does(
                 actor(they),
-                attack(defender = or([you, a(and([isPlaneswalker, youControl]))]))))]),
+                attack(defender = or([you, a(nominal(planeswalker, post = [youControl]))]))))]),
         sacrifice(thisAura))]})

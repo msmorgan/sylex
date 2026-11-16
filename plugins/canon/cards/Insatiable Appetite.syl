@@ -9,6 +9,6 @@ card singleFaced({
     text = [
       spell(
         may(
-          sacrifice(a(hasSubtype(food))),
-          ifDid = get(target(isCreature), up(5), up(5), duration = untilEndOfTurn),
+          sacrifice(a(food)),
+          ifDid = get(target(creature), up(5), up(5), duration = untilEndOfTurn),
           ifNot = get(that(creature), up(3), up(3), duration = untilEndOfTurn)))]})

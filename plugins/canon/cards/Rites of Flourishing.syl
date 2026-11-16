@@ -7,5 +7,5 @@ card singleFaced({
       static(
         can(
           actor(eachPlayer),
-          play(counted(additional(exactly(1)), isLand)),
+          play(counted(additional(exactly(1)), land)),
           timing = onEachOfTheirTurns(they)))]})

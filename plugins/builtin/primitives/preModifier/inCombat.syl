@@ -1,0 +1,1 @@
+primitive inCombat(relation: CombatRelation): PreModifier = InCombat

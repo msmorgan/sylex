@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [sphinx],
     text = [
       flying,
-      cumulativeUpkeep(perform(discard(a(cardIn(yourHand))))),
+      cumulativeUpkeep(perform(discard(a(nominal(card, post = [in(yourHand)]))))),
       when(does(actor(thisCreature), die), draw(countersOn(ageCounter, it)))],
     power = 4,
     toughness = 4})

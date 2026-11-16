@@ -6,7 +6,11 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(and([isSpell, hasColor(white), did(actor(you), cast(which), within = thisObject)])),
+          allOf(
+            nominal(
+              pre = [white],
+              spell,
+              post = [did(actor(you), cast(which), within = thisObject)])),
           moreBySymbols(symbols([pip(white)]))))],
     power = 1,
     toughness = 3})

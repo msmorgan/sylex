@@ -4,5 +4,10 @@ ability affinity(quality: Predicate) {
   lexical = {lemma = "affinity", parameters = [[Quality(Some("for"))]]},
   spelling = "affinity for $quality",
   body = [
-    static(costShift(thisSpell, generic(down(forEach(1, and([$quality, youControl]))), none)))]
+    static(
+      costShift(
+        thisSpell,
+        generic(
+          down(forEach(1, nominal(pre = [hasQuality($quality)], permanent, post = [youControl]))),
+          none)))]
 }

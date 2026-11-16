@@ -5,6 +5,6 @@ ability ingest {
   spelling = "ingest",
   body = [
     whenever(
-      does(actor(thisCreature), dealDamage(kind = combat, recipient = a(isPlayer))),
+      does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
       instruct(they, exile(slice(top, 1, libraryOf(they)))))]
 }

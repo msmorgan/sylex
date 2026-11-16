@@ -4,10 +4,12 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(
         conjunction([
             abilityGrant(
               enchanted(creature),
-              [protection(eachKind(color, domain = allOf(and([isPermanent, youControl]))))]),
+              [
+                protection(
+                  eachKind(color, domain = allOf(nominal(permanent, post = [youControl]))))]),
             doesnt(actor(thisEffect), remove(thisAura))]))]})

@@ -14,33 +14,37 @@ sba legendRule {
   lexical = {lemma = "legend rule"},
   spelling = "legend rule",
   body = {
-    scope = isPlayer,
+    scope = player,
     when = thereAre(
-      withTheSameName(counted(orMore(2), and([hasSupertype(legendary), isPermanent, youControl])))),
+      counted(
+        orMore(2),
+        nominal(pre = [legendary], permanent, post = [withTheSameName, youControl]))),
     then = sequentially([
         doForEachKind(
           name,
           domain = allOf(
-            and([
-                hasSupertype(legendary),
-                isPermanent,
+            nominal(
+              pre = [legendary],
+              permanent,
+              post = [
                 youControl,
                 shares(
                   cardName,
                   share,
-                  a(and([isOther, hasSupertype(legendary), isPermanent, youControl])))])),
+                  a(nominal(pre = [other, legendary], permanent, post = [youControl])))])),
           cardName,
-          choose(a(and([hasSupertype(legendary), isPermanent, youControl, named(chosenName)])))),
+          choose(a(nominal(pre = [legendary], permanent, post = [youControl, named(chosenName)])))),
         putInto(
           each(
-            and([
-                hasSupertype(legendary),
-                isPermanent,
+            nominal(
+              pre = [legendary],
+              permanent,
+              post = [
                 youControl,
                 shares(
                   cardName,
                   share,
-                  a(and([isOther, hasSupertype(legendary), isPermanent, youControl]))),
+                  a(nominal(pre = [other, legendary], permanent, post = [youControl]))),
                 notChosen])),
           graveyard)])}
 }

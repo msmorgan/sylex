@@ -1,0 +1,5 @@
+# "outlaw" [CR#700.12]
+template outlaw: PreModifier {
+  spelling = "outlaw",
+  body = andOr([assassin, mercenary, pirate, rogue, warlock])
+}

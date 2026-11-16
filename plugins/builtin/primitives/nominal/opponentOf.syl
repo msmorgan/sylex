@@ -1,0 +1,4 @@
+# An opponent of `who` [CR#102.2,102.3].
+primitive opponentOf(who: NounPhrase): Nominal = OpponentOf {
+  spelling = "opponent of $who"
+}

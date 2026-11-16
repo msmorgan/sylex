@@ -4,15 +4,16 @@ card singleFaced({
     types = [enchantment],
     subtypes = [aura],
     text = [
-      enchant(isCreature),
+      enchant(hasType(creature)),
       static(getsPt(enchanted(creature), up(2), up(2))),
       static(abilityGrant(enchanted(creature), [flying])),
       whenever(
         does(
           actor(
             a(
-              and([
-                  isCreature,
+              nominal(
+                creature,
+                post = [
                   did(
                     actor(attachHost(enchanted, creature)),
                     dealDamage(recipient = which),

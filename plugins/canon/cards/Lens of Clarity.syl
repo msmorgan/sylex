@@ -9,4 +9,4 @@ card singleFaced({
             visibility(
               lookAt,
               you,
-              objects(allOf(and([isCreature, isFaceDown, youDontControl]))))]))]})
+              objects(allOf(nominal(pre = [faceDown], creature, post = [youDontControl]))))]))]})

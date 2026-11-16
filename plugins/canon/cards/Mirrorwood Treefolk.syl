@@ -9,7 +9,7 @@ card singleFaced({
         establishThroughout(
           replace(
             would(any, dealDamage(recipient = thisCreature)),
-            instead(redirectDamage(allDamage, target(isAnyTarget))),
+            instead(redirectDamage(allDamage, target(anyTarget))),
             use = nextTimeOnly),
           thisTurn))],
     power = 2,

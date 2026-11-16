@@ -7,7 +7,7 @@ card singleFaced({
       whenever(
         timed(
           does(actor(thisCreature), attack),
-          whileTrue(compareAmt(countOf(and([isArtifact, youControl])), atLeast, 2))),
+          whileTrue(compareAmt(countOf(nominal(artifact, post = [youControl])), atLeast, 2))),
         get(it, up(2), up(1), duration = untilEndOfTurn))],
     power = 2,
     toughness = 3})

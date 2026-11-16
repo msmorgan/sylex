@@ -32,7 +32,7 @@ ability suspend(amount: Amount, cost: Cost) {
       sequentially([
           may(play(thisCard, altCost = withoutPaying)),
           doIf(
-            did(actor(you), cast(a(and([isCreature, isSpell]))), thisWay),
+            did(actor(you), cast(a(nominal(pre = [creature], spell))), thisWay),
             gain(
               that(spell),
               [haste],

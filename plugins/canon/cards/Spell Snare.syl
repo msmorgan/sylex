@@ -2,4 +2,4 @@ card singleFaced({
     name = "Spell Snare",
     cost = [pip(blue)],
     types = [instant],
-    text = [spell(counter(target(and([isSpell, hasManaValue(equal, 2)]))))]})
+    text = [spell(counter(target(nominal(spell, post = [hasManaValue(equal, 2)]))))]})

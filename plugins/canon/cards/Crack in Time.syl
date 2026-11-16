@@ -7,5 +7,5 @@ card singleFaced({
       triggered(
         and([when(does(actor(thisEnchantment), enter)), at(beginningOfYour(firstMain))]),
         exileUntil(
-          target(and([isCreature, anOpponentControls])),
+          target(nominal(creature, post = [anOpponentControls])),
           does(actor(thisEnchantment), leave)))]})

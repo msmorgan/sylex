@@ -13,6 +13,6 @@ ability tribute(amount: Amount) {
         before(
           choose(anOpponent),
           body = optionally(
-            chooser = the(isChosenPlayer),
+            chooser = the(nominal(pre = [chosen], player)),
             withRiders([withCounters($amount, printedKind(p1p1Counter), additional)])))))]
 }

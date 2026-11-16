@@ -1,7 +1,7 @@
 # Coordination of noun phrases under `and` (group of all, introducing a plural group referent), `or`
 # (one alternative), or `andOr` (any non-empty subset, also plural); reached through the worded
 # Templates `and`, `or`, and `andOr`. Coordinated indefinite descriptions (`and([a(A), a(B)])`)
-# witness each arm independently and do not require distinct objects unless `isOther` ("another" or
+# witness each arm independently and do not require distinct objects unless `other` ("another" or
 # "other") is written (Kami of Terrible Secrets: one artifact enchantment satisfies "if you control
 # an artifact and an enchantment").
 primitive coord(coordinator: Coordinator, phrases: List(NounPhrase)): NounPhrase = Coordination

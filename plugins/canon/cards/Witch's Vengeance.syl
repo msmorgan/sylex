@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         get(
-          allOf(and([isCreature, ofYourChoice(subtype(creature))])),
+          allOf(nominal(creature, post = [ofYourChoice(subtype(creature))])),
           down(3),
           down(3),
           duration = untilEndOfTurn))]})

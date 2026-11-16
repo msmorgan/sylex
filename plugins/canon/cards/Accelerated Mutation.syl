@@ -5,5 +5,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            get(target(isCreature), up(letter(x)), up(letter(x)), duration = untilEndOfTurn),
-            define(x, aggregateAll(max, stat(manaValue), and([isPermanent, youControl])))]))]})
+            get(target(creature), up(letter(x)), up(letter(x)), duration = untilEndOfTurn),
+            define(
+              x,
+              aggregateAll(max, stat(manaValue), nominal(permanent, post = [youControl])))]))]})

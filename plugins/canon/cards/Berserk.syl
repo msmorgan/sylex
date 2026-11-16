@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         sequentially([
             establishFor(
-              target(isCreature),
+              target(creature),
               [
                 abilityGrant(it, [trample]),
                 getsPt(it, up(letter(x)), up(0)),

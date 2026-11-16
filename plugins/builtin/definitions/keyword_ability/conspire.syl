@@ -15,7 +15,10 @@ ability conspire {
             tap(
               counted(
                 exactly(2),
-                and([isUntapped, isCreature, youControl, shares(color, share, thisSpell)]))))))),
+                nominal(
+                  pre = [untapped],
+                  creature,
+                  post = [youControl, shares(color, share, thisSpell)]))))))),
     when(
       does(actor(you), cast(thisSpell)),
       if = keywordCostPaid(thisSpell, conspire),

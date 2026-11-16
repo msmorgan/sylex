@@ -8,7 +8,7 @@ card singleFaced({
       static(
         can(
           actor(thisCreature),
-          block(attacker = counted(additional(exactly(7)), isCreature)),
+          block(attacker = counted(additional(exactly(7)), creature)),
           timing = eachCombat))],
     power = 2,
     toughness = 5})

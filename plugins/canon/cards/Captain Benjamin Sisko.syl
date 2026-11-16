@@ -19,9 +19,9 @@ card singleFaced({
               cast(
                 fromAmong(
                   anyNumber,
-                  and([
-                      isSpell,
-                      hasManaValue(atMost, countOf(and([hasSubtype(officer), youControl])))]),
+                  nominal(
+                    spell,
+                    post = [hasManaValue(atMost, countOf(nominal(officer, post = [youControl])))]),
                   those(card)),
                 altCost = withoutPaying))]))],
     power = 2,

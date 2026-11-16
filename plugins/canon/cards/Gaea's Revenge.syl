@@ -11,8 +11,8 @@ card singleFaced({
           by(
             allOf(
               or([
-                  and([isSpell, non(hasColor(green))]),
-                  abilityOf(allOf(and([isSource, non(hasColor(green))])))]))),
+                  nominal(pre = [non(green)], spell),
+                  abilityOf(allOf(nominal(pre = [non(green)], source)))]))),
           target(thisCreature)))],
     power = 8,
     toughness = 5})

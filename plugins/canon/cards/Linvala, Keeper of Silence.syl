@@ -11,8 +11,8 @@ card singleFaced({
           any,
           activate(
             allOf(
-              and([
-                  abilityHead(anyActivated),
-                  abilityOf(allOf(and([isCreature, opponentsControl])))])))))],
+              nominal(
+                abilityHead(anyActivated),
+                post = [ofSource(allOf(nominal(creature, post = [opponentsControl])))])))))],
     power = 3,
     toughness = 4})

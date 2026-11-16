@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(partSkip(you, drawStep)),
-      whenever(does(actor(you), discard(a(isCard))), exileFrom(that(card), yourGraveyard)),
+      whenever(does(actor(you), discard(a(card))), exileFrom(that(card), yourGraveyard)),
       activated(
         perform(payLife(amount = 1)),
         sequentially([

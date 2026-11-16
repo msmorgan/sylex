@@ -1,0 +1,4 @@
+# A subtype as a Nominal head: a permanent of that subtype on the battlefield [CR#109.2,110.1].
+primitive subtype(subtype: Subtype): Nominal = Subtype {
+  spelling = "$subtype"
+}
