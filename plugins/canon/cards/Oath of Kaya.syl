@@ -7,7 +7,7 @@ card singleFaced({
       when(
         does(actor(this), enter),
         sequentially(
-          [instruct(this, dealDamage(amount = 3, recipient = target(anyTarget))), gainLife(3)])),
+          [instruct(it, dealDamage(amount = 3, recipient = target(anyTarget))), gainLife(3)])),
       whenever(
         does(
           actor(anOpponent),
