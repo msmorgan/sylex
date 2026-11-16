@@ -12,6 +12,6 @@ ability backup(amount: Amount) {
           doIf(
             is(that(creature), and([isCreature, isOther])),
             establishThroughout(
-              abilityGrantSelected(that(creature), thisCreature, printedAfter(backup)),
+              abilityGrantSelected(that(creature), printedAfter(backup), thisCreature),
               untilEndOfTurn))]))]
 }

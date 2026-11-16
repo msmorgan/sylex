@@ -1,2 +1,2 @@
 # The game is during the specified turn part.
-primitive duringPart(part: TurnPart, whose: Option(NounPhrase) = none): Condition = DuringPart
+primitive duringPart(whose: Option(NounPhrase) = none, part: TurnPart): Condition = DuringPart

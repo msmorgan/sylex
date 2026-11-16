@@ -10,7 +10,7 @@ card singleFaced({
       at(
         beginningOfYour(endStep),
         if = exists(
-          comparesOwnStat(power, and([isCreature, youControl]), greater, basePowerOf(ownMember))),
+          comparesOwnStat(and([isCreature, youControl]), power, greater, basePowerOf(ownMember))),
         create(1, written(creatureToken(1, 1, [white], [soldier]))))],
     power = 2,
     toughness = 2})

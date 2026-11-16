@@ -18,6 +18,6 @@ card singleFaced({
               did(
                 actor(you),
                 cast(thisSpell),
-                within(soFarThisTurn, timing = duringPart(mainPhase, whose = you))),
+                within(soFarThisTurn, timing = duringPart(whose = you, mainPhase))),
               get(the(and([isCreature, youControl])), up(1), up(1), duration = untilEndOfTurn)),
             fightEachOther(those(creature))]))]})

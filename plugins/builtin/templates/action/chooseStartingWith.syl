@@ -1,10 +1,10 @@
-# "choose <chosen> starting with <first>"
+# "starting with <first>, [each player] [<disclosure>] chooses <chosen> [<when>]"
 template chooseStartingWith(
   first: NounPhrase,
-  chosen: NounPhrase,
   disclosure: Disclosure = openly,
+  chosen: NounPhrase,
   when: Option(Timing) = none): VerbPhrase {
   # TODO(spelling): "Starting with <first>," precedes the clause's subject; waits on
   # `syl-clause-and-imperative`.
-  body = choose($chosen, disclosure = $disclosure, first = $first, when = $when)
+  body = choose(first = $first, disclosure = $disclosure, $chosen, when = $when)
 }

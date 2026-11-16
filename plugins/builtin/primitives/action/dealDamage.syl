@@ -1,7 +1,7 @@
 # "<subject> deals [<amount>] [<kind>] damage [to <recipient>]"
 primitive dealDamage(
   amount: Amount = anyAmount,
-  recipient: NounPhrase = any,
-  kind: Option(DamageKind) = none): VerbPhrase = DealDamage {
+  kind: Option(DamageKind) = none,
+  recipient: NounPhrase = any): VerbPhrase = DealDamage {
   spelling = "deal< $amount>< $kind> damage< to $recipient>"
 }

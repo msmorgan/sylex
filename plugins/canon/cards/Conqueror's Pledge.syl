@@ -7,4 +7,4 @@ card singleFaced({
       spell(
         replace(
           create(6, written(creatureToken(1, 1, [white], [kor, soldier]))),
-          doIf(keywordCostPaid(kicker, this), instead(create(12, asThose)))))]})
+          doIf(keywordCostPaid(this, kicker), instead(create(12, asThose)))))]})

@@ -8,7 +8,7 @@ card singleFaced({
       flying,
       when(
         does(actor(thisCreature), enter),
-        if = keywordCostPaid(surge, it),
+        if = keywordCostPaid(it, surge),
         instruct(it, dealDamage(amount = 3, recipient = target(isAnyTarget))))],
     power = 5,
     toughness = 4})

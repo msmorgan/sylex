@@ -4,8 +4,8 @@
 # Duration, since the text states none. Once it has triggered, paying no longer stops it. The text names the delayed trigger nowhere, so the special action reads
 # the most recently created delayed trigger directly.
 template delayUnlessPaid(
-  event: GameEvent,
   action: VerbPhrase,
+  event: GameEvent,
   player: NounPhrase,
   cost: Cost): VerbPhrase {
   spelling = "$action at $event unless $player pays $cost before that step",

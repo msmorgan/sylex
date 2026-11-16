@@ -3,12 +3,12 @@
 # that cost and mana spendable only on it read this payment.
 template doUnlessKeywordCost(
   action: VerbPhrase,
-  cost: Cost,
   whose: NounPhrase,
-  keyword: KeywordLabel): VerbPhrase {
+  keyword: KeywordLabel,
+  cost: Cost): VerbPhrase {
   spelling = "$action unless you pay $whose's $keyword cost",
   body = withContinuation(
     optional,
-    pay(payment($cost), once, whose = $whose, keyword = $keyword),
+    pay(whose = $whose, keyword = $keyword, payment($cost), once),
     ifNot = $action)
 }

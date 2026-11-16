@@ -13,7 +13,7 @@ card singleFaced({
       activated(
         compound([mana([generic(1)]), tapSymbol]),
         sequentially([
-            repeatTimes(letter(x), proliferate),
+            repeatTimes(proliferate, letter(x)),
             define(
               x,
               countOf(

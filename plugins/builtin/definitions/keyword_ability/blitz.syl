@@ -13,10 +13,10 @@ ability blitz(cost: Cost) {
     static(
       resolutionDelayedTrigger(
         doIf(
-          keywordCostPaid(blitz, thisSpell),
+          keywordCostPaid(thisSpell, blitz),
           atNext(beginningOfNext(endStep), sacrifice(becomes(thisSpell)))))),
     static(
       asLongAs(
-        keywordCostPaid(blitz, thisPermanent),
+        keywordCostPaid(thisPermanent, blitz),
         abilityGrant(thisPermanent, [haste, when(does(actor(thisPermanent), die), draw(1))])))]
 }

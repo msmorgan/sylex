@@ -7,7 +7,7 @@ card singleFaced({
         asLongAs(
           is(thisArtifact, isUntapped),
           replace(
-            would(actor(a(isCreature)), dealDamage(recipient = you, kind = combat)),
+            would(actor(a(isCreature)), dealDamage(kind = combat, recipient = you)),
             instead(preventDamage(ofThatDamage(1)))))),
       activated(
         compound([mana([generic(2)]), tapSymbol]),

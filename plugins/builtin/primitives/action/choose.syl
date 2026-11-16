@@ -1,8 +1,8 @@
 # "[<disclosure>] choose <chosen> [<when>]"
 primitive choose(
-  chosen: NounPhrase,
-  disclosure: Disclosure = openly,
   first: Option(NounPhrase) = none,
+  disclosure: Disclosure = openly,
+  chosen: NounPhrase,
   when: Option(Timing) = none): VerbPhrase = Choose {
   spelling = "<$disclosure >choose $chosen< $when>"
 }

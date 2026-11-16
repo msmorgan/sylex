@@ -1,5 +1,5 @@
 # "<spec> during [<whose>] untap step"
-template duringUntapStep(whose: Option(NounPhrase), spec: StaticSpec): StaticSpec {
+template duringUntapStep(spec: StaticSpec, whose: Option(NounPhrase)): StaticSpec {
   spelling = "$spec during< $whose> untap step",
-  body = partScope(untapStep, $whose, $spec)
+  body = partScope($whose, untapStep, $spec)
 }

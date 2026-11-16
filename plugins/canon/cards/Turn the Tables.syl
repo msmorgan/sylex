@@ -6,6 +6,6 @@ card singleFaced({
       spell(
         establishThroughout(
           replace(
-            would(any, dealDamage(recipient = you, kind = combat)),
+            would(any, dealDamage(kind = combat, recipient = you)),
             instead(redirectDamage(allDamage, target(and([isCreature, isAttacking]))))),
           thisTurn))]})

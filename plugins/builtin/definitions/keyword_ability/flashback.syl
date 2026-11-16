@@ -17,5 +17,5 @@ ability flashback(cost: Cost) {
     static(
       replace(
         would(actor(thisSpell), leave(from = stack)),
-        doIf(keywordCostPaid(flashback, thisSpell), instead(exile(thisSpell)))))]
+        doIf(keywordCostPaid(thisSpell, flashback), instead(exile(thisSpell)))))]
 }

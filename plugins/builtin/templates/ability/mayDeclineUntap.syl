@@ -3,5 +3,5 @@
 # writes, holding only if you so choose. Untapping stays the default.
 template mayDeclineUntap(subject: NounPhrase, whose: Option(NounPhrase)): StaticSpec {
   spelling = "You may choose not to untap $subject during< $whose> untap step",
-  body = duringUntapStep($whose, onlyIf(cant(any, untap($subject)), soChooses(you)))
+  body = duringUntapStep(onlyIf(cant(any, untap($subject)), soChooses(you)), $whose)
 }

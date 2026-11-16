@@ -1,6 +1,6 @@
 # "<subject> attacks [<defender>] with <attackers>"
 primitive attackWith(
-  attackers: NounPhrase,
-  defender: Option(NounPhrase) = none): VerbPhrase = AttackWith {
+  defender: Option(NounPhrase) = none,
+  attackers: NounPhrase): VerbPhrase = AttackWith {
   spelling = "attack< $defender> with $attackers"
 }

@@ -8,12 +8,12 @@ card singleFaced({
       static(
         conjunction([
             gatedBy(
-              scaledGenericMana(times(1, countersOn(p1p1Counter, it))),
               actor(thisCreature),
-              attack),
+              attack,
+              scaledGenericMana(times(1, countersOn(p1p1Counter, it)))),
             gatedBy(
-              scaledGenericMana(times(1, countersOn(p1p1Counter, it))),
               actor(thisCreature),
-              block)]))],
+              block,
+              scaledGenericMana(times(1, countersOn(p1p1Counter, it))))]))],
     power = 2,
     toughness = 2})

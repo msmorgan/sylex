@@ -13,7 +13,7 @@ card singleFaced({
       whenever(
         does(
           actor(a(and([isCreature, youControl, hasCounter(kind = p1p1Counter)]))),
-          dealDamage(recipient = a(isPlayer), kind = combat)),
+          dealDamage(kind = combat, recipient = a(isPlayer))),
         instruct(that(player), discard(a(cardIn(hand)))))],
     power = 1,
     toughness = 1})

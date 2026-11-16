@@ -13,7 +13,7 @@ ability dash(cost: Cost) {
     static(
       resolutionDelayedTrigger(
         doIf(
-          keywordCostPaid(dash, thisSpell),
+          keywordCostPaid(thisSpell, dash),
           atNext(beginningOfNext(endStep), returnToHand(becomes(thisSpell)))))),
-    static(asLongAs(keywordCostPaid(dash, thisPermanent), abilityGrant(thisPermanent, [haste])))]
+    static(asLongAs(keywordCostPaid(thisPermanent, dash), abilityGrant(thisPermanent, [haste])))]
 }

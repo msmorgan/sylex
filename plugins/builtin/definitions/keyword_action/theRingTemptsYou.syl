@@ -28,12 +28,12 @@ action theRingTemptsYou {
               asLongAs(
                 compareAmt(
                   eventCount(
+                    actor(you),
                     ownScope(
                       theRingTemptsYou,
                       sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
-                    actor(you),
                     thisGame),
                   atLeast,
                   2),
@@ -47,12 +47,12 @@ action theRingTemptsYou {
               asLongAs(
                 compareAmt(
                   eventCount(
+                    actor(you),
                     ownScope(
                       theRingTemptsYou,
                       sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
-                    actor(you),
                     thisGame),
                   atLeast,
                   3),
@@ -68,12 +68,12 @@ action theRingTemptsYou {
               asLongAs(
                 compareAmt(
                   eventCount(
+                    actor(you),
                     ownScope(
                       theRingTemptsYou,
                       sequentially([
                           choose(a(and([isCreature, actorControls]))),
                           gainDesignation(that(creature), ringBearer)])),
-                    actor(you),
                     thisGame),
                   atLeast,
                   4),
@@ -83,7 +83,7 @@ action theRingTemptsYou {
                     whenever(
                       does(
                         actor(a(and([hasDesignation(ringBearer), youControl]))),
-                        dealDamage(recipient = a(isPlayer), kind = combat)),
+                        dealDamage(kind = combat, recipient = a(isPlayer))),
                       instruct(eachOpponent, loseLife(3)))])))])),
       choose(a(and([isCreature, actorControls]))),
       gainDesignation(that(creature), ringBearer)])

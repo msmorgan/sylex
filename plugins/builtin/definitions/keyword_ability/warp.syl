@@ -15,7 +15,7 @@ ability warp(cost: Cost) {
     static(
       resolutionDelayedTrigger(
         doIf(
-          keywordCostPaid(warp, thisSpell),
+          keywordCostPaid(thisSpell, warp),
           atNext(
             beginningOfNext(endStep),
             sequentially([

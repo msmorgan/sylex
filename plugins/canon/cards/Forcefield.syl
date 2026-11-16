@@ -9,7 +9,7 @@ card singleFaced({
           replace(
             would(
               actor(aYourChoice(and([isCreature, isUnblocked]))),
-              dealDamage(recipient = you, kind = combat)),
+              dealDamage(kind = combat, recipient = you)),
             instead(preventDamage(allBut(1))),
             use = nextTimeOnly),
           thisTurn))]})

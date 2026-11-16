@@ -1,4 +1,4 @@
 template thisClass: NounPhrase {
   spelling = "this Class",
-  body = headed(class, this)
+  body = headed(this, class)
 }

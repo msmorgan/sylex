@@ -8,11 +8,11 @@ card singleFaced({
         does(
           actor(a(isPlayer)),
           pay(
-            payment(anyCost),
-            once,
             outcome = unpaid,
             whose = thisEnchantment,
-            keyword = cumulativeUpkeep)),
+            keyword = cumulativeUpkeep,
+            payment(anyCost),
+            once)),
         sequentially([
             instruct(
               this,

@@ -634,7 +634,7 @@ fn fight_deals_damage_between_performer_and_other() {
         };
         assert_eq!(definition, "fight");
         let mut hits = Vec::new();
-        performed_targets(body, &performer, "dealDamage", 1, &mut hits);
+        performed_targets(body, &performer, "dealDamage", 2, &mut hits);
         assert_eq!(
             hits,
             vec![(&performer, &other), (&other, &performer)],

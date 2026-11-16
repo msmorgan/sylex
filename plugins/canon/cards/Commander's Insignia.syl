@@ -8,6 +8,6 @@ card singleFaced({
           allOf(and([isCreature, youControl])),
           up(
             eventCount(
-              cast(headed(spell, yourCommander), from = commandZone),
               actor(you),
+              cast(headed(yourCommander, spell), from = commandZone),
               thisGame))))]})

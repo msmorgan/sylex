@@ -1,7 +1,7 @@
 # The number of occurrences of a historical action clause.
 template eventCount(
-  action: VerbPhrase,
   subj: Subject,
+  action: VerbPhrase,
   within: Duration,
   timing: Option(Timing) = none): Amount {
   # TODO(spelling): Tally wordings are not yet designed (`docs/specs/voice-and-object-phrases.md`

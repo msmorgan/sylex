@@ -16,7 +16,7 @@ ability melee {
                 isOpponent,
                 did(
                   actor(you),
-                  attackWith(a(isCreature), defender = which),
+                  attackWith(defender = which, a(isCreature)),
                   within = within(thisCombat))]))),
         duration = untilEndOfTurn))]
 }

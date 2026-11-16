@@ -10,6 +10,7 @@ card singleFaced({
           instruct(
             controllerOf(it),
             doUnless(
+              mana([generic(1)]),
               instruct(
                 you,
                 gain(
@@ -17,5 +18,4 @@ card singleFaced({
                     and(
                       [isCreature, youControl, inCombat(blockerOf, counterpart = that(creature))])),
                   [firstStrike],
-                  duration = untilEndOfTurn)),
-              mana([generic(1)])))))]})
+                  duration = untilEndOfTurn))))))]})

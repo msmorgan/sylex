@@ -1,8 +1,8 @@
-# "If <clause> would happen, <replacement> instead [duration]."
+# "[<duration>, ]<clause>, <replacement>" ("Until end of turn, if a creature would enter …")
 template replaceEvent(
+  duration: Option(Duration),
   clause: WouldClause,
-  replacement: Replacement,
-  duration: Option(Duration)): VerbPhrase {
+  replacement: Replacement): VerbPhrase {
   spelling = "<$duration, >$clause, $replacement",
   body = establish(replace($clause, $replacement), duration = $duration)
 }

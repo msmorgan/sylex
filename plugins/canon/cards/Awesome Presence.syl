@@ -7,9 +7,9 @@ card singleFaced({
       enchant(isCreature),
       static(
         gatedBy(
+          any,
+          block(attacker = enchanted(creature)),
           scaledGenericMana(
             forEach(
               3,
-              and([isCreature, controlledBy(they), inCombat(blockerOf, counterpart = it)]))),
-          any,
-          block(attacker = enchanted(creature))))]})
+              and([isCreature, controlledBy(they), inCombat(blockerOf, counterpart = it)])))))]})

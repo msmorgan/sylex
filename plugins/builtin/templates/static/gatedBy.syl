@@ -1,15 +1,15 @@
 # "<subj> can't <action> unless <its controller> pays <cost>"
 template gatedBy(
-  cost: Cost,
   subj: Subject,
   action: VerbPhrase,
   timing: Option(Timing) = none,
   asThough: Option(AsThough) = none,
-  except: Option(DeonticExcept) = none): StaticSpec {
+  except: Option(DeonticExcept) = none,
+  cost: Cost): StaticSpec {
   spelling = "$subj can't $action< $timing>< $asThough>< $except> unless its controller pays $cost",
   body = staticSpecGatedBy(
-    $cost,
     $subj,
     $action,
-    {timing = $timing, asThough = $asThough, except = $except})
+    {timing = $timing, asThough = $asThough, except = $except},
+    $cost)
 }

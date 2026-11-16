@@ -14,12 +14,12 @@ ability sneak(cost: Cost) {
           altCost = payingInstead(
             compound(
               [$cost, perform(returnToHand(a(and([isCreature, isUnblocked, youControl]))))]))),
-        timing = and([asInstant, duringPart(declareBlockers, whose = you)]))),
+        timing = and([asInstant, duringPart(whose = you, declareBlockers)]))),
     static(
       replace(
         would(actor(thisPermanent), enter),
         doIf(
-          keywordCostPaid(sneak, thisPermanent),
+          keywordCostPaid(thisPermanent, sneak),
           # It enters tapped and attacking what the returned creature was attacking [CR#702.190b].
           withRiders([
               entersAs(tapped),

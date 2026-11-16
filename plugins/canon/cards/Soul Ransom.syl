@@ -7,6 +7,6 @@ card singleFaced({
       enchant(isCreature),
       static(controlGrant(you, enchanted(creature))),
       activatedBy(
-        perform(repeatTimes(2, sequentially([choose(a(cardIn(hand))), discard(that(card))]))),
+        perform(repeatTimes(sequentially([choose(a(cardIn(hand))), discard(that(card))]), 2)),
         sequentially([instruct(controllerOf(thisAura), sacrifice(it)), instruct(they, draw(2))]),
         yourOpponents)]})

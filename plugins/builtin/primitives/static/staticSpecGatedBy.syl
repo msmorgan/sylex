@@ -1,5 +1,5 @@
 primitive staticSpecGatedBy(
-  cost: Cost,
   subj: Subject,
   action: VerbPhrase,
-  mods: DeonticMods): StaticSpec = GatedBy
+  mods: DeonticMods,
+  cost: Cost): StaticSpec = GatedBy

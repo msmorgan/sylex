@@ -17,6 +17,6 @@ designation initiative {
       whenever(
         does(
           actor(counted(orMore(1), and([isCreature, controlledBy(a(isPlayer))]))),
-          dealDamage(recipient = theInitiativeHolder, kind = combat)),
+          dealDamage(kind = combat, recipient = theInitiativeHolder)),
         gainDesignation(controllerOf(those(creature)), initiative)))]
 }

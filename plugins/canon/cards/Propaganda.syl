@@ -5,9 +5,9 @@ card singleFaced({
     text = [
       static(
         gatedBy(
+          actor(allOf(isCreature)),
+          attack(defender = you),
           scaledGenericMana(
             forEach(
               2,
-              and([isCreature, controlledBy(they), inCombat(attackerOf, counterpart = you)]))),
-          actor(allOf(isCreature)),
-          attack(defender = you)))]})
+              and([isCreature, controlledBy(they), inCombat(attackerOf, counterpart = you)])))))]})

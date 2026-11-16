@@ -6,8 +6,8 @@ card singleFaced({
     text = [
       static(
         partScope(
-          turn,
           you,
+          turn,
           conjunction([
               costShift(
                 allOf(and([isSpell, did(actor(yourOpponents), cast(which), within = thisObject)])),

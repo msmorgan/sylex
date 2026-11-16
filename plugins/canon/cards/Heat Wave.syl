@@ -10,6 +10,7 @@ card singleFaced({
           block(attacker = allOf(and([isCreature, youControl]))))),
       static(
         gatedBy(
-          perform(payLife(amount = forEach(1, and([isCreature, isBlocking, controlledBy(they)])))),
           actor(allOf(and([isCreature, non(hasColor(blue))]))),
-          block(attacker = allOf(and([isCreature, youControl])))))]})
+          block(attacker = allOf(and([isCreature, youControl]))),
+          perform(
+            payLife(amount = forEach(1, and([isCreature, isBlocking, controlledBy(they)]))))))]})

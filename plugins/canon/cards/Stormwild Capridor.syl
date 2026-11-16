@@ -7,7 +7,7 @@ card singleFaced({
       flying,
       static(
         replace(
-          would(any, dealDamage(recipient = thisCreature, kind = noncombat)),
+          would(any, dealDamage(kind = noncombat, recipient = thisCreature)),
           instead(
             preventDamage(
               allDamage,

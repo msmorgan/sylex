@@ -17,7 +17,7 @@ ability cipher {
         counterpart(encodedOn, this),
         [
           whenever(
-            does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),
+            does(actor(thisCreature), dealDamage(kind = combat, recipient = a(isPlayer))),
             may(
               sequentially([
                   copy(

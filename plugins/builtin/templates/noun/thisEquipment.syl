@@ -1,4 +1,4 @@
 template thisEquipment: NounPhrase {
   spelling = "this Equipment",
-  body = headed(equipment, this)
+  body = headed(this, equipment)
 }

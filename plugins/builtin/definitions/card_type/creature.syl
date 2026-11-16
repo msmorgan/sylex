@@ -24,7 +24,7 @@ card_type creature {
         any,
         activate(allOf(and([abilityHead(anyActivated), abilityOf(this), tapOrUntapInCost]))),
         unless = controlledSinceTheirTurnBegan(this))),
-    damageResult(markDamage(this, amount = thatMuch)),
+    damageResult(markDamage(amount = thatMuch, this)),
     stateBased(compareAmt(toughnessOf(this), atMost, 0), putInto(this, graveyard)),
     stateBased(
       and([

@@ -18,5 +18,5 @@ ability jumpStart {
     static(
       replace(
         would(actor(thisSpell), leave(from = stack)),
-        doIf(choiceWasTaken(byKeyword(jumpStart), thisSpell), instead(exile(thisSpell)))))]
+        doIf(choiceWasTaken(thisSpell, byKeyword(jumpStart)), instead(exile(thisSpell)))))]
 }

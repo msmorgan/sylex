@@ -10,7 +10,7 @@ card singleFaced({
       whenever(
         does(
           actor(a(and([isHistoric, isCreature, youControl]))),
-          dealDamage(recipient = a(isPlayer), kind = combat)),
+          dealDamage(kind = combat, recipient = a(isPlayer))),
         create(
           1,
           written({

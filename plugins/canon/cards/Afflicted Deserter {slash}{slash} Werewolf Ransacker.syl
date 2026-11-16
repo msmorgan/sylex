@@ -27,7 +27,7 @@ card transforming({
       at(
         beginningOfEach(upkeep),
         if = compareAmt(
-          aggregateOver(max, isPlayer, eventCount(cast(a(isSpell)), actor(they), lastTurn)),
+          aggregateOver(max, isPlayer, eventCount(actor(they), cast(a(isSpell)), lastTurn)),
           atLeast,
           2),
         transform(thisCreature))],

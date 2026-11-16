@@ -7,6 +7,6 @@ card singleFaced({
       trample,
       when(
         does(actor(thisCreature), enter),
-        doUnless(sacrifice(it), scaledGenericMana(forEach(1, cardIn(yourHand)))))],
+        doUnless(scaledGenericMana(forEach(1, cardIn(yourHand))), sacrifice(it)))],
     power = 4,
     toughness = 4})

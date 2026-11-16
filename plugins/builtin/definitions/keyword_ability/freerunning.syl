@@ -14,6 +14,6 @@ ability freerunning(cost: Cost) {
             a(
               and(
                 [isCreature, or([hasSubtype(assassin), hasDesignation(commander)]), youControl]))),
-          dealDamage(recipient = a(isPlayer), kind = combat),
+          dealDamage(kind = combat, recipient = a(isPlayer)),
           within(soFarThisTurn))))]
 }

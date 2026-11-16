@@ -1,7 +1,7 @@
 # The accumulated magnitude of historical action events.
 template eventSum(
-  action: VerbPhrase,
   subj: Subject,
+  action: VerbPhrase,
   within: Duration,
   timing: Option(Timing) = none): Amount {
   # TODO(spelling): Tally wordings are not yet designed (`docs/specs/voice-and-object-phrases.md`

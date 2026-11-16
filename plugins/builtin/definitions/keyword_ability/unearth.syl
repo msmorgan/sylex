@@ -11,6 +11,6 @@ ability unearth(cost: Cost) {
           returnToBattlefield(thisCard, from = yourGraveyard),
           gain(thisPermanent, [haste]),
           atNext(beginningOfNext(endStep), exile(thisPermanent)),
-          replaceEvent(would(actor(thisPermanent), leave), instead(exile(thisPermanent)), none)]),
+          replaceEvent(none, would(actor(thisPermanent), leave), instead(exile(thisPermanent)))]),
       asSorcery)]
 }

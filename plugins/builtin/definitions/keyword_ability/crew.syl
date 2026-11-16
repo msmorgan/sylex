@@ -11,10 +11,10 @@ ability crew(amount: Amount) {
       perform(
         tap(
           withTotal(
+            allOf(and([isUntapped, and([isCreature, youControl, isOther])])),
             stat(power),
             atLeast,
-            $amount,
-            allOf(and([isUntapped, and([isCreature, youControl, isOther])]))))),
+            $amount))),
       establishThroughout(
         characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})]),
         untilEndOfTurn))]

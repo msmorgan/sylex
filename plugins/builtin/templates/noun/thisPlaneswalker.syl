@@ -1,4 +1,4 @@
 template thisPlaneswalker: NounPhrase {
   spelling = "this planeswalker",
-  body = headed(planeswalker, this)
+  body = headed(this, planeswalker)
 }

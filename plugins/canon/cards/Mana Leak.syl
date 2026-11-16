@@ -8,4 +8,4 @@ card singleFaced({
       spell(
         instruct(
           controllerOf(target(isSpell)),
-          doUnless(instruct(you, counter(it)), mana([generic(3)]))))]})
+          doUnless(mana([generic(3)]), instruct(you, counter(it)))))]})

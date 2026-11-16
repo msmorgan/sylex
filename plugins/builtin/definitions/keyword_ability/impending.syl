@@ -12,18 +12,18 @@ ability impending(amount: Amount, cost: Cost) {
       replace(
         would(actor(thisPermanent), enter),
         doIf(
-          keywordCostPaid(impending, thisPermanent),
+          keywordCostPaid(thisPermanent, impending),
           withRiders([withCounters($amount, printedKind(timeCounter), fresh)])))),
     static(
       asLongAs(
         and([
-            keywordCostPaid(impending, thisPermanent),
+            keywordCostPaid(thisPermanent, impending),
             is(thisPermanent, hasCounter(kind = timeCounter))]),
         characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]))),
     at(
       beginningOfYour(endStep),
       if = and([
-          keywordCostPaid(impending, thisPermanent),
+          keywordCostPaid(thisPermanent, impending),
           is(thisPermanent, hasCounter(kind = timeCounter))]),
       removeCounters(exactly(1), printedKind(timeCounter), thisPermanent))]
 }

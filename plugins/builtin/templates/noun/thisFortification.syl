@@ -1,5 +1,5 @@
 # "this Fortification"
 template thisFortification: NounPhrase {
   spelling = "this Fortification",
-  body = headed(fortification, this)
+  body = headed(this, fortification)
 }

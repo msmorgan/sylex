@@ -1,5 +1,5 @@
 # "during <whose> <part>"
-template duringPart(part: TurnPart, whose: Option(NounPhrase) = none): Timing {
+template duringPart(whose: Option(NounPhrase) = none, part: TurnPart): Timing {
   spelling = "during $whose $part",
   body = inPart($part, $whose, current)
 }

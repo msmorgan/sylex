@@ -2,5 +2,5 @@
 template delayWithin(event: GameEvent, duration: Duration, action: VerbPhrase): VerbPhrase {
   # TODO(spelling): Separating fronted-duration "whenever"/"at" wordings from `delay` waits on
   # `syl-spelling-conventions`.
-  body = delay($event, $action, duration = $duration)
+  body = delay($event, duration = $duration, $action)
 }

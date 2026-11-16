@@ -19,5 +19,5 @@ ability beamMeUp(cost: Cost) {
     static(
       replace(
         would(actor(thisSpell), leave(from = stack)),
-        doIf(keywordCostPaid(beamMeUp, thisSpell), instead(exile(thisSpell)))))]
+        doIf(keywordCostPaid(thisSpell, beamMeUp), instead(exile(thisSpell)))))]
 }

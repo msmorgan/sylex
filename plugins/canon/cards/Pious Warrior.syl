@@ -4,6 +4,6 @@ card singleFaced({
     types = [creature],
     subtypes = [human, rebel, warrior],
     text = [
-      whenever(does(any, dealDamage(recipient = thisCreature, kind = combat)), gainLife(thatMuch))],
+      whenever(does(any, dealDamage(kind = combat, recipient = thisCreature)), gainLife(thatMuch))],
     power = 2,
     toughness = 3})

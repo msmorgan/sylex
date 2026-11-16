@@ -6,4 +6,4 @@ card singleFaced({
       activatedOnlyDuring(
         compound([tapSymbol, perform(sacrifice(thisArtifact))]),
         exchangeLifeTotals(and([you, target(isOpponent)])),
-        duringPart(upkeep, whose = you))]})
+        duringPart(whose = you, upkeep))]})

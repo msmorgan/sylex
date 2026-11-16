@@ -8,7 +8,7 @@ card singleFaced({
       at(
         beginningOfYour(endStep),
         create(
-          eventCount(faceDilemma, actor(you), soFarThisTurn),
+          eventCount(actor(you), faceDilemma, soFarThisTurn),
           written(creatureToken(1, 1, [red], [officer])))),
       activated(
         compound(

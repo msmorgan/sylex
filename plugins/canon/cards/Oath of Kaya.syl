@@ -12,7 +12,7 @@ card singleFaced({
         does(
           actor(anOpponent),
           attackWith(
-            counted(orMore(1), isCreature),
-            defender = a(and([isPlaneswalker, youControl])))),
+            defender = a(and([isPlaneswalker, youControl])),
+            counted(orMore(1), isCreature))),
         sequentially(
           [instruct(this, dealDamage(amount = 2, recipient = that(player))), gainLife(2)]))]})

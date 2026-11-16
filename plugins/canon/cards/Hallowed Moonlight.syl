@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         sequentially([
             replaceEvent(
+              untilEndOfTurn,
               would(actor(a(and([isCreature, not(was(cast(which), within = thisObject))]))), enter),
-              instead(exile(it)),
-              untilEndOfTurn),
+              instead(exile(it))),
             draw(1)]))]})

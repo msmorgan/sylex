@@ -1,7 +1,7 @@
 # "a <dom> with <stat> <r> <bound>": the stat of `member`, the member itself unless written.
 template comparesOwnStat(
-  stat: Stat,
   domain: Predicate,
+  stat: Stat,
   comparator: Comparator,
   bound: Amount,
   member: NounPhrase = ownMember): Predicate {

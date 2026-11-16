@@ -14,8 +14,8 @@ card singleFaced({
               choose(
                 a(
                   comparesOwnStat(
-                    power,
                     and([isCreature, controlledBy(they)]),
+                    power,
                     atMost,
                     powerOf(it))))),
             doIf(

@@ -1,5 +1,5 @@
 # "<body> <times> times"
-template repeatTimes(times: Amount, body: VerbPhrase): VerbPhrase {
+template repeatTimes(body: VerbPhrase, times: Amount): VerbPhrase {
   spelling = "$body $times times",
   body = repeat(fixed($times, $body))
 }

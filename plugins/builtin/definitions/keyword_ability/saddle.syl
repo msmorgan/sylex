@@ -12,10 +12,10 @@ ability saddle(amount: Amount) {
       perform(
         tap(
           withTotal(
+            allOf(and([isUntapped, and([isCreature, youControl, isOther])])),
             stat(power),
             atLeast,
-            $amount,
-            allOf(and([isUntapped, and([isCreature, youControl, isOther])]))))),
+            $amount))),
       gainDesignation(thisPermanent, saddled, duration = untilEndOfTurn),
       asSorcery)]
 }

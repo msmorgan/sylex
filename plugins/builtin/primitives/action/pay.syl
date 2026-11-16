@@ -4,8 +4,8 @@
 # TODO(spelling): `whose`, `keyword`, and `outcome` replace `$cost` with keyword-cost wordings
 # rather than adding an optional part; waits on `syl-spelling-conventions`.
 primitive pay(
-  cost: Cost,
-  times: PayTimes,
   outcome: PaymentOutcome = paid,
   whose: Option(NounPhrase) = none,
-  keyword: Option(KeywordLabel) = none): VerbPhrase = Pay
+  keyword: Option(KeywordLabel) = none,
+  cost: Cost,
+  times: PayTimes): VerbPhrase = Pay

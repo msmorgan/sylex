@@ -9,6 +9,6 @@ ability prowl(cost: Cost) {
         altCost(payingInstead($cost), this),
         did(
           actor(a(and([shares(subtype(creature), share, thisSpell), youControl]))),
-          dealDamage(recipient = a(isPlayer), kind = combat),
+          dealDamage(kind = combat, recipient = a(isPlayer)),
           within(soFarThisTurn))))]
 }

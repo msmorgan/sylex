@@ -8,7 +8,7 @@ template preventAll(
   spelling = "prevent all< $kind> damage that would be dealt< to $to>< $by>< $duration>",
   body = establish(
     replace(
-      would($by, dealDamage(recipient = $to, kind = $kind)),
+      would($by, dealDamage(kind = $kind, recipient = $to)),
       instead(preventDamage(allDamage))),
     duration = $duration)
 }

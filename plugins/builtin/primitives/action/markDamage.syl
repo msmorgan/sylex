@@ -1,5 +1,5 @@
 # "<amount> damage is marked on <subject>": the result of damage dealt to a creature by a source
 # with neither wither nor infect [CR#120.3e].
-primitive markDamage(subject: NounPhrase, amount: Amount = anyAmount): VerbPhrase = MarkDamage {
+primitive markDamage(amount: Amount = anyAmount, subject: NounPhrase): VerbPhrase = MarkDamage {
   spelling = "$amount damage is marked on $subject"
 }

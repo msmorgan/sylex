@@ -13,7 +13,7 @@ ability offering(quality: Predicate) {
         plusAdditional(perform(sacrifice(a(and([$quality, isPermanent]))))))),
     static(
       if(
-        keywordCostPaid(offering, thisSpell),
+        keywordCostPaid(thisSpell, offering),
         reducedBySymbols(thisSpell, manaCostOf(the(and([was(sacrifice(which)), isPermanent])))))),
-    static(if(keywordCostPaid(offering, this), can(actor(you), cast(this), timing = asInstant)))]
+    static(if(keywordCostPaid(this, offering), can(actor(you), cast(this), timing = asInstant)))]
 }

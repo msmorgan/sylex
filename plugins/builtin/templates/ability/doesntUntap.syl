@@ -8,5 +8,5 @@ template doesntUntap(
   whose: Option(NounPhrase),
   unless: Option(Condition) = none): StaticSpec {
   spelling = "$subject doesn't untap during< $whose> untap step< unless $unless>",
-  body = duringUntapStep($whose, cant(any, untap($subject), unless = $unless))
+  body = duringUntapStep(cant(any, untap($subject), unless = $unless), $whose)
 }

@@ -1,8 +1,8 @@
 # "<subject> has <selection> of <source>" (backup [CR#702.165a]).
 template abilityGrantSelected(
   subject: NounPhrase,
-  source: NounPhrase,
-  selection: AbilitySelection): StaticSpec {
+  selection: AbilitySelection,
+  source: NounPhrase): StaticSpec {
   spelling = "$subject has $selection of $source",
   body = characteristicChange($subject, [addedSelectionOf($source, $selection)])
 }

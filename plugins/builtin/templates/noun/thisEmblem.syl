@@ -1,4 +1,4 @@
 template thisEmblem: NounPhrase {
   spelling = "this emblem",
-  body = headed(emblem, this)
+  body = headed(this, emblem)
 }

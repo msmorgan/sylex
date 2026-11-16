@@ -1,8 +1,8 @@
 # "put <subject> [from <from>] onto the battlefield attached to <host>" [CR#303.4i]
 template putOntoBattlefieldAttachedTo(
   subject: NounPhrase,
-  host: NounPhrase,
-  from: Location = anywhere): VerbPhrase {
+  from: Location = anywhere,
+  host: NounPhrase): VerbPhrase {
   spelling = "put $subject< from $from> onto the battlefield attached to $host",
   body = zoneChange($subject, battlefield, $from, [attachedTo($host)])
 }

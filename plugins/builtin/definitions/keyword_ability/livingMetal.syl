@@ -6,7 +6,7 @@ ability livingMetal {
   body = [
     static(
       partScope(
-        turn,
         you,
+        turn,
         characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})])))]
 }

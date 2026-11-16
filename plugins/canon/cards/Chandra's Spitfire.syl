@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       flying,
       whenever(
-        does(any, dealDamage(recipient = anOpponent, kind = noncombat)),
+        does(any, dealDamage(kind = noncombat, recipient = anOpponent)),
         get(thisCreature, up(3), up(0), duration = untilEndOfTurn))],
     power = 1,
     toughness = 3})

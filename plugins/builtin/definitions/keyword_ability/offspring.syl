@@ -8,7 +8,7 @@ ability offspring(cost: Cost) {
     static(addedCost(this, optional, plusAdditional($cost))),
     when(
       does(actor(thisPermanent), enter),
-      if = keywordCostPaid(offspring, thisPermanent),
+      if = keywordCostPaid(thisPermanent, offspring),
       create(
         1,
         copyOf(

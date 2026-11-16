@@ -1,5 +1,5 @@
 # "untap <subject> during [<whose>] untap step"
 template untapDuring(subject: NounPhrase, whose: Option(NounPhrase)): StaticSpec {
   spelling = "Untap $subject during< $whose> untap step",
-  body = duringUntapStep($whose, must(any, untap($subject)))
+  body = duringUntapStep(must(any, untap($subject)), $whose)
 }

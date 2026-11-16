@@ -7,8 +7,8 @@ card singleFaced({
       enchant(isCreature),
       static(
         conjunction([
-            gatedBy(mana([generic(3)]), actor(enchanted(creature)), attack),
-            gatedBy(mana([generic(3)]), actor(enchanted(creature)), block)])),
+            gatedBy(actor(enchanted(creature)), attack, mana([generic(3)])),
+            gatedBy(actor(enchanted(creature)), block, mana([generic(3)]))])),
       static(
         costShift(
           allOf(and([abilityHead(anyActivated), abilityOf(enchanted(creature))])),

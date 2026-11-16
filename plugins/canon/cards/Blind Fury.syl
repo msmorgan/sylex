@@ -8,7 +8,7 @@ card singleFaced({
             establishThroughout(abilityLoss(allOf(isCreature), [written(trample)]), untilEndOfTurn),
             establishThroughout(
               replace(
-                would(actor(a(isCreature)), dealDamage(recipient = a(isCreature), kind = combat)),
+                would(actor(a(isCreature)), dealDamage(kind = combat, recipient = a(isCreature))),
                 instead(
                   instruct(
                     it,

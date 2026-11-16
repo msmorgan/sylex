@@ -12,7 +12,7 @@ ability mutate(cost: Cost) {
     static(altCost(payingInstead($cost), this)),
     static(
       if(
-        choiceWasTaken(byKeyword(mutate), thisSpell),
+        choiceWasTaken(thisSpell, byKeyword(mutate)),
         addsTarget(
           thisSpell,
           and([isCreature, not(hasSubtype(human)), ownedBy(ownerOf(thisSpell))])))),
@@ -20,7 +20,7 @@ ability mutate(cost: Cost) {
       replace(
         would(actor(thisSpell), enter),
         doIf(
-          choiceWasTaken(byKeyword(mutate), thisSpell),
+          choiceWasTaken(thisSpell, byKeyword(mutate)),
           instead(
             chooseOne(
               merge(thisSpell, the(was(target(which))), top),

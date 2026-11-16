@@ -9,7 +9,7 @@ template preventNext(
   spelling = "prevent the next $amount< $kind> damage that would be dealt< to $to>< $by>< $duration>",
   body = establish(
     replace(
-      would($by, dealDamage(recipient = $to, kind = $kind)),
+      would($by, dealDamage(kind = $kind, recipient = $to)),
       instead(preventDamage(theNext($amount)))),
     duration = $duration)
 }

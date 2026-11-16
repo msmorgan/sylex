@@ -1,5 +1,5 @@
 # "may pay <cost>. If they don't, <action>."
-template doUnless(action: VerbPhrase, cost: Cost): VerbPhrase {
+template doUnless(cost: Cost, action: VerbPhrase): VerbPhrase {
   spelling = "may pay $cost. If they don't, $action.",
   body = withContinuation(optional, pay(payment($cost), once), ifNot = $action)
 }
