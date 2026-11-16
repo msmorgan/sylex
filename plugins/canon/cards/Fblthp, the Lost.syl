@@ -12,7 +12,7 @@ card singleFaced({
           doIf(
             or([
                 did(actor(it), enter(from = yourLibrary), triggering),
-                is(it, did(any, cast(which, from = yourLibrary), within = thisObject))]),
+                is(it, was(cast(which, from = yourLibrary), within = thisObject))]),
             instead(draw(2))))),
       when(does(actor(a(isSpell)), target(this)), shuffleInto(this))],
     power = 1,

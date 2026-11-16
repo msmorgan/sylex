@@ -6,5 +6,5 @@ card singleFaced({
       spell(
         sequentially([
             counter(
-              target(and([isSpell, did(any, cast(which, from = graveyard), within = thisObject)]))),
+              target(and([isSpell, was(cast(which, from = graveyard), within = thisObject)]))),
             draw(1)]))]})

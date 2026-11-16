@@ -13,8 +13,7 @@ card singleFaced({
               preventDamage(
                 allDamage,
                 also = doIf(
-                  did(
-                    any,
+                  was(
                     preventDamage(
                       allDamage,
                       damage = would(actor(a(and([isSource, hasColor(black)]))), dealDamage)),

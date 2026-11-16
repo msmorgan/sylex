@@ -6,7 +6,7 @@ card transforming({
     text = [
       at(
         beginningOfEach(upkeep),
-        if = not(did(any, cast(a(isSpell)), within(lastTurn))),
+        if = not(was(cast(a(isSpell)), within(lastTurn))),
         transform(thisCreature))],
     power = 3,
     toughness = 2},

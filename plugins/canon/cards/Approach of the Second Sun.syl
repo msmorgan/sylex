@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         doIf(
           and([
-              is(this, did(any, cast(which, from = yourHand), within = thisObject)),
+              is(this, was(cast(which, from = yourHand), within = thisObject)),
               did(
                 actor(you),
                 cast(a(and([isSpell, isOther, named(printedName("Approach of the Second Sun"))]))),

@@ -10,8 +10,7 @@ ability paradigm {
     spell(
       doIf(
         not(
-          did(
-            any,
+          was(
             resolve(a(and([isSpell, isOther, youControl, shares(cardName, share, thisSpell)]))),
             within(thisGame))),
         delayWithin(

@@ -13,5 +13,5 @@ conferral plottedCardCast {
             actor(you),
             cast(this, from = exileZone, altCost = withoutPaying),
             timing = asSorcery),
-          did(any, gainDesignation(this, plotted), within(soFarThisTurn)))))}
+          was(gainDesignation(this, plotted), within(soFarThisTurn)))))}
 }

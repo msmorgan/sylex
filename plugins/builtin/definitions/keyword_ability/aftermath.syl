@@ -14,6 +14,6 @@ ability aftermath {
       replace(
         would(actor(thisSpell), leave(from = stack)),
         doIf(
-          is(thisSpell, did(any, cast(which, from = graveyard), within = thisObject)),
+          is(thisSpell, was(cast(which, from = graveyard), within = thisObject)),
           instead(exile(thisSpell)))))]
 }

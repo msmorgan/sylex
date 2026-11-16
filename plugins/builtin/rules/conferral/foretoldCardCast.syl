@@ -10,5 +10,5 @@ conferral foretoldCardCast {
       static(
         onlyUnless(
           can(actor(you), cast(this, from = exileZone, altCost = usingKeyword(foretell))),
-          did(any, gainDesignation(this, foretold), within(soFarThisTurn)))))}
+          was(gainDesignation(this, foretold), within(soFarThisTurn)))))}
 }

@@ -1,4 +1,6 @@
-# "… this way": the event the enclosing action caused.
+# "… this way": the event the enclosing ability's earlier text caused [CR#608.2c]. It is no
+# linking phrase [CR#607.1], so it reads only the current ability's stamps; a Participial
+# Description that reaches a linked ability's objects [CR#607.2a] omits `within`.
 primitive thisWay: LookbackSpan = ThisWay {
   spelling = "this way"
 }

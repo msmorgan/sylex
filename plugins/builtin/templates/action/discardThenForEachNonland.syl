@@ -4,7 +4,5 @@ template discardThenForEachNonland(discarded: NounPhrase, step: VerbPhrase): Ver
   spelling = "discard $discarded, then $step for each nonland card discarded this way",
   body = sequentially([
       discard($discarded),
-      doForEach(
-        allOf(and([non(isLand), isCard, did(any, discard(which), within = thisWay)])),
-        $step)])
+      doForEach(allOf(and([non(isLand), isCard, was(discard(which), within = thisWay)])), $step)])
 }
