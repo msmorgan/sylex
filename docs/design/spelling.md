@@ -663,12 +663,12 @@ and an argument printed at two Holes prints its Tail once. A Tail stands last am
 beside it and holds no Tail.
 
 **A Gap is `^`.** A word that stands for a Gap is spelled with the mark and nothing else: `which`,
-the Gap of a relative clause, and `_`, the Gap a shared phrase fills, are each to be `spelling =
-"^"`; today `which` has no `spelling` and `_` is not declared. The mark prints no word. Where it
-stands, the Reading has a Gap of the Category its word's sort is spelled as (§1), and a wording
-that holds one is checked as English with the Gap in place. So, once they are, every word a card's
-term may hold has a `spelling`, except the promoted `subject` of a passive, which is no Gap (§2),
-and a declaration with no `spelling` is a word only a rule may use ([Semantics](semantics.md) §4).
+the Gap of a relative clause, has `spelling = "^"`, and `_`, the Gap a shared phrase fills, is to
+have `spelling = "^"` (`_` is not declared yet). The mark prints no word. Where it stands, the
+Reading has a Gap of the Category its word's sort is spelled as (§1), and a wording that holds one
+is checked as English with the Gap in place. Once `_` is declared, every word a card's term may
+hold has a `spelling`, except the promoted `subject` of a passive, which is no Gap (§2), and a
+declaration with no `spelling` is a word only a rule may use ([Semantics](semantics.md) §4).
 
 **The notation does not yet express passive subject promotion (§2).** Nothing marks a
 context's Subject Hole and Action Hole as the pair the rule links, or which Action's parameter
@@ -732,16 +732,15 @@ things are known limits:
   tokens" prints a word for an empty list of colors.
 - **A Tail between two of its host's adjuncts.** Only the two placements exist.
 
-The declarations under `plugins/` still write a Hole `<name>`: 784 Holes on 601 `spelling`
-lines, three of which need a tie (`landwalk`, `typecycling` and `non`) and two an ordinal
-(`fromTop` and `fromBottom`, "$n@Ordinal from …"). No declaration writes a form label, a `*` or
-a `#<.>` join yet. The `syl-spelling-notation-crate` ticket migrates the Holes, and
-`syl-spelling-forms-and-runs` writes the labels, marks and joins.
+`sylex_spelling` parses every `spelling` under `plugins/`. Only `fromTop` and `fromBottom`
+write a form label (`$n@Ordinal`), and no declaration writes another form label, a `*` or a
+`#<.>` join yet; the `syl-spelling-forms-and-runs` ticket writes them.
 
 ## 8. Capacity and cost
 
 What the grammar can describe is known only in part, and what recovery costs is not known at
-all, because no spelling crate exists. This section separates the two.
+all, because `sylex_spelling` parses only the `spelling` notation so far and does not yet
+recover or spell terms. This section separates the two.
 
 - **Substitution keeps the English side context-free.** Each Construction's English half is a
   tree of a kind the context-free English grammar already builds, and substitution builds only

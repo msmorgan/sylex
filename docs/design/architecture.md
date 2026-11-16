@@ -57,7 +57,8 @@ each name resolved by expected sort. It keeps its Template and Definition
 calls, follows the card's English phrase by phrase, and is what is stored,
 recovered and rendered. It says which words and constructions the card prints,
 and its sorts name kinds of phrase ([Surface](surface.md) §1). `sylex_syl` parses,
-formats and checks `.syl` and reads nothing inside a `spelling`.
+formats and checks `.syl` and reads nothing inside a `spelling`;
+`sylex_spelling` parses the `spelling` notation.
 
 **Semantics** reads a surface term and decides what it means. **Expanding** the
 term's calls yields the **expanded tree** of primitives, and semantics reads

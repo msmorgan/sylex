@@ -110,8 +110,7 @@ location is not stated by the declaration, and it can disagree with what the dec
   third, which a `spelling` needs for the join that puts each mode on its own line. Why: a line
   break typed inside a string is ugly and easy to miss.
 - **A `spelling` is written in the notation of [`spelling.md`](./spelling.md) §7**, where a Hole
-  is `$name`, the sigil that reads the same parameter in `body`. The corpus still writes a Hole
-  `<name>`, which `syl-spelling-conventions` migrates.
+  is `$name`, the sigil that reads the same parameter in `body`.
 - **Citations live in comments.** There is no `rule` field; `cargo xtask cite` checks the comments.
 - **Paths are for people.** Folder and file names never carry meaning.
 
