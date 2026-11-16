@@ -383,20 +383,20 @@ the one creature that "it" names. An unprinted anaphor is a word in the term tha
 not have, and spelling would have to know to print nothing for it. The term writes the phrase
 once in one of two ways:
 
-- **Where the phrase has the same role in every arm, the term coordinates where English does.**
-  The coordinated phrases stand under one subject: Predator's Strike's two continuous-effect verb
+- **Where the phrase has the same role in every arm, the term coordinates where English does.** The
+  coordinated phrases stand under one subject: Predator's Strike's two continuous-effect verb
   phrases under the one Construction that supplies their subject (not yet built, §2), and one
   `does` over an `or` of the Actions of "attacks or blocks" and of Chub Toad's "blocks or becomes
   blocked", `does(actor(thisCreature), or([block, becomeBlocked]))` (not yet built: no `or` stands
-  at `Action` under `plugins/builtin/`, `surface.md` §7.5 refuses one at the event gate,
-  `becomeBlocked` still takes its subject, and the `syl-shared-phrase-written-once` ticket settles
-  both). The subject of Predator's Strike is no Handoff's, since a Handoff makes its subject the
-  Actor and a creature that gets +3/+3 performs nothing. A list Hole spells the coordination
-  (§3.1), and no extension is involved. "Attacks or blocks" is one trigger condition, met when a
-  game event matches either event [CR#603.2], and an `or` of event-capable Actions under one
-  Subject is how the term says so when the events share their Subject. Several trigger conditions
-  of one ability, each with its own trigger word, are instead the disjunction at
-  `TriggerCondition` [CR#603.1b].
+  at `Action` under `plugins/builtin/`, the event gate refuses one (`semantics.md` §3.2,
+  `surface.md` §7.5), `becomeBlocked` still takes its subject, and the
+  `syl-shared-phrase-written-once` ticket settles both). The subject of Predator's Strike is no
+  Handoff's, since a Handoff makes its subject the Actor and a creature that gets +3/+3 performs
+  nothing. A list Hole spells the coordination (§3.1), and no extension is involved. "Attacks or
+  blocks" is one trigger condition, met when a game event matches either event [CR#603.2], and an
+  `or` of event-capable Actions under one Subject is how the term says so when the events share
+  their Subject. Several trigger conditions of one ability, each with its own trigger word, are
+  instead the disjunction at `TriggerCondition` [CR#603.1b].
 - **Where the roles differ, the coordination binds the phrase once.** Its Construction takes
   the shared phrase as a parameter, and each arm holds a placeholder word where the phrase
   belongs, as a lookback holds `which` (§1). The parameter is the binding, read once

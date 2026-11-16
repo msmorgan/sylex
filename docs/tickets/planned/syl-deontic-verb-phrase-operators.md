@@ -61,10 +61,10 @@ These are the last words that take a `Subject`, so the sort and its three words 
   is left in `plugins/`. A one-off script, kept in `docs/evidence/`, removes the remaining
   wrappers and checks that every file parses to the same tree apart from them; the landing
   reports the counts it compared.
-- `docs/design/surface.md` §7.6 states a deontic rule and a negative declarative as the
-  spec's §5 does, `docs/design/semantics.md` §2.2 item 3 gives the force of an indefinite
-  subject and where each operator's box opens as §5 does, and `docs/design/surface.md` §7.1's
-  table has the deontic and negative-declarative rows of the spec's §1 table.
+- `docs/design/surface.md` §7.6 states a deontic rule and a negative declarative as the spec's §5
+  does, `docs/design/semantics.md` §3.3 states the Unless Condition and §2.2 item 3 the force of an
+  indefinite subject and where each operator's box opens as §5 does, and `docs/design/surface.md`
+  §7.1's table has the deontic and negative-declarative rows of the spec's §1 table.
   `docs/design/syl.md` §2 no longer names `actor(…)` as a wrap written at the call site, and
   `docs/design/spelling.md` §3.3 gives *Aether Tunnel* as an ordinary coordination.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.

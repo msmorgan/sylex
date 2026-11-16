@@ -2,12 +2,14 @@
 
 ## Status: DRAFT
 
-This document is directional. It describes the semantic model the project is aiming at
-(reference resolution over a Discourse Representation Structure, Definitions and Templates, and
-the action-clause spine), and the design is not settled: read it for the intended shape, not as
-a contract the code keeps.
+This document is directional. It describes how a surface term is read into its meaning (what a
+clause means, reference resolution over a Discourse Representation Structure, and the path from a
+card's text to a stored term), and the design is not settled: read it for the intended shape, not
+as a contract the code keeps.
 
-- **Companion:** [`syl.md`](./syl.md), the `.syl` data language this model is written in.
+- **Companions:** [`syl.md`](./syl.md), the `.syl` data language, and
+  [`surface.md`](./surface.md), what a term is built from: Definitions, Templates and the
+  action-clause spine.
 
 ## Overview
 
@@ -183,8 +185,8 @@ anchor like any other reference (§2.4).
 
 ## 3. What a Clause Means
 
-What a term is built from, and how each of these is written, is [`surface.md`](./surface.md)
-§6 and §7.
+What a term is built from, and how an event, a static statement and a lookback are written, is
+[`surface.md`](./surface.md) §6 and §7.
 
 ### 3.1 Before and After the Event
 

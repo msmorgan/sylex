@@ -7,7 +7,7 @@ needs: [cleanup-step6-surface, syl-shared-phrase-written-once, syl-replacement-s
 ## Why
 
 `docs/design/semantics.md` §4 says how a surface term is read into its meaning: classify each
-clause, open its boxes, resolve its references, build the meaning. Nothing has run it. Its §8
+clause, open its boxes, resolve its references, build the meaning. Nothing has run it. Its §6
 already lists what the steps as written leave unsettled (items 11 to 13), and taking the
 sorts that say what a clause means out of the term language makes several names meet at one sort
 (item 7). Building `sylex_semantics` on that design untested commits to it, and removing the
@@ -45,9 +45,9 @@ replacements have landed.
   *Deflecting Palm*, *Dandân*, *Mana Leak*, *Contamination*, *Bounding Krasis*, *Centaur
   Omenreader*, *Broken Wings*, *Elven Riders* and *Detection Tower*, and the cards under
   "Events and their participants" in `docs/unusual-cards.md`.
-- For each card the findings give its hand-written terms, what each step did with each term,
-  and the outcome of §6: read, refused with the rule that refused it, or not understood. For
-  each wrong term they say whether a step refused it or it would reach pragmatics.
+- For each card the findings give its hand-written terms, what each step did with each term, and
+  the outcome of `semantics.md` §4: read, refused with the rule that refused it, or not understood.
+  For each wrong term they say whether a step refused it or it would reach pragmatics.
 - For each set of names that meets at one sort (`doIf`, `replace`, `nthOccurrence`, the ten
   `or` declarations and any other the audit of `plugins/builtin/` finds), the findings give
   each member's wording and say whether the set is one word or needs distinct names.

@@ -11,9 +11,10 @@ game. The design is not settled, and [`semantics.md`](./semantics.md) §6 lists 
 
 The words a surface term is built from are designed in `docs/specs/voice-and-object-phrases.md`
 (the clause, the verb phrase and its operators, the object phrases) and in the planned tickets
-that build them. §6 and §7 say what Definitions, Templates
-and the action-clause spine are in today's terms, with the sorts that say what a clause means
-still in the term language (§2).
+that build them. §6 and §7 say what Definitions, Templates and the action-clause spine are in
+today's term language, where the sorts that say what a clause means are still in it (§2). They
+were written when the term stated its own meaning, so they still say what some words mean
+beside how they are written, and the tickets that build the clause and voice words rewrite them.
 
 ## 1. A Sort Names a Kind of Phrase
 
@@ -83,9 +84,9 @@ calling a rules-only word, and what the clauses inside rules data are written as
 that arguments are bound as [`syl.md`](./syl.md) §2 says, and the structural refusals of
 `voice-and-object-phrases.md` §9 that concern silent words (`subject` under `done`, `_` under
 `shared`, `$actor` in an `action` Definition). The event gate and "a replacement's event is a
-`would` clause" are not surface form. Semantics refuses them ([`semantics.md`](./semantics.md) §4).
-Until it exists, the sorts that say what a clause means and the checks the planned tickets add to
-`cargo xtask dsl check` stand in for it.
+`would` clause" are not surface form. Semantics refuses them ([`semantics.md`](./semantics.md) §3.2
+and §4). Until it exists, the sorts that say what a clause means and the checks the planned tickets
+add to `cargo xtask dsl check` stand in for it.
 
 ## 6. Definitions and Templates
 
@@ -178,7 +179,7 @@ mention ([`syl.md`](./syl.md) §4). A Subject is one of three:
 The noun phrase of `actor(np)` or `by(np)` names the Actor and is an ordinary referent, not the
 Actor itself ([`semantics.md`](./semantics.md) §2.1). What an active Subject names need not
 be a player or a permanent: a spell or ability ("<ability> triggers") or an effect
-(`actor(thisEffect)`, §7.6) can be one.
+(`actor(thisEffect)`, §7.6 and [`semantics.md`](./semantics.md) §3.3) can be one.
 
 "Becomes blocked" is therefore not the agentless passive of `block`. It is its own event head,
 `becomeBlocked`: the Blocked status beginning, once per combat, even when an effect blocks the
@@ -238,7 +239,8 @@ Which events a pattern may name, and from which side of an event its description
 
 ### 7.6 Static Statements as Written
 
-What each of these means is [`semantics.md`](./semantics.md) §3.3.
+How an Unless Condition is read, what a cast permission widens and what makes something an
+effect are [`semantics.md`](./semantics.md) §3.3.
 
 - **Abilities granted, lost or listed together are one list**, in printed order, at the parameter
   of the word that grants, removes or lists them: "gains hexproof and indestructible" (`gain`),
