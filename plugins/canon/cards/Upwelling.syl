@@ -2,4 +2,4 @@ card singleFaced({
     name = "Upwelling",
     cost = [generic(3), pip(green)],
     types = [enchantment],
-    text = [static(manaRetention(eachPlayer, unspent(none)))]})
+    text = [static(manaRetention(bare(player), unspent(none)))]})

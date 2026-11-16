@@ -10,7 +10,7 @@ card singleFaced({
         does(actor(you), cast(a(spell))),
         sequentially([
             get(
-              each(nominal(creature, post = [youControl])),
+              bare(nominal(creature, post = [youControl])),
               up(1),
               up(0),
               duration = untilEndOfTurn),
