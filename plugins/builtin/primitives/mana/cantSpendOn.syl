@@ -1,4 +1,4 @@
-# "You can't spend this mana to <purposes>."
+# "This mana can't be spent to <purposes>." [CR#111.10h,111.10w]
 primitive cantSpendOn(purposes: List(SpendPurpose)): ManaRider = SpendNotOn {
-  spelling = "You can't spend this mana to $purposes#<or>."
+  spelling = "This mana can't be spent to $purposes#<or>."
 }

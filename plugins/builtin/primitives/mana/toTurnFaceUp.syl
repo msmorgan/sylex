@@ -1,4 +1,4 @@
-# "to turn <subject> face up" [CR#116.2b]
+# "turn <subject> face up" [CR#116.2b]
 primitive toTurnFaceUp(subject: Predicate): SpendPurpose = ToTurnFaceUp {
-  spelling = "to turn $subject face up"
+  spelling = "turn $subject face up"
 }

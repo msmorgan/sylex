@@ -1,4 +1,4 @@
-# "to cast <predicate> spells"
+# "cast <predicate> spells"
 primitive toCast(predicate: Predicate): SpendPurpose = ToCast {
-  spelling = "to cast $predicate spells"
+  spelling = "cast $predicate spells"
 }
