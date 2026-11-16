@@ -1,4 +1,8 @@
-# The difference established by the preceding comparison.
+# "the difference": the positive difference established by the enclosing strict inequality
+# comparison (`compareAmt`, `compareOver`). It is not `thatMuch`: it is introduced by a comparator
+# rather than an action or event, stays scoped to that comparison's positive branch without leaking
+# across negation (`not`, an `else` branch) or disjunction (`or`), and is never eligible for bare
+# "that much" or "that many".
 primitive theDifference: Amount = Difference {
   spelling = "the difference"
 }

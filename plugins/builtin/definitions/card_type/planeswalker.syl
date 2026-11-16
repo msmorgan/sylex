@@ -13,6 +13,6 @@ card_type planeswalker {
     castableFrom(yourHand, asSorcery),
     ability(static(entersWithCounters(this, statOf(stat(loyalty), this), loyaltyCounter))),
     property(can(any, attack(defender = this))),
-    damageResult(loseCounters(printedKind(loyaltyCounter), thatMuch, agent = this)),
+    damageResult(loseCounters(printedKind(loyaltyCounter), thatMany, agent = this)),
     stateBased(compareAmt(countersOn(loyaltyCounter, this), equal, 0), putInto(this, graveyard))]
 }

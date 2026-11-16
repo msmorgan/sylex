@@ -1,0 +1,6 @@
+# "that many": the count-noun form of `thatMuch`, chosen by the noun quantified rather than by
+# whether the antecedent was a scalar outcome or an object group.
+template thatMany: Amount {
+  spelling = "that many",
+  body = thatMuch
+}

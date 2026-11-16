@@ -10,7 +10,7 @@ card singleFaced({
             would(
               any,
               createObject(anyAmount, token(copyOf(counted(orMore(1), token)), []), under = you))),
-          instead(create(times(2, groupSize), asThose)))),
+          instead(create(times(2, thatMany), asThose)))),
       static(
         replace(
           causedBy(
@@ -18,4 +18,4 @@ card singleFaced({
             would(
               any,
               putCounters(anyAmount, anyKind, a(nominal(permanent, post = [youControl]))))),
-          instead(putCounters(times(2, thatMuch), thoseCounters, that(permanent)))))]})
+          instead(putCounters(times(2, thatMany), thoseCounters, that(permanent)))))]})

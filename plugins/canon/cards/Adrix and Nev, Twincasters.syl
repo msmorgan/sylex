@@ -11,6 +11,6 @@ card singleFaced({
           would(
             any,
             createObject(anyAmount, token(copyOf(counted(orMore(1), token)), []), under = you)),
-          instead(create(times(2, groupSize), asThose))))],
+          instead(create(times(2, thatMany), asThose))))],
     power = 2,
     toughness = 2})

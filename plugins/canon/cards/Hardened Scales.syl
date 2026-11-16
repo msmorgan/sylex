@@ -11,4 +11,4 @@ card singleFaced({
               anyAmount,
               printedKind(p1p1Counter),
               a(nominal(creature, post = [youControl])))),
-          instead(putCounters(plus(thatMuch, 1), printedKind(p1p1Counter), it))))]})
+          instead(putCounters(plus(thatMany, 1), printedKind(p1p1Counter), it))))]})

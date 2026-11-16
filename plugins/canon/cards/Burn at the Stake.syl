@@ -11,4 +11,10 @@ card singleFaced({
             perform(
               tap(counted(anyNumber, nominal(pre = [untapped], creature, post = [youControl]))))))),
       spell(
-        instruct(this, dealDamage(amount = times(3, groupSize), recipient = target(anyTarget))))]})
+        instruct(
+          this,
+          dealDamage(
+            amount = times(
+              3,
+              countOf(nominal(creature, post = [was(tap(which), within = thisWay)]))),
+            recipient = target(anyTarget))))]})

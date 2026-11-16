@@ -12,10 +12,10 @@ card singleFaced({
               anyAmount,
               anyKind,
               a(nominal(or([artifact, creature]), post = [youControl])))),
-          instead(putCounters(plus(thatMuch, 1), thoseCounters, that(permanent))))),
+          instead(putCounters(plus(thatMany, 1), thoseCounters, that(permanent))))),
       static(
         replace(
           would(any, putCounters(anyAmount, anyKind, you)),
-          instead(putCounters(plus(thatMuch, 1), thoseCounters, you))))],
+          instead(putCounters(plus(thatMany, 1), thoseCounters, you))))],
     power = 2,
     toughness = 3})

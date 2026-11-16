@@ -13,7 +13,7 @@ card singleFaced({
               under = you)),
           instead(
             create(
-              groupSize,
+              thatMany,
               written({
                   characteristics = {
                     colors = [white],

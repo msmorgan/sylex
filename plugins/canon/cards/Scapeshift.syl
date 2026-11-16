@@ -6,6 +6,6 @@ card singleFaced({
       spell(
         sequentially([
             sacrifice(counted(anyNumber, land)),
-            search(yourLibrary, for = counted(upToOf(groupSize), nominal(pre = [land], card))),
+            search(yourLibrary, for = counted(upToOf(thatMany), nominal(pre = [land], card))),
             putOntoBattlefieldTapped(them),
             shuffle]))]})

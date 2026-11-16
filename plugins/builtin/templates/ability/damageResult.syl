@@ -1,4 +1,4 @@
-# The results of damage dealt to `this`, `result` reading the damage dealt as `thatMuch`.
+# The results of damage dealt to `this`, `result` reading the damage dealt as `thatMuch` or `thatMany`.
 template damageResult(result: VerbPhrase): Conferral {
   body = property(asEvent(does(any, dealDamage(recipient = this)), $result))
 }

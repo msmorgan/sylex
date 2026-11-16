@@ -7,6 +7,6 @@ card singleFaced({
       flying,
       whenever(
         does(actor(a(source)), dealDamage(recipient = thisCreature)),
-        instruct(controllerOf(thatSource), mill(thatMuch)))],
+        instruct(controllerOf(thatSource), mill(thatMany)))],
     power = 2,
     toughness = 5})

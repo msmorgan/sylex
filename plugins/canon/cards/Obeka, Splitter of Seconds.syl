@@ -8,6 +8,6 @@ card singleFaced({
       menace,
       whenever(
         does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
-        additionalStep(upkeep, none, thatMuch))],
+        additionalStep(upkeep, none, thatMany))],
     power = 2,
     toughness = 5})

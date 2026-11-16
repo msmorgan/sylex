@@ -1,4 +1,8 @@
-# "the chosen number"
+# "the chosen number": the number a choice in scope or a linked choice ability selected
+# [CR#607.2d], paired with `theLastChosenNumber` over `ChoiceRef`. It is not `thatMuch`: it belongs
+# to the `ChoiceRef` family alongside `chosen`, `ofChosen` and `thatAbility`, and crosses ability
+# boundaries on linked abilities [CR#607.1,607.2d], whereas numeric anaphors resolve only within
+# the current ability.
 primitive chosenNumber(ref: ChoiceRef = theChoice): Amount = ChosenNumber {
   spelling = "the chosen number"
 }

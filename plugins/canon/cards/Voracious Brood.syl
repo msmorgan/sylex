@@ -11,6 +11,6 @@ card singleFaced({
           p1p1Counter)),
       whenever(
         does(any, putInto(counted(orMore(1), nominal(pre = [creature], card)), yourGraveyard)),
-        putCounters(groupSize, printedKind(p1p1Counter), thisCreature))],
+        putCounters(thatMany, printedKind(p1p1Counter), thisCreature))],
     power = 1,
     toughness = 1})

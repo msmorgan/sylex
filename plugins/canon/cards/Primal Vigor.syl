@@ -6,8 +6,8 @@ card singleFaced({
       static(
         replace(
           would(any, createObject(anyAmount, token(copyOf(counted(orMore(1), token)), []))),
-          instead(create(times(2, groupSize), asThose)))),
+          instead(create(times(2, thatMany), asThose)))),
       static(
         replace(
           would(any, putCounters(anyAmount, printedKind(p1p1Counter), a(creature))),
-          instead(putCounters(times(2, thatMuch), printedKind(p1p1Counter), that(creature)))))]})
+          instead(putCounters(times(2, thatMany), printedKind(p1p1Counter), that(creature)))))]})

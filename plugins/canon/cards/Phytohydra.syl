@@ -7,6 +7,6 @@ card singleFaced({
       static(
         replace(
           would(any, dealDamage(recipient = thisCreature)),
-          instead(putCounters(thatMuch, printedKind(p1p1Counter), it))))],
+          instead(putCounters(thatMany, printedKind(p1p1Counter), it))))],
     power = 1,
     toughness = 1})

@@ -14,6 +14,6 @@ card singleFaced({
               anyAmount,
               anyKind,
               a(nominal(permanent, post = [controlledBy(or([you, a(teammate)]))])))),
-          instead(putCounters(plus(thatMuch, 1), thoseCounters, that(permanent)))))],
+          instead(putCounters(plus(thatMany, 1), thoseCounters, that(permanent)))))],
     power = 1,
     toughness = 1})

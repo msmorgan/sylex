@@ -1,2 +1,0 @@
-# The size of the current group.
-primitive groupSize: Amount = GroupSize

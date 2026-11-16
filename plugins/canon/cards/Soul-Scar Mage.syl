@@ -12,6 +12,6 @@ card singleFaced({
             dealDamage(
               kind = noncombat,
               recipient = a(nominal(creature, post = [anOpponentControls])))),
-          instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))],
+          instead(putCounters(thatMany, printedKind(m1m1Counter), that(creature)))))],
     power = 1,
     toughness = 2})

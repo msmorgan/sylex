@@ -9,5 +9,5 @@ ability wither {
     static(
       replace(
         causedBy(bySource(this), would(any, markDamage(a(creature)))),
-        instead(putCounters(thatMuch, printedKind(m1m1Counter), that(creature)))))]
+        instead(putCounters(thatMany, printedKind(m1m1Counter), that(creature)))))]
 }

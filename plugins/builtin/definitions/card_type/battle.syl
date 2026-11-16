@@ -14,7 +14,7 @@ card_type battle {
     castableFrom(yourHand, asSorcery),
     ability(static(entersWithCounters(this, statOf(stat(defense), this), defenseCounter))),
     property(can(any, attack(defender = this))),
-    damageResult(loseCounters(printedKind(defenseCounter), thatMuch, agent = this)),
+    damageResult(loseCounters(printedKind(defenseCounter), thatMany, agent = this)),
     stateBased(
       and([not(is(this, noun(a(siege)))), compareAmt(countersOn(defenseCounter, this), equal, 0)]),
       putInto(this, graveyard)),
