@@ -126,9 +126,10 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    Condition is inside its box (§3.3). Under `cant`, a hypothetical indefinite has universal
    force: "A player can't cast …" forbids each player ([CR#205.4e]). Targets, definite references
    and universal domains stay accessible under their identities ([CR#101.2]).
-4. **Distributive loop** (`doForEach`). Each pass binds the loop referent for the body to read.
-   On exit, the loop exports plural referents for the targets the body announced and the objects
-   it created. Each is a recorded discourse fact, not derived from determiners or stamps.
+4. **Distributive** (`each`, `eachOf`, `doForEach`). Inside its nuclear scope, "each" (`each`,
+   `eachOf`) introduces a singular referent, and `doForEach` binds one per pass. On leaving that
+   scope, its domain and the indefinites, targets and created objects introduced inside it are
+   exported as plural (§2.4). Each export is a recorded discourse fact, not derived from stamps.
 5. **Relative clause or comparison**, including the domain `countOf` and `aggregateAll` measure. It is
    closed on exit, so no later pronoun reads a measured domain. Attachment Hosts ("enchanted",
    "equipped") project to the ability's box ([CR#303.4b]).
@@ -165,9 +166,15 @@ Resolution applies DRT techniques to the DRS, measured against a gold set of the
 endophora. Whatever the technique, a referent is accessible to an anaphor only if all four hold:
 
 1. No active Reference Scope hides it.
-2. Its number agrees with the anaphor's. Inside a deontic rule's Unless Condition (§3.3), a
-   universal participant is read one member at a time: a plural anaphor reads the domain
-   distributively, and a singular one reads the member at hand.
+2. Its number agrees with the anaphor's. "Each" (`each`, `eachOf`) is distributive: inside its
+   nuclear scope its referent is singular (*Wave of Reckoning*'s "Each creature deals damage to
+   itself equal to its power", and singular "their" in *Rites of Flourishing*'s "Each player may
+   play an additional land on each of their turns"), and on leaving that scope its domain and the
+   indefinites introduced inside it are exported as plural (*Consume the Meek*'s "Destroy each
+   creature with mana value 3 or less. They can't be regenerated."; *Promise of Loyalty*'s "Each
+   player puts a vow counter on a creature they control … Each of those creatures …"). Inside a
+   deontic rule's Unless Condition (§3.3), a universal participant is read one member at a time: a
+   plural anaphor reads the domain distributively, and a singular one reads the member at hand.
 3. Its sort, zone and Head Noun fit the anaphor's carrier word ([CR#109.2]).
 4. The consuming verb can apply to it in its zone ([CR#109.2,701.21a]). A creature that died
    cannot be sacrificed or have counters put on it as a permanent.
