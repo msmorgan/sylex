@@ -19,5 +19,5 @@ ability infect {
         causedBy(
           byEvent(does(actor(this), dealDamage(recipient = a(player)))),
           would(any, loseLife(anyAmount))),
-        instead(putCounters(thatMuch(sort = damageDealt), printedKind(poison), that(player)))))]
+        instead(putCounters(thatMany(sort = damageDealt), printedKind(poison), that(player)))))]
 }

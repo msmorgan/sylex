@@ -547,7 +547,7 @@ the deontic words, and `replace`'s event is a `Clause` whose verb phrase is `wou
     # it instead."
     replace(
       clause(bare(damage), would(be(done(deal(subject, to = thisCreature))))),
-      instead(imperative(putCounters(counted(thatMuch, p1p1Counter), it))))
+      instead(imperative(putCounters(counted(thatMany, p1p1Counter), it))))
 
 `would` is an operator because cards print it inside a relative on a damage phrase (333 lines)
 and coordinate it under one subject with another verb phrase (*Illusionary Mask*'s "has not been

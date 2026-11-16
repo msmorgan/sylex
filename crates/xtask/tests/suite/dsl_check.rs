@@ -2661,6 +2661,7 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          template targets(q: Quantity, n: Nominal): NounPhrase {{ body = described(target($q), $n) }}\n\
          primitive whole: SliceCount = Whole\n\
          primitive sliceCounted(quantity: Quantity): SliceCount = Counted\n\
+         primitive totaling(bound: Amount): SliceCount = Totaling\n\
          primitive someOf(count: SliceCount, description: Option(Nominal) = none, group: NounPhrase): NounPhrase = SomeOf\n\
          primitive numberOf(group: NounPhrase): Amount = CountOf\n\
          template countOf(n: Nominal): Amount {{ body = numberOf(described(all, $n)) }}\n\
@@ -2679,6 +2680,9 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          template okPluralThe: NounPhrase {{ body = thePlural(nominal(card, post = [withDifferentNames])) }}\n\
          template okWholeSlice(g: NounPhrase): NounPhrase {{\n\
            body = someOf(whole, description = nominal(card, post = [withDifferentNames]), $g)\n\
+         }}\n\
+         template okTotaling(g: NounPhrase): NounPhrase {{\n\
+           body = someOf(totaling(4), description = nominal(card, post = [withDifferentNames]), $g)\n\
          }}\n\
          template okNestedInSingular: NounPhrase {{\n\
            body = a(nominal(creature, post = [didDiscard(counted(exactlyOf(2), nominal(card, post = [withDifferentNames])))]))\n\

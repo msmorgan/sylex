@@ -8,5 +8,6 @@ ability fear {
       cant(
         any,
         block(attacker = thisCreature),
-        except = byObjects(bare(nominal(pre = [andOr([artifact, black])], creature)))))]
+        except = byObjects(
+          bare(andOr([nominal(pre = [artifact], creature), nominal(pre = [black], creature)])))))]
 }

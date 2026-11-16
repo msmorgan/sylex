@@ -1,6 +1,6 @@
 # "that many": the count-noun form of `thatMuch`, chosen by the noun quantified rather than by
 # whether the antecedent was a scalar outcome or an object group.
-template thatMany: Amount {
+template thatMany(sort: Option(OutcomeSort) = none): Amount {
   spelling = "that many",
-  body = thatMuch
+  body = thatMuch(sort = $sort)
 }

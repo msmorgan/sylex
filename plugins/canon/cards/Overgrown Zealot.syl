@@ -9,6 +9,6 @@ card singleFaced({
         tapSymbol,
         addMana(
           counted(2, ofAnyColor(sameColor)),
-          riders = [spendOnly([toTurnFaceUp(in(battlefield))])]))],
+          riders = [spendOnly([toTurnFaceUp(isPermanent)])]))],
     power = 0,
     toughness = 4})

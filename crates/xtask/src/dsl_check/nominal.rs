@@ -641,7 +641,7 @@ impl<'a> NominalChecker<'a, '_> {
             } => {
                 let decl = &self.decls[*decl_idx];
                 if Self::is_primitive_ctor(decl, "SliceCount", "Whole")
-                    || Self::is_primitive_ctor(decl, "SliceCount", "Totalling")
+                    || Self::is_primitive_ctor(decl, "SliceCount", "Totaling")
                 {
                     true
                 } else if Self::is_primitive_ctor(decl, "SliceCount", "Counted") {
