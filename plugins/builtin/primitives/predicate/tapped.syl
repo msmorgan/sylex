@@ -1,4 +1,4 @@
-# [CR#110.5]
+# "tapped": a permanent's tapped status [CR#110.5].
 primitive tapped: Status = Tapped {
   lexical = {adjectives = ["tapped"]},
   spelling = "tapped"

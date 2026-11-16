@@ -1,5 +1,4 @@
-# "Undaunted" means "This spell costs {1} less to cast for each opponent you have."
-# [CR#702.125a]
+# "Undaunted" means "This spell costs {1} less to cast for each opponent you have." [CR#702.125a]
 ability undaunted {
   lexical = {lemma = "undaunted"},
   spelling = "undaunted",

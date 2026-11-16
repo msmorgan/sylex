@@ -1,5 +1,4 @@
-# "Menace": "This creature can't be blocked except by two or more creatures."
-# [CR#702.111b]
+# "Menace": "This creature can't be blocked except by two or more creatures." [CR#702.111b]
 ability menace {
   lexical = {lemma = "menace"},
   spelling = "menace",

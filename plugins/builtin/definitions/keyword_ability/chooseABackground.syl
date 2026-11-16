@@ -1,6 +1,5 @@
-# "Choose a Background" means "You may designate two cards as your commander rather than one if
-# one of them is this card and the other is a legendary Background enchantment card."
-# [CR#702.124k]
+# "Choose a Background" means "You may designate two cards as your commander rather than one if one
+# of them is this card and the other is a legendary Background enchantment card." [CR#702.124k]
 # It modifies deck construction and functions before the game begins [CR#702.124a], and nothing
 # models deck construction, so its body is empty.
 ability chooseABackground {

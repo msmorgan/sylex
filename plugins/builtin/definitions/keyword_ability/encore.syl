@@ -1,7 +1,6 @@
-# "Encore [cost]": "[Cost], Exile this card from your graveyard: For each opponent, create a
-# token that's a copy of this card that attacks that opponent this turn if able. The tokens gain
-# haste. Sacrifice them at the beginning of the next end step. Activate only as a sorcery."
-# [CR#702.141a]
+# "Encore [cost]": "[Cost], Exile this card from your graveyard: For each opponent, create a token
+# that's a copy of this card that attacks that opponent this turn if able. The tokens gain haste.
+# Sacrifice them at the beginning of the next end step. Activate only as a sorcery." [CR#702.141a]
 ability encore(cost: Cost) {
   lexical = {lemma = "encore", parameters = [[Cost]]},
   spelling = "encore $cost",

@@ -1,4 +1,4 @@
-# [CR#110.5]
+# "face down": a permanent's face-down status [CR#110.5].
 primitive faceDown: Status = FaceDown {
   lexical = {
     prepositions = [

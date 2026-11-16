@@ -1,5 +1,5 @@
-# "A Heartwood token is a red and green Heartwood artifact token with '{T}: Add {R} or {G}.'"
-# [CR#111.10x]
+# "A Heartwood token is a red and green Heartwood artifact token with '{T}: Add {R} or
+# {G}.'" [CR#111.10x]
 token heartwoodToken {
   spelling = "Heartwood token",
   body = {

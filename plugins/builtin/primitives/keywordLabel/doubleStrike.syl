@@ -1,5 +1,4 @@
-# Double strike is a static ability that modifies the rules for the combat damage step.
-# [CR#702.4a]
+# Double strike is a static ability that modifies the rules for the combat damage step [CR#702.4a].
 primitive doubleStrike: KeywordLabel = DoubleStrike {
   lexical = {lemma = "double strike"}
 }

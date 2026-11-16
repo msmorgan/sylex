@@ -1,5 +1,4 @@
-# "A creature with horsemanship can't be blocked by creatures without horsemanship."
-# [CR#702.31b]
+# "A creature with horsemanship can't be blocked by creatures without horsemanship." [CR#702.31b]
 ability horsemanship {
   lexical = {lemma = "horsemanship"},
   spelling = "horsemanship",

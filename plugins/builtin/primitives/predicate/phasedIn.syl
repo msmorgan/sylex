@@ -1,4 +1,4 @@
-# [CR#110.5]
+# "phased in": a permanent's phased-in status [CR#110.5].
 primitive phasedIn: Status = PhasedIn {
   lexical = {
     prepositions = [

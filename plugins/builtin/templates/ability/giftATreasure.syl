@@ -1,5 +1,4 @@
-# "Gift a Treasure" means the effect is "The chosen player creates a Treasure token."
-# [CR#702.174h]
+# "Gift a Treasure" means the effect is "The chosen player creates a Treasure token." [CR#702.174h]
 template giftATreasure: Ability {
   spelling = "gift a Treasure",
   body = gift(create(1, defined(treasureToken)))

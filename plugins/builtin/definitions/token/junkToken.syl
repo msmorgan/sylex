@@ -1,6 +1,5 @@
 # "A Junk token is a colorless Junk artifact token with '{T}, Sacrifice this token: Exile the top
-# card of your library. You may play that card this turn. Activate only as a sorcery.'"
-# [CR#111.10t]
+# card of your library. You may play that card this turn. Activate only as a sorcery.'" [CR#111.10t]
 token junkToken {
   spelling = "Junk token",
   body = {

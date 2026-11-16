@@ -1,4 +1,4 @@
-# [CR#110.5]
+# "phased out": a permanent's phased-out status [CR#110.5].
 primitive phasedOut: Status = PhasedOut {
   lexical = {
     prepositions = [

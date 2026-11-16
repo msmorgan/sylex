@@ -1,4 +1,4 @@
-# [CR#110.5]
+# "face up": a permanent's face-up status [CR#110.5].
 primitive faceUp: Status = FaceUp {
   lexical = {
     prepositions = [
