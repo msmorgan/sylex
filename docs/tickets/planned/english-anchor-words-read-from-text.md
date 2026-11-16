@@ -36,33 +36,19 @@ holds the label.
 - Where `CardScope` holds an Anchor Word, `Lexicon::stands_in` admits the open Anchor Word reading
   and refuses `FlavorWord` on the same spelling; elsewhere `FlavorWord` stands and the Anchor Word
   is refused.
+- Confirmation across units is paired in a shared `sylex_english` face-scope helper (called by
+  `census`, `forests`, `english parse --card` and `english forestwalk --card`): candidate words
+  `{A, B}` from an entry-choice unit (`As … enters, choose A or B.`) are committed only when
+  bulleted units on the face begin with `• A — ` and `• B — ` [CR#614.12c]; otherwise the choice
+  unit parses without anchor candidates (*Roots of Life* keeps its single `WordMention` Reading,
+  and *Believe* needs no card-name refusal).
+- `english.fug` licenses `choose A or B` through a dedicated binary `or`-coordination complement of
+  `choose` whose arms are both read Anchor Words rather than general `NounPhrase`s (1 Derivation on
+  the five `choose Khans or Dragons` Sieges).
+- Standalone judgment entries and `english parse` state anchor context with `<anchor=Khans>` /
+  `--anchor Khans` beside `<card=NAME>`.
 - `anchor_words.ron`, `schema::AnchorWord`, and the `anchor_name:` and `anchor_word:` loader paths
   are deleted.
-
-## Open questions
-
-- **How the cross-unit pass confirms `{A, B}` on a face.**
-  (a) Paired confirmation in `sylex_english`: candidate words `{A, B}` from an entry-choice unit
-  (`As … enters, choose A or B.`) are committed only when the following bulleted units on the face
-  begin with `• A — ` and `• B — ` [CR#614.12c]; otherwise the choice unit parses without anchor
-  candidates. *Roots of Life* keeps its single `WordMention` Reading, and *Believe* needs no
-  card-name refusal.
-  (b) Forward-only pass: any `As … enters, choose A or B.` unit licenses `A` and `B` on itself and
-  puts them in `CardScope` for later units on the face without checking for bullets, adding an
-  anchor-word Reading on *Roots of Life*'s first line.
-- **How `choose A or B` licenses the two words in `english.fug`.**
-  (a) A dedicated binary `or`-coordination complement of `choose` whose arms are both read Anchor
-  Words, rather than general `NounPhrase`s. On the five `choose Khans or Dragons` Sieges, line 1
-  drops from 2 Derivations (`ProperName("Khans")` coordinated with `BarePlural` `subtype:Dragon`
-  beside `ProperName("Dragons")`) to 1.
-  (b) Read each word into `Name` / `ProperName`, keeping 2 Derivations on `choose Khans or Dragons`.
-- **How a standalone judgment or `english parse` input states anchor context** (since
-  `Judgment::scope` and `--as-card` look up no card text, and `anchored_abilities.txt` judges
-  `• Khans — …` without its preceding choice unit).
-  (a) An explicit scope tag on the entry and CLI (`<anchor=Khans>` / `--anchor Khans`), beside
-  `<card=NAME>`.
-  (b) Multi-unit sequential inputs in judgment entries and `english parse`, threading `CardScope`
-  from the introducing line to the bullet lines.
 
 ## Done when
 
@@ -72,11 +58,11 @@ holds the label.
   *Frostcliff Siege*, *Glacierwood Siege*, *Hollowmurk Siege*, *Mirrodin Besieged*, *Monastery
   Siege*, *Outpost Siege*, *Palace Siege*, *Windcrag Siege*, *Battle of Hoover Dam*, *Phenomenon
   Investigators*, *Struggle for Project Purity*) is read, with each bulleted unit parsed as
-  `AnchoredAbility` (`!Mode`, 1 Reading on the *Frontier Siege* bullets).
+  `AnchoredAbility` (`!Mode`, 1 Reading on the *Frontier Siege* bullets) and 1 Derivation on the
+  five `choose Khans or Dragons` choice lines.
 - Non-anchor choices (*Roots of Life*'s "As this enchantment enters, choose Island or Swamp.") and
   flavor-labeled modal bullets (*Dawnbringer Cleric*, *Cult of Skaro*, *Astarion, the Decadent*)
-  keep their verdicts and Derivation counts; any count change on the five `Khans or Dragons` choice
-  lines matches the ruling on `choose A or B`.
+  keep their verdicts and Derivation counts.
 - Standalone judgment and CLI tests pin `anchored_abilities.txt`, admission's refusal of an
   unintroduced Anchor Word, and `FlavorWord` standing on the same spelling off-scope, replacing the
   `anchor_words.ron`-backed tests in `crates/vocabulary/tests/labels.rs`,
@@ -91,7 +77,7 @@ holds the label.
 ## Not in scope
 
 - Authoring or running anchor-word choices in `.syl` or the engine (`core-as-enters-choices`).
-- `vote_options.ron`.
+- `vote_options.ron` (`english-vote-options-read-from-text`).
 
 ## Pointers
 

@@ -18,16 +18,22 @@ A related gap: a `dependents` equation relates one dependent to the `head`, so t
 dependents of one Production that differ in time are both admitted under a head that carries no
 time.
 
-## Open questions
+## Design
 
-- Whether the Complement of causative *have*, *rather than* and *plus* shares its head's time.
+- Keep `BareInf` in `dependents TimeGiving` (documenting modals, supportive *do*, causative *have*
+  [CGEL, Ch. 14, §5.4, p. 1236; §5.6.2, p. 1244], *rather than* [Ch. 15, §2.8, p. 1317], and cost
+  *plus*), and add `PastPart` (`have + NP + PastPart`) to `dependents TimeGiving` with `Time`.
+- Collapse `PastTime` and `NonPastTime` into a single `feature Time = Past | Mixed | NonPast` with
+  `resolve: [Time -> Mixed]` on coordinations, so non-coordination `TimeGiving` unifies `$.Time`
+  across any number of dependents without pairwise `ExcludeTogether` negations.
 
 ## Done when
 
-- Each head that takes a bare infinitival either shares time with it on a cited ground or does
-  not share it, and a judgment pins each case on a real card.
-- Two time-giving dependents of one head that differ in time have no Reading together, whatever
-  the head carries.
+- `BareInf` and `PastPart` share time through `dependents TimeGiving` with their comment citing all
+  governors, and judgments pin causative *have* (`BareInf` and `PastPart`) and *rather than*.
+- `PastTime` and `NonPastTime` are replaced by `feature Time = Past | Mixed | NonPast` with
+  `resolve: [Time -> Mixed]`, and two time-giving dependents of one head that differ in time have no
+  Reading together whatever the head carries.
 - `cargo xtask english strata --check` passes, and `cargo test` and
   `cargo clippy --tests -- -D warnings` pass for each changed crate.
 

@@ -18,20 +18,28 @@ Separately, a multiplier before an object also reads as a frequency Adjunct of t
 produces twice [as much of that mana]* (Mana Reflection) and *enters with three times that
 many* each keep such a Reading beside the correct one.
 
-## Open questions
+## Design
 
-- Does any real card print *twice* before a bare Noun Phrase, so that the missing
-  `Determination = Overt` on `AdverbMultipliedNounPhrase` is needed?
-- What tells the frequency *twice* (*copy that spell twice*) from the multiplier before an
-  Object: position before the Object alone, or the degree determinative that follows?
+- Fold `DeterminativeDistribution = Multiplier` (*half*, *double*) into `Multiplier`, replace
+  `MultiplierPredetermination`, `AdverbMultipliedNounPhrase` and `MultipliedNounPhrase` with one
+  `MultipliedNounPhrase: NounPhrase -> multiplier:Multiplier NounPhrase` requiring
+  `head.Determination = Overt`, `head.Case = Plain` and
+  `head.DeterminativeDistribution != Numerical | Degree`, license `multiplier:Multiplier Symbols`
+  for `twice {X}` (*Thassa's Intervention*), and delete unused `MultipliedAmount`.
+- Exclude `Multiplying` (`head.AdjunctPosition != Multiplying`) from `InterleavedAdverb` and
+  `Serial` (`head.NounDistribution != Serial`) from `InterleavedTemporal`, so heavy-NP shift never
+  reads pre-object *twice* or *three times* as an interleaved frequency Adjunct.
 
 ## Done when
 
-- One Production places a `Multiplier` before a Noun Phrase, and the serial-noun form is
-  declared once.
-- Mana Reflection has no Reading with *twice* as an Adjunct of *produces*, and *Copy that spell
-  twice.* keeps its Reading.
-- The census shows no verdict change on the supported corpus.
+- One Production places a `Multiplier` before a `NounPhrase` (`Determination = Overt`, plus
+  `multiplier:Multiplier Symbols` for *Thassa's Intervention*), `MultipliedAmount` is deleted, and
+  the serial-noun form is declared once.
+- *Mana Reflection* has no Reading with *twice* as an Adjunct of *produces*, *Amplifire* loses its
+  genitive-determiner multiplier Readings, and *Copy that spell twice.* keeps its Reading.
+- The census shows no verdict change on the supported corpus, and `cargo xtask english strata
+  --check`, `cargo test -p sylex_english` and `cargo clippy -p sylex_english --tests -- -D warnings`
+  pass.
 
 ## Pointers
 

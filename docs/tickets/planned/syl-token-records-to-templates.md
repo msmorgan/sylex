@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-surface, syl-nominal-descriptions]
+needs: [cleanup-step6-surface, syl-nominal-descriptions, english-names-read-from-text]
 specs: [voice-and-object-phrases]
 ---
 
@@ -86,16 +86,11 @@ many of those tokens are created instead" each print them as one (spec §6).
   which lists the case among its open questions; this ticket writes these cards after it.
 - **A token named for a card** (*Tarmogoyf Nest*'s granted "{1}{G}, {T}: Create a Tarmogoyf
   token."): a token created by name with no other characteristics takes the characteristics of
-  the Oracle card of that name [CR#111.11]. The Reading carries "Tarmogoyf" as an Introduced Name
-  (`introduced_name:Tarmogoyf`, a name modifier of the nominal "Tarmogoyf token"), listed for
-  *Disa the Restless* and *Tarmogoyf Nest* in `crates/vocabulary/catalogs/introduced_names.ron`;
-  another card's name is admitted only after "named" or "Partner with" (`docs/design/lexicon.md`
-  §6). Options: the `.syl` value is that Introduced Name, a name premodifier before the head
-  `token`, whose lowering reads the Oracle card of the same name for the characteristics; or the
-  grammar admits another card's name before "token" as a third opting-in position, and the value
-  is that card's name. Recommendation: the Introduced Name, which is the leaf the Reading carries
-  and keeps §6's two positions; lowering's lookup by name is [CR#111.11]'s own rule. A predefined
-  token ("a Treasure token") stays its `token` Definition.
+  the Oracle card of that name [CR#111.11]. With `english-names-read-from-text` deleting
+  `introduced_names.ron`, `create [det] <OtherCardName> token(s)` opts in to `OtherCardName()`
+  (`docs/design/lexicon.md` §6), refused where a predefined token or subtype spells the name, so the
+  `.syl` value is that card's name (whose lowering looks up the Oracle card's characteristics per
+  [CR#111.11]); a predefined token ("a Treasure token") stays its `token` Definition.
 - **Chosen qualities** (*Volrath's Laboratory*, *Riptide Replicator*, *Sarpadian Empires, Vol.
   VII*, which print "creature token of the chosen color and type"). Recommendation: a
   postmodifier "of the chosen color and type".

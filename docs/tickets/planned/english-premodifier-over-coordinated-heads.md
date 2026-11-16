@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-category-restriction, english-pre-post-dependent-nesting]
 ---
 
 # Read a premodifier over a whole coordination of nominal heads
@@ -32,6 +32,18 @@ coordination nodes of every Reading:
 - `"Whenever you cast a Phyrexian creature or artifact creature spell, incubate X, where X is
   that spell's mana value."` (*Brimaz, Blight of Oreskos*): 4 Readings, none with "Phyrexian
   creature or artifact creature" as one premodifier of "spell".
+
+## Design
+
+- Generalize `CoordinationPremodifier` over the shared `Premodifier` category and drop
+  `head.Number = Plural` and `head.ConjunctNumber := Singular` so any coordinated `Nominal` (*Mox
+  Amber*, *Justice*, *Ghostly Flame*) admits both the wide-scope premodifier Reading (nested inside
+  `NominalPostmodifier` per `english-pre-post-dependent-nesting`) and the first-conjunct Reading.
+- Drop `modifier.Polarity := Negative` on `adjunct NounPremodifier { host: NounPremodifierConjunct }`
+  (restricting conjunct-internal noun modifiers to single-word `AttributiveNoun` so uncoordinated
+  noun stacks stay right-branching) and remove `Fronting::Wide` from `Nominal` premodifiers in
+  `sylex_syntax` so *Brimaz*'s `"Phyrexian creature or artifact creature spell"`, `"instant or
+  artifact creature spell"` and `"[legendary artifact] or enchantment card"` parse symmetrically.
 
 ## Done when
 

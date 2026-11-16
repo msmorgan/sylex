@@ -17,6 +17,21 @@ comparative clause after a modified equative quantity has no comparative analysi
 *an opponent who controls at least as many lands as you do* (Land Equilibrium), *as you do*
 reads only as a temporal clause.
 
+## Design
+
+- Mark VP-ellipsis and pro-`do` predicates (`StrandedModal`, `StrandedBe`, `StrandedPerfect` and
+  intransitive `verb:do`, excluding `verb:do so`, CGEL, Ch. 17, §7.5, p. 1531) with an ellipsis
+  feature (`Code`) while keeping `Gap = None` so relative clauses (`Gap = NP`) never admit them.
+- Remove `Intransitive` from `verb:choose` in `verbs.ron` and give `odd` and `even`
+  `fused_head: Some(Quality)` in `adjectives.ron` (`"Choose odd or even."` takes a direct Object,
+  and `"you choose"` has a complement `Gap = NP` rather than a gapless `Clause` parse).
+- Replace `Clause(Finite)` on `prep:than` and equative `prep:as` with `ComparativeClause`
+  (`ComplementOnly`), licensed by either `Gap = NP` (*Forget* `"as many cards as they discarded __
+  this way"`, *Lim-Dûl's Vault* `"as many times as you choose __"`) or `Gap = None` with `Code`
+  (*Keeper*/*Oath* `"than you do"`, *Land Equilibrium* `"as you do"`), and refactor
+  `EquativeCountDetermined` (and its mass twin) to take `EquativeDeterminer` including
+  `BoundingAdverb` (*at least*).
+
 ## Done when
 
 - A comparative clause Complement of *than* or *as* has its gap, and a gapless finite Clause is

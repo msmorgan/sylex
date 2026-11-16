@@ -1,0 +1,47 @@
+---
+needs: []
+---
+# Split overloaded features (`DeterminerNeed`, `ConjunctKind`)
+
+## Why
+
+Several features in `crates/english/grammar/english.fug` hold values for distinct concepts on
+different categories:
+
+- `Determination` means "has a determiner" (`Bare | Mixed | Overt`) on `NounPhrase` and
+  `PrepositionPhrase`, and "needs an overt determiner" on `Nominal`, `BareNominal` and
+  `AdjectivePhrase` (propagating `Mixed` across categories that have no determination resolution).
+- `ComplementKind` serves both as the Slot Kind of a head's selected Complement and as the filler
+  tag in unlike-coordination categories (`Depictive`, `PredicateAdjunct`, `Attributes`,
+  `ObjectConjunct`, `PostmodifierConjunct`, `AmountOrNounConjunct`), plus an unused feature on
+  `ExistentialPredicate`.
+- `Polarity`'s comment claims auxiliary negation alongside `non-` premodifiers and `but not`
+  contrasts.
+
+## Design
+
+- Split a privative `feature DeterminerNeed = Required` on `Nominal`, `BareNominal` and
+  `AdjectivePhrase` from `Determination` (`Bare | Mixed | Overt` on `NounPhrase` and
+  `PrepositionPhrase`).
+- Split `ConjunctKind` for unlike-coordination filler categories from `ComplementKind`, and remove
+  unused `ComplementKind` from `ExistentialPredicate`.
+- Update `Polarity` and `AdjunctPosition` comments to state what each holds accurately, and keep
+  flat `Oblique*` features without adding nested feature-bundle DSL syntax to `sylex_syntax`.
+
+## Done when
+
+- `DeterminerNeed` and `ConjunctKind` are separated from `Determination` and `ComplementKind`,
+  `ExistentialPredicate` drops `ComplementKind`, and no equation relies on accidental feature
+  sharing.
+- The census shows identical Readings before and after, and `cargo xtask english strata --check`,
+  `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_syntax`,
+  `sylex_vocabulary` and `sylex_english`.
+
+## Not in scope
+
+- `ComplementKind` on `Amount` in comparative Productions: `english-comparative-productions`.
+
+## Pointers
+
+- `crates/english/grammar/english.fug`: `Determination`, `ComplementKind`, `Polarity`,
+  `AdjunctPosition`, `ExistentialPredicate` and the unlike-coordination categories.

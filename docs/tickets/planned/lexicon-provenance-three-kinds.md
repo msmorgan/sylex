@@ -17,9 +17,9 @@ not have.
 
 - `SourceKind` has exactly `Core`, `Catalog` and `Symbol`; every `Plugin` and `Keyword` source is
   `Catalog`.
-- Every construction site and test is updated (`crates/english/src/cleave.rs`, the `sylex_english`
-  and `sylex_lexicon` tests, `sylex_vocabulary`'s loaders), and the Catalog-constraint check
-  (`crates/english/tests/catalog_leak.rs`) still passes.
+- Every construction site and test is updated (`crates/english/src/cleave.rs`,
+  `crates/xtask/src/lexical.rs`, the `sylex_english` and `sylex_lexicon` tests, `sylex_vocabulary`'s
+  loaders), and the Catalog-constraint check (`crates/english/tests/catalog_leak.rs`) still passes.
 - `cargo xtask english strata --check` passes, and tests and clippy pass for `sylex_lexicon`,
   `sylex_vocabulary`, `sylex_english` and `xtask`.
 

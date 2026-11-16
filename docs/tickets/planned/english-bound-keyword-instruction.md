@@ -11,17 +11,27 @@ which takes no period. A Bound Keyword counts its stem as its parameter (*forest
 *forest*, bound *walk*), so *Forestwalk.* and *Landwalk.* read as keyword instructions. No card
 prints a bound keyword with a period.
 
-## Open questions
+## Design
 
-- Which keyword line items does a real card print with a period, and what do they share: a
-  parameter that is a separate word, a cost, or a list of named keywords?
+- Retire unconditioned `KeywordInstruction` (`Sentence -> KeywordLineItem '.'`): standalone keyword
+  lines without an em-dash cost or trailing supplement take no period (`docs/oracle-style-guide.md`
+  §3), so both `*Forestwalk.` and standalone `*Equip {2}.` are refused, eliminating surplus
+  `KeywordInstruction` derivations on quoted granted keywords.
+- Fix `DashCost` vs `DashCondition` in `crates/vocabulary/src/lib.rs` so set-off em-dash costs value
+  `FinalParameter = SetOffCost` consistently (`SetOffKeywordItem`), extend
+  `KeywordFollowedBySentences` for keyword items followed by sentences on one line (*Enchant
+  creature. …*), and admit a terminal `.` on a `KeywordLineItem` only when it carries a trailing
+  supplement (*Firebending X, where X is … .*).
 
 ## Done when
 
-- `KeywordInstruction` states the property the printed forms share, and a bound keyword with a
-  period has no Reading as one.
-- Every unit that reads as a `KeywordInstruction` keeps its Reading, and the census shows no
-  verdict change on the supported corpus.
+- `KeywordInstruction` is retired, and neither `*Forestwalk.` nor standalone `*Equip {2}.` reads as
+  a `Sentence`.
+- Every corpus unit previously read through `KeywordInstruction` keeps a valid Reading through
+  `SetOffKeywordItem`, `KeywordFollowedBySentences` or supplemented `KeywordLineItem`, and the
+  census shows no verdict loss on the supported corpus.
+- `cargo xtask english strata --check`, `cargo test` and `cargo clippy --tests -- -D warnings` pass
+  for `sylex_vocabulary` and `sylex_english`.
 
 ## Pointers
 

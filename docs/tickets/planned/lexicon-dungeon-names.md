@@ -27,23 +27,14 @@ a dungeon is *Acererak the Archlich*. Every other in-scope "Undercity" is part o
 ## Design
 
 - Dungeon names come from the Oracle data, as card names do (`docs/design/lexicon.md` §3):
-  `cargo xtask catalogs generate` writes them to `data/gen/catalogs/`, from the cards whose card
-  type is Dungeon, and `sylex_vocabulary` loads each as a Proper Name with no Card Scope.
-
-## Open questions
-
-- Which dungeon cards: (a) all five in the card data; (b) only the dungeons whose names some
-  in-scope text prints, which today is Tomb of Annihilation alone. Option (a) needs no judgment
-  per dungeon and stays right when a new card names Lost Mine of Phandelver. It also declares four
-  names that no in-scope text uses yet. Option (b) leaves nothing unused but has to be revisited
-  for every new card. Recommendation: (a), because the list is the card data's and is not chosen
-  by hand. Confidence: medium.
-- Undercity is both a dungeon type (`subtypes.ron`) and the name of a dungeon card. Under (a)
-  the word gets a second Lexeme, and *venture into Undercity* gets a Reading with the name as well
-  as the one with the dungeon type [CR#701.49d]. No in-scope line prints that phrase outside
-  reminder text today. Options: generate it like the others and judge the line when one is
-  parsed; or leave out a dungeon name that a dungeon type already spells. Recommendation: leave
-  it out, since [CR#701.49d] reads *venture into [quality]* as the type. Confidence: low.
+  `cargo xtask catalogs generate` writes the four non-oversized real dungeon cards
+  (`!oversized && set_type == "token"`: *Dungeon of the Mad Mage*, *Lost Mine of Phandelver*, *Tomb
+  of Annihilation*, and *Undercity*, excluding the oversized Commander Party aid *Baldur's Gate
+  Wilderness*) to `data/gen/catalogs/`, and `sylex_vocabulary` loads each as a Proper Name with no
+  Card Scope.
+- *Undercity* is generated alongside the other three: singular count `subtype:Undercity` cannot
+  project a bare `NounPhrase` after *into*, so the `ProperName` entry gives `"Venture into
+  Undercity."` [CR#727.2,701.49d] its single Reading.
 
 ## Done when
 

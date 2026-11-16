@@ -23,6 +23,8 @@ yet mapped") is also out of date.
 
 ## Pointers
 
-`crates/lexicon/src/types.rs` (`Category`), `crates/vocabulary/src/lib.rs`,
+`crates/lexicon/src/types.rs` (`Category`), `crates/lexicon/tests/`,
+`crates/vocabulary/src/lib.rs`, `crates/vocabulary/tests/loader.rs`,
+`crates/syntax/tests/card_names.rs`, `crates/xtask/src/lexical.rs`,
 `crates/english/grammar/english.fug`, `docs/contexts/oracle-english/CONTEXT.md` (Proper Name),
 `docs/design/lexicon.md` §2.

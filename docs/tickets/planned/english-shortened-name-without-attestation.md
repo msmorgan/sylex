@@ -1,5 +1,5 @@
 ---
-needs: [english-parse-corpus-load]
+needs: []
 ---
 
 # A legendary card's Shortened Name does not depend on its text using it
@@ -38,39 +38,37 @@ spelling, it only withholds the form.
 A name a card's text gives another object (*Rinoa Heartilly*'s *create Angelo, a legendary ...
 token*) is a different matter with its own ticket; this one is about a card's own name.
 
-## Open questions
+## Design
 
-- How a stated-name parse states that the card is legendary, the one printed characteristic the
-  Shortened form needs beyond the name: on the command line (`--as-card NAME` with a type line
-  or a `--legendary` flag) and in a judgment entry (`<card=NAME>` today states the name alone).
-  A stated name that is a real card's could take it from the card-name list if that list
-  carried it, which is again a fact prepared per card.
-- Whether the Shortened form needs a permanent type as well as the legendary supertype, as
-  `short_name` requires today.
-- Which word is the Shortened form where the name does not show it. `SURNAME_TITLES` lists five
-  titles by hand (*Captain*, *Commander*, *Dr.*, *Ensign*, *Lieutenant*: *Captain James T. Kirk*
-  is *Captain Kirk*) because nothing in a name's words marks a title. 274 legendary faces have
-  no candidate (one-word names, names starting *The*).
-- The 13 faces whose candidate is spelled only inside a longer title in their own text: with
-  the form in scope, *Mishra* is a second analysis of the first word of *Mishra, Lost to
-  Phyrexia*. Whether the grammar refuses it there, or the form is withheld by another rule.
-- Whether `names::shortened_name` still drops a Shortened form that other vocabulary in scope
-  spells (*Sliver* in *Sliver Queen*); it analyzes the candidate against the vocabulary and
-  reads no card text.
-- Whether a Card Scope still holds a name form by form. Nothing builds a scope with a name in
-  its Full form alone now, and `crates/syntax/tests/card_names.rs` pins that capability
-  (`CardScope::insert` with one `NameForm`).
-- Whether a stated name that is no line of `data/gen/catalogs/card-names.txt` (*Abuelo the
-  Brave*) is read as a card's own name, with its forms, or stays refused.
+- No per-card characteristics are prepared before parsing: `data/gen/catalogs/card-names.txt` holds
+  card names alone (for `OtherCardName()`), and `Lexicon` stores no precomputed `Shortened` forms per
+  card; `AttestedShortenings` and `attested_short_name` are deleted.
+- On faces (`census`, `forests`, `--card`), `CardScope` derives the face's `Shortened` form at parse
+  time from the face's own parsed type line (`Legendary` supertype plus permanent card type) and
+  `shortening::short_name`, keeping `SURNAME_TITLES` and `names::shortened_name`'s vocabulary
+  collision filter (*Sliver* in *Sliver Queen*).
+- `shortening::rule` rejects non-comma candidates ending in or preceding a possessive (`'s`, `’s`,
+  `s'`, `s’`), so legendary possessives (*Urza's Saga*, *Marit Lage's Slumber*, *Gaea's Cradle*)
+  never derive `"Urza's"` or `"Marit"`.
+- Longer titles in the card's own text (*Mishra, Lost to Phyrexia* on *Mishra, Claimed by Gix*) are
+  not withheld from `CardScope`; `OtherCardName()` / longest-title admission handles the full title
+  at its `named` position.
+- Standalone single-line inputs (`--as-card NAME` and `<card=NAME>`) admit any stated name as the
+  card's own Full name in `CardScope` (including unprinted names such as *Abuelo the Brave*) and
+  derive its `Shortened` form when an explicit `--legendary` / `<legendary>` (or `--type-line`)
+  flag is given; `CardScope` continues to track Full vs Shortened availability accordingly, and
+  existing shortened-name judgment entries add `<legendary>`.
 
 ## Done when
 
-- `--as-card "Abuelo, Ancestral Echo" "When Abuelo enters, draw a card."` reads *Abuelo* as that
-  card's own name in its Shortened form.
+- `--as-card "Abuelo, Ancestral Echo" --legendary "When Abuelo enters, draw a card."` (and an
+  unprinted `--as-card "Abuelo the Brave" --legendary`) reads *Abuelo* as that card's own name in
+  its Shortened form, while without `--legendary` (and no legendary permanent type line) only the
+  Full form stands.
 - `LexicalEnvironment::load` reads no card text, and an `english parse` call that fetches no
   card reads no `oracle-cards.jsonl`.
 - The pool census is compared before and after, and every unit whose verdict or count changes is
-  reported.
+  checked and reported.
 - `cargo test` and `cargo clippy --tests -- -D warnings` pass for every crate changed.
 
 ## Pointers

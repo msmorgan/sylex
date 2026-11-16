@@ -16,11 +16,12 @@ booleans used by `prep:among` alone (`plural_complement` and `named_only`). To c
 (`rhs.len() == 1 && head == Some(0)`). Expressing preposition-level constraints this way grows a
 new `PrepositionFrame` flag and compiler branch in `sylex_syntax` per preposition.
 
-## Open questions
+## Design
 
-- Should preposition frames express complement constraints through grammar-declared `slot` kinds
-  or feature equations on frame slots in `.fug`, retiring `plural_complement`, `named_only`,
-  `whole_coordination` and `"Plural"` from `sylex_syntax`?
+- Express preposition complement constraints through grammar-declared `slot` declarations and slot
+  feature/coordination equations in `english.fug` (including `coordinated` / plural-complement
+  requirements for `among` and cited-name slots), retiring `plural_complement`, `named_only` and
+  hardcoded `"Plural"` from `sylex_syntax` (`PrepositionFrame` and `compile.rs`).
 
 ## Done when
 

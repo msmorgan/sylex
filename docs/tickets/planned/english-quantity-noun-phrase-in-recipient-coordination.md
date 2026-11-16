@@ -11,17 +11,23 @@ target opponent or planeswalker] and [half X damage, rounded up, to you]*. Two m
 take *target opponent or planeswalker and half X damage* as one coordinated Noun Phrase, the
 Complement of the first *to*, which leaves *to you* a second recipient of *X damage*.
 
-## Open questions
+## Design
 
-- What refuses the coordination: the conjuncts' unlike Noun Kinds (a player or permanent beside
-  a measured amount), or a Targeting Noun Phrase coordinated with a non-Targeting one? Which
-  real cards coordinate such unlike Noun Phrases correctly?
+- Assign `NounKind = Resource` to measured-quantity Noun Phrase Productions (`MeasuredMass`,
+  `MaximumMeasuredMass`, `ComparativeQuantityMassDetermined`, `DistributiveMeasure`) and
+  `SymbolNominalPhrase` (`{R}`, `{1}`), leaving definite property Noun Phrases (*the planeswalker's
+  loyalty* on *Soul Burn* and *Drain Life*) `Ordinary`, and remove `NounKind` from `proximate:` on
+  `coordination NounPhrase` so coordinates share `NounKind`.
 
 ## Done when
 
-- Eternal Flame has only its cluster-coordination Readings.
-- The census shows no verdict change on the supported corpus, and every unit whose Readings
-  change is checked.
+- *Eternal Flame* has only its cluster-coordination Readings, the other measured-quantity +
+  entity/temporal coordinations (*Dragonlord Atarka*, *Fury*, *Mox Amber*, *Fire and Brimstone*,
+  *Open the Omenpaths*, *Scrying Glass*) lose their spurious `NounPhrase` coordinations, and
+  `{R} or one mana`, `{1} and 1 life` and *Soul Burn*/*Drain Life* keep theirs.
+- The census shows no verdict change on the supported corpus, every unit whose Readings change is
+  checked, and `cargo xtask english strata --check`, `cargo test -p sylex_english` and
+  `cargo clippy -p sylex_english --tests -- -D warnings` pass.
 
 ## Pointers
 

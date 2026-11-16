@@ -25,20 +25,27 @@ twins: `category Possessor` (the Noun Phrase Productions over `BareNominal`) and
 `NominalPostmodifier` and `TemporalPostmodifier`). `TemporalNounPhrase` and
 `TargetedNounPhrase` may be further cases.
 
-## Open questions
+## Design
 
-- Should the DSL gain a way to state a restriction once (for example, a Category that excludes
-  named Productions, or equations over engine summaries such as whether a Clause is
-  Subject-initial), or should the twins stay with a check that they agree?
+- Unify restricted twin categories onto their base categories via `State` features/summaries and a
+  shared `Premodifier` category rather than cloning categories across the Earley chart: fold
+  `SubjectInitialClause` onto `Clause`, `Possessor` (via `Postmodification` / `Postmodified`, which
+  also closes `*the mana value less than 3's owner`), `QuotedCostNominal`, `TargetedNounPhrase`,
+  `PerfectParticiple`, `TemporalComplementClause`, `InternalizedInterleaved`, `NominalModifier`,
+  `RelativeTemporalNominal` and consumer-gated `TemporalNounPhrase` cases.
+- Extend `coordination` in `sylex_syntax` and `.fug` to factor multi-shape coordination declarations
+  (`over [...]`) and contrastive `but not` (`ContrastConjunct` / `ContrastCoordination` /
+  `ContrastPrepositionConjunct` / `ContrastPrepositionCoordination` on *Drain Life*, *Soul Burn* and
+  *Haakon, Stromgald Scourge*), deleting the hand-copied category pairs and coordination blocks.
 
 ## Done when
 
-- Every restating Category in `english.fug` is listed with its twins, including whether
-  `TemporalNounPhrase` and `TargetedNounPhrase` are such cases.
-- The owner's ruling is carried out: either each restriction is stated once and the twins are
-  deleted, or a check fails the build when a pair of twins disagrees beyond their stated
-  difference.
-- The census shows identical Readings before and after.
+- The twin categories and `Contrast*` category pairs above are retired onto their base categories,
+  multi-shape and contrastive `but not` coordinations are derived from `coordination`, and no
+  `// Twin:` production pairs remain in `english.fug`.
+- The census shows no verdict loss on the supported corpus, every Corpus Unit whose Readings change
+  (such as closing `Possessor` leaks) is checked, and `cargo xtask english strata --check`, `cargo
+  test` and `cargo clippy --tests -- -D warnings` pass for `sylex_syntax` and `sylex_english`.
 
 ## Pointers
 

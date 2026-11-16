@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-preposition-frame-constraints]
 ---
 # Complement selection written as grammar classes instead of frames
 
@@ -34,27 +34,29 @@ each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
 `DegreeArithmetic` exclusion become removable; `NominalPredicative`'s exclusion does not (fused
 *each* as the Predicative of *power and toughness are each equal to ...*).
 
-## Open questions
+## Design
 
-- Should the frame engine gain these two capabilities so the three selections move to the
-  lexicon, or do they stay in the grammar with the gap recorded?
+- Extend `valence` in `sylex_syntax` to derive fused determiner-head projections, complement-to-mother
+  `agree` mappings with `unshared` features, and existential-*be* preposition selection from lexicon
+  frames.
+- Move `PartitiveQuantifier` (*of* oblique), `ComparativeQuantifier` (*than* complement) and
+  existential-*be*'s preposition list to lexicon frames in `closed_class.ron` and `verbs.ron`,
+  deleting the grammar classes and hand-listed prepositions along with `QuantityPartitiveOfEach` and
+  `DegreeArithmetic`'s exclusion.
 
 ## Done when
 
-- It is confirmed in the frame engine that a frame can neither build a fused head nor take the
-  mother's Number from its Complement, or the capability that already does it is named.
-- The selections follow the owner's ruling: declared as frames with the classes and word list
-  gone, or kept with each class's comment saying why it is not a frame.
-- Regardless of that ruling, no Production sets a `DeterminativeDistribution` its head does not
-  have (retiring `QuantityPartitiveOfEach`'s `Distributive` value over a `Numerical` head), and
-  `QuantityPartitiveOfEach` and the `DegreeArithmetic` exclusion are deleted or kept with an
-  ablation that justifies each.
-- The census shows no Reading lost on the supported corpus.
+- `PartitiveQuantifier`, `ComparativeQuantifier`, existential-*be*'s hand-listed prepositions,
+  `QuantityPartitiveOfEach` and `DegreeArithmetic`'s exclusion are retired in favor of lexicon
+  frames compiled through `valence`, and no Production sets a `DeterminativeDistribution` its head
+  does not have.
+- The census shows no Reading lost on the supported corpus, and `cargo xtask english strata
+  --check`, `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_syntax`,
+  `sylex_vocabulary` and `sylex_english`.
 
 ## Not in scope
 
 - Collapsing the comparative Productions: `english-comparative-productions`.
-- The existential Productions' other defects: `english-single-card-productions`.
 
 ## Pointers
 

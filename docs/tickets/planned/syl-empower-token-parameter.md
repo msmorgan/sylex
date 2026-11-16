@@ -22,6 +22,9 @@ Written against the surface (`cleanup-step6-surface`).
 - The check ("If you don't control a Jace planeswalker token") and the choice ("Choose a Jace
   planeswalker token you control") [CR#701.71a] match the subtype the token Definition declares,
   not a hard-coded `jace` and not the whole token.
+- Switching `keyword_actions.ron`'s lemma from `"empower Jace"` to `"empower"` requires licensing a
+  bare singular planeswalker subtype (`subtype:Jace`) in the keyword action's token parameter slot
+  (`crates/english/grammar/english.fug`), since `BarePlural` refuses singular count subtypes.
 
 ## Done when
 

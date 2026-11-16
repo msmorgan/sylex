@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-comparative-clause-gap]
 ---
 
 # A manner *as* clause is not a temporal clause
@@ -14,12 +14,14 @@ the Dark Baron*). So 74 units with *divided as you choose* have a Reading in whi
 modifies a noun (*Fire Covenant*: *damage divided [as you choose]* under *damage*), and a manner
 clause under a past host with a present verb would be refused as a time mismatch.
 
-## Open questions
+## Design
 
-- What tells the two apart in the grammar. A manner *as* clause has a gap or an elided
-  Complement that its host supplies (*as you choose [to divide it]*), and a temporal one is
-  complete; a second frame with no such restriction would give every temporal *as* clause a
-  manner Reading that no time restricts.
+- Add a `Predicate`-only, non-`TimeGiving` manner-clause frame on `prep:as` requiring `Gap = NP`
+  (neither `Gap = Adjunct`, which would give complete clauses a manner Reading, nor `Code`
+  `Gap = None`, which would add a manner Reading on *Land Equilibrium*'s `"controls at least as many
+  lands as you do"`), while `TemporalClause` keeps `NominalAndPredicate` and `Gap = None`. With
+  `Intransitive` removed from `verb:choose` in `english-comparative-clause-gap`, `"divided as you
+  choose"` parses only as a manner clause (`Gap = NP`) and complete clauses parse only as temporal.
 
 ## Done when
 

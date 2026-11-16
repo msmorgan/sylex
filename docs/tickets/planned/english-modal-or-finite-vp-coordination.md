@@ -1,45 +1,45 @@
 ---
-needs: [plural-name-flag]
+needs: []
 ---
-# Is [modal finite VP] *or* [plain finite VP] grammatical?
+# Disjunctive finite VP coordination excludes modal with lexical verb
 
 ## Why
 
-With card names number-neutral, *Rhonas can't attack or block* gains Readings that coordinate
-finite *can't attack* with plural present *block* (*[they] [can't attack] or [block]*), the name
-taking Plural from *block*. Twelve units gain 71 derivations this way: the "[God] can't attack or
-block unless …" units (Sab-Sunen, Hazoret the Fervent, Rhonas, Oketra, The Ancient One, Hazoret,
-Godseeker, Bontu, Kefnet, Ketramose, Bast, The Lion-Turtle) and Cloud, Planet's Champion's "… that
-target Cloud cost {2} less". None ranks cheapest.
+Disjunctive `coordination VerbPhrase` (`or`, `and/or`, `nor`) currently admits a modal-headed
+finite VP coordinated with a plain lexical finite VP across 108 corpus units: singular proper-name
+subjects with unvalued `Number` (*Rhonas can't attack or block*), plural subjects (*Creatures you
+control can't attack or block*, *Players can't pay life or sacrifice creatures*), second-person
+`you` subjects (*you may tap or untap target …*), and 3rd-singular subjects before invariant
+preterites (*Damping Engine*'s `"[can't play lands] or [cast/Preterite … spells]"`), because
+`feature VerbKind = Auxiliary` is privative (`Auxiliary` unifies with unvalued lexical verbs) and
+`coordination VerbPhrase` puts `Inflection` in `unshared:`. Zero corpus units intend that finite
+coordination: under modal/negated scope, `can't/may V1 or V2` coordinates `BareInf`s under the
+modal (CGEL, Ch. 15, §2.1(b), p. 1290).
 
-These Readings feel ungrammatical: no sentence of the form *they can't X or Y*, with Y a plain
-finite VP and no auxiliary, reads as *[they can't X] or [they Y]*. With a 3rd-singular subject, so
-that the second verb's form is unambiguous:
+Meanwhile, *Lesser Werewolf* (`"{B}: If this creature's power is 1 or more, it gets -1/-0 until end
+of turn and put a -0/-1 counter on target creature blocking or blocked by this creature."`) only
+parses today through that `Present + Preterite` `put` VP coordination because `coordination Clause`
+has `Plain + and + Finite` and `Finite + , but + Plain` without `Finite + and + Plain`.
 
-- *She can't sing but dances beautifully.* and *He can cook and does the dishes every night.*
-  sound acceptable.
-- *She can't sing or dances.* sounds bad; *She can sing or dances.* sounds odd.
-- *She either sings or dances.* is fine.
+## Design
 
-The oddness seems to lie with *or* joining a modal-headed finite VP to a plain finite one, not with
-finite VP coordination in general. CGEL's finite-VP coordinations (Ch. 15 §2.1, p. 1291, [4i]; §2.9,
-p. 1319, [76i]; §2.10, [80]) use *and*, *let alone* and *so*, and none has a negated modal first
-coordinate. If the pairing is ungrammatical, the grammar's VP coordination admits a second tree that
-English does not, independent of name Number.
-
-## Open questions
-
-- Is [modal-headed finite VP] *or* [plain finite VP] grammatical, and under what conditions (the
-  coordinator, negation in the first coordinate, *either*)? Answer from CGEL (Ch. 15 §2.1(b)
-  "Coordinates must be syntactically alike", p. 1290; the scope of *or* under negation) and the
-  corpus (any attested Oracle *or* joining such coordinates), with a recommendation.
+- Split finite active `coordination VerbPhrase` between `And`/`But` and `Disjunctive` (`or`,
+  `and/or`, `nor`), excluding modal catenative + lexical finite VP coordination under `Disjunctive`
+  while preserving `and`/`but` (*Ace's Baseball Bat*), `be + modal` (*Break the Ice*) and
+  `lexical + copular be` (*Hooded Horror*).
+- Forbid mixing `Present` and `Preterite` finite VPs in `coordination VerbPhrase`, and add
+  `Finite + and + Plain` to `coordination Clause` so *Lesser Werewolf* parses as coordinated clauses
+  with an imperative second conjunct.
 
 ## Done when
 
-- The question is answered with evidence and the owner has ruled.
-- If ruled ungrammatical, VP coordination refuses the pairing by a declared constraint (no unit or
-  word keyed), the twelve units lose those Readings, a negative judgment pins *Rhonas can't attack
-  or block* to the bare-infinitive coordination, and `cargo xtask english strata --check` passes.
+- Disjunctive finite VP coordination refuses modal + lexical finite VPs and finite `Present +
+  Preterite` mixing by declared grammar constraints, eliminating the spurious finite derivations
+  across the 108 units while preserving *Ace's Baseball Bat*, *Break the Ice*, *Hooded Horror* and
+  *Lesser Werewolf*.
+- Judgment tests pin *Rhonas can't attack or block* to bare-infinitive coordination and *Lesser
+  Werewolf* to clause coordination, and `cargo xtask english strata --check`, `cargo test -p
+  sylex_english` and `cargo clippy -p sylex_english --tests -- -D warnings` pass.
 
 ## Pointers
 

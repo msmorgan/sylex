@@ -96,57 +96,23 @@ in the middle of a sentence at several positions. And it is used again after its
 - A name a card's text introduces (the name of a token it creates [CR#111.4], or of a permanent
   or copy it changes) is a string read from the text. No catalog lists it, and nothing keyed by
   card holds it.
-- A name is read where the text introduces it: the complement of *named*, the Object of *create*
-  before a token-description Supplement, and the complement of `its name is` in a copy's exception.
-  These are the in-scope positions of the table.
+- `sylex_lexicon` proposes one longest title run per capitalized start at word boundaries (using the
+  shape rule and three card-name refusals above, with the `", "` card-name refusal checking
+  `WordForm::Full` only so a `Shortened` form such as *Icingdeath* never truncates `"Icingdeath,
+  Frost Tongue"`), and `english.fug` admits the read-name leaf only at the introducing positions:
+  the complement of *named*, the Object of *create* before a token-description Supplement, and the
+  complement of `its name is` in a copy's exception.
+- Reuse is unit-local in two passes: names read at licensing positions on the unit's first pass
+  stand across all `Name` positions of that unit on a second pass, covering quoted abilities and
+  later sentences on the introducing unit.
+- `create [det] <OtherCardName> token(s)` [CR#111.11] opts in to `OtherCardName()`
+  (`docs/design/lexicon.md` §6) as the name premodifying the head *token* in the Object of *create*,
+  refused where a predefined token or a subtype spells the name (*Blood Fountain*'s `"create a Blood
+  token"` keeps its single Reading).
 - A read name is a Proper Name, unmarked for Number (`lexicon.md` §6). Its genitive is formed as a
   card name's is (*Beau's power*).
 - `introduced_names.ron`, the `IntroducedName` schema type, its loader path and the
   `introduced_name:` Lexemes are deleted.
-
-## Open questions
-
-- **How the read span is proposed and licensed.**
-  (a) Analysis proposes a run by shape at every capitalized word, and the grammar admits the
-  read-name value only in the licensing productions, as `Lex(FlavorWord)` is admitted. Analysis
-  stays free of grammar (`lexicon.md` §2), and the license lives where the position is defined.
-  This needs new productions for the `create NAME, a … token` Supplement and for `its name is`,
-  because today both go through the general `NounPhraseSupplement` and `ProperName`.
-  (b) Analysis proposes a run only after fixed context words (*named*, *create*, `its name is`),
-  which is what `longest.py` emulates. This needs no grammar change, but analysis has to know
-  English words and their order, which `lexicon.md` §2 keeps out of it.
-  Recommendation: (a). Confidence: medium.
-- **Where a read name ends.** (a) One run per start, the longest the shape rule above allows,
-  with its three refusals. This reproduces the lists exactly over the pool. (b) Every end of the
-  run, with the chart choosing among them. This adds Readings on four lines, such as *Minor*
-  beside *Minor Demon*, and a second Reading of *Nissa, Sage Animist*'s line with the run
-  "Ashaya, the Awoken" and "World" as a depictive supertype adjective. Recommendation: (a).
-  Confidence: medium-high. The run's word classes (*of*, *the*, *to*; no *and*; no digits or
-  other lowercase words) are drawn from the names in the pool, and a new card can break them.
-  Under (a) such a card loses its Reading and the census reports it.
-- **Where a read name stands after its introduction.** Every in-scope reuse other than after
-  *named* is on the introducing line, and *named* licenses a read name by itself (*Hand of
-  Vecna*).
-  (a) Unit-local: the names a unit's first parse reads at licensing positions stand at every
-  Name position of that unit, and the unit is parsed a second time. This covers all 13 uses.
-  (b) Face-wide: the same, with the names read anywhere on the face standing on every unit of
-  the face. This covers reuse across lines, which no in-scope card prints.
-  (c) Licensing positions only. This is one pass, but the 12 lines with a reuse lose their
-  Reading.
-  Recommendation: (a), the smallest scope the cards need. Confidence: medium.
-- **`create a NAME token`.** A token created by name with no other characteristics takes the
-  characteristics of the Oracle card of that name [CR#111.11]. So NAME is another card's name,
-  not a name the text introduces: *Tarmogoyf* (*Disa the Restless*, *Tarmogoyf Nest*),
-  *Gingerbrute* (*Ginger, Queen of Sweets*), *Mutavault* (*Mutable Explorer*), *Spellgorger
-  Weird* (*Ral and the Implicit Maze*).
-  (a) A fourth position opts in to `OtherCardName()` (`lexicon.md` §6): the name premodifying
-  the head *token* in the Object of *create*. It is refused where a predefined token or a subtype
-  spells the name, because [CR#111.11] excludes predefined tokens and *Blood* is both a card and
-  a predefined token (*Blood Fountain*'s "create a Blood token" has one Reading today).
-  (b) Read it as a read name, with *token* as a fifth licensing position. A read name there
-  would have to stand where a card name spells it, and it carries no link to the card the rule
-  names.
-  Recommendation: (a). Confidence: high on the classification, medium on the position's extent.
 
 ## Done when
 
@@ -193,9 +159,9 @@ in the middle of a sentence at several positions. And it is used again after its
 
 ## Not in scope
 
-- `vote_options.ron`, also a card-scoped list, which has no ruling; `anchor_words.ron` is
-  `english-anchor-words-read-from-text`; the expansion entries of `cited_names.ron` are
-  `english-set-names-read-from-text`.
+- `vote_options.ron` (`english-vote-options-read-from-text`), `anchor_words.ron`
+  (`english-anchor-words-read-from-text`), and the expansion entries of `cited_names.ron`
+  (`english-set-names-read-from-text`).
 - The participle premodifier that misreads "named New Planet" today
   (`Premodification:BareNominal/Verb/attach`).
 

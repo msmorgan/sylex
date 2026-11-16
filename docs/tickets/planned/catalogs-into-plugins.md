@@ -1,5 +1,5 @@
 ---
-needs: [v1-retirement, plural-name-flag]
+needs: [v1-retirement, lexicon-dungeon-names, english-names-read-from-text, english-set-names-read-from-text, english-anchor-words-read-from-text, english-vote-options-read-from-text]
 ---
 # Move the Catalogs into `plugins/` declarations
 
@@ -10,28 +10,20 @@ and meaning (`docs/design/lexicon.md` §3). The Catalogs still live in
 `crates/vocabulary/catalogs/*.ron`. Some are declared twice: card types, subtypes, counters,
 designations, keyword abilities and keyword actions also have `plugins/builtin/definitions/`
 declarations, so `ageCounter.syl` and the `age` entry of `counters.ron` both declare the age
-counter. The rest have no `.syl` declaration at all: ability words, statuses, turn parts,
-predefined tokens, cited names, Introduced Names, plural names, Anchor Words and vote options.
+counter. Others (`ability_words.ron`, `statuses.ron`, `turn_parts.ron`, `tokens.ron`,
+`plural_names.ron`) have no `.syl` declaration yet, while the card-scoped name lists
+(`introduced_names.ron`, `cited_names.ron`, `anchor_words.ron`, `vote_options.ron`) are retired by
+their `*-read-from-text` tickets.
 
 ## Done when
 
-- Every Catalog item is declared in `plugins/`, and `sylex_vocabulary` reads it from there.
+- Every remaining Catalog item is declared in `plugins/` (or generated from Oracle data for card
+  and dungeon names per `lexicon.md` §3), and `sylex_vocabulary` reads it from there.
 - `crates/vocabulary/catalogs/` is gone, and `sylex_vocabulary` declares only Core English.
-- Each Catalog with no declaration today gets a declaration sort, recorded in `lexicon.md` §3.
-- No declaration names a specific card. The card lists in `introduced_names.ron`,
-  `cited_names.ron`, `anchor_words.ron` and `vote_options.ron` are facts about cards known before
-  parsing, and they go; such a name is found from the card's own text by rule, as a Shortened Name
-  is [CR#201.5c], or admitted at parse time without a list. Which is chosen here, with its
-  parse-forest cost measured.
-
-## Open
-
-`lexicon.md` §3 fixes only that each game word is a declaration of its own sort with a `lexical`
-field (*Khans* is `khans.syl`, of the AnchorWord sort). Undecided:
-
-- Expansion names a card's text cites (*Antiquities*) may need a set-name Catalog. A dungeon name
-  (*Tomb of Annihilation*) is a Catalog item of its dungeon's definition; dungeons are not declared
-  yet.
+- Each Catalog with no declaration today gets a declaration sort, recorded in `lexicon.md` §3, and
+  no declaration names a specific card.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo xtask english strata --check` and
+  `cargo test` pass for all affected crates.
 
 ## Pointers
 

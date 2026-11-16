@@ -16,10 +16,12 @@ all four Categories for one determinative class.
 
 ## Design
 
-- Add `Degree` to `DeterminativeDistribution`, value `DegreeDeterminer` and `EquativeDeterminer`
-  as `DeterminativeDistribution = Degree` (`unshared: [DeterminativeDistribution]`), update
-  `FusedDegreeDeterminer`, `DegreePartitive`, `MultipliedDegree` and the Noun Phrase multiplier
-  exclusions to read `DeterminativeDistribution`, and delete `feature QuantityKind`.
+- Add `Degree` to `DeterminativeDistribution` and at the matching variant index of
+  `ObliqueDistribution` (for `valence DeterminerPhrase`'s `agree` mapping), value
+  `DegreeDeterminer` and `EquativeDeterminer` as `DeterminativeDistribution = Degree`
+  (`unshared: [DeterminativeDistribution]`), update `FusedDegreeDeterminer`, `DegreePartitive`,
+  `TemporalLocation` (`!=` list), `MultipliedDegree` and the Noun Phrase multiplier exclusions to
+  read `DeterminativeDistribution`, and delete `feature QuantityKind`.
 
 ## Done when
 

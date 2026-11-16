@@ -34,22 +34,12 @@ every one starts with `A–Z` or `0–9`.
   `over`, `and`, `a`, `vs.`, `&`, `/`, `×`) — stops before `" expansion"` across all 121 `expansion`
   sets and 881 of 882 sets in `SetList.json` (all except *The List (Unfinity Foil Edition)*, whose
   parentheses reminder-text removal strips in `lexicon.md` §1).
-- `english.fug` admits that open leaf only in a dedicated expansion-citation production modifying
-  `ClosedWord(Expansion)` rather than general `NamePremodifier`, so it never stands in `Name`
-  positions and builds no second tree (`docs/design/english.md` §8) where a card's own name
-  matches the set name.
+- `english.fug` admits that open leaf only in `"the <SetName> expansion"`, a dedicated
+  expansion-citation production modifying `ClosedWord(Expansion)` rather than general
+  `NamePremodifier` (matching [CR#206.3a..206.3c]), so it never stands in `Name` positions and
+  builds no second tree (`docs/design/english.md` §8) where a card's own name matches the set name.
 - `cited_names.ron`, `Sources::cited_names` and the `cited_name:` loader path are deleted.
-  `ScopedName` stays for `vote_options.ron`.
-
-## Open questions
-
-- **Set names starting with `"The "`** (5 `expansion` sets, 26 sets total: *The Dark*, *The
-  Brothers' War*, *The Lost Caverns of Ixalan*, ...):
-  (a) Admit `"the <SetName> expansion"` only, matching the three [CR#206.3a..206.3c] wordings
-  (`"in the Arabian Nights expansion"`).
-  (b) Also admit `<SetName> expansion` with no preceding *the* when the read set name begins with
-  `"The "` (`"originally printed in The Dark expansion"`, where capitalized interior `"The"` begins
-  the title run rather than matching lowercase determinative *the*).
+  `ScopedName` is deleted in `english-vote-options-read-from-text`.
 
 ## Done when
 
