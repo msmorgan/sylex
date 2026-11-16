@@ -1,6 +1,7 @@
 # "<subj> can't <action>" [CR#101.2]. `causedBy` restricts the prohibition to an event that
 # cause causes, as `causedBy` does a would-clause: "damage doesn't cause you to lose life" is
-# `cant you (loseLife anyAmount) (causedBy := byEvent (does (a isSource) (dealDamage anyAmount you)))`
+# `cant(actor(you), loseLife(anyAmount), causedBy = byEvent(does(actor(a(isSource)),
+# dealDamage(recipient = you))))`
 # [CR#120.3a]. `unless` is its printed "unless <condition>", read inside the prohibition
 # (`docs/design/semantics.md` §3.3): "A player can't cast a legendary instant or sorcery spell
 # unless that player controls …" [CR#205.4e].

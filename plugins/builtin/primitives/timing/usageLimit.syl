@@ -1,2 +1,1 @@
-# Full-arity binding for `UsageLimit.mk`.
 primitive usageLimit(times: Amount, per: Period): UsageLimit = UsageLimit

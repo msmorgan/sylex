@@ -1,5 +1,5 @@
 # "<performer> amasses <subtype> N" with its reminder text (`Definition`, [CR#701.47a]): the
-# chosen Army is `that (.type .creature)` and `it`, resolved inside `ownScope`.
+# chosen Army is `that(creature)` and `it`, resolved inside the Definition's Reference Scope.
 action amass(subtype: Subtype, count: Amount) {
   spelling = "amass $subtype $count",
   lexical = {verbs = [{lemma = "amass", frames = [TransitiveAmount, Monotransitive]}]},

@@ -1,4 +1,4 @@
-# "<subj> <action>": the handoff (`VerbPhrase.instruct`), to a player or a permanent.
+# "<subj> <action>": the handoff (`instruct`), to a player or a permanent.
 primitive instruct(subj: NounPhrase, action: VerbPhrase): VerbPhrase = Instruct {
   spelling = "$subj $action"
 }

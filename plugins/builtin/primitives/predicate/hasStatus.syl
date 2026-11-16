@@ -1,4 +1,3 @@
-# Authoring primitive for `Predicate.hasStatus`.
 primitive hasStatus(status: Status): Predicate = HasStatus {
   spelling = "$status"
 }

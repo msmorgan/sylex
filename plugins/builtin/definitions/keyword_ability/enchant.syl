@@ -4,7 +4,7 @@
 # into its owner's graveyard from the stack, and a token Aura isn't created [CR#303.4g]. An Aura
 # entering other than by resolving as an Aura spell, by an effect that doesn't specify what it will
 # enchant, enters attached to a legal host its controller chooses as it enters [CR#303.4f]. An
-# effect that names the host (`MoveRider.attachedTo`) puts it onto that host, and if it can't
+# effect that names the host (`attachedTo`) puts it onto that host, and if it can't
 # legally enchant that host or the host is undefined, the Aura doesn't enter, as with no legal host
 # at all [CR#303.4i]. Which hosts are legal is the engine's to evaluate (`legalHostOf`).
 ability enchant(subject: Predicate) {

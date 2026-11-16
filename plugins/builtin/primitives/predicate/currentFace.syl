@@ -1,2 +1,1 @@
-# Authoring primitive for `Predicate.currentFace`.
 primitive currentFace(side: CardFaceSide): Predicate = CurrentFace

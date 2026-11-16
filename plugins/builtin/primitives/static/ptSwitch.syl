@@ -1,2 +1,1 @@
-# Authoring primitive for `CharacteristicEdit.ptSwitch`.
 primitive ptSwitch: CharacteristicEdit = SwitchPowerToughness

@@ -1,5 +1,5 @@
 # "Airbend <subject>" (`Definition`, [CR#701.65a]): per-card `doForEach` loop over
-# `allOf(and([isCard, was(exile(which), within = thisWay)]))` where `it` resolves by `D′` to the
+# `allOf(and([isCard, was(exile(which), within = thisWay)]))` where `it` resolves to the
 # singular loop referent.
 action airbend(subject: NounPhrase) {
   lexical = {

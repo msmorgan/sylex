@@ -1,5 +1,5 @@
 # "look at <slice>, put any number of them into <spill> [riders] and the rest on top of its
-# owner's library in any order" (`Template` using `firstMention` / `laterMention` for `slice`).
+# owner's library in any order" (`Template` reading `$slice` once at its first use).
 template lookAndSortSlice(
   slice: NounPhrase,
   spill: Location,

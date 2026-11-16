@@ -1,2 +1,1 @@
-# Authoring primitive for `Predicate.colorCount`.
 primitive colorCount(comparator: Comparator, count: Nat): Predicate = ColorCount

@@ -1,9 +1,9 @@
 # "Prototype": its player may cast this card prototyped [CR#702.160a,719.3], with the inset
-# frame's mana cost, power and toughness. The frame holds that set (`Card.prototype`
+# frame's mana cost, power and toughness. The frame holds that set (`prototype` at `Card`
 # [CR#719.1]), so the keyword carries no parameters of its own.
 ability prototype {
   lexical = {lemma = "prototype", parameters = [[Cost, DashPowerToughness]]},
   # TODO(spelling): `prototype` prints "prototype <cost> — <power>/<toughness>" from the card's
-  # `PrototypeFrame` rather than parameters on this declaration (`Card.prototype` [CR#719.1]).
+  # `PrototypeFrame` rather than parameters on this declaration (`prototype` at `Card` [CR#719.1]).
   body = [static(can(actor(you), cast(thisCard, payment = prototyped)))]
 }

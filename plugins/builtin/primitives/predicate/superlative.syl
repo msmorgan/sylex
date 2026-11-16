@@ -1,2 +1,1 @@
-# Authoring primitive for `Predicate.superlative`.
 primitive superlative(op: AggregateOp, axis: ProjAxis, domain: Predicate): Predicate = Superlative

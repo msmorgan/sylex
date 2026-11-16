@@ -1,5 +1,5 @@
 # "<ability> triggers": the ability is the subject of `trigger` [CR#603.2]; whose ability it is
-# ("a triggered ability of a creature you control") is `Predicate.abilityOf` in its description.
+# ("a triggered ability of a creature you control") is `abilityOf` in its description.
 # What made it trigger is `triggersBy`.
 template triggers(ability: NounPhrase): GameEvent {
   spelling = "$ability trigger",

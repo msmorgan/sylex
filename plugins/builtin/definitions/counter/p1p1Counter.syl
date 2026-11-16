@@ -1,4 +1,4 @@
-# A counter declaration's name read as its kind (`CounterKind.named`), so a bare
+# A counter declaration's name stands at `CounterKind` (`printedKind(p1p1Counter)`), so a bare
 # `p1p1Counter` is the +1/+1 counter's kind [CR#122.1]. A counter is placed on an object or a
 # player [CR#122.1]: a kind is an object's unless its declaration names a player as its holder, as
 # energy and experience counters do, and poison and rad counters [CR#122.1f,122.1i].

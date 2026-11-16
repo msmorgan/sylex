@@ -1,2 +1,1 @@
-# Authoring primitive for `StaticSpec.additionalTriggers`.
 primitive additionalTriggers(event: GameEvent, quantity: Quantity): StaticSpec = AdditionalTriggers

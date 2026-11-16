@@ -1,5 +1,5 @@
-# "<subject>'s controller sacrifices it" (`Template` using `firstMention` / `laterMention`
-# without `Window` plumbing, [CR#701.21a]).
+# "<subject>'s controller sacrifices it" (`Template` reading `$subject` once at its first use
+# and re-mentioning it at its second [CR#701.21a]).
 template controllerSacrifices(subject: NounPhrase): VerbPhrase {
   spelling = "$subject's controller sacrifices it",
   body = instruct(possessorOf(controller, $subject), sacrifice($subject))

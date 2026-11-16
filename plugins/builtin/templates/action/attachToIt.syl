@@ -1,4 +1,4 @@
-# "attach <what> to it": ordinary pronoun `it` resolved by `D′` (no `Window` override).
+# "attach <what> to it": ordinary pronoun `it` resolved by anaphor resolution.
 template attachToIt(what: NounPhrase): VerbPhrase {
   spelling = "attach $what to it",
   body = attachTo($what, it)

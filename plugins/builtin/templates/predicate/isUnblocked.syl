@@ -1,6 +1,6 @@
 # "unblocked": an attacking creature once no blocker was declared for it [CR#509.1h], or one
-# that entered attacking after blockers were declared [CR#508.4d]. Not `not isBlocked`: before
-# blockers are declared an attacking creature is neither.
+# that entered attacking after blockers were declared [CR#508.4d]. Not `not(isBlocked)`:
+# before blockers are declared an attacking creature is neither.
 template isUnblocked: Predicate {
   spelling = "unblocked",
   body = inCombat(unblocked)

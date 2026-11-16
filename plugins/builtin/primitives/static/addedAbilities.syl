@@ -1,2 +1,1 @@
-# Authoring primitive for `CharacteristicEdit.addedAbilities`.
 primitive addedAbilities(abilities: List(Ability)): CharacteristicEdit = AddedAbilities
