@@ -106,7 +106,7 @@ Corpse-Born* prints "Grimgrin enters tapped and doesn't untap during your untap 
 
 ## Done when
 
-- The open questions are answered and written in `docs/design/semantics.md` §4.7 and the
+- The open questions are answered and written in `docs/design/surface.md` §7.6 and the
   declarations' doc comments.
 - One coercion goes from `Clause` to `StaticSpec`, so a static ability's statement is
   `static(clause(…))`. The declarations that wrap a `StaticSpec` (`asLongAs`, `if`,
@@ -145,7 +145,7 @@ Corpse-Born* prints "Grimgrin enters tapped and doesn't untap during your untap 
 ## Pointers
 
 - `docs/specs/voice-and-object-phrases.md` §1, §8, §11, §13
-- `docs/design/spelling.md` §2, §3.3; `docs/design/semantics.md` §4.1, §4.7; glossary **Static
+- `docs/design/spelling.md` §2, §3.3; `docs/design/surface.md` §7.1, §7.6; glossary **Static
   Spec**, **Coercion** (`docs/contexts/game-model/CONTEXT.md`)
 - `plugins/builtin/templates/action/{gain,get,getsBoth,establishFor,become}.syl`,
   `plugins/builtin/templates/ability/{getsPt,abilityGrant,getsBase,enters,entersTapped}.syl`,

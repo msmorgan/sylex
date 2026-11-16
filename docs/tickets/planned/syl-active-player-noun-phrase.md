@@ -37,4 +37,4 @@ recorded, which this ticket's lookback reads.
 ## Pointers
 
 - `plugins/builtin/rules/conferral/phasingTurnBased.syl`, `plugins/builtin/definitions/keyword_ability/phasing.syl`
-- `docs/design/semantics.md` §4.8 (lookback)
+- `docs/design/semantics.md` §3.4 (lookback)

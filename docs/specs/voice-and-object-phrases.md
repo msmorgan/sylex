@@ -290,7 +290,7 @@ subject performs, while `getCounters` is not:
 
 **A verb with a causative and an inchoative use is one Definition and one Template.** *Mana Vault*
 prints both: "This artifact doesn't untap during your untap step" and "untap this artifact". They
-are one keyword action with one Deed (`semantics.md` §3.1): the Definition `untap` stays as it is,
+are one keyword action with one Deed (`surface.md` §6.1): the Definition `untap` stays as it is,
 and the inchoative is a Template whose body calls it with the word `subject` as its argument. The
 same holds for `transform`. The Template cannot share its Definition's name at `VerbPhrase`
 (`syl.md` §3), so the two are `untapSelf` and `transformSelf`. `die`, `enter`, `leave`,
@@ -303,7 +303,7 @@ is `regeneration` said of its subject. How the two are written is `syl-explicit-
 
 **"Becomes blocked" is one word with an optional agent**, `becomeBlocked(by = none)`, "become
 blocked( by $by)". Its two forms are two events, and an absent `by` is not "by anything": a
-pattern watches what it writes (`semantics.md` §4.6).
+pattern watches what it writes (`semantics.md` §3.2).
 
 - Without `by`, the Blocked status begins: once each combat, and an effect can cause it with no
   blocker [CR#509.1h,509.3c].
@@ -363,7 +363,7 @@ The grammar reads *Aether Tunnel*'s line as one subject over a coordination of t
 and 15 more coordinate a power/toughness change with another verb under one subject ("gets +2/+2
 and attacks each combat if able").
 
-A prohibition over a coordination forbids each arm (`semantics.md` §4.7), and it passes through
+A prohibition over a coordination forbids each arm (`surface.md` §7.6), and it passes through
 `be`: *Lava Burst*'s "that damage can't be prevented or dealt instead to another permanent or
 player" is one "be" over an `or` of two `done` phrases.
 
@@ -598,12 +598,12 @@ follow-up.
 **The event gate reads through the new words.** A phrase under `does`, `did` or `would` must
 name an event: an event-capable head or a keyword action's Definition, a `done` over one, `be`
 over that, a Template of §4 whose body is one, a `shared` over these, or an `and` or `or` of
-these. `syl-shared-phrase-written-once` already brings `semantics.md` §4.6 to admit an `or` of
-event-capable heads under one subject.
+these. `syl-shared-phrase-written-once` already brings `semantics.md` §3.2 and `surface.md` §7.5 to
+admit an `or` of event-capable heads under one subject.
 
 **An unprinted pattern writes `any` as its subject.** Rule bodies that no card prints, such as
 `infect`'s `would(any, loseLife(anyAmount))`, become `clause(any, would(loseLife(…)))`, with
-`any` the wildcard word at `NounPhrase` (`semantics.md` §4.3).
+`any` the wildcard word at `NounPhrase` (`surface.md` §7.3).
 
 ## 9. What is refused, and where
 
@@ -640,15 +640,15 @@ In the design docs, a follow-up edit for the tickets that build this:
 |---|---|---|
 | `semantics.md` §2.1 | "A Subject is a referent; an Actor is not." through "…in a Subject, an agent or a Handoff, is an ordinary referent." | §2 and §4 here |
 | `semantics.md` §2.2 item 3 | "Under `cant`, a hypothetical indefinite has universal force" | of a subject, §5's rule; of the phrase's own participants, unchanged |
-| `semantics.md` §4.1 | the table of eight contexts | §1's table |
-| `semantics.md` §4.2 | the whole section ("Voice belongs to the Subject, not to the Action"; "'Becomes blocked by <B>' is `by(B)` over `block`") | §3 and §4 |
-| `semantics.md` §4.4 | "A transitive Action always keeps its patient inside it. The Subject supplies only the performer." | the slot stays in the verb phrase and holds `subject` under `done` |
-| `semantics.md` §4.6 | "Each arm is a whole event with its own subject … An `or` over Actions would be a compound action, which the gate refuses." | §8's gate |
-| `semantics.md` §4.7 | "A deontic rule is a Subject, an Action and optional modifiers"; "`doesnt(subj, action)`" | §5 |
+| `surface.md` §7.1 | the table of eight contexts | §1's table |
+| `surface.md` §7.2 | the whole section ("Voice belongs to the Subject, not to the Action"; "'Becomes blocked by <B>' is `by(B)` over `block`") | §3 and §4 |
+| `surface.md` §7.4 | "A transitive Action always keeps its patient inside it. The Subject supplies only the performer." | the slot stays in the verb phrase and holds `subject` under `done` |
+| `surface.md` §7.5 | "Each arm is a whole event with its own subject … An `or` over Actions would be a compound action, which the gate refuses." | §8's gate |
+| `surface.md` §7.6 | "A deontic rule is a Subject, an Action and optional modifiers"; "`doesnt(subj, action)`" | §5 |
 | `syl.md` §2 | "There are three" coercions | the coercions that exist, §1's and §6's among them |
 | `syl.md` §4 | a Definition's body and its parameters | an `action` Definition's body is clauses and reads `$actor` (§4) |
 | `semantics.md` §2.3 | "the `actor` word still reads the innermost Actor" | a Definition's body reads `$actor` |
-| `semantics.md` §4.8 | "A lookback is `did(subj, action, within)`" | the operator `did(phrase, within)` under `holds` or in a postmodifier (§8) |
+| `semantics.md` §3.4 | "A lookback is `did(subj, action, within)`" | the operator `did(phrase, within)` under `holds` or in a postmodifier (§8) |
 | `syl.md` §4 | "a passive `by(np)` reads the patient before `np`" | removed |
 | `spelling.md` §1 | "its Subject selects the voice" | `done` selects the passive |
 | `spelling.md` §2, §4, §6, §7, §9, §10 | passive subject promotion, its notation and "Which passive a term prints" | removed; §3 |
@@ -792,7 +792,7 @@ Tickets this meets, each to be revised against it before it is claimed:
    (which clause is an event, a condition, a static statement, a replacement) and is the home of
    reference resolution. A clause then stands bare after "when" and "if" and in a static
    ability, and the event gate is a check semantics makes, not a sort. The direction is written in
-   `architecture.md` ("The layers"), `semantics.md` §6 to §8 and `surface.md`. Until
+   `architecture.md` ("The layers"), `semantics.md` §4 to §6 and `surface.md`. Until
    `sylex_semantics` exists, this spec's `does`, `holds`, coercion into `StaticSpec` and event
    gate in `cargo xtask dsl check` are built as written: they are the scaffolding that keeps the
    corpus checked, and they come out when semantics makes the same refusals. Item 3 is part of

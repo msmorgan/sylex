@@ -12,7 +12,7 @@ carry a rule that applies once however many of it an object has: the [CR#704.5q]
 `p1p1Counter`, or toxic's poison, which reads the sum of every toxic instance once
 [CR#702.164b,702.164c] and so is written apart, as `rules/conferral/toxicPoison.syl`. `syl.md` §2
 already lists a `rules` field among a declaration's meaning fields, but no kind in
-`crates/xtask/src/dsl_check/schema.rs` has one. `semantics.md` §5 says counter state-based
+`crates/xtask/src/dsl_check/schema.rs` has one. `semantics.md` §3.5 says counter state-based
 actions are Conferrals on their definitions [CR#704.5q], and `p1p1Counter.syl` has none.
 `engine.md` law 5 says data rows are evaluated "one object at a time", but rows are scoped to
 whatever their `scope` matches, players included (`playerDamageLifeLoss`).
@@ -36,7 +36,7 @@ Written against the surface (`cleanup-step6-surface`).
 - `toxic.syl` writes `number = $amount` and carries the poison rule under `rules`;
   `plugins/builtin/rules/conferral/toxicPoison.syl` is deleted, and `totalToxicValue` still reads
   `keywordNumber(toxic)`.
-- `p1p1Counter` writes the [CR#704.5q] annihilation under `rules`, and `semantics.md` §5 is true
+- `p1p1Counter` writes the [CR#704.5q] annihilation under `rules`, and `semantics.md` §3.5 is true
   of it.
 - `syl.md` §2 states what `confers` and `rules` each mean, and `engine.md` law 5 says rows are
   evaluated once per scope match, not one object at a time.
@@ -61,4 +61,4 @@ Written against the surface (`cleanup-step6-surface`).
   `plugins/builtin/rules/conferral/toxicPoison.syl`,
   `plugins/builtin/templates/quantity/totalToxicValue.syl`,
   `plugins/builtin/definitions/counter/p1p1Counter.syl`
-- `docs/design/syl.md` §2, `docs/design/semantics.md` §5, `docs/design/engine.md` law 5
+- `docs/design/syl.md` §2, `docs/design/semantics.md` §3.5, `docs/design/engine.md` law 5

@@ -34,5 +34,5 @@ times, once per emblem ability that reads it [CR#701.54c]; only the threshold di
 
 `plugins/builtin/definitions/keyword_action/theRingTemptsYou.syl`,
 `crates/xtask/src/dsl_check/schema.rs` (`RING_EXCEPTION`, `EXPANSION_CONSTRUCTORS`),
-`crates/xtask/src/dsl_check.rs` (`ring_only`), `docs/design/semantics.md` §2.3 and §3,
-`docs/design/syl.md` §4.
+`crates/xtask/src/dsl_check.rs` (`ring_only`), `docs/design/semantics.md` §2.3,
+`docs/design/surface.md` §6, `docs/design/syl.md` §4.

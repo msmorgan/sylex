@@ -60,8 +60,9 @@ same `Subject` and verb phrase.
 - The `subj` of `DidClause`, `tally`, `eventCount`, `eventSum` and `eventTally` is a
   `NounPhrase`, and their passive sites are written with `done`. `conditionDid` and
   `predicateDid` go if nothing calls them.
-- `docs/design/semantics.md` §4.8 states the lookback as the spec's §8 does, and §4.1's table has
-  the lookback and condition rows of the spec's §1 table.
+- `docs/design/semantics.md` §3.4 states the lookback as the spec's §8 does, and
+  `docs/design/surface.md` §7.1's table has the lookback and condition rows of the spec's §1
+  table.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
@@ -84,4 +85,4 @@ same `Subject` and verb phrase.
   `plugins/builtin/templates/amount/{eventCount,eventSum,eventTally}.syl`
 - `crates/xtask/src/dsl_check/schema.rs` (`DidClause`)
 - `plugins/canon/cards/{Sengir Vampire,Phyrexian Rebirth,Tuktuk Scrapper,Fyndhorn Druid,Alabaster Leech,Efflorescence}.syl`
-- `docs/design/semantics.md` §4.1, §4.8
+- `docs/design/surface.md` §7.1; `docs/design/semantics.md` §3.4

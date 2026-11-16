@@ -36,11 +36,11 @@ printed. It does not wait for the rest of step 6 (`cleanup-step6-syl`).
 ## Not in scope
 
 - Pruning candidates by what they mean, which waits for the semantics crate
-  (`docs/design/semantics.md` §7), and choosing among the candidates left: the pragmatics step
+  (`docs/design/semantics.md` §5), and choosing among the candidates left: the pragmatics step
   (`docs/design/pragmatics.md`).
 
 ## Pointers
 
 `docs/design/architecture.md` ("Spelling is a construction grammar"),
-`docs/design/english.md` §4, §8, `docs/design/semantics.md` §1, §3, §7,
+`docs/design/english.md` §4, §8, `docs/design/semantics.md` §1, §5, `docs/design/surface.md` §6,
 `docs/design/syl.md`, `crates/english/`, `plugins/canon/cards/`.

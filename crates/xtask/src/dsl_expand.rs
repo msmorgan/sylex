@@ -170,10 +170,10 @@ enum Role {
     /// Builds its constructor.
     Primitive,
     /// Is replaced by its body, leaving no boundary: a Template, a coercion,
-    /// and an ability word, which `semantics.md` §3 lists among no
+    /// and an ability word, which `surface.md` §6 lists among no
     /// Definition.
     Template,
-    /// Is replaced by its body inside a mark (`semantics.md` §3).
+    /// Is replaced by its body inside a mark (`surface.md` §6).
     Definition,
     /// Names a declaration and calls nothing: a catalog declaration.
     Named,

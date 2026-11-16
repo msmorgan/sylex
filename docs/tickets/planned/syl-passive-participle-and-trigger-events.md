@@ -74,10 +74,10 @@ and the tickets after it the other words that take a `Subject`.
   body may place `subject` wherever a noun phrase stands. The five canon cards that write the
   participant word in their own term (*Afflicted Deserter // Werewolf Ransacker*, *Bewitching
   Leechcraft*, *Darksteel Garrison*, *Tuktuk Scrapper*, *Verity Circle*) are rewritten.
-- `docs/design/semantics.md` §2.1, §4.2 and §4.4, `docs/design/syl.md` §4,
+- `docs/design/semantics.md` §2.1, `docs/design/surface.md` §7.2 and §7.4, `docs/design/syl.md` §4,
   `docs/design/spelling.md` §1, §2, §4, §5, §6, §7, §9 and §10 and
   `docs/design/architecture.md` say what the spec's §10 table gives for each: `done` selects the
-  passive, and nothing describes passive subject promotion or a `Subject` that carries voice. `semantics.md` §4.1's table has the
+  passive, and nothing describes passive subject promotion or a `Subject` that carries voice. `surface.md` §7.1's table has the
   trigger row of the spec's §1 table. The glossary entries **Subject**, **Actor** and **Patient**
   (`docs/contexts/game-model/CONTEXT.md`) are rewritten as the spec's §10 says.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -102,4 +102,5 @@ and the tickets after it the other words that take a `Subject`.
   `plugins/builtin/templates/action/{becomeBlocked,becomeBlocking,stopBlocking,phaseOutUntil,becomeStatus,die}.syl`,
   `plugins/builtin/definitions/keyword_action/{resolve,transform,sacrifice}.syl`
 - `crates/xtask/src/dsl_check.rs`, `crates/xtask/src/dsl_expand/tests.rs`
-- `docs/design/semantics.md` §2.1, §4.1, §4.2, §4.4; `docs/design/spelling.md` §2
+- `docs/design/semantics.md` §2.1; `docs/design/surface.md` §7.1, §7.2, §7.4;
+  `docs/design/spelling.md` §2

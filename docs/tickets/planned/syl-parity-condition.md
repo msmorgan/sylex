@@ -37,7 +37,7 @@ chosen parity ("choose odd or even", "of the chosen quality": *Ashling's Preroga
 - *Chaos Lord* is in `plugins/canon/cards/`, its first ability's "if the number of permanents is
   even" written with that word.
 - The `can` Template takes `unless: Option(Condition) = none` as `cant` and `must` do, read inside
-  the permission as `cant`'s is (`docs/design/semantics.md` §4.7), and *Chaos Lord*'s "unless
+  the permission as `cant`'s is (`docs/design/semantics.md` §3.3), and *Chaos Lord*'s "unless
   it entered this turn" is that `unless`.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p xtask` and
   `cargo xtask cite check` pass.
@@ -50,4 +50,4 @@ chosen parity ("choose odd or even", "of the chosen quality": *Ashling's Preroga
 
 `plugins/builtin/primitives/parity/`, `plugins/builtin/primitives/condition/{compareAmt,manaValueParity}.syl`,
 `plugins/builtin/templates/static/{can,cant,must}.syl`, `docs/tickets/done/syl-cant-unless.md`,
-`docs/design/semantics.md` §4.7.
+`docs/design/semantics.md` §3.3, `docs/design/surface.md` §7.6.

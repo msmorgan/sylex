@@ -46,7 +46,7 @@ none of it is an operation of this grammar:
 - **Case.** `controllerOf`, "$subject's controller", over `it` is "its controller".
 - **Voice and verb form.** An Action's wording selects one of its verb's Subcategorization
   Frames. The context that embeds the Action selects the form that frame takes, and its Subject
-  selects the voice ([Semantics](semantics.md) §4.2): under `any` or `by(np)` the wording is
+  selects the voice ([Surface](surface.md) §7.2): under `any` or `by(np)` the wording is
   the frame's passive, with the complement the passive promotes as the clause's subject (§2,
   passive subject promotion).
 - **Gaps.** `which` fills a Hole and prints no word. The Reading has a Gap there, as in
@@ -109,7 +109,7 @@ Where English attaches a word inside or beside a phrase, the term has the struct
 has, or a Template holds the word in its one fixed fragment:
 
 - **An auxiliary or negation** stands between a Subject and an Action that its context takes
-  apart ([Semantics](semantics.md) §4.1): "$subj can't $action", with the Action's verb phrase
+  apart ([Surface](surface.md) §7.1): "$subj can't $action", with the Action's verb phrase
   in one Hole. Only the passive needs more (passive subject promotion, below).
 - **A central adverb** ("also", "still", "no longer") attaches to the verb phrase below the
   subject (`CentralAdverbial`, `crates/english/grammar/english.fug`): *Efflorescence* prints
@@ -155,7 +155,7 @@ of §3. Each gets one closed rule.
 **Passive subject promotion.** The contexts whose first parameter is a Subject take a Subject
 and an Action apart: a trigger (`does`), a replacement (`would`), a lookback (`did`), the
 deontic rules (`cant`, `must`, `can`, `gatedBy`) and the negative declarative (`doesnt`)
-([Semantics](semantics.md) §4.1). An imperative, a cost and a Handoff have no Subject. Under the
+([Surface](surface.md) §7.1). An imperative, a cost and a Handoff have no Subject. Under the
 Subject `any` or `by(np)`, the context's Subject position prints the complement of the Action's
 frame that the English passive promotes, and the Action's verb phrase is that frame's passive
 (§1), with the `np` of `by(np)` as its agent phrase. The English layer derives three such
@@ -166,7 +166,7 @@ prepositional frame, whose preposition's object is promoted and the preposition 
 card looked at"). Which parameter of the Action fills that complement is its frame's. Abrupt
 Decay's
 "This spell can't be countered" is `cant(any, counter(thisSpell))`. The patient is an argument
-of `counter` ([Semantics](semantics.md) §4.4), yet it is printed before "can't be", where
+of `counter` ([Surface](surface.md) §7.4), yet it is printed before "can't be", where
 `cant`'s wording has its Subject, and "countered" in the verb-phrase Hole. No card under
 `plugins/` writes `doesnt` with `any` or `by(np)`. Where one verb has two frames with two
 promoted complements, as `deal` has, one term has two passives, and which one a card prints is
@@ -183,7 +183,7 @@ becomeBlocked)`, so the rule has nothing to promote. That form is not yet built:
 (*General Jarkeld*'s "all creatures that the other is blocked by"), so "becomes blocked by" is
 a Template whose one fragment prints it over `by(B)` and `block`.
 
-Why: voice is already the Subject's choice ([Semantics](semantics.md) §4.2), so the rule links
+Why: voice is already the Subject's choice ([Surface](surface.md) §7.2), so the rule links
 two Holes the term already holds in one fixed way, and it adds no place for words: the
 promoted phrase takes the subject position the context's own wording has.
 
@@ -365,7 +365,7 @@ English prints once what coordinated clauses share. Howling Golem's "Whenever th
 attacks or blocks" has one subject for two events, and so does Chub Toad's "Whenever this creature
 blocks or becomes blocked". Aether Tunnel's "Enchanted creature gets +1/+0 and can't be blocked"
 has one subject that stands in two roles, the subject of an active verb phrase in one arm and the
-patient a passive promotes in the other ([Semantics](semantics.md) §4.2). Predator's Strike's
+patient a passive promotes in the other ([Surface](surface.md) §7.2). Predator's Strike's
 "Target creature gets +3/+3 and gains trample until end of turn" has one subject and one duration
 over two actions. The English grammar reads each as a coordination whose conjuncts share a
 dependent ([English](english.md) §3).
@@ -388,7 +388,7 @@ once in one of two ways:
   phrases under the one Construction that supplies their subject (not yet built, §2), and one
   `does` over an `or` of the Actions of "attacks or blocks" and of Chub Toad's "blocks or becomes
   blocked", `does(actor(thisCreature), or([block, becomeBlocked]))` (not yet built: no `or` stands
-  at `Action` under `plugins/builtin/`, `semantics.md` §4.6 refuses one at the event gate,
+  at `Action` under `plugins/builtin/`, `surface.md` §7.5 refuses one at the event gate,
   `becomeBlocked` still takes its subject, and the `syl-shared-phrase-written-once` ticket settles
   both). The subject of Predator's Strike is no Handoff's, since a Handoff makes its subject the
   Actor and a creature that gets +3/+3 performs nothing. A list Hole spells the coordination
@@ -482,7 +482,7 @@ created token's description becomes a nominal (§2) instead is the open question
 
 **What expansion means.** Expansion substitutes a Template's parameters and wraps a
 Definition's ([`.syl`](syl.md) §4), and a Template still adds no meaning
-([Semantics](semantics.md) §3). Spelling relates Readings to the surface term, before
+([Surface](surface.md) §6). Spelling relates Readings to the surface term, before
 expansion; the copying and rearranging a body does to its parameters happens after, where no
 wording is involved. Semantics still reads the expanded tree in printed order, with
 a Tail read where it is printed (§3.2).
@@ -490,7 +490,7 @@ a Tail read where it is printed (§3.2).
 **Spelling chooses nothing.** Spelling is many-to-many. Recovery yields every surface term
 whose wording matches some Reading in the forest. Semantics refuses the candidates that have no
 meaning, and a pragmatics step ranks what is left ([Architecture](architecture.md), "Spelling is
-a construction grammar"; [Semantics](semantics.md) §7). Nothing in this document chooses among
+a construction grammar"; [Semantics](semantics.md) §5). Nothing in this document chooses among
 candidates.
 
 ## 6. The round trip

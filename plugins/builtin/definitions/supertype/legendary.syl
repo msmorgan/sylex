@@ -5,7 +5,7 @@
 # controls a legendary creature or a legendary planeswalker." Per holder: while it is an instant
 # or sorcery, a player can't cast it unless that player controls one. The "unless" condition is
 # read inside the prohibition, so "that player" is its Subject's "a player"
-# (`docs/design/semantics.md` §4.7).
+# (`docs/design/semantics.md` §3.3).
 #
 # [CR#205.4d] The legend rule a legendary permanent is subject to is its own row, `legendRule`,
 # since card text names it.

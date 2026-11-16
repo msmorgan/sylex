@@ -51,5 +51,5 @@ this ticket also rewrites, and lands first.
 ## Pointers
 
 `plugins/builtin/definitions/keyword_ability/{evolve,training,exploit,mentor,devour,champion,enlist}.syl`,
-`plugins/builtin/definitions/keyword_action/{devour,adapt}.syl`, `docs/design/semantics.md`
-§3 and §3.1 (Deeds of keyword actions and abilities).
+`plugins/builtin/definitions/keyword_action/{devour,adapt}.syl`, `docs/design/surface.md`
+§6 and §6.1 (Deeds of keyword actions and abilities).

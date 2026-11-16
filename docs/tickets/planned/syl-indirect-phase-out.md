@@ -38,4 +38,4 @@ Written against the surface (`cleanup-step6-surface`).
 
 - `plugins/builtin/rules/conferral/phasingTurnBased.syl`, `plugins/builtin/definitions/keyword_ability/phasing.syl`
 - `plugins/builtin/templates/action/phaseOut.syl`, `phaseIn.syl`, `phaseOutUntil.syl`
-- `docs/design/semantics.md` §1 item 5, §4.8 (lookback)
+- `docs/design/semantics.md` §1 item 5, §3.4 (lookback)

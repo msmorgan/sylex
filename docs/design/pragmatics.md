@@ -109,7 +109,7 @@ are attested wordings and not counts.
 
 No hypothesis reads every line above as it means. In the *Airlift Chaplain* line the two
 readings pick out the same cards, since a land card's mana value is 0, so whether it reaches
-pragmatics at all depends on when two meanings are the same ([Semantics](semantics.md) §8).
+pragmatics at all depends on when two meanings are the same ([Semantics](semantics.md) §6).
 
 ## 5. Open
 

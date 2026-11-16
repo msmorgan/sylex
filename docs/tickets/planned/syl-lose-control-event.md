@@ -31,4 +31,4 @@ Written against the surface (`cleanup-step6-surface`).
 
 `plugins/builtin/primitives/action/gainControlOf.syl`,
 `plugins/builtin/definitions/keyword_action/exchangeControl.syl`, `docs/design/semantics.md`
-§4.6 (the event gate, pattern-only heads).
+§3.2 (the event gate), `docs/design/surface.md` §7.5 (pattern-only heads).

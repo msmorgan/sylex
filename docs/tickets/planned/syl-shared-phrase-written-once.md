@@ -87,7 +87,8 @@ deontic operators and `and` and `or` at `VerbPhrase`.
 ## Pointers
 
 - `docs/specs/voice-and-object-phrases.md` §5, §7, §8, §9, §10
-- `docs/design/spelling.md` §3.3, §10; `docs/design/semantics.md` §4.6
+- `docs/design/spelling.md` §3.3, §10; `docs/design/semantics.md` §3.2;
+  `docs/design/surface.md` §7.5
 - `plugins/builtin/primitives/event/or.syl`,
   `plugins/builtin/definitions/keyword_ability/bushido.syl`,
   `plugins/builtin/templates/action/becomeBlocked.syl`

@@ -56,4 +56,4 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 `plugins/builtin/definitions/keyword_ability/{hexproof,hexproofFrom}.syl`,
 `plugins/builtin/definitions/keyword_ability/{partner*,chooseABackground,doctorsCompanion}.syl`,
 `plugins/builtin/definitions/keyword_ability/{devour,devourQuality,emerge,emergeFrom,equip,equipQuality,morph,megamorph,kicker,multikicker,cycling,typecycling}.syl`,
-`docs/design/semantics.md` §3.1.
+`docs/design/surface.md` §6.1.

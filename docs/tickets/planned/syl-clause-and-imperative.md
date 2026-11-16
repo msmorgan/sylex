@@ -92,10 +92,11 @@ to say who does what (spec §1, §4).
   checks that each rewritten term is the term before it with `instruct` read as `clause`, an
   `imperative(…)` or `clause(you, …)` added where an effect stood bare, and nothing else changed;
   the landing reports the counts it compared.
-- `docs/design/semantics.md` §4.1's table has the imperative, clause and cost rows of the spec's
-  §1 table; no sentence of §2.1, §3.1 or `docs/design/spelling.md` §3.3 names a Handoff;
-  `docs/design/syl.md` §4 says an `action` Definition's body is clauses. In the glossary
-  (`docs/contexts/game-model/CONTEXT.md`), **Handoff** is retired, **Clause** is new, and
+- `docs/design/surface.md` §7.1's table has the imperative, clause and cost rows of the spec's
+  §1 table; no sentence of `docs/design/semantics.md` §2.1, `docs/design/surface.md` §6.1 or
+  `docs/design/spelling.md` §3.3 names a Handoff; `docs/design/syl.md` §4 says an `action`
+  Definition's body is clauses. In the glossary (`docs/contexts/game-model/CONTEXT.md`),
+  **Handoff** is retired, **Clause** is new, and
   **Actor** no longer says "unless a Handoff names another".
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -121,5 +122,5 @@ to say who does what (spec §1, §4).
   `plugins/builtin/definitions/keyword_action/`
 - `crates/xtask/src/dsl_check/schema.rs` (the `action` kind, the record sorts),
   `crates/xtask/src/dsl_expand/tests.rs`
-- `docs/design/semantics.md` §2.1, §3.1, §4.1; `docs/design/syl.md` §3, §4;
+- `docs/design/semantics.md` §2.1; `docs/design/surface.md` §6.1, §7.1; `docs/design/syl.md` §3, §4;
   `docs/design/spelling.md` §3.3

@@ -47,8 +47,9 @@ Meditation*'s "The first time you would create one or more tokens each turn" is
   "If this creature would untap during your untap step" and *Winding Constrictor*'s "If you
   would get one or more counters, you get that many plus one of each of those kinds of counters
   instead."
-- `docs/design/semantics.md` §4.1's table has the replacement row of the spec's §1 table, and
-  §4.5 and §4.7 name `would` as an operator on a clause's verb phrase.
+- `docs/design/surface.md` §7.1's table has the replacement row of the spec's §1 table, and
+  `docs/design/semantics.md` §3.1 and `docs/design/surface.md` §7.6 name `would` as an operator
+  on a clause's verb phrase.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
@@ -74,4 +75,4 @@ Meditation*'s "The first time you would create one or more tokens each turn" is
   `plugins/builtin/templates/ability/enters.syl`,
   `plugins/builtin/definitions/keyword_ability/infect.syl`
 - `plugins/canon/cards/{Phytohydra,Hardened Scales,Moonlit Meditation,Winding Constrictor,Bewitching Leechcraft}.syl`
-- `docs/design/semantics.md` §4.1, §4.5, §4.7
+- `docs/design/surface.md` §7.1, §7.6; `docs/design/semantics.md` §3.1

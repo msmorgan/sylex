@@ -39,4 +39,4 @@ Written against the surface (`cleanup-step6-surface`).
 - `plugins/builtin/definitions/card_type/creature.syl`
 - `plugins/builtin/rules/sba/deathtouchDestruction.syl`
 - `plugins/builtin/definitions/keyword_ability/deathtouch.syl`
-- `docs/design/semantics.md` §4.8 (Lookback), §5 (state-based actions as Conferrals)
+- `docs/design/semantics.md` §3.4 (Lookback), §3.5 (state-based actions as Conferrals)

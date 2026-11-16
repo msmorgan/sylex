@@ -52,7 +52,7 @@ damage to a player causing that much life loss) live in `plugins/builtin/`, and
 cards live in `plugins/canon/`. A Template is printed wording over other
 declarations and adds no meaning; a Definition is vocabulary the rules define,
 such as a keyword action or ability, checked on its own
-([Semantics](semantics.md) §3). A card's **surface term** is its `.syl` with
+([Surface](surface.md) §6). A card's **surface term** is its `.syl` with
 each name resolved by expected sort. It keeps its Template and Definition
 calls, follows the card's English phrase by phrase, and is what is stored,
 recovered and rendered. It says which words and constructions the card prints,
@@ -65,7 +65,7 @@ that tree in printed order: it classifies each clause as an event, a condition,
 a static statement or a replacement, builds a Discourse Representation
 Structure, resolves every reference against it, and builds the **meaning**. A
 term that has no meaning is refused here, and a meaning is never stored
-([Semantics](semantics.md) §2 and §6).
+([Semantics](semantics.md) §2 and §4).
 
 The split between the two is the direction and not yet the code, and so are the
 pragmatics step below and the crates the split names: `sylex_surface`, for the
@@ -74,7 +74,7 @@ resolution, and `sylex_semantics`. Today name resolution and expansion are
 tools in `xtask`. Until `sylex_semantics` exists, sorts of the term language
 (`GameEvent`, `Condition`, `StaticSpec`, `Replacement`) say what a clause means
 and `cargo xtask dsl check` refuses by them. They are scaffolding, which comes
-out when semantics makes the same refusals ([Semantics](semantics.md) §6).
+out when semantics makes the same refusals ([Semantics](semantics.md) §4).
 
 **Lowering** compiles a meaning, every reference in it resolved,
 into core, in one direction only.
@@ -167,9 +167,9 @@ stored; two ranked equal are reported and no term is stored
 layers"). The stored term is the decision: reading it to play it never ranks
 anything, and what is checked for every card is that its stored term is among
 the candidates of its text, that semantics accepts it and that it spells back
-to the text ([Semantics](semantics.md) §7). A choice among antecedents is no
+to the text ([Semantics](semantics.md) §5). A choice among antecedents is no
 such decision: one surface term holds both, and semantics makes it by a fixed
-rule on every reading ([Semantics](semantics.md) §8).
+rule on every reading ([Semantics](semantics.md) §6).
 
 ## Exact round trip
 
@@ -206,7 +206,7 @@ the term ([Spelling](spelling.md) §4, §6).
    is stored but not derivable from the text drifts, and nothing can check it.
 3. **Sugar never replaces structure.** A Template is printed wording only. It
    expands into the expressions its parts would be written as and adds no
-   meaning ([Semantics](semantics.md) §3). Its expansion carries the
+   meaning ([Surface](surface.md) §6). Its expansion carries the
    complete rules meaning, so a card's expanded tree means the same whichever
    Templates spell it. Why: a convenience that carried meaning of its own would be a
    second, hidden semantics.
@@ -214,7 +214,7 @@ the term ([Spelling](spelling.md) §4, §6).
    composes with an open class gets one mechanism; only a closed idiom gets a
    word. One Action per verb serves every clause context, whether instruction,
    trigger, replacement, prohibition or lookback
-   ([Semantics](semantics.md) §4.1). The English grammar derives a verb's
+   ([Surface](surface.md) §7.1). The English grammar derives a verb's
    passive and gapped forms from its one Subcategorization Frame. "Dies" is a
    Template over the one zone-change Action [CR#700.4]. Why: a word for every
    combination multiplies as verbs times contexts, and the copies drift apart.

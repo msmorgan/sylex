@@ -6,7 +6,7 @@ needs: [cleanup-step6-surface, syl-shared-phrase-written-once, syl-replacement-s
 
 ## Why
 
-`docs/design/semantics.md` §6 says how a surface term is read into its meaning: classify each
+`docs/design/semantics.md` §4 says how a surface term is read into its meaning: classify each
 clause, open its boxes, resolve its references, build the meaning. Nothing has run it. Its §8
 already lists what the steps as written leave unsettled (items 11 to 13), and taking the
 sorts that say what a clause means out of the term language makes several names meet at one sort
@@ -34,12 +34,12 @@ replacements have landed.
 - What the slice does not test it does not decide. Crate boundaries, the sorts beyond the names
   that meet, the pragmatics data and recovery get the crudest stub that lets the cards be read,
   and the findings list each stub as not decided. How a replacement's two clauses are held
-  (`semantics.md` §8 item 2) is one of them: a replacement is written both ways.
+  (`semantics.md` §6 item 2) is one of them: a replacement is written both ways.
 
 ## Done when
 
 - The findings note's first section states, for each question, the results that would change
-  `semantics.md` §6 or §8.
+  `semantics.md` §4 or §6.
 - These cards are read, each checked against its Oracle text: *Tide of War*, *Carom*,
   *Worship*, *Illusionary Mask*, *Cursed Windbreaker*, *Soulflayer*, *Urza's Armor*,
   *Deflecting Palm*, *Dandân*, *Mana Leak*, *Contamination*, *Bounding Krasis*, *Centaur
@@ -51,8 +51,8 @@ replacements have landed.
 - For each set of names that meets at one sort (`doIf`, `replace`, `nthOccurrence`, the ten
   `or` declarations and any other the audit of `plugins/builtin/` finds), the findings give
   each member's wording and say whether the set is one word or needs distinct names.
-- `semantics.md` §6 and §8 and `surface.md` are edited from the findings, each edit naming the
-  card that forced it, and an item of §8 the slice answers leaves §8.
+- `semantics.md` §4 and §6 and `surface.md` are edited from the findings, each edit naming the
+  card that forced it, and an item of §6 the slice answers leaves §6.
 - The findings list every stub and what it leaves undecided.
 - No file under `crates/` or `plugins/` is changed by the landing.
 
@@ -65,7 +65,7 @@ replacements have landed.
 
 ## Pointers
 
-- `docs/design/semantics.md` §2, §6, §7, §8; `docs/design/surface.md`;
+- `docs/design/semantics.md` §2, §4, §5, §6; `docs/design/surface.md`;
   `docs/design/architecture.md` ("The layers"); `docs/design/pragmatics.md`
 - `docs/specs/voice-and-object-phrases.md` §3 to §5, §8
 - `docs/unusual-cards.md` ("Events and their participants")

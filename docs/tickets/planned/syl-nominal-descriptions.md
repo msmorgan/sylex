@@ -179,7 +179,7 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
   off the battlefield. A leaves-the-battlefield trigger looks back [CR#603.10a], an entering
   permanent is checked as it would exist on the battlefield [CR#614.12], and a departed object's
   information is its last known [CR#608.2h]. Recommendation: keep the permanent reading and read
-  each such description at its event's time, which `semantics.md` §4.5 states and a lowering
+  each such description at its event's time, which `semantics.md` §3.1 states and a lowering
   test proves.
 - **A verb phrase as a postmodifier.** The lookback descriptions are `did(subj, action, within,
   ordinal)` and `was(action, within)` at `Predicate` today ("creatures that attacked this turn",
@@ -204,7 +204,7 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 ## Done when
 
 - The open questions are answered, and each answer is written where it governs: `spelling.md`,
-  `syl.md`, `semantics.md` §2.4 and §4.5, and the declarations' doc comments.
+  `syl.md`, `semantics.md` §2.4 and §3.1, and the declarations' doc comments.
 - `spelling.md` describes a description as a nominal whose modifiers are substitution into its two
   lists: nothing in it describes a description as one `Predicate` list, and explicit premodifier
   and postmodifier slots are not among its rejected alternatives. `syl.md` §2 and §3 list the coercions that
@@ -257,7 +257,7 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 
 - `docs/design/spelling.md` (substitution, optional and list Holes, the surface term as the
   derivation, the notation, rejected alternatives); `docs/design/syl.md` §2, §3, §5;
-  `docs/design/semantics.md` §2.4, §4.5
+  `docs/design/semantics.md` §2.4, §3.1
 - `plugins/builtin/coercions/`, `plugins/builtin/primitives/noun/`,
   `plugins/builtin/primitives/nounWord/`, `plugins/builtin/primitives/predicate/`,
   `plugins/builtin/templates/predicate/`, `plugins/builtin/rules/`,

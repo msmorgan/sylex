@@ -17,7 +17,7 @@ says how a term is written, named and expanded; what a term may say is
 resolve, is [`semantics.md`](./semantics.md). A file is parsed (§2), each name is resolved by the
 sort expected where it stands (§3), and Templates and Definitions are expanded (§4). The expanded
 term is then read in printed order (§5) by semantics ([`semantics.md`](./semantics.md)
-§2, §6).
+§2, §4).
 
 What sets the language apart, each in its own section:
 
@@ -50,9 +50,9 @@ constructor's spelling, adding printed wording, and adding vocabulary the rules 
   `sylex_syl::check` refuses a primitive without a constructor clause, a constructor clause on
   any other declaration, and two primitives for one constructor.
 - **A Template** substitutes its parameters (§4). What that means, and why it adds no meaning, is
-  [`semantics.md`](./semantics.md) §3.
+  [`surface.md`](./surface.md) §6.
 - **A Definition** wraps its parameters and its body (§4). What it carries, a Deed and its own
-  Reference Scope, is [`semantics.md`](./semantics.md) §3.
+  Reference Scope, is [`surface.md`](./surface.md) §6.
 
 A declaration's kind decides which it is; its file path never does. Why: a role inferred from
 location is not stated by the declaration, and it can disagree with what the declaration is.
@@ -127,7 +127,7 @@ word reaches a constructor except through its primitive (§1). A declaration's k
 name at a second sort: an `ability` declaration is also its keyword's `KeywordLabel`, so a keyword
 is named bare where a label is expected (`byKeyword(kicker)`). That is a second declaration, not a
 conversion; the keyword's term is written `theKeyword(kicker)`. A Primitive Keyword Ability has no
-`ability` declaration ([`semantics.md`](./semantics.md) §3): its label is a primitive at
+`ability` declaration ([`surface.md`](./surface.md) §6): its label is a primitive at
 `KeywordLabel` with no parameters that builds the constructor its own name capitalizes
 (`primitive firstStrike: KeywordLabel = FirstStrike`), the only `KeywordLabel` constructor a
 primitive may build, and a Template at `Ability` of the same name wraps the label
@@ -176,7 +176,7 @@ declared word at any other sort is wrapped by a coercion or by a written primiti
   of a parameter is its first mention is decided by reference resolution, in read order (§5). Why:
   the first mention is the one that introduces referents, so it must be the use actually read
   first. It is never decided by written argument order. For example, a passive `by(np)` reads the
-  patient before `np` ([`semantics.md`](./semantics.md) §4.2).
+  patient before `np` ([`surface.md`](./surface.md) §7.2).
 - Sorts are checked per slot, before expansion: `cargo xtask dsl check` checks each argument
   against its parameter's declared sort at the call, and each `$name` in a declaration against the
   sort of the slot it stands in, which must be the parameter's sort or `Option` of it (§3).
