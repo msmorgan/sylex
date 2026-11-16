@@ -49,7 +49,7 @@ use sylex_vocabulary::LexicalEnvironment;
 /// Real units, each for what it exercises:
 /// - *Crook of Condemnation*: one dependency fork ("from" modifies "card" or
 ///   adjoins the Verb Phrase) behind a vertex five levels up.
-/// - *Draugr Necromancer* (3,312 Derivations), *Maralen, Fae Ascendant* (5,955)
+/// - *Draugr Necromancer* (3,312 Derivations), *Maralen, Fae Ascendant* (6,208)
 ///   and *Remove Enchantments* (1,536): many forks on large forests.
 /// - *Counterbore*: two attachments ("with", "as") that one vertex packs as a
 ///   disjunction.

@@ -191,7 +191,7 @@ fn false_judgments_fail() {
 }
 
 /// *Remove Enchantments* (1,536 Derivations) and *Maralen, Fae Ascendant*
-/// (5,955) are evaluated like any unit: their entries hold, and a false
+/// (6,208) are evaluated like any unit: their entries hold, and a false
 /// assertion on them fails on the assertion, not on their size.
 #[test]
 fn units_of_thousands_of_derivations_are_evaluated() {
