@@ -24,7 +24,7 @@ Each of these terms writes words its card does not print, or cannot print what i
   `target`'s wording "target $p" would print as "target …", where the cards print "any target"
   [CR#115.4]; *Fall of the Titans* writes `targets(upTo(2), isAnyTarget)` for "up to two
   targets", with no type word to print after "target", and *Chandra's Pyrohelix* and *Electrolyze*
-  write `targets(oneThrough(2), isAnyTarget)` for "one or two targets". `isAnyOtherTarget` (*Screaming Nemesis*,
+  write `targets(oneOrTwo, isAnyTarget)` for "one or two targets". `isAnyOtherTarget` (*Screaming Nemesis*,
   "any other target") is the same.
 
 ## Open questions
