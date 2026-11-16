@@ -245,9 +245,9 @@ Which events a pattern may name, and from which side of an event its description
   `when`, `whenever` or `at` over its event ([CR#603.1]), so a trigger word stands only where a
   trigger condition does. Several trigger conditions of one ability ([CR#603.1b]) are one
   disjunction of them, each with its own word: "When this creature enters and whenever it
-  attacks while saddled" (*Autarch Mammoth*). The ability triggers on any of them. "And" is the
-  printed coordinator, so the primitive is `and`; one card, *Tenuous Truce*, prints "or", the
-  Template `or` over `and` with the same meaning. A concurrent condition or timing window ("while
+  attacks while saddled" (*Autarch Mammoth*). The ability triggers on any of them. The primitive is
+  `or`, named for that disjunction and spelled with "or" (*Tenuous Truce*); cards that print "and"
+  between their trigger conditions write the Template `and` over `or`. A concurrent condition or timing window ("while
   saddled", "during your turn") restricts the event it follows (`timed`), so it stands inside the
   one trigger condition it qualifies.
 

@@ -18,7 +18,7 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
   states its join, `$xs#<and>`. Where this ticket's text differs, §7 governs.
 - A coordinator word is its Template's, never a `coord` primitive's: the `and`, `or` and `andOr`
   Templates at `NounPhrase`, `Predicate` and `Location` are spelled `$xs#<and>`, `$xs#<or>` and
-  `$xs#<and/or>` over their list, and the `or` at `TriggerCondition` `$conditions#<or>`.
+  `$xs#<and/or>` over their list.
 - A move's riders are left unspelled. They are depictives, not one list under one join ("tapped
   and attacking" beside "tapped under their control"), and their wording waits for that design
   (`docs/design/semantics.md` §6 item 13).
@@ -55,9 +55,8 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
   `distinctChosenKinds`, `getEmblem`, and `enters`, `entersUnless` and `mayHaveEnter`; re-run the
   scan when claimed). The last three hold a move's riders: their riders Hole is taken out and a
   marker names the depictives design.
-- The coordinator Templates are spelled as Design states, the `or` at `TriggerCondition`
-  replacing its `TODO(spelling)`, and no `coord` primitive has a `spelling`. `isOutlaw` keeps
-  its own wording over an unspelled `coord(andOr, …)` in its body.
+- The coordinator Templates are spelled as Design states, and no `coord` primitive has a
+  `spelling`. `isOutlaw` keeps its own wording over an unspelled `coord(andOr, …)` in its body.
 - The near-duplicate Template families that differed only by an optional or repeated part are
   each one Template; the landing lists the merges.
 - No spelling this ticket writes carries a form label, `*` or `#<.>` join.

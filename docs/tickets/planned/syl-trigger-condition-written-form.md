@@ -9,8 +9,8 @@ needs: [cleanup-step6-spine]
 One printed text has one written form (`docs/design/spelling.md` §4): a one-condition trigger
 is the Ability `when`, `whenever` or `at`, and `triggered` is written only over a disjunction of
 trigger conditions. `cargo xtask dsl check` resolves the other forms too:
-`triggered(when(e), action = a)` beside `when(e, a)`, an `and` at `TriggerCondition` (or the
-Template `or` over it) with fewer than two conditions, and one nested directly in another, so
+`triggered(when(e), action = a)` beside `when(e, a)`, an `or` at `TriggerCondition` (or the
+Template `and` over it) with fewer than two conditions, and one nested directly in another, so
 nothing keeps the corpus on the one form.
 
 ## Open questions
