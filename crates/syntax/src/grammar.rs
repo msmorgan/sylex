@@ -167,8 +167,8 @@ pub struct CategoryDecl {
 /// - `clusters`, `cluster`: a coordination of dependent Clusters
 ///   (`CategoryDecl::cluster`, `ClustersDecl`) whose dependents bear their
 ///   functions in this phrase (`clusters`), and an inner Cluster whose
-///   dependents bear their functions in the same phrase as its mother
-///   Cluster (`cluster`) (`reading.rs`, `locate`).
+///   dependents bear their functions in the same phrase as its mother Cluster
+///   (`cluster`) (`reading.rs`, `locate`).
 /// - The dependent functions `subject`, `object`, `indirect_object`,
 ///   `complement`, `predicative_complement`, `adjunct`, `modifier`,
 ///   `determiner` and `supplement`: a head line does not run through one while

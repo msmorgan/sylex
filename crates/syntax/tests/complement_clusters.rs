@@ -399,10 +399,7 @@ fn authored_nominal_clusters_record_functions_in_shared_nominal_phrase() {
         .iter()
         .position(|c| c.category.as_str() == "NounPhrase")
         .unwrap();
-    assert_eq!(
-        constituents[np].head.map(|id| id.as_str()),
-        Some("n:card")
-    );
+    assert_eq!(constituents[np].head.map(|id| id.as_str()), Some("n:card"));
     let determiners: Vec<_> = constituents
         .iter()
         .filter(|c| c.category.as_str() == "DeterminerPhrase")

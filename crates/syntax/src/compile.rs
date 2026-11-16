@@ -102,7 +102,8 @@ pub struct CompiledGrammar {
     pub(crate) category_features: Vec<Vec<usize>>,
     /// Each Category's mask of the Gaps it may contain (`Gap::bit`).
     pub(crate) category_gap: Vec<u16>,
-    /// Whether each Category builds a dependent Cluster (`CategoryDecl::cluster`).
+    /// Whether each Category builds a dependent Cluster
+    /// (`CategoryDecl::cluster`).
     pub(crate) category_cluster: Vec<bool>,
     /// Categories that name a function (`CategoryDecl::function`).
     pub(crate) function_categories: BTreeSet<Ident>,

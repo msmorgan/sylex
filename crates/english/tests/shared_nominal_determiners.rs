@@ -27,7 +27,11 @@ fn word_lexemes(reading: &Reading, out: &mut Vec<String>) {
 }
 
 /// Every `ReadingNode` built by `production` under `reading`.
-fn nodes_with_production<'a>(reading: &'a Reading, production: &str, out: &mut Vec<&'a ReadingNode>) {
+fn nodes_with_production<'a>(
+    reading: &'a Reading,
+    production: &str,
+    out: &mut Vec<&'a ReadingNode>,
+) {
     match reading {
         Reading::Node(node) => {
             if node.production == production {
@@ -60,7 +64,10 @@ fn parse_readings(
 /// and `modifier` in the shared nominal's `NounPhrase` (`Constituent::also`,
 /// CGEL 15§4.4(d):1344 [25]) without forming a `DeterminerPhrase` over any
 /// cluster.
-#[expect(clippy::too_many_arguments, reason = "explicit structural and function assertions")]
+#[expect(
+    clippy::too_many_arguments,
+    reason = "explicit structural and function assertions"
+)]
 fn has_shared_nominal_reading(
     grammar: &CompiledGrammar,
     env: &LexicalEnvironment,
@@ -90,9 +97,9 @@ fn has_shared_nominal_reading(
     word_lexemes(&coord.children[2], &mut second_words);
 
     let (realized, constituents) = grammar.constituents(reading, &env.lexicon).unwrap();
-    let has_nominal = constituents.iter().any(|c| {
-        c.category == "Nominal" && realized.get(c.span.clone()) == Some(expected_nominal)
-    });
+    let has_nominal = constituents
+        .iter()
+        .any(|c| c.category == "Nominal" && realized.get(c.span.clone()) == Some(expected_nominal));
     let Some(clusters_coord) = constituents
         .iter()
         .find(|c| c.function.map(|f| f.as_str()) == Some("clusters"))
@@ -120,9 +127,8 @@ fn has_shared_nominal_reading(
         assert_eq!(cluster.head, None);
         let cluster_surface = &realized[cluster.span.clone()];
         assert!(
-            !constituents
-                .iter()
-                .any(|c| c.category == "DeterminerPhrase" && &realized[c.span.clone()] == cluster_surface),
+            !constituents.iter().any(|c| c.category == "DeterminerPhrase"
+                && &realized[c.span.clone()] == cluster_surface),
             "cluster `{cluster_surface}` must not be a DeterminerPhrase"
         );
     }
@@ -139,7 +145,8 @@ fn has_shared_nominal_reading(
         return false;
     }
 
-    // Every premodifier bears `modifier` in the shared NounPhrase, never on a determiner.
+    // Every premodifier bears `modifier` in the shared NounPhrase, never on a
+    // determiner.
     for &(category, surface) in expected_modifiers {
         let matched = constituents.iter().any(|c| {
             c.category == category
@@ -152,9 +159,7 @@ fn has_shared_nominal_reading(
         }
     }
 
-    first_words == first_conjunct_lexemes
-        && second_words == second_conjunct_lexemes
-        && has_nominal
+    first_words == first_conjunct_lexemes && second_words == second_conjunct_lexemes && has_nominal
 }
 
 #[test]
@@ -168,7 +173,11 @@ fn balthor_and_participial_shared_nominal_determiners() {
     assert!(
         balthor.iter().any(|reading| {
             let mut wide_coord = Vec::new();
-            nodes_with_production(reading, "CoordinatedNounPhrasePostmodifier", &mut wide_coord);
+            nodes_with_production(
+                reading,
+                "CoordinatedNounPhrasePostmodifier",
+                &mut wide_coord,
+            );
             wide_coord.len() == 1
         }),
         "expected a wide CoordinatedNounPhrasePostmodifier reading: {balthor:#?}",
@@ -224,11 +233,12 @@ fn balthor_and_participial_shared_nominal_determiners() {
         participial[0]
     );
 
-    // Stacked premodifiers in a cluster (derived from Balthor the Defiled and Evacuation):
-    // one analysis attaches "blocking" inside the second cluster ([all untapped blocking] + [creature cards]);
-    // the other attaches "blocking" on the shared nominal ([all untapped] + [blocking creature cards]).
-    let stacked_line =
-        "Each player returns all tapped attacking and all untapped blocking creature cards to their owners' hands.";
+    // Stacked premodifiers in a cluster (derived from Balthor the Defiled and
+    // Evacuation): one analysis attaches "blocking" inside the second cluster
+    // ([all untapped blocking] + [creature cards]); the other attaches
+    // "blocking" on the shared nominal ([all untapped] + [blocking creature
+    // cards]).
+    let stacked_line = "Each player returns all tapped attacking and all untapped blocking creature cards to their owners' hands.";
     let stacked = parse_readings(&grammar, &env, None, stacked_line);
     assert_eq!(stacked.len(), 2);
     assert!(
@@ -309,11 +319,16 @@ fn bare_determiners_stay_on_the_canonical_path() {
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
 
     // Counterintelligence: bare coordinated determiners keep a single Reading.
-    let counterintelligence =
-        parse_readings(&grammar, &env, None, "Return one or two target creatures to their owners' hands.");
+    let counterintelligence = parse_readings(
+        &grammar,
+        &env,
+        None,
+        "Return one or two target creatures to their owners' hands.",
+    );
     assert_eq!(counterintelligence.len(), 1);
 
-    // Simplified from Balthor the Defiled: bare determiner coordination + premodifier.
+    // Simplified from Balthor the Defiled: bare determiner coordination +
+    // premodifier.
     let analyzed = env.lexicon.analyze("one or two black creatures");
     let readings: Vec<Reading> = grammar
         .parse_category(&analyzed, "NounPhrase")

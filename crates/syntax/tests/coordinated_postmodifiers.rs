@@ -31,10 +31,8 @@ fn lexicon() -> Lexicon {
         path: "tests/coordinated_postmodifiers.rs".to_owned(),
         owner: "test".to_owned(),
     };
-    let count =
-        |id: &str, lemma: &str| Lexeme::noun(id, lemma, vec![Countability::Count], core());
-    let mass =
-        |id: &str, lemma: &str| Lexeme::noun(id, lemma, vec![Countability::Mass], core());
+    let count = |id: &str, lemma: &str| Lexeme::noun(id, lemma, vec![Countability::Count], core());
+    let mass = |id: &str, lemma: &str| Lexeme::noun(id, lemma, vec![Countability::Mass], core());
     Lexicon::new([
         Lexeme::verb("v:cast", "cast", core()),
         Lexeme::verb("v:note", "note", core()),
@@ -178,7 +176,10 @@ fn a_coordinated_postmodifier_stays_coordinated_under_floated_each() {
     // Reading (and the two Readings where `the` scopes over the Nominal
     // coordination `instant and sorceries`).
     let mixed: Vec<Reading> = grammar
-        .parse(&lexicon, "Cast the instant and sorceries from the graveyard.")
+        .parse(
+            &lexicon,
+            "Cast the instant and sorceries from the graveyard.",
+        )
         .readings()
         .collect();
     assert_eq!(mixed.len(), 4, "{mixed:#?}");
@@ -228,7 +229,10 @@ fn unlike_omissions_hold_only_for_undetermined_bare_head_coordinations() {
     // library* stays `top`'s Complement alone and never modifies `instant or
     // sorcery from the top`.
     let johann: Vec<Reading> = grammar
-        .parse(&lexicon, "Cast the instant or sorcery from the top of the library.")
+        .parse(
+            &lexicon,
+            "Cast the instant or sorcery from the top of the library.",
+        )
         .readings()
         .collect();
     assert_eq!(johann.len(), 2, "{johann:#?}");
