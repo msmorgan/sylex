@@ -205,3 +205,100 @@ fn a_conjunct_with_no_value_of_the_unlike_feature_is_of_no_selected_kind() {
         1
     );
 }
+
+#[test]
+fn a_central_adjunct_shifts_an_unlike_slot() {
+    let core = || Source {
+        kind: SourceKind::Core,
+        path: "tests/unlike_frames.rs".to_owned(),
+        owner: "test".to_owned(),
+    };
+    let catalog = || Source {
+        kind: SourceKind::Catalog,
+        path: "tests/unlike_frames.rs".to_owned(),
+        owner: "test".to_owned(),
+    };
+    let lexicon = Lexicon::new([
+        Lexeme::invariant("c:and", "and", Category::Coordinator, core()),
+        Lexeme::invariant("adv:still", "still", Category::Adverb, core()),
+        Lexeme::verb("v:have", "have", core()),
+        Lexeme::invariant("k:banding", "banding", Category::Keyword, catalog()),
+        Lexeme::noun("n:ability", "ability", vec![Countability::Count], catalog()),
+    ])
+    .unwrap();
+    let frames = FrameCatalog::from_ron_str(
+        r#"(
+            frames: {
+                "v:have": [
+                    (family: Monotransitive, slots: [(relation: Object, fill: NP)]),
+                    (family: Monotransitive, slots: [(relation: Object, fill: KeywordPhrase)]),
+                ],
+            },
+        )"#,
+    )
+    .unwrap();
+    let grammar_src = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        feature ComplementKind = NP | KeywordPhrase | Amount
+        category AdverbPhrase
+        category AmountPhrase
+        category CentralAdjunct { function }
+        category KeywordPhrase
+        category Nominal
+        category NounPhrase
+        category ObjectConjunct [ComplementKind]
+        category ObjectCoordination [ComplementKind]
+        category Sentence
+        category VerbPhrase [VerbForm]
+        class HaveVerb = ["v:have"]
+        word And = "c:and"
+        slot NP = NounPhrase
+        slot KeywordPhrase = KeywordPhrase
+        slot Amount = AmountPhrase
+        slot Objects = ObjectCoordination { unlike: [NP, KeywordPhrase, Amount] }
+        Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+        Numeral: AmountPhrase -> Lex(Numeral)
+        Keyword: KeywordPhrase -> Lex(Keyword)
+        Adverb: AdverbPhrase -> Lex(Adverb)
+        CentralAdverb: CentralAdjunct -> AdverbPhrase
+        Bare: NounPhrase -> Nominal
+        NominalConjunct: ObjectConjunct -> NounPhrase where $.ComplementKind = NP
+        KeywordConjunct: ObjectConjunct -> KeywordPhrase where $.ComplementKind = KeywordPhrase
+        AmountConjunct: ObjectConjunct -> AmountPhrase where $.ComplementKind = Amount
+        coordination ObjectCoordination {
+            coordinators: And,
+            unshared: [ComplementKind],
+            serial: true,
+            conjunct: ObjectConjunct,
+            unlike: ComplementKind,
+        }
+        valence VerbPhrase {
+            head: Verb,
+            central: CentralAdjunct,
+            central_heads: HaveVerb,
+        }
+        valence Nominal { head: Noun }
+    "#;
+    let grammar = CompiledGrammar::bind(
+        &Grammar::from_fug_str(grammar_src).unwrap(),
+        &lexicon,
+        &frames,
+    )
+    .unwrap();
+    let valid = "Have still banding and abilities.";
+    let parsed = grammar.parse(&lexicon, valid).readings().collect::<Vec<_>>();
+    assert_eq!(parsed.len(), 1, "{valid}: {parsed:#?}");
+    assert_eq!(
+        grammar.admit(&parsed[0], &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
+    assert_eq!(grammar.realize(&parsed[0], &lexicon).unwrap(), valid);
+    assert_eq!(
+        grammar
+            .parse(&lexicon, "Have still banding and 2.")
+            .readings()
+            .count(),
+        0
+    );
+}

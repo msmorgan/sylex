@@ -3813,7 +3813,10 @@ impl<'a> Binder<'a> {
                     .retain(|joint| joint.iter().all(|(i, _, _)| *i < split));
                 base.carried.retain(|(i, _, _)| *i < split);
                 base.weights.retain(|(i, _)| *i < split);
+                base.unlike_slots.retain(|(i, _)| *i < split);
                 base.predicative = base.predicative.filter(|&i| i < split);
+                base.internalized = base.internalized.filter(|&i| i < split);
+                base.clusters = base.clusters.filter(|&(i, _)| i < split);
                 // A Nominal's unselected dependent is its Modifier.
                 let function = match host {
                     HostKind::Nominal => "modifier",
@@ -3855,7 +3858,10 @@ impl<'a> Binder<'a> {
                     .retain(|joint| joint.iter().all(|(i, _, _)| *i >= split));
                 suffix.carried.retain(|(i, _, _)| *i >= split);
                 suffix.weights.retain(|(i, _)| *i >= split);
+                suffix.unlike_slots.retain(|(i, _)| *i >= split);
                 suffix.predicative = suffix.predicative.filter(|&i| i >= split);
+                suffix.internalized = suffix.internalized.filter(|&i| i >= split);
+                suffix.clusters = suffix.clusters.filter(|&(i, _)| i >= split);
                 remap_draft(&mut suffix, |i| i - split + 1);
                 out.push(suffix);
             }
@@ -5805,27 +5811,100 @@ fn central_adjuncts(
 }
 
 fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
+    let Draft {
+        id: _,
+        lhs: _,
+        children: _,
+        equations,
+        exclusions,
+        joint_exclusions,
+        carried,
+        resolutions: _,
+        resolution_nonlast,
+        resolution_last,
+        weights,
+        cost: _,
+        introduces: _,
+        gap_followed: _,
+        frame: _,
+        host_check,
+        adjunct_slot: _,
+        adjunct_unfit: _,
+        predicative,
+        coordinator,
+        distinct_coordinator,
+        requires_coordination,
+        paired_coordinator: _,
+        uncoordinated,
+        coordinated,
+        whole_coordination,
+        unshared: _,
+        unlinked,
+        delimits: _,
+        tail: _,
+        interleaved_prefix: _,
+        unlike,
+        unlike_slots,
+        chained,
+        gap_preposition: _,
+        fills_preposition,
+        foreign_coordinators: _,
+        internalized,
+        omits_complement: _,
+        elliptical: _,
+        unclosed: _,
+        nonfinal: _,
+        nonfinal_conjuncts,
+        link: _,
+        cluster: _,
+        clusters,
+        remnant: _,
+        parallel: _,
+        central_site: _,
+        frame_variant: _,
+        gap_slot: _,
+        shifted_object: _,
+    } = draft;
     let path = |p: &mut Path| {
         if let Path::Child(i, _) = p {
             *i = map(*i);
         }
     };
-    for (a, b) in &mut draft.equations {
+    for (a, b) in equations {
         path(a);
         if let Target::Path(p) = b {
             path(p);
         }
     }
-    for (i, _, _) in draft
-        .exclusions
+    for (i, _, _) in exclusions
         .iter_mut()
-        .chain(&mut draft.carried)
-        .chain(draft.joint_exclusions.iter_mut().flatten())
+        .chain(carried.iter_mut())
+        .chain(joint_exclusions.iter_mut().flatten())
     {
         *i = map(*i);
     }
-    for (i, _) in &mut draft.weights {
+    for i in weights
+        .iter_mut()
+        .map(|(i, _)| i)
+        .chain(whole_coordination.iter_mut().map(|(i, _)| i))
+        .chain(unlike_slots.iter_mut().map(|(i, _)| i))
+        .chain(resolution_nonlast.iter_mut())
+        .chain(distinct_coordinator.iter_mut())
+        .chain(uncoordinated.iter_mut())
+        .chain(coordinated.iter_mut())
+        .chain(unlinked.iter_mut())
+        .chain(nonfinal_conjuncts.iter_mut())
+    {
         *i = map(*i);
     }
-    draft.predicative = draft.predicative.map(&map);
+    *resolution_last = resolution_last.map(|(at, rest)| (map(at), rest));
+    *host_check = host_check.map(|(h, a, k)| (map(h), map(a), k));
+    *predicative = predicative.map(&map);
+    *coordinator = coordinator.map(&map);
+    *requires_coordination = requires_coordination.map(&map);
+    *unlike = unlike.map(|u| Unlike::new(map(u.first), map(u.last), u.feature, u.rest));
+    *chained = chained.map(&map);
+    *fills_preposition = fills_preposition.map(&map);
+    *internalized = internalized.map(&map);
+    *clusters = clusters.map(|(at, f)| (map(at), f));
 }
