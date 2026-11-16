@@ -7,6 +7,6 @@ card singleFaced({
         sequentially([
             destroy(each(and([non(isLand), isPermanent, hasManaValue(atMost, 2)]))),
             addMana(
-              counted(
-                forEach(1, and([isPermanent, was(destroy(which), within = thisWay)])),
-                or([symbols([pip(black)]), symbols([pip(green)])])))]))]})
+              forEach(
+                or([symbols([pip(black)]), symbols([pip(green)])]),
+                and([isPermanent, was(destroy(which), within = thisWay)])))]))]})
