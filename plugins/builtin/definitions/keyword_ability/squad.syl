@@ -3,7 +3,7 @@
 # of it for each time its squad cost was paid." [CR#702.157a]
 ability squad(cost: Cost) {
   lexical = {lemma = "squad", parameters = [[Cost]]},
-  spelling = "squad <cost>",
+  spelling = "squad $cost",
   body = [
     static(addedCost(this, optional, plusAdditional($cost, times = anyNumberOfTimes))),
     when(

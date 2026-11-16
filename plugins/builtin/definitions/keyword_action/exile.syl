@@ -1,6 +1,6 @@
 # "exile <subject>" (`Definition`, [CR#701.13]).
 action exile(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "exile", frames = [Monotransitive]}]},
-  spelling = "exile <subject>",
+  spelling = "exile $subject",
   body = move($subject, anywhere, exileZone, [])
 }

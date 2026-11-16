@@ -4,6 +4,6 @@
 # other. Named apart from `beamMeUp`, the keyword ability.
 action beamUp(subject: NounPhrase) {
   ofAbility = beamMeUp,
-  spelling = "beam <subject> up",
+  spelling = "beam $subject up",
   body = returnToHand($subject)
 }

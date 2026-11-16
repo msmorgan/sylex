@@ -9,7 +9,7 @@ ability typecycling(quality: Predicate, cost: Cost) {
     bound = {surface = "cycling", stems = [Subtype, CardType, Supertype]},
     verbs = [{lemma = "cycle", frames = [Monotransitive]}]},
   label = "cycling",
-  spelling = "<quality>cycling <cost>",
+  spelling = "$quality~cycling $cost",
   body = [
     activated(
       compound([$cost, perform(discard(this))]),

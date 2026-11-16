@@ -2,7 +2,7 @@
 # isn't renowned, put N +1/+1 counters on it and it becomes renowned." [CR#702.112a]
 ability renown(count: Amount) {
   lexical = {lemma = "renown", parameters = [[Amount]]},
-  spelling = "renown <count>",
+  spelling = "renown $count",
   body = [
     when(
       does(actor(thisCreature), dealDamage(recipient = a(isPlayer), kind = combat)),

@@ -2,7 +2,7 @@
 # 1/1 white and black Spirit creature tokens with flying." [CR#702.135a]
 ability afterlife(amount: Amount) {
   lexical = {lemma = "afterlife", parameters = [[Amount]]},
-  spelling = "afterlife <amount>",
+  spelling = "afterlife $amount",
   body = [
     when(
       does(actor(thisPermanent), die),

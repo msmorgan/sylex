@@ -3,7 +3,7 @@
 # [CR#702.46a]
 ability soulshift(amount: Amount) {
   lexical = {lemma = "soulshift", parameters = [[Amount]]},
-  spelling = "soulshift <amount>",
+  spelling = "soulshift $amount",
   body = [
     when(
       does(actor(thisPermanent), die),

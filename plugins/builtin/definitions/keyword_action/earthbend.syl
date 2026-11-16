@@ -2,7 +2,7 @@
 # counters, and returns tapped under your control when it dies or is exiled. [CR#701.66a]
 action earthbend(amount: Amount) {
   lexical = {verbs = [{lemma = "earthbend", past = "earthbent", frames = [Amount, Intransitive]}]},
-  spelling = "earthbend <amount>",
+  spelling = "earthbend $amount",
   body = sequentially([
       establish(
         characteristicChange(

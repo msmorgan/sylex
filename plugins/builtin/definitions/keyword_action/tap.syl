@@ -2,6 +2,6 @@
 action tap(subject: NounPhrase) {
   lexical = {
     verbs = [{lemma = "tap", past = "tapped", gerund = "tapping", frames = [Monotransitive]}]},
-  spelling = "tap <subject>",
+  spelling = "tap $subject",
   body = setStatus(tapped, $subject)
 }

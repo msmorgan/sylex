@@ -4,7 +4,7 @@
 # of your library in any order."
 ability ripple(amount: Amount) {
   lexical = {lemma = "ripple", parameters = [[Amount]]},
-  spelling = "ripple <amount>",
+  spelling = "ripple $amount",
   body = [
     when(
       does(actor(you), cast(thisSpell)),

@@ -1,5 +1,5 @@
 ability_word raid(ability: Ability) {
   lexical = {lemma = "raid", listed = Rules},
-  spelling = "raid — <ability>",
+  spelling = "raid — $ability",
   body = $ability
 }

@@ -5,7 +5,7 @@ ability firebending(amount: Amount) {
     lemma = "firebending",
     parameters = [[Amount]],
     verbs = [{lemma = "firebend", past = "firebent", frames = [Intransitive]}]},
-  spelling = "firebending <amount>",
+  spelling = "firebending $amount",
   body = [
     whenever(
       does(actor(thisCreature), attack),

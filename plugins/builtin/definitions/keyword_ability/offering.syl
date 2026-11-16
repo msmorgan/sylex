@@ -4,7 +4,7 @@
 # instant." [CR#702.48a]
 ability offering(quality: Predicate) {
   lexical = {lemma = "offering", parameters = [[QualityBefore]]},
-  spelling = "<quality> offering",
+  spelling = "$quality offering",
   body = [
     static(
       addedCost(

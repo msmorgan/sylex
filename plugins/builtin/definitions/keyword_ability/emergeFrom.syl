@@ -5,7 +5,7 @@
 ability emergeFrom(quality: Predicate, cost: Cost) {
   lexical = {lemma = "emerge", parameters = [[Cost], [Quality(Some("from")), Cost]]},
   label = "emerge",
-  spelling = "emerge from <quality> <cost>",
+  spelling = "emerge from $quality $cost",
   body = [
     static(
       can(

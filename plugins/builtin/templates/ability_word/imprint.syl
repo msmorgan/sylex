@@ -1,5 +1,5 @@
 ability_word imprint(ability: Ability) {
   lexical = {lemma = "imprint", listed = Rules},
-  spelling = "imprint — <ability>",
+  spelling = "imprint — $ability",
   body = $ability
 }

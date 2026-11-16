@@ -2,7 +2,7 @@
 # graveyard by paying [cost] rather than paying its mana cost." [CR#702.187b]
 ability mayhem(cost: Cost) {
   lexical = {lemma = "mayhem", parameters = [[Cost], []]},
-  spelling = "mayhem <cost>",
+  spelling = "mayhem $cost",
   body = [
     static(
       asLongAs(

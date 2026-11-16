@@ -4,7 +4,7 @@
 ability hexproofFrom(quality: Predicate) {
   lexical = {lemma = "hexproof", parameters = [[], [Quality(Some("from"))]]},
   label = "hexproof",
-  spelling = "hexproof from <quality>",
+  spelling = "hexproof from $quality",
   body = [
     static(
       cant(

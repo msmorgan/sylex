@@ -7,7 +7,7 @@ ability equip(cost: Cost) {
     determinatives = [{number = Singular, countability = Count, lemma = "equipped"}],
     verbs = [
       {lemma = "equip", past = "equipped", gerund = "equipping", frames = [Monotransitive]}]},
-  spelling = "equip <cost>",
+  spelling = "equip $cost",
   body = [
     activatedOnlyDuring(
       $cost,

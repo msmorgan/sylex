@@ -3,7 +3,7 @@
 # [CR#701.19a], the deed "can't be regenerated" forbids. Activating or casting what creates a
 # shield is not regenerating (`regenerate`, [CR#701.19c]) (`Definition`).
 action regeneration(subject: NounPhrase) {
-  spelling = "the regeneration of <subject>",
+  spelling = "the regeneration of $subject",
   lexical = {verbs = [{lemma = "regenerate", frames = [Intransitive, Monotransitive]}]},
   deed = "regenerate",
   body = sequentially([

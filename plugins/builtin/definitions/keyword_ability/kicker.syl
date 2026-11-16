@@ -6,6 +6,6 @@ ability kicker(cost: Cost) {
     nouns = ["kicker"],
     variants = [{lemma = "multikicker", parameters = [[Cost]]}],
     verbs = [{lemma = "kick", frames = [Monotransitive]}]},
-  spelling = "kicker <cost>",
+  spelling = "kicker $cost",
   body = [static(addedCost(this, optional, plusAdditional($cost)))]
 }

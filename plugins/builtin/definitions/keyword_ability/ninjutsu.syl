@@ -4,7 +4,7 @@ ability ninjutsu(cost: Cost) {
     lemma = "ninjutsu",
     parameters = [[Cost]],
     variants = [{lemma = "commander ninjutsu", parameters = [[Cost]]}]},
-  spelling = "ninjutsu <cost>",
+  spelling = "ninjutsu $cost",
   body = [
     activated(
       compound([

@@ -2,7 +2,7 @@
 # permanents." [CR#702.86a]
 ability annihilator(amount: Amount) {
   lexical = {lemma = "annihilator", parameters = [[Amount]]},
-  spelling = "annihilator <amount>",
+  spelling = "annihilator $amount",
   body = [
     whenever(
       does(actor(thisCreature), attack),

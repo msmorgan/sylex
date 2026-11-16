@@ -1,7 +1,7 @@
 # "Bushido N" with its definition, a triggered ability [CR#702.45a].
 ability bushido(count: Amount) {
   lexical = {lemma = "bushido", parameters = [[Amount]]},
-  spelling = "bushido <count>",
+  spelling = "bushido $count",
   body = [
     whenever(
       or([does(actor(thisCreature), block), does(any, becomeBlocked(thisCreature))]),

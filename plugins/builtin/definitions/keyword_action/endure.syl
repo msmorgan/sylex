@@ -3,7 +3,7 @@
 action endure(amount: Amount) {
   lexical = {verbs = [{lemma = "endure", frames = [Amount]}]},
   permanent = performs,
-  spelling = "endure <amount>",
+  spelling = "endure $amount",
   body = instruct(
     controllerOf(actor),
     chooseOne(

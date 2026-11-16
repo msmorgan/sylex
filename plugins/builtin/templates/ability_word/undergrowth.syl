@@ -1,5 +1,5 @@
 ability_word undergrowth(ability: Ability) {
   lexical = {lemma = "undergrowth", listed = Rules},
-  spelling = "undergrowth — <ability>",
+  spelling = "undergrowth — $ability",
   body = $ability
 }

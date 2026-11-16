@@ -5,7 +5,7 @@ ability tribute(amount: Amount) {
     lemma = "tribute",
     parameters = [[Amount]],
     nouns = [{lemma = "tribute", countability = [Mass]}]},
-  spelling = "tribute <amount>",
+  spelling = "tribute $amount",
   body = [
     static(
       replace(

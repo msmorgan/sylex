@@ -4,7 +4,7 @@
 # [CR#702.141a]
 ability encore(cost: Cost) {
   lexical = {lemma = "encore", parameters = [[Cost]]},
-  spelling = "encore <cost>",
+  spelling = "encore $cost",
   body = [
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),

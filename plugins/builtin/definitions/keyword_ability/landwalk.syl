@@ -6,7 +6,7 @@ ability landwalk(quality: Predicate) {
     lemma = "landwalk",
     parameters = [[], [Quality(Some("of"))]],
     bound = {surface = "walk", stems = [LandType, CardType]}},
-  spelling = "<quality>walk",
+  spelling = "$quality~walk",
   body = [
     static(
       onlyWhile(

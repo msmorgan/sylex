@@ -2,7 +2,7 @@
 # hand." [CR#702.65a]
 ability auraSwap(cost: Cost) {
   lexical = {lemma = "Aura swap", parameters = [[Cost]]},
-  spelling = "aura swap <cost>",
+  spelling = "aura swap $cost",
   body = [
     activated(
       $cost,

@@ -4,5 +4,5 @@
 # of times. [CR#702.157a]
 # TODO(spelling): Include the clause supplied by times.
 primitive plusAdditional(cost: Cost, times: PayTimes = once): AddedCost = PlusAdditional {
-  spelling = "by <cost> as an additional cost to cast it"
+  spelling = "by $cost as an additional cost to cast it"
 }

@@ -1,5 +1,5 @@
 ability_word sweep(ability: Ability) {
   lexical = {lemma = "sweep", listed = Rules},
-  spelling = "sweep — <ability>",
+  spelling = "sweep — $ability",
   body = $ability
 }

@@ -10,7 +10,7 @@ action empowerJace(amount: Amount) {
         past = "empowered Jace",
         gerund = "empowering Jace",
         frames = [Amount]}]},
-  spelling = "empower Jace <amount>",
+  spelling = "empower Jace $amount",
   body = sequentially([
       doIf(
         not(exists(and([isToken, isPlaneswalker, hasSubtype(jace), actorControls]))),

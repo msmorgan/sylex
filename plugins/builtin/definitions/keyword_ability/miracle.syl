@@ -4,7 +4,7 @@
 # written as a reflexive trigger: as you draw your first card each turn, if it is this card.
 ability miracle(cost: Cost) {
   lexical = {lemma = "miracle", parameters = [[Cost]]},
-  spelling = "miracle <cost>",
+  spelling = "miracle $cost",
   body = [
     static(
       asEvent(

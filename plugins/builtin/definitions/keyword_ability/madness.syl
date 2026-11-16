@@ -4,7 +4,7 @@
 # this card into their graveyard." [CR#702.35a]
 ability madness(cost: Cost) {
   lexical = {lemma = "madness", parameters = [[Cost]]},
-  spelling = "madness <cost>",
+  spelling = "madness $cost",
   body = [
     static(
       replace(

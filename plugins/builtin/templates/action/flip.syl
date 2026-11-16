@@ -2,6 +2,6 @@
 # text box, type line, power and toughness apply [CR#710.1a,710.2]. Flipping is no keyword action
 # [CR#701.1], so this is a Template, naming no deed.
 template flip(subject: NounPhrase): Action {
-  spelling = "flip <subject>",
+  spelling = "flip $subject",
   body = setStatus(flipped, $subject)
 }

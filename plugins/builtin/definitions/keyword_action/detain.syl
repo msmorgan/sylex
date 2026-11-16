@@ -3,7 +3,7 @@
 # changed control [CR#113.8].
 action detain(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "detain", frames = [Monotransitive]}]},
-  spelling = "detain <subject>",
+  spelling = "detain $subject",
   body = establishThroughout(
     conjunction([
         cant(actor($subject), attack),

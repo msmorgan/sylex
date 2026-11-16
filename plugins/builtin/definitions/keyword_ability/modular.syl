@@ -1,7 +1,7 @@
 # "Modular N" with its definition, a static ability and a triggered one [CR#702.43a].
 ability modular(count: Amount) {
   lexical = {lemma = "modular", parameters = [[Amount], [DashKeyword]]},
-  spelling = "modular <count>",
+  spelling = "modular $count",
   body = [
     static(entersWithCounters(thisPermanent, $count, p1p1Counter)),
     when(

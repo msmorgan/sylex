@@ -4,7 +4,7 @@
 # reads the creature as it dealt the damage, as prowl's does.
 ability freerunning(cost: Cost) {
   lexical = {lemma = "freerunning", parameters = [[Cost]]},
-  spelling = "freerunning <cost>",
+  spelling = "freerunning $cost",
   body = [
     static(
       onlyIfSo(

@@ -1,5 +1,5 @@
 ability_word renew(ability: Ability) {
   lexical = {lemma = "renew", listed = Rules},
-  spelling = "renew — <ability>",
+  spelling = "renew — $ability",
   body = $ability
 }

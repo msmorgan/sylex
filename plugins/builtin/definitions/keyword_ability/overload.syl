@@ -4,7 +4,7 @@
 # Its second ability is a text-changing effect [CR#702.96c].
 ability overload(cost: Cost) {
   lexical = {lemma = "overload", parameters = [[Cost]]},
-  spelling = "overload <cost>",
+  spelling = "overload $cost",
   body = [
     static(altCost(payingInstead($cost), this)),
     static(if(keywordCostPaid(overload, thisSpell), textChange(thisSpell, targetToEach)))]

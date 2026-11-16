@@ -5,7 +5,7 @@ ability boast(ability: Ability) {
     lemma = "boast",
     parameters = [[DashAbility]],
     verbs = [{lemma = "boast", frames = [Intransitive]}]},
-  spelling = "boast — <ability>",
+  spelling = "boast — $ability",
   body = [
     qualified(
       $ability,

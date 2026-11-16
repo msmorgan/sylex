@@ -3,7 +3,7 @@
 # [CR#702.181a]
 ability mobilize(amount: Amount) {
   lexical = {lemma = "mobilize", parameters = [[Amount]]},
-  spelling = "mobilize <amount>",
+  spelling = "mobilize $amount",
   body = [
     whenever(
       does(actor(thisCreature), attack),

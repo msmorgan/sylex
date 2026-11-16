@@ -1,5 +1,5 @@
 ability_word inspired(ability: Ability) {
   lexical = {lemma = "inspired", listed = Rules},
-  spelling = "inspired — <ability>",
+  spelling = "inspired — $ability",
   body = $ability
 }

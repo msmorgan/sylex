@@ -4,7 +4,7 @@
 # sneak cost was paid enters tapped and attacking what the returned creature was attacking.
 ability sneak(cost: Cost) {
   lexical = {lemma = "sneak", parameters = [[Cost]]},
-  spelling = "sneak <cost>",
+  spelling = "sneak $cost",
   body = [
     static(
       can(

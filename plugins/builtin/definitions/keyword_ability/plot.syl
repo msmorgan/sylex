@@ -9,7 +9,7 @@ ability plot(cost: Cost) {
     lemma = "plot",
     parameters = [[Cost]],
     verbs = [{lemma = "plot", past = "plotted", gerund = "plotting", frames = [Monotransitive]}]},
-  spelling = "plot <cost>",
+  spelling = "plot $cost",
   body = [
     static(
       specialAction(

@@ -1,7 +1,7 @@
 # "<performer> waterbends <cost>" (`Definition`, [CR#701.67a,701.67b]).
 action waterbend(cost: Cost) {
   lexical = {verbs = [{lemma = "waterbend", past = "waterbent", frames = [Cost, Intransitive]}]},
-  spelling = "waterbend <cost>",
+  spelling = "waterbend $cost",
   body = actionPay(
     withSubstitute(
       $cost,

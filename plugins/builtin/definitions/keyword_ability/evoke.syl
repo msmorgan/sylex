@@ -4,7 +4,7 @@
 # and 'When this permanent enters, if its evoke cost was paid, its controller sacrifices it.'"
 ability evoke(cost: Cost) {
   lexical = {lemma = "evoke", parameters = [[Cost]]},
-  spelling = "evoke <cost>",
+  spelling = "evoke $cost",
   body = [
     static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
     when(

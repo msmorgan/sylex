@@ -1,5 +1,5 @@
 ability_word descend8(ability: Ability) {
   lexical = {lemma = "descend 8", listed = Rules},
-  spelling = "descend 8 — <ability>",
+  spelling = "descend 8 — $ability",
   body = $ability
 }

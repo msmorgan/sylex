@@ -1,6 +1,6 @@
 # "the number of creatures in <player>'s party" [CR#700.8a]. A creature is the party member for
 # only one role [CR#700.8b].
 template partySizeOf(player: NounPhrase): Amount {
-  spelling = "the number of creatures in <player>'s party",
+  spelling = "the number of creatures in $player's party",
   body = numberOf(partyOf($player))
 }

@@ -4,7 +4,7 @@
 # priority. [CR#702.168d]
 ability disguise(cost: Cost) {
   lexical = {lemma = "disguise", parameters = [[Cost]]},
-  spelling = "disguise <cost>",
+  spelling = "disguise $cost",
   body = [
     static(
       can(

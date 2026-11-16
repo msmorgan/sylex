@@ -1,5 +1,5 @@
 ability_word celebration(ability: Ability) {
   lexical = {lemma = "celebration", listed = Rules},
-  spelling = "celebration — <ability>",
+  spelling = "celebration — $ability",
   body = $ability
 }

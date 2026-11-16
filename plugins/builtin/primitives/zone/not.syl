@@ -1,4 +1,4 @@
 # "anywhere other than <loc>"
 primitive not(loc: Location): Location = Not {
-  spelling = "anywhere other than <loc>"
+  spelling = "anywhere other than $loc"
 }

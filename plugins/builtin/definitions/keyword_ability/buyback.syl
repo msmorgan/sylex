@@ -3,7 +3,7 @@
 # graveyard as it resolves." [CR#702.27a]
 ability buyback(cost: Cost) {
   lexical = {lemma = "buyback", parameters = [[Cost]]},
-  spelling = "buyback <cost>",
+  spelling = "buyback $cost",
   body = [
     static(addedCost(this, optional, plusAdditional($cost))),
     static(

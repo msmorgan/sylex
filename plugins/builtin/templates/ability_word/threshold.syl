@@ -1,5 +1,5 @@
 ability_word threshold(ability: Ability) {
   lexical = {lemma = "threshold", listed = Rules},
-  spelling = "threshold — <ability>",
+  spelling = "threshold — $ability",
   body = $ability
 }

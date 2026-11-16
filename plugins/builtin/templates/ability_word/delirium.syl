@@ -1,5 +1,5 @@
 ability_word delirium(ability: Ability) {
   lexical = {lemma = "delirium", listed = Rules},
-  spelling = "delirium — <ability>",
+  spelling = "delirium — $ability",
   body = $ability
 }

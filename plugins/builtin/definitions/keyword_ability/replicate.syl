@@ -4,7 +4,7 @@
 # for any of the copies." [CR#702.56a]
 ability replicate(cost: Cost) {
   lexical = {lemma = "replicate", parameters = [[Cost]]},
-  spelling = "replicate <cost>",
+  spelling = "replicate $cost",
   body = [
     static(addedCost(this, optional, plusAdditional($cost, times = anyNumberOfTimes))),
     when(

@@ -3,7 +3,7 @@
 # deed.
 ability reconfigure(cost: Cost) {
   lexical = {lemma = "reconfigure", parameters = [[Cost]]},
-  spelling = "reconfigure <cost>",
+  spelling = "reconfigure $cost",
   body = [
     activatedOnlyDuring(
       $cost,

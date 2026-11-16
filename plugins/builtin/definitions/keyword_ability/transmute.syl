@@ -3,7 +3,7 @@
 # your library. Activate only as a sorcery." [CR#702.53a]
 ability transmute(cost: Cost) {
   lexical = {lemma = "transmute", parameters = [[Cost]]},
-  spelling = "transmute <cost>",
+  spelling = "transmute $cost",
   body = [
     activatedOnlyDuring(
       compound([$cost, perform(discard(this))]),

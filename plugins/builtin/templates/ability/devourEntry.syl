@@ -3,7 +3,7 @@
 # permanent enters with N +1/+1 counters on it for each [head] sacrificed this way." Devour counts
 # each creature [CR#702.82a], devour [quality] each permanent [CR#702.82c].
 template devourEntry(quality: Predicate, head: Predicate, amount: Amount): Ability {
-  spelling = "As this object enters, you may sacrifice any number of <quality> permanents. This permanent enters with <amount> +1/+1 counters on it for each <head> sacrificed this way.",
+  spelling = "As this object enters, you may sacrifice any number of $quality permanents. This permanent enters with $amount +1/+1 counters on it for each $head sacrificed this way.",
   body = static(
     replace(
       would(actor(thisPermanent), enter),

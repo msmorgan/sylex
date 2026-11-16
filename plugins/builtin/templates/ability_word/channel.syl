@@ -1,5 +1,5 @@
 ability_word channel(ability: Ability) {
   lexical = {lemma = "channel", listed = Rules},
-  spelling = "channel — <ability>",
+  spelling = "channel — $ability",
   body = $ability
 }

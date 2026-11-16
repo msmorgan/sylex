@@ -13,7 +13,7 @@ ability enchant(subject: Predicate) {
     parameters = [[Quality(None)]],
     determinatives = [{number = Singular, countability = Count, lemma = "enchanted"}],
     verbs = [{lemma = "enchant", frames = [Monotransitive]}]},
-  spelling = "enchant <subject>",
+  spelling = "enchant $subject",
   body = [
     static(addsTarget(thisAura, $subject)),
     static(mayBeAttachedTo(thisAura, allOf($subject))),

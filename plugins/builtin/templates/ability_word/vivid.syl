@@ -1,5 +1,5 @@
 ability_word vivid(ability: Ability) {
   lexical = {lemma = "vivid", listed = Rules},
-  spelling = "vivid — <ability>",
+  spelling = "vivid — $ability",
   body = $ability
 }

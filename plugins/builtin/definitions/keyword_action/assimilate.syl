@@ -7,7 +7,7 @@
 # set as its creature type [CR#205.1a].
 action assimilate(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "assimilate", frames = [Monotransitive]}]},
-  spelling = "assimilate <subject>",
+  spelling = "assimilate $subject",
   body = doIf(
     is($subject, in(battlefield)),
     sequentially([

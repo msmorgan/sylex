@@ -9,7 +9,7 @@ ability warp(cost: Cost) {
     lemma = "warp",
     parameters = [[Cost]],
     verbs = [{lemma = "warp", frames = [Monotransitive]}]},
-  spelling = "warp <cost>",
+  spelling = "warp $cost",
   body = [
     static(can(actor(you), cast(thisCard, from = yourHand, altCost = payingInstead($cost)))),
     static(

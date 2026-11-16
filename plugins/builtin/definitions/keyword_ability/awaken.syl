@@ -4,7 +4,7 @@
 # [CR#702.113a]
 ability awaken(amount: Amount, cost: Cost) {
   lexical = {lemma = "awaken", parameters = [[Amount, DashCost]]},
-  spelling = "awaken <amount>—<cost>",
+  spelling = "awaken $amount—$cost",
   body = [
     static(altCost(payingInstead($cost), this)),
     spell(

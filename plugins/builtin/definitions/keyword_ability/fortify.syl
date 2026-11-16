@@ -6,7 +6,7 @@ ability fortify(cost: Cost) {
     determinatives = [{number = Singular, countability = Count, lemma = "fortified"}],
     parameters = [[Cost]],
     verbs = [{lemma = "fortify", frames = [Monotransitive]}]},
-  spelling = "fortify <cost>",
+  spelling = "fortify $cost",
   body = [
     activatedOnlyDuring(
       $cost,

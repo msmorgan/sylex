@@ -6,7 +6,7 @@
 # sideboard cards are set aside [CR#702.139b].
 ability companion(condition: DeckCondition) {
   lexical = {lemma = "companion", parameters = [[DashCondition]]},
-  spelling = "companion — <condition>",
+  spelling = "companion — $condition",
   body = [
     static(
       specialAction(

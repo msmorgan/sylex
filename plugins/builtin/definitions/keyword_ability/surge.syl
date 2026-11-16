@@ -2,7 +2,7 @@
 # spell if you or one of your teammates has cast another spell this turn." [CR#702.117a]
 ability surge(cost: Cost) {
   lexical = {lemma = "surge", parameters = [[Cost]]},
-  spelling = "surge <cost>",
+  spelling = "surge $cost",
   body = [
     static(
       onlyIfSo(

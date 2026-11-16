@@ -2,7 +2,7 @@
 # opponent controls, counter that spell or ability unless that player pays [cost]." [CR#702.21a]
 ability ward(cost: Cost) {
   lexical = {lemma = "ward", parameters = [[Cost]]},
-  spelling = "ward <cost>",
+  spelling = "ward $cost",
   body = [
     whenever(
       does(by(a(and([in(stack), opponentsControl]))), target(thisPermanent)),

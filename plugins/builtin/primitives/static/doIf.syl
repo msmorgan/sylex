@@ -8,5 +8,5 @@ primitive doIf(
   body: Replacement,
   otherwise: Option(Replacement) = none): Replacement = OnlyIf {
   # TODO(spelling): Print ". Otherwise, <otherwise>" when otherwise is supplied.
-  spelling = "If <condition>, <body> instead"
+  spelling = "If $condition, $body instead"
 }

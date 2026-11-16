@@ -4,7 +4,7 @@
 # generic reduces what remains [CR#702.193b].
 ability powerUp(ability: Ability) {
   lexical = {lemma = "power-up", parameters = [[DashAbility]]},
-  spelling = "power-up — <ability>",
+  spelling = "power-up — $ability",
   body = [
     qualified($ability, limit = oncePerObject),
     static(

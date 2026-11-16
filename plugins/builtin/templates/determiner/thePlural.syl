@@ -1,5 +1,5 @@
 # "the …s", the definite plural: "the exiled cards", "the discarded cards" [CR#607.2a].
 template thePlural(p: Predicate): NounPhrase {
-  spelling = "the <p>",
+  spelling = "the $p",
   body = described(the(plur = many), $p)
 }

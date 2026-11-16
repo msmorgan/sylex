@@ -3,7 +3,7 @@
 # this permanent onto that creature." [CR#702.58a]
 ability graft(amount: Amount) {
   lexical = {lemma = "graft", parameters = [[Amount]]},
-  spelling = "graft <amount>",
+  spelling = "graft $amount",
   body = [
     static(entersWithCounters(thisPermanent, $amount, p1p1Counter)),
     whenever(

@@ -1,7 +1,7 @@
 # "<performer> discovers N" (`Definition`, [CR#701.57a]).
 action discover(amount: Amount) {
   lexical = {verbs = [{lemma = "discover", frames = [Amount, Intransitive]}]},
-  spelling = "discover <amount>",
+  spelling = "discover $amount",
   body = sequentially([
       exile(
         run(

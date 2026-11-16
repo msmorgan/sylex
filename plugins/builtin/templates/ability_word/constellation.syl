@@ -1,5 +1,5 @@
 ability_word constellation(ability: Ability) {
   lexical = {lemma = "constellation", listed = Rules},
-  spelling = "constellation — <ability>",
+  spelling = "constellation — $ability",
   body = $ability
 }

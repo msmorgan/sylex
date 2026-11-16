@@ -4,6 +4,6 @@ template activatedOnlyOnceIf(
   action: Action,
   limit: UsageLimit,
   guard: Condition): Ability {
-  spelling = "<cost>: <action>. Activate only once <limit> and only if <guard>.",
+  spelling = "$cost: $action. Activate only once $limit and only if $guard.",
   body = activated($cost, $action, limit = $limit, guard = $guard)
 }

@@ -1,5 +1,5 @@
 ability_word cohort(ability: Ability) {
   lexical = {lemma = "cohort", listed = Rules},
-  spelling = "cohort — <ability>",
+  spelling = "cohort — $ability",
   body = $ability
 }

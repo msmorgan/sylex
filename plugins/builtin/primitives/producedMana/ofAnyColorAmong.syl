@@ -6,5 +6,5 @@
 # object, and `ofColorProducibleBy` ("mana of any color that <subject> could produce"), which
 # reads the mana the objects could produce [CR#106.7] rather than their colors.
 primitive ofAnyColorAmong(subject: NounPhrase): ProducedMana = ColorAmong {
-  spelling = "mana of any color among <subject>"
+  spelling = "mana of any color among $subject"
 }

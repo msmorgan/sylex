@@ -6,7 +6,7 @@ ability saddle(amount: Amount) {
     lemma = "saddle",
     parameters = [[Amount]],
     verbs = [{lemma = "saddle", frames = [Monotransitive]}]},
-  spelling = "saddle <amount>",
+  spelling = "saddle $amount",
   body = [
     activatedOnlyDuring(
       perform(

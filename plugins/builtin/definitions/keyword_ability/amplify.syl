@@ -4,7 +4,7 @@
 # same time as this card." [CR#702.38a]
 ability amplify(amount: Amount) {
   lexical = {lemma = "amplify", parameters = [[Amount]]},
-  spelling = "amplify <amount>",
+  spelling = "amplify $amount",
   body = [
     static(
       replace(

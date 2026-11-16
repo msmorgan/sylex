@@ -2,7 +2,7 @@
 # opponent lost life this turn." [CR#702.137a]
 ability spectacle(cost: Cost) {
   lexical = {lemma = "spectacle", parameters = [[Cost]]},
-  spelling = "spectacle <cost>",
+  spelling = "spectacle $cost",
   body = [
     static(
       onlyIfSo(

@@ -3,7 +3,7 @@
 # addition to its other types. Activate only as a sorcery." [CR#702.129a]
 ability eternalize(cost: Cost) {
   lexical = {lemma = "eternalize", parameters = [[Cost]]},
-  spelling = "eternalize <cost>",
+  spelling = "eternalize $cost",
   body = [
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),

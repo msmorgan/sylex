@@ -2,6 +2,6 @@
 # specified. If you do, you pay an additional [cost]." [CR#702.42a]
 ability entwine(cost: Cost) {
   lexical = {lemma = "entwine", parameters = [[Cost]]},
-  spelling = "entwine <cost>",
+  spelling = "entwine $cost",
   body = [static(modeChoice(allInstead(cost = $cost)))]
 }

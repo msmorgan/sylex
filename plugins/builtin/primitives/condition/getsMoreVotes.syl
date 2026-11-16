@@ -4,5 +4,5 @@
 # No `Amount` reads the votes of a vote's other choices or the vote's total, and the number of
 # players is not that total, since a player may have several votes [CR#701.38d].
 primitive getsMoreVotes(label: String): Condition = GetsMoreVotes {
-  spelling = "<label> gets more votes"
+  spelling = "$label gets more votes"
 }

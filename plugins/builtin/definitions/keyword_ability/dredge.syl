@@ -3,7 +3,7 @@
 # [CR#702.52a]
 ability dredge(amount: Amount) {
   lexical = {lemma = "dredge", parameters = [[Amount]]},
-  spelling = "dredge <amount>",
+  spelling = "dredge $amount",
   body = [
     static(
       asLongAs(

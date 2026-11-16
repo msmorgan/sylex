@@ -5,7 +5,7 @@
 ability megamorph(cost: Cost) {
   lexical = {lemma = "megamorph", parameters = [[Cost]]},
   label = "morph",
-  spelling = "megamorph <cost>",
+  spelling = "megamorph $cost",
   body = [
     static(
       can(actor(you), cast(thisCard, payment = faceDown(faceDownCreature, mana([generic(3)]))))),

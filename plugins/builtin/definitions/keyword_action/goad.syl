@@ -2,6 +2,6 @@
 # ability, "your next turn" [CR#701.15a,109.5], as detain's.
 action goad(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "goad", frames = [Monotransitive]}]},
-  spelling = "goad <subject>",
+  spelling = "goad $subject",
   body = gainDesignation($subject, goaded, duration = untilYourNextTurn)
 }

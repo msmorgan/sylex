@@ -1,5 +1,5 @@
 ability_word domain(ability: Ability) {
   lexical = {lemma = "domain", listed = Rules},
-  spelling = "domain — <ability>",
+  spelling = "domain — $ability",
   body = $ability
 }

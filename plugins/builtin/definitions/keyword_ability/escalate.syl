@@ -2,6 +2,6 @@
 # pay an additional [cost]" [CR#702.120a]
 ability escalate(cost: Cost) {
   lexical = {lemma = "escalate", parameters = [[Cost]]},
-  spelling = "escalate <cost>",
+  spelling = "escalate $cost",
   body = [static(modeChoice(extraModesCost($cost)))]
 }

@@ -2,7 +2,7 @@
 # creature you control to its owner's hand rather than paying its mana cost." [CR#702.188a]
 ability webSlinging(cost: Cost) {
   lexical = {lemma = "web-slinging", parameters = [[Cost]]},
-  spelling = "web-slinging <cost>",
+  spelling = "web-slinging $cost",
   body = [
     static(
       can(

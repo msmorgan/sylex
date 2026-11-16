@@ -4,6 +4,6 @@
 action exchangeLifeTotals(parties: NounPhrase) {
   lexical = {verbs = [{lemma = "exchange", frames = [Monotransitive, TransitiveWithPP(["with"])]}]},
   deed = "exchange",
-  spelling = "exchange the life totals of <parties>",
+  spelling = "exchange the life totals of $parties",
   body = exchange(lifeTotals($parties))
 }

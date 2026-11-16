@@ -7,7 +7,7 @@ ability mutate(cost: Cost) {
     lemma = "mutate",
     parameters = [[Cost]],
     verbs = [{lemma = "mutate", frames = [Intransitive]}]},
-  spelling = "mutate <cost>",
+  spelling = "mutate $cost",
   body = [
     static(altCost(payingInstead($cost), this)),
     static(

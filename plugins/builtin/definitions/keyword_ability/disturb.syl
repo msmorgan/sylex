@@ -3,7 +3,7 @@
 # [CR#712.6b], and the permanent it becomes enters with its back face up [CR#702.146b].
 ability disturb(cost: Cost) {
   lexical = {lemma = "disturb", parameters = [[Cost]]},
-  spelling = "disturb <cost>",
+  spelling = "disturb $cost",
   body = [
     static(can(actor(you), cast(this, from = yourGraveyard, payment = transformedPaying($cost))))]
 }

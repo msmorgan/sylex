@@ -1,5 +1,5 @@
 # "take <count> extra turns after this one": the performer takes them [CR#500.7].
 template extraTurn(count: Amount): Action {
-  spelling = "take <count> extra turns after this one",
+  spelling = "take $count extra turns after this one",
   body = addTurnPart(turn, $count)
 }

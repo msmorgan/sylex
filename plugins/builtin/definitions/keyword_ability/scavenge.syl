@@ -3,7 +3,7 @@
 # sorcery." [CR#702.97a]
 ability scavenge(cost: Cost) {
   lexical = {lemma = "scavenge", parameters = [[Cost]]},
-  spelling = "scavenge <cost>",
+  spelling = "scavenge $cost",
   body = [
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),

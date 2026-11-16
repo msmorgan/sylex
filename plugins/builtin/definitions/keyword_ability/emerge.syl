@@ -4,7 +4,7 @@
 # [CR#702.119a]
 ability emerge(cost: Cost) {
   lexical = {lemma = "emerge", parameters = [[Cost], [Quality(Some("from")), Cost]]},
-  spelling = "emerge <cost>",
+  spelling = "emerge $cost",
   body = [
     static(
       can(

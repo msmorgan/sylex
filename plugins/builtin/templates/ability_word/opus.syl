@@ -1,5 +1,5 @@
 ability_word opus(ability: Ability) {
   lexical = {lemma = "opus", listed = Rules},
-  spelling = "opus — <ability>",
+  spelling = "opus — $ability",
   body = $ability
 }

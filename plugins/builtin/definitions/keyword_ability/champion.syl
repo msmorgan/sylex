@@ -6,7 +6,7 @@ ability champion(subject: Predicate) {
     lemma = "champion",
     parameters = [[Quality(None)]],
     verbs = [{lemma = "champion", frames = [Monotransitive]}]},
-  spelling = "champion <subject>",
+  spelling = "champion $subject",
   body = [
     when(
       does(actor(thisPermanent), enter),

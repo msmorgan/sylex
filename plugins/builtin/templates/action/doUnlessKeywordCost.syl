@@ -6,7 +6,7 @@ template doUnlessKeywordCost(
   cost: Cost,
   whose: NounPhrase,
   keyword: KeywordLabel): Action {
-  spelling = "<action> unless you pay <whose>'s <keyword> cost",
+  spelling = "$action unless you pay $whose's $keyword cost",
   body = withContinuation(
     optional,
     actionPay(payment($cost), once, paid, $whose, $keyword),

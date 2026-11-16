@@ -2,5 +2,5 @@
 # cost included), and every later X on the object reads that same referent [CR#107.3a,107.3i];
 # "where X is" is a later definition of it (`define`).
 primitive letter(letter: Letter): Amount = Letter {
-  spelling = "<letter>"
+  spelling = "$letter"
 }

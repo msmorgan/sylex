@@ -1,5 +1,5 @@
 ability_word willOfTheCouncil(ability: Ability) {
   lexical = {lemma = "will of the council", listed = Rules},
-  spelling = "will of the council — <ability>",
+  spelling = "will of the council — $ability",
   body = $ability
 }

@@ -1,5 +1,5 @@
 ability_word flurry(ability: Ability) {
   lexical = {lemma = "flurry", listed = Rules},
-  spelling = "flurry — <ability>",
+  spelling = "flurry — $ability",
   body = $ability
 }

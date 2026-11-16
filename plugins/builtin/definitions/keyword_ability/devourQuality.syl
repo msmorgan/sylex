@@ -5,6 +5,6 @@ ability devourQuality(quality: Predicate, amount: Amount) {
     parameters = [[Amount], [Quality(None), Amount]],
     verbs = [{lemma = "devour", frames = [Monotransitive]}]},
   label = "devour",
-  spelling = "devour <quality> <amount>",
+  spelling = "devour $quality $amount",
   body = [devourEntry($quality, isPermanent, $amount)]
 }

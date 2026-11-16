@@ -11,7 +11,7 @@ ability foretell(cost: Cost) {
     lemma = "foretell",
     parameters = [[Cost]],
     verbs = [{lemma = "foretell", past = "foretold", frames = [Monotransitive]}]},
-  spelling = "foretell <cost>",
+  spelling = "foretell $cost",
   body = [
     static(
       specialAction(

@@ -4,7 +4,7 @@
 action airbend(subject: NounPhrase) {
   lexical = {
     verbs = [{lemma = "airbend", past = "airbent", frames = [Monotransitive, Intransitive]}]},
-  spelling = "airbend <subject>",
+  spelling = "airbend $subject",
   body = sequentially([
       exile($subject),
       doForEach(

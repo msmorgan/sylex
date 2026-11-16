@@ -2,7 +2,7 @@
 # +1/+1 counters on it." [CR#702.54a]
 ability bloodthirst(amount: Amount) {
   lexical = {lemma = "bloodthirst", parameters = [[Amount]]},
-  spelling = "bloodthirst <amount>",
+  spelling = "bloodthirst $amount",
   body = [
     static(
       replace(

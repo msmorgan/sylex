@@ -4,7 +4,7 @@ template returnToBattlefieldWithCounters(
   who: NounPhrase,
   amount: Amount,
   kind: CounterKind): Action {
-  spelling = "return <subject> to the battlefield under <who>'s control with <amount> <kind> counters on it",
+  spelling = "return $subject to the battlefield under $who's control with $amount $kind counters on it",
   body = zoneChange(
     $subject,
     battlefield,

@@ -2,7 +2,7 @@
 # you controlled that shared a creature type with this spell [CR#702.76a].
 ability prowl(cost: Cost) {
   lexical = {lemma = "prowl", parameters = [[Cost]]},
-  spelling = "prowl <cost>",
+  spelling = "prowl $cost",
   body = [
     static(
       onlyIfSo(

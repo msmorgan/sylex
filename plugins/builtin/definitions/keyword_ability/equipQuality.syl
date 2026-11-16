@@ -9,7 +9,7 @@ ability equipQuality(quality: Predicate, cost: Cost) {
     verbs = [
       {lemma = "equip", past = "equipped", gerund = "equipping", frames = [Monotransitive]}]},
   label = "equip",
-  spelling = "equip <quality> <cost>",
+  spelling = "equip $quality $cost",
   body = [
     activatedOnlyDuring(
       $cost,

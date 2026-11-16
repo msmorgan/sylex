@@ -4,6 +4,6 @@ template withTotal(
   comparator: Comparator,
   bound: Amount,
   group: NounPhrase): NounPhrase {
-  spelling = "any number of <group> with total <axis> <comparator> <bound>",
+  spelling = "any number of $group with total $axis $comparator $bound",
   body = nounPhraseSomeOf(totaling($axis, $comparator, $bound), none, $group)
 }

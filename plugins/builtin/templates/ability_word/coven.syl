@@ -1,5 +1,5 @@
 ability_word coven(ability: Ability) {
   lexical = {lemma = "coven", listed = Rules},
-  spelling = "coven — <ability>",
+  spelling = "coven — $ability",
   body = $ability
 }

@@ -8,7 +8,7 @@ ability beamMeUp(cost: Cost) {
     lemma = "beam me up",
     parameters = [[Cost]],
     verbs = [{lemma = "beam", frames = [TransitiveWithPP(["up"])]}]},
-  spelling = "beam me up <cost>",
+  spelling = "beam me up $cost",
   body = [
     static(
       can(

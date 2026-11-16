@@ -4,7 +4,7 @@
 # stack" [CR#702.34a].
 ability flashback(cost: Cost) {
   lexical = {lemma = "flashback", parameters = [[Cost]]},
-  spelling = "flashback <cost>",
+  spelling = "flashback $cost",
   body = [
     static(
       can(

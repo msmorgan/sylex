@@ -1,5 +1,5 @@
 # "<subject> becomes <status>" [CR#603.2e]
 template becomeStatus(status: Status): Action {
-  spelling = "becomes <status>",
+  spelling = "becomes $status",
   body = setStatus($status, actor)
 }

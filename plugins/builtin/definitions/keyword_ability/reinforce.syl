@@ -2,7 +2,7 @@
 # [CR#702.77a]
 ability reinforce(amount: Amount, cost: Cost) {
   lexical = {lemma = "reinforce", parameters = [[Amount, DashCost]]},
-  spelling = "reinforce <amount>—<cost>",
+  spelling = "reinforce $amount—$cost",
   body = [
     activated(
       compound([$cost, perform(discard(this))]),

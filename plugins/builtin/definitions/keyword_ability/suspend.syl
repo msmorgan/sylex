@@ -13,7 +13,7 @@ ability suspend(amount: Amount, cost: Cost) {
     lemma = "suspend",
     parameters = [[Amount, DashCost]],
     verbs = [{lemma = "suspend", frames = [Monotransitive]}]},
-  spelling = "suspend <amount>—<cost>",
+  spelling = "suspend $amount—$cost",
   body = [
     static(
       specialAction(

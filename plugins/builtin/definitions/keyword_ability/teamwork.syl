@@ -2,7 +2,7 @@
 # creatures you control with total power N or more." [CR#702.194a]
 ability teamwork(amount: Amount) {
   lexical = {lemma = "teamwork", parameters = [[Amount]]},
-  spelling = "teamwork <amount>",
+  spelling = "teamwork $amount",
   body = [
     static(
       addedCost(

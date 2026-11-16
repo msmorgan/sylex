@@ -9,5 +9,5 @@
 # each <p>" follows the mana ("{G} for each creature you control"); an amount that is neither a
 # number nor a letter prints "an amount of <produced> equal to <amount>".
 primitive counted(amount: Amount, produced: ProducedMana): ProducedMana = Counted {
-  spelling = "<amount> <produced>"
+  spelling = "$amount $produced"
 }

@@ -1,4 +1,4 @@
 template exactly(n: Nat): Quantity {
-  spelling = "<n>",
+  spelling = "$n",
   body = range(low = $n, high = $n)
 }

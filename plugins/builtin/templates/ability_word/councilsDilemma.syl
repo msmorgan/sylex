@@ -1,5 +1,5 @@
 ability_word councilsDilemma(ability: Ability) {
   lexical = {lemma = "council's dilemma", listed = Rules},
-  spelling = "council's dilemma — <ability>",
+  spelling = "council's dilemma — $ability",
   body = $ability
 }

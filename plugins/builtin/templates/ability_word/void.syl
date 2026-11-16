@@ -1,5 +1,5 @@
 ability_word void(ability: Ability) {
   lexical = {lemma = "void", listed = Rules},
-  spelling = "void — <ability>",
+  spelling = "void — $ability",
   body = $ability
 }

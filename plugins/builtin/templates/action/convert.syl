@@ -4,6 +4,6 @@
 # Template's and the tree is `transform`'s.
 template convert(subject: NounPhrase): Action {
   lexical = {verbs = [{lemma = "convert", frames = [Monotransitive]}]},
-  spelling = "convert <subject>",
+  spelling = "convert $subject",
   body = transform($subject)
 }

@@ -1,5 +1,5 @@
 ability_word strive(ability: Ability) {
   lexical = {lemma = "strive", listed = Rules},
-  spelling = "strive — <ability>",
+  spelling = "strive — $ability",
   body = $ability
 }

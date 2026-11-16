@@ -1,5 +1,5 @@
 ability_word paradox(ability: Ability) {
   lexical = {lemma = "paradox", listed = Rules},
-  spelling = "paradox — <ability>",
+  spelling = "paradox — $ability",
   body = $ability
 }

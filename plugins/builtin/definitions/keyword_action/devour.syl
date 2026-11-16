@@ -4,6 +4,6 @@
 # sort, as `devour` is the keyword ability.
 action devour(subject: NounPhrase) {
   ofAbility = devour,
-  spelling = "devour <subject>",
+  spelling = "devour $subject",
   body = sacrifice($subject)
 }

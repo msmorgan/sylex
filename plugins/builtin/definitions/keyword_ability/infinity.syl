@@ -2,7 +2,7 @@
 # [CR#702.186b]
 ability infinity(ability: Ability) {
   lexical = {lemma = "∞", parameters = [[DashAbility]]},
-  spelling = "∞ — <ability>",
+  spelling = "∞ — $ability",
   body = [
     static(
       asLongAs(

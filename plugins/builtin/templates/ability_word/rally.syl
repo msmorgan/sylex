@@ -1,5 +1,5 @@
 ability_word rally(ability: Ability) {
   lexical = {lemma = "rally", listed = Rules},
-  spelling = "rally — <ability>",
+  spelling = "rally — $ability",
   body = $ability
 }

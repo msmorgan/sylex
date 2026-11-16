@@ -2,7 +2,7 @@
 # permanent", the Source, that the ability's controller follows [CR#608.2c].
 action adapt(amount: Amount) {
   lexical = {verbs = [{lemma = "adapt", frames = [Amount, Intransitive]}]},
-  spelling = "adapt <amount>",
+  spelling = "adapt $amount",
   body = doIf(
     not(is(thisPermanent, hasCounter(kind = p1p1Counter))),
     putCounters($amount, printedKind(p1p1Counter), thisPermanent))

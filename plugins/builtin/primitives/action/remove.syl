@@ -3,5 +3,5 @@
 # [CR#704.5m,704.5n], so `remove` names no Deed and happens as no one event: the Event Gate
 # refuses it (semantics.md §3.2). It is written in what an effect doesn't do (`doesnt`).
 primitive remove(what: NounPhrase): Action = Remove {
-  spelling = "remove <what>"
+  spelling = "remove $what"
 }

@@ -2,7 +2,7 @@
 # opponent of the performer.
 action fateseal(amount: Amount) {
   lexical = {verbs = [{lemma = "fateseal", frames = [Amount]}]},
-  spelling = "fateseal <amount>",
+  spelling = "fateseal $amount",
   body = lookAndSortSlice(
     slice(top, $amount, libraryOf(a(isOpponentOf(actor)))),
     onBottom,

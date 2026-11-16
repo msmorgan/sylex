@@ -1,5 +1,5 @@
 ability_word fatefulHour(ability: Ability) {
   lexical = {lemma = "fateful hour", listed = Rules},
-  spelling = "fateful hour — <ability>",
+  spelling = "fateful hour — $ability",
   body = $ability
 }

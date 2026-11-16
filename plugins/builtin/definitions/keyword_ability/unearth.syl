@@ -3,7 +3,7 @@
 # exile it instead of putting it anywhere else. Activate only as a sorcery." [CR#702.84a]
 ability unearth(cost: Cost) {
   lexical = {lemma = "unearth", parameters = [[Cost]]},
-  spelling = "unearth <cost>",
+  spelling = "unearth $cost",
   body = [
     activatedOnlyDuring(
       $cost,

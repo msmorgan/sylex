@@ -6,5 +6,5 @@ primitive activated(
   limit: Option(UsageLimit) = none,
   guard: Option(Condition) = none,
   activator: Option(NounPhrase) = none): Ability = Activated {
-  spelling = "<cost>: <action>"
+  spelling = "$cost: $action"
 }

@@ -2,6 +2,6 @@
 # with another verb [CR#701.28a], and a converted spell is cast as a transformed one is
 # [CR#712.6b,702.162a].
 template convertedPaying(cost: Cost): PlayPayment {
-  spelling = "converted by paying <cost> rather than its mana cost",
+  spelling = "converted by paying $cost rather than its mana cost",
   body = transformedPaying($cost)
 }

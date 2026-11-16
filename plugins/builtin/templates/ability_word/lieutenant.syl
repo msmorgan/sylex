@@ -1,5 +1,5 @@
 ability_word lieutenant(ability: Ability) {
   lexical = {lemma = "lieutenant", listed = Rules},
-  spelling = "lieutenant — <ability>",
+  spelling = "lieutenant — $ability",
   body = $ability
 }

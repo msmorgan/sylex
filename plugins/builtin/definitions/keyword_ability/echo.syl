@@ -4,7 +4,7 @@
 # is of this permanent's echo cost, which a replacement or a trigger on paying it reads.
 ability echo(cost: Cost) {
   lexical = {lemma = "echo", parameters = [[Cost]]},
-  spelling = "echo <cost>",
+  spelling = "echo $cost",
   body = [
     at(
       beginningOfYour(upkeep),

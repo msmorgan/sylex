@@ -3,7 +3,7 @@
 # If the spell has any targets, you may choose new targets for the copy." [CR#702.153a]
 ability casualty(amount: Amount) {
   lexical = {lemma = "casualty", parameters = [[Amount]]},
-  spelling = "casualty <amount>",
+  spelling = "casualty $amount",
   body = [
     static(
       addedCost(

@@ -5,7 +5,7 @@
 # looked at the card and exiled it face down may keep looking at it too [CR#406.3].
 ability hideaway(amount: Amount) {
   lexical = {lemma = "hideaway", parameters = [[Amount]]},
-  spelling = "hideaway <amount>",
+  spelling = "hideaway $amount",
   body = [
     when(
       does(actor(thisPermanent), enter),

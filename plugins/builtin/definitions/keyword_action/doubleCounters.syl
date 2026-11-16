@@ -3,7 +3,7 @@
 action doubleCounters(on: NounPhrase) {
   lexical = {verbs = [{lemma = "double", frames = [Monotransitive]}]},
   deed = "double",
-  spelling = "double the number of each kind of counter on <on>",
+  spelling = "double the number of each kind of counter on $on",
   body = doForEachKind(
     counterKind,
     domain = $on,

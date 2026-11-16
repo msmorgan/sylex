@@ -4,5 +4,5 @@
 # [CR#702.16n].
 # TODO(spelling): Agree "doesn't" with the subject's number ("don't" after a plural).
 primitive doesnt(subj: Subject, action: Action): StaticSpec = Doesnt {
-  spelling = "<subj> doesn't <action>"
+  spelling = "$subj doesn't $action"
 }

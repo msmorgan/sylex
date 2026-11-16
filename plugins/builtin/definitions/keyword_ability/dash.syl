@@ -7,7 +7,7 @@
 # second is a Resolution Delayed Trigger, as blitz's is [CR#608.3g,603.7d].
 ability dash(cost: Cost) {
   lexical = {lemma = "dash", parameters = [[Cost]]},
-  spelling = "dash <cost>",
+  spelling = "dash $cost",
   body = [
     static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
     static(

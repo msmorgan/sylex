@@ -3,7 +3,7 @@
 # card." [CR#702.59a]
 ability recover(cost: Cost) {
   lexical = {lemma = "recover", parameters = [[Cost]]},
-  spelling = "recover <cost>",
+  spelling = "recover $cost",
   body = [
     when(
       does(any, putInto(a(isCreature), yourGraveyard, from = battlefield)),

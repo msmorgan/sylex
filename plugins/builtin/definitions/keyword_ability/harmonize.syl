@@ -5,7 +5,7 @@
 # this card instead of putting it anywhere else any time it would leave the stack." [CR#702.180a]
 ability harmonize(cost: Cost) {
   lexical = {lemma = "harmonize", parameters = [[Cost]]},
-  spelling = "harmonize <cost>",
+  spelling = "harmonize $cost",
   body = [
     static(
       can(

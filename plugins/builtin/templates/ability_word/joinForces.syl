@@ -1,5 +1,5 @@
 ability_word joinForces(ability: Ability) {
   lexical = {lemma = "join forces", listed = Rules},
-  spelling = "join forces — <ability>",
+  spelling = "join forces — $ability",
   body = $ability
 }

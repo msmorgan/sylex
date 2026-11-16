@@ -10,7 +10,7 @@ action fightEachOther(pair: NounPhrase) {
   lexical = {verbs = [{lemma = "fight", past = "fought", frames = [Monotransitive, Intransitive]}]},
   deed = "fight",
   permanent = performs,
-  spelling = "<pair> fight each other",
+  spelling = "$pair fight each other",
   body = doIf(
     is($pair, isCreature),
     instruct(eachOf($pair), dealDamage(amount = powerOf(it), recipient = theOther)))

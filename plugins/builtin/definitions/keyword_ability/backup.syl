@@ -3,7 +3,7 @@
 # until end of turn." [CR#702.165a] Only printed abilities are granted. [CR#702.165c]
 ability backup(amount: Amount) {
   lexical = {lemma = "backup", parameters = [[Amount]]},
-  spelling = "backup <amount>",
+  spelling = "backup $amount",
   body = [
     when(
       does(actor(thisCreature), enter),

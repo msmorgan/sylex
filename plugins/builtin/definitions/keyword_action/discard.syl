@@ -2,6 +2,6 @@
 # to the graveyard (`Definition`, [CR#701.9a]).
 action discard(subject: NounPhrase, destination: Zone = graveyard) {
   lexical = {verbs = [{lemma = "discard", frames = [Monotransitive]}]},
-  spelling = "discard <subject>",
+  spelling = "discard $subject",
   body = move($subject, zone(hand, actor), zone($destination, none), [])
 }

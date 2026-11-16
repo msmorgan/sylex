@@ -3,7 +3,7 @@
 # your library. Activate only as a sorcery." [CR#702.71a]
 ability transfigure(cost: Cost) {
   lexical = {lemma = "transfigure", parameters = [[Cost]]},
-  spelling = "transfigure <cost>",
+  spelling = "transfigure $cost",
   body = [
     activatedOnlyDuring(
       compound([$cost, perform(sacrifice(thisPermanent))]),

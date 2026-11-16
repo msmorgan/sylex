@@ -1,5 +1,5 @@
 ability_word converge(ability: Ability) {
   lexical = {lemma = "converge", listed = Rules},
-  spelling = "converge — <ability>",
+  spelling = "converge — $ability",
   body = $ability
 }

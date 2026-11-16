@@ -3,7 +3,7 @@
 # except it's 1/1." [CR#702.175a]
 ability offspring(cost: Cost) {
   lexical = {lemma = "offspring", parameters = [[Cost]]},
-  spelling = "offspring <cost>",
+  spelling = "offspring $cost",
   body = [
     static(addedCost(this, optional, plusAdditional($cost))),
     when(

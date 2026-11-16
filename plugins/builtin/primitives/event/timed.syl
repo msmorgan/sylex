@@ -2,5 +2,5 @@
 # creature attacks while you control two or more artifacts", "whenever a land enters during your
 # turn"). The Timing spells its own word.
 primitive timed(event: GameEvent, timing: Timing): GameEvent = Timed {
-  spelling = "<event> <timing>"
+  spelling = "$event $timing"
 }

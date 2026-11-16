@@ -4,6 +4,6 @@
 # results. [CR#702.164c]
 ability toxic(amount: Amount) {
   lexical = {lemma = "toxic", parameters = [[Amount]]},
-  spelling = "toxic <amount>",
+  spelling = "toxic $amount",
   body = []
 }

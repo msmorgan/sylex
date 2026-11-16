@@ -5,7 +5,7 @@ ability crew(amount: Amount) {
     lemma = "crew",
     parameters = [[Amount]],
     verbs = [{lemma = "crew", frames = [Monotransitive]}]},
-  spelling = "crew <amount>",
+  spelling = "crew $amount",
   body = [
     activated(
       perform(

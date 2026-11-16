@@ -3,7 +3,7 @@
 # "When the last time counter is removed from this permanent, sacrifice it." [CR#702.63a]
 ability vanishing(amount: Amount) {
   lexical = {lemma = "vanishing", parameters = [[], [Amount]]},
-  spelling = "vanishing <amount>",
+  spelling = "vanishing $amount",
   body = [
     static(entersWithCounters(thisPermanent, $amount, timeCounter)),
     at(

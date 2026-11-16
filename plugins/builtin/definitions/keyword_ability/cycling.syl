@@ -6,6 +6,6 @@ ability cycling(cost: Cost) {
     parameters = [[Cost]],
     bound = {surface = "cycling", stems = [Subtype, CardType, Supertype]},
     verbs = [{lemma = "cycle", frames = [Monotransitive]}]},
-  spelling = "cycling <cost>",
+  spelling = "cycling $cost",
   body = [activated(compound([$cost, perform(discard(this))]), draw(1))]
 }

@@ -3,7 +3,7 @@
 # and fortifying are a permanent's [CR#702.16d] and blocking a creature's [CR#702.16f].
 ability protection(quality: Predicate) {
   lexical = {lemma = "protection", parameters = [[Quality(Some("from"))]]},
-  spelling = "protection from <quality>",
+  spelling = "protection from $quality",
   body = [
     static(
       cant(

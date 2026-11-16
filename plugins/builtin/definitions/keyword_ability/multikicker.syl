@@ -4,6 +4,6 @@
 ability multikicker(cost: Cost) {
   lexical = {lemma = "multikicker", parameters = [[Cost]]},
   label = "kicker",
-  spelling = "multikicker <cost>",
+  spelling = "multikicker $cost",
   body = [static(addedCost(this, optional, plusAdditional($cost, times = anyNumberOfTimes)))]
 }

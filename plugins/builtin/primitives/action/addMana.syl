@@ -2,5 +2,5 @@
 # part of the produced mana (`counted`).
 # TODO(spelling): Print each rider as its own sentence after the clause.
 primitive addMana(produced: ProducedMana, riders: List(ManaRider) = []): Action = AddMana {
-  spelling = "add <produced>"
+  spelling = "add $produced"
 }

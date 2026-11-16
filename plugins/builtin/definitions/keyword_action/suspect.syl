@@ -2,6 +2,6 @@
 # no longer suspected. [CR#701.60a]
 action suspect(subject: NounPhrase) {
   lexical = {verbs = [{lemma = "suspect", frames = [Monotransitive]}]},
-  spelling = "suspect <subject>",
+  spelling = "suspect $subject",
   body = gainDesignation($subject, suspected)
 }

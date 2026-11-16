@@ -7,7 +7,7 @@
 # its own.
 ability blitz(cost: Cost) {
   lexical = {lemma = "blitz", parameters = [[Cost]]},
-  spelling = "blitz <cost>",
+  spelling = "blitz $cost",
   body = [
     static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
     static(

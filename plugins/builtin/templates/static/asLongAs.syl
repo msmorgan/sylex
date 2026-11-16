@@ -1,5 +1,5 @@
 # "As long as <condition>, <spec>"
 template asLongAs(condition: Condition, spec: StaticSpec): StaticSpec {
-  spelling = "As long as <condition>, <spec>",
+  spelling = "As long as $condition, $spec",
   body = conditionally($spec, $condition)
 }

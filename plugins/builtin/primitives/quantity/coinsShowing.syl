@@ -3,5 +3,5 @@
 # [CR#706.2], and a value stands only at its own sort (`syl.md` §2), so one typed read cannot
 # return both.
 primitive coinsShowing(face: CoinFace): Amount = CoinsShowing {
-  spelling = "the number of coins that came up <face>"
+  spelling = "the number of coins that came up $face"
 }

@@ -6,7 +6,7 @@ ability embalm(cost: Cost) {
     lemma = "embalm",
     parameters = [[Cost]],
     verbs = [{lemma = "embalm", frames = [Monotransitive]}]},
-  spelling = "embalm <cost>",
+  spelling = "embalm $cost",
   body = [
     activatedOnlyDuring(
       compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),

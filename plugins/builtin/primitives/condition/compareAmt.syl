@@ -3,5 +3,5 @@ primitive compareAmt(
   subject: Amount,
   comparator: Comparator,
   bound: Amount): Condition = CompareAmount {
-  spelling = "<subject> is <comparator> <bound>"
+  spelling = "$subject is $comparator $bound"
 }
