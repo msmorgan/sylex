@@ -3,5 +3,5 @@
 # coordinated indefinites (`and([a(A), a(B)])`) witness each arm independently unless `isOther` is
 # written.
 primitive thereAre(subject: NounPhrase): Condition = Exists {
-  spelling = "if there are $subject"
+  spelling = "if there be $subject"
 }

@@ -3,6 +3,6 @@ template entersWithAdditionalCounters(
   subject: NounPhrase,
   amount: Amount,
   kind: CounterKind): StaticSpec {
-  spelling = "$subject enters with an additional $amount $kind counters on it",
+  spelling = "$subject enter with an additional $amount $kind counters on it",
   body = enters($subject, [withCounters($amount, printedKind($kind), additional)])
 }

@@ -2,6 +2,6 @@
 # `source` [CR#120.1], whose "its" is an ordinary possessive pronoun that `D′` resolves to the
 # clause subject, `source`.
 template dealDamageOwnPower(source: NounPhrase, recipient: NounPhrase): VerbPhrase {
-  spelling = "$source deals damage equal to its power to $recipient",
+  spelling = "$source deal damage equal to its power to $recipient",
   body = instruct($source, dealDamage(amount = powerOf(it), recipient = $recipient))
 }

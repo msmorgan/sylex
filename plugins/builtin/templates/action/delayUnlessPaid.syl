@@ -8,7 +8,7 @@ template delayUnlessPaid(
   event: GameEvent,
   player: NounPhrase,
   cost: Cost): VerbPhrase {
-  spelling = "$action at $event unless $player pays $cost before that step",
+  spelling = "$action at $event unless $player pay $cost before that step",
   body = sequentially([
       delay($event, $action),
       establish(

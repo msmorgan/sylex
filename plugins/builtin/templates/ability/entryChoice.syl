@@ -4,6 +4,6 @@ template entryChoice(
   subject: NounPhrase,
   disclosure: Disclosure = openly,
   chosen: NounPhrase): StaticSpec {
-  spelling = "As $subject enters, <$disclosure >choose $chosen",
+  spelling = "As $subject enter, <$disclosure >choose $chosen",
   body = replace(would(actor($subject), enter), before(choose(disclosure = $disclosure, $chosen)))
 }

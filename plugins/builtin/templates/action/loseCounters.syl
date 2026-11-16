@@ -4,6 +4,6 @@ template loseCounters(
   kind: Option(CounterKindSource),
   amount: Amount,
   agent: NounPhrase = you): VerbPhrase {
-  spelling = "$agent loses $amount< $kind> counters",
+  spelling = "$agent lose $amount< $kind> counters",
   body = removeCounters(exactlyOf($amount), $kind, $agent)
 }

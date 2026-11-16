@@ -5,5 +5,5 @@
 # TODO(spelling): Subject-verb number agreement ("don't" after a plural) waits on
 # `syl-spelling-conventions` and `syl-deontic-verb-phrase-operators`.
 primitive doesnt(subj: Subject, action: VerbPhrase): StaticSpec = Doesnt {
-  spelling = "$subj doesn't $action"
+  spelling = "$subj don't $action"
 }

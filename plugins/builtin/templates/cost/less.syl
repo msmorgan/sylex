@@ -3,6 +3,6 @@
 template less(amount: Amount, floor: Option(Amount) = none): CostShift {
   # TODO(spelling): Printing the `floor` sentence after the reduction clause waits on
   # `syl-spelling-forms-and-runs`.
-  spelling = "costs $amount less",
+  spelling = "cost $amount less",
   body = generic(down($amount), $floor)
 }

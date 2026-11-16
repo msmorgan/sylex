@@ -1,5 +1,5 @@
 # "<subject> wins the game"
 template winGame: VerbPhrase {
-  spelling = "wins the game",
+  spelling = "win the game",
   body = conclude(winGame)
 }

@@ -1,5 +1,5 @@
 # "<subject> stops blocking <blocked>"
 template stopBlocking(subject: NounPhrase, blocked: NounPhrase): VerbPhrase {
-  spelling = "$subject stops blocking $blocked",
+  spelling = "$subject stop blocking $blocked",
   body = combat($subject, blocking(unattached, $blocked))
 }

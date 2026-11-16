@@ -1,5 +1,5 @@
 # "<subject> becomes <status>" [CR#603.2e]
 template becomeStatus(status: Status): VerbPhrase {
-  spelling = "becomes $status",
+  spelling = "become $status",
   body = setStatus($status, subject)
 }

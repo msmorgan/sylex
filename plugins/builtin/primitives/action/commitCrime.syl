@@ -1,4 +1,4 @@
 # "<subject> commits a crime" [CR#700.13]
 primitive commitCrime: VerbPhrase = CommitCrime {
-  spelling = "commits a crime"
+  spelling = "commit a crime"
 }

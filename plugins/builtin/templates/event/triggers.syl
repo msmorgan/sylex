@@ -2,6 +2,6 @@
 # ("a triggered ability of a creature you control") is `Predicate.abilityOf` in its description.
 # What made it trigger is `triggersBy`.
 template triggers(ability: NounPhrase): GameEvent {
-  spelling = "$ability triggers",
+  spelling = "$ability trigger",
   body = does(actor($ability), trigger)
 }

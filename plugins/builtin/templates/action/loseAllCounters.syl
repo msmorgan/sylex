@@ -1,5 +1,5 @@
 # "<who> loses all [<kind>] counters": the removal names no quantity.
 template loseAllCounters(kind: Option(CounterKindSource), agent: NounPhrase = you): VerbPhrase {
-  spelling = "$agent loses all< $kind> counters",
+  spelling = "$agent lose all< $kind> counters",
   body = removeCounters(none, $kind, $agent)
 }

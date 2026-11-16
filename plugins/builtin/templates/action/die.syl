@@ -1,5 +1,5 @@
 # "<subject> dies": put into a graveyard from the battlefield [CR#700.4].
 template die: VerbPhrase {
-  spelling = "dies",
+  spelling = "die",
   body = move(subject, zone(battlefield, none), zone(graveyard, none), [])
 }

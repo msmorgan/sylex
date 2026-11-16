@@ -4,6 +4,6 @@ template abilityGrantFrom(
   classes: List(AbilityClass),
   source: NounPhrase,
   except: Option(Predicate) = none): StaticSpec {
-  spelling = "$subject has all $classes#<and> abilities of $source< except $except>",
+  spelling = "$subject have all $classes#<and> abilities of $source< except $except>",
   body = characteristicChange($subject, [addedAbilitiesOf($source, $classes, $except)])
 }

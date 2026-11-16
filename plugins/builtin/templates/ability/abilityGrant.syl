@@ -1,6 +1,6 @@
 # "<subject> has <abilities>": the abilities are a list in printed order, so "has double strike
 # and trample" adds each of the two as an ability of its own [CR#113.2c,613.1f].
 template abilityGrant(subject: NounPhrase, abilities: List(Ability)): StaticSpec {
-  spelling = "$subject has $abilities#<and>",
+  spelling = "$subject have $abilities#<and>",
   body = characteristicChange($subject, [addedAbilities($abilities)])
 }

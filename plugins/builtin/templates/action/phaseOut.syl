@@ -1,5 +1,5 @@
 # "<subject> phases out" [CR#702.26b]
 template phaseOut: VerbPhrase {
-  spelling = "phases out",
+  spelling = "phase out",
   body = setStatus(phasedOut, subject)
 }

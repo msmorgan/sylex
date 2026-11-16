@@ -4,7 +4,7 @@ template gain(
   subject: NounPhrase,
   abilities: List(Ability),
   duration: Option(Duration) = none): VerbPhrase {
-  spelling = "$subject gains $abilities#<and>< $duration>",
+  spelling = "$subject gain $abilities#<and>< $duration>",
   body = establish(
     characteristicChange($subject, [addedAbilities($abilities)]),
     duration = $duration)

@@ -1,5 +1,5 @@
 # "<subject> becomes attacking [<defender>]"
 template becomeAttacking(subject: NounPhrase, defender: Option(NounPhrase)): VerbPhrase {
-  spelling = "$subject becomes attacking< $defender>",
+  spelling = "$subject become attacking< $defender>",
   body = combat($subject, participation(attacking($defender)))
 }

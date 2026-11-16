@@ -1,5 +1,5 @@
 # "<subject> becomes blocking <blocked>"
 template becomeBlocking(subject: NounPhrase, blocked: NounPhrase): VerbPhrase {
-  spelling = "$subject becomes blocking $blocked",
+  spelling = "$subject become blocking $blocked",
   body = combat($subject, blocking(attached, $blocked))
 }

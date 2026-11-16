@@ -1,5 +1,5 @@
 # "<subject> enters tapped"
 template entersTapped(subject: NounPhrase): StaticSpec {
-  spelling = "$subject enters tapped",
+  spelling = "$subject enter tapped",
   body = enters($subject, [entersAs(tapped)])
 }

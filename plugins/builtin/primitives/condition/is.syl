@@ -3,5 +3,5 @@
 # matches `predicate`. Over `coord(and, …)`, each arm matches `predicate` independently, so
 # `and([a(A), a(B)])` admits one object matching both unless `isOther` is written.
 primitive is(subject: NounPhrase, predicate: Predicate): Condition = Matches {
-  spelling = "$subject is $predicate"
+  spelling = "$subject be $predicate"
 }

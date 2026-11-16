@@ -1,4 +1,4 @@
 # "<subject> crews <vehicle>" [CR#702.122a]
 primitive crew(vehicle: NounPhrase): VerbPhrase = Crew {
-  spelling = "crews $vehicle"
+  spelling = "crew $vehicle"
 }

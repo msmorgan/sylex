@@ -1,5 +1,5 @@
 # "<subject> loses all abilities [except <except>]"
 template allAbilityLoss(subject: NounPhrase, except: Option(Predicate) = none): StaticSpec {
-  spelling = "$subject loses all abilities< except $except>",
+  spelling = "$subject lose all abilities< except $except>",
   body = characteristicChange($subject, [removedAbilities(allExcept($except))])
 }
