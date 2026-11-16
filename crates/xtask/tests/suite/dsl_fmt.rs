@@ -43,3 +43,13 @@ fn a_stdin_parse_error_fails_with_the_named_path_and_no_output() {
         "{stderr}"
     );
 }
+
+#[test]
+fn formatting_leaves_every_spelling_as_written() {
+    let input = "template t(p: Predicate, xs: List(Predicate)): Predicate {\n  \
+                 spelling = \"non~$p< and $xs#<and>> %VerbPhrase: for $p@Ordinal\",\n  \
+                 body = $p\n}\n";
+    let output = run_stdin(&[], input);
+    assert!(output.status.success(), "{output:?}");
+    assert_eq!(String::from_utf8(output.stdout).unwrap(), input);
+}

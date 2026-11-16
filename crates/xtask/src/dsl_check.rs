@@ -1,8 +1,10 @@
 //! `cargo xtask dsl check`: every reference in the `.syl` bundles resolves.
 //!
 //! A temporary validator that guards `.syl` until the Rust resolution layer
-//! replaces it. It checks names, sorts and argument binding only, following
-//! `docs/design/syl.md` §2 and §3; it expands nothing and reads no meaning.
+//! replaces it. It checks names, sorts, argument binding and each declaration's
+//! `spelling` notation ([`sylex_spelling`]), following `docs/design/syl.md` §2
+//! and §3 and `docs/design/spelling.md` §7; it expands nothing and reads no
+//! meaning.
 //!
 //! [`check`] first runs [`sylex_syl::check()`] (constructor clauses, and words
 //! that name no declaration at any sort), then resolves every value at its
@@ -598,6 +600,15 @@ fn resolve(
     .body(decl);
 }
 
+/// Where a `{ ... }` field list stands.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum FieldHost {
+    /// A declaration's `{ ... }` block, which may carry `lexical` and `spelling`.
+    DeclarationBlock,
+    /// A record value `{ ... }`, which carries only its record sort's fields.
+    RecordValue,
+}
+
 /// Resolves values for one declaration.
 struct Resolver<'r> {
     registry: &'r Registry,
@@ -638,12 +649,13 @@ impl Resolver<'_> {
                 default: None,
             })
             .collect();
-        self.fields(block, &slots, &at);
+        self.fields(block, &slots, &at, FieldHost::DeclarationBlock);
     }
 
-    /// Resolves a record's or block's fields against `slots`, skipping the
-    /// metadata fields.
-    fn fields(&mut self, record: &Record, slots: &[Slot], at: &str) {
+    /// Resolves a record's or block's fields against `slots`. On a
+    /// declaration's block, `lexical` is skipped and `spelling` is parsed with
+    /// [`sylex_spelling`].
+    fn fields(&mut self, record: &Record, slots: &[Slot], at: &str, host: FieldHost) {
         let mut written = BTreeSet::new();
         for field in record.nodes() {
             let name = field.name.ident.as_str();
@@ -654,7 +666,12 @@ impl Resolver<'_> {
                 );
                 continue;
             }
-            if METADATA_FIELDS.contains(&name) {
+            if host == FieldHost::DeclarationBlock && METADATA_FIELDS.contains(&name) {
+                match name {
+                    "spelling" => self.spelling(&field.value),
+                    "lexical" => {}
+                    other => unreachable!("unhandled metadata field `{other}`"),
+                }
                 continue;
             }
             match slots.iter().find(|slot| slot.name == name) {
@@ -681,6 +698,23 @@ impl Resolver<'_> {
         }
     }
 
+    fn spelling(&mut self, value: &Value) {
+        match &value.kind {
+            ValueKind::String(text) => {
+                if let Err(error) = sylex_spelling::parse(text) {
+                    self.refuse(value.span, RefusalKind::InvalidSpelling(error.kind));
+                }
+            }
+            ValueKind::Integer(_)
+            | ValueKind::List(_)
+            | ValueKind::Record(_)
+            | ValueKind::Call(_)
+            | ValueKind::Parameter(_) => {
+                self.refuse(value.span, RefusalKind::SpellingNotString);
+            }
+        }
+    }
+
     fn record(&mut self, record: &Record, sort: &SortKey) {
         let Some(spec) = RECORDS
             .iter()
@@ -699,7 +733,7 @@ impl Resolver<'_> {
                 default: None,
             })
             .collect();
-        self.fields(record, &slots, spec.sort);
+        self.fields(record, &slots, spec.sort, FieldHost::RecordValue);
     }
 
     /// Resolves `value` at `expected` (`syl.md` §3).

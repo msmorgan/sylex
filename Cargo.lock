@@ -2263,6 +2263,7 @@ dependencies = [
  "sylex_plugin_v1",
  "sylex_render_v1",
  "sylex_semantics_v1",
+ "sylex_spelling",
  "sylex_syl",
  "sylex_syntax",
  "sylex_upstream",

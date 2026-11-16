@@ -151,6 +151,10 @@ pub enum RefusalKind {
     ListAt(String),
     #[error("record at {0}, which is not a record sort")]
     RecordAt(String),
+    #[error("a `spelling` is a string literal")]
+    SpellingNotString,
+    #[error("invalid `spelling`: {0}")]
+    InvalidSpelling(sylex_spelling::ErrorKind),
     #[error("dependency cycle: {}", .0.join(" -> "))]
     Cycle(Vec<String>),
 }

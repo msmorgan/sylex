@@ -1587,3 +1587,45 @@ fn a_move_names_no_observation_point() {
         };
     }
 }
+
+#[test]
+fn valid_spellings_and_unspelled_declarations_pass_and_invalid_spellings_are_refused() {
+    let valid = format!(
+        "{COLORS}\
+         primitive unspelled: Color = Unspelled\n\
+         primitive gap: Color = Gap {{ spelling = \"^\" }}\n\
+         template tied(p: Color): Color {{ spelling = \"non~$p\", body = $p }}\n\
+         template ord(n: Nat): Nat {{ spelling = \"$n@Ordinal\", body = $n }}\n\
+         template opt(a: Color, b: Option(Color) = none): Color {{\n\
+           spelling = \"pick $a< or $b> %VerbPhrase: for $a\",\n\
+           body = $a\n\
+         }}"
+    );
+    assert_eq!(kinds(&valid), []);
+
+    let invalid = format!(
+        "{COLORS}\
+         template untied(p: Color): Color {{ spelling = \"non$p\", body = $p }}\n\
+         template badForm(n: Nat): Nat {{ spelling = \"$n@Plural\", body = $n }}\n\
+         template badGap: Color {{ spelling = \"cast ^\", body = white }}\n\
+         template notString: Color {{ spelling = 1, body = white }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [
+            (
+                RefusalKind::InvalidSpelling(sylex_spelling::ErrorKind::AbuttingHole),
+                s("\"non$p\"")
+            ),
+            (
+                RefusalKind::InvalidSpelling(sylex_spelling::ErrorKind::UnknownForm(s("Plural"))),
+                s("\"$n@Plural\"")
+            ),
+            (
+                RefusalKind::InvalidSpelling(sylex_spelling::ErrorKind::GapNotWholeSpelling),
+                s("\"cast ^\"")
+            ),
+            (RefusalKind::SpellingNotString, s("1")),
+        ]
+    );
+}
