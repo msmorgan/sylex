@@ -22,7 +22,7 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
 - A move's riders are left unspelled. They are depictives, not one list under one join ("tapped
   and attacking" beside "tapped under their control"), and their wording waits for that design
   (`docs/design/semantics.md` §6 item 13).
-- A list of modes takes the line-break join, as the grammar's `Modes` joins its `Mode`s, and a
+- A list of modes takes the line-break join, `$modes#<\n>`, as the grammar's `Modes` joins its `Mode`s, and a
   mode's bullet is the mode's own wording, with its cost clause an optional part.
 
 ## Done when
