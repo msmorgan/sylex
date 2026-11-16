@@ -343,6 +343,11 @@ primitives and positions, never which Template a card calls, since a Template ad
 keeps its own slot after the trigger condition [CR#603.4]: each is printed structure that
 classification needs.
 
+**A word only a rule may use is refused in a card.** The rules are transcribed into surface form
+as cards are ([`surface.md`](./surface.md) §4), and some of their words name what no card prints
+(`asEvent`, `stateBasedActionsChecked`). No sort separates them from a card's words, so
+classification refuses a card's term that calls one.
+
 **Why one layer.** Which box a clause opens depends on what the clause is, reference resolution
 needs the boxes, and the meaning needs resolved references, since an event pattern's subject is
 a Referent. A reference step in a crate of its own would have to restate what each clause and
@@ -422,10 +427,11 @@ are found over enumerated candidates or over a packed form is open (§6).
    reference resolution allocates and keep printed order; it is not defined. The fixed rule of
    §5 step 5 cannot be the Reading's Ranking Key alone, since two terms from one Reading share
    it.
-9. **What a rules row's clauses are written as** ([`surface.md`](./surface.md) §4), and what
-   replaces `Condition` and `Action` where a clause is held: `SbaRule`'s `when` and `then`, the
-   `intervening` parameter of `triggered`, a deontic rule's Unless Condition. Where the line
-   between rules data and printed text runs is part of this.
+9. **Which rules data becomes clauses and which sorts stay as frames**
+   ([`surface.md`](./surface.md) §4): a fair amount of the first and a fair few of the second,
+   declaration by declaration. With it, what replaces `Condition` and `Action` where a clause is
+   held: `SbaRule`'s `when` and `then`, the `intervening` parameter of `triggered`, a deontic
+   rule's Unless Condition.
 10. **A Definition's meaning.** A Definition's sorts are checked once, at its declaration, and its
     references in each context that expands it ([`surface.md`](./surface.md) §6). Whether
     classification runs on a body once or at each call is not settled.

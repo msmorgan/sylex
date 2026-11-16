@@ -80,13 +80,15 @@ a Definition's body in its Reference Scope under its Deed, keeps every call and 
 boundary, and reads each argument once, in printed order ([`syl.md`](./syl.md) §4, §5).
 
 **The rules are transcribed as cards are.** A Definition's body, a state-based action and a
-conferral state a rule of the Comprehensive Rules in surface form. Today a state-based action
-and a conferral are records (an `SbaRule`'s `scope`, `when` and `then`; a `ConferralRule`'s
-`scope` and `confer`), a declaration's `confers` field holds `Conferral` values, and some bodies
-use words no card prints (`asEvent` in `lifelink`, `stateBasedActionsChecked`). How much of that
-becomes clauses as a rule states them, which of those sorts stay as the frame a rule is written
-in, and what keeps a card from calling a rules-only word are open
-([`semantics.md`](./semantics.md) §6).
+conferral state a rule of the Comprehensive Rules in surface form. Today a state-based action and a
+conferral are records (an `SbaRule`'s `scope`, `when` and `then`; a `ConferralRule`'s `scope` and
+`confer`), a declaration's `confers` field holds `Conferral` values, and some bodies use words no
+card prints (`asEvent` in `lifelink`, `stateBasedActionsChecked`). A fair amount of that becomes
+clauses as the rule states them, and a fair few of those sorts stay, as the frame a rule is written
+in: the frames of the kinds of ability (`static`, `triggered`, `activated`, `spell`) are frames of
+that kind already. Which declaration goes which way is not settled
+([`semantics.md`](./semantics.md) §6). Nothing at the surface keeps a card from calling a word only
+a rule may use; semantics refuses a card that does ([`semantics.md`](./semantics.md) §4).
 
 ## 5. What Is Checked at the Surface
 
