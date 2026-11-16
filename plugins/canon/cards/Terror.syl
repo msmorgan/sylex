@@ -4,4 +4,6 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        destroyCantRegenerate(target(and([isCreature, non(isArtifact), non(hasColor(black))]))))]})
+        doUnderProhibition(
+          destroy(target(and([isCreature, non(isArtifact), non(hasColor(black))]))),
+          regeneration(it)))]})

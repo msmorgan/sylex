@@ -8,4 +8,4 @@ card singleFaced({
         can(
           actor(eachPlayer),
           play(counted(additional(exactly(1)), isLand)),
-          timing = onEachOfTheirTurns))]})
+          timing = onEachOfTheirTurns(they)))]})

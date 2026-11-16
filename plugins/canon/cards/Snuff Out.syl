@@ -7,4 +7,7 @@ card singleFaced({
         if(
           exists(and([isLand, hasSubtype(swamp), youControl])),
           altCost(payingInstead(perform(payLife(amount = 4))), this))),
-      spell(destroyCantRegenerate(target(and([isCreature, non(hasColor(black))]))))]})
+      spell(
+        doUnderProhibition(
+          destroy(target(and([isCreature, non(hasColor(black))]))),
+          regeneration(it)))]})

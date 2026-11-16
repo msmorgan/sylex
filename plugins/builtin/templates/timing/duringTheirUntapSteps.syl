@@ -1,6 +1,6 @@
-# "during their untap steps": each player's own untap steps, "their" the plural pronoun
-# resolved to the players the deontic subject names ("Players can't untap …") [CR#502.3].
-template duringTheirUntapSteps: Timing {
-  spelling = "during their untap steps",
-  body = inPart(untapStep, pro(word(player), many), eachTime)
+# "during <whose>'s untap steps": each player's own untap steps ("Players can't untap …")
+# [CR#502.3].
+template duringTheirUntapSteps(whose: NounPhrase): Timing {
+  spelling = "during $whose's untap steps",
+  body = inPart(untapStep, $whose, eachTime)
 }

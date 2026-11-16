@@ -9,4 +9,6 @@ card singleFaced({
       spell(
         sequentially([
             separateIntoPiles(allOf(and([isCreature, controlledBy(target(isPlayer))])), 2),
-            destroyPluralCantRegenerate(allOf(and([isCreature, inPile(pileOfChoice(they))])))]))]})
+            doUnderProhibition(
+              destroy(allOf(and([isCreature, inPile(pileOfChoice(they))]))),
+              regeneration(them))]))]})
