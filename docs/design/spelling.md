@@ -541,7 +541,8 @@ form     := "Cardinal" | "Arabic" | "Ordinal" | "Roman" | "Counting"
           | "Present" | "Preterite" | "PastParticiple" | "GerundParticiple"
 join     := "" | "," | "." | "and" | "or" | "and/or" | "then"
 optional := "<" part* [tail] ">"                    -- not empty
-tail     := "%" ["inner "] Category ": " part+       -- last in its spelling or optional part
+tail     := "%" ["inner "] Category ": " part+       -- last in its spelling or optional part;
+                                                    -- holds no Tail, at any depth
 gap      := "^"                                     -- the whole spelling of a Gap's word
 affix    := letter+
 text     := any characters except "$", "~", "@", "*", "^", "#", "%", "<" and ">"
@@ -660,10 +661,10 @@ and an argument printed at two Holes prints its Tail once. A Tail stands last am
 beside it and holds no Tail.
 
 **A Gap is `^`.** A word that stands for a Gap is spelled with the mark and nothing else:
-`which`, the Gap of a relative clause, and `_`, the Gap a shared phrase fills, are each
-`spelling = "^"`. The mark prints no word. Where it stands, the Reading has a Gap of the
+`which`, the Gap of a relative clause, and `_`, the Gap a shared phrase fills, are each to be
+`spelling = "^"`; today `which` has no `spelling` and `_` is not declared. The mark prints no word. Where it stands, the Reading has a Gap of the
 Category its word's sort is spelled as (§1), and a wording that holds one is checked as English
-with the Gap in place. So every word a card's term may hold has a `spelling`, except the
+with the Gap in place. So, once they are, every word a card's term may hold has a `spelling`, except the
 promoted `subject` of a passive, which is no Gap (§2), and a declaration with no `spelling` is
 a word only a rule may use ([Semantics](semantics.md) §4).
 
