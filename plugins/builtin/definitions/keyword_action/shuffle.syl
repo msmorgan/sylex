@@ -4,5 +4,5 @@ action shuffle {
     verbs = [
       {lemma = "shuffle", frames = [Intransitive, Monotransitive, TransitiveWithPP(["into"])]}]},
   spelling = "shuffle",
-  body = shufflePile(libraryOf(actor))
+  body = shufflePile(libraryOf($actor))
 }

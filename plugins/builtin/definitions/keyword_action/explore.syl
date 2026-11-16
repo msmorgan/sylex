@@ -4,13 +4,13 @@ action explore {
   permanent = performs,
   spelling = "explore",
   body = instruct(
-    controllerOf(actor),
+    controllerOf($actor),
     sequentially([
-        reveal(slice(top, 1, libraryOf(actor))),
+        reveal(slice(top, 1, libraryOf(they))),
         doIf(
           is(that(card), isLand),
           putInto(that(card), zone(hand, ownerOf(that(card)))),
           otherwise = sequentially([
-              putCounters(1, printedKind(p1p1Counter), actor),
+              putCounters(1, printedKind(p1p1Counter), $actor),
               may(putInto(that(card), graveyard))]))]))
 }

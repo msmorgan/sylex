@@ -5,8 +5,8 @@ action endure(amount: Amount) {
   permanent = performs,
   spelling = "endure $amount",
   body = instruct(
-    controllerOf(actor),
+    controllerOf($actor),
     chooseOne(
-      putCounters($amount, printedKind(p1p1Counter), actor),
+      putCounters($amount, printedKind(p1p1Counter), $actor),
       create(1, written(creatureTokenOf($amount, $amount, [white], [spirit])))))
 }

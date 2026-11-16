@@ -11,6 +11,6 @@ action learn {
         not(exists(and([isCard, was(discard(which), within = thisWay)]))),
         may(
           sequentially([
-              reveal(a(and([isCard, hasSubtype(lesson), ownedBy(actor), outsideTheGame]))),
-              putInto(it, handOf(actor))])))])
+              reveal(a(and([isCard, hasSubtype(lesson), ownedBy($actor), outsideTheGame]))),
+              putInto(it, handOf($actor))])))])
 }

@@ -24,7 +24,7 @@ action assimilate(subject: NounPhrase) {
       anywhere,
       battlefield,
       [
-        underControlOf(actor),
+        underControlOf($actor),
         withCounters(1, printedKind(p1p1Counter), fresh),
         withCharacteristicEdits(
           [typeLine(adds, {types = [artifact, creature]}), typeLine(sets, {subtypes = [borg]})])]))

@@ -3,7 +3,7 @@ action scry(amount: Amount) {
   lexical = {verbs = [{lemma = "scry", frames = [Amount, Intransitive, Monotransitive]}]},
   spelling = "scry $amount",
   body = lookAndSortSlice(
-    slice(top, $amount, libraryOf(actor)),
+    slice(top, $amount, libraryOf($actor)),
     onBottom,
     spillRiders = [inOrder(anyOrder)])
 }

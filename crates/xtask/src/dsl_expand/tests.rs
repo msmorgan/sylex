@@ -473,6 +473,176 @@ fn joined_trigger_and_expands_to_trigger_or() {
     });
 }
 
+/// Collects `(active_actor, target)` for every call to `verb` inside `node`,
+/// updating `active_actor` whenever an `instruct(subj, action)` hands off the
+/// performer.
+fn performed_targets<'a>(
+    node: &'a Node,
+    active_actor: &'a Node,
+    verb: &str,
+    target_arg: usize,
+    out: &mut Vec<(&'a Node, &'a Node)>,
+) {
+    match node {
+        Node::Call { word, args, .. } if word == INSTRUCT_WORD => {
+            let [subj, action] = args.as_slice() else {
+                panic!("`instruct` takes two arguments:\n{node}");
+            };
+            performed_targets(action, subj, verb, target_arg, out);
+        }
+        Node::Call { word, args, .. } => {
+            if word == verb {
+                out.push((active_actor, &args[target_arg]));
+            }
+            for arg in args {
+                performed_targets(arg, active_actor, verb, target_arg, out);
+            }
+        }
+        Node::Mark { body, .. } => performed_targets(body, active_actor, verb, target_arg, out),
+        Node::List(items) => {
+            for item in items {
+                performed_targets(item, active_actor, verb, target_arg, out);
+            }
+        }
+        Node::Record(fields) => {
+            for (_, field) in fields {
+                performed_targets(field, active_actor, verb, target_arg, out);
+            }
+        }
+        Node::Word { .. }
+        | Node::Param(_)
+        | Node::UnnamedPerformer
+        | Node::String(_)
+        | Node::Integer(_)
+        | Node::None => {}
+    }
+}
+
+/// On `explore` (*Jadelight Ranger*, [CR#701.44a]), `connive` (*Raffine's
+/// Informant*, [CR#701.50a,701.50d]) and `endure` (*Anafenza, Unyielding
+/// Lineage*, [CR#701.63a]), the counter's holder (`putCounters`'s `on`) is the
+/// call's performer, while the one who puts it (`instruct`'s subject) is that
+/// permanent's controller; a nested `action` Definition (`connive`'s `discard`)
+/// binds its own `$actor` to the performer at its call (`controllerOf($x)`
+/// under `instruct`, `<unnamed>` under `was`), never leaking the outer `$actor`.
+#[test]
+fn permanent_actions_put_counters_on_performer_by_its_controller() {
+    let probes = vec![
+        probe(
+            "probeController",
+            &[("x", "NounPhrase")],
+            "NounPhrase",
+            "controllerOf($x)",
+        ),
+        probe(
+            "probeExplore",
+            &[("x", "NounPhrase")],
+            "VerbPhrase",
+            "instruct($x, explore)",
+        ),
+        probe(
+            "probeConnive",
+            &[("x", "NounPhrase")],
+            "VerbPhrase",
+            "instruct($x, connive)",
+        ),
+        probe(
+            "probeEndure",
+            &[("x", "NounPhrase"), ("n", "Amount")],
+            "VerbPhrase",
+            "instruct($x, endure($n))",
+        ),
+    ];
+    with_probes(probes, |_, expander| {
+        let performer = x();
+        let controller = expander.term("probeController", "NounPhrase").unwrap();
+        assert_ne!(controller, performer);
+        for (action, probe_name) in [
+            ("explore", "probeExplore"),
+            ("connive", "probeConnive"),
+            ("endure", "probeEndure"),
+        ] {
+            let expansion = expander.term(probe_name, "VerbPhrase").unwrap();
+            let Node::Call { word, args, .. } = &expansion else {
+                panic!("`{action}` probe expands to no call:\n{expansion}");
+            };
+            assert_eq!(word, INSTRUCT_WORD);
+            assert_eq!(args[0], performer);
+            let Node::Mark {
+                definition, body, ..
+            } = &args[1]
+            else {
+                panic!("`{action}` expands to no mark:\n{expansion}");
+            };
+            assert_eq!(definition, action);
+            let mut placements = Vec::new();
+            performed_targets(body, &performer, "putCounters", 2, &mut placements);
+            assert_eq!(
+                placements,
+                vec![(&controller, &performer)],
+                "`{action}` counter placements (putter, holder):\n{expansion}"
+            );
+            if action == "connive" {
+                let discard_actors: Vec<&Node> = marks(body)
+                    .into_iter()
+                    .filter_map(|mark| match mark {
+                        Node::Mark {
+                            definition, body, ..
+                        } if definition == "discard" => match body.as_ref() {
+                            Node::Call { word, args, .. } if word == "move" => match &args[1] {
+                                Node::Call { word, args, .. } if word == "zone" => Some(&args[1]),
+                                other => panic!("unexpected discard origin: {other}"),
+                            },
+                            other => panic!("unexpected discard body: {other}"),
+                        },
+                        _ => None,
+                    })
+                    .collect();
+                assert_eq!(
+                    discard_actors,
+                    vec![&controller, &Node::UnnamedPerformer],
+                    "`connive` nested `discard` `$actor` bindings:\n{expansion}"
+                );
+            }
+        }
+    });
+}
+
+/// On `fight` (*Wolverine, Fierce Fighter*, [CR#701.14a]), the call's performer
+/// deals damage to `$other` and `$other` deals damage back to the call's
+/// performer, not to itself.
+#[test]
+fn fight_deals_damage_between_performer_and_other() {
+    let probes = vec![probe(
+        "probeFight",
+        &[("x", "NounPhrase"), ("y", "NounPhrase")],
+        "VerbPhrase",
+        "instruct($x, fight($y))",
+    )];
+    with_probes(probes, |_, expander| {
+        let performer = x();
+        let other = Node::Param("y".to_owned());
+        let expansion = expander.term("probeFight", "VerbPhrase").unwrap();
+        let Node::Call { args, .. } = &expansion else {
+            panic!("`fight` probe expands to no call:\n{expansion}");
+        };
+        let Node::Mark {
+            definition, body, ..
+        } = &args[1]
+        else {
+            panic!("`fight` expands to no mark:\n{expansion}");
+        };
+        assert_eq!(definition, "fight");
+        let mut hits = Vec::new();
+        performed_targets(body, &performer, "dealDamage", 1, &mut hits);
+        assert_eq!(
+            hits,
+            vec![(&performer, &other), (&other, &performer)],
+            "`fight` damage (dealer, recipient):\n{expansion}"
+        );
+    });
+}
+
 /// Every declaration's fields, each parameter free, and every card expand.
 #[test]
 fn every_declaration_and_card_expands() {

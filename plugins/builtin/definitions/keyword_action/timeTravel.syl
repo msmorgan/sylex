@@ -14,7 +14,7 @@ action timeTravel {
               and([
                   isCard,
                   in(exileZone),
-                  ownedBy(actor),
+                  ownedBy($actor),
                   hasKeyword(theKeyword(suspend)),
                   hasCounter(kind = timeCounter)])]))),
       doForEach(

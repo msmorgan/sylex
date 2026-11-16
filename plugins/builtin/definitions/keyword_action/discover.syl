@@ -7,7 +7,7 @@ action discover(amount: Amount) {
         run(
           top,
           and([non(isLand), compare(atMost, $amount, [stat(manaValue)])]),
-          libraryOf(actor))),
+          libraryOf($actor))),
       withContinuation(
         optional,
         cast(

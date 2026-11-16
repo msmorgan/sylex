@@ -15,5 +15,5 @@ action earthbend(amount: Amount) {
       putCounters($amount, printedKind(p1p1Counter), that(land)),
       delay(
         or([does(actor(that(land)), die), does(any, move(that(land), battlefield, exileZone, []))]),
-        returnToBattlefield(that(land), riders = [entersAs(tapped), underControlOf(actor)]))])
+        returnToBattlefield(that(land), riders = [entersAs(tapped), underControlOf($actor)]))])
 }
