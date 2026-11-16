@@ -348,6 +348,11 @@ as cards are ([`surface.md`](./surface.md) §4), and some of their words name wh
 (`asEvent`, `stateBasedActionsChecked`). No sort separates them from a card's words, so
 classification refuses a card's term that calls one.
 
+Spelling is the other bound on what a card's term may hold. A card's stored term must be among
+the candidates recovery gives for its text and spell back to it (§5), so a word with no wording,
+or with a wording the card does not print, has no route into it. For a card read from its text
+that bound does most of the work, and the refusal above matters for a term written by hand.
+
 **Why one layer.** Which box a clause opens depends on what the clause is, reference resolution
 needs the boxes, and the meaning needs resolved references, since an event pattern's subject is
 a Referent. A reference step in a crate of its own would have to restate what each clause and

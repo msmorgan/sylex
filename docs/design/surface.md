@@ -87,8 +87,10 @@ card prints (`asEvent` in `lifelink`, `stateBasedActionsChecked`). A fair amount
 clauses as the rule states them, and a fair few of those sorts stay, as the frame a rule is written
 in: the frames of the kinds of ability (`static`, `triggered`, `activated`, `spell`) are frames of
 that kind already. Which declaration goes which way is not settled
-([`semantics.md`](./semantics.md) §6). Nothing at the surface keeps a card from calling a word only
-a rule may use; semantics refuses a card that does ([`semantics.md`](./semantics.md) §4).
+([`semantics.md`](./semantics.md) §6). Two things keep a card from calling a word only a
+rule may use, and neither is a sort: the word has no route through spelling into a term read
+from a card's text, and semantics refuses a card's term that calls it
+([`semantics.md`](./semantics.md) §4).
 
 ## 5. What Is Checked at the Surface
 
