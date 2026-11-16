@@ -1,4 +1,5 @@
-# Each member of the named group.
+# Distributive "each of <group>": singular inside its nuclear scope, exported with any
+# indefinites introduced there as plural on leaving it (`docs/design/semantics.md` §2.4).
 primitive eachOf(group: NounPhrase): NounPhrase = EachOf {
   spelling = "each of $group"
 }

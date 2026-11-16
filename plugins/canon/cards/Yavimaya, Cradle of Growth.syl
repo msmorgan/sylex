@@ -2,4 +2,4 @@ card singleFaced({
     name = "Yavimaya, Cradle of Growth",
     supertypes = [legendary],
     types = [land],
-    text = [static(addSubtype(allOf(land), forest))]})
+    text = [static(addSubtype(each(land), forest))]})

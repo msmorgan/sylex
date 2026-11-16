@@ -1,4 +1,5 @@
-# "each …"
+# Distributive "each …": singular inside its nuclear scope, exported with any indefinites
+# introduced there as plural on leaving it (`docs/design/semantics.md` §2.4).
 primitive each: DetPhrase = Each {
   spelling = "each"
 }

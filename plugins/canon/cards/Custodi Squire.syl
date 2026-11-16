@@ -19,6 +19,6 @@ card singleFaced({
                         pre = [or([artifact, creature, enchantment])],
                         card,
                         post = [in(yourGraveyard)]))))),
-              returnToHand(allOf(nominal(card, post = [withMostVotes])))])))],
+              returnToHand(each(nominal(card, post = [withMostVotes])))])))],
     power = 3,
     toughness = 3})

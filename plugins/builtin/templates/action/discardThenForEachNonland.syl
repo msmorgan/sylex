@@ -5,6 +5,6 @@ template discardThenForEachNonland(discarded: NounPhrase, step: VerbPhrase): Ver
   body = sequentially([
       discard($discarded),
       doForEach(
-        allOf(nominal(pre = [non(land)], card, post = [was(discard(which), within = thisWay)])),
+        each(nominal(pre = [non(land)], card, post = [was(discard(which), within = thisWay)])),
         $step)])
 }

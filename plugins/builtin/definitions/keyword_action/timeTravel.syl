@@ -19,7 +19,7 @@ action timeTravel {
                   hasKeyword(theKeyword(suspend)),
                   hasCounter(kind = timeCounter)])]))),
       doForEach(
-        them,
+        eachOf(them),
         chooseOne(
           putCounters(1, printedKind(timeCounter), it),
           removeCounters(exactly(1), printedKind(timeCounter), it)))])

@@ -1,6 +1,6 @@
-# "Airbend <subject>" (`Definition`, [CR#701.65a]): per-card `doForEach` loop over
-# `allOf(nominal(card, post = [was(exile(which), within = thisWay)]))` where `it` resolves to the
-# singular loop referent.
+# "Airbend <subject>" (`Definition`, [CR#701.65a]): exiles `subject`, then for each card exiled
+# this way (`each(nominal(card, post = [was(exile(which), within = thisWay)]))`), its owner may
+# cast it by paying {2} for as long as it remains exiled.
 action airbend(subject: NounPhrase) {
   lexical = {
     verbs = [{lemma = "airbend", past = "airbent", frames = [Monotransitive, Intransitive]}]},
@@ -8,7 +8,7 @@ action airbend(subject: NounPhrase) {
   body = sequentially([
       exile($subject),
       doForEach(
-        allOf(nominal(card, post = [was(exile(which), within = thisWay)])),
+        each(nominal(card, post = [was(exile(which), within = thisWay)])),
         instruct(
           ownerOf(it),
           establish(

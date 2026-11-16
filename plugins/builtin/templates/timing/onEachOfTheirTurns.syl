@@ -1,5 +1,6 @@
-# "on each of <whose>'s turns": each of the turns of the player(s) `whose` names ("Each player may
-# play an additional land on each of their turns").
+# "on each of <whose>'s turns": each turn of the player `whose` names ("Each player may play an
+# additional land on each of their turns", where `whose` is singular `they` inside `eachPlayer`'s
+# nuclear scope).
 template onEachOfTheirTurns(whose: NounPhrase): Timing {
   spelling = "on each of $whose's turns",
   body = inPart(turn, $whose, eachTime)

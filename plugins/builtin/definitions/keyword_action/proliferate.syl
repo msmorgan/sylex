@@ -1,8 +1,9 @@
-# "Proliferate" with its reminder text (`Definition`, [CR#701.34a]).
+# "Proliferate" (`Definition`, [CR#701.34a]): expresses "then give each one additional counter of
+# each kind that permanent or player already has" via `doForEach(eachOf(those(join)), ...)`.
 action proliferate {
   lexical = {verbs = [{lemma = "proliferate", frames = [Intransitive]}]},
   spelling = "proliferate",
   body = sequentially([
       choose(counted(anyNumber, nominal(andOr([permanent, player]), post = [hasCounter]))),
-      doForEach(those(join), putCounters(1, sameKindAs(it), it))])
+      doForEach(eachOf(those(join)), putCounters(1, sameKindAs(it), it))])
 }
