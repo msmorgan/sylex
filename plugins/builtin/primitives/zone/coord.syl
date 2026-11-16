@@ -1,2 +1,4 @@
-# Full-arity binding for `Location.coord`.
+# Coordination of locations under `and` (all listed places together), `or` (one of the listed
+# places), or `andOr` (any non-empty subset, as "search your library and/or graveyard"); reached
+# through the worded Templates `and`, `or`, and `andOr`.
 primitive coord(coordinator: Coordinator, locs: List(Location)): Location = Coordination

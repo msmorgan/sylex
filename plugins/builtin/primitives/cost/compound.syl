@@ -1,2 +1,4 @@
-# A cost composed of all the listed costs [CR#118].
+# A composite cost paid by paying all listed costs [CR#601.2h,602.1a], distinct from choosing
+# among alternative costs (`or`) and printed with commas in activation costs rather than
+# `Coordinator`.
 primitive compound(costs: List(Cost)): Cost = Compound

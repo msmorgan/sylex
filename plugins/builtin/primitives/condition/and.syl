@@ -1,2 +1,4 @@
-# All of the listed conditions hold.
+# All of the listed conditions hold. `Condition` has boolean `and` and `or` directly rather than
+# `coord(Coordinator, …)` because conditions have no `and/or` subset operation and introduce no
+# group referent.
 primitive and(conjuncts: List(Condition)): Condition = And

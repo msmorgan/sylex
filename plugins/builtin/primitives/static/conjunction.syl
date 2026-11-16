@@ -1,4 +1,5 @@
-# Authoring primitive for `StaticSpec.conjunction`.
+# Concurrent static statements holding together, optionally sharing `subject`; `StaticSpec`
+# neither disjoins nor takes `and/or`, so it declares `conjunction` rather than `coord`.
 primitive conjunction(
   parts: List(StaticSpec),
   subject: Option(NounPhrase) = none): StaticSpec = Conjunction

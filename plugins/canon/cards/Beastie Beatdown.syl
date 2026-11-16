@@ -12,9 +12,9 @@ card singleFaced({
     text = [
       spell(
         choose(
-          both(
-            target(and([isCreature, youControl])),
-            target(and([isCreature, anOpponentControls]))))),
+          and([
+              target(and([isCreature, youControl])),
+              target(and([isCreature, anOpponentControls]))]))),
       delirium(
         spell(
           doIf(

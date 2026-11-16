@@ -5,9 +5,9 @@ card singleFaced({
     text = [
       spell(
         get(
-          both(
-            target(isCreature),
-            allOf(and([isCreature, shares(cardName, share, that(creature)), isOther]))),
+          and([
+              target(isCreature),
+              allOf(and([isCreature, shares(cardName, share, that(creature)), isOther]))]),
           down(3),
           down(3),
           duration = untilEndOfTurn))]})

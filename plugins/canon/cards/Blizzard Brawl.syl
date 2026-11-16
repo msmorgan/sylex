@@ -12,9 +12,9 @@ card singleFaced({
       spell(
         sequentially([
             choose(
-              both(
-                target(and([isCreature, youControl])),
-                target(and([isCreature, youDontControl])))),
+              and([
+                  target(and([isCreature, youControl])),
+                  target(and([isCreature, youDontControl]))])),
             doIf(
               compareAmt(countOf(and([hasSupertype(snow), isPermanent, youControl])), atLeast, 3),
               establishFor(

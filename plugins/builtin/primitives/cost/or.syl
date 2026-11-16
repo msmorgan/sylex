@@ -1,2 +1,3 @@
-# A choice between alternative costs.
+# A choice between alternative costs; paying several costs together is `compound`, and no `and/or`
+# applies at `Cost`.
 primitive or(costs: List(Cost)): Cost = Or

@@ -1,1 +1,4 @@
+# Non-empty subset coordinator at `NounPhrase` ("you and/or creatures you control") and `Location`
+# ("your library and/or graveyard"): either arm alone or all together. At `Predicate`, printed
+# "and/or" is inclusive disjunction over one candidate (`templates/predicate/andOr.syl`, over `or`).
 primitive andOr: Coordinator = AndOr

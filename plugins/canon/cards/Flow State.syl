@@ -19,9 +19,9 @@ card singleFaced({
                   putInto(theRest, onBottom, riders = [inOrder(anyOrder)])]),
               doIf(
                 thereAre(
-                  both(
-                    a(and([isInstant, cardIn(yourGraveyard)])),
-                    a(and([isSorcery, cardIn(yourGraveyard)])))),
+                  and([
+                      a(and([isInstant, cardIn(yourGraveyard)])),
+                      a(and([isSorcery, cardIn(yourGraveyard)]))])),
                 instead(
                   sequentially([
                       putInto(partOf(exactly(2), them), hand),

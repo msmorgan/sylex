@@ -10,9 +10,9 @@ card singleFaced({
       spell(
         sequentially([
             choose(
-              both(
-                target(and([isCreature, youControl])),
-                target(and([isCreature, anOpponentControls])))),
+              and([
+                  target(and([isCreature, youControl])),
+                  target(and([isCreature, anOpponentControls]))])),
             instruct(
               eachOf(those(creature)),
               dealDamage(amount = toughnessOf(it), recipient = theOther))]))]})

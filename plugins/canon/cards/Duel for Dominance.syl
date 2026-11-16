@@ -13,9 +13,9 @@ card singleFaced({
         spell(
           sequentially([
               choose(
-                both(
-                  target(and([isCreature, youControl])),
-                  target(and([isCreature, youDontControl])))),
+                and([
+                    target(and([isCreature, youControl])),
+                    target(and([isCreature, youDontControl]))])),
               doIf(
                 compareAmt(
                   distinctCount(value(power), allOf(and([isCreature, youControl]))),

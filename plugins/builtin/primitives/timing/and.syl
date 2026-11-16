@@ -1,2 +1,3 @@
-# All of the timing constraints apply.
+# All of the timing constraints apply. `Timing` has boolean `and` and `or` directly rather than
+# `coord(Coordinator, …)` because timing windows have no `and/or` subset operation.
 primitive and(conjuncts: List(Timing)): Timing = And

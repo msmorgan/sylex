@@ -1,0 +1,6 @@
+# "<player> control <object>" ("you control an artifact and an enchantment"): `player` controls
+# `object`, in printed order over `is`.
+template controls(player: NounPhrase, object: NounPhrase): Condition {
+  spelling = "$player control $object",
+  body = is($object, controlledBy($player))
+}

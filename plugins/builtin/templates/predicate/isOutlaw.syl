@@ -2,9 +2,7 @@
 # player controls are outlaw permanents unless otherwise specified [CR#700.12a].
 template isOutlaw: Predicate {
   spelling = "outlaw",
-  body = coord(
-    andOr,
-    [
+  body = andOr([
       hasSubtype(assassin),
       hasSubtype(mercenary),
       hasSubtype(pirate),

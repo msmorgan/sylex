@@ -1,2 +1,3 @@
-# At least one listed condition holds.
+# At least one listed condition holds; paired with `Condition`'s `and` (no `and/or` applies to
+# conditions).
 primitive or(disjuncts: List(Condition)): Condition = Or

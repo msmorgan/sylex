@@ -14,15 +14,11 @@ card singleFaced({
             whose = thisEnchantment,
             keyword = cumulativeUpkeep)),
         sequentially([
-            simultaneously([
-                instruct(
-                  this,
-                  dealDamage(
-                    amount = letter(x),
-                    recipient = target(or([isPlaneswalker, isPlayer])))),
-                instruct(
-                  this,
-                  dealDamage(
-                    amount = letter(x),
-                    recipient = each(and([isCreature, controlledBy(splitOverPlaneswalker)]))))]),
+            instruct(
+              this,
+              dealDamage(
+                amount = letter(x),
+                recipient = and([
+                    target(or([isPlayer, isPlaneswalker])),
+                    each(and([isCreature, controlledBy(splitOverPlaneswalker)]))]))),
             define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]})
