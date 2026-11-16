@@ -468,3 +468,12 @@ are found over enumerated candidates or over a packed form is open (§6).
     (`Gap` in `crates/syntax/src/step.rs`), which the term language writes with fixed-wording
     Templates (`voice-and-object-phrases.md` §7). That at most one Gap of the right sort stands
     in a phrase is a checker refusal today and could be a property of the Rust structures.
+17. **Depictives.** "Put it onto the battlefield tapped and attacking", "enters tapped" and
+    "attacks alone" each end in a predicative that describes the subject or object as the event
+    happens, which the English grammar reads as a `Depictive`. The term language writes the ones
+    on a move as a `riders` list at the sort `MoveRider`, whose words print as the description
+    words do ("tapped", "transformed"), and the others as Templates of their own. At the surface
+    a depictive is a dependent of its verb phrase, built from the description words, and what it
+    means on each verb (an Entry Rider on an entering) is classification's. It belongs with the
+    verb phrase's other unselected dependents (`voice-and-object-phrases.md` §13 item 1) and is
+    not designed.
