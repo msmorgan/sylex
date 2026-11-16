@@ -1,6 +1,5 @@
-# "… <performer> controls"
+# Rule-only helper inside keyword-action Definitions ("… <performer> controls"); no card term
+# calls it (`docs/design/spelling.md` §7).
 template actorControls: Predicate {
-  # TODO(spelling): Recovering the performer's pronoun inside a description waits on
-  # `syl-clause-and-imperative` and `syl-spelling-conventions`.
   body = hasPossessor(controller, actor)
 }

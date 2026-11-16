@@ -1,7 +1,7 @@
 # "Rather than pay <subject>'s mana cost, you may <cost>": `altCost` with its subject printed first,
 # as *Invigorate* prints it [CR#118.9].
-# TODO(spelling): Unwrapping `payingInstead(<cost>)` waits on `syl-spelling-conventions` and
-# `syl-cycling-cost-substitute`.
+# TODO(spelling): Unwrapping `payingInstead(<cost>)` into "rather than pay $subject's mana cost,
+# you may <cost>" (*Invigorate*) waits on `syl-cycling-cost-substitute`.
 template ratherThanPay(subject: NounPhrase, cost: AltCost): StaticSpec {
   body = altCost($cost, $subject)
 }

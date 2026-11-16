@@ -1,6 +1,6 @@
 # "enchanted by <by>", "equipped by <by>": the host of an attachment `by` names.
 template attachedBy(word: Option(AttachWord), by: NounPhrase): Predicate {
-  # TODO(spelling): Participial attachment postmodifiers wait on `syl-nominal-descriptions` and
-  # `syl-spelling-conventions`.
+  # TODO(spelling): Participial attachment postmodifiers ("enchanted by $by", *Kitsune Mystic*) wait
+  # on `syl-nominal-descriptions`.
   body = attachment(host, counterpart = $by, word = $word)
 }

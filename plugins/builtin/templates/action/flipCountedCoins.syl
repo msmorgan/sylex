@@ -3,7 +3,7 @@ template flipCountedCoins(
   count: Amount = anyAmount,
   call: Option(FlipCall) = none,
   outcome: Option(CoinFace) = none): VerbPhrase {
-  # TODO(spelling): Selecting between "flip N coins" and "win/lose a coin flip" waits on
-  # `syl-spelling-conventions`.
+  # TODO(spelling): Missing separate Templates for "win a coin flip" (*Chance Encounter*) vs "flip
+  # $count coins" (`spelling.md` §4).
   body = flipCoins(count($count), call = $call, outcome = $outcome)
 }

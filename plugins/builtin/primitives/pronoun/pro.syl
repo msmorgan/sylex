@@ -1,3 +1,4 @@
-# TODO(spelling): Selecting the pronoun from `reach`, `plurality`, and grammatical role waits on
-# `syl-spelling-conventions` and `syl-personal-pronoun-self-references`.
+# TODO(spelling): Pronoun surface forms are spelled by their `templates/pronoun/` Templates (`it`,
+# `them`, `they`, `that`, `those`), and personal-pronoun self-references wait on
+# `syl-personal-pronoun-self-references`.
 primitive pro(reach: Reach, plurality: Plurality): NounPhrase = Pronoun

@@ -1,6 +1,5 @@
-# "if <subject>'s <cost> was paid"
+# Rule-only helper beneath `keywordCostPaid` ("if <subject>'s <cost> was paid"); no card term
+# calls it directly (`docs/design/spelling.md` §7).
 template costWasPaid(subject: NounPhrase, which: LinkSource, window: Option(Duration)): Condition {
-  # TODO(spelling): Rule-level helper beneath `keywordCostPaid`; waits on
-  # `syl-spelling-conventions` and `syl-dead-weight-sweep`.
   body = compareAmt(paidCostRead($subject, $which, $window), atLeast, 1)
 }

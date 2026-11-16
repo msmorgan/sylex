@@ -1,7 +1,7 @@
 # "At <point>, <action>": a delayed triggered ability [CR#603.7a], which triggers only the next
 # time the point comes [CR#603.7b].
-# TODO(spelling): A separate Template for a Turn Point printed after its action waits on
-# `syl-spelling-conventions`.
+# TODO(spelling): Missing a separate Template for "$action at $point" where the Turn Point is
+# printed after its action (*Necropotence*, `decayed`, `spelling.md` §2, §4).
 template atNext(point: TurnPoint, action: VerbPhrase): VerbPhrase {
   spelling = "At $point, $action.",
   body = delay(reached($point), $action)

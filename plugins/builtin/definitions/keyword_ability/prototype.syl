@@ -3,7 +3,7 @@
 # [CR#719.1]), so the keyword carries no parameters of its own.
 ability prototype {
   lexical = {lemma = "prototype", parameters = [[Cost, DashPowerToughness]]},
-  # TODO(spelling): Reading the inset frame's cost and power/toughness rather than parameters waits
-  # on `syl-spelling-conventions`.
+  # TODO(spelling): `prototype` prints "prototype <cost> — <power>/<toughness>" from the card's
+  # `PrototypeFrame` rather than parameters on this declaration (`Card.prototype` [CR#719.1]).
   body = [static(can(actor(you), cast(thisCard, payment = prototyped)))]
 }

@@ -2,8 +2,6 @@
 # deontic rule and takes no deontic modifiers. "This effect doesn't remove this Aura" is
 # `doesnt(actor(thisEffect), remove(thisAura))`, its own sentence beside the effect it talks about
 # [CR#702.16n].
-# TODO(spelling): Subject-verb number agreement ("don't" after a plural) waits on
-# `syl-spelling-conventions` and `syl-deontic-verb-phrase-operators`.
 primitive doesnt(subj: Subject, action: VerbPhrase): StaticSpec = Doesnt {
   spelling = "$subj don't $action"
 }

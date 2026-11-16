@@ -1,6 +1,6 @@
 # "the beginning of your <part>", each time it comes
-# TODO(spelling): Splitting "the beginning of combat on your turn" from "the beginning of your
-# <part>" waits on `syl-turn-point-printed-wordings` and `syl-spelling-conventions`.
+# TODO(spelling): Splitting "the beginning of combat on your turn" (*Bleeding Effect*, *Centaur of
+# Attention*) from "the beginning of your $part" waits on `syl-turn-point-printed-wordings`.
 template beginningOfYour(part: TurnPart): TurnPoint {
   spelling = "the beginning of your $part",
   body = beginningOf($part, you, eachTime)

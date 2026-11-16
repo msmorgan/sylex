@@ -2,5 +2,5 @@
 # the shortest amount of time" [CR#704.5k]: a projection `superlative` compares across objects.
 # It is not a timestamp, since a permanent can gain the world supertype after it enters.
 # TODO(spelling): Printing "has had <predicate> for" with the predicate as a noun phrase waits on
-# `syl-nominal-descriptions` and `syl-spelling-conventions`.
+# `syl-nominal-descriptions`.
 primitive heldFor(predicate: Predicate): ProjAxis = HeldFor

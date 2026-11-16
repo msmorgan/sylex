@@ -5,7 +5,7 @@
 ability gift(promise: VerbPhrase) {
   lexical = {lemma = "gift", parameters = [[Quality(None)]], nouns = ["gift"]},
   # TODO(spelling): Naming the promised gift's noun phrase rather than its action clause waits on
-  # `syl-spelling-conventions` and `syl-dead-weight-sweep`.
+  # `syl-dead-weight-sweep` (each gift phrasing currently has its own `gift*` Template).
   body = [
     static(addedCost(this, optional, plusAdditional(perform(choose(anOpponent))))),
     ifPermanentType(

@@ -1,5 +1,5 @@
 # "mana of any color", "mana of any one color": with a count, the freedom says whether every
 # counted mana takes the one color chosen.
-# TODO(spelling): Selecting "mana of any color" vs "mana of any one color" from `freedom` waits on
-# `syl-spelling-conventions`.
+# TODO(spelling): Splitting "mana of any color" from "mana of any one color" by making `freedom`
+# optional waits on `syl-single-value-sorts`.
 primitive ofAnyColor(freedom: ColorFreedom): ProducedMana = AnyColor

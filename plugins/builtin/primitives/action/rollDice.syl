@@ -1,7 +1,8 @@
 # "roll <count> <sides>-sided dice [and watch for <watch>]": as a pattern, "roll a die" is the
 # default `1` and "roll one or more dice" `anyAmount`.
-# TODO(spelling): Selecting between "roll a die" and "roll N d20" waits on
-# `syl-spelling-conventions`.
+# TODO(spelling): Missing separate Templates for "roll $count six-sided dice" (*Centaur of
+# Attention*), "roll $count d$sides" (*Thunderwave*), and "roll $count dice" (*Brazen Dwarf*),
+# since die-sides wordings vary by value (`docs/design/spelling.md` §4, §7).
 primitive rollDice(
   count: Amount = 1,
   sides: DieSides = sides(6),

@@ -3,7 +3,7 @@ template modification(
   subject: NounPhrase,
   axis: CharacteristicStat,
   delta: Delta(Amount)): StaticSpec {
-  # TODO(spelling): Stat-change and base-setting wordings wait on `syl-spelling-conventions` and
-  # `syl-pt-change-sort`.
+  # TODO(spelling): Unused single-stat change Template (`syl-dead-weight-sweep`), and PT-change
+  # wordings wait on `syl-pt-change-sort`.
   body = characteristicChange($subject, [stat($axis, $delta)])
 }

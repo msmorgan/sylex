@@ -1,7 +1,6 @@
-# "For each <pip> mana …, you may <action> rather than pay that mana": a Mana Substitute
-# [CR#702.51a,702.66a,702.126a,701.67a].
+# Rule-only helper inside keyword Definitions ("For each <pip> mana …, you may <action> rather
+# than pay that mana", [CR#702.51a,702.66a,702.126a,701.67a]); no card term calls it
+# (`docs/design/spelling.md` §7).
 template substitute(action: VerbPhrase, pays: List(PipPaid)): ManaSubstitute {
-  # TODO(spelling): Rule-only helper inside keyword Definitions; waits on
-  # `syl-spelling-conventions`.
   body = {action = $action, pays = $pays}
 }

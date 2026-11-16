@@ -5,7 +5,9 @@ template additionalPhase(
   anchor: Option(TurnPart),
   count: Amount,
   followedBy: Option(TurnPart) = none): VerbPhrase {
-  # TODO(spelling): Fronted vs trailing `anchor` clauses and phase-wording conventions wait on
-  # `syl-spelling-conventions`.
+  # TODO(spelling): Missing separate Templates for fronted "After this< $anchor>, there is an
+  # additional $part< followed by an additional $followedBy>" (*Aggravated Assault*, *Hellkite
+  # Charger*) vs trailing "there is an additional $part after this phase" (*Sphinx of the Second
+  # Sun*), and `TurnPart` lacks "phase" on `combat` (`spelling.md` §4).
   body = addTurnPart($part, $count, anchor = $anchor, followedBy = $followedBy)
 }

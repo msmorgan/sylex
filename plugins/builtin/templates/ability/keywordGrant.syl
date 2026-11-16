@@ -2,7 +2,7 @@
 # granted itself; a family term ("landwalk", "protection", "hexproof") grants each variant of it
 # that the objects `holders` describes have, "the <term> abilities of those objects" [CR#702.1c].
 template keywordGrant(subject: NounPhrase, term: KeywordTerm, holders: Predicate): StaticSpec {
-  # TODO(spelling): Bare keyword vs family-ability wording inside `alsoForKeywords` waits on
-  # `syl-spelling-conventions`.
+  # TODO(spelling): `holders` is duplicated from the enclosing condition of `alsoForKeywords`'s
+  # `frame` and never printed at `keywordGrant`'s own site (*Cairn Wanderer*, *Bleeding Effect*).
   body = characteristicChange($subject, [addedKeywordTerm($term, $holders)])
 }

@@ -1,7 +1,8 @@
 # "there is an additional <part> [after <anchor>]": steps added to the current turn's phase
 # [CR#500.9].
 template additionalStep(part: TurnPart, anchor: Option(TurnPart), count: Amount): VerbPhrase {
-  # TODO(spelling): Step-wording and "after this step/phase" conventions wait on
-  # `syl-spelling-conventions`.
+  # TODO(spelling): Missing separate Templates for "get $count additional $part steps after this
+  # step" (*Paradox Haze*) vs "after this phase" (*Obeka, Splitter of Seconds*), where `upkeep`
+  # omits "step" (`spelling.md` §4).
   body = addTurnPart($part, $count, anchor = $anchor)
 }

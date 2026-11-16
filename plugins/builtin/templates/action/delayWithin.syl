@@ -1,6 +1,7 @@
 # "When <event> <duration>, <action>": a delayed trigger with a window.
 template delayWithin(event: GameEvent, duration: Duration, action: VerbPhrase): VerbPhrase {
-  # TODO(spelling): Separating fronted-duration "whenever"/"at" wordings from `delay` waits on
-  # `syl-spelling-conventions`.
+  # TODO(spelling): Missing separate Templates for "$duration, whenever $event, $action." (*Bonus
+  # Round*), "When <subject> next <phrase> $duration, $action." (*Repeated Reverberation*), and "At
+  # $point $duration, $action." (`epic`, `paradigm`) (`spelling.md` §4).
   body = delay($event, duration = $duration, $action)
 }

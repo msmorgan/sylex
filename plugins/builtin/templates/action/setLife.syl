@@ -1,6 +1,7 @@
 # "<player>'s life total becomes <amount>"
 template setLife(amount: Amount): VerbPhrase {
-  # TODO(spelling): Reading the life total's possessor from the enclosing clause waits on
-  # `syl-clause-and-imperative` and `syl-spelling-conventions`.
+  # TODO(spelling): Reading the life total's possessor from the enclosing clause ("$player's life
+  # total becomes <equal to >$amount", *Repay in Kind*, *Exquisite Archangel*) waits on
+  # `syl-clause-and-imperative`.
   body = changeLife(set($amount))
 }

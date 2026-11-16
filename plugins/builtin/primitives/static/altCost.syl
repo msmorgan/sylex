@@ -1,6 +1,7 @@
 # "You may <cost> rather than pay <subject>'s mana cost": an alternative cost its subject's caster
 # may pay [CR#118.9]. "You may cast <subject> without paying its mana cost" is a permission whose
 # `cast` carries the alternative cost (`docs/design/surface.md` §7.6).
-# TODO(spelling): Unwrapping `payingInstead(<cost>)` waits on `syl-spelling-conventions` and
+# TODO(spelling): Unwrapping `payingInstead(<cost>)` into "You may <cost> rather than pay
+# $subject's mana cost" and separating cycling-ability cost substitutes wait on
 # `syl-cycling-cost-substitute`.
 primitive altCost(cost: AltCost, subject: NounPhrase): StaticSpec = AltCost

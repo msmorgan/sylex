@@ -13,7 +13,7 @@ template cant(
   causedBy: Option(Causing) = none,
   unless: Option(Condition) = none): StaticSpec {
   # TODO(spelling): `causedBy` ("<cause> doesn't cause <subj> to <action>") waits on
-  # `syl-deontic-verb-phrase-operators` and `syl-spelling-conventions`.
+  # `syl-deontic-verb-phrase-operators`.
   spelling = "$subj can't $action< $timing>< $asThough>< $except>< unless $unless>",
   body = staticSpecCant(
     $subj,

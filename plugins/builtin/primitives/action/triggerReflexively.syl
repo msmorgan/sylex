@@ -1,8 +1,9 @@
 # "<body>. When you do, <trigger>" [CR#603.12]. The reflexive ability triggers once for each time
 # its event happens during the resolution, but once in all for a cost paid any number of times
 # [CR#603.12a].
-# TODO(spelling): Printing "When you do" when `event` is absent needs a word for an absent value;
-# waits on `syl-spelling-conventions` (`offerWhen` and `triggerThisWay` spell the two cases).
+# TODO(spelling): Missing a Template for "$body. When you do, $trigger." when `body` is non-optional
+# (*Blood Spatter Analysis*); `offerWhen` and `triggerThisWay` spell the optional and `$event this
+# way` cases, and printing "When you do" for an absent `event` is outside `< … >` (`spelling.md` §7).
 primitive triggerReflexively(
   body: VerbPhrase,
   trigger: VerbPhrase,
