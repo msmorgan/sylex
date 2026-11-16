@@ -83,8 +83,8 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
 ## Pointers
 
 - `docs/specs/voice-and-object-phrases.md` §6
-- `plugins/builtin/primitives/action/{putCounters,actionRemoveCounters,moveCounters}.syl`,
-  `plugins/builtin/templates/action/{removeCounters,removeAllCounters,loseCounters,distributeCounters}.syl`,
+- `plugins/builtin/primitives/action/{putCounters,removeCounters,moveCounters}.syl`,
+  `plugins/builtin/templates/action/{removeAllCounters,loseCounters,distributeCounters}.syl`,
   `plugins/builtin/primitives/zone/withCounters.syl`,
   `plugins/builtin/primitives/noun/{printedKind,anyKind,thoseCounters,chosenKind,distinctChosenKinds,sameKindAs}.syl`,
   `plugins/builtin/definitions/counter/`, `plugins/builtin/coercions/`

@@ -54,5 +54,5 @@ Written against the surface (`cleanup-step6-surface`).
 ## Pointers
 
 `plugins/canon/cards/{Call Damage Control,Wild Shape}.syl`,
-`plugins/builtin/primitives/action/actionChooseModes.syl`,
+`plugins/builtin/primitives/action/chooseModes.syl`,
 `plugins/builtin/primitives/static/notChosenBefore.syl`, `docs/design/semantics.md` §1 item 2.

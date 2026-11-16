@@ -145,7 +145,7 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
      with no call site in `plugins/`.
 
   Also taking `Predicate`, not in the eight: `described`, `nameOfCard`, `players`, `withQuality`,
-  `selectRandom`, `spendOnlyToCastAnd`, `devourEntry`, `aggregate`; and `someOf` takes a
+  `selectRandom`, `spendOnlyToCastAnd`, `devourEntry`, `aggregateAll`; and `partOf` takes a
   `NounPhrase`. Recommendation: this ticket retypes every description consumer and class 2
   (`Predicative`); classes 1, 3, 4, 5, 6, 7 and 8 keep `Predicate` until a ticket gives each its
   sort (class 1 is `syl-tocast-noun-phrase`'s), and the landing lists what still takes

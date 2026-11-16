@@ -58,7 +58,7 @@ same `Subject` and verb phrase.
   carries the same subject, verb phrase, window and ordinal before and after; the landing reports
   the counts it compared.
 - The `subj` of `DidClause`, `tally`, `eventCount`, `eventSum` and `eventTally` is a
-  `NounPhrase`, and their passive sites are written with `done`. `conditionDid` and
+  `NounPhrase`, and their passive sites are written with `done`. `happened` and
   `predicateDid` go if nothing calls them.
 - `docs/design/semantics.md` §3.4 states the lookback as the spec's §8 does, and
   `docs/design/surface.md` §7.1's table has the lookback and condition rows of the spec's §1
@@ -79,7 +79,7 @@ same `Subject` and verb phrase.
 
 - `docs/specs/voice-and-object-phrases.md` §1, §3, §8, §11
 - `plugins/builtin/templates/{condition,predicate}/{did,was}.syl`,
-  `plugins/builtin/primitives/condition/conditionDid.syl`,
+  `plugins/builtin/primitives/condition/happened.syl`,
   `plugins/builtin/primitives/predicate/predicateDid.syl`,
   `plugins/builtin/primitives/quantity/tally.syl`,
   `plugins/builtin/templates/amount/{eventCount,eventSum,eventTally}.syl`

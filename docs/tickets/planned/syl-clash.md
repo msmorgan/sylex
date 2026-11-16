@@ -40,7 +40,7 @@ Written against the surface (`cleanup-step6-surface`).
 ## Pointers
 
 - `plugins/builtin/definitions/keyword_action/clash.syl`
-- `plugins/builtin/templates/action/flipCoins.syl`, `plugins/builtin/primitives/action/actionFlipCoins.syl`,
+- `plugins/builtin/templates/action/flipCountedCoins.syl`, `plugins/builtin/primitives/action/flipCoins.syl`,
   `plugins/canon/cards/Chance Encounter.syl` (the coin-flip precedent)
 - `docs/design/surface.md` §6.1 (keyword actions and Deeds), `docs/design/semantics.md` §3.4
   (lookback)

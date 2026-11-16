@@ -129,7 +129,7 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
 4. **Distributive loop** (`doForEach`). Each pass binds the loop referent for the body to read.
    On exit, the loop exports plural referents for the targets the body announced and the objects
    it created. Each is a recorded discourse fact, not derived from determiners or stamps.
-5. **Relative clause or comparison**, including the domain `countOf` and `aggregate` measure. It is
+5. **Relative clause or comparison**, including the domain `countOf` and `aggregateAll` measure. It is
    closed on exit, so no later pronoun reads a measured domain. Attachment Hosts ("enchanted",
    "equipped") project to the ability's box ([CR#303.4b]).
 6. **Definition Reference Scope:** see §2.3.

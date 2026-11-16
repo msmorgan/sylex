@@ -15,7 +15,7 @@ some required parameters after optional ones; a positional argument binds only r
 parameters, so those call sites need no naming.
 
 The same sites are rewritten by another ticket, which lands first:
-`syl-sort-prefixed-primitive-names` renames the `actionPay` and `actionVote` calls inside the
+`syl-sort-prefixed-primitive-names` folds `pay` and renames `castVote` inside the
 `pay` and `vote` declarations that this ticket reorders.
 `syl-enlist-optional-attack-cost` gives `gatedBy` and `staticSpecGatedBy` their offered form after
 this ticket reorders them.

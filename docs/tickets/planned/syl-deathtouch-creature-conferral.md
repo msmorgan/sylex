@@ -27,8 +27,8 @@ Written against the surface (`cleanup-step6-surface`).
 
 - The deathtouch row is a `stateBased` conferral on `creature.syl` beside the [CR#704.5g] row,
   with the same condition: toughness greater than 0, and dealt damage by a source with deathtouch
-  within the window from the last state-based action check to now (`within(durationBetween(
-  stateBasedActionsChecked, now))`).
+  within the window from the last state-based action check to now (`within(between(
+  start = stateBasedActionsChecked, end = now))`).
 - Its citations and comment ([CR#702.2b,704.5h], and [CR#702.2d] for reading the source from any
   zone) move into the creature declaration's header comment.
 - `plugins/builtin/rules/sba/deathtouchDestruction.syl` is deleted, and nothing names it.

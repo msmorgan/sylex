@@ -25,7 +25,7 @@ Written against the surface (`cleanup-step6-surface`).
 - Which shape the materials take:
   1. a noun phrase over a pool placeholder that the body fills with the domain; or
   2. a Template the card calls builds the whole materials phrase with the domain as its
-     `someOf`/`oneEachOf`/`agree` group, and the Definition receives that phrase.
+     `someOf`/`partOf`/`oneEachOf`/`agree` group, and the Definition receives that phrase.
 
 ## Done when
 
@@ -44,5 +44,6 @@ Written against the surface (`cleanup-step6-surface`).
 
 - `plugins/builtin/definitions/keyword_ability/craft.syl`
 - `plugins/builtin/primitives/determiner/oneEachOf.syl`, `plugins/builtin/primitives/noun/agree.syl`,
-  `plugins/builtin/templates/determiner/someOf.syl`, `plugins/builtin/templates/zone/andOr.syl`
+  `plugins/builtin/primitives/determiner/someOf.syl`, `plugins/builtin/templates/determiner/partOf.syl`,
+  `plugins/builtin/templates/zone/andOr.syl`
 - `data/derived/cards.jsonl` (the craft cards' printed phrasings)
