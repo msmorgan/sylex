@@ -621,15 +621,15 @@ run's first sentence: `when`'s "When $event," before it, `instead`'s "instead" a
 phrase. A sentence of the wording after the Hole's, as `activatedOnlyDuring`'s "Activate only
 $timing.", follows the run's last.
 
-**An optional part is `< … >`.** A parameter is omissible when it has a declared default, or
-its sort is `Option(T)` or a list; its absent value is the default, else `none`, else the
-empty list. An optional part is governed by every parameter with a Hole directly in it, and
-each of those must be omissible. It is printed when every governor differs from its absent
-value and omitted when none does: "put $subject< from $from> onto the battlefield<
-$riders#<>>". A term in which only some governors are supplied has no wording by that
-declaration. An optional part may hold another, which can print only when the outer one does. All
-the Holes of one parameter stand in one optional part, or all stand outside every one. An empty
-list is never printed by its Hole; it is spelled only as the absent value of an optional part.
+**An optional part is `< … >`.** A parameter is omissible when it has a declared default, or its
+sort is `Option(T)` or a list; its absent value is the default, else `none`, else the empty list.
+An optional part is governed by every parameter with a Hole directly in it, and each of those must
+be omissible. It is printed when every governor differs from its absent value and omitted when none
+does: "put $subject into $destination< from $from>". A term in which only some governors are
+supplied has no wording by that declaration. An optional part may hold another, which can print
+only when the outer one does. All the Holes of one parameter stand in one optional part, or all
+stand outside every one. An empty list is never printed by its Hole; it is spelled only as the
+absent value of an optional part.
 
 **A Tail is `%Category: …` or `%inner Category: …`** (§3.2): "$per %VerbPhrase: for each $p". It
 has no closing mark: a Tail stands last among the parts beside it, so it runs to the end of the

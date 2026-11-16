@@ -47,6 +47,12 @@ Written against the spine (`cleanup-step6-spine`).
   crate exists, and `docs/design/architecture.md` says `sylex_spelling` parses the `spelling`
   notation, beside its sentence that `sylex_syl` parses `.syl`.
 - Every `TODO(spelling)` that needed an optional or repeated segment is written with it.
+- A move's riders print as cards print them, each wording checked against Oracle text. "Onto the
+  battlefield tapped and attacking" (40 Oracle lines by a regular expression, not restricted to
+  Vintage-legal cards) coordinates two riders with "and", "onto the battlefield tapped under
+  their control" sets two side by side, and no line prints "tapped attacking": so a riders list
+  is not one list under one join, and `putInto`'s marker ("Format and coordinate the riders list
+  entries") is resolved with the coordination written as its own word.
 - The notation has no mark for the Holes of the words that take a `Subject` and a verb phrase
   (`does`, `would`, `did`, `cant`, `must`, `can`, `gatedBy`, `doesnt`), whose `Subject` selects
   the voice the verb phrase prints. Their optional parts are written like any other, no mark is
