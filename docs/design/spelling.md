@@ -539,7 +539,7 @@ hole     := [affix "~"] "$" name [mark] ["~" affix]   -- a parameter's argument
 mark     := "@" form | "*"
 form     := "Cardinal" | "Arabic" | "Ordinal" | "Roman" | "Counting"
           | "Present" | "Preterite" | "PastParticiple" | "GerundParticiple"
-join     := "" | "," | "." | "and" | "or" | "and/or" | "then"
+join     := "" | "," | "." | "and" | "or" | "and/or" | "then" | line-break
 optional := "<" part* [tail] ">"                    -- not empty
 tail     := "%" ["inner "] Category ": " part+       -- last in its spelling or optional part;
                                                     -- holds no Tail, at any depth
@@ -608,16 +608,18 @@ whose spelling is "one".
 may, so a list is visible at its Hole. The joins are a closed set: `#<>` juxtaposes the elements;
 `#<,>` separates them with commas and no coordinator; `#<.>` prints each element as a run of
 sentences (`*`, below) after the one before, so such a list needs no `*`; `#<and>`, `#<or>`,
-`#<and/or>` and `#<then>` coordinate them. No parameter chooses a join: a coordinator is printed by
-the Template that names it, as the Templates `and`, `or` and `andOr` print "and", "or" and
-"and/or" over the three `coord` primitives (at `NounPhrase`, `Predicate` and `Location`), which
-have no `spelling`. Under
-`plugins/`, no `coord` has a `spelling`, and the Templates `and`, `or` and `andOr` have none yet
-either; the `syl-spelling-optional-segments` ticket writes them. The commas of a coordination of
-three or more are the English layer's and are never written. One element prints alone, with no
-join. An element whose own wording prints nothing in place, having only a Tail, takes no part in
-the join. A `#<` directly after a Hole's name is only ever a join, and `%` only ever opens a Tail,
-so a Tail may follow a Hole with or without a space. A `~` is always a tie.
+`#<and/or>` and `#<then>` coordinate them; and a line break written between the brackets puts each
+element on a line of its own, as the modes of a modal ability are printed. A mode's bullet is the
+mode's own wording, "• $action", so it prints before the first mode too. No parameter chooses a
+join: a coordinator is printed by the Template that names it, as the Templates `and`, `or` and
+`andOr` print "and", "or" and "and/or" over the three `coord` primitives (at `NounPhrase`,
+`Predicate` and `Location`), which have no `spelling`. Under `plugins/`, no `coord` has a
+`spelling`, and the Templates `and`, `or` and `andOr` have none yet either; the
+`syl-spelling-optional-segments` ticket writes them. The commas of a coordination of three or more
+are the English layer's and are never written. One element prints alone, with no join. An element
+whose own wording prints nothing in place, having only a Tail, takes no part in the join. A `#<`
+directly after a Hole's name is only ever a join, and `%` only ever opens a Tail, so a Tail may
+follow a Hole with or without a space. A `~` is always a tie.
 
 **A Hole a run of sentences may fill is `$name*`** (§2, the run rule). An unmarked Hole holds one
 phrase. `when`'s `action` Hole is `$action*`, and holds Boommobile's two sentences. The parts of
@@ -660,13 +662,13 @@ host's other trailing dependents. Tails that land at one edge print in the order
 and an argument printed at two Holes prints its Tail once. A Tail stands last among the parts
 beside it and holds no Tail.
 
-**A Gap is `^`.** A word that stands for a Gap is spelled with the mark and nothing else:
-`which`, the Gap of a relative clause, and `_`, the Gap a shared phrase fills, are each to be
-`spelling = "^"`; today `which` has no `spelling` and `_` is not declared. The mark prints no word. Where it stands, the Reading has a Gap of the
-Category its word's sort is spelled as (§1), and a wording that holds one is checked as English
-with the Gap in place. So, once they are, every word a card's term may hold has a `spelling`, except the
-promoted `subject` of a passive, which is no Gap (§2), and a declaration with no `spelling` is
-a word only a rule may use ([Semantics](semantics.md) §4).
+**A Gap is `^`.** A word that stands for a Gap is spelled with the mark and nothing else: `which`,
+the Gap of a relative clause, and `_`, the Gap a shared phrase fills, are each to be `spelling =
+"^"`; today `which` has no `spelling` and `_` is not declared. The mark prints no word. Where it
+stands, the Reading has a Gap of the Category its word's sort is spelled as (§1), and a wording
+that holds one is checked as English with the Gap in place. So, once they are, every word a card's
+term may hold has a `spelling`, except the promoted `subject` of a passive, which is no Gap (§2),
+and a declaration with no `spelling` is a word only a rule may use ([Semantics](semantics.md) §4).
 
 **The notation does not yet express passive subject promotion (§2).** Nothing marks a
 context's Subject Hole and Action Hole as the pair the rule links, or which Action's parameter

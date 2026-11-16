@@ -22,20 +22,15 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
 - A move's riders are left unspelled. They are depictives, not one list under one join ("tapped
   and attacking" beside "tapped under their control"), and their wording waits for that design
   (`docs/design/semantics.md` §6 item 13).
-
-## Open questions
-
-- **Modes printed one to a line.** `chooseModes` and `chooseSpree` ask for their modes as
-  lines, and no join of §7 prints a line break; `chooseOne` writes its line breaks and bullets
-  as fixed text over two Holes. Options: a join for a line break, added to §7; or the modes as a
-  run of sentences, which `syl-spelling-forms-and-runs` writes. Recommendation: the owner rules
-  which.
+- A list of modes takes the line-break join, as the grammar's `Modes` joins its `Mode`s, and a
+  mode's bullet is the mode's own wording, with its cost clause an optional part.
 
 ## Done when
 
-- The open question is answered. If the answer is a join, §7 states it and `chooseModes` and
-  `chooseSpree` are written with it; if it is a run, their markers stay and name
-  `syl-spelling-forms-and-runs`.
+- `chooseModes` and `chooseSpree` are spelled over their list of modes with the line-break join,
+  and a mode's wording prints its bullet and, where it has one, its cost; each is checked
+  against a modal card (*Cryptic Command*) and a spree card. The landing says whether
+  `chooseOne` still needs a wording of its own.
 - Every `TODO(spelling)` whose wording needs an optional part or a list's join is written with
   it and checked against a card's Oracle text, except the ones below, whose markers stay, each
   rewritten to name what it waits on:
