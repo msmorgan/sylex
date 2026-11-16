@@ -539,7 +539,7 @@ hole     := [affix "~"] "$" name [mark] ["~" affix]   -- a parameter's argument
 mark     := "@" form | "*"
 form     := "Cardinal" | "Arabic" | "Ordinal" | "Roman" | "Counting"
           | "Present" | "Preterite" | "PastParticiple" | "GerundParticiple"
-join     := "" | "," | "." | "and" | "or" | "and/or" | "then" | "\n"
+join     := "" | "," | "." | "and" | "or" | "and/or" | "then" | line-break
 optional := "<" part* [tail] ">"                    -- not empty
 tail     := "%" ["inner "] Category ": " part+       -- last in its spelling or optional part;
                                                     -- holds no Tail, at any depth
@@ -608,17 +608,18 @@ whose spelling is "one".
 may, so a list is visible at its Hole. The joins are a closed set: `#<>` juxtaposes the elements;
 `#<,>` separates them with commas and no coordinator; `#<.>` prints each element as a run of
 sentences (`*`, below) after the one before, so such a list needs no `*`; `#<and>`, `#<or>`,
-`#<and/or>` and `#<then>` coordinate them; and `#<\n>` puts each element on a line of its own, as
-the modes of a modal ability are printed. A mode's bullet is the mode's own wording, "• $action",
-so it prints before the first mode too. No parameter chooses a join: a coordinator is printed by
-the Template that names it, as the Templates `and`, `or` and `andOr` print "and", "or" and "and/or"
-over the three `coord` primitives (at `NounPhrase`, `Predicate` and `Location`), which have no
-`spelling`. Under `plugins/`, no `coord` has a `spelling`, and the Templates `and`, `or` and
-`andOr` have none yet either; the `syl-spelling-optional-segments` ticket writes them. The commas
-of a coordination of three or more are the English layer's and are never written. One element
-prints alone, with no join. An element whose own wording prints nothing in place, having only a
-Tail, takes no part in the join. A `#<` directly after a Hole's name is only ever a join, and `%`
-only ever opens a Tail, so a Tail may follow a Hole with or without a space. A `~` is always a tie.
+`#<and/or>` and `#<then>` coordinate them; and a line break as the join puts each element on a line
+of its own, as the modes of a modal ability are printed. A mode's bullet is the mode's own wording,
+"• $action", so it prints before the first mode too. No parameter chooses a join: a coordinator is
+printed by the Template that names it, as the Templates `and`, `or` and `andOr` print "and", "or"
+and "and/or" over the three `coord` primitives (at `NounPhrase`, `Predicate` and `Location`), which
+have no `spelling`. Under `plugins/`, no `coord` has a `spelling`, and the Templates `and`, `or`
+and `andOr` have none yet either; the `syl-spelling-optional-segments` ticket writes them. The
+commas of a coordination of three or more are the English layer's and are never written. One
+element prints alone, with no join. An element whose own wording prints nothing in place, having
+only a Tail, takes no part in the join. A `#<` directly after a Hole's name is only ever a join,
+and `%` only ever opens a Tail, so a Tail may follow a Hole with or without a space. A `~` is
+always a tie.
 
 **A Hole a run of sentences may fill is `$name*`** (§2, the run rule). An unmarked Hole holds one
 phrase. `when`'s `action` Hole is `$action*`, and holds Boommobile's two sentences. The parts of
@@ -676,13 +677,13 @@ variant is English (below), and so do the sentences of a run after its first: th
 substitutes one phrase for each Hole where the Hole stands, and under passive subject promotion
 and in a run's later sentences the printed material stands elsewhere (§10).
 
-**No escape exists but the join `\n`, because none is needed.** None of `$`, `~`, `@`, `*`, `^`,
-`#`, `%`, `<` and `>` occurs in any in-scope card's rules text ([Lexicon](lexicon.md) §1). A
-parenthesis is no mark: Oracle text uses parentheses for reminder text, which is removed before
-analysis, and a `spelling` writes none. The line-break join is written `\n`, an escape, and not as
-a line break between the brackets; a backslash occurs in no card's rules text either. Square
-brackets and braces are Oracle's own characters, for cleave and for symbols, and are never markup.
-`+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is no mark.
+**No escape exists, because none is needed.** None of `$`, `~`, `@`, `*`, `^`, `#`, `%`, `<` and
+`>` occurs in any in-scope card's rules text ([Lexicon](lexicon.md) §1). A parenthesis is no mark:
+Oracle text uses parentheses for reminder text, which is removed before analysis, and a `spelling`
+writes none. The line-break join is a line break in the `spelling`, which a `.syl` file writes with
+its string escape, `#<\n>` ([`.syl`](syl.md) §2): the escape is the `.syl` string's, not this
+notation's. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
+are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is no mark.
 
 **A `spelling` is refused at load** when it breaks a rule above, and also when:
 

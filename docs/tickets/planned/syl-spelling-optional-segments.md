@@ -22,11 +22,23 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
 - A move's riders are left unspelled. They are depictives, not one list under one join ("tapped
   and attacking" beside "tapped under their control"), and their wording waits for that design
   (`docs/design/semantics.md` §6 item 13).
-- A list of modes takes the line-break join, `$modes#<\n>`, as the grammar's `Modes` joins its `Mode`s, and a
+- A list of modes takes the line-break join, written `$modes#<\n>` with the `.syl` string escape
+  for a line break, as the grammar's `Modes` joins its `Mode`s, and a
   mode's bullet is the mode's own wording, with its cost clause an optional part.
+
+## Open questions
+
+- **Whether a string may still hold a typed line break once `\n` exists.** `chooseOne`'s
+  `spelling` holds two today. Options: the lexer still reads one and the printer writes every
+  line break in a string as `\n`, so `cargo xtask dsl fmt` rewrites it; the lexer refuses one;
+  or both forms stand. Recommendation: the printer writes `\n` and the lexer still reads a
+  typed one, so one value has one written form after formatting.
 
 ## Done when
 
+- The open question is answered.
+- `sylex_syl`'s lexer reads `\n` in a string as a line break and still refuses any other new
+  escape, with a test for each, and `docs/design/syl.md` §2 no longer says the lexer lacks it.
 - `chooseModes` and `chooseSpree` are spelled over their list of modes with the line-break join,
   and a mode's wording prints its bullet and, where it has one, its cost; each is checked
   against a modal card (*Cryptic Command*) and a spree card. The landing says whether
@@ -57,7 +69,8 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
 - No spelling this ticket writes carries a form label, `*` or `#<.>` join.
 - `docs/design/spelling.md` §7 no longer says the coordinator Templates have no spelling.
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
-- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_syl`, `cargo test
+  -p xtask` and clippy for both crates pass.
 
 ## Not in scope
 
