@@ -5,10 +5,8 @@ ability riot {
   spelling = "riot",
   body = [
     static(
-      replace(
-        would(actor(thisPermanent), enter),
-        alongside(
-          mayOrElse(
-            putCounters(1, printedKind(p1p1Counter), thisPermanent),
-            gain(thisPermanent, [haste])))))]
+      mayHaveEnter(
+        thisPermanent,
+        [withCounters(1, printedKind(p1p1Counter), additional)],
+        otherwise = alongside(gain(thisPermanent, [haste]))))]
 }

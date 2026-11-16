@@ -1,4 +1,10 @@
-# A replacement that applies only if you choose, as the event would happen, to have it apply: "you
-# may have <subject> enter …". A choice an entering replacement requires is made before the
+# A replacement that applies only if `chooser` (defaulting to `you`) chooses, as the event would
+# happen, to have it apply ("you may have <subject> enter …" [CR#702.98a], or Tribute's "that
+# player may put an additional N +1/+1 counters on it as it enters" [CR#702.104a,702.104b]); if
+# not, `otherwise` applies when one is written ("If you don't, it gains haste" [CR#702.136a]), or
+# the event happens unmodified. A choice an entering replacement requires is made before the
 # permanent enters [CR#614.12a].
-primitive optionally(body: Replacement): Replacement = Optionally
+primitive optionally(
+  chooser: NounPhrase = you,
+  body: Replacement,
+  otherwise: Option(Replacement) = none): Replacement = Optionally

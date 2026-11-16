@@ -9,9 +9,9 @@ template devourEntry(quality: Predicate, head: Predicate, amount: Amount): Abili
       would(actor(thisPermanent), enter),
       before(
         may(devour(counted(anyNumber, and([$quality, in(battlefield)])))),
-        body = alongside(
-          putCounters(
-            forEach($amount, and([$head, was(sacrifice(which), within = thisWay)])),
-            printedKind(p1p1Counter),
-            thisPermanent)))))
+        body = withRiders([
+            withCounters(
+              forEach($amount, and([$head, was(sacrifice(which), within = thisWay)])),
+              printedKind(p1p1Counter),
+              fresh)]))))
 }

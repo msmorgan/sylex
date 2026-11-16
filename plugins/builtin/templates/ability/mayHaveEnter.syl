@@ -1,7 +1,14 @@
-# "You may have <subject> enter <riders>", a static ability: as `subject` would enter, you choose
-# whether it enters with `riders` ("you may have this creature enter as a copy of any creature on
-# the battlefield") [CR#614.1c,614.12a].
-template mayHaveEnter(subject: NounPhrase, riders: List(MoveRider)): StaticSpec {
+# "You may have <subject> enter <riders>[. If you don't, <otherwise>.]", a static ability: as
+# `subject` would enter, you choose whether it enters with `riders` ("you may have this creature
+# enter as a copy of any creature on the battlefield", Unleash's additional +1/+1 counter
+# [CR#702.98a], or Riot's with "If you don't, it gains haste" [CR#702.136a]) [CR#614.1c,614.12a].
+template mayHaveEnter(
+  subject: NounPhrase,
+  riders: List(MoveRider),
+  otherwise: Option(Replacement) = none): StaticSpec {
+  # TODO(spelling): Include or omit the clause supplied by otherwise.
   spelling = "You may have $subject enter $riders",
-  body = replace(would(actor($subject), enter), optionally(withRiders($riders)))
+  body = replace(
+    would(actor($subject), enter),
+    optionally(withRiders($riders), otherwise = $otherwise))
 }

@@ -1,4 +1,6 @@
-# `action` done as part of the replaced event, which still happens ("with" it): "that player may
-# put … counters on it as it enters", "you may have this permanent enter with an additional +1/+1
-# counter on it" [CR#614.1c,702.104a,702.136a].
+# `action` done as part of the replaced event, which still happens: an action that is not an Entry
+# Rider, such as putting a counter on a permanent as it turns face up [CR#614.1e,702.37b],
+# exchanging text boxes as a permanent enters, or granting haste when Riot's counter is declined
+# [CR#702.136a]. Counters put on an entering permanent are `withRiders([withCounters(…)])`
+# [CR#614.1c].
 primitive alongside(action: VerbPhrase): Replacement = Alongside
