@@ -19,13 +19,14 @@ has four steps:
 2. Resolve names by expected sort, and expand Templates and Definitions ([`syl.md`](./syl.md)
    §3–§4).
 3. Read the expanded term: classify each clause, build a Discourse Representation Structure,
-   resolve every reference against it (§2), and build the meaning (§6).
+   resolve every reference against it (§2), and build the meaning (§4).
 4. Lower the meaning to the engine's core.
 
 The term says what the card prints and semantics decides what it means. That split is the
 direction: today the term language's own sorts (`GameEvent`, `Condition`, `StaticSpec`,
-`Replacement`) say what a clause means, and §4 describes the action-clause spine in those terms.
-They are scaffolding until the reading of §6 exists ([`surface.md`](./surface.md) §2).
+`Replacement`) say what a clause means, and [`surface.md`](./surface.md) §7 describes the
+action-clause spine in those terms. They are scaffolding until the reading of §4 exists
+([`surface.md`](./surface.md) §2).
 
 ## 1. Principles
 
@@ -50,10 +51,10 @@ They are scaffolding until the reading of §6 exists ([`surface.md`](./surface.m
    the text, but runtime state is not. A check of runtime state can only be satisfied by adding
    model structure that the text does not contain (item 5(c)).
 4. **Rules are data.** Every decomposable game rule is a declaration, not engine code: damage
-   results, state-based actions, turn-based actions, intrinsic type rules ([CR#702.15b,704.5q,703.1]).
-   Their CR citations, not the checker, vouch for their correctness. Why: a rule written as data is
-   written once and read by every tool. A rule in engine code is a second source of truth that the
-   model cannot see.
+   results, state-based actions, turn-based actions, intrinsic type rules
+   ([CR#702.15b,704.5q,703.1]). Their CR citations, not the checker, vouch for their correctness.
+   Why: a rule written as data is written once and read by every tool. A rule in engine code is a
+   second source of truth that the model cannot see.
 5. **The CR decides structure.**
    - (a) Where the CR distinguishes two structures, the model does too: an intervening "if" from a
      plain condition ([CR#603.4]), a replacement from a trigger ([CR#614.1,603.1]), an additional
@@ -76,21 +77,23 @@ stacks cannot supply these, because a binding's position shifts as others are pu
 
 - Every mention that introduces an entity, quantity, choice or outcome creates a referent with a
   stable identity. A re-mention resolves to the existing referent and creates nothing.
-- Each mention has a grammatical role in its clause: subject, object or other (§4.2).
-- **A Subject is a referent; an Actor is not.** The noun phrase of a clause's Subject (§4.2) is an
-  ordinary mention, which pronouns and demonstratives read like any other: "it" in "whenever a
-  creature dies, … it" reads the Subject's "a creature". The Actor is the performer of an Action:
-  in an instruction, the controller of the text's spell or ability unless a Handoff names another;
-  in a clause, what its active Subject or its `by` agent names. A Handoff makes its Actor the
-  innermost for the Action it contains. The Actor is a role that only the `actor` word at
-  NounPhrase reads, not a discourse referent; pronouns, groups and counts never read it. The noun
-  phrase naming it, in a Subject, an agent or a Handoff, is an ordinary referent.
+- Each mention has a grammatical role in its clause: subject, object or other
+  ([`surface.md`](./surface.md) §7.2).
+- **A Subject is a referent; an Actor is not.** The noun phrase of a clause's Subject
+  ([`surface.md`](./surface.md) §7.2) is an ordinary mention, which pronouns and demonstratives
+  read like any other: "it" in "whenever a creature dies, … it" reads the Subject's "a creature".
+  The Actor is the performer of an Action: in an instruction, the controller of the text's spell or
+  ability unless a Handoff names another; in a clause, what its active Subject or its `by` agent
+  names. A Handoff makes its Actor the innermost for the Action it contains. The Actor is a role
+  that only the `actor` word at NounPhrase reads, not a discourse referent; pronouns, groups and
+  counts never read it. The noun phrase naming it, in a Subject, an agent or a Handoff, is an
+  ordinary referent.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
   to a parameter binds every member under the parameter's one Binding Identity.
 - A zone change keeps the referent and records the move on it: its origin, its new zone and the
   deed. Carrier words ("that card" after "exile target creature", [CR#109.2]), the consuming
   verb's applicability (§2.4) and Participial Descriptions read those. The origin keys the reads
-  that reach the object as it was before the move: a lookback's historical subject (§4.8), as in
+  that reach the object as it was before the move: a lookback's historical subject (§3.4), as in
   *Saw in Half*'s and *Kaervek's Purge*'s "If that creature dies this way" and *Tuktuk
   Scrapper*'s "If that artifact is put into a graveyard this way, … that artifact's controller",
   and last-known information once the move hid it (*Zoyowa's Justice*'s "its mana value" after
@@ -117,7 +120,7 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    long as" sentence.
 3. **Negated or modal** (`cant`/`must`/`can`/`gatedBy`, `not`, an else branch). Hypothetical
    indefinite, counted and partitive participants are closed on exit; a deontic rule's Unless
-   Condition is inside its box (§4.7). Under `cant`, a hypothetical indefinite has universal
+   Condition is inside its box (§3.3). Under `cant`, a hypothetical indefinite has universal
    force: "A player can't cast …" forbids each player ([CR#205.4e]). Targets, definite references
    and universal domains stay accessible under their identities ([CR#101.2]).
 4. **Distributive loop** (`doForEach`). Each pass binds the loop referent for the body to read.
@@ -155,7 +158,7 @@ Resolution applies DRT techniques to the DRS, measured against a gold set of the
 endophora. Whatever the technique, a referent is accessible to an anaphor only if all four hold:
 
 1. No active Reference Scope hides it.
-2. Its number agrees with the anaphor's. Inside a deontic rule's Unless Condition (§4.7), a
+2. Its number agrees with the anaphor's. Inside a deontic rule's Unless Condition (§3.3), a
    universal participant is read one member at a time: a plural anaphor reads the domain
    distributively, and a singular one reads the member at hand.
 3. Its sort, zone and Head Noun fit the anaphor's carrier word ([CR#109.2]).
@@ -178,115 +181,12 @@ A bare printed "another" or "other" (`isOther`) excludes its Contrast Anchor, wh
 target ([CR#702.151a]). `otherThan` is only for a printed "other than". Resolution finds the
 anchor like any other reference (§2.4).
 
-## 3. Definitions and Templates
+## 3. What a Clause Means
 
-A named word is a primitive, a Template or a Definition; why the language has the three is a
-language matter ([`syl.md`](./syl.md) §1). A primitive only names a model constructor. The other
-two differ in what they mean:
+What a term is built from, and how each of these is written, is [`surface.md`](./surface.md)
+§6 and §7.
 
-- **A Definition** is vocabulary the rules define: a keyword action or ability ([CR#701.1,702.1]),
-  a Counter, a Designation, a Defined Token ([CR#111.10,701.71a]). It carries rules meaning and
-  its own Reference Scope (§2.3).
-  - A keyword action's Definition carries a Deed that triggers, lookbacks and prohibitions can
-    name ("whenever you scry", "the card exiled this way", "can't be regenerated"). "This way"
-    reads the current ability's stamps (§2.4), and the stamp a keyword action leaves is its
-    Definition's Deed. That is why each keyword action has exactly one Deed (§3.1): a variant with
-    its own Deed would make "exiled this way" miss it.
-  - A keyword ability's Definition carries a Deed only where the rules let text ask who did it:
-    a creature tapped to pay a crew cost "crews" the Vehicle, and the Vehicle is "crewed by" it
-    ([CR#702.122b,702.122c]), so Crew's Definition carries the Deed paying that cost stamps.
-  - A Primitive Keyword Ability is the exception: a keyword ability defined by the engine rather
-    than by a Definition (first strike, double strike, trample and banding). It is a primitive,
-    with no body and no Reference Scope ([`syl.md`](./syl.md) §3).
-  - A Counter's, a Designation's or a Defined Token's Definition carries none.
-  - A Defined Token's Definition takes no arguments, so its Reference Scope holds nothing of
-    the caller's; the ability text in its characteristics is embedded ability text (§2.3).
-- **A Template** is printed wording only. It expands transparently into the expressions its parts
-  would be written as, and it adds no meaning: it has no Reference Scope and no Deed, so its
-  body's references reach the referents at its call site.
-
-Templates and Definitions bind parameters alike: each parameter's argument is read once, at its
-first use, and later uses re-mention it ([`syl.md`](./syl.md) §4). In expansion they differ only in
-Reference Scope and Deed.
-
-They are kept apart because conflating them goes wrong both ways. A phrasing given a Deed or a
-scope invents a rules distinction the CR does not make: an event then matches it, and referents it
-should see are hidden from it. A rules-defined keyword treated as a phrasing loses its identity, so
-"can't X" and "whenever X" can no longer name it. So the kind a declaration states decides which it
-is ([`syl.md`](./syl.md) §1). That a Definition's body is the rules' meaning of its keyword is
-trusted, vouched for by its CR citation like any rule declaration (§1 item 4). Its sorts are
-checked once, at its declaration ([`syl.md`](./syl.md) §4); its reference resolution is checked in
-each context that expands it.
-
-### 3.1 Keyword Actions and Deeds
-
-- Every keyword action is a Definition with exactly one Deed ([CR#701.1]). The exception is
-  an action the rules define as another action: `convert` is a Template over `transform`
-  ([CR#701.28a]).
-- A keyword ability's verb that is done by doing another deed is a Definition over that deed:
-  `devour` over `sacrifice` ([CR#702.82b]).
-- With no Handoff to a Permanent, a deed a permanent performs is performed by the Source
-  ([CR#701.14a,701.44a]). The checker never guesses a deed from a body's shape.
-
-## 4. The Action-Clause Spine
-
-### 4.1 One Action Per Verb
-
-Every verb is one Action, its bare infinitive verb phrase. Why: otherwise each verb is encoded once
-per clause mood (as an instruction, an event, a prohibition and a lookback), each copy with its own
-subject and patient plumbing, and the copies drift apart. With one Action, "sacrifice" means the same
-thing in "sacrifice a creature", "whenever you sacrifice", "can't be sacrificed" and "if you
-sacrificed". Eight contexts embed that Action directly, with no double wrapping:
-
-| Context | Form |
-|---|---|
-| Imperative | `action` |
-| Handoff | `instruct(subj, action)` |
-| Cost | `perform(action)` |
-| Trigger | `does(subj, action)` |
-| Replacement | `replace(would(subj, action), repl)` |
-| Deontic | `cant`, `must`, `can`, `gatedBy` |
-| Lookback | `did(subj, action, within)` |
-| Negative declarative | `doesnt(subj, action)` |
-
-Triggers, replacements, deontic rules and lookbacks share one head gate (§4.6), and every context
-shares one reading of subject, action and agent. A context adds only what is its own.
-
-### 4.2 Voice
-
-Voice belongs to the Subject, not to the Action, so the passive needs no separate event. The
-passive matters only because it promotes the patient to grammatical subject. The patient is then
-read first, ahead of any agent, and that decides which occurrence of a parameter is its first
-mention ([`syl.md`](./syl.md) §4). A Subject is one of three:
-
-- `actor(np)`: active. `np` is read first, with role subject.
-- `any`: passive with no agent. The patient is promoted to subject.
-- `by(np)`: passive with an agent. The patient is promoted and read first, then `np` with role
-  other.
-
-The noun phrase of `actor(np)` or `by(np)` names the Actor and is an ordinary referent, not the
-Actor itself (§2.1). What an active Subject names need not
-be a player or a permanent: a spell or ability ("<ability> triggers") or an effect
-(`actor(thisEffect)`, §4.7) can be one.
-
-"Becomes blocked" is therefore not the agentless passive of `block`. It is its own event head,
-`becomeBlocked`: the Blocked status beginning, once per combat, even when an effect blocks the
-creature with no blocker ([CR#509.1h,509.3c]). "Becomes blocked by <B>" is `by(B)` over `block`,
-one event per blocker ([CR#509.3d]).
-
-### 4.3 `any`
-
-There is one wildcard word, `any`, written at every sort that needs one. No sort has a wildcard
-word of its own.
-
-### 4.4 Patients and Relative Clauses
-
-- A transitive Action always keeps its patient inside it. The Subject supplies only the performer.
-- A relative clause filtering by an event is a lookback with `which` in the relativized slot.
-- "The same is true for …" is one frame with a `thatKeyword` placeholder, checked per keyword
-  ([CR#702.1c]).
-
-### 4.5 Before and After the Event
+### 3.1 Before and After the Event
 
 A replacement must see the world the replaced event would change, so `would` reads its Action
 **before** the event. Its patients are still in their old zone, and
@@ -295,12 +195,12 @@ prospective amounts such as "that many" exist, but products such as a drawn card
 below: patients have moved, are stamped with the deed, and become new objects where [CR#400.7]
 applies.
 
-Two reads are of the world before the event. A look-back trigger pattern (§4.6) reads its own
+Two reads are of the world before the event. A look-back trigger pattern (§3.2) reads its own
 descriptions as the objects were immediately prior to the event ([CR#603.10]); only the trigger's
-body reads after. A lookback's historical subject or patient (§4.8) is the object as it was when
+body reads after. A lookback's historical subject or patient (§3.4) is the object as it was when
 the event happened, found by the recorded origin (§2.1).
 
-### 4.6 The Event Gate
+### 3.2 The Event Gate
 
 Events, lookbacks and deontic rules admit only the event-capable Action heads, plus a keyword-action
 Definition matched by its Deed. An event pattern, a lookback or a prohibition must name something
@@ -308,10 +208,6 @@ that happens as one event; control flow (`sequentially`, `doIf`, `doForEach`, `c
 and compound actions are not events, so they are refused. A deontic rule has no gate of its own,
 since a "can't" outranks anything that allows the thing ([CR#101.2]).
 
-Event decisions:
-
-- **A move is the one Zone Change event.** `die`, `enter` and `leave` are Templates over it
-  ([CR#700.4]). A move carries no cause; a caused move is wrapped in `causes` or `causedBy`.
 - **The Observation Point is derived, never written.** No event head or trigger carries it. Each
   arm of a trigger pattern looks back in time when it names an event on the closed list of
   look-back triggers. The list is: leaving the battlefield, a sacrifice, leaving a graveyard, and
@@ -335,58 +231,13 @@ Event decisions:
   damage in a pattern ([CR#120.2b]).
 - **A counter or die pattern watches its written amount.** `1` matches each occurrence; `anyAmount`
   matches the event ([CR#603.2c,715.2b]).
-- **Pattern-only heads.** `gainControlOf` is a pattern head only; performed control change is
-  `establish(controlGrant(…))` ([CR#613.1b]). `anyCost` and `anyBallot` likewise appear only in
-  patterns.
-- **Paying life** is a cost payment of `loseLife`; there is no life Cost ([CR#119.4,119.8]).
-- **Alternative events are an `or` over events**: one trigger condition, met when a game event
-  matches any arm ([CR#603.2]). Several trigger conditions are the disjunction at
-  `TriggerCondition` instead ([CR#603.1b]). Each arm is a whole event with its own subject:
-  "attacks or blocks" is `or([does(actor(x), attack), does(actor(x), block)])`, and "blocks or
-  becomes blocked" joins two events whose subjects differ. An `or` over Actions would be a
-  compound action, which the gate refuses.
-- **"At" names a Turn Point.** A phase or step beginning is a trigger event [CR#603.2b], and
-  "at end of combat" triggers as the end of combat step begins [CR#511.2], so there is one
-  triggered-ability constructor and `at` builds it too. What tells the trigger words apart is
-  sort: `at` takes a `TurnPoint` (`beginningOf`, an `nthOccurrence` of one), and the event it
-  triggers on is the game reaching it (`reached`); `when` and `whenever` take a `GameEvent`,
-  which no Turn Point is. A delayed "at" trigger (`atNext`) takes a Turn Point the same way.
-  Any other event-taking position that names a beginning writes `reached` ("until your next
-  turn", "continuously since the beginning of your last upkeep"). The end of a phase, step or
-  turn (`endOf`) is no Turn Point: "at end of combat" is a beginning. `reached(point)` is an
-  ordinary `GameEvent`, which durations, `heldSince` and `delay` need, so `when` and `whenever`
-  refuse a Turn Point written bare but not one wrapped in `reached`; the trigger word for a Turn
-  Point is `at`.
-- **A trigger condition prints its trigger word.** `triggered` takes one `TriggerCondition`:
-  `when`, `whenever` or `at` over its event ([CR#603.1]), so a trigger word stands only where a
-  trigger condition does. Several trigger conditions of one ability ([CR#603.1b]) are one
-  disjunction of them, each with its own word: "When this creature enters and whenever it
-  attacks while saddled" (*Autarch Mammoth*). The ability triggers on any of them. "And" is the
-  printed coordinator, so the primitive is `and`; one card, *Tenuous Truce*, prints "or", the
-  Template `or` over `and` with the same meaning. A concurrent condition or timing window ("while
-  saddled", "during your turn") restricts the event it follows (`timed`), so it stands inside the
-  one trigger condition it qualifies.
 - **`remove` is no event head.** What it names, an effect taking an attachment off its host by
   way of a state-based action ([CR#704.5m,704.5n]), is no one event, so `remove` names no Deed
   and is refused here. It is written in a negative declarative, "this effect doesn't remove this
   Aura" ([CR#702.16n]).
 
-### 4.7 Static Specs
+### 3.3 Static Statements
 
-- **Abilities granted, lost or listed together are one list**, in printed order, at the parameter
-  of the word that grants, removes or lists them: "gains hexproof and indestructible" (`gain`),
-  "has double strike and trample" (`abilityGrant`), "loses hexproof and indestructible"
-  (`abilityLoss`), "except it has haste and dethrone" (`alsoHas`), "creature tokens with flying
-  and vigilance" (`creatureToken`). Each element is an ability of its own. An object may have
-  several abilities, and a spell or ability may grant it more ([CR#113.2c]): granted and lost
-  abilities are each added or removed in layer 6 ([CR#613.1f]), the abilities a copy effect's
-  exception lists each become part of the copy's copiable values ([CR#707.9b]), and the abilities
-  listed for a token are each an ability the effect that creates it gives it ([CR#113.2c,111.3]).
-  So no Ability stands for several, and `Ability` has no conjunction. A grant of one ability is a
-  list of one.
-- **A deontic rule** is a Subject, an Action and optional modifiers: Timing, as-though, a Deontic
-  Exception, an Unless Condition (`cant` and `must`), a cause (`cant` only), and a Permission
-  Rider (`can` only) ([CR#113.2c]). "Can't A or B" is a conjunction of prohibitions.
 - **An Unless Condition** ("<subject> can't <action> unless <condition>", "<subject> <action>s if
   able unless <condition>") is read inside its deontic rule's box (§2.2 item 3), after the rule's
   Subject and Action, so it reaches the Subject's noun phrase and the Action's patients, a
@@ -411,27 +262,10 @@ Event decisions:
   later cast from exile its delayed trigger allows ([CR#702.185a]). A permission that states no zone
   bounds none, so its cost joins a cast any other rule or effect allows, as a morph card is cast
   face down from the top of a library under *Garruk's Horde* ([CR#702.37c,601.3e]).
-- **An alternative or additional cost stands where its sentence prints it.** "You may cast X by
-  paying C …" or "… without paying its mana cost", in a permission or an instructed cast, fills that
-  `cast`'s `altCost` (or, "as an additional cost", its `addedCost`). "You may pay C rather than pay
-  …" is the static `altCost`, and "As an additional cost to cast …" the static `addedCost`
-  ([CR#118.8,118.9]).
-- **A replacement's `repl`** says what happens:
-  - `instead`: in the event's place.
-  - `before`: before the event, which still happens; the choices "as it enters" requires
-    ([CR#614.12a]).
-  - `alongside`: as part of the event; "enters with" ([CR#603.6d]).
-  - `withRiders`: the entering happens with Entry Riders.
 - **Being an effect follows from the enclosing node.** No Action carries an effect flag, so a
   Saga's turn-based lore counter is no effect ([CR#614.16,715.3c]). A performer and a cause are
   independent. `thisEffect`, what a sentence calls "this effect", is found the same way: it is the
   effect of the enclosing spell or ability.
-- **A negative declarative** `doesnt(subj, action)` says what its Subject does not do. It is no
-  deontic rule and takes no modifiers. "This effect doesn't remove this Aura" is
-  `doesnt(actor(thisEffect), remove(thisAura))`, written as the card prints it: its own Static
-  Spec beside the spec it talks about, the two joined by `conjunction` in one static ability.
-  Which consequence of the effect it exempts, an Aura put into its owner's graveyard or Equipment
-  unattached ([CR#704.5m,704.5n]), is the engine's ([CR#702.16n]).
 - **Damage is composed, not special.** Damage results are conferred properties
   ([CR#120.3a,120.3c,120.3e,120.4c]). Wither and infect replace the marking results
   ([CR#702.80a,702.90b]). Prevention, redirection and scaling replace the damage event
@@ -439,11 +273,11 @@ Event decisions:
 - **`statOf` for loyalty and defense reads by zone:** counters on the battlefield, the printed
   number elsewhere ([CR#306.5c,310.4c]).
 
-### 4.8 Lookback
+### 3.4 Lookback
 
 A lookback is `did(subj, action, within)`, with an optional Event Ordinal. Its subject and its
 patients are read as they were when the event happened, through the zone change's recorded origin
-(§2.1, §4.5): "that creature" in "If that creature dies this way" is the departed permanent.
+(§2.1, §3.1): "that creature" in "If that creature dies this way" is the departed permanent.
 
 - `thisWay` reads an event its own ability's earlier text caused ([CR#608.2c]). `triggering` reads
   the event its ability triggers on ([CR#603.2]). Both must be grounded in the text. Whether the
@@ -454,7 +288,7 @@ patients are read as they were when the event happened, through the zone change'
   do" trigger is a separate ability whose targets do not escape ([CR#603.12]).
 - Linked and self-linked abilities share one authored tree. Lowering finds the link.
 
-## 5. Standing Mechanisms
+### 3.5 Standing Mechanisms
 
 - `getsPt` carries both printed deltas ("+X/+0"), because spelling must render them back
   ([CR#613.4c]).
@@ -466,16 +300,16 @@ patients are read as they were when the event happened, through the zone change'
 - An ability's text publishes its choices, cost results and introduced objects to the abilities
   after it, never what its trigger event names ([CR#607.1]).
 
-## 6. Reading a Term
+## 4. Reading a Term
 
 Semantics takes the expanded surface tree and gives a meaning or a refusal. It is one reading
 in four steps, stated in the order of what each needs. Whether one pass in that order is enough
-is open (§8).
+is open (§6).
 
 1. **Classification.** Each clause is classified from where it stands and the words it holds,
    with no reference resolved:
    - the clause of a trigger is an event pattern, which must name one event (the event gate of
-     §4.6, read through `done`, `be`, Templates and coordinations as
+     §3.2, read through `done`, `be`, Templates and coordinations as
      `voice-and-object-phrases.md` §8 states), or a state, for a state trigger [CR#603.8]:
      *Dandân*'s "When you control no Islands, sacrifice this creature.";
    - a clause under "if", "as long as" or "unless" is a condition: a state, a lookback, or a
@@ -500,7 +334,7 @@ is open (§8).
    the accessibility rules of §2.4. A Definition's body is read in its own
    Reference Scope and exports its outcomes to the caller (§2.3), which is what *Cursed
    Windbreaker*'s "manifest dread, then attach this Equipment to that creature" needs. §2.3 does
-   not say what an outcome is (§8).
+   not say what an outcome is (§6).
 4. **Construction.** The meaning is built from the classified clauses and resolved references: an
    event with its subject and Action, a Static Spec, a Replacement. These are the values today's
    term language names with sorts, built as Rust values, and lowering reads them. Where the
@@ -520,9 +354,9 @@ operator means.
 **Each step answers one of three ways** for a term or a part of one: it is accepted; it is
 refused, with the rule that refuses it; or it is not understood, because semantics has no rule
 for the construction yet. Only a refusal says a reading is wrong. A term that is not understood
-is reported as that, and is never dropped as though it had been refused (§7).
+is reported as that, and is never dropped as though it had been refused (§5).
 
-## 7. From Text to a Stored Term
+## 5. From Text to a Stored Term
 
 1. **Recovery** gives the set of candidate surface terms whose wording matches a Reading in the
    card's Packed Forest and which spell back to the analyzed text. Candidates are not one per
@@ -553,27 +387,27 @@ no term is stored for that card until an author picks one.
 The steps above speak of candidates one at a time. `english.md` §4 has recovery run over the
 forest and enumerate no tree, since a chain of unselected Preposition Phrases has Catalan-many
 attachments, and `spelling.md` §8 calls enumerating trees a defect. Whether classes of meaning
-are found over enumerated candidates or over a packed form is open (§8).
+are found over enumerated candidates or over a packed form is open (§6).
 
-## 8. Open
+## 6. Open
 
-1. **Which sorts are kinds of phrase.** [`surface.md`](./surface.md) §1 gives the test and applies it to
-   the four sorts the voice spec worked around. `plugins/builtin/` declares words at more than a
-   hundred sorts, among them `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
+1. **Which sorts are kinds of phrase.** [`surface.md`](./surface.md) §1 gives the test and applies
+   it to the four sorts the voice spec worked around. `plugins/builtin/` declares words at more
+   than a hundred sorts, among them `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
    `Timing` and `TriggerCondition`, and none of those has been put to the test. Each is a kind of
-   phrase the text prints, a classification that moves into the meaning, or rules data, which
-   stays ([`surface.md`](./surface.md) §4).
+   phrase the text prints, a classification that moves into the meaning, or rules data, which stays
+   ([`surface.md`](./surface.md) §4).
 2. **Which word holds a replacement's two clauses.** *Phytohydra* prints "If damage would be
    dealt to this creature, put that many +1/+1 counters on it instead." With `instead` a
-   primitive (§6), either the sentence's "if" is the ordinary conditional word and classification
+   primitive (§4), either the sentence's "if" is the ordinary conditional word and classification
    reads the replacement off the `would` and the `instead`, or `replace` stays a word of its
    own for this wording.
 3. **The pragmatics defaults and the form of the data.** [`pragmatics.md`](./pragmatics.md) §4
    keeps four hypotheses for one kind of ambiguity and settles none. The list of ambiguities
-   that reach pragmatics and the default for each come from the first run of §7 over the corpus.
+   that reach pragmatics and the default for each come from the first run of §5 over the corpus.
    "This creature is tapped" under "as long as" (*Centaur Omenreader*) has a copular and a
    passive Reading, and no rule here or there picks.
-4. **How candidates of one class are told apart for storing** (§7 step 5): the fixed rule is not
+4. **How candidates of one class are told apart for storing** (§5 step 5): the fixed rule is not
    chosen (item 8).
 5. **A name for the meaning.** What semantics builds has no name of its own yet.
 6. **Sentences that depend on an earlier one.** "If the player does, untap that creature."
@@ -587,17 +421,17 @@ are found over enumerated candidates or over a packed form is open (§8).
    `nthOccurrence` at three sorts and `or` at ten. Each set that meets is one word, where its
    members print alike and differ only in what they mean, or needs names that tell its members
    apart. None has been examined.
-8. **When two meanings are the same** (§7 step 3). Equality has to ignore the identities
+8. **When two meanings are the same** (§5 step 3). Equality has to ignore the identities
    reference resolution allocates and keep printed order; it is not defined. The fixed rule of
-   §7 step 5 cannot be the Reading's Ranking Key alone, since two terms from one Reading share
+   §5 step 5 cannot be the Reading's Ranking Key alone, since two terms from one Reading share
    it.
-9. **What a rules row's clauses are written as** ([`surface.md`](./surface.md) §4), and what replaces
-   `Condition` and `Action` where a clause is held: `SbaRule`'s `when` and `then`, the
+9. **What a rules row's clauses are written as** ([`surface.md`](./surface.md) §4), and what
+   replaces `Condition` and `Action` where a clause is held: `SbaRule`'s `when` and `then`, the
    `intervening` parameter of `triggered`, a deontic rule's Unless Condition. Where the line
    between rules data and printed text runs is part of this.
 10. **A Definition's meaning.** A Definition's sorts are checked once, at its declaration, and its
-   references in each context that expands it (§3). Whether classification runs on a
-   body once or at each call is not settled.
+    references in each context that expands it ([`surface.md`](./surface.md) §6). Whether
+    classification runs on a body once or at each call is not settled.
 11. **Whether the four steps run once in order.** "The same is true for …" (*Soulflayer*) takes
     its clause's kind from the sentence it refers to, so classification there waits on a
     reference. A prevention's event and its "prevent 1 of that damage" are joined by a reference
@@ -610,7 +444,7 @@ are found over enumerated candidates or over a packed form is open (§8).
     may read and not which it reads when several qualify. Two meanings that differ only in an
     antecedent are one surface term, so the stored term cannot carry the choice: it is made by a
     fixed rule in the reference step each time a term is read, and that rule is not designed.
-14. **Enumerated candidates or a packed form** (§7).
+14. **Enumerated candidates or a packed form** (§5).
 15. **Refusals that are lowering's today.** `voice-and-object-phrases.md` §6 has lowering refuse
     an object phrase a verb cannot read; a candidate refused only there is stored before it is
     refused.

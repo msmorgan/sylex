@@ -4,16 +4,16 @@
 
 This document is directional. It describes what a surface term may say: the stored `.syl` term
 of a card, which follows the card's English and says nothing about what its words do in the
-game. The design is not settled, and [`semantics.md`](./semantics.md) §8 lists what is open.
+game. The design is not settled, and [`semantics.md`](./semantics.md) §6 lists what is open.
 
 - **Companions:** [`syl.md`](./syl.md), the language a surface term is written in, and
   [`semantics.md`](./semantics.md), how a surface term is read into its meaning.
 
 The words a surface term is built from are designed in `docs/specs/voice-and-object-phrases.md`
 (the clause, the verb phrase and its operators, the object phrases) and in the planned tickets
-that build them. What [`semantics.md`](./semantics.md) §3 and §4 say of Definitions, Templates
-and the action-clause spine is surface design too, and moves here
-(`syl-surface-and-semantics-design-docs`).
+that build them. §6 and §7 say what Definitions, Templates
+and the action-clause spine are in today's terms, with the sorts that say what a clause means
+still in the term language (§2).
 
 ## 1. A Sort Names a Kind of Phrase
 
@@ -46,7 +46,7 @@ surrounding construction takes the clause:
 So `does`, `holds` and the coercion from `Clause` to `StaticSpec` are scaffolding: the planned
 tickets build them as `voice-and-object-phrases.md` states, and they come out when semantics
 exists. `StaticSpec`, `GameEvent`, `Condition` and `Replacement` are
-types of the meaning ([`semantics.md`](./semantics.md) §6).
+types of the meaning ([`semantics.md`](./semantics.md) §4).
 
 ## 3. More Than a Reading
 
@@ -75,7 +75,7 @@ boundary, and reads each argument once, in printed order ([`syl.md`](./syl.md) �
 (`asEvent` in `lifelink`, `stateBasedActionsChecked`). Their sorts say what the data does in the
 game and stay. Where the line between rules data and printed text runs, what keeps a card from
 calling a rules-only word, and what the clauses inside rules data are written as are open
-([`semantics.md`](./semantics.md) §8).
+([`semantics.md`](./semantics.md) §6).
 
 ## 5. What Is Checked at the Surface
 
@@ -83,6 +83,191 @@ calling a rules-only word, and what the clauses inside rules data are written as
 that arguments are bound as [`syl.md`](./syl.md) §2 says, and the structural refusals of
 `voice-and-object-phrases.md` §9 that concern silent words (`subject` under `done`, `_` under
 `shared`, `$actor` in an `action` Definition). The event gate and "a replacement's event is a
-`would` clause" are not surface form. Semantics refuses them ([`semantics.md`](./semantics.md) §6).
+`would` clause" are not surface form. Semantics refuses them ([`semantics.md`](./semantics.md) §4).
 Until it exists, the sorts that say what a clause means and the checks the planned tickets add to
 `cargo xtask dsl check` stand in for it.
+
+## 6. Definitions and Templates
+
+A named word is a primitive, a Template or a Definition; why the language has the three is a
+language matter ([`syl.md`](./syl.md) §1). A primitive only names a model constructor. The other
+two differ in what they mean:
+
+- **A Definition** is vocabulary the rules define: a keyword action or ability ([CR#701.1,702.1]),
+  a Counter, a Designation, a Defined Token ([CR#111.10,701.71a]). It carries rules meaning and
+  its own Reference Scope ([`semantics.md`](./semantics.md) §2.3).
+  - A keyword action's Definition carries a Deed that triggers, lookbacks and prohibitions can name
+    ("whenever you scry", "the card exiled this way", "can't be regenerated"). "This way" reads the
+    current ability's stamps ([`semantics.md`](./semantics.md) §2.4), and the stamp a keyword
+    action leaves is its Definition's Deed. That is why each keyword action has exactly one Deed
+    (§6.1): a variant with its own Deed would make "exiled this way" miss it.
+  - A keyword ability's Definition carries a Deed only where the rules let text ask who did it:
+    a creature tapped to pay a crew cost "crews" the Vehicle, and the Vehicle is "crewed by" it
+    ([CR#702.122b,702.122c]), so Crew's Definition carries the Deed paying that cost stamps.
+  - A Primitive Keyword Ability is the exception: a keyword ability defined by the engine rather
+    than by a Definition (first strike, double strike, trample and banding). It is a primitive,
+    with no body and no Reference Scope ([`syl.md`](./syl.md) §3).
+  - A Counter's, a Designation's or a Defined Token's Definition carries none.
+  - A Defined Token's Definition takes no arguments, so its Reference Scope holds nothing of the
+    caller's; the ability text in its characteristics is embedded ability text
+    ([`semantics.md`](./semantics.md) §2.3).
+- **A Template** is printed wording only. It expands transparently into the expressions its parts
+  would be written as, and it adds no meaning: it has no Reference Scope and no Deed, so its
+  body's references reach the referents at its call site.
+
+Templates and Definitions bind parameters alike: each parameter's argument is read once, at its
+first use, and later uses re-mention it ([`syl.md`](./syl.md) §4). In expansion they differ only in
+Reference Scope and Deed.
+
+They are kept apart because conflating them goes wrong both ways. A phrasing given a Deed or a
+scope invents a rules distinction the CR does not make: an event then matches it, and referents it
+should see are hidden from it. A rules-defined keyword treated as a phrasing loses its identity, so
+"can't X" and "whenever X" can no longer name it. So the kind a declaration states decides which it
+is ([`syl.md`](./syl.md) §1). That a Definition's body is the rules' meaning of its keyword is
+trusted, vouched for by its CR citation like any rule declaration ([`semantics.md`](./semantics.md)
+§1 item 4). Its sorts are checked once, at its declaration ([`syl.md`](./syl.md) §4); its reference
+resolution is checked in each context that expands it.
+
+### 6.1 Keyword Actions and Deeds
+
+- Every keyword action is a Definition with exactly one Deed ([CR#701.1]). The exception is
+  an action the rules define as another action: `convert` is a Template over `transform`
+  ([CR#701.28a]).
+- A keyword ability's verb that is done by doing another deed is a Definition over that deed:
+  `devour` over `sacrifice` ([CR#702.82b]).
+- With no Handoff to a Permanent, a deed a permanent performs is performed by the Source
+  ([CR#701.14a,701.44a]). The checker never guesses a deed from a body's shape.
+
+## 7. The Action-Clause Spine
+
+### 7.1 One Action Per Verb
+
+Every verb is one Action, its bare infinitive verb phrase. Why: otherwise each verb is encoded once
+per clause mood (as an instruction, an event, a prohibition and a lookback), each copy with its own
+subject and patient plumbing, and the copies drift apart. With one Action, "sacrifice" means the
+same thing in "sacrifice a creature", "whenever you sacrifice", "can't be sacrificed" and "if you
+sacrificed". Eight contexts embed that Action directly, with no double wrapping:
+
+| Context | Form |
+|---|---|
+| Imperative | `action` |
+| Handoff | `instruct(subj, action)` |
+| Cost | `perform(action)` |
+| Trigger | `does(subj, action)` |
+| Replacement | `replace(would(subj, action), repl)` |
+| Deontic | `cant`, `must`, `can`, `gatedBy` |
+| Lookback | `did(subj, action, within)` |
+| Negative declarative | `doesnt(subj, action)` |
+
+Triggers, replacements, deontic rules and lookbacks share one head gate
+([`semantics.md`](./semantics.md) §3.2), and every context shares one reading of subject, action
+and agent. A context adds only what is its own.
+
+### 7.2 Voice
+
+Voice belongs to the Subject, not to the Action, so the passive needs no separate event. The
+passive matters only because it promotes the patient to grammatical subject. The patient is then
+read first, ahead of any agent, and that decides which occurrence of a parameter is its first
+mention ([`syl.md`](./syl.md) §4). A Subject is one of three:
+
+- `actor(np)`: active. `np` is read first, with role subject.
+- `any`: passive with no agent. The patient is promoted to subject.
+- `by(np)`: passive with an agent. The patient is promoted and read first, then `np` with role
+  other.
+
+The noun phrase of `actor(np)` or `by(np)` names the Actor and is an ordinary referent, not the
+Actor itself ([`semantics.md`](./semantics.md) §2.1). What an active Subject names need not
+be a player or a permanent: a spell or ability ("<ability> triggers") or an effect
+(`actor(thisEffect)`, §7.6) can be one.
+
+"Becomes blocked" is therefore not the agentless passive of `block`. It is its own event head,
+`becomeBlocked`: the Blocked status beginning, once per combat, even when an effect blocks the
+creature with no blocker ([CR#509.1h,509.3c]). "Becomes blocked by <B>" is `by(B)` over `block`,
+one event per blocker ([CR#509.3d]).
+
+### 7.3 `any`
+
+There is one wildcard word, `any`, written at every sort that needs one. No sort has a wildcard
+word of its own.
+
+### 7.4 Patients and Relative Clauses
+
+- A transitive Action always keeps its patient inside it. The Subject supplies only the performer.
+- A relative clause filtering by an event is a lookback with `which` in the relativized slot.
+- "The same is true for …" is one frame with a `thatKeyword` placeholder, checked per keyword
+  ([CR#702.1c]).
+
+### 7.5 Events as Written
+
+Which events a pattern may name, and from which side of an event its descriptions are read, is
+[`semantics.md`](./semantics.md) §3.1 and §3.2.
+
+- **A move is the one Zone Change event.** `die`, `enter` and `leave` are Templates over it
+  ([CR#700.4]). A move carries no cause; a caused move is wrapped in `causes` or `causedBy`.
+- **Pattern-only heads.** `gainControlOf` is a pattern head only; performed control change is
+  `establish(controlGrant(…))` ([CR#613.1b]). `anyCost` and `anyBallot` likewise appear only in
+  patterns.
+- **Paying life** is a cost payment of `loseLife`; there is no life Cost ([CR#119.4,119.8]).
+- **Alternative events are an `or` over events**: one trigger condition, met when a game event
+  matches any arm ([CR#603.2]). Several trigger conditions are the disjunction at
+  `TriggerCondition` instead ([CR#603.1b]). Each arm is a whole event with its own subject:
+  "attacks or blocks" is `or([does(actor(x), attack), does(actor(x), block)])`, and "blocks or
+  becomes blocked" joins two events whose subjects differ. An `or` over Actions would be a
+  compound action, which the gate refuses.
+- **"At" names a Turn Point.** A phase or step beginning is a trigger event [CR#603.2b], and
+  "at end of combat" triggers as the end of combat step begins [CR#511.2], so there is one
+  triggered-ability constructor and `at` builds it too. What tells the trigger words apart is
+  sort: `at` takes a `TurnPoint` (`beginningOf`, an `nthOccurrence` of one), and the event it
+  triggers on is the game reaching it (`reached`); `when` and `whenever` take a `GameEvent`,
+  which no Turn Point is. A delayed "at" trigger (`atNext`) takes a Turn Point the same way.
+  Any other event-taking position that names a beginning writes `reached` ("until your next
+  turn", "continuously since the beginning of your last upkeep"). The end of a phase, step or
+  turn (`endOf`) is no Turn Point: "at end of combat" is a beginning. `reached(point)` is an
+  ordinary `GameEvent`, which durations, `heldSince` and `delay` need, so `when` and `whenever`
+  refuse a Turn Point written bare but not one wrapped in `reached`; the trigger word for a Turn
+  Point is `at`.
+- **A trigger condition prints its trigger word.** `triggered` takes one `TriggerCondition`:
+  `when`, `whenever` or `at` over its event ([CR#603.1]), so a trigger word stands only where a
+  trigger condition does. Several trigger conditions of one ability ([CR#603.1b]) are one
+  disjunction of them, each with its own word: "When this creature enters and whenever it
+  attacks while saddled" (*Autarch Mammoth*). The ability triggers on any of them. "And" is the
+  printed coordinator, so the primitive is `and`; one card, *Tenuous Truce*, prints "or", the
+  Template `or` over `and` with the same meaning. A concurrent condition or timing window ("while
+  saddled", "during your turn") restricts the event it follows (`timed`), so it stands inside the
+  one trigger condition it qualifies.
+
+### 7.6 Static Statements as Written
+
+What each of these means is [`semantics.md`](./semantics.md) §3.3.
+
+- **Abilities granted, lost or listed together are one list**, in printed order, at the parameter
+  of the word that grants, removes or lists them: "gains hexproof and indestructible" (`gain`),
+  "has double strike and trample" (`abilityGrant`), "loses hexproof and indestructible"
+  (`abilityLoss`), "except it has haste and dethrone" (`alsoHas`), "creature tokens with flying
+  and vigilance" (`creatureToken`). Each element is an ability of its own. An object may have
+  several abilities, and a spell or ability may grant it more ([CR#113.2c]): granted and lost
+  abilities are each added or removed in layer 6 ([CR#613.1f]), the abilities a copy effect's
+  exception lists each become part of the copy's copiable values ([CR#707.9b]), and the abilities
+  listed for a token are each an ability the effect that creates it gives it ([CR#113.2c,111.3]).
+  So no Ability stands for several, and `Ability` has no conjunction. A grant of one ability is a
+  list of one.
+- **A deontic rule** is a Subject, an Action and optional modifiers: Timing, as-though, a Deontic
+  Exception, an Unless Condition (`cant` and `must`), a cause (`cant` only), and a Permission
+  Rider (`can` only) ([CR#113.2c]). "Can't A or B" is a conjunction of prohibitions.
+- **An alternative or additional cost stands where its sentence prints it.** "You may cast X by
+  paying C …" or "… without paying its mana cost", in a permission or an instructed cast, fills that
+  `cast`'s `altCost` (or, "as an additional cost", its `addedCost`). "You may pay C rather than pay
+  …" is the static `altCost`, and "As an additional cost to cast …" the static `addedCost`
+  ([CR#118.8,118.9]).
+- **A replacement's `repl`** says what happens:
+  - `instead`: in the event's place.
+  - `before`: before the event, which still happens; the choices "as it enters" requires
+    ([CR#614.12a]).
+  - `alongside`: as part of the event; "enters with" ([CR#603.6d]).
+  - `withRiders`: the entering happens with Entry Riders.
+- **A negative declarative** `doesnt(subj, action)` says what its Subject does not do. It is no
+  deontic rule and takes no modifiers. "This effect doesn't remove this Aura" is
+  `doesnt(actor(thisEffect), remove(thisAura))`, written as the card prints it: its own Static
+  Spec beside the spec it talks about, the two joined by `conjunction` in one static ability.
+  Which consequence of the effect it exempts, an Aura put into its owner's graveyard or Equipment
+  unattached ([CR#704.5m,704.5n]), is the engine's ([CR#702.16n]).
