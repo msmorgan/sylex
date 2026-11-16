@@ -353,6 +353,11 @@ the candidates recovery gives for its text and spell back to it (§5), so a word
 or with a wording the card does not print, has no route into it. For a card read from its text
 that bound does most of the work, and the refusal above matters for a term written by hand.
 
+Which words those are is read from the declarations. Every primitive has a declaration of its
+own, which is where a wording attaches ([`syl.md`](./syl.md) §1), so a word only a rule may use
+is one whose declaration has no `spelling` and which no rule of the spelling grammar places
+silently, as it places a Gap or a promoted subject. No separate list names them.
+
 **Why one layer.** Which box a clause opens depends on what the clause is, reference resolution
 needs the boxes, and the meaning needs resolved references, since an event pattern's subject is
 a Referent. A reference step in a crate of its own would have to restate what each clause and
