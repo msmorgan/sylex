@@ -35,7 +35,7 @@ the term language.
 
 The test is put to a pair of sorts: where two terms differ only in which of the two they stand
 at and print the same words in the same structure, the sort that names a role in the game is the
-one that goes. The sorts of the words a coercion wraps (`CardType` under `NounWord`) name kinds
+one that goes. The sorts of the words a coercion wraps (`CardType` under `Nominal`) name kinds
 of word and are not such a pair. `clause(you, did(attack, within = thisTurn))` prints "you
 attacked this turn" whether it stands where a condition or an event is wanted, so `Condition`
 and `GameEvent` go and `Clause` stays. `VerbPhrase` and `Clause` are no such pair: one prints a

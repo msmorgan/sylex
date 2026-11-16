@@ -33,173 +33,82 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 
 ## Design
 
-- A description is a `Nominal`: its head, with a `List(PreModifier)` before it and a
-  `List(PostModifier)` after it, built by `nominal(pre = [], head, post = [])`. Each list's
-  elements stand in printed order. `headed` is taken by an existing primitive ("$subject as a
-  $head"), so the constructor is `nominal`.
-- `pre` is declared before the required `head` because it is printed first, and arguments are
-  written in declaration order (`syl.md` §2).
-- A copula's complement is a `Predicative`: what `is(subject, …)` takes ("If it's a land",
-  "is tapped", "is in your graveyard").
-- A type word coerces to two things, and the sort of the slot it stands in decides which: at
-  `Nominal` it is a permanent of that type on the battlefield [CR#109.2]; at `PreModifier` it is
-  the bare type test. No `Predicate` coercion infers a reading from its context.
-- `NounWord` is merged into `Nominal`: every `NounWord` consumer takes a `Nominal`, and each head
-  word means at `Nominal` what today's description word of the same name means (`opponent` what
-  `isOpponent` means). `ofType` and `copied` become a `nominal` with a premodifier.
-- `ConferralRule.scope` and `SbaRule.scope` take a `Nominal`.
-
-## Open questions
-
-- **Words printed both before the head and after it or as a complement**: `tapped` ("tapped
-  creature", "it's tapped"), `white`, `attacking` ("attacking creature", "creatures attacking
-  you"). A coercion from `Status` or `Color` into `PreModifier` reaches the bare word only at that
-  sort; the `PostModifier` and `Predicative` forms need a declaration each, and a `PreModifier`
-  Template named `tapped` would collide with the `Status` word `tapped` under Reaches(`PreModifier`)
-  (`syl.md` §3). Options: a coercion into each of the three sorts from `Status` and `Color`; or a
-  coercion into one and declarations at the others under other names. Recommendation: coercions
-  into `PreModifier` and `Predicative`, which print the bare word in both places, and
-  `PostModifier` declarations only where a word takes a complement ("attacking you").
-- **Whether `DesignationLabel` coerces into `PreModifier` wholesale.** None of the six source sorts
-  (`CardType` 10, `Subtype` 463, `Supertype` 4, `Color` 5, `Status` 7, `DesignationLabel` 21)
-  shares a name with another, so no coercion collides. But `DesignationLabel` holds non-adjectival
-  labels (`monarch`, `initiative`, `day`, `night`, `level`, `commander`, `citysBlessing`), which a
-  wholesale coercion admits as premodifiers. Recommendation: no coercion from
-  `DesignationLabel`; the labels printed as premodifiers ("monstrous", "renowned", "goaded") get a
-  `PreModifier` declaration each.
-- **Coordinated heads.** "Target white creature or black Zombie you control" coordinates two
-  nominals under one postmodifier: `nominal(or([nominal(pre = [white], creature),
-  nominal(pre = [black], zombie)]), post = [youControl])`. Whether `head` takes a coordination of
-  nominals, and whether `nominal(pre = [a], nominal(pre = [b], c))` is refused in favor of
-  `nominal(pre = [a, b], c)` so a nominal has one tree. A coordination at `Nominal` is a union
-  ("all artifacts and creatures"), where `pre = [artifact]` on `creature` is an intersection.
-  Recommendation: both, with the refusal a checker rule and a negative test.
-- **Stacked premodifiers inside a premodifier coordination.** "Artifact or non-Aura enchantment
-  card", "Knight, Aura, Equipment, or legendary artifact card": one arm of an `or` at `pre` is
-  itself several premodifiers (`NounPremodifierConjunct`, `crates/english/grammar/english.fug`). Whether a
-  `PreModifier` coordination's arm may be a list of premodifiers, and by what constructor.
-  Recommendation: yes, through one constructor at `PreModifier` that takes a list printed with no
-  join, refused with one element.
-- **A group property printed as a postmodifier.** *Eerie Ultimatum* prints "Return any number of
-  permanent cards with different names from your graveyard to the battlefield", and writes
-  `withDifferentNames(counted(anyNumber, and([isPermanentCard, in(yourGraveyard)])))`: the
-  wrapper stands outside the determiner, so it prints "with different names" after "from your
-  graveyard". `withDifferentNames` and `withTheSameName` (7 files call them) are
-  `NounPhrase -> NounPhrase` over `agree`, an Agreement that holds of the group, not of each member
-  (glossary **Agreement**). In the Readings (`cargo xtask english parse`) "with different names"
-  is an ordinary postmodifier of the nominal (`Nominal+PrepositionPhrase/After/Nominal`), with
-  other postmodifiers on either side of it: *Behold the Sinister Six!*'s "up to six target
-  creature cards with different names from your graveyard", *Turtles Forever*'s "exactly four
-  legendary creature cards you own with different names". The determiners vary ("any number of",
-  "up to six target", "exactly four", "up to four"). Options:
-  - a `PostModifier` in `nominal.post`, in its printed place, whose Agreement lowering reads off
-    the enclosing plural determiner's group. Its cost: as a member postmodifier it would test each
-    card alone, so lowering must lift it, and a determiner that forms no group (a singular one)
-    must refuse it;
-  - a Template at `NounPhrase` taking the determiner and the nominal. It cannot print the group
-    words between the nominal's postmodifiers by substitution, since they stand inside the
-    nominal, and it needs a variant per determiner.
-
-  Recommendation: the `PostModifier`, which matches the Readings, with the refusal for a
-  determiner that forms no group.
-- **One operator printed on both sides of the head.** `nominal(pre, head, post)` gives each
-  modifier one side. Two constructions put one operator's words on both:
-  - an ordinal over a head and its relative: *Highspire Bell-Ringer*'s "The second spell you cast
-    each turn costs {1} less to cast", which ranks the spells cast each turn, and is written today
-    with the ordinal inside the lookback (`did(…, ordinal = {ordinal = nth(2), per = turn})`). The
-    Reading is the determiner "The" over the nominal "second spell you cast each turn", whose
-    premodifier "second" and relative "you cast each turn" both attach to "spell";
-  - a comparative premodifier with its "than" complement after the head: *Conformer Shuriken*'s
-    granted "If that creature has greater power than this creature", one Nominal node
-    (`ComparativeIndirectComplement`) holding "greater", "power" and "than this creature";
-    *Death's Oasis*'s "a creature card with lesser mana value than the creature that died".
-
-  Options: a Template at `Nominal` per construction whose wording has Holes on both sides of the
-  head Hole ("$ordinal $head $relative", the determiner staying outside it), which is
-  substitution of one fragment; or a premodifier and a postmodifier that the checker pairs.
-  Recommendation: the Templates, one per construction, each with its card as caller.
-- **Two well-sorted trees for one nominal.** "Artifact or enchantment you control" is
-  `nominal(or([artifact, enchantment]), post = [youControl])` or
-  `or([artifact, nominal(enchantment, post = [youControl])])`, and choosing between well-sorted
-  candidates is the pragmatics step's (`docs/design/pragmatics.md` §4). Recommendation: canon
-  writes the attachment each card means, read from its Oracle text.
-- **Consumers that are not descriptions.** Eight classes of declaration take a `Predicate` for a
-  phrase that is no description:
-  1. spend purposes: `toCast`, `toTurnFaceUp`, `toActivate` (`syl-tocast-noun-phrase`);
-  2. the copula `is` ("is a creature", "is tapped", "is in your graveyard", "it's 4/3", "is tapped
-     and attacking");
-  3. `transform` and `turnOver`'s result (*Cult of the Waxing Moon*'s "into a non-Human creature",
-     *Afflicted Deserter*'s "into Werewolf Ransacker");
-  4. `procedure`'s `resulting`, which holds both a printed depictive (siege's "cast it
-     transformed") and unprinted rule filters (`discover`, `cascade`, `flashback`, `jumpStart`);
-  5. fifteen keyword qualities: `protection` and `hexproofFrom` ("from artifacts", "from red"),
-     `affinity` ("for artifacts"), `champion` and `behold` ("a Merfolk", "a Dragon"), `enchant`,
-     `equipQuality`, `emergeFrom`, `devourQuality`, `bandsWithOther`, `offering`, `landwalk`,
-     `typecycling`, `splice`, and `partnerWith`, which names a card;
-  6. exceptions and holders: `allExcept`, `abilityGrantFrom` and `allAbilityLoss` ("except mana
-     abilities"), `keywordGrant.holders` (*Cairn Wanderer*'s "a creature card with flying is in a
-     graveyard"), `heldFor` ("the world supertype");
-  7. `chosenQuality` ("the chosen type", which *Arcane Adaptation* writes with a nested
-     `ofChosen(subtype(creature))`);
-  8. `aCharacteristic`, a finite verb phrase ("has mana value 2 or less", "shares a card type"),
-     with no call site in `plugins/`.
-
-  Also taking `Predicate`, not in the eight: `described`, `nameOfCard`, `players`, `withQuality`,
-  `selectRandom`, `spendOnlyToCastAnd`, `devourEntry`, `aggregateAll`; and `partOf` takes a
-  `NounPhrase`. Recommendation: this ticket retypes every description consumer and class 2
-  (`Predicative`); classes 1, 3, 4, 5, 6, 7 and 8 keep `Predicate` until a ticket gives each its
-  sort (class 1 is `syl-tocast-noun-phrase`'s), and the landing lists what still takes
-  `Predicate` and why.
-- **Rules scopes written as conjunctions.** Four of the eight rules rows scope by an `and([…])`
-  that needs respelling as a nominal, not only a retype: `rules/conferral/toxicPoison.syl`
-  ("creature with toxic"), `foretoldCardCast.syl`, `foretoldCardLook.syl` and
-  `plottedCardCast.syl` (a card with a designation in exile). Recommendation: respell them as
-  nominals with the head the rule's text names, in this ticket.
-- **A complement with a type word** ("If it's a land", *Prophecy*, of a card in a library; "If the
-  exiled card is a snow land", *Storm Elemental*). A `Predicative` that takes a `Nominal` gives the
-  type word the permanent reading [CR#109.2], which these cards do not mean. Options: the
-  `Predicative` "a $x" takes a `PreModifier`-headed form with no permanent reading; or it takes a
-  `Nominal` read at the subject's zone. Recommendation: the first.
-- **What the head `card` means.** A card is a Magic card or an object represented by one
-  [CR#108.2]; a token is not [CR#108.2b]; with a zone, a card in that zone [CR#109.2a].
-  Recommendation: the class alone, never a zone; the zone is what the text prints, in the
-  description or in its verb.
-- **How the permanent reading is written.** Under the rules a permanent is a card or token on the
-  battlefield [CR#110.1], and `isPermanent`'s body is `in(battlefield)`. A coercion's body is a
-  primitive at its result sort applied to its one parameter (`syl.md` §2), so the reading lives in
-  the `Nominal` primitive the coercion goes through and in lowering, not in the coercion.
-  Recommendation: the primitive lowers to the type test together with the permanent class, and a
-  printed "on the battlefield" stays `in(battlefield)` as a postmodifier.
-- **The head `token`**: a token on the battlefield, since a token elsewhere ceases to exist
-  [CR#111.7], or the token test alone. Recommendation: the token test alone, which the
-  zone-change subjects ("a token you control dies") need.
-- **The object of `play` and departed objects.** "Play lands" (*Exploration*, *Courser of
-  Kruphix*, *Crucible of Worlds*) names land cards [CR#116.2a,305.1]; "the sacrificed creature"
-  (*Soldevi Adnate*) and the 37 zone-change subjects ("Whenever a creature dies") name objects
-  off the battlefield. A leaves-the-battlefield trigger looks back [CR#603.10a], an entering
-  permanent is checked as it would exist on the battlefield [CR#614.12], and a departed object's
-  information is its last known [CR#608.2h]. Recommendation: keep the permanent reading and read
-  each such description at its event's time, which `semantics.md` §3.1 states and a lowering
-  test proves.
-- **A verb phrase as a postmodifier.** The lookback descriptions are `did(subj, action, within,
-  ordinal)` and `was(action, within)` at `Predicate` today ("creatures that attacked this turn",
-  "each creature destroyed this way"), and this ticket retypes them with the other description
-  words. `docs/specs/voice-and-object-phrases.md` makes a lookback a verb-phrase operator that
-  stands in `post`, said of the thing the nominal describes, with a printed "that" a Template's
-  (§2, §8), and leaves to this ticket the relative words and how a verb phrase reaches
-  `PostModifier` (§11). Options: a coercion from the verb-phrase sort to `PostModifier`, so a
-  bare participle ("creatures destroyed this way") is written with no word, as it is printed; or
-  a word at `PostModifier` for each printed form, a silent one for the participle among them.
-  Recommendation: a Template for "that" and the coercion for the bare participle, provided no
-  word then stands at both sorts (`syl.md` §3); the landing reports the collisions it checked.
-  Whichever is chosen is declared here, so that `syl-lookback-operator-and-holds` changes only
-  what stands under it.
-- **Names and glossary.** `Nominal`, `PreModifier`, `PostModifier` and `Predicative` have no entry
-  in either `CONTEXT.md`; the game-model glossary's **Predicate** ("A truth condition tested
-  against a candidate") and **Head Noun** entries describe today's split. Recommendation: the
-  four names as written, `Nominal` and `Predicative` matching the English grammar's Categories of
-  those names (`english.fug`), with glossary entries, and **Predicate** kept for what still takes
-  it.
+- A description is a `Nominal` (glossary **Nominal**, matching `english.fug`): its head, with a
+  `List(PreModifier)` before it and a `List(PostModifier)` after it, built by
+  `nominal(pre = [], head, post = [])` (`spelling = "<$pre#<> >$head< $post#<>>"`). Each list's
+  elements stand in printed order, and `pre` is declared before the required `head` because it is
+  printed first (`syl.md` §2). `headed` is taken by an existing primitive ("$subject as a $head"),
+  so the constructor is `nominal`.
+- `cargo xtask dsl check` refuses `nominal(head)` with neither `pre` nor `post`, and refuses an
+  uncoordinated `nominal(…)` directly inside `nominal.head`, so a nominal has one tree. A
+  coordination at `Nominal` (`coord`, `and`, `or`, `andOr`) is a union of the domains its arms
+  describe ("all artifacts and creatures"), whereas modifiers in `pre` and `post` intersect with the
+  head; `nominal.head` may hold a coordination of nominals under shared postmodifiers ("Target white
+  creature or black Zombie you control":
+  `nominal(or([nominal(pre = [white], creature), nominal(pre = [black], zombie)]), post =
+  [youControl])`). Where a nominal has two well-sorted attachments, canon writes the attachment each
+  card's Oracle text means (`pragmatics.md` §4).
+- Inside a `PreModifier` coordination, a stacked arm of two or more premodifiers is
+  `stacked(modifiers: List(PreModifier))` (`spelling = "$modifiers#<>"`, `body = coord(and,
+  $modifiers)`; *Acclaimed Contender*'s "Knight, Aura, Equipment, or legendary artifact card").
+  `cargo xtask dsl check` refuses `stacked` with fewer than two elements or outside a `PreModifier`
+  coordination arm.
+- Eight coercions exist (`plugins/builtin/coercions/`): `CardType` and `Subtype` into `Nominal`
+  (through `type` and `subtype`, each meaning a permanent of that type or subtype on the battlefield
+  [CR#109.2,110.1]); `CardType`, `Subtype`, `Supertype` and `Color` into `PreModifier` (through
+  `hasType`, `hasSubtype`, `hasSupertype` and `hasColor`, testing the characteristic alone
+  [CR#105.1,205.4a]); `Status` into `Predicative` (through `hasStatus` [CR#110.5]); and `Int` into
+  `Amount` (through `lit`). `Status` does not coerce into `PreModifier`, where "face-down" and
+  "phased-out" spell with a hyphen through `PreModifier` Templates (`tapped`, `untapped`,
+  `faceDown`, `phasedOut`) over an unspelled `hasStatus`. `DesignationLabel` has no coercion, since
+  non-adjectival labels such as `monarch` and `citysBlessing` are not premodifiers; designations
+  printed as premodifiers (`foretold`, `plotted`) get a `PreModifier` Template each.
+- A copula's complement is a `Predicative`: what `is(subject, predicative)` takes ("If it's a land",
+  "is tapped", "is in your graveyard"). Noun-phrase complements go through
+  `noun(phrase: NounPhrase): Predicative = NominalPredicative` (`english.fug`), where [CR#109.2]'s
+  battlefield restriction does not apply: a type word tests the characteristic alone in the
+  subject's zone, and "card" or "permanent" adds that class (*Explore*, *Bioplasm*, *Skill
+  Borrower*).
+- `NounWord` is merged into `Nominal`: every former `NounWord` consumer (`attachHost`, `enchanted`,
+  `equipped`, `fortified`, `headed`, `that`, `those`, `theGrantor`, `word`, `unionHalf`) takes a
+  `Nominal`, and each head word means at `Nominal` what its description word meant (`opponent` is
+  `opponentOf(you)` [CR#102.2,102.3]). `ofType` and `copied` are gone in favor of `nominal` with a
+  premodifier (`nominal(pre = [creature], card)`, `nominal(pre = [copied], ability)`).
+- Head semantics: `card` tests the card class alone, never a zone ([CR#108.2,108.2b,109.2a]);
+  `permanent` is a card or token on the battlefield ([CR#110.1]), while a printed "on the
+  battlefield" stays the postmodifier `in(battlefield)` (*Topple*, *Éomer of the Riddermark*,
+  *Clone*, *Caller of the Hunt*);
+  `token` tests token status alone ([CR#111.1,111.7]); `spell` and `source` give their domains
+  ([CR#109.2b,109.2c,112.1,113.7]); an ability class (`abilityHead`) with a printed source takes the
+  `PostModifier` `ofSource` (*Arrest*, *Cursed Totem*) while unqualified "abilities of …" uses the
+  `Nominal` Template `abilityOf` over `ability` + `ofSource`, and "of the <axis> of your choice" on
+  a permanent head uses `PostModifier` `ofYourChoice` (*Extinction*, *Root Greevil*). Descriptions
+  in `play(bare(land))` ([CR#116.2a,305.1]),
+  look-back triggers ([CR#603.10a]), entering permanents ([CR#614.12]), and departed objects
+  ([CR#608.2h]) keep the permanent reading and are read at the event's or action's point in time
+  (`semantics.md` §3.1).
+- Agreement phrases printed among postmodifiers (`agree`, `withDifferentNames`, `withTheSameName`)
+  stand at `PostModifier` in `nominal.post` in printed order (*Eerie Ultimatum*), lifted in lowering
+  to constrain the enclosing plural group; `cargo xtask dsl check` refuses an Agreement
+  `PostModifier` when its enclosing consumer forms no plural group.
+- Operators whose own words span or attach across a head are Templates with Holes in printed order:
+  `ordinalRelative` at `Nominal` (*Highspire Bell-Ringer*'s "second spell you cast each turn") and
+  `hasLesserManaValueThan` at `PostModifier` (*Death's Oasis*'s "with lesser mana value than the
+  creature that died").
+- `VerbPhrase` does not coerce into `PostModifier` (`attachment` stands at both sorts); attributive
+  pre-head participials ("the exiled card") use `was` at `PreModifier`, post-head relatives and
+  participials use `did` and `was` at `PostModifier`, and copular lookbacks use `did` and `was` at
+  `Predicative` until `syl-lookback-operator-and-holds`.
+- `ConferralRule.scope` and `SbaRule.scope` take a `Nominal`, and all eight rules rows under
+  `plugins/builtin/rules/` write nominal scopes.
+- Non-description `Predicate` consumers — spend purposes (`toCast`, `toTurnFaceUp`, `toActivate`),
+  `transform` / `turnOver`, `procedure.resulting`, keyword qualities (`protection`, `hexproofFrom`,
+  `affinity`, `champion`, `behold`, `enchant`, `equipQuality`, `emergeFrom`, `devourQuality`,
+  `bandsWithOther`, `offering`, `landwalk`, `typecycling`, `splice`, `partnerWith`,
+  `primitiveKeyword`, `devourEntry.quality`), ability/holder filters (`allExcept`, `addedAbilitiesOf`,
+  `abilityGrantFrom`, `allAbilityLoss`, `addedKeywordTerm`, `keywordGrant`, `heldFor`),
+  `chosenQuality` / `withQuality`, `aCharacteristic`, `nameOfCard`, `players`, `spendOnlyToCastAnd`,
+  and `oneEachOf` — stay at `Predicate` until their own tickets retype them.
 
 ## Done when
 
@@ -236,9 +145,6 @@ The rules rows scope by `Predicate` too: `ConferralRule.scope` and `SbaRule.scop
 
 ## Not in scope
 
-- Restoring other dropped heads ("permanent", and "card" after a color or a zone), the "on the
-  battlefield" sites written as `isPermanent`, and hexproof's headless body:
-  `syl-card-head-noun-sweep`.
 - The fits relation between head nouns that anaphors read ("that player" reading an opponent), and
   encore's "that opponent": `syl-opponent-noun-and-predicate`.
 - Created tokens and characteristic-setting complements: `syl-token-records-to-templates`,

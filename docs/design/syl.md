@@ -24,7 +24,7 @@ What sets the language apart, each in its own section:
 - **Each word's spelling and meaning have one source.** A primitive is a constructor's only
   binding (§1), and one block per declaration holds its frames, spelling and meaning (§2).
 - **What a file says is what it means.** It is first-order data: no evaluation, no local bindings,
-  no conversions besides `Option` and three declared coercions, no type inference (§2).
+  no conversions besides `Option` and the declared coercions, no type inference (§2).
 - **A name is found by its expected sort**, not by qualification (§3).
 - **Expansion, not the author, supplies scopes, mentions and bindings** (§4).
 - **Read order is printed order** (§5).
@@ -71,13 +71,22 @@ location is not stated by the declaration, and it can disagree with what the dec
 - **No conversions besides `Option` and the declared coercions.** A value stands at its own sort
   (§3), and every other wrap into another sort is a primitive or a Template written at the call
   site, `actor(…)` included. A coercion is a declaration with no name,
-  `coercion(type: CardType): NounWord { body = type($type) }`: its one parameter's sort reaches its
+  `coercion(type: CardType): Nominal { body = type($type) }`: its one parameter's sort reaches its
   result sort through a primitive at that sort, so it builds no constructor of its own. There are
-  three: a card type and a subtype stand at `NounWord`
-  (through `type` and `subtype`), and an integer at `Amount` (through `lit`). The bare form, as
-  printed (`creature`, `goblin`, `3`), is the corpus's spelling of each such term; the wrapped
-  primitive stays callable, and `cargo xtask dsl check` accepts both. Everything else is written:
-  a color word is a `Color`, and a `ColorOrColorless` or a mana symbol wraps it; a mana
+  eight:
+  - `CardType` and `Subtype` stand at `Nominal` (through `type` and `subtype`, each a permanent of
+    that type or subtype on the battlefield [CR#109.2,110.1]);
+  - `CardType`, `Subtype`, `Supertype` and `Color` stand at `PreModifier` (through `hasType`,
+    `hasSubtype`, `hasSupertype` and `hasColor`, testing the characteristic alone [CR#105.1,205.4a]);
+  - `Status` stands at `Predicative` (through `hasStatus`, as "is tapped" or "is phased out"
+    [CR#110.5]);
+  - `Int` stands at `Amount` (through `lit`).
+  `Status` does not coerce into `PreModifier`, where "face-down" and "phased-out" spell with a
+  hyphen through `PreModifier` Templates over an unspelled `hasStatus`; `DesignationLabel` has no
+  coercion, since labels such as `monarch` and `citysBlessing` are not premodifiers. The bare form,
+  as printed (`creature`, `goblin`, `basic`, `white`, `tapped`, `3`), is the corpus's spelling of
+  each such term; the wrapped primitive stays callable, and `cargo xtask dsl check` accepts both.
+  Everything else is written: a `ColorOrColorless` or a mana symbol wraps a `Color`, and a mana
   symbol is always written (`pip`, `colorlessPip`, `generic`), since a color word is not a mana
   symbol. Mana-symbol wrappers are Templates over primitive chains. Why: a conversion hides which
   word was meant, so the language keeps only those whose word cannot be mistaken, and §3 refuses
@@ -148,14 +157,15 @@ coerced again. A coercion is one hop, so `cargo xtask dsl check` refuses a coerc
 another coercion goes into, and two coercions with the same from-sort and to-sort. For each
 to-sort `T`, Reaches(`T`) is `T` together with every from-sort of a coercion into `T`. A word
 declared at two sorts of Reaches(`T`) is refused: at both `CardType` and `Subtype`, or at
-`NounWord` beside a card type of the same name, so a direct declaration never silently shadows a
+`Nominal` beside a card type of the same name, so a direct declaration never silently shadows a
 coercion. For the same reason a word declared at `Option(T)` and at a from-sort of a coercion into
 `T` is refused, since at an `Option(T)` position the first is found before the coercion is tried.
 A literal that stands at two sorts of Reaches(`T`) is refused likewise: an integer when
 `Int` and `Nat` both reach `T`, a record when two record sorts do, a list when two list sorts do.
 These checks run at load, across the whole registry, so a latent collision fails before any call
-site writes the word. A word at a sort outside every Reaches set, such as `snow` at `Supertype` and
-at `ManaSymbol`, or a `List(CardType)` Template named `creature`, is no collision.
+site writes the word. A word at two sorts no Reaches set joins, such as `snow` at `Supertype` and
+at `ManaSymbol`, `tapped` at `Status` and at `PreModifier`, or a `List(CardType)` Template named
+`creature`, is no collision.
 
 **Literals** stand only at their own sorts: a string at `String`, an integer at the integer sorts
 (`Int`, and `Nat` when it is not negative). There are no direct sort atoms: a literal or a
@@ -198,6 +208,6 @@ resolution sees what the text says first as first, spelling renders a declaratio
 order, and a reference oracle keyed to printed text lines up with the term only if the two orders
 agree.
 
-The elements of a list are read in printed order too: a conjunction's conjuncts and a sequence's
-steps stand in the order the text prints them, so "basic land" is
-`and([hasSupertype(basic), isLand])`.
+The elements of a list are read in printed order too: a nominal's modifier lists and a sequence's
+steps stand in the order the text prints them, so "other nonland permanents" has
+`[other, non(land)]` in `pre`, and "basic land" is `nominal(pre = [basic], land)`.

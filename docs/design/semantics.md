@@ -172,6 +172,22 @@ endophora. Whatever the technique, a referent is accessible to an anaphor only i
 4. The consuming verb can apply to it in its zone ([CR#109.2,701.21a]). A creature that died
    cannot be sacrificed or have counters put on it as a permanent.
 
+A description is a `Nominal`, `nominal(pre, head, post)`, and its head sets the domain it ranges
+over. A card type or subtype at `Nominal` means a permanent of that card type or subtype on the
+battlefield ([CR#109.2,110.1]); at `PreModifier` it tests the characteristic alone, with no zone
+implied. `permanent` means a card or token on the battlefield ([CR#110.1]); a printed "on the
+battlefield" stays the postmodifier `in(battlefield)`. `card` means a Magic card or an object
+represented by one, never a token ([CR#108.2,108.2b]), and carries no zone of its own: a stated
+zone comes from its postmodifiers or its verb ([CR#109.2a]). `spell` means a spell on the stack
+([CR#109.2b,112.1]), `source` a source in any zone ([CR#109.2c,113.7]), `token` the token test
+alone ([CR#111.1,111.7]), and `player` and `opponent` a player ([CR#102.1..102.3]). Under the
+copula `is(subject, predicative)`, `Predicative`'s noun-phrase form `noun(phrase)` tests its
+subject in that subject's own zone without [CR#109.2]'s battlefield restriction ("If it's a land",
+of a card in a library; "if it's a creature card" adds the card class through `card`). A
+coordination at `Nominal` is a union of the domains its arms describe ("artifacts and creatures"),
+whereas modifiers in `pre` and `post` intersect with the head; an Agreement `PostModifier` (`agree`)
+constrains the enclosing plural determiner's group rather than each member alone.
+
 A **characteristic read** ("its power") may select a departed object by its last known information
 ([CR#608.2h]). Such a read never makes the object the patient of a battlefield action. Oracle text
 writes a departed object's information in the past tense, so a present-tense guard over a
@@ -184,7 +200,7 @@ Only a Participial Description written without "this way" reaches a linked abili
 
 ### 2.5 The Contrast Anchor
 
-A bare printed "another" or "other" (`isOther`) excludes its Contrast Anchor, which need not be a
+A bare printed "another" or "other" (`other`) excludes its Contrast Anchor, which need not be a
 target ([CR#702.151a]). `otherThan` is only for a printed "other than". Resolution finds the
 anchor like any other reference (§2.4).
 
@@ -203,9 +219,15 @@ below: patients have moved, are stamped with the deed, and become new objects wh
 applies.
 
 Two reads are of the world before the event. A look-back trigger pattern (§3.2) reads its own
-descriptions as the objects were immediately prior to the event ([CR#603.10]); only the trigger's
-body reads after. A lookback's historical subject or patient (§3.4) is the object as it was when
-the event happened, found by the recorded origin (§2.1).
+descriptions as the objects were immediately prior to the event ([CR#603.10,603.10a]), so "Whenever
+a creature dies" matches a permanent that was a creature on the battlefield just before dying; only
+the trigger's body reads after. A lookback's historical subject or patient (§3.4), and a
+Participial Description of a departed object ("the sacrificed creature"), read the object as it was
+when the event happened or by its last known information ([CR#608.2h]), found by the recorded
+origin (§2.1). An entering permanent's replacement effects read it as it would exist on the
+battlefield ([CR#614.12]), and playing a land ("play an additional land", "play lands from your
+graveyard") names the land permanent the special action puts onto the battlefield from a land card
+([CR#116.2a,305.1]), so a card-type head at `Nominal` keeps its permanent reading in each place.
 
 ### 3.2 The Event Gate
 

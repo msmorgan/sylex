@@ -123,14 +123,23 @@ has, or a Template holds the word in its one fixed fragment:
   first strike until end of turn". Its Construction is that clause, "$subject each $action",
   with the subject and the subjectless verb phrase as two Holes. Only after an auxiliary
   (`AuxiliaryFloatedEach`) does "each" stand over a verb phrase of its own.
-- **Modifiers on both sides of a noun** come from two lists. A description is a nominal: a head
+- **Modifiers on both sides of a noun** come from two lists. A description is a `Nominal`: a head
   with the premodifiers printed before it and the postmodifiers printed after it,
   `nominal(pre = [], head, post = [])`, each list in its own list Hole (§3.1) on its own side of
-  the head's Hole. In "other nonland permanents you control" (*Abdel Adrian, Gorion's Ward*),
-  "other" and "nonland" are premodifiers and "you control" a postmodifier. The `nominal`
-  declaration is not yet built: the descriptions under `plugins/` are one flat `and([…])` of
-  predicates, the head among its modifiers, which has no wording under substitution, and the
-  `syl-nominal-descriptions` ticket restructures them.
+  the head's Hole (`"<$pre#<> >$head< $post#<>>"`). In "other nonland permanents you control"
+  (*Abdel Adrian, Gorion's Ward*), "other" and "nonland" are premodifiers and "you control" a
+  postmodifier. A `nominal` call with neither modifier list, or with another `nominal` directly as
+  its `head`, is refused so each nominal has one tree; a coordinated head is allowed, as "target
+  white creature or black Zombie you control" writes
+  `nominal(or([nominal(pre = [white], creature), nominal(pre = [black], zombie)]), post =
+  [youControl])`. Inside a `PreModifier` coordination, a stacked arm of two or more premodifiers is
+  `stacked([…])` (`"$modifiers#<>"`, *Acclaimed Contender*'s "Knight, Aura, Equipment, or legendary
+  artifact card"), refused outside such an arm or with fewer than two elements. An Agreement phrase
+  printed among postmodifiers (`withDifferentNames`, `withTheSameName`) stands in `post` in its
+  printed place (*Eerie Ultimatum*'s "permanent cards with different names from your graveyard") and
+  is refused when its enclosing consumer forms no plural group. Where one construction prints its
+  own words on both sides of the head, it is a Template at `Nominal` with Holes on both sides of
+  `$head` (`ordinalRelative`, *Highspire Bell-Ringer*'s "second spell you cast each turn").
 - **A word printed in several places is a Template per placement.** "Also" stands between a
   subject and its verb ("it also deals 4 damage", *Goblin Barrage*), after a copula or passive
   auxiliary ("Burakos is also a Cleric, Rogue, Warrior, and Wizard", *Burakos, Party Leader*;
@@ -289,7 +298,7 @@ in such a part become families of near-duplicate Templates, and 128 of the 167
 
 **Printed order governs the order of a list's elements**, in every list, the conjuncts of
 `and([…])` included. The elements are written in the order the text prints them. A nominal's
-modifiers stand in two lists (§2; the `nominal` declaration is not yet built), so which side of
+modifiers stand in two lists (§2), so which side of
 the head a modifier stands on is which list holds it, and each list's order says the rest:
 "other nonland permanents you control" has "other" then "nonland" in `pre`, and "you control" in
 `post`. Why: order among modifiers is wording. Favorable Winds prints "Creatures you control
@@ -305,7 +314,7 @@ a phrase that encloses the Construction's Hole, and the wording names the Catego
 phrase. It is the one place a Construction prints words outside its own fragment. Quantity
 adjuncts are the case. In Kabira Outrider's
 "target creature gets +1/+1 until end of turn for each creature in your party", what is
-scaled is "+1/+1", and one `forEach` holds it and the predicate. The "+1/+1" is printed where
+scaled is "+1/+1", and one `forEach` holds it and the nominal. The "+1/+1" is printed where
 the verb's object stands, and "for each $p" is printed at the end of the verb phrase, past the
 duration. "Equal to" does the same in Dogpile's "deals damage to any target equal to
 the number of attacking creatures you control", where the recipient stands between "damage" and
@@ -612,8 +621,8 @@ element as a run of sentences (`*`, below) after the one before, so such a list 
 each element on a line of its own, as the modes of a modal ability are printed. A mode's bullet is
 the mode's own wording, "• $action", so it prints before the first mode too. No parameter chooses a
 join: a coordinator is printed by the Template that names it, as the Templates `and`, `or` and
-`andOr` print "and", "or" and "and/or" over the three `coord` primitives (at `NounPhrase`,
-`Predicate` and `Location`), which have no `spelling`. The commas of a coordination of three or
+`andOr` print "and", "or" and "and/or" over the `coord` primitives (at `NounPhrase`, `Nominal`,
+`PreModifier`, `PostModifier`, `Predicative`, `Predicate` and `Location`), which have no `spelling`. The commas of a coordination of three or
 more are the English layer's and are never written. One element prints alone, with no join; where
 the `spelling` outside optional parts is one list Hole and an element can stand at the result sort,
 a list of one words as its element, so that declaration spells lists of two or more only. An
@@ -699,10 +708,10 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
   grammar: its in-place part at a Category its result sort is spelled as, and each Tail as a
   trailing dependent of a host of its named Category, each Hole standing for a phrase of any
   Category that its own sort's Constructions spell, with the features agreement will fix left
-  unmarked. A sort is not one Category: a `Predicate` is a noun in "creature", an adjective in
-  "tapped", a preposition phrase in "with flying" and a relative clause in "you control". A
-  `spelling` whose in-place part parses in several ways names no one fragment, and which of them
-  spelling prints is open (§10).
+  unmarked. A sort is not one Category: a `PreModifier` is a noun in "creature card" and an
+  adjective in "tapped creature", and a `PostModifier` is a preposition phrase in "with flying" and
+  a relative clause in "you control". A `spelling` whose in-place part parses in several ways names
+  no one fragment, and which of them spelling prints is open (§10).
 - **Its skeleton is ambiguous.** Replace each Hole by its parameter's sort, with a tie's affix as
   a word on its side of the sort, counting two sorts as one when a coercion or `Option` takes one
   to the other, each optional part by an optional, each list Hole by one or more of its element's

@@ -25,8 +25,9 @@ carries none. A Defined Token's takes no arguments, so its scope holds nothing o
 
 **Coercion**:
 A nameless `.syl` declaration through which a value of one sort stands at another by way of an
-existing Primitive: a Card Type or Subtype as a Head Noun, an integer as an Amount. It applies
-only where the value does not stand at the expected sort itself, and never twice in a row.
+existing Primitive: a Card Type or Subtype as a Nominal, a Card Type, Subtype, Supertype or Color
+as a PreModifier, a Status as a Predicative, an integer as an Amount. It applies only where the
+value does not stand at the expected sort itself, and never twice in a row.
 
 **Defined Token**:
 A token whose characteristics the rules define in full: a predefined token ([CR#111.10]) or one
@@ -76,8 +77,9 @@ The identity a Referent is bound under, fixed at its first mention; later mentio
 without a pronoun search.
 
 **Head Noun**:
-The Object class, Card Type or Subtype a reference names its Object by ("this creature", "this
-Aura") ([CR#109.2]).
+The `Nominal` head a description or reference names its Entity by (`card`, `permanent`, `spell`,
+`source`, `token`, `player`, a Card Type or Subtype, and the rest; "this creature", "this Aura")
+([CR#109.2]).
 
 **Participial Description**:
 A description naming what a Deed or zone change did to its referent ("the exiled card", "each
@@ -227,20 +229,39 @@ cost ([CR#607.2i]).
 **Entity**:
 A Player or an Object ([CR#102.1,109.1]).
 
+**Nominal**:
+The sort `Nominal`, named for the English grammar's Category of the same name: an Entity
+description's Head Noun, alone or combined with its `PreModifier`s and `PostModifier`s
+(`nominal(pre, head, post)`), or a coordination of Nominals.
+
+**PreModifier**:
+The sort `PreModifier`: a modifier printed before a Nominal's head ("other", "nonland", "legendary",
+"tapped", an attributive Card Type, Subtype or Color).
+
+**PostModifier**:
+The sort `PostModifier`: a modifier printed after a Nominal's head ("with flying", "you control",
+"in your graveyard", a relative or participial clause).
+
+**Predicative**:
+The sort `Predicative`, named for the English grammar's Category of the same name: the complement
+of the copula `is` ("is a land", "is tapped", "is in your graveyard").
+
 **Predicate**:
-A truth condition tested against a candidate.
+A truth condition tested against a candidate where a phrase is neither a Nominal nor a Predicative,
+such as a keyword's quality or a mana spend purpose.
 
 **Selection**:
 In core, a resolution-time group or query over Objects, such as all matching Objects or a
 group held in a register.
 
 **Sharing**:
-A Predicate true of an Object that has a value in common with another on one characteristic
-(`shares`: "a creature that shares a color with it") ([CR#105.2,205.3m]).
+A PostModifier or Predicative true of an Object that has a value in common with another on one
+characteristic (`shares`: "a creature that shares a color with it") ([CR#105.2,205.3m]).
 
 **Agreement**:
-Whether the members of a group share, or do not share, a value on one characteristic (`agree`:
-"two creatures that share a creature type"). It holds of the group, not of one member.
+Whether the members of a group share, or do not share, a value on one characteristic (`agree` in a
+Nominal's postmodifiers: "permanent cards with different names"). It holds of the enclosing plural
+determiner's group, not of one member.
 
 **Core Deed**:
 A Deed the core rules define outside the keyword actions: attacking, blocking, drawing,
