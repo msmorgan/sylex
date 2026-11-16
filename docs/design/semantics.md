@@ -220,8 +220,9 @@ since a "can't" outranks anything that allows the thing ([CR#101.2]).
   leaves-the-battlefield one ([CR#603.6c]). Arms of one `or` can differ: *Syr Konrad, the Grim*'s
   "another creature dies", "a creature card is put into a graveyard from anywhere other than the
   battlefield" and "a creature card leaves your graveyard" look back, look after and look back.
-  The derivation reads an arm's event through `triggerEvent`, through the `or` at
-  `TriggerCondition` (each trigger condition of which is an arm, as each arm of an event `or`
+  The derivation reads an arm's event through `triggerEvent`, through the disjunction of
+  trigger conditions, which cards print with "and" ([`surface.md`](./surface.md) §7.5; each
+  trigger condition of it is an arm, as each arm of an event `or`
   is), and through `timed`, whose Timing is read at the same point as its event:
   *Market Gnome*'s "is exiled from the battlefield while you're activating a craft ability" is a
   leaves-the-battlefield arm, so it looks back, and so does its "while" ([CR#603.10,603.10a]).

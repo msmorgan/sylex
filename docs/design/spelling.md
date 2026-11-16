@@ -555,7 +555,9 @@ written again, and recovery requires the same term at each (§4).
 "$quality~walk". The word is formed by the lexicon's morphology, never by putting the characters
 side by side: "non~$p" is "nonland" in Abrupt Decay and "non-Aura" in Absorbing Man. A Hole that
 abuts a letter or digit with no tie fails to load, so a missing space is never read as a tie, and
-the affix is a bound form the lexicon declares. An ordinal is no tie: "third" is a numeral of the
+the affix is a bound form the lexicon declares. An affix is the whole run of letters that
+touches its tie, and a Hole's name the whole run of letters after its `$`, so the notation is
+read one way. An ordinal is no tie: "third" is a numeral of the
 lexicon's, written `$n@Ordinal` (below).
 
 **A printed form is `$name@Form`.** It states the form of a Hole's head word where neither
@@ -578,8 +580,10 @@ agreement nor a governing word fixes it (§1). The forms are the lexicon's (`Num
 A label is refused where the position admits only one form. A wording at a numeric sort that
 leaves its numeric Hole unlabeled, as `lit`'s "$value" and `plus`'s "$left plus $right" do,
 prints it in the notation of the Hole its own call fills: `plus(thatMuch, 1)` is "that many plus
-one +1/+1 counters" under `putCounters` in *Hardened Scales* and "that much damage plus 1" under
-`dealDamage` in *Sulfuric Vapors*.
+one +1/+1 counters" under `putCounters` in *Hardened Scales*, with its 1 a word, and under
+`dealDamage` its 1 is a numeral. *Sulfuric Vapors* prints that as "that much damage plus 1",
+with "plus 1" after the noun, which `plus`'s wording inside the amount does not print: it is a
+wording of its own (`syl-damage-and-life-noun-phrases`).
 
 **`Counting` is `Cardinal`, except that the integer 1 prints as the article or as no word in
 three places.** Oracle counts objects that way, and it is the one alternation chosen by a value
