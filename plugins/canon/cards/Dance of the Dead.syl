@@ -18,7 +18,7 @@ card singleFaced({
                 subject = it)),
             putOntoBattlefield(
               enchanted(ofType(card, creature)),
-              riders = [entersAs(tapped), under(you)]),
+              riders = [entersAs(tapped), underControlOf(you)]),
             attachTo(thisAura, it),
             delay(
               does(actor(thisAura), leave),

@@ -13,6 +13,6 @@ card singleFaced({
                 it,
                 riders = [
                   faceDownAs({characteristics = {types = [land], subtypes = [forest]}}),
-                  under(ownerOf(it))])])))],
+                  underControlOf(ownerOf(it))])])))],
     power = 5,
     toughness = 5})

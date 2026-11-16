@@ -11,6 +11,6 @@ card singleFaced({
             exile(target(and([isPermanent, isOther]))),
             atNext(
               beginningOfNext(endStep),
-              returnToBattlefield(that(card), riders = [under(ownerOf(it))]))]))],
+              returnToBattlefield(that(card), riders = [underControlOf(ownerOf(it))]))]))],
     power = 3,
     toughness = 1})

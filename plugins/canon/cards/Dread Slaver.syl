@@ -18,7 +18,7 @@ card singleFaced({
         returnToBattlefield(
           it,
           riders = [
-            under(you),
+            underControlOf(you),
             withCharacteristicEdits(
               [colors(adds, colors([black])), typeLine(adds, {subtypes = [zombie]})])]))],
     power = 3,

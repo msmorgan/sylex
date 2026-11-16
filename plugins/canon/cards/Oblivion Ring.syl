@@ -10,4 +10,4 @@ card singleFaced({
         does(actor(thisEnchantment), leave),
         returnToBattlefield(
           the(cardIn(exiledWith(thisEnchantment))),
-          riders = [under(ownerOf(it))]))]})
+          riders = [underControlOf(ownerOf(it))]))]})

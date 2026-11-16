@@ -15,5 +15,7 @@ ability champion(subject: Predicate) {
         sacrifice(thisPermanent))),
     when(
       does(actor(thisPermanent), leave),
-      returnToBattlefield(the(and([was(exile(which)), isCard])), riders = [under(ownerOf(it))]))]
+      returnToBattlefield(
+        the(and([was(exile(which)), isCard])),
+        riders = [underControlOf(ownerOf(it))]))]
 }

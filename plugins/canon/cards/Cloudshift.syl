@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         sequentially([
             exile(target(and([isCreature, youControl]))),
-            returnToBattlefield(that(card), riders = [under(you)])]))]})
+            returnToBattlefield(that(card), riders = [underControlOf(you)])]))]})

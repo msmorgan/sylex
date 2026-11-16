@@ -20,4 +20,4 @@ card singleFaced({
         chapterMark([3]),
         sequentially([
             exile(the(and([hasSubtype(borg), did(by(thisSaga), assimilate(which))]))),
-            returnToBattlefield(it, riders = [under(ownerOf(it))])]))]})
+            returnToBattlefield(it, riders = [underControlOf(ownerOf(it))])]))]})

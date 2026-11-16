@@ -16,7 +16,7 @@ card singleFaced({
                     it,
                     [enchant(and([isCreature, did(by(thisAura), putOntoBattlefield(which))]))])],
                 subject = it)),
-            returnToBattlefield(enchanted(ofType(card, creature)), riders = [under(you)]),
+            returnToBattlefield(enchanted(ofType(card, creature)), riders = [underControlOf(you)]),
             attachTo(thisAura, it),
             delay(
               does(actor(thisAura), leave),

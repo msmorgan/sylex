@@ -1,0 +1,4 @@
+# "under <controller>'s control"
+primitive underControlOf(controller: NounPhrase): MoveRider = UnderControlOf {
+  spelling = "under $controller's control"
+}

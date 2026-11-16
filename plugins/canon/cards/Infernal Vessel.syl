@@ -10,7 +10,7 @@ card singleFaced({
         returnToBattlefield(
           it,
           riders = [
-            under(ownerOf(it)),
+            underControlOf(ownerOf(it)),
             withCounters(2, printedKind(p1p1Counter), fresh),
             withCharacteristicEdits([typeLine(adds, {subtypes = [demon]})])]))],
     power = 2,
