@@ -7,9 +7,8 @@ action cast(
   resulting: Option(Predicate) = none,
   altCost: Option(AltCost) = none,
   addedCost: Option(AddedCost) = none) {
-  # TODO(spelling): Include or omit the clauses supplied by from, resulting, altCost,
-  # addedCost.
   lexical = {verbs = [{lemma = "cast", past = "cast", frames = [Monotransitive]}]},
+  spelling = "cast $subject< from $from>< $payment>< $resulting>< $altCost>< $addedCost>",
   body = procedure(
     cast,
     $subject,

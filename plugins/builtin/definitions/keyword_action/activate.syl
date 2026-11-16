@@ -7,9 +7,8 @@ action activate(
   resulting: Option(Predicate) = none,
   altCost: Option(AltCost) = none,
   addedCost: Option(AddedCost) = none) {
-  # TODO(spelling): Include or omit the clauses supplied by from, resulting, altCost,
-  # addedCost.
   lexical = {verbs = [{lemma = "activate", frames = [Monotransitive, Intransitive]}]},
+  spelling = "activate $subject< from $from>< $payment>< $resulting>< $altCost>< $addedCost>",
   body = procedure(
     activate,
     $subject,

@@ -1,11 +1,11 @@
 # "search <scope>", or "search <scope> for <for>" (`Definition`, [CR#701.23a]).
 # The `for` parameter is bound like any other (there is no opt-out).
 action search(scope: Location, for: NounPhrase = any) {
-  # TODO(spelling): Omit the 'for' phrase when for is any; otherwise print the search selection.
   lexical = {
     verbs = [
       {
         lemma = "search",
         frames = [TransitiveWithPP(["for"]), Monotransitive, Prepositional(["for"])]}]},
+  spelling = "search $scope< for $for>",
   body = searchZone($scope, $for)
 }

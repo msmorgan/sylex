@@ -13,7 +13,6 @@ card singleFaced({
                 eachPlayer,
                 voteStartingWith(
                   you,
-                  openly,
                   byCandidate(
                     a(and([or([isArtifact, isCreature, isEnchantment]), in(yourGraveyard)]))))),
               returnToHand(allOf(and([isCard, withMostVotes])))])))],

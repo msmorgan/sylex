@@ -6,7 +6,7 @@ ability craft(cost: Cost) {
     lemma = "craft",
     parameters = [[Quality(Some("with")), Cost]],
     verbs = [{lemma = "craft", frames = [Monotransitive]}]},
-  # TODO(spelling): The cost must be decomposed into the materials after 'with' and the remaining
-  # payment.
+  # TODO(spelling): Splitting the materials phrase after "with" from the payment waits on
+  # `syl-craft-materials`.
   body = []
 }

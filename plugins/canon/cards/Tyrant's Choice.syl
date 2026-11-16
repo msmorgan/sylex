@@ -6,7 +6,7 @@ card singleFaced({
       willOfTheCouncil(
         spell(
           sequentially([
-              instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["death", "torture"]))),
+              instruct(eachPlayer, voteStartingWith(you, byLabel(["death", "torture"]))),
               doIf(
                 getsMoreVotes("death"),
                 instruct(eachOpponent, sacrifice(aTheirChoice(isCreature)))),

@@ -4,8 +4,8 @@
 # instant or sorcery spell. [CR#702.174b]
 ability gift(promise: VerbPhrase) {
   lexical = {lemma = "gift", parameters = [[Quality(None)]], nouns = ["gift"]},
-  # TODO(spelling): Extract the promised gift's noun phrase from the Action; substituting its
-  # action clause is not gift wording.
+  # TODO(spelling): Naming the promised gift's noun phrase rather than its action clause waits on
+  # `syl-spelling-conventions` and `syl-dead-weight-sweep`.
   body = [
     static(addedCost(this, optional, plusAdditional(perform(choose(anOpponent))))),
     ifPermanentType(

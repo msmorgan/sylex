@@ -7,7 +7,7 @@ card singleFaced({
         at(
           beginningOfYour(upkeep),
           sequentially([
-              instruct(eachPlayer, voteStartingWith(you, openly, byLabel(["carnage", "homage"]))),
+              instruct(eachPlayer, voteStartingWith(you, byLabel(["carnage", "homage"]))),
               doIf(
                 getsMoreVotes("carnage"),
                 sequentially(
