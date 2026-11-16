@@ -2,5 +2,5 @@
 # [CR#107.4a,107.4c], and wrapped even when the sequence is one symbol.
 # TODO(lowering): Refuse a symbol that shows no one mana of a type [CR#106.1b].
 primitive symbols(symbols: List(ManaSymbol)): ProducedMana = Symbols {
-  spelling = "$symbols"
+  spelling = "$symbols#<>"
 }

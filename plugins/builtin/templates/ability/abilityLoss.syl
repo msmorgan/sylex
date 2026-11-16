@@ -1,5 +1,5 @@
 # "<subject> loses <abilities>"
 template abilityLoss(subject: NounPhrase, abilities: List(AbilityLost)): StaticSpec {
-  spelling = "$subject loses $abilities",
+  spelling = "$subject loses $abilities#<and>",
   body = characteristicChange($subject, [removedAbilities(specified($abilities))])
 }

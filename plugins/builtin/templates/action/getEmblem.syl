@@ -1,5 +1,5 @@
 # "you get an emblem with <abilities>"
 template getEmblem(abilities: List(Ability)): VerbPhrase {
-  spelling = "you get an emblem with $abilities",
+  spelling = "you get an emblem with $abilities#<and>",
   body = createObject(1, emblem(none, $abilities))
 }

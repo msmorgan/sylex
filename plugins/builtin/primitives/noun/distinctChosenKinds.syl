@@ -1,4 +1,4 @@
-# "N different counters from among <menu>"
-primitive distinctChosenKinds(menu: List(CounterKind)): CounterKindSource = DistinctChosen {
-  spelling = "N different counters from among $menu"
-}
+# "your choice of N different counters on it from among <menu>" (*Grimdancer*)
+# TODO(spelling): Reshaping counter phrases into one noun phrase waits on
+# `syl-counters-noun-phrase`.
+primitive distinctChosenKinds(menu: List(CounterKind)): CounterKindSource = DistinctChosen

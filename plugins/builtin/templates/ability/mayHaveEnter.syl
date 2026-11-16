@@ -6,8 +6,9 @@ template mayHaveEnter(
   subject: NounPhrase,
   riders: List(MoveRider),
   otherwise: Option(Replacement) = none): StaticSpec {
-  # TODO(spelling): Include or omit the clause supplied by otherwise.
-  spelling = "You may have $subject enter $riders",
+  # TODO(spelling): Move riders are depictives, waiting on the depictives design
+  # (`docs/design/semantics.md` §6 item 13).
+  spelling = "You may have $subject enter<. If you don't, $otherwise>",
   body = replace(
     would(actor($subject), enter),
     optionally(withRiders($riders), otherwise = $otherwise))

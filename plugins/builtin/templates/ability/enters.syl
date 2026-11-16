@@ -2,6 +2,8 @@
 # with `riders` ("this land enters tapped", "creatures you control enter with an additional +1/+1
 # counter on them") [CR#603.6d,614.1c,614.1d].
 template enters(subject: NounPhrase, riders: List(MoveRider)): StaticSpec {
-  spelling = "$subject enters $riders",
+  # TODO(spelling): Move riders are depictives, waiting on the depictives design
+  # (`docs/design/semantics.md` §6 item 13).
+  spelling = "$subject enters",
   body = replace(would(actor($subject), enter), withRiders($riders))
 }

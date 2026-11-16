@@ -5,6 +5,8 @@ template entersUnless(
   subject: NounPhrase,
   riders: List(MoveRider),
   condition: Condition): StaticSpec {
-  spelling = "$subject enters $riders unless $condition",
+  # TODO(spelling): Move riders are depictives, waiting on the depictives design
+  # (`docs/design/semantics.md` §6 item 13).
+  spelling = "$subject enters unless $condition",
   body = replace(would(actor($subject), enter), doIf(not($condition), withRiders($riders)))
 }
