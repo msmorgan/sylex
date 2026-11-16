@@ -1,0 +1,6 @@
+# "+ <cost> — <action>" [CR#702.172b]: a Spree mode, printing "+" and its additional cost before
+# the mode's effect [CR#700.2h,702.172a].
+template plusMode(cost: Cost, action: VerbPhrase): Mode {
+  spelling = "+ $cost — $action",
+  body = mode(cost = $cost, $action)
+}

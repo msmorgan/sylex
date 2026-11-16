@@ -1,7 +1,6 @@
-# "Choose one or more — [cost] — <mode>; …" [CR#702.172a]: each mode a `Mode` record with its
-# additional cost.
+# "Spree" followed by its "+" costed modes, one per line: choose one or more modes and pay the
+# additional costs associated with those modes [CR#702.172a,702.172b].
 template chooseSpree(modes: List(Mode)): VerbPhrase {
-  # TODO(spelling): Include or omit each mode's cost clause. Format and coordinate the modes list
-  # entries, including the empty case.
+  spelling = "Spree\n$modes#<\n>",
   body = chooseModes(orMore(1), $modes)
 }

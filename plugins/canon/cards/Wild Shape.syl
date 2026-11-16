@@ -12,8 +12,6 @@ card singleFaced({
           exactly(1),
           [
             mode(
-              none,
-              none,
               establish(
                 qualityChange(
                   target(and([isCreature, youControl])),
@@ -26,8 +24,6 @@ card singleFaced({
                         toughness = 3}})),
                 duration = untilEndOfTurn)),
             mode(
-              none,
-              none,
               establish(
                 qualityChange(
                   target(and([isCreature, youControl])),
@@ -40,8 +36,6 @@ card singleFaced({
                         toughness = 5}})),
                 duration = untilEndOfTurn)),
             mode(
-              none,
-              none,
               establish(
                 qualityChange(
                   target(and([isCreature, youControl])),

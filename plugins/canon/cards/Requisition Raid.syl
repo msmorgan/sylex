@@ -5,11 +5,11 @@ card singleFaced({
     text = [
       spell(
         chooseSpree([
-            {cost = mana([generic(1)]), action = destroy(target(isArtifact))},
-            {cost = mana([generic(1)]), action = destroy(target(isEnchantment))},
-            {
-              cost = mana([generic(1)]),
-              action = putCounters(
+            plusMode(mana([generic(1)]), destroy(target(isArtifact))),
+            plusMode(mana([generic(1)]), destroy(target(isEnchantment))),
+            plusMode(
+              mana([generic(1)]),
+              putCounters(
                 1,
                 printedKind(p1p1Counter),
-                each(and([isCreature, controlledBy(target(isPlayer))])))}]))]})
+                each(and([isCreature, controlledBy(target(isPlayer))]))))]))]})

@@ -1,1 +1,7 @@
-primitive mode(cost: Option(Cost), weight: Option(Nat), action: VerbPhrase): Mode = Mode
+# "• <action>" [CR#700.2]: one bulleted mode of a modal spell or ability.
+primitive mode(
+  cost: Option(Cost) = none,
+  weight: Option(Nat) = none,
+  action: VerbPhrase): Mode = Mode {
+  spelling = "• $action"
+}

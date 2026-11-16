@@ -1,5 +1,7 @@
-# "Choose one — <first>; or <second>."
+# "<first> or <second>": inline disjunction of two actions (*Crypt Lurker*'s "sacrifice a creature
+# or discard a creature card"); bulleted "Choose one —" modal text is spelled by `chooseModes` over
+# `mode`.
 template chooseOne(first: VerbPhrase, second: VerbPhrase): VerbPhrase {
-  spelling = "Choose one —\n• $first\n• $second",
-  body = chooseModes(exactly(1), [mode(none, none, $first), mode(none, none, $second)])
+  spelling = "$first or $second",
+  body = chooseModes(exactly(1), [mode($first), mode($second)])
 }

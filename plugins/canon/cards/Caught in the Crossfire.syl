@@ -5,13 +5,13 @@ card singleFaced({
     text = [
       spell(
         chooseSpree([
-            {
-              cost = mana([generic(1)]),
-              action = instruct(
+            plusMode(
+              mana([generic(1)]),
+              instruct(
                 this,
-                dealDamage(amount = 2, recipient = each(and([isCreature, isOutlaw]))))},
-            {
-              cost = mana([generic(1)]),
-              action = instruct(
+                dealDamage(amount = 2, recipient = each(and([isCreature, isOutlaw]))))),
+            plusMode(
+              mana([generic(1)]),
+              instruct(
                 this,
-                dealDamage(amount = 2, recipient = each(and([isCreature, non(isOutlaw)]))))}]))]})
+                dealDamage(amount = 2, recipient = each(and([isCreature, non(isOutlaw)])))))]))]})

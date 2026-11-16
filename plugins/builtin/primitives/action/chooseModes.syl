@@ -1,4 +1,5 @@
-# "Choose <quantity> — <modes>": choose modes from the given modal choices, each mode an action
-# alone or a costed or weighted `Mode` record.
-# TODO(spelling): Format and coordinate the modes list entries, including the empty case.
-primitive chooseModes(quantity: Quantity, modes: List(Mode)): VerbPhrase = ChooseModes
+# "choose <quantity> — <modes>" [CR#700.2]: choose modes from the bulleted list, each mode on its
+# own line.
+primitive chooseModes(quantity: Quantity, modes: List(Mode)): VerbPhrase = ChooseModes {
+  spelling = "choose $quantity —\n$modes#<\n>"
+}

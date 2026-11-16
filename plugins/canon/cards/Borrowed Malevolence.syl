@@ -8,8 +8,5 @@ card singleFaced({
         chooseModes(
           oneOrBoth,
           [
-            mode(none, none, get(target(isCreature), up(1), up(1), duration = untilEndOfTurn)),
-            mode(
-              none,
-              none,
-              get(target(isCreature), down(1), down(1), duration = untilEndOfTurn))]))]})
+            mode(get(target(isCreature), up(1), up(1), duration = untilEndOfTurn)),
+            mode(get(target(isCreature), down(1), down(1), duration = untilEndOfTurn))]))]})

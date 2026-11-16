@@ -5,9 +5,9 @@ card singleFaced({
     text = [
       spell(
         chooseSpree([
-            {
-              cost = mana([generic(1)]),
-              action = untap(allOf(and([isCreature, controlledBy(target(isPlayer))])))},
-            {
-              cost = mana([generic(1)]),
-              action = gain(target(isCreature), [doubleStrike], duration = untilEndOfTurn)}]))]})
+            plusMode(
+              mana([generic(1)]),
+              untap(allOf(and([isCreature, controlledBy(target(isPlayer))])))),
+            plusMode(
+              mana([generic(1)]),
+              gain(target(isCreature), [doubleStrike], duration = untilEndOfTurn))]))]})

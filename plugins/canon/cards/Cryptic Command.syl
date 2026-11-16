@@ -7,7 +7,7 @@ card singleFaced({
         chooseModes(
           exactly(2),
           [
-            mode(none, none, counter(target(isSpell))),
-            mode(none, none, returnToHand(target(isPermanent))),
-            mode(none, none, tap(allOf(and([isCreature, opponentsControl])))),
-            mode(none, none, draw(1))]))]})
+            mode(counter(target(isSpell))),
+            mode(returnToHand(target(isPermanent))),
+            mode(tap(allOf(and([isCreature, opponentsControl])))),
+            mode(draw(1))]))]})
