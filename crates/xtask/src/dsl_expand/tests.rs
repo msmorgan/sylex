@@ -432,6 +432,46 @@ fn an_observation_has_no_instruction_and_no_other_participant() {
     });
 }
 
+/// The printed "and" between trigger conditions expands to the disjunction
+/// primitive `or` [CR#603.1b,603.2].
+#[test]
+fn joined_trigger_and_expands_to_trigger_or() {
+    let params = [("a", "TriggerCondition"), ("b", "TriggerCondition")];
+    let probes = vec![
+        probe(
+            "probeTriggerAnd",
+            &params,
+            "TriggerCondition",
+            "and([$a, $b])",
+        ),
+        probe(
+            "probeTriggerOr",
+            &params,
+            "TriggerCondition",
+            "or([$a, $b])",
+        ),
+    ];
+    with_probes(probes, |_, expander| {
+        let and_tree = expander
+            .term("probeTriggerAnd", "TriggerCondition")
+            .unwrap();
+        let or_tree = expander.term("probeTriggerOr", "TriggerCondition").unwrap();
+        assert_eq!(and_tree, or_tree);
+        assert_eq!(
+            or_tree,
+            Node::Call {
+                constructor: "Or".to_owned(),
+                word: "or".to_owned(),
+                sort: "TriggerCondition".to_owned(),
+                args: vec![Node::List(vec![
+                    Node::Param("a".to_owned()),
+                    Node::Param("b".to_owned()),
+                ])],
+            }
+        );
+    });
+}
+
 /// Every declaration's fields, each parameter free, and every card expand.
 #[test]
 fn every_declaration_and_card_expands() {
