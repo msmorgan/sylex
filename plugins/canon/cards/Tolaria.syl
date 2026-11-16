@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       activated(tapSymbol, addMana(symbols([pip(blue)]))),
       activatedOnlyDuring(
-        compound([tapSymbol]),
+        tapSymbol,
         establishThroughout(
           abilityLoss(
             target(isCreature),
