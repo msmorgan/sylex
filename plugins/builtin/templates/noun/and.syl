@@ -1,4 +1,5 @@
 # A conjunction of Noun Phrases.
 template and(phrases: List(NounPhrase)): NounPhrase {
+  spelling = "$phrases#<and>",
   body = coord(and, $phrases)
 }

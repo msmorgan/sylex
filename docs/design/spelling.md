@@ -613,8 +613,7 @@ of its own, as the modes of a modal ability are printed. A mode's bullet is the 
 "• $action", so it prints before the first mode too. No parameter chooses a join: a coordinator is
 printed by the Template that names it, as the Templates `and`, `or` and `andOr` print "and", "or"
 and "and/or" over the three `coord` primitives (at `NounPhrase`, `Predicate` and `Location`), which
-have no `spelling`. Under `plugins/`, no `coord` has a `spelling`, and the Templates `and`, `or`
-and `andOr` have none yet either; the `syl-spelling-optional-segments` ticket writes them. The
+have no `spelling`. The
 commas of a coordination of three or more are the English layer's and are never written. One
 element prints alone, with no join. An element whose own wording prints nothing in place, having
 only a Tail, takes no part in the join. A `#<` directly after a Hole's name is only ever a join,

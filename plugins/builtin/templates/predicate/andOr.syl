@@ -1,5 +1,6 @@
 # "<p> and/or <q>": some disjunct holds, as "with flying and/or reach". Over one candidate,
 # printed "and/or" has the same inclusive-disjunction meaning as `or`.
 template andOr(disjuncts: List(Predicate)): Predicate {
+  spelling = "$disjuncts#<and/or>",
   body = or($disjuncts)
 }

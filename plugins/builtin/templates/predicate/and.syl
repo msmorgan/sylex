@@ -1,4 +1,5 @@
 # "<p> and <q>": every conjunct holds.
 template and(conjuncts: List(Predicate)): Predicate {
+  spelling = "$conjuncts#<and>",
   body = coord(and, $conjuncts)
 }

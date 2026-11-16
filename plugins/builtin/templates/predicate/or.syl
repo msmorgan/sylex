@@ -1,4 +1,5 @@
 # "<p> or <q>": some disjunct holds.
 template or(disjuncts: List(Predicate)): Predicate {
+  spelling = "$disjuncts#<or>",
   body = coord(or, $disjuncts)
 }
