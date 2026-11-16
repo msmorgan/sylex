@@ -376,10 +376,7 @@ pub const RECORDS: &[RecordSort] = &[
     ),
     record(
         "ConferralRule",
-        &[
-            ("scope", "Nominal", false),
-            ("confer", "Conferral", false),
-        ],
+        &[("scope", "Nominal", false), ("confer", "Conferral", false)],
     ),
     record(
         "DefinedToken",

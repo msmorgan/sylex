@@ -185,8 +185,8 @@ fn role(kind: &str) -> anyhow::Result<Role> {
         "primitive" => Role::Primitive,
         "template" | "coercion" | "ability_word" => Role::Template,
         "action" | "ability" | "token" => Role::Definition,
-        "counter" | "designation" | "subtype" | "card_type" | "supertype" | "relation"
-        | "verb" | "sba" | "conferral" => Role::Named,
+        "counter" | "designation" | "subtype" | "card_type" | "supertype" | "relation" | "verb"
+        | "sba" | "conferral" => Role::Named,
         other => bail!("a `{other}` declaration has no word to call"),
     })
 }
@@ -299,12 +299,7 @@ impl<'c, 'a> Expander<'c, 'a> {
     }
 
     /// Expands `value`, whose parameters read `env`, under `performer`.
-    fn value(
-        &self,
-        value: &'a Value,
-        env: &Env<'a>,
-        performer: &Node,
-    ) -> anyhow::Result<Node> {
+    fn value(&self, value: &'a Value, env: &Env<'a>, performer: &Node) -> anyhow::Result<Node> {
         let node = match &value.kind {
             ValueKind::Parameter(name) => {
                 let name = name.ident.as_str();
@@ -319,11 +314,8 @@ impl<'c, 'a> Expander<'c, 'a> {
                         env,
                         performer: caller_performer,
                     } => {
-                        let active = if is_verb_phrase_sort(sort) {
-                            performer
-                        } else {
-                            caller_performer
-                        };
+                        let active =
+                            if is_verb_phrase_sort(sort) { performer } else { caller_performer };
                         self.value(value, env, active)?
                     }
                 }
@@ -367,11 +359,7 @@ impl<'c, 'a> Expander<'c, 'a> {
             fields.push(("subj".to_owned(), subj));
             for field in record.nodes().filter(|f| f.name.ident != "subj") {
                 let name = field.name.ident.as_str();
-                let active = if name == "action" {
-                    &clause_performer
-                } else {
-                    performer
-                };
+                let active = if name == "action" { &clause_performer } else { performer };
                 fields.push((name.to_owned(), self.value(&field.value, env, active)?));
             }
         } else {
@@ -455,7 +443,11 @@ impl<'c, 'a> Expander<'c, 'a> {
         expand().with_context(|| format!("expanding `{word}` at `{sort}`"))
     }
 
-    fn written_args<'b>(&self, call: &'b Call, arity: usize) -> anyhow::Result<Vec<Option<&'b Value>>> {
+    fn written_args<'b>(
+        &self,
+        call: &'b Call,
+        arity: usize,
+    ) -> anyhow::Result<Vec<Option<&'b Value>>> {
         let mut written = vec![None; arity];
         for arg in call.args.iter().filter_map(Item::node) {
             let index = self
@@ -480,11 +472,7 @@ impl<'c, 'a> Expander<'c, 'a> {
         env: &Env<'a>,
         performer: &Node,
     ) -> anyhow::Result<Vec<Node>> {
-        let base = if sort_name == "Ability" {
-            ambient_performer()
-        } else {
-            performer.clone()
-        };
+        let base = if sort_name == "Ability" { ambient_performer() } else { performer.clone() };
         let written = self.written_args(call, decl.params.len())?;
         if constructor == "Instruct" && sort_name == "VerbPhrase" {
             let [Some(subj_val), Some(action_val)] = written.as_slice() else {
@@ -633,7 +621,12 @@ fn free<'a>(decl: &Decl<'a>) -> Env<'a> {
     decl.params
         .iter()
         .map(|param| param.name.clone())
-        .chain(decl.kind.implicit.iter().map(|(name, _)| (*name).to_owned()))
+        .chain(
+            decl.kind
+                .implicit
+                .iter()
+                .map(|(name, _)| (*name).to_owned()),
+        )
         .map(|name| {
             let param = Node::Param(name.clone());
             (name, Binding::Node(param))

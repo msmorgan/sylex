@@ -209,7 +209,11 @@ fn shared_catalog_verbs_belong_to_neither_keyword_entry() {
             "faces",
             "catalog_verb:face",
         ),
-        ("Creatures can't be beamed up.", "beamed", "catalog_verb:beam"),
+        (
+            "Creatures can't be beamed up.",
+            "beamed",
+            "catalog_verb:beam",
+        ),
     ] {
         let analyzed = env.lexicon.analyze(text);
         let verbal: std::collections::BTreeSet<_> = analyzed

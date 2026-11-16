@@ -66,7 +66,9 @@ impl<'a> NominalChecker<'a, '_> {
     }
 
     fn is_primitive_ctor(decl: &Decl<'_>, sort: &str, ctor: &str) -> bool {
-        if decl.kind.word != schema::PRIMITIVE || !decl.sort.args.is_empty() || decl.sort.head != sort
+        if decl.kind.word != schema::PRIMITIVE
+            || !decl.sort.args.is_empty()
+            || decl.sort.head != sort
         {
             return false;
         }
@@ -91,7 +93,10 @@ impl<'a> NominalChecker<'a, '_> {
         if !sort.args.is_empty() || sort.head != "PreModifier" {
             return false;
         }
-        let Some(sig) = self.registry.get(&(call.head.ident.to_string(), sort.clone())) else {
+        let Some(sig) = self
+            .registry
+            .get(&(call.head.ident.to_string(), sort.clone()))
+        else {
             return false;
         };
         if sig.secondary {
@@ -185,9 +190,7 @@ impl<'a> NominalChecker<'a, '_> {
 
                 let is_pre_coord = !coerced && self.is_pre_modifier_coordination(call);
                 for arg in call.args.iter().filter_map(Item::node) {
-                    if is_pre_coord
-                        && let ValueKind::List(items) = &arg.value.kind
-                    {
+                    if is_pre_coord && let ValueKind::List(items) = &arg.value.kind {
                         for item in items.iter().filter_map(Item::node) {
                             self.walk_syntax(item, true, refusals);
                         }
@@ -201,7 +204,10 @@ impl<'a> NominalChecker<'a, '_> {
     }
 
     fn check_nominal_call(&self, call: &Call, sort: &SortKey, refusals: &mut Vec<Refusal>) {
-        let Some(sig) = self.registry.get(&(call.head.ident.to_string(), sort.clone())) else {
+        let Some(sig) = self
+            .registry
+            .get(&(call.head.ident.to_string(), sort.clone()))
+        else {
             return;
         };
         let mut has_pre_or_post = false;
@@ -268,13 +274,8 @@ impl<'a> NominalChecker<'a, '_> {
             Shape::Header(header) => {
                 for (index, param) in header.params.iter().filter_map(Item::node).enumerate() {
                     if let Some(default) = &param.default
-                        && let Some(term) = self.elaborate(
-                            default,
-                            &decl.params[index].sort,
-                            &env,
-                            None,
-                            refusals,
-                        )
+                        && let Some(term) =
+                            self.elaborate(default, &decl.params[index].sort, &env, None, refusals)
                     {
                         self.walk_agreement(&term, refusals);
                     }
@@ -378,13 +379,9 @@ impl<'a> NominalChecker<'a, '_> {
                         (Some(val), _) => {
                             self.elaborate(val, &slot.sort, env, span_override, refusals)?
                         }
-                        (None, Some(def)) => self.elaborate(
-                            def,
-                            &slot.sort,
-                            &callee_env,
-                            Some(call_span),
-                            refusals,
-                        )?,
+                        (None, Some(def)) => {
+                            self.elaborate(def, &slot.sort, &callee_env, Some(call_span), refusals)?
+                        }
                         (None, None) => return None,
                     };
                     callee_env.insert(slot.name.clone(), arg_term.clone());
@@ -456,8 +453,7 @@ impl<'a> NominalChecker<'a, '_> {
                     .find(|s| sort.args.is_empty() && s.sort == sort.head);
                 for (fname, fterm) in fields {
                     if let Some(spec) = spec
-                        && let Some((_, fsort, _)) =
-                            spec.fields.iter().find(|(n, _, _)| n == fname)
+                        && let Some((_, fsort, _)) = spec.fields.iter().find(|(n, _, _)| n == fname)
                         && Self::is_nominal_sort(&SortKey::table(fsort))
                         && let Some(bad_span) = self.nominal_agree_span(fterm)
                     {
@@ -500,7 +496,10 @@ impl<'a> NominalChecker<'a, '_> {
                     return;
                 }
                 if Self::is_primitive_ctor(decl, "NounPhrase", "SomeOf") {
-                    let count = args.iter().find(|(n, _, _)| n == "count").map(|(_, _, t)| t);
+                    let count = args
+                        .iter()
+                        .find(|(n, _, _)| n == "count")
+                        .map(|(_, _, t)| t);
                     let desc = args
                         .iter()
                         .find(|(n, _, _)| n == "description")
@@ -565,7 +564,8 @@ impl<'a> NominalChecker<'a, '_> {
                     }
                     None
                 } else if Self::is_primitive_ctor(decl, "Nominal", "Coordination") {
-                    args.iter().find_map(|(_, _, aterm)| self.nominal_agree_span(aterm))
+                    args.iter()
+                        .find_map(|(_, _, aterm)| self.nominal_agree_span(aterm))
                 } else {
                     None
                 }

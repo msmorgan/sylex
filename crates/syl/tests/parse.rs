@@ -388,7 +388,10 @@ fn typed_newline_in_string_is_read_as_line_break() {
         panic!("named");
     };
     let field = named.body.as_ref().unwrap().nodes().next().unwrap();
-    assert_eq!(field.value.kind, ValueKind::String("first\nsecond".to_owned()));
+    assert_eq!(
+        field.value.kind,
+        ValueKind::String("first\nsecond".to_owned())
+    );
 }
 
 #[test]
