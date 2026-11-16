@@ -1,3 +1,3 @@
-# "the next" occurrence [of <player>'s]
-# TODO(spelling): Include or omit the clauses supplied by player.
-primitive nextTime(player: Option(NounPhrase) = none): TurnRef = Next
+# The next occurrence ("the next end step", "your next turn"); whose turn, phase, or step it is
+# lives on `beginningOf`, `endOf`, and `inPart`.
+primitive nextTime: TurnRef = Next

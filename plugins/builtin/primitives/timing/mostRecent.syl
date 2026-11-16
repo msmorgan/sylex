@@ -1,1 +1,3 @@
-primitive mostRecent(player: NounPhrase): TurnRef = MostRecent
+# The most recent occurrence ("their most recent turn" [CR#302.6]); whose turn, phase, or step it
+# is lives on `beginningOf`, `endOf`, and `inPart`.
+primitive mostRecent: TurnRef = MostRecent

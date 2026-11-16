@@ -1,1 +1,3 @@
+# The current occurrence ("this turn", "this combat"); whose turn, phase, or step it is lives on
+# `beginningOf`, `endOf`, and `inPart`.
 primitive current: TurnRef = Current

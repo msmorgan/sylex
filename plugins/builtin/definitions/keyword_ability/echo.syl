@@ -9,6 +9,6 @@ ability echo(cost: Cost) {
     at(
       beginningOfYour(upkeep),
       if = not(
-        heldSince(is(thisPermanent, youControl), reached(beginningOf(upkeep, you, previous(you))))),
+        heldSince(is(thisPermanent, youControl), reached(beginningOf(upkeep, you, previous)))),
       doUnlessKeywordCost(sacrifice(thisPermanent), $cost, thisPermanent, echo))]
 }

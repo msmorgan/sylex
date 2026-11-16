@@ -1,2 +1,3 @@
-# TODO(spelling): Include or omit the clauses supplied by player.
-primitive previous(player: Option(NounPhrase)): TurnRef = Previous
+# The previous occurrence ("last turn", "your last upkeep"); whose turn, phase, or step it is
+# lives on `beginningOf`, `endOf`, and `inPart`.
+primitive previous: TurnRef = Previous

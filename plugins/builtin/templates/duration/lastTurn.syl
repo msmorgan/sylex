@@ -2,6 +2,6 @@
 template lastTurn: Duration {
   spelling = "last turn",
   body = between(
-    start = reached(beginningOf(turn, none, previous(none))),
-    end = endOf(turn, none, previous(none)))
+    start = reached(beginningOf(turn, none, previous)),
+    end = endOf(turn, none, previous))
 }
