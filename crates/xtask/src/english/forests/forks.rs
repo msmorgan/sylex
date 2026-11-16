@@ -559,7 +559,9 @@ mod tests {
     /// Time*). *Court Hussar*'s *in any order* and *on the bottom* attach
     /// over *look …, then put …* or inside its last conjunct, among them on
     /// the Complement Cluster *the rest on the bottom*, whose Head Line ends
-    /// in *rest* though no `head` child leads there. Not *Kessig Naturalist*'s
+    /// in *rest* though no `head` child leads there; each also attaches over
+    /// the noun phrase coordination *one of them … and the rest* or inside its
+    /// last conjunct. Not *Kessig Naturalist*'s
     /// *Until end of turn, you don't lose this mana as steps and phases end*:
     /// every Clause headed by *don't* that holds *Until* also holds *and*,
     /// which there joins only *steps and phases*; the options differ in what is
@@ -620,42 +622,62 @@ mod tests {
             [
                 "Bull's Strength | until | adjunct | VerbPhrase | and | adjunct | VerbPhrase | \
                  gains | 1 | 1 | 2",
-                "Court Hussar | When | adjunct | Clause | then | adjunct | Clause | look | 19 | 19 \
-                 | 38",
-                "Court Hussar | in | adjunct | Clause | then | adjunct | VerbPhrase | put | 8 | 6 \
-                 | 38",
+                "Court Hussar | When | adjunct | Clause | then | adjunct | Clause | look | 25 | 25 \
+                 | 50",
+                "Court Hussar | in | adjunct | Clause | then | adjunct | VerbPhrase | put | 10 | 8 \
+                 | 50",
+                "Court Hussar | in | adjunct | Clause | then | modifier | NounPhrase | and | 10 | \
+                 4 | 50",
                 "Court Hussar | in | adjunct | Clause | then | adjunct | ComplementCluster | rest \
-                 | 8 | 2 | 38",
+                 | 10 | 2 | 50",
                 "Court Hussar | in | adjunct | Clause | then | complement | ComplementCluster | \
-                 rest | 8 | 4 | 38",
-                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | rest | 8 | 2 | \
-                 38",
-                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | bottom | 8 | 8 \
-                 | 38",
-                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | library | 8 | \
-                 8 | 38",
+                 rest | 10 | 4 | 50",
+                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | rest | 10 | 2 \
+                 | 50",
+                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | bottom | 10 | \
+                 10 | 50",
+                "Court Hussar | in | adjunct | Clause | then | modifier | Nominal | library | 10 | \
+                 10 | 50",
+                "Court Hussar | in | modifier | NounPhrase | and | adjunct | ComplementCluster | \
+                 rest | 4 | 2 | 50",
+                "Court Hussar | in | modifier | NounPhrase | and | complement | ComplementCluster \
+                 | rest | 4 | 4 | 50",
+                "Court Hussar | in | modifier | NounPhrase | and | modifier | Nominal | rest | 4 | \
+                 2 | 50",
+                "Court Hussar | in | modifier | NounPhrase | and | modifier | Nominal | bottom | 4 \
+                 | 10 | 50",
+                "Court Hussar | in | modifier | NounPhrase | and | modifier | Nominal | library | \
+                 4 | 10 | 50",
                 "Court Hussar | on | adjunct | Clause | then | adjunct | VerbPhrase | put | 6 | 8 \
-                 | 38",
+                 | 50",
+                "Court Hussar | on | adjunct | Clause | then | modifier | NounPhrase | and | 6 | \
+                 10 | 50",
                 "Court Hussar | on | adjunct | Clause | then | adjunct | ComplementCluster | rest \
-                 | 6 | 2 | 38",
+                 | 6 | 2 | 50",
                 "Court Hussar | on | adjunct | Clause | then | complement | ComplementCluster | \
-                 rest | 6 | 10 | 38",
-                "Court Hussar | on | adjunct | Clause | then | modifier | Nominal | rest | 6 | 12 \
-                 | 38",
+                 rest | 6 | 10 | 50",
+                "Court Hussar | on | adjunct | Clause | then | modifier | Nominal | rest | 6 | 14 \
+                 | 50",
+                "Court Hussar | on | modifier | NounPhrase | and | adjunct | ComplementCluster | \
+                 rest | 10 | 2 | 50",
+                "Court Hussar | on | modifier | NounPhrase | and | complement | ComplementCluster \
+                 | rest | 10 | 10 | 50",
+                "Court Hussar | on | modifier | NounPhrase | and | modifier | Nominal | rest | 10 \
+                 | 14 | 50",
                 "Iroas's Blessing | controls | modifier | Nominal | or | modifier | Nominal | \
                  planeswalker | 1 | 1 | 2",
-                "Lisette, Dean of the Root | until | adjunct | Clause | and | adjunct | \
-                 VerbPhrase | gain | 1 | 1 | 2",
-                "Lord of the Ulvenwald | control | modifier | Nominal | and | modifier | Nominal \
-                 | Werewolves | 1 | 1 | 2",
+                "Lisette, Dean of the Root | until | adjunct | Clause | and | adjunct | VerbPhrase \
+                 | gain | 1 | 1 | 2",
+                "Lord of the Ulvenwald | control | modifier | Nominal | and | modifier | Nominal | \
+                 Werewolves | 1 | 1 | 2",
                 "Sage Owl | When | adjunct | Clause | then | adjunct | Clause | look | 2 | 2 | 4",
                 "Sage Owl | in | adjunct | Clause | then | adjunct | VerbPhrase | put | 2 | 2 | 4",
                 "Sands of Time | control | modifier | Nominal | and | modifier | Nominal | land | \
                  60 | 40 | 100",
                 "Sands of Time | simultaneously | adjunct | VerbPhrase | and | adjunct | \
                  VerbPhrase | untaps | 50 | 50 | 100",
-                "Sands of Time | tapped | modifier | Nominal | and | modifier | Nominal | \
-                 artifact | 60 | 40 | 100",
+                "Sands of Time | tapped | modifier | Nominal | and | modifier | Nominal | artifact \
+                 | 60 | 40 | 100",
                 "Sands of Time | untapped | modifier | Nominal | and | modifier | Nominal | \
                  artifact | 60 | 40 | 100",
             ]
