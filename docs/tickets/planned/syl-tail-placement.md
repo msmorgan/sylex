@@ -21,19 +21,10 @@ recover to one term and one of them does not round-trip.
 - A Tail states its placement among the host's other trailing dependents: before them (`inner`)
   or after them (unmarked). Each placement a card prints is its own Template.
 
-## Open questions
-
-- Whether the two placements are told apart by `inner` or by Category. In the Readings
-  (`cargo xtask english parse`) both attach "for each …" as a trailing adjunct of a verb phrase:
-  *Aurochs* stacks it outside "gets +1/+0 until end of turn", *Ral's Staticaster* inside "gets
-  +1/+0 for each card in your hand", below "until end of turn". The Category does not separate
-  them. Recommendation: `inner` for the *Ral's Staticaster* placement, unmarked for *Aurochs*'s.
-
 ## Done when
 
-- The open question is answered.
-- `sylex_spelling` parses `inner` and every `spelling` this ticket writes, and resolving a
-  Tail's host follows the Tail notation in `docs/design/spelling.md`.
+- Every `spelling` this ticket writes parses with `sylex_spelling`, the ones marked `inner`
+  among them.
 - Every "for each" and "equal to" wording that in-scope text prints in more than one placement
   has a Template for each; the landing lists them with a card for each.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p sylex_spelling` and
@@ -41,6 +32,7 @@ recover to one term and one of them does not round-trip.
 
 ## Not in scope
 
+- Finding a Tail's host in a Reading: recovery's (`english-syl-term-recovery`).
 - What "for each" scales in a power/toughness change: `syl-pt-change-sort`.
 - The Tails of a copy's ", except …" (`syl-copy-exceptions`) and of `half`'s ", rounded …"
   (`syl-round-each-time`), each written by its own ticket under the placement rule above.

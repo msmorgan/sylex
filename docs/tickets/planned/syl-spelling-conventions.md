@@ -17,8 +17,8 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 ## Design
 
 The notation is settled in `docs/design/spelling.md` §7; where this ticket's text differs, §7
-governs. `syl-spelling-optional-segments` has already written every Hole `$name` and turned on
-the check that every `spelling` parses.
+governs. `syl-spelling-notation-crate` has already written every Hole `$name` and turned on the check
+that every `spelling` parses.
 
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:

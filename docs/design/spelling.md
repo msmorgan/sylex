@@ -731,7 +731,7 @@ things are known limits:
 The declarations under `plugins/` still write a Hole `<name>`: 784 Holes on 601 `spelling`
 lines, three of which need a tie (`landwalk`, `typecycling` and `non`) and two an ordinal
 (`fromTop` and `fromBottom`, "$n@Ordinal from …"). No declaration writes a form label, a `*` or
-a `#<.>` join yet. The `syl-spelling-optional-segments` ticket migrates the Holes, and
+a `#<.>` join yet. The `syl-spelling-notation-crate` ticket migrates the Holes, and
 `syl-spelling-forms-and-runs` writes the labels, marks and joins.
 
 ## 8. Capacity and cost
