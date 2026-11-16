@@ -467,6 +467,13 @@ are found over enumerated candidates or over a packed form is open (§6).
     (`Gap` in `crates/syntax/src/step.rs`), which the term language writes with fixed-wording
     Templates (`voice-and-object-phrases.md` §7). That at most one Gap of the right sort stands
     in a phrase is a checker refusal today and could be a property of the Rust structures.
+    Against merging: `which` is nearer to `subject` than to `_`. `subject` reads what its verb
+    phrase is said of and `which` what the whole postmodifier is said of, and the two coincide
+    wherever a postmodifier is a bare verb phrase, which is why a subject relative and a
+    participle write no Gap word. `which` is needed only where a relative clause has a subject of
+    its own ("spells you cast" is `clause(you, did(cast(which)))`, where `subject` would read
+    "you"). `_` is filled from the other side, by the phrase after a coordination. No card found
+    prints a clause that relativizes an object and shares a phrase.
 13. **Depictives.** "Put it onto the battlefield tapped and attacking", "enters tapped" and
     "attacks alone" each end in a predicative that describes the subject or object as the event
     happens, which the English grammar reads as a `Depictive`. The term language writes the ones
