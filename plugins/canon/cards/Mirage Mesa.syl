@@ -4,5 +4,5 @@ card singleFaced({
     subtypes = [desert],
     text = [
       static(entersTapped(thisLand)),
-      static(entersChoosing(thisLand, color)),
+      static(entersChoosing(it, color)),
       activated(tapSymbol, addMana(counted(1, ofTheChosenColor)))]})

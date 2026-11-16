@@ -4,7 +4,7 @@ card singleFaced({
     cost = [variable],
     types = [artifact],
     text = [
-      static(entersWithCounters(thisArtifact, colorsSpentToCast(thisArtifact), chargeCounter)),
+      static(entersWithCounters(thisArtifact, colorsSpentToCast(it), chargeCounter)),
       activated(
         compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]),
         destroy(

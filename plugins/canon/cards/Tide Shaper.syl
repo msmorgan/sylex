@@ -7,7 +7,7 @@ card singleFaced({
       kicker(mana([generic(1)])),
       when(
         does(actor(thisCreature), enter),
-        if = keywordCostPaid(kicker, thisCreature),
+        if = keywordCostPaid(kicker, it),
         establish(
           qualityChange(target(isLand), sets, bundle({characteristics = {subtypes = [island]}})),
           duration = forAsLongAs(is(thisCreature, in(battlefield))))),

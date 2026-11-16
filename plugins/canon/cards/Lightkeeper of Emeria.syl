@@ -6,8 +6,6 @@ card singleFaced({
     text = [
       multikicker(mana([pip(white)])),
       flying,
-      when(
-        does(actor(thisCreature), enter),
-        gainLife(times(2, timesPaid(byKeyword(kicker), thisCreature))))],
+      when(does(actor(thisCreature), enter), gainLife(times(2, timesPaid(byKeyword(kicker), it))))],
     power = 2,
     toughness = 4})

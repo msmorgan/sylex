@@ -19,7 +19,7 @@ card singleFaced({
             instead(
               preventDamage(
                 allDamage,
-                also = putCounters(preventedThisWay, printedKind(p1p1Counter), thisCreature)))),
+                also = putCounters(preventedThisWay, printedKind(p1p1Counter), it)))),
           is(you, hasDesignation(monarch))))],
     power = 3,
     toughness = 3})

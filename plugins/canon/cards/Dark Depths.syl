@@ -8,7 +8,7 @@ card singleFaced({
       when(
         stateHolds(not(is(thisLand, hasCounter(kind = iceCounter)))),
         doIfDone(
-          sacrifice(thisLand),
+          sacrifice(it),
           ifDid = create(
             1,
             written({

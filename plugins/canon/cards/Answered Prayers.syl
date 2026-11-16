@@ -10,7 +10,7 @@ card singleFaced({
             doIf(
               not(is(thisEnchantment, isCreature)),
               become(
-                thisEnchantment,
+                it,
                 {
                   characteristics = {
                     types = [creature],

@@ -10,6 +10,6 @@ card singleFaced({
           thisCreature,
           aggregateOver(max, isOpponent, eventCount(draw(anyAmount), actor(they), soFarThisTurn)),
           p1p1Counter)),
-      when(does(actor(thisCreature), die), draw(powerOf(thisCreature)))],
+      when(does(actor(thisCreature), die), draw(powerOf(it)))],
     power = 1,
     toughness = 1})

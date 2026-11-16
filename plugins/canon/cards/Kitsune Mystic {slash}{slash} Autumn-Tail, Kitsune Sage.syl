@@ -7,7 +7,7 @@ card flip({
       at(
         beginningOfEach(endStep),
         if = is(thisCreature, attachedBy(enchanted, counted(orMore(2), hasSubtype(aura)))),
-        flip(thisCreature))],
+        flip(it))],
     power = 2,
     toughness = 3},
   {

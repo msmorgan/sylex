@@ -6,7 +6,7 @@ card singleFaced({
       when(
         does(actor(thisEnchantment), enter),
         instruct(
-          thisEnchantment,
+          it,
           dealDamage(amount = 3, recipient = target(and([isCreature, anOpponentControls]))))),
       whenever(
         does(actor(counted(orMore(1), isCreature)), die),
@@ -14,9 +14,7 @@ card singleFaced({
             mill(1),
             putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
             triggerReflexively(
-              doOnlyIf(
-                sacrifice(thisEnchantment),
-                compareAmt(countersOn(bloodstainCounter, thisEnchantment), atLeast, 5)),
+              doOnlyIf(sacrifice(it), compareAmt(countersOn(bloodstainCounter, it), atLeast, 5)),
               returnToHand(
                 target(and([isCreature, isCard, in(yourGraveyard)])),
                 from = yourGraveyard))]))]})

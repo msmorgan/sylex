@@ -15,8 +15,8 @@ card singleFaced({
             keywordGrant(
               thisCreature,
               thatKeyword,
-              and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
-            exists(and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
+              and([in(exiledWith(it)), hasKeyword(thatKeyword)])),
+            exists(and([in(exiledWith(it)), hasKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(firstStrike),

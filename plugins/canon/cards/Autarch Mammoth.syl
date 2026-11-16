@@ -9,7 +9,7 @@ card singleFaced({
             when(does(actor(thisCreature), enter)),
             whenever(
               timed(
-                does(actor(thisCreature), attack),
+                does(actor(it), attack),
                 whileTrue(is(thisCreature, hasDesignation(saddled)))))]),
         create(1, written(creatureToken(3, 3, [green], [elephant])))),
       saddle(5)],
