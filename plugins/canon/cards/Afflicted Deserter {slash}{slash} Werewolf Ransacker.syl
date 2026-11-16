@@ -20,7 +20,7 @@ card transforming({
         sequentially([
             may(destroy(target(isArtifact))),
             doIf(
-              did(actor(that(artifact)), putInto(actor, graveyard), thisWay),
+              did(actor(that(artifact)), putInto(subject, graveyard), thisWay),
               instruct(
                 thisCreature,
                 dealDamage(amount = 3, recipient = controllerOf(that(artifact)))))])),

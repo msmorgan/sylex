@@ -84,12 +84,13 @@ stacks cannot supply these, because a binding's position shifts as others are pu
 - **A Subject is a referent; an Actor is not.** The noun phrase of a clause's Subject
   ([`surface.md`](./surface.md) §7.2) is an ordinary mention, which pronouns and demonstratives
   read like any other: "it" in "whenever a creature dies, … it" reads the Subject's "a creature".
-  The Actor is the performer of an Action: in an instruction, the controller of the text's spell or
-  ability unless a Handoff names another; in a clause, what its active Subject or its `by` agent
-  names. A Handoff makes its Actor the innermost for the Action it contains. The Actor is a role
-  that only the `actor` word at NounPhrase reads, not a discourse referent; pronouns, groups and
-  counts never read it. The noun phrase naming it, in a Subject, an agent or a Handoff, is an
-  ordinary referent.
+  Inside a verb phrase, the `subject` word at `NounPhrase` reads what the phrase is said of as a
+  participant of its event, printing no word. The Actor is the performer of an Action: in an
+  instruction, the controller of the text's spell or ability unless a Handoff names another; in a
+  clause, what its active Subject or its `by` agent names. A Handoff makes its Actor the innermost
+  for the Action it contains. The Actor is a role that only the `actor` word at `NounPhrase` reads,
+  not a discourse referent; pronouns, groups and counts never read it. The noun phrase naming it,
+  in a Subject, an agent or a Handoff, is an ordinary referent.
 - A disjunctive noun phrase exports only the referents common to every branch. A coordination bound
   to a parameter binds every member under the parameter's one Binding Identity.
 - A zone change keeps the referent and records the move on it: its origin, its new zone and the
@@ -143,7 +144,8 @@ of the sentence that uses it. So a pronoun inside the body must not find the cal
 and the body's own scratch referents must not leak out to the caller's pronouns.
 
 - The caller's referents are hidden from it, except its arguments; the `actor` word still reads
-  the innermost Actor. A referent hidden by an enclosing Definition stays hidden.
+  the innermost Actor, the performer, while `subject` reads what its enclosing verb phrase is said
+  of as a participant. A referent hidden by an enclosing Definition stays hidden.
 - Each argument is read in the caller's scope and bound to the Definition's Binding Identity at its
   first mention.
 - On exit, the body's changes to its arguments and its outcomes are exported to the caller. Its

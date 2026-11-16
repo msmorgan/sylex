@@ -15,7 +15,7 @@ card singleFaced({
         sequentially([
             may(destroy(target(isArtifact))),
             doIf(
-              did(actor(that(artifact)), putInto(actor, graveyard), thisWay),
+              did(actor(that(artifact)), putInto(subject, graveyard), thisWay),
               instruct(
                 thisCreature,
                 dealDamage(

@@ -1,5 +1,5 @@
 # "<subject> leaves <from>", the battlefield unless said.
 template leave(from: Location = battlefield): VerbPhrase {
   spelling = "leaves $from",
-  body = move(actor, $from, none, [])
+  body = move(subject, $from, none, [])
 }

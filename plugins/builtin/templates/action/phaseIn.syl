@@ -1,5 +1,5 @@
 # "<subject> phases in" [CR#702.26c]
 template phaseIn: VerbPhrase {
   spelling = "phases in",
-  body = setStatus(phasedIn, actor)
+  body = setStatus(phasedIn, subject)
 }

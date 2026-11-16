@@ -1,0 +1,4 @@
+# What the enclosing verb phrase is said of, read as a participant of its event: the thing that
+# dies, enters, leaves, changes status or phases, or the complement a passive promotes. Prints no
+# word; `actor` reads the performer instead.
+primitive subject: NounPhrase = Subject

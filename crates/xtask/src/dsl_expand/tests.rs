@@ -24,10 +24,9 @@ use super::probe;
 use super::role;
 use crate::dsl_check::Checked;
 
-/// The word a body reads its clause's subject through, at `NounPhrase`. It
-/// means the subject of the clause; `syl-misnamed-declarations` renames it
-/// `subject`, a change to this line alone.
-const SUBJECT_WORD: &str = "actor";
+/// The word a verb phrase reads what it is said of through as a participant,
+/// at `NounPhrase`.
+const SUBJECT_WORD: &str = "subject";
 
 /// The sort a clause's participants stand at.
 const PARTICIPANT_SORT: &str = "NounPhrase";
@@ -352,36 +351,48 @@ fn an_integer_at_amount_is_coerced() {
     assert!(card.descendants().contains(&&literal), "{card}");
 }
 
-/// An observation of something occurring expands to a tree with no
-/// `instruct` in it and no participant word other than the subject word,
-/// both with its defaults filled and with its parameters free.
+/// An observation of something occurring expands to a tree that holds the
+/// subject word, no `instruct` and no other participant word, both with its
+/// defaults filled and with its parameters free.
 #[test]
 fn an_observation_has_no_instruction_and_no_other_participant() {
     let observations = [
-        ("die", &[][..]),
+        ("die", &[][..], &[][..]),
         (
             "enter",
+            &[][..],
             &[("from", "Location"), ("riders", "List(MoveRider)")][..],
         ),
-        ("leave", &[("from", "Location")][..]),
+        ("leave", &[][..], &[("from", "Location")][..]),
+        ("becomeStatus", &[("status", "Status")][..], &[][..]),
+        ("phaseIn", &[][..], &[][..]),
+        ("phaseOut", &[][..], &[][..]),
     ];
     let mut probes = Vec::new();
-    for (word, params) in observations {
-        probes.push(probe(
-            &format!("probeDefault_{word}"),
-            &[],
-            "VerbPhrase",
-            word,
-        ));
-        if !params.is_empty() {
-            let named: Vec<String> = params
-                .iter()
-                .map(|(name, _)| format!("{name} = ${name}"))
-                .collect();
-            let term = format!("{word}({})", named.join(", "));
+    for (word, required, defaulted) in observations {
+        if required.is_empty() {
+            probes.push(probe(
+                &format!("probeDefault_{word}"),
+                &[],
+                "VerbPhrase",
+                word,
+            ));
+        }
+        if !required.is_empty() || !defaulted.is_empty() {
+            let mut params = Vec::new();
+            let mut args = Vec::new();
+            for (name, sort) in required {
+                params.push((*name, *sort));
+                args.push(format!("${name}"));
+            }
+            for (name, sort) in defaulted {
+                params.push((*name, *sort));
+                args.push(format!("{name} = ${name}"));
+            }
+            let term = format!("{word}({})", args.join(", "));
             probes.push(probe(
                 &format!("probeFree_{word}"),
-                params,
+                &params,
                 "VerbPhrase",
                 &term,
             ));
@@ -395,6 +406,9 @@ fn an_observation_has_no_instruction_and_no_other_participant() {
         let mut failures = Vec::new();
         for name in names {
             let expansion = expander.term(&name, "VerbPhrase").unwrap();
+            if !expansion.descendants().into_iter().any(is_subject_word) {
+                failures.push(format!("`{name}` holds no `{SUBJECT_WORD}`:\n{expansion}"));
+            }
             for node in expansion.descendants() {
                 let offends = match node {
                     Node::Call { word, .. } if word == INSTRUCT_WORD => true,
