@@ -20,10 +20,8 @@ Written against the spine (`cleanup-step6-spine`).
 ## Design
 
 - The notation is settled in `docs/design/spelling.md` §7 (`$name` Holes, `$name@Form` printed
-  forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a join is nothing, `,`, `.`, `and`, `or`,
-  `and/or` or `then`, never chosen by a parameter), `( … )` optional parts, `<~Category: …>` and
-  `<~inner Category: …>` Tails, the `^` Gap mark) with its load rules; where this ticket's text
-  differs, §7 governs.
+  forms, `$name*` run Holes, `~` ties, `$xs#<join>` lists, `< … >` optional parts, `%Category: …`
+  Tails, the `^` Gap mark) with its load rules; where this ticket's text differs, §7 governs.
 - The notation is parsed by a new crate, `sylex_spelling` (`crates/spelling/`), whose first
   module it is. `sylex_syl` parses the `.syl` language and nothing else: a `spelling` stays a
   string to it. `cargo xtask dsl check` parses every `spelling` with it once no `<name>` Hole is
@@ -37,10 +35,14 @@ Written against the spine (`cleanup-step6-spine`).
   labels, `*` and the `<.>` join included, and refuses a form outside §7's set, with a negative
   test. No code under `crates/syl/` reads inside a `spelling`, and `cargo xtask dsl fmt` leaves
   every `spelling` as written.
-- Every `spelling` this ticket writes or merges parses with `sylex_spelling`: a one-off script,
-  kept in `docs/evidence/`, parses each, and the landing reports the count. The spellings it
-  leaves still write `<name>` Holes, so `cargo xtask dsl check` parsing every `spelling` under
-  `plugins/` is `syl-spelling-conventions`'s.
+- Before any optional part is written, every `<name>` Hole under `plugins/` (784 Holes on 601
+  `spelling` lines; re-count when claimed) is written `$name` by a one-off script kept in
+  `docs/evidence/`: `< … >` is an optional part in the notation, so a Hole left in the old form
+  would parse as one. A declared affix that abuts a Hole takes a `~` tie (`landwalk`,
+  `typecycling`, `non`). An ordinal is a form, not a tie: `fromTop`'s and `fromBottom`'s "<n>th
+  from …" become "$n@Ordinal from …", and no spelling under `plugins/` contains `~th`.
+- `cargo xtask dsl check` parses every `spelling` under `plugins/` with `sylex_spelling` and
+  refuses one it cannot parse, with a negative test.
 - `docs/design/spelling.md` §8 says what the spelling crate holds, where it says no spelling
   crate exists, and `docs/design/architecture.md` says `sylex_spelling` parses the `spelling`
   notation, beside its sentence that `sylex_syl` parses `.syl`.

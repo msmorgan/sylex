@@ -7,8 +7,7 @@ needs: [syl-parameter-sigil, lean-retirement, syl-spelling-optional-segments, sy
 ## Why
 
 `spelling` strings are to be parsed through the English grammar with typed holes, but
-today they inflect verbs inconsistently, they still write a Hole `<name>` (784 Holes on 601
-`spelling` lines), and 168 `TODO(spelling)` markers, all under `plugins/builtin/`, stand where a
+today they inflect verbs inconsistently, and 168 `TODO(spelling)` markers, all under `plugins/builtin/`, stand where a
 spelling is missing, many carrying generated text instead of a reason.
 
 Two narrower tickets rewrite spellings this ticket also normalizes, and land first:
@@ -17,12 +16,9 @@ Two narrower tickets rewrite spellings this ticket also normalizes, and land fir
 
 ## Design
 
-The notation is settled in `docs/design/spelling.md` §7 (`$name` Holes, `$name@Form` printed
-forms, `$name*` run Holes, `~` ties, `$xs<join>` lists (a fixed join, never one chosen by a
-parameter), `( … )` optional parts, `<~Category: …>` and `<~inner Category: …>` Tails); where this
-ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every `<name>` Hole to
-`$name`. An ordinal is a form, not a tie: `fromTop`'s and `fromBottom`'s "<n>th from …" become
-"$n@Ordinal from …", and no `$n~th` is written.
+The notation is settled in `docs/design/spelling.md` §7; where this ticket's text differs, §7
+governs. `syl-spelling-optional-segments` has already written every Hole `$name` and turned on
+the check that every `spelling` parses.
 
 - A verb is written uninflected wherever its agreement depends on a hole or on the performer;
   agreement is solved when the clause is rendered. Three cases:
@@ -44,11 +40,6 @@ ticket's text differs, §7 governs. This ticket's corpus rewrite migrates every 
 
 ## Done when
 
-- Every `<name>` Hole under `plugins/` is written `$name`, with a `~` tie where a declared affix
-  abuts it (`landwalk`, `typecycling`, `non`), and `fromTop` and `fromBottom` write their ordinal
-  `$n@Ordinal`; no spelling under `plugins/` contains `~th`.
-- `cargo xtask dsl check` parses every `spelling` under `plugins/` with `sylex_spelling`
-  (`syl-spelling-optional-segments`) and refuses one it cannot parse, with a negative test.
 - In separate corpus commits: every spelling follows the three inflection cases, and every
   `TODO(spelling)` whose wording needs no optional or repeated segment is resolved, either written
   or replaced by the specific missing wording.

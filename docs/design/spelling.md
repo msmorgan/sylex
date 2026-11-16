@@ -529,22 +529,22 @@ representation yet.
 
 A `spelling` is fixed words with markup, each mark with one job. `$` marks a Hole, `@` the printed
 form of its head word, `*` a Hole a run of sentences may fill, `~` ties a Hole to letters,
-parentheses mark an optional part, angle brackets a list's join, `<~ … >` a Tail, and `^` a Gap.
+angle brackets mark an optional part, `#< … >` a list's join, `%` a Tail, and `^` a Gap.
 
 ```
 spelling := part*
 part     := text | hole | optional | tail | gap
 hole     := [affix "~"] "$" name [mark] ["~" affix]   -- a parameter's argument
-          | "$" name "<" join ">"                     -- a List parameter
+          | "$" name "#<" join ">"                    -- a List parameter
 mark     := "@" form | "*"
 form     := "Cardinal" | "Arabic" | "Ordinal" | "Roman" | "Counting"
           | "Present" | "Preterite" | "PastParticiple" | "GerundParticiple"
 join     := "" | "," | "." | "and" | "or" | "and/or" | "then"
-optional := "(" part+ ")"
-tail     := "<~" ["inner"] Category ":" part+ ">"
+optional := "<" part+ ">"
+tail     := "%" ["inner"] Category ":" part+        -- runs to the end of its part
 gap      := "^"                                     -- no word; a Gap in the Reading
 affix    := letter+
-text     := any characters except "$", "~", "@", "*", "^", "(", ")", "<" and ">"
+text     := any characters except "$", "~", "@", "*", "^", "#", "%", "<" and ">"
 ```
 
 **A Hole is `$name`**, the sigil that reads the same parameter in `body`
@@ -599,7 +599,7 @@ print the article, as in *Melira, the Living Cure*'s "you get one poison counter
 Vapors*'s "chooses one card of each color", is the parameterless Template `one` at `Amount`,
 whose spelling is "one".
 
-**A list Hole is `$name<join>`.** A `List` parameter must state its join and no other parameter
+**A list Hole is `$name#<join>`.** A `List` parameter must state its join and no other parameter
 may, so a list is visible at its Hole. The joins are a closed set: `<>` juxtaposes the elements;
 `<,>` separates them with commas and no coordinator; `<.>` prints each element as a run of
 sentences (`*`, below) after the one before, so such a list needs no `*`; `<and>`, `<or>`,
@@ -621,7 +621,7 @@ run's first sentence: `when`'s "When $event," before it, `instead`'s "instead" a
 phrase. A sentence of the wording after the Hole's, as `activatedOnlyDuring`'s "Activate only
 $timing.", follows the run's last.
 
-**An optional part is `( … )`.** A parameter is omissible when it has a declared default, or
+**An optional part is `< … >`.** A parameter is omissible when it has a declared default, or
 its sort is `Option(T)` or a list; its absent value is the default, else `none`, else the
 empty list. An optional part is governed by every parameter with a Hole directly in it, and
 each of those must be omissible. It is printed when every governor differs from its absent
@@ -632,7 +632,9 @@ another, which can print only when the outer one does. All the Holes of one para
 one optional part, or all stand outside every one. An empty list is never printed by its Hole;
 it is spelled only as the absent value of an optional part.
 
-**A Tail is `<~Category: …>` or `<~inner Category: …>`** (§3.2): "$per <~VerbPhrase: for each $p>".
+**A Tail is `%Category: …` or `%inner Category: …`** (§3.2): "$per %VerbPhrase: for each $p". It
+has no closing mark: a Tail stands last among the parts beside it, so it runs to the end of the
+`spelling` or of the optional part that holds it.
 Its host is the nearest phrase of the named Category above the Hole the declaration's call fills
 that the English grammar lets carry the Tail's words as a trailing dependent. For ", except …"
 that is a finite Clause and never a relative's Clause, whose Gap the grammar keeps it from
@@ -669,12 +671,10 @@ variant is English (below), and so do the sentences of a run after its first: th
 substitutes one phrase for each Hole where the Hole stands, and under passive subject promotion
 and in a run's later sentences the printed material stands elsewhere (§10).
 
-**No escape exists, because none is needed.** None of `$`, `~`, `@`, `*`, `^`, `(`, `)`, `<` and
-`>` occurs in the analyzed Oracle text ([Lexicon](lexicon.md) §1). `$`, `~`, `@`, `*`, `^`, `<` and
-`>` occur in no in-scope card's text at all, and every parenthesis is removed with reminder text: a
-parenthetical is reminder text even where it reminds the player of something other than a
-keyword's rule, as on Mistform Ultimus, and one inside an ability-word label has no rules
-meaning. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
+**No escape exists, because none is needed.** None of `$`, `~`, `@`, `*`, `^`, `#`, `%`, `<` and
+`>` occurs in any in-scope card's rules text ([Lexicon](lexicon.md) §1). A parenthesis is no
+mark: Oracle text uses parentheses for reminder text, which is removed before analysis, and a
+`spelling` writes none. Square brackets and braces are Oracle's own characters, for cleave and for symbols, and
 are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is no mark.
 
 **A `spelling` is refused at load** when it breaks a rule above, and also when:
