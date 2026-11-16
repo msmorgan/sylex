@@ -48,9 +48,10 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 - American spelling everywhere (code, identifiers, docs, tickets, messages); verbatim quotations
   keep theirs.
 - Before naming a public item or coining a term, check `docs/contexts/game-model/CONTEXT.md` or
-  `docs/contexts/oracle-english/CONTEXT.md`. Where the entry describes settled design, rename
-  the identifier to match, never the entry. Where it describes a design a DRAFT doc is changing,
-  the design wins: update or delete the entry with the change.
+  `docs/contexts/oracle-english/CONTEXT.md`. Rename the identifier to match, never the
+  entry. The one exception: a glossary entry is no authority over a design doc marked DRAFT, so
+  when you change such a doc and an entry contradicts the new text, update or delete the entry
+  in the same change.
 
 ## Version control
 

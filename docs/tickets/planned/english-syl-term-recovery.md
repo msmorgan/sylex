@@ -24,9 +24,8 @@ printed. It does not wait for the rest of step 6 (`cleanup-step6-syl`).
 ## Done when
 
 - For a canon card, recovery reads the Packed Forest of its Oracle text and yields candidate
-  surface terms built from the builtin Primitives, Templates and Definitions; candidates that
-  semantics refuses drop out, and one it does not understand is reported as that
-  (`docs/design/semantics.md` §7).
+  surface terms built from the builtin Primitives, Templates and Definitions; a candidate
+  `cargo xtask dsl check` refuses drops out.
 - Every canon card's recovery is run and reported: one surviving candidate that matches the
   card's `.syl` file, a mismatch, no candidate, or more than one candidate. A card with more than
   one is reported with each candidate; recovery chooses none, by rank or otherwise, and stores no
@@ -36,11 +35,12 @@ printed. It does not wait for the rest of step 6 (`cleanup-step6-syl`).
 
 ## Not in scope
 
-- Choosing among the candidates the checker and discourse leave: the pragmatics step
+- Pruning candidates by what they mean, which waits for the semantics crate
+  (`docs/design/semantics.md` §7), and choosing among the candidates left: the pragmatics step
   (`docs/design/pragmatics.md`).
 
 ## Pointers
 
 `docs/design/architecture.md` ("Spelling is a construction grammar"),
-`docs/design/english.md` §4, §8, `docs/design/semantics.md` §1, §3,
+`docs/design/english.md` §4, §8, `docs/design/semantics.md` §1, §3, §7,
 `docs/design/syl.md`, `crates/english/`, `plugins/canon/cards/`.

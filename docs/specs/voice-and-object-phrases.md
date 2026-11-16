@@ -629,8 +629,8 @@ passive term and a copular one, since the grammar gives both Readings, and a tra
 over a coordination has a wide and a narrow term (*Broken Wings*'s "target artifact, enchantment,
 or creature with flying"; *Troublemaker Ouphe*'s "target artifact or enchantment an opponent
 controls"). The contexts separate many of them: `does`, `did` and `would` admit only events, and
-a condition wants a state. Choosing among the rest is a pragmatics step of its own, outside the
-term language and outside this spec.
+a condition wants a state. Choosing among the rest is a pragmatics step of its own
+(`docs/design/pragmatics.md`), outside this spec.
 
 ## 10. What this replaces
 

@@ -27,11 +27,11 @@ inspects to rank a class, the term or the meaning, is open (§5).
 
 ## 2. Principles
 
-1. **Rank proposes and the stored term decides.** Pragmatics runs when a card's text is read
-   into a term for the first time. Reading a stored term never runs it. A wrong choice is
-   corrected in the card's `.syl` file, and the check on a stored term is that it is among the
-   candidates of its text, that semantics accepts it and that it spells back to its text,
-   whatever its rank. Why: a ranking that
+1. **Rank proposes and the stored term decides.** Pragmatics runs when a card's text is read into a
+   term for the first time. Reading a stored term to play it never runs it; the check of a stored
+   card may run it to report a rank, which gates nothing. A wrong choice is corrected in the card's
+   `.syl` file, and the check on a stored term is that it is among the candidates of its text, that
+   semantics accepts it and that it spells back to its text, whatever its rank. Why: a ranking that
    decided what a stored card means would be a second, unwritten source for that meaning.
 2. **Pragmatics never overrules semantics.** It ranks only what semantics accepted, and it
    refuses nothing. A reading that cannot be true of the game is semantics' to refuse; a reading
@@ -54,8 +54,8 @@ inspects to rank a class, the term or the meaning, is open (§5).
 A declaration carries its preferences in a `pragmatics` field beside its `lexical`, `spelling`
 and meaning (the form is a sketch):
 
-    keyword_ability flying = { pragmatics = { preferHostTypes = [creature] }, … }
-    subtype vehicle        = { pragmatics = { mimicTypes = [creature] }, … }
+    ability flying  { pragmatics = {preferHostTypes = [creature]}, … }
+    subtype vehicle { pragmatics = {mimicTypes = [creature]}, … }
 
 `preferHostTypes` says which hosts a description by this ability is likely to describe. What
 `mimicTypes` does depends on the default (§4): under hypothesis B a type that mimics another
@@ -76,37 +76,40 @@ The lines the hypotheses are tried against, each with the reading it means:
 | *Broken Wings*: "Destroy target artifact, enchantment, or creature with flying." | narrow |
 | *Elven Riders*: "can't be blocked except by Walls and/or creatures with flying" | narrow |
 | "an instant card or a card with flash" | narrow |
+| *Exorcise*: "Exile target artifact, enchantment, or creature with power 4 or greater." | narrow |
+| *Airlift Chaplain*: "a Plains card or a creature card with mana value 3 or less" | narrow |
 | *Detection Tower*: "your opponents and creatures your opponents control with hexproof can be the targets of spells and abilities you control as though they didn't have hexproof" | wide |
 
 Wide is the modifier over the whole coordination and narrow over its last arm. The lines come
 from regular expressions over Oracle text that is not restricted to Vintage-legal cards, so they
-are attested wordings and not counts. 
+are attested wordings and not counts.
 
 - **A. Wide, unless a preference narrows it.** `flying` prefers a creature host, which narrows
   *Broken Wings*. It reads *Elven Riders* wide, wrongly: a Wall is a creature, so the preference
-  is met by both arms and narrows nothing.
+  is met by both arms and narrows nothing. It reads the flash, *Exorcise* and *Airlift Chaplain*
+  lines wide, wrongly, unless `flash`, power and mana value each carry a preference.
 - **B. Wide where the arms' sorts match, narrow where they differ, unless a preference says
   otherwise.** Card types match (*Troublemaker Ouphe*; *Broken Wings*, which `flying` then
   narrows), and a subtype beside a card type does not, which reads *Elven Riders* narrow.
   `mimicTypes` makes Vehicle count as a card type for "Creatures and Vehicles you control". It
   reads the Heroes and Treasures lines narrow, wrongly, unless each such subtype carries the
-  same data, and "an instant card or a card with flash" wide, wrongly, since both arms are
-  cards.
+  same data, "an instant card or a card with flash" and *Exorcise* wide, wrongly, since their
+  arms' sorts match, and *Detection Tower* narrow, wrongly, since a player and a creature differ.
 - **C. Wide, unless a preference narrows it or the wide reading makes one arm a subset of
   another.** Every Wall with flying is a creature with flying, so the wide reading of *Elven
   Riders* says its first arm twice and the narrow one is taken. It needs which card type a
-  subtype belongs to, which the Catalogs hold. It reads every line above as it means.
+  subtype belongs to, which the Catalogs hold. It reads *Airlift Chaplain* wide, wrongly, since
+  neither arm is a subset of the other, and *Exorcise* narrow only if it knows that a
+  noncreature permanent has no power.
 - **D. By kind of modifier: "you control" and "an opponent controls" are wide, and "with" and a
-  keyword ability is narrow.** It reads *Detection Tower* narrow, wrongly, and every other line
-  above as it means, with no data on any declaration. Each other kind of modifier ("with mana value
+  keyword ability is narrow.** It reads *Detection Tower* narrow, wrongly, and the control and
+  keyword lines as they mean, with no data on any declaration. It says nothing of the mana
+  value and power lines: each other kind of modifier ("with mana value
   …", "with power …", a relative clause, "named …") needs its own row.
 
-C is the one hypothesis that reads every line above as it means. *Detection Tower* separates
-it from D: its arms, players and creatures, do not overlap, and "with hexproof" is meant of
-both.
-
-Some lines never reach these rules. In "target player or creature you control" the wide reading
-has a player that someone controls, which semantics refuses.
+No hypothesis reads every line above as it means. In the *Airlift Chaplain* line the two
+readings pick out the same cards, since a land card's mana value is 0, so whether it reaches
+pragmatics at all depends on when two meanings are the same ([Semantics](semantics.md) §8).
 
 ## 5. Open
 

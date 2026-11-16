@@ -42,7 +42,8 @@ term yields a Reading for the English layer to realize. Its data is not kept
 apart: every `.syl` declaration carries its `lexical` and `spelling` fields
 beside its meaning ([`.syl`](syl.md) §2), so a word's wording
 and its meaning are one fact with one source. Spelling coverage is therefore
-ingestion coverage: a card recovers when every phrase it prints has a spelling.
+the first condition of ingestion: a card has candidates to recover when every
+phrase it prints has a spelling.
 [Spelling](spelling.md) is the grammar's design.
 
 **The card language** is `.syl`: declarations under `plugins/`. Primitives,
@@ -162,10 +163,13 @@ Readings, which the parser keeps rather than choosing ([English](english.md)
 gives every candidate term, and semantics drops each one it refuses. Where more
 than one meaning is left, a pragmatics step ranks them and the top one is
 stored; two ranked equal are reported and no term is stored
-([Pragmatics](pragmatics.md)). The stored term is the decision: reading it
-never ranks anything, and what is checked for every card is that its stored
-term is among the candidates of its text, that semantics accepts it and that it
-spells back to the text ([Semantics](semantics.md) §7).
+([Pragmatics](pragmatics.md)). This pipeline is part of the direction ("The
+layers"). The stored term is the decision: reading it to play it never ranks
+anything, and what is checked for every card is that its stored term is among
+the candidates of its text, that semantics accepts it and that it spells back
+to the text ([Semantics](semantics.md) §7). A choice among antecedents is no
+such decision: one surface term holds both, and semantics makes it by a fixed
+rule on every reading ([Semantics](semantics.md) §8).
 
 ## Exact round trip
 

@@ -154,17 +154,17 @@ linter that checks whether Oracle's templating conventions were followed. A
 grammatical sentence a card could print is admitted, even where Oracle would
 template it differently. The grammar refuses a grammatical form only where a
 gate measurably prevents spurious Readings or forest growth on real card text
-(§6). The style guide describes
-what Oracle writes: it is evidence about the register, never a rule a Reading
-must pass. So a template difference is never grounds for correcting a card's
-text; an Editorial Correction
+(§6). The style guide describes what Oracle writes: it is evidence about the
+register, never a rule a Reading must pass. So a template difference is never
+grounds for correcting a card's text; an Editorial Correction
 ([`corrections.txt`](../../crates/english/corrections.txt)) is only for an
-error in the text. A Reading that is grammatical but wrong for the rules is not the
-grammar's to reject either. The layers above resolve it, by meaning and then by likelihood
-([Architecture](architecture.md), "Spelling is a construction grammar"). Why:
-a grammar that enforced templating would refuse any card, custom content
-included, whose wording departs from current templates, and it would decide
-by convention what only meaning can decide.
+error in the text. A Reading that is grammatical but wrong for the rules is not
+the grammar's to reject either. In the direction the design is heading, the
+layers above resolve it, by meaning and then by likelihood
+([Architecture](architecture.md), "Spelling is a construction grammar"). Why: a
+grammar that enforced templating would refuse any card, custom content
+included, whose wording departs from current templates, and it would decide by
+convention what only meaning can decide.
 
 **Keep it packed.** When a phrase can attach at more than one site, every
 grammatical attachment stays in the Packed Forest, and nothing in this layer

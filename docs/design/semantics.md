@@ -559,9 +559,10 @@ are found over enumerated candidates or over a packed form is open (§8).
 
 1. **Which sorts are kinds of phrase.** [`syl.md`](./syl.md) §6 gives the test and applies it to
    the four sorts the voice spec worked around. `plugins/builtin/` declares words at more than a
-   hundred sorts, among them `Conferral`, `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
-   `Timing` and `TriggerCondition`, and none of those has been put to the test. Each is either a
-   kind of phrase the text prints or a classification that moves into the meaning.
+   hundred sorts, among them `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
+   `Timing` and `TriggerCondition`, and none of those has been put to the test. Each is a kind of
+   phrase the text prints, a classification that moves into the meaning, or rules data, which
+   stays ([`syl.md`](./syl.md) §6).
 2. **Which word holds a replacement's two clauses.** *Phytohydra* prints "If damage would be
    dealt to this creature, put that many +1/+1 counters on it instead." With `instead` a
    primitive (§6), either the sentence's "if" is the ordinary conditional word and classification
@@ -599,7 +600,7 @@ are found over enumerated candidates or over a packed form is open (§8).
    body once or at each call is not settled.
 11. **Whether the four steps run once in order.** "The same is true for …" (*Soulflayer*) takes
     its clause's kind from the sentence it refers to, so classification there waits on a
-    reference. A prevention's event and its "prevent that damage" are joined by a reference
+    reference. A prevention's event and its "prevent 1 of that damage" are joined by a reference
     (*Urza's Armor*), and a later sentence may read a Referent the event introduced. A `shared`
     phrase's `_` is read before the phrase it stands for.
 12. **What a Definition's outcome is** (§2.3), which decides what its body exports: the creature
