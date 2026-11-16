@@ -589,9 +589,10 @@ agreement nor a governing word fixes it (§1). The forms are the lexicon's (`Num
 
 A label is refused where the position admits only one form. A wording at a numeric sort that
 leaves its numeric Hole unlabeled, as `lit`'s "$value" and `plus`'s "$left plus $right" do,
-prints it in the notation of the Hole its own call fills: `plus(thatMuch, 1)` is "that many plus
-one +1/+1 counters" under `putCounters` in *Hardened Scales*, with its 1 a word, and under
-`dealDamage` its 1 is a numeral. *Sulfuric Vapors* prints that as "that much damage plus 1",
+prints it in the notation of the Hole its own call fills: `plus(thatMany, 1)` is "that many plus
+one +1/+1 counters" under `putCounters` in *Hardened Scales*, with its 1 a word, and
+`plus(thatMuch, 1)` under `dealDamage` prints its 1 as a numeral. *Sulfuric Vapors* prints that as
+"that much damage plus 1",
 with "plus 1" after the noun, which `plus`'s wording inside the amount does not print: it is a
 wording of its own (`syl-damage-and-life-noun-phrases`).
 

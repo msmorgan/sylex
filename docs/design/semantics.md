@@ -198,6 +198,22 @@ They are the only references that reach objects a linked ability published ([CR#
 "This way" reads only the current ability's stamps, since it is no linking phrase ([CR#607.1]).
 Only a Participial Description written without "this way" reaches a linked ability's objects.
 
+**Numeric anaphors** read back a number within the current ability ([CR#607.1,608.2c]).
+`thatMuch(sort)` covers both scalar outcomes and the size of an event's or action's group — whether
+a `would` clause's prospective group or amount ([CR#614.6]) or a completed one — because English
+selects "that much" (`thatMuch`) against "that many" (`thatMany`) by the noun quantified rather
+than by whether the antecedent was a scalar or a group (*Ingenious Artillerist*, *Ageless Entity*,
+*Doubling Season*). Unqualified (`sort = none`), it excludes clause-mate subjects and outcomes that
+name what was declined (`ceilingShortfall`), ranks accessible numeric antecedents by clause
+prominence (*Neheb, Dreadhorde Champion*, *Memory Vampire*), and is refused when two tie; a
+sort-qualified read (`preventedThisWay`, `removedThisWay`, `shortOfCeiling`, or `infect`'s
+`damageDealt` [CR#702.90b]) filters by `OutcomeSort`. `theDifference` is separate: a strict
+inequality (`compareAmt`, `compareOver`) introduces its positive difference into that comparison's
+branch alone, closed across negation (`not`, an `else` branch) and disjunction (`or`) and never
+eligible for bare `thatMuch`. `chosenNumber` is no numeric anaphor: it belongs to the `ChoiceRef`
+family (`theChoice`, `theLatestChoice`) and crosses ability boundaries on linked choice abilities
+([CR#607.2d]).
+
 ### 2.5 The Contrast Anchor
 
 A bare printed "another" or "other" (`other`) excludes its Contrast Anchor, which need not be a
@@ -484,9 +500,11 @@ are found over enumerated candidates or over a packed form is open (§6).
    manifest dread puts onto the battlefield is chosen from the cards looked at, and §2.3 drops
    partitive Referents.
 10. **An anaphor with more than one accessible Referent.** §2.4 says which Referents an anaphor
-    may read and not which it reads when several qualify. Two meanings that differ only in an
-    antecedent are one surface term, so the stored term cannot carry the choice: it is made by a
-    fixed rule in the reference step each time a term is read, and that rule is not designed.
+    may read (and that an unqualified numeric anaphor ranks by clause prominence and refuses a
+    tie), not the exact salience rule when several Referents qualify. Two meanings that differ
+    only in an antecedent are one surface term, so the stored term cannot carry the choice: it is
+    made by a fixed rule in the reference step each time a term is read, and that rule is not
+    designed.
 11. **Enumerated candidates or a packed form** (§5).
 12. **Whether the Gap of a relative clause and the Gap a shared phrase fills are one word.**
     `which` and `_` are both the Gap at `NounPhrase`, each spelled `^` (`spelling.md` §7), and

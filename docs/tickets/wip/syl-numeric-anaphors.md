@@ -19,10 +19,18 @@ This ticket lands after `syl-single-face-card-call`, which re-indents every sing
 
 Written against the spine (`cleanup-step6-spine`).
 
-## Open questions
+## Design
 
-- Whether the four readbacks become one primitive, optionally sort-qualified, or stay distinct
-  because they resolve differently; and whether `chosenNumber` joins them.
+- `thatMuch(sort: Option(OutcomeSort) = none)` merges `thatMuch`, `theOutcome` and `groupSize`, with
+  `thatMany` (`spelling = "that many"`, `body = thatMuch`) for the count-noun surface; `theOutcome`
+  and `groupSize` are deleted, and `preventedThisWay`, `removedThisWay`, `shortOfCeiling` and
+  `infect` pass `sort = …`.
+- `theDifference` stays its own primitive because a strict inequality introduces it into that
+  comparison's positive branch alone, closed across negation and disjunction, and bare `thatMuch`
+  never reads it.
+- `chosenNumber` stays excluded because it belongs to the `ChoiceRef` family (`theChoice`,
+  `theLatestChoice`) and reaches across linked abilities ([CR#607.1,607.2d]), whereas numeric
+  anaphors resolve within the current ability.
 
 ## Done when
 
@@ -44,8 +52,7 @@ Written against the spine (`cleanup-step6-spine`).
 
 ## Pointers
 
-`plugins/builtin/primitives/quantity/thatMuch.syl`, `theOutcome.syl`,
-`groupSize.syl`, `theDifference.syl`, `chosenNumber.syl`;
-`plugins/builtin/templates/quantity/preventedThisWay.syl`, `removedThisWay.syl`,
+`plugins/builtin/primitives/quantity/thatMuch.syl`, `theDifference.syl`, `chosenNumber.syl`;
+`plugins/builtin/templates/quantity/thatMany.syl`, `preventedThisWay.syl`, `removedThisWay.syl`,
 `shortOfCeiling.syl`; `plugins/canon/cards/Woodland Champion.syl`, `Divine Visitation.syl`,
 `Sandstone Oracle.syl`; `docs/design/semantics.md` §1 (item 5(b)), §2.4.
