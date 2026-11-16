@@ -12,7 +12,8 @@ sort and expansion exist only as throwaway tools in `xtask` (`dsl check`, `dsl e
 ## Overview
 
 `.syl` is the language in which the vocabulary and cards under `plugins/` are written. This document
-says how a term is written, named and expanded; what the term means, and how its references
+says how a term is written, named and expanded; what a term may say is
+[`surface.md`](./surface.md); what the term means, and how its references
 resolve, is [`semantics.md`](./semantics.md). A file is parsed (§2), each name is resolved by the
 sort expected where it stands (§3), and Templates and Definitions are expanded (§4). The expanded
 term is then read in printed order (§5) by semantics ([`semantics.md`](./semantics.md)
@@ -192,67 +193,3 @@ agree.
 The elements of a list are read in printed order too: a conjunction's conjuncts and a sequence's
 steps stand in the order the text prints them, so "basic land" is
 `and([hasSupertype(basic), isLand])`.
-
-## 6. What a Surface Term Says
-
-**A sort names a kind of phrase.** `Clause`, `VerbPhrase`, `NounPhrase`, `Nominal` and its
-modifier sorts, `Amount`, a determiner, a duration phrase, a Turn Point are kinds of phrase. So
-are the sorts of words and symbols a card prints: a card type, a color, a mana symbol, a counter
-kind. A sort that says what a phrase does in the game is no kind of phrase and is not a sort of
-the term language.
-
-The test is put to a pair of sorts: where two terms differ only in which of the two they stand
-at and print the same words in the same structure, the sort that names a role in the game is the
-one that goes. The sorts of the words a coercion wraps (`CardType` under `NounWord`) name kinds
-of word and are not such a pair. `clause(you, did(attack, within = thisTurn))` prints "you
-attacked this turn" whether it stands where a condition or an event is wanted, so `Condition`
-and `GameEvent` go and `Clause` stays. `VerbPhrase` and `Clause` are no such pair: one prints a
-subject and the other does not.
-
-**A clause stands bare wherever the text prints one.** In the direction, the words that make an
-event, a condition or a static statement out of a clause go, and the word that prints the
-surrounding construction takes the clause:
-
-| Card | Text | As `voice-and-object-phrases.md` builds it | In the direction |
-|---|---|---|---|
-| *Grollub* | "Whenever this creature is dealt damage, …" | `whenever(does(thisCreature, be(done(…))), …)` | `whenever(clause(thisCreature, be(done(…))), …)` |
-| *Mardu Hordechief* | "if you attacked this turn" | `holds(you, did(attack, within = thisTurn))` | `clause(you, did(attack, within = thisTurn))` |
-| *Glorious Anthem* | "Creatures you control get +1/+1." | `static(clause(…, getsPt(…)))`, through a coercion from `Clause` to `StaticSpec` | `static(clause(…, getsPt(…)))`, `static` taking a `Clause` |
-
-So `does`, `holds` and the coercion from `Clause` to `StaticSpec` are scaffolding: the planned
-tickets build them as `voice-and-object-phrases.md` states, and they come out when semantics
-exists. `StaticSpec`, `GameEvent`, `Condition` and `Replacement` are
-types of the meaning ([`semantics.md`](./semantics.md) §6).
-
-**A surface term still says more than a Reading.** It is not the parse written another way:
-
-- It names which word of the game each printed word is. A Reading has the verb "counter" with a
-  frame; the term has the keyword action `counter`, and a keyword's Definition where the card prints
-  the keyword.
-- Its arguments are named roles, not complement positions, and the same roles in every voice and
-  verb form (`voice-and-object-phrases.md` §3).
-- It holds no inflection, agreement, case or punctuation, which the English layer derives
-  (`spelling.md` §1, `english.md` §7).
-- A fixed wording is one Template call, and its body is the surface term the wording abbreviates.
-- Attachment and bracketing are explicit, so two Readings of one sentence are two terms.
-
-**Templates and Definitions are surface to surface.** A body is a surface term over the
-declaration's parameters. Expansion is unchanged: it substitutes a Template's parameters, wraps
-a Definition's body in its Reference Scope under its Deed, keeps every call and parameter
-boundary, and reads each argument once, in printed order (§4, §5).
-
-**Rules data is not text a card prints.** A state-based action or a conferral is a record (an
-`SbaRule`'s `scope`, `when` and `then`; a `ConferralRule`'s `scope` and `confer`), a declaration's
-`confers` field holds `Conferral` values, and some Definition bodies use words no card prints
-(`asEvent` in `lifelink`, `stateBasedActionsChecked`). Their sorts say what the data does in the
-game and stay. Where the line between rules data and printed text runs, what keeps a card from
-calling a rules-only word, and what the clauses inside rules data are written as are open
-([`semantics.md`](./semantics.md) §8).
-
-**`cargo xtask dsl check` checks surface form only**: that names resolve at their expected sorts,
-that arguments are bound as §2 says, and the structural refusals of `voice-and-object-phrases.md`
-§9 that concern silent words (`subject` under `done`, `_` under `shared`, `$actor` in an `action`
-Definition). The event gate and "a replacement's event is a `would` clause" are not surface form.
-Semantics refuses them ([`semantics.md`](./semantics.md) §6). Until it exists, the sorts that say
-what a clause means and the checks the planned tickets add to `cargo xtask dsl check` stand in
-for it.

@@ -24,7 +24,7 @@ replacements have landed.
   2. For each set of names that meet at one sort, are its members one word or do they need
      names that tell them apart?
 - It rewrites no corpus. A card on the list gets its surface term written by hand in the slice's
-  folder, in the form `docs/design/syl.md` §6 gives with the scaffolding sorts gone, with
+  folder, in the form `docs/design/surface.md` gives with the scaffolding sorts gone, with
   the term the card means and each known wrong one: the wide and the narrow attachment, the
   passive and the copular "is tapped".
 - Its code is thrown away. It lives under the gitignored
@@ -51,7 +51,7 @@ replacements have landed.
 - For each set of names that meets at one sort (`doIf`, `replace`, `nthOccurrence`, the ten
   `or` declarations and any other the audit of `plugins/builtin/` finds), the findings give
   each member's wording and say whether the set is one word or needs distinct names.
-- `semantics.md` §6 and §8 and `syl.md` §6 are edited from the findings, each edit naming the
+- `semantics.md` §6 and §8 and `surface.md` are edited from the findings, each edit naming the
   card that forced it, and an item of §8 the slice answers leaves §8.
 - The findings list every stub and what it leaves undecided.
 - No file under `crates/` or `plugins/` is changed by the landing.
@@ -65,7 +65,7 @@ replacements have landed.
 
 ## Pointers
 
-- `docs/design/semantics.md` §2, §6, §7, §8; `docs/design/syl.md` §6;
+- `docs/design/semantics.md` §2, §6, §7, §8; `docs/design/surface.md`;
   `docs/design/architecture.md` ("The layers"); `docs/design/pragmatics.md`
 - `docs/specs/voice-and-object-phrases.md` §3 to §5, §8
 - `docs/unusual-cards.md` ("Events and their participants")

@@ -792,7 +792,7 @@ Tickets this meets, each to be revised against it before it is claimed:
    (which clause is an event, a condition, a static statement, a replacement) and is the home of
    reference resolution. A clause then stands bare after "when" and "if" and in a static
    ability, and the event gate is a check semantics makes, not a sort. The direction is written in
-   `architecture.md` ("The layers"), `semantics.md` §6 to §8 and `syl.md` §6. Until
+   `architecture.md` ("The layers"), `semantics.md` §6 to §8 and `surface.md`. Until
    `sylex_semantics` exists, this spec's `does`, `holds`, coercion into `StaticSpec` and event
    gate in `cargo xtask dsl check` are built as written: they are the scaffolding that keeps the
    corpus checked, and they come out when semantics makes the same refusals. Item 3 is part of

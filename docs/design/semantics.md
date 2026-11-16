@@ -25,7 +25,7 @@ has four steps:
 The term says what the card prints and semantics decides what it means. That split is the
 direction: today the term language's own sorts (`GameEvent`, `Condition`, `StaticSpec`,
 `Replacement`) say what a clause means, and §4 describes the action-clause spine in those terms.
-They are scaffolding until the reading of §6 exists ([`syl.md`](./syl.md) §6).
+They are scaffolding until the reading of §6 exists ([`surface.md`](./surface.md) §2).
 
 ## 1. Principles
 
@@ -557,12 +557,12 @@ are found over enumerated candidates or over a packed form is open (§8).
 
 ## 8. Open
 
-1. **Which sorts are kinds of phrase.** [`syl.md`](./syl.md) §6 gives the test and applies it to
+1. **Which sorts are kinds of phrase.** [`surface.md`](./surface.md) §1 gives the test and applies it to
    the four sorts the voice spec worked around. `plugins/builtin/` declares words at more than a
    hundred sorts, among them `CharacteristicEdit`, `MoveRider`, `CostShift`, `Cost`,
    `Timing` and `TriggerCondition`, and none of those has been put to the test. Each is a kind of
    phrase the text prints, a classification that moves into the meaning, or rules data, which
-   stays ([`syl.md`](./syl.md) §6).
+   stays ([`surface.md`](./surface.md) §4).
 2. **Which word holds a replacement's two clauses.** *Phytohydra* prints "If damage would be
    dealt to this creature, put that many +1/+1 counters on it instead." With `instead` a
    primitive (§6), either the sentence's "if" is the ordinary conditional word and classification
@@ -591,7 +591,7 @@ are found over enumerated candidates or over a packed form is open (§8).
    reference resolution allocates and keep printed order; it is not defined. The fixed rule of
    §7 step 5 cannot be the Reading's Ranking Key alone, since two terms from one Reading share
    it.
-9. **What a rules row's clauses are written as** ([`syl.md`](./syl.md) §6), and what replaces
+9. **What a rules row's clauses are written as** ([`surface.md`](./surface.md) §4), and what replaces
    `Condition` and `Action` where a clause is held: `SbaRule`'s `when` and `then`, the
    `intervening` parameter of `triggered`, a deontic rule's Unless Condition. Where the line
    between rules data and printed text runs is part of this.

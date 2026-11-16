@@ -37,9 +37,9 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
   never extend it or copy newer work into it.
 - `docs/design/`: design docs; `architecture.md` is the overall design and the place to start,
   `english.md` the English grammar, `semantics.md` the semantics design, `syl.md` the `.syl`
-  language, `spelling.md` the spelling grammar and `pragmatics.md` the step that ranks the
-  meanings a text can have. The last four are marked DRAFT: they give direction, not a settled
-  design.
+  language, `surface.md` what a stored term may say, `spelling.md` the spelling grammar and
+  `pragmatics.md` the step that ranks the meanings a text can have. The last five are marked
+  DRAFT: they give direction, not a settled design.
 - `docs/specs/`: accepted designs not yet in code. `docs/unusual-cards.md`: cards whose text defeats
   a natural modeling assumption.
 
