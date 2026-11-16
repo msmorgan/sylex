@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         sequentially([
             instruct(this, dealDamage(amount = 4, recipient = target(isCreature))),
-            establish(cant(any, preventDamage(allDamage)), duration = modifiesPrecedingAction)]))]})
+            establish(cant(any, preventDamage(allDamage)), duration = precedingAction)]))]})
