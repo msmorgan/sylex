@@ -679,10 +679,10 @@ and in a run's later sentences the printed material stands elsewhere (§10).
 **No escape exists but the join `\n`, because none is needed.** None of `$`, `~`, `@`, `*`, `^`,
 `#`, `%`, `<` and `>` occurs in any in-scope card's rules text ([Lexicon](lexicon.md) §1). A
 parenthesis is no mark: Oracle text uses parentheses for reminder text, which is removed before
-analysis, and a `spelling` writes none. The line-break join is written `\n` so that no `spelling`
-holds a line break; a backslash occurs in no card's rules text either. Square brackets and braces
-are Oracle's own characters, for cleave and for symbols, and are never markup. `+` is Oracle's too
-("+1/+1", Will Kenrith's "[+2]"), and is no mark.
+analysis, and a `spelling` writes none. The line-break join is written `\n`, an escape, and not as
+a line break between the brackets; a backslash occurs in no card's rules text either. Square
+brackets and braces are Oracle's own characters, for cleave and for symbols, and are never markup.
+`+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is no mark.
 
 **A `spelling` is refused at load** when it breaks a rule above, and also when:
 
