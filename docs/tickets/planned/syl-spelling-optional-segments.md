@@ -56,7 +56,7 @@ near-duplicate Template families: `enters…`, `activatedOnly…`, `prevent…`,
   scan when claimed). The last three hold a move's riders: their riders Hole is taken out and a
   marker names the depictives design.
 - The coordinator Templates are spelled as Design states, and no `coord` primitive has a
-  `spelling`. `isOutlaw` keeps its own wording over an unspelled `coord(andOr, …)` in its body.
+  `spelling`. `isOutlaw` keeps its own `"outlaw"` wording over `andOr([…])` in its body.
 - The near-duplicate Template families that differed only by an optional or repeated part are
   each one Template; the landing lists the merges.
 - No spelling this ticket writes carries a form label, `*` or `#<.>` join.
