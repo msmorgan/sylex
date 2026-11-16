@@ -21,7 +21,7 @@ card singleFaced({
                       toughness = 5}},
                   retained = planeswalker)),
               untilEndOfTurn),
-            preventAll(it, thisTurn)])),
+            preventAll(to = it, duration = thisTurn)])),
       activated(
         loyaltySymbol(up(0)),
         create(1, written(creatureToken(2, 2, [white], [knight, ally])))),

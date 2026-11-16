@@ -1,5 +1,5 @@
-# "Activate only once": no more than one while the object exists [CR#602.5b,702.177a].
+# "only once": no more than once while the object exists [CR#602.5b,702.177a].
 template oncePerObject: UsageLimit {
-  spelling = "Activate only once",
+  spelling = "only once",
   body = usageLimit(1, thisObject)
 }

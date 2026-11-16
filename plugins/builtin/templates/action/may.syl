@@ -1,8 +1,8 @@
-# "You may <body>. [If you do, <ifDid>.] [If you don't, <ifNot>.]"
+# "you may <body>[. If you do, <ifDid>][. If you don't, <ifNot>]"
 template may(
   body: VerbPhrase,
   ifDid: Option(VerbPhrase) = none,
   ifNot: Option(VerbPhrase) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by ifDid, ifNot.
+  spelling = "you may $body<. If you do, $ifDid><. If you don't, $ifNot>",
   body = withContinuation(optional, $body, ifDid = $ifDid, ifNot = $ifNot)
 }

@@ -1,14 +1,15 @@
-# "Prevent the next N <kind> damage that would be dealt [to <to>] [duration]": a shield, used
-# up as it prevents [CR#615.7].
+# "Prevent the next N [<kind>] damage that would be dealt [to <to>] [by <source>] [<duration>]": a
+# shield, used up as it prevents [CR#615.7].
 template preventNext(
-  to: NounPhrase,
   amount: Amount,
-  duration: Option(Duration),
-  kind: Option(DamageKind) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration, kind.
+  kind: Option(DamageKind) = none,
+  to: NounPhrase = any,
+  by: Subject = any,
+  duration: Option(Duration) = none): VerbPhrase {
+  spelling = "prevent the next $amount< $kind> damage that would be dealt< to $to>< $by>< $duration>",
   body = establish(
     replace(
-      would(any, dealDamage(recipient = $to, kind = $kind)),
+      would($by, dealDamage(recipient = $to, kind = $kind)),
       instead(preventDamage(theNext($amount)))),
     duration = $duration)
 }

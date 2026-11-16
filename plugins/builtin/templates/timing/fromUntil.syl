@@ -1,5 +1,0 @@
-# A Duration bounded by a starting Event and an ending Event.
-template fromUntil(start: GameEvent, end: GameEvent): Duration {
-  spelling = "from $start until $end",
-  body = between(start = $start, end = $end)
-}

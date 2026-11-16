@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(1)],
     types = [artifact],
     text = [
-      static(entersChoosingPlayer(thisArtifact, anOpponent)),
+      static(entryChoice(thisArtifact, anOpponent)),
       at(
         beginningOfPossessed(the(isChosenPlayer), upkeep),
         sequentially([

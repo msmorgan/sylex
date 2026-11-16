@@ -1,5 +1,9 @@
-# "[cost]: <action>. Activate only once <limit>."
-template activatedOnlyOnce(cost: Cost, action: VerbPhrase, limit: UsageLimit): Ability {
-  spelling = "$cost: $action. Activate only once $limit.",
-  body = activated($cost, $action, limit = $limit)
+# "[cost]: <action>. Activate <limit>[ and only if <guard>]."
+template activatedOnlyOnce(
+  cost: Cost,
+  action: VerbPhrase,
+  limit: UsageLimit,
+  guard: Option(Condition) = none): Ability {
+  spelling = "$cost: $action. Activate $limit< and only if $guard>.",
+  body = activated($cost, $action, limit = $limit, guard = $guard)
 }

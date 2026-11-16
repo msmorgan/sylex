@@ -3,7 +3,6 @@
 template splitOverPlaneswalker: NounPhrase {
   # TODO(spelling): Select the player or the permanent's controller from the preceding subject's
   # union alternative.
-  body = eitherOf(
-    pro(unionHalf(player), one),
-    possessorOf(controller, pro(unionHalf(planeswalker), one)))
+  body = or(
+    [pro(unionHalf(player), one), possessorOf(controller, pro(unionHalf(planeswalker), one))])
 }

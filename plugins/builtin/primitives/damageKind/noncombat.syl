@@ -1,1 +1,3 @@
-primitive noncombat: DamageKind = Noncombat
+primitive noncombat: DamageKind = Noncombat {
+  spelling = "noncombat"
+}

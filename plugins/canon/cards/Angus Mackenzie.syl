@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       activatedOnlyDuring(
         compound([mana([pip(green), pip(white), pip(blue)]), tapSymbol]),
-        preventAll(any, thisTurn, kind = combat),
+        preventAll(kind = combat, duration = thisTurn),
         beforePart(combatDamage))],
     power = 2,
     toughness = 2})

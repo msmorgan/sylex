@@ -10,9 +10,9 @@ ability champion(subject: Predicate) {
   body = [
     when(
       does(actor(thisPermanent), enter),
-      mayOrElse(
+      may(
         pay(payment(perform(exile(a(and([$subject, youControl, isOther]))))), once),
-        sacrifice(thisPermanent))),
+        ifNot = sacrifice(thisPermanent))),
     when(
       does(actor(thisPermanent), leave),
       returnToBattlefield(

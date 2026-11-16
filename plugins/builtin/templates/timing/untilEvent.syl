@@ -1,5 +1,6 @@
 # "until <event>"
-template untilEvent(event: GameEvent): Duration {
-  spelling = "until $event",
-  body = between(end = $event)
+# "[from <start>] until <end>"
+template untilEvent(start: Option(GameEvent) = none, end: GameEvent): Duration {
+  spelling = "<from $start >until $end",
+  body = between(start = $start, end = $end)
 }

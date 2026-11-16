@@ -6,7 +6,7 @@ ability fabricate(amount: Amount) {
   body = [
     when(
       does(actor(thisPermanent), enter),
-      mayOrElse(
+      may(
         putCounters($amount, printedKind(p1p1Counter), thisPermanent),
-        create($amount, written(artifactCreatureToken(1, 1, [], [servo])))))]
+        ifNot = create($amount, written(artifactCreatureToken(1, 1, [], [servo])))))]
 }

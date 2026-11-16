@@ -1,5 +1,0 @@
-# "You may <body>. If you don't, <otherwise>.": an optional Action with only a failure branch.
-template mayOrElse(body: VerbPhrase, otherwise: VerbPhrase): VerbPhrase {
-  spelling = "You may $body. If you don't, $otherwise.",
-  body = may($body, ifNot = $otherwise)
-}

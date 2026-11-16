@@ -1,5 +1,5 @@
-# "you get an emblem with <abilities>"
-template getEmblem(abilities: List(Ability)): VerbPhrase {
-  spelling = "you get an emblem with $abilities#<and>",
-  body = createObject(1, emblem(none, $abilities))
+# "you get an emblem [named <name>] with <abilities>" [CR#114.1,701.54c].
+template getEmblem(name: Option(String) = none, abilities: List(Ability)): VerbPhrase {
+  spelling = "you get an emblem< named $name> with $abilities#<and>",
+  body = createObject(1, emblem($name, $abilities))
 }

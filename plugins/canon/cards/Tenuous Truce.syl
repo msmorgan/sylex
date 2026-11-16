@@ -7,16 +7,17 @@ card singleFaced({
       enchant(isOpponent),
       at(
         beginningOfPossessed(enchanted(opponent), endStep),
-        instruct(eachOf(youAnd(that(player))), draw(1))),
+        instruct(eachOf(and([you, that(player)])), draw(1))),
       triggered(
         or([
             when(
               does(
                 actor(you),
                 attack(
-                  defender = eitherOf(
-                    enchanted(opponent),
-                    a(and([isPlaneswalker, controlledBy(they)])))))),
+                  defender = or(
+                    [enchanted(opponent), a(and([isPlaneswalker, controlledBy(they)]))])))),
             when(
-              does(actor(they), attack(defender = youOr(a(and([isPlaneswalker, youControl]))))))]),
+              does(
+                actor(they),
+                attack(defender = or([you, a(and([isPlaneswalker, youControl]))]))))]),
         sacrifice(thisAura))]})

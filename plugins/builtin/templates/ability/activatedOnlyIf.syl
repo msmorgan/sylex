@@ -1,5 +1,9 @@
-# "[cost]: <action>. Activate only if <guard>."
-template activatedOnlyIf(cost: Cost, action: VerbPhrase, guard: Condition): Ability {
-  spelling = "$cost: $action. Activate only if $guard.",
-  body = activated($cost, $action, guard = $guard)
+# "[cost]: <action>. Activate only if <guard>[ and <limit>]."
+template activatedOnlyIf(
+  cost: Cost,
+  action: VerbPhrase,
+  guard: Condition,
+  limit: Option(UsageLimit) = none): Ability {
+  spelling = "$cost: $action. Activate only if $guard< and $limit>.",
+  body = activated($cost, $action, limit = $limit, guard = $guard)
 }

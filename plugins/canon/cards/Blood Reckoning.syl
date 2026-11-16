@@ -4,5 +4,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       whenever(
-        does(actor(a(isCreature)), attack(defender = youOr(a(and([isPlaneswalker, youControl]))))),
+        does(
+          actor(a(isCreature)),
+          attack(defender = or([you, a(and([isPlaneswalker, youControl]))]))),
         instruct(controllerOf(that(creature)), loseLife(1)))]})

@@ -7,8 +7,8 @@ action theRingTemptsYou {
   body = sequentially([
       doIf(
         not(exists(and([isEmblem, named(printedName("The Ring")), ownedBy($actor)]))),
-        getNamedEmblem(
-          "The Ring",
+        getEmblem(
+          name = "The Ring",
           [
             static(
               characteristicChange(

@@ -9,5 +9,5 @@ card singleFaced({
         replace(
           would(
             by(allOf(and([isSource, named(chosenName)]))),
-            dealDamage(recipient = youAnd(allOf(and([isPermanent, youControl]))))),
+            dealDamage(recipient = and([you, allOf(and([isPermanent, youControl]))]))),
           instead(preventDamage(allDamage))))]})

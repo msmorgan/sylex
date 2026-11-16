@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [merfolk, rogue],
     text = [
-      static(entersChoosingPlayer(thisCreature, a(isPlayer))),
+      static(entryChoice(thisCreature, a(isPlayer))),
       protection(objectsOfPlayer(the(isChosenPlayer)))],
     power = 3,
     toughness = 1})

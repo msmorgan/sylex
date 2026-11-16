@@ -12,9 +12,7 @@ card singleFaced({
             and([hasSubtype(sphinx), isSpell, did(actor(you), cast(which), within = thisObject)])),
           less(2))),
       whenever(
-        does(
-          actor(eitherOf(thisCreature, a(and([hasSubtype(sphinx), youControl, isOther])))),
-          enter),
+        does(actor(or([thisCreature, a(and([hasSubtype(sphinx), youControl, isOther]))])), enter),
         sequentially([
             reveal(topSlice(4)),
             instruct(anOpponent, separateIntoPiles(them, 2)),

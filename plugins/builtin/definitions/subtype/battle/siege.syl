@@ -7,7 +7,7 @@ subtype siege {
   types = [battle],
   name = "Siege",
   confers = [
-    property(entersChoosingPlayer(thisSiege, anOpponent)),
+    property(entryChoice(thisSiege, anOpponent)),
     ability(
       when(
         does(any, removeCounters(theLast, printedKind(defenseCounter), thisPermanent)),

@@ -1,5 +1,0 @@
-# "you and <subject>"
-template youAnd(subject: NounPhrase): NounPhrase {
-  spelling = "you and $subject",
-  body = and([you, $subject])
-}

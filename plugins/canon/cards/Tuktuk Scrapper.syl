@@ -11,7 +11,7 @@ card singleFaced({
     subtypes = [goblin, artificer, ally],
     text = [
       whenever(
-        does(actor(eitherOf(thisCreature, a(and([hasSubtype(ally), youControl, isOther])))), enter),
+        does(actor(or([thisCreature, a(and([hasSubtype(ally), youControl, isOther]))])), enter),
         sequentially([
             may(destroy(target(isArtifact))),
             doIf(

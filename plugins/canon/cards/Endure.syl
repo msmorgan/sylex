@@ -2,4 +2,6 @@ card singleFaced({
     name = "Endure",
     cost = [generic(3), pip(white), pip(white)],
     types = [instant],
-    text = [spell(preventAll(youAnd(allOf(and([isPermanent, youControl]))), thisTurn))]})
+    text = [
+      spell(
+        preventAll(to = and([you, allOf(and([isPermanent, youControl]))]), duration = thisTurn))]})

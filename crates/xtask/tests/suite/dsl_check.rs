@@ -1103,7 +1103,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                      when(\n\
                        does(\n\
                          actor(enchanted(player)),\n\
-                         attack(defender = youOr(a(and([isPlaneswalker, youControl]))))))]),\n\
+                         attack(defender = or([you, a(and([isPlaneswalker, youControl]))]))))]),\n\
                    sacrifice(thisAura))]})\n\
              card singleFaced({\n\
                name = \"Bartered Cow\",\n\

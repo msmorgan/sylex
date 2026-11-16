@@ -21,6 +21,6 @@ card_type battle {
       putInto(this, graveyard)),
     property(
       onlyUnless(
-        entersChoosingPlayer(this, a(and([isPlayer, not(otherThan(you))]))),
+        entryChoice(this, a(and([isPlayer, not(otherThan(you))]))),
         is(this, hasSubtype(siege))))]
 }

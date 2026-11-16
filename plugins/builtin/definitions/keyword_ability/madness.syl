@@ -14,7 +14,7 @@ ability madness(cost: Cost) {
       causes(byEvent(does(any, discard(thisCard))), does(any, exileFrom(thisCard, hand))),
       instruct(
         ownerOf(thisCard),
-        mayOrElse(
+        may(
           cast(thisCard, from = exileZone, altCost = payingInstead($cost)),
-          putInto(thisCard, graveyard))))]
+          ifNot = putInto(thisCard, graveyard))))]
 }
