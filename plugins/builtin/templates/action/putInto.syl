@@ -5,7 +5,8 @@ template putInto(
   destination: Location,
   from: Location = anywhere,
   riders: List(MoveRider) = []): VerbPhrase {
-  # TODO(spelling): Omit the origin phrase when from is anywhere; otherwise print 'from' and that
-  # location. Format and coordinate the riders list entries, including the empty case.
+  # TODO(spelling): Move riders are depictives, waiting on the depictives design
+  # (`docs/design/semantics.md` §6 item 13).
+  spelling = "put $subject into $destination< from $from>",
   body = zoneChange($subject, $destination, $from, $riders)
 }

@@ -1,1 +1,3 @@
-primitive mana: AbilityClass = Mana
+primitive mana: AbilityClass = Mana {
+  spelling = "mana"
+}

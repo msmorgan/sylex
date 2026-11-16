@@ -1,6 +1,5 @@
 # "put <subject> [from <from>] onto the battlefield tapped"
 template putOntoBattlefieldTapped(subject: NounPhrase, from: Location = anywhere): VerbPhrase {
-  # TODO(spelling): Omit the origin phrase when from is anywhere; otherwise print 'from' and that
-  # location.
+  spelling = "put $subject< from $from> onto the battlefield tapped",
   body = zoneChange($subject, battlefield, $from, [entersAs(tapped)])
 }

@@ -3,7 +3,7 @@ template establishFor(
   subject: NounPhrase,
   parts: List(StaticSpec),
   duration: Option(Duration) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration. Format and coordinate the
-  # parts list entries, including the empty case.
+  # TODO(spelling): Sharing one subject across continuous effects waits on
+  # `syl-continuous-effect-subject` and `syl-shared-phrase-written-once`.
   body = establish(conjunction($parts, subject = $subject), duration = $duration)
 }

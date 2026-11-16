@@ -1,2 +1,4 @@
 # A keyword as a term: "<keyword>" where an ability is named by its keyword.
-primitive theKeyword(keyword: KeywordLabel): KeywordTerm = The
+primitive theKeyword(keyword: KeywordLabel): KeywordTerm = The {
+  spelling = "$keyword"
+}

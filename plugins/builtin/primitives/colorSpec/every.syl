@@ -1,1 +1,3 @@
-primitive every: ColorSpec = Every
+primitive every: ColorSpec = Every {
+  spelling = "all colors"
+}

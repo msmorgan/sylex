@@ -1,5 +1,6 @@
 # "if <subject>'s <cost> was paid"
 template costWasPaid(which: LinkSource, window: Option(Duration), subject: NounPhrase): Condition {
-  # TODO(spelling): Include or omit the clauses supplied by window.
+  # TODO(spelling): Rule-level helper beneath `keywordCostPaid`; waits on
+  # `syl-spelling-conventions` and `syl-dead-weight-sweep`.
   body = compareAmt(paidCostRead($which, $window, $subject), atLeast, 1)
 }

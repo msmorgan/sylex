@@ -9,6 +9,7 @@ template zoneChange(
   destination: Location,
   from: Location,
   riders: List(MoveRider)): VerbPhrase {
-  # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
+  # TODO(spelling): Move riders are depictives, waiting on the depictives design
+  # (`docs/design/semantics.md` §6 item 13).
   body = move($subject, $from, $destination, $riders)
 }

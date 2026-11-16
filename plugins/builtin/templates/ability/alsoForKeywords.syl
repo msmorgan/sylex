@@ -5,6 +5,6 @@
 # are each keyword's. A keyword with variants grants each of them through `keywordGrant`
 # [CR#702.1c].
 template alsoForKeywords(frame: Ability, keywords: List(KeywordTerm)): Ability {
-  # TODO(spelling): Format and coordinate the keywords list entries, including the empty case.
+  spelling = "$frame. The same is true for $keywords#<and>.",
   body = sameIsTrueFor($frame, $keywords)
 }

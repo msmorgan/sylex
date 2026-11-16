@@ -1,6 +1,6 @@
 # "<player>'s life total becomes <amount>"
 template setLife(amount: Amount): VerbPhrase {
-  # TODO(spelling): The Actor supplies the possessor of 'life total'; no subject parameter is
-  # available in this declaration.
+  # TODO(spelling): Reading the life total's possessor from the enclosing clause waits on
+  # `syl-clause-and-imperative` and `syl-spelling-conventions`.
   body = changeLife(set($amount))
 }

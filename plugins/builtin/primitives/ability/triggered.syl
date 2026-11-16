@@ -7,5 +7,5 @@ primitive triggered(
   intervening: Option(Condition) = none,
   action: VerbPhrase,
   limit: Option(UsageLimit) = none): Ability = Triggered {
-  spelling = "$condition, <if $intervening, >$action.< This ability triggers $limit.>"
+  spelling = "$condition, <if $intervening, >$action<. This ability triggers $limit.>"
 }

@@ -8,6 +8,6 @@ template when(
   if: Option(Condition) = none,
   action: VerbPhrase,
   limit: Option(UsageLimit) = none): Ability {
-  # TODO(spelling): Include or omit the clauses supplied by limit and if.
+  spelling = "When $event, <if $if, >$action<. This ability triggers $limit.>",
   body = triggered(when($event), intervening = $if, $action, limit = $limit)
 }

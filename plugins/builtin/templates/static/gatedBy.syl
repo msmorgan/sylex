@@ -6,7 +6,7 @@ template gatedBy(
   timing: Option(Timing) = none,
   asThough: Option(AsThough) = none,
   except: Option(DeonticExcept) = none): StaticSpec {
-  # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except.
+  spelling = "$subj can't $action< $timing>< $asThough>< $except> unless its controller pays $cost",
   body = staticSpecGatedBy(
     $cost,
     $subj,

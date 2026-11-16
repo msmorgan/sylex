@@ -1,6 +1,6 @@
 # "… <performer> controls"
 template actorControls: Predicate {
-  # TODO(spelling): The controlling Actor must be recovered from the enclosing instruction; there
-  # is no actor parameter.
+  # TODO(spelling): Recovering the performer's pronoun inside a description waits on
+  # `syl-clause-and-imperative` and `syl-spelling-conventions`.
   body = hasPossessor(controller, actor)
 }

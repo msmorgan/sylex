@@ -1,1 +1,3 @@
-primitive anyTriggered: AbilityClass = AnyTriggered
+primitive anyTriggered: AbilityClass = AnyTriggered {
+  spelling = "triggered"
+}

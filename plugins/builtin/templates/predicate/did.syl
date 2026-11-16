@@ -10,6 +10,8 @@ template did(
   action: VerbPhrase,
   within: Option(LookbackSpan) = none,
   ordinal: Option(EventOrdinal) = none): Predicate {
-  # TODO(spelling): Include or omit the clauses supplied by within, ordinal.
+  # TODO(spelling): Pre-head `ordinal` modifiers and bare or participial lookbacks wait on
+  # `syl-nominal-descriptions` and `syl-lookback-operator-and-holds`.
+  spelling = "that $subj $action< $within>",
   body = predicateDid({subj = $subj, action = $action, within = $within, ordinal = $ordinal})
 }

@@ -1,1 +1,3 @@
-primitive anyActivated: AbilityClass = AnyActivated
+primitive anyActivated: AbilityClass = AnyActivated {
+  spelling = "activated"
+}

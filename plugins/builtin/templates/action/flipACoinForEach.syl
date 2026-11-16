@@ -3,6 +3,7 @@ template flipACoinForEach(
   each: NounPhrase,
   call: Option(FlipCall) = none,
   outcome: Option(CoinFace) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by call, outcome.
+  # TODO(spelling): Coin-flip call/outcome wordings and unused-declaration triage wait on
+  # `syl-spelling-conventions` and `syl-dead-weight-sweep`.
   body = flipCoins(per($each), call = $call, outcome = $outcome)
 }

@@ -1,7 +1,7 @@
 # "At <point>, <action>": a delayed triggered ability [CR#603.7a], which triggers only the next
 # time the point comes [CR#603.7b].
-# TODO(spelling): The point is also printed after the action ("Put that card into your hand at the
-# beginning of your next end step", Necropotence).
+# TODO(spelling): A separate Template for a Turn Point printed after its action waits on
+# `syl-spelling-conventions`.
 template atNext(point: TurnPoint, action: VerbPhrase): VerbPhrase {
   spelling = "At $point, $action.",
   body = delay(reached($point), $action)

@@ -7,7 +7,9 @@ template can(
   asThough: Option(AsThough) = none,
   except: Option(DeonticExcept) = none,
   rider: Option(VerbPhrase) = none): StaticSpec {
-  # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, rider.
+  # TODO(spelling): Printing `rider` as a sentence after the clause waits on
+  # `syl-spelling-forms-and-runs`.
+  spelling = "$subj can $action< $timing>< $asThough>< $except>",
   body = staticSpecCan(
     $subj,
     $action,

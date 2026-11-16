@@ -5,6 +5,6 @@ template gainControl(
   subject: NounPhrase,
   duration: Option(Duration) = none,
   controller: NounPhrase = actor): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration.
+  spelling = "<$controller >gain control of $subject< $duration>",
   body = establish(controlGrant($controller, $subject), duration = $duration)
 }

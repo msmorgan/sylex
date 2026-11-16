@@ -1,11 +1,10 @@
 # "<subject> gains <abilities> [until …]": the abilities are a list in printed order, so "gains
 # hexproof and indestructible" adds each of the two as an ability of its own [CR#113.2c,613.1f].
-# TODO(spelling): Include or omit the clauses supplied by duration. Coordinate the abilities list
-# entries with "and".
 template gain(
   subject: NounPhrase,
   abilities: List(Ability),
   duration: Option(Duration) = none): VerbPhrase {
+  spelling = "$subject gains $abilities#<and>< $duration>",
   body = establish(
     characteristicChange($subject, [addedAbilities($abilities)]),
     duration = $duration)

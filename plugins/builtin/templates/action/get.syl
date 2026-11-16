@@ -4,6 +4,6 @@ template get(
   powerValue: Delta(Amount),
   toughnessValue: Delta(Amount),
   duration: Option(Duration) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration.
+  spelling = "$subject gets $powerValue/$toughnessValue< $duration>",
   body = establish(getsPt($subject, $powerValue, $toughnessValue), duration = $duration)
 }

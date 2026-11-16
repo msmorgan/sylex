@@ -5,7 +5,7 @@ template eventTally(
   action: VerbPhrase,
   within: LookbackSpan,
   mode: TallyMode): Amount {
-  # TODO(spelling): The mode selects an occurrence count or accumulated magnitude, requiring
-  # different historical clauses.
+  # TODO(spelling): Tally wordings are not yet designed (`docs/specs/voice-and-object-phrases.md`
+  # §11, `syl-lookback-operator-and-holds`).
   body = tally({subj = $subj, action = $action, within = $within}, $mode)
 }

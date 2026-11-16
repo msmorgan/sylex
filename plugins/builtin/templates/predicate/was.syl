@@ -4,6 +4,6 @@
 # enclosing ability's earlier text [CR#607.1,608.2c]; or with a turn span, "creatures that were
 # dealt damage this turn".
 template was(action: VerbPhrase, within: Option(LookbackSpan) = none): Predicate {
-  # TODO(spelling): Include or omit the clauses supplied by within.
+  spelling = "$action< $within>",
   body = did(any, $action, within = $within)
 }

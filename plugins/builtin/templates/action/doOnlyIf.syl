@@ -7,6 +7,6 @@ template doOnlyIf(
   action: VerbPhrase,
   condition: Condition,
   otherwise: Option(VerbPhrase) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by otherwise.
+  spelling = "$action if $condition<. Otherwise, $otherwise>",
   body = doIf($condition, $action, otherwise = $otherwise, postposed = true)
 }

@@ -5,6 +5,6 @@ template copyOnStack(
   subject: NounPhrase,
   times: Amount = 1,
   exceptions: List(CopyExcept) = []): VerbPhrase {
-  # TODO(spelling): Format and coordinate the exceptions list entries, including the empty case.
+  # TODO(spelling): Copy exception wording waits on `syl-copy-exceptions`.
   body = copy(fromStack, $subject, $times, $exceptions)
 }

@@ -3,6 +3,6 @@ template replaceEvent(
   clause: WouldClause,
   replacement: Replacement,
   duration: Option(Duration)): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration.
+  spelling = "<$duration, >$clause, $replacement",
   body = establish(replace($clause, $replacement), duration = $duration)
 }

@@ -3,6 +3,7 @@ template createTappedAttacking(
   count: Amount,
   token: CharacteristicBundle,
   defender: Option(NounPhrase) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by defender.
+  # TODO(spelling): Token characteristic records wait on `syl-token-records-to-templates`, and
+  # move riders wait on the depictives design (`docs/design/semantics.md` §6 item 13).
   body = create($count, written($token), riders = [entersAs(tapped), entersAttacking($defender)])
 }

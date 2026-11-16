@@ -2,6 +2,6 @@
 template isAlso(
   types: Option(List(CardType)) = none,
   subtypes: Option(List(Subtype)) = none): CopyExcept {
-  # TODO(spelling): Format and coordinate the types, subtypes list entries.
+  # TODO(spelling): Copy exception wording waits on `syl-copy-exceptions`.
   body = characteristicEdits([typeLine(adds, {types = $types, subtypes = $subtypes})])
 }

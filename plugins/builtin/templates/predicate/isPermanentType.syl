@@ -1,8 +1,7 @@
 # "has a permanent type": an artifact, battle, creature, enchantment, land, or planeswalker
 # [CR#110.4]; read off the types, so it holds of a card or a token.
 template isPermanentType: Predicate {
-  # TODO(spelling): Select and coordinate the applicable permanent-type nouns within the enclosing
-  # description.
+  # TODO(spelling): Permanent-type nominal premodifiers wait on `syl-nominal-descriptions`.
   body = or([
       hasType(artifact),
       hasType(battle),

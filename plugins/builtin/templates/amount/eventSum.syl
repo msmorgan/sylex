@@ -4,7 +4,8 @@ template eventSum(
   subj: Subject,
   within: Duration,
   timing: Option(Timing) = none): Amount {
-  # TODO(spelling): Include or omit the clauses supplied by timing.
+  # TODO(spelling): Tally wordings are not yet designed (`docs/specs/voice-and-object-phrases.md`
+  # §11, `syl-lookback-operator-and-holds`).
   body = tally(
     {subj = $subj, action = $action, within = within($within, timing = $timing)},
     quantity)

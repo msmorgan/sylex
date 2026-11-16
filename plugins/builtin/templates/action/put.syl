@@ -1,5 +1,7 @@
 # "put <subject> <destination>"
 template put(subject: NounPhrase, destination: Location, riders: List(MoveRider)): VerbPhrase {
-  # TODO(spelling): Format and coordinate the riders list entries, including the empty case.
+  # TODO(spelling): Move riders are depictives, waiting on the depictives design
+  # (`docs/design/semantics.md` §6 item 13).
+  spelling = "put $subject $destination",
   body = zoneChange($subject, $destination, anywhere, $riders)
 }

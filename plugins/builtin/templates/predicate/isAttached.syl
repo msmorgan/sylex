@@ -1,6 +1,7 @@
 # "enchanted", "equipped", "fortified": the host of an attachment of that kind, or of any
 # attachment when `word` is none.
 template isAttached(word: Option(AttachWord) = none): Predicate {
-  # TODO(spelling): Include or omit the clauses supplied by word.
+  # TODO(spelling): Premodifier attachment words ("equipped") vs rule-only unworded `isAttached()`
+  # wait on `syl-nominal-descriptions` and `syl-spelling-conventions`.
   body = attachment(host, word = $word)
 }

@@ -12,8 +12,9 @@ template cant(
   except: Option(DeonticExcept) = none,
   causedBy: Option(Causing) = none,
   unless: Option(Condition) = none): StaticSpec {
-  # TODO(spelling): Include or omit the clauses supplied by timing, asThough, except, causedBy,
-  # unless.
+  # TODO(spelling): `causedBy` ("<cause> doesn't cause <subj> to <action>") waits on
+  # `syl-deontic-verb-phrase-operators` and `syl-spelling-conventions`.
+  spelling = "$subj can't $action< $timing>< $asThough>< $except>< unless $unless>",
   body = staticSpecCant(
     $subj,
     $action,

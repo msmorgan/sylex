@@ -1,1 +1,3 @@
-primitive loyalty: AbilityClass = Loyalty
+primitive loyalty: AbilityClass = Loyalty {
+  spelling = "loyalty"
+}

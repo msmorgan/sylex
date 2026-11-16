@@ -3,6 +3,7 @@ template replaceNextEvent(
   clause: WouldClause,
   replacement: Replacement,
   duration: Option(Duration)): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration.
+  # TODO(spelling): "The next time" replacement clauses wait on
+  # `syl-would-operator-and-replacement-clauses`.
   body = establish(replace($clause, $replacement, use = nextTimeOnly), duration = $duration)
 }

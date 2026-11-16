@@ -3,6 +3,7 @@ template become(
   subject: NounPhrase,
   added: CharacteristicBundle,
   duration: Option(Duration) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration.
+  # TODO(spelling): Replacing raw `CharacteristicBundle` records with printed nominals and
+  # separating type-retaining forms wait on `syl-become-replaces-types`.
   body = establish(qualityChange($subject, adds, bundle($added)), duration = $duration)
 }

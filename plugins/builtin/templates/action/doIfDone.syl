@@ -3,6 +3,6 @@ template doIfDone(
   body: VerbPhrase,
   ifDid: Option(VerbPhrase) = none,
   ifNot: Option(VerbPhrase) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by ifDid, ifNot.
+  spelling = "$body<. If you do, $ifDid><. If you can't, $ifNot>",
   body = withContinuation(required, $body, ifDid = $ifDid, ifNot = $ifNot)
 }

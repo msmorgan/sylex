@@ -1,1 +1,3 @@
-primitive nonpositiveLife: StateBasedCause = NonpositiveLife
+primitive nonpositiveLife: StateBasedCause = NonpositiveLife {
+  spelling = "having 0 or less life"
+}

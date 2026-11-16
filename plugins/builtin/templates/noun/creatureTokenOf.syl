@@ -6,8 +6,8 @@ template creatureTokenOf(
   colors: List(Color),
   subtypes: List(Subtype),
   abilities: List(Ability) = []): CharacteristicBundle {
-  # TODO(spelling): Format and coordinate the colors, subtypes, abilities list entries, including
-  # the empty case.
+  # TODO(spelling): Printing "colorless" for an empty `colors` list waits on
+  # `syl-token-records-to-templates`.
   body = {
     characteristics = {
       colors = $colors,

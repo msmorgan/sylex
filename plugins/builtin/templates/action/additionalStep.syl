@@ -1,6 +1,7 @@
 # "there is an additional <part> [after <anchor>]": steps added to the current turn's phase
 # [CR#500.9].
 template additionalStep(part: TurnPart, anchor: Option(TurnPart), count: Amount): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by anchor.
+  # TODO(spelling): Step-wording and "after this step/phase" conventions wait on
+  # `syl-spelling-conventions`.
   body = addTurnPart($part, $count, anchor = $anchor)
 }

@@ -4,6 +4,6 @@ template getsBoth(
   subject: NounPhrase,
   delta: Delta(Amount),
   duration: Option(Duration) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by duration.
+  # TODO(spelling): Retiring `getsBoth` for one PT-change sort waits on `syl-pt-change-sort`.
   body = get($subject, $delta, $delta, duration = $duration)
 }

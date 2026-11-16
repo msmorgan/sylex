@@ -1,6 +1,5 @@
 # "<subject> gets +X/+X": the same delta to power and toughness, written once [CR#613.4c].
 template getsBoth(subject: NounPhrase, delta: Delta(Amount)): StaticSpec {
-  # TODO(spelling): Print the delta's sign and number on both sides of the slash and any
-  # "for each" qualifier once, after both.
+  # TODO(spelling): Retiring `getsBoth` for one PT-change sort waits on `syl-pt-change-sort`.
   body = getsPt($subject, $delta, $delta)
 }

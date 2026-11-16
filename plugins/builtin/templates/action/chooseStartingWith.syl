@@ -4,6 +4,7 @@ template chooseStartingWith(
   chosen: NounPhrase,
   disclosure: Disclosure = openly,
   when: Option(Timing) = none): VerbPhrase {
-  # TODO(spelling): Include or omit the clauses supplied by when.
+  # TODO(spelling): "Starting with <first>," precedes the clause's subject; waits on
+  # `syl-clause-and-imperative`.
   body = choose($chosen, disclosure = $disclosure, first = $first, when = $when)
 }
