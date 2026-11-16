@@ -172,8 +172,12 @@ declared word at any other sort is wrapped by a coercion or by a written primiti
   ([CR#115.1]).
 - Templates substitute their parameters. A Template adds no Reference Scope and no Deed, so its
   body's references reach the referents at its call site.
-- A Definition wraps every parameter for caller-scope reading, with no opt-out. It wraps its body
-  in its Reference Scope under its Deed ([`semantics.md`](./semantics.md) §2.3).
+- A Definition wraps every parameter for caller-scope reading, with no opt-out. Every `action`
+  Definition has an implicit parameter `$actor` at `NounPhrase`, bound once at the call to the
+  call's performer; a Definition's body reads its call's performer through `$actor`, whereas the
+  `actor` word reads the performer of the verb phrase it stands in and rebinds under a Handoff
+  inside the body. A Definition wraps its body in its Reference Scope under its Deed
+  ([`semantics.md`](./semantics.md) §2.3).
 - So Templates and Definitions bind parameters alike; in expansion they differ only in Reference
   Scope and Deed.
 - `.syl` cannot write a scope, a mention, a raw Deed or a keyword wrapper.

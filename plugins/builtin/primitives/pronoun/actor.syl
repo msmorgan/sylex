@@ -1,4 +1,6 @@
-# The performer of the enclosing verb phrase: in an instruction, the controller of the spell or
+# The performer of the verb phrase it stands in: in an instruction, the controller of the spell or
 # ability unless a Handoff names another; in a clause, what its active Subject or its `by` agent
-# names. Prints no word; `subject` reads what the verb phrase is said of as a participant instead.
+# names. An `action` Definition's body reads its call's performer through `$actor` instead, which
+# does not rebind inside the body. Prints no word; `subject` reads what the verb phrase is said of
+# as a participant.
 primitive actor: NounPhrase = Actor

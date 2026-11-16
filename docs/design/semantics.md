@@ -143,9 +143,12 @@ A Definition body runs in its own Reference Scope. Why: the rules define a keywo
 of the sentence that uses it. So a pronoun inside the body must not find the caller's referents,
 and the body's own scratch referents must not leak out to the caller's pronouns.
 
-- The caller's referents are hidden from it, except its arguments; the `actor` word still reads
-  the innermost Actor, the performer, while `subject` reads what its enclosing verb phrase is said
-  of as a participant. A referent hidden by an enclosing Definition stays hidden.
+- The caller's referents are hidden from it, except its arguments, an `action` Definition's
+  implicit `$actor` parameter (bound at the call to the call's performer) among them: a
+  Definition's body reads its call's performer through `$actor`, whereas the `actor` word reads the
+  performer of the verb phrase it stands in and rebinds under a Handoff inside the body, and
+  `subject` reads what its enclosing verb phrase is said of as a participant. A referent hidden by
+  an enclosing Definition stays hidden.
 - Each argument is read in the caller's scope and bound to the Definition's Binding Identity at its
   first mention.
 - On exit, the body's changes to its arguments and its outcomes are exported to the caller. Its
