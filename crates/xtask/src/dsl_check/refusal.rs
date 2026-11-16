@@ -141,6 +141,21 @@ pub enum RefusalKind {
         argument: String,
         after: String,
     },
+    #[error("`triggered` over a single `{0}` condition; write `{0}` at Ability")]
+    SingleConditionTriggered(String),
+    #[error("empty `{word}` at {sort}; write `{word}` with two or more items")]
+    EmptyCoordination { word: String, sort: String },
+    #[error("`{word}` at {sort} has one item; write `{instead}` directly")]
+    SingleItemCoordination {
+        word: String,
+        sort: String,
+        instead: String,
+    },
+    #[error(
+        "nested `{inner}` inside `{outer}` at TriggerCondition; \
+         write one flat `{outer}([...])` list"
+    )]
+    NestedTriggerCondition { outer: String, inner: String },
     #[error("string at {0}")]
     StringAt(String),
     #[error("integer at {0}")]
@@ -190,7 +205,9 @@ pub enum RefusalKind {
     LexicalNotRecord,
     #[error("`lexical.verbs` must be a list")]
     LexicalVerbsNotList,
-    #[error("inline verb in `lexical.verbs` needs a non-empty string `lemma` and non-empty `frames`")]
+    #[error(
+        "inline verb in `lexical.verbs` needs a non-empty string `lemma` and non-empty `frames`"
+    )]
     InvalidLexicalVerb,
     #[error("inline verb `{lemma}` in `lexical` duplicates shared `verb {verb}`")]
     DuplicateSharedVerb { lemma: String, verb: String },

@@ -2106,3 +2106,388 @@ fn spelling_tie_affix_must_be_a_declared_bound_form() {
         ]
     );
 }
+
+#[test]
+fn triggered_refuses_a_bare_when_whenever_or_at_condition() {
+    assert_eq!(
+        RefusalKind::SingleConditionTriggered(s("when")).to_string(),
+        "`triggered` over a single `when` condition; write `when` at Ability"
+    );
+    assert_eq!(
+        plugin_refusals(
+            "template a: Ability {\n\
+               body = triggered(when(does(actor(thisCreature), enter)), draw(1))\n\
+             }\n\
+             template b: Ability {\n\
+               body = triggered(\n\
+                 whenever(does(actor(thisCreature), attack)),\n\
+                 intervening = is(you, hasDesignation(monarch)),\n\
+                 draw(1))\n\
+             }\n\
+             template c: Ability {\n\
+               body = triggered(at(beginningOfYour(upkeep)), draw(1))\n\
+             }"
+        ),
+        [
+            (
+                RefusalKind::SingleConditionTriggered(s("when")),
+                s("triggered(when(does(actor(thisCreature), enter)), draw(1))")
+            ),
+            (
+                RefusalKind::SingleConditionTriggered(s("whenever")),
+                s("triggered(\n\
+                 whenever(does(actor(thisCreature), attack)),\n\
+                 intervening = is(you, hasDesignation(monarch)),\n\
+                 draw(1))")
+            ),
+            (
+                RefusalKind::SingleConditionTriggered(s("at")),
+                s("triggered(at(beginningOfYour(upkeep)), draw(1))")
+            ),
+        ]
+    );
+
+    // Only `(w, Ability)`'s own root body may write `triggered(w(...), ...)`.
+    let synthetic = "\
+        primitive ev: GameEvent = Ev\n\
+        primitive pt: TurnPoint = Pt\n\
+        primitive act: VerbPhrase = Act\n\
+        primitive triggerEvent(e: GameEvent): TriggerCondition = Event\n\
+        primitive reached(p: TurnPoint): GameEvent = Reached\n\
+        primitive triggered(c: TriggerCondition, a: VerbPhrase): Ability = Triggered\n\
+        template when(e: GameEvent): TriggerCondition { body = triggerEvent($e) }\n\
+        template whenever(e: GameEvent): TriggerCondition { body = triggerEvent($e) }\n\
+        template at(p: TurnPoint): TriggerCondition { body = triggerEvent(reached($p)) }\n\
+        template when(e: GameEvent, a: VerbPhrase): Ability { body = triggered(when($e), $a) }\n\
+        template at(p: TurnPoint, a: VerbPhrase): Ability { body = triggered(at($p), $a) }\n\
+        template whenever(e: GameEvent, a: VerbPhrase): Ability {\n\
+          body = triggered(when($e), $a)\n\
+        }\n\
+        template alias(e: GameEvent, a: VerbPhrase): Ability {\n\
+          body = triggered(when($e), $a)\n\
+        }";
+    assert_eq!(
+        refusals(&[("a.syl", synthetic)]),
+        [
+            (
+                RefusalKind::SingleConditionTriggered(s("when")),
+                s("triggered(when($e), $a)")
+            ),
+            (
+                RefusalKind::SingleConditionTriggered(s("when")),
+                s("triggered(when($e), $a)")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn trigger_condition_and_and_or_refuse_fewer_than_two_conditions() {
+    assert_eq!(
+        RefusalKind::EmptyCoordination {
+            word: s("or"),
+            sort: s("TriggerCondition"),
+        }
+        .to_string(),
+        "empty `or` at TriggerCondition; write `or` with two or more items"
+    );
+    assert_eq!(
+        RefusalKind::SingleItemCoordination {
+            word: s("and"),
+            sort: s("TriggerCondition"),
+            instead: s("when(...)"),
+        }
+        .to_string(),
+        "`and` at TriggerCondition has one item; write `when(...)` directly"
+    );
+    assert_eq!(
+        plugin_refusals(
+            "template a: Ability { body = triggered(or([]), draw(1)) }\n\
+             template b: Ability { body = triggered(and([]), draw(1)) }\n\
+             template c: Ability {\n\
+               body = triggered(or([when(does(actor(thisCreature), enter))]), draw(1))\n\
+             }\n\
+             template d: Ability {\n\
+               body = triggered(and([at(beginningOfYour(upkeep))]), draw(1))\n\
+             }"
+        ),
+        [
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("or"),
+                    sort: s("TriggerCondition"),
+                },
+                s("or([])")
+            ),
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("and"),
+                    sort: s("TriggerCondition"),
+                },
+                s("and([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("or"),
+                    sort: s("TriggerCondition"),
+                    instead: s("when(...)"),
+                },
+                s("or([when(does(actor(thisCreature), enter))])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("and"),
+                    sort: s("TriggerCondition"),
+                    instead: s("at(...)"),
+                },
+                s("and([at(beginningOfYour(upkeep))])")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn trigger_condition_and_and_or_refuse_direct_nesting() {
+    assert_eq!(
+        RefusalKind::NestedTriggerCondition {
+            outer: s("and"),
+            inner: s("or"),
+        }
+        .to_string(),
+        "nested `or` inside `and` at TriggerCondition; write one flat `and([...])` list"
+    );
+    assert_eq!(
+        plugin_refusals(
+            "template a(x: TriggerCondition, y: TriggerCondition, z: TriggerCondition): TriggerCondition {\n\
+               body = and([$x, and([$y, $z])])\n\
+             }\n\
+             template b(x: TriggerCondition, y: TriggerCondition, z: TriggerCondition): TriggerCondition {\n\
+               body = and([$x, or([$y, $z])])\n\
+             }\n\
+             template c(x: TriggerCondition, y: TriggerCondition, z: TriggerCondition): TriggerCondition {\n\
+               body = or([$x, and([$y, $z])])\n\
+             }\n\
+             template d(x: TriggerCondition, y: TriggerCondition, z: TriggerCondition): TriggerCondition {\n\
+               body = or([$x, or([$y, $z])])\n\
+             }"
+        ),
+        [
+            (
+                RefusalKind::NestedTriggerCondition {
+                    outer: s("and"),
+                    inner: s("and"),
+                },
+                s("and([$y, $z])")
+            ),
+            (
+                RefusalKind::NestedTriggerCondition {
+                    outer: s("and"),
+                    inner: s("or"),
+                },
+                s("or([$y, $z])")
+            ),
+            (
+                RefusalKind::NestedTriggerCondition {
+                    outer: s("or"),
+                    inner: s("and"),
+                },
+                s("and([$y, $z])")
+            ),
+            (
+                RefusalKind::NestedTriggerCondition {
+                    outer: s("or"),
+                    inner: s("or"),
+                },
+                s("or([$y, $z])")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn conjunction_and_disjunction_primitives_refuse_fewer_than_two_items() {
+    assert_eq!(
+        plugin_refusals(
+            "template ev0: GameEvent { body = or([]) }\n\
+             template ev1: GameEvent { body = or([does(actor(you), shuffle)]) }\n\
+             template pm0: ProducedMana { body = or([]) }\n\
+             template pm1: ProducedMana { body = or([symbols([colorlessPip])]) }\n\
+             template cond0: Condition { body = and([]) }\n\
+             template cond1(c: Condition): Condition { body = or([$c]) }\n\
+             template cost0: Cost { body = compound([]) }\n\
+             template cost1: Cost { body = compound([tapSymbol]) }\n\
+             template costOr1: Cost { body = or([tapSymbol]) }\n\
+             template spec1: StaticSpec { body = conjunction([getsPt(it, up(1), up(1))]) }\n\
+             template tim0: Timing { body = and([]) }\n\
+             template tim1: Timing { body = or([anyTiming]) }\n\
+             template deck0: DeckTrait { body = anyOf([]) }"
+        ),
+        [
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("or"),
+                    sort: s("GameEvent"),
+                },
+                s("or([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("or"),
+                    sort: s("GameEvent"),
+                    instead: s("does(...)"),
+                },
+                s("or([does(actor(you), shuffle)])")
+            ),
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("or"),
+                    sort: s("ProducedMana"),
+                },
+                s("or([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("or"),
+                    sort: s("ProducedMana"),
+                    instead: s("symbols(...)"),
+                },
+                s("or([symbols([colorlessPip])])")
+            ),
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("and"),
+                    sort: s("Condition"),
+                },
+                s("and([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("or"),
+                    sort: s("Condition"),
+                    instead: s("$c"),
+                },
+                s("or([$c])")
+            ),
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("compound"),
+                    sort: s("Cost"),
+                },
+                s("compound([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("compound"),
+                    sort: s("Cost"),
+                    instead: s("tapSymbol"),
+                },
+                s("compound([tapSymbol])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("or"),
+                    sort: s("Cost"),
+                    instead: s("tapSymbol"),
+                },
+                s("or([tapSymbol])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("conjunction"),
+                    sort: s("StaticSpec"),
+                    instead: s("getsPt(...)"),
+                },
+                s("conjunction([getsPt(it, up(1), up(1))])")
+            ),
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("and"),
+                    sort: s("Timing"),
+                },
+                s("and([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("or"),
+                    sort: s("Timing"),
+                    instead: s("anyTiming"),
+                },
+                s("or([anyTiming])")
+            ),
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("anyOf"),
+                    sort: s("DeckTrait"),
+                },
+                s("anyOf([])")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn coordination_templates_refuse_fewer_than_two_items() {
+    // Non-TriggerCondition cross-operator nesting stays valid.
+    assert_eq!(
+        plugin_refusals(
+            "template okPred: Predicate {\n\
+               body = and([isCreature, or([isTapped, isAttacking])])\n\
+             }\n\
+             template okCond(a: Condition, b: Condition, c: Condition): Condition {\n\
+               body = and([$a, or([$b, $c])])\n\
+             }"
+        ),
+        []
+    );
+
+    assert_eq!(
+        plugin_refusals(
+            "template pred0: Predicate { body = and([]) }\n\
+             template pred1: Predicate { body = andOr([isCreature]) }\n\
+             template np1: NounPhrase { body = or([you]) }\n\
+             template loc1: Location { body = and([hand]) }\n\
+             template est1: VerbPhrase { body = establishFor(it, [getsPt(it, up(1), up(1))]) }"
+        ),
+        [
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("and"),
+                    sort: s("Predicate"),
+                },
+                s("and([])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("andOr"),
+                    sort: s("Predicate"),
+                    instead: s("isCreature"),
+                },
+                s("andOr([isCreature])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("or"),
+                    sort: s("NounPhrase"),
+                    instead: s("you"),
+                },
+                s("or([you])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("and"),
+                    sort: s("Location"),
+                    instead: s("hand"),
+                },
+                s("and([hand])")
+            ),
+            (
+                RefusalKind::SingleItemCoordination {
+                    word: s("establishFor"),
+                    sort: s("VerbPhrase"),
+                    instead: s("establish(...)"),
+                },
+                s("establishFor(it, [getsPt(it, up(1), up(1))])")
+            ),
+        ]
+    );
+}

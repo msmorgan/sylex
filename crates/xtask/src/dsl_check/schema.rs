@@ -126,6 +126,9 @@ const fn record_body(word: &'static str, sort: &'static str) -> Kind {
 /// The kind word of the declaration that binds a word to a constructor.
 pub const PRIMITIVE: &str = "primitive";
 
+/// The kind word of a Template declaration (`syl.md` §1).
+pub const TEMPLATE: &str = "template";
+
 /// The kind word of a coercion, which declares no word (`syl.md` §3).
 pub const COERCION: &str = "coercion";
 
@@ -139,7 +142,7 @@ pub const KINDS: &[Kind] = &[
     Kind {
         sort: None,
         ..kind(
-            "template",
+            TEMPLATE,
             "",
             &[FieldSpec {
                 name: "body",
@@ -256,6 +259,25 @@ pub const KINDS: &[Kind] = &[
 
 /// The sort constructors, each taking one sort argument.
 pub const SORT_CONSTRUCTORS: [&str; 3] = ["Option", "List", "Delta"];
+
+/// Conjunction and disjunction constructors whose `List` parameter takes two
+/// or more items (`spelling.md` §4, §7). Templates that forward a `List`
+/// parameter into one inherit the rule.
+pub const CONJUNCTION_AND_DISJUNCTION_CONSTRUCTORS: &[&str] = &[
+    "And",
+    "AnyOf",
+    "Compound",
+    "Conjunction",
+    "Coordination",
+    "Or",
+];
+
+/// The triggered-ability constructor `(sort, constructor)`, its trigger
+/// condition sort, and the one-condition trigger words whose `Ability`
+/// Templates write it (`spelling.md` §4).
+pub const TRIGGERED_ABILITY: (&str, &str) = ("Ability", "Triggered");
+pub const TRIGGER_CONDITION_SORT: &str = "TriggerCondition";
+pub const SINGLE_TRIGGER_WORDS: &[&str] = &["when", "whenever", "at"];
 
 /// Constructors only expansion writes, each at its sort (`None`: at every
 /// sort that has it). `syl.md` §4 names the categories (a scope, a mention, a

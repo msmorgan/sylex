@@ -1,29 +1,269 @@
-//! A call's arguments (`syl.md` §2).
+//! A call's arguments (`syl.md` §2) and written-form rules (`spelling.md` §4,
+//! §7).
 //!
 //! A required argument is positional and binds the next required parameter
 //! not yet bound; a defaulted argument is passed by name, and never with the
 //! value its parameter declares as its default. Arguments are written in
 //! declaration order.
+//!
+//! Conjunction and disjunction constructors
+//! (`schema::CONJUNCTION_AND_DISJUNCTION_CONSTRUCTORS`), and every Template
+//! forwarding a `List` parameter into one, take two or more
+//! items. At `TriggerCondition`, `and` and `or` are flat and `triggered` is
+//! written only over a disjunction, never over a single `when`, `whenever` or
+//! `at` outside that `Ability` Template's own body.
 
 use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 
 use sylex_syl::Arg;
 use sylex_syl::Call;
 use sylex_syl::Item;
+use sylex_syl::Shape;
 use sylex_syl::Value;
 use sylex_syl::ValueKind;
 
+use super::Decl;
 use super::RefusalKind;
+use super::Registry;
 use super::Resolver;
 use super::Signature;
 use super::Slot;
+use super::coercion::Coercion;
 use super::schema;
 use super::sort::SortKey;
+
+/// Call-site written-form rules derived from the declarations and [`schema`].
+#[derive(Default)]
+pub(super) struct WrittenForms {
+    /// `(decl, param)` pairs whose list argument takes two or more items:
+    /// `None` when the single item itself stands at `decl.sort`, or
+    /// `Some(form)` when `decl` wraps the conjunction or disjunction inside an
+    /// outer call (such as `establishFor` wrapping `conjunction` in
+    /// `establish`).
+    two_or_more: BTreeMap<(usize, usize), Option<String>>,
+    /// `(decl, param)` pairs where `decl` builds `Triggered` at `Ability` and
+    /// `param` is its `TriggerCondition` parameter.
+    triggered_condition: BTreeSet<(usize, usize)>,
+    /// Declarations at `TriggerCondition` that build or expand to a trigger
+    /// condition disjunction (`or` and `and` at `TriggerCondition`).
+    trigger_disjunctions: BTreeSet<usize>,
+}
+
+pub(super) fn written_forms(
+    decls: &[Decl<'_>],
+    registry: &Registry,
+    coercions: &[Coercion],
+) -> WrittenForms {
+    let mut forms = WrittenForms::default();
+    let triggered_sort = SortKey::named(schema::TRIGGERED_ABILITY.0);
+    let trig_cond_sort = SortKey::named(schema::TRIGGER_CONDITION_SORT);
+    for (decl_idx, decl) in decls.iter().enumerate() {
+        if decl.kind.word != schema::PRIMITIVE {
+            continue;
+        }
+        let Shape::Header(header) = &decl.declaration.shape else {
+            continue;
+        };
+        let Some(ctor) = header.constructor.map(|c| c.ident.as_str()) else {
+            continue;
+        };
+        if schema::CONJUNCTION_AND_DISJUNCTION_CONSTRUCTORS.contains(&ctor) {
+            for (param_idx, param) in decl.params.iter().enumerate() {
+                if param.sort.list_inner() == Some(&decl.sort) {
+                    forms.two_or_more.insert((decl_idx, param_idx), None);
+                }
+            }
+        }
+        if decl.sort == triggered_sort && ctor == schema::TRIGGERED_ABILITY.1 {
+            for (param_idx, param) in decl.params.iter().enumerate() {
+                if param.sort == trig_cond_sort {
+                    forms.triggered_condition.insert((decl_idx, param_idx));
+                }
+            }
+        }
+    }
+    while propagate_templates(decls, registry, coercions, &mut forms) {}
+    for &(decl_idx, param_idx) in forms.two_or_more.keys() {
+        let decl = &decls[decl_idx];
+        if decl.sort == trig_cond_sort
+            && decl.params[param_idx].sort.list_inner() == Some(&trig_cond_sort)
+        {
+            forms.trigger_disjunctions.insert(decl_idx);
+        }
+    }
+    forms
+}
+
+fn propagate_templates(
+    decls: &[Decl<'_>],
+    registry: &Registry,
+    coercions: &[Coercion],
+    forms: &mut WrittenForms,
+) -> bool {
+    let mut changed = false;
+    for (decl_idx, decl) in decls.iter().enumerate() {
+        if decl.kind.word != schema::TEMPLATE {
+            continue;
+        }
+        let Some(body) = decl.field("body") else {
+            continue;
+        };
+        let mut prop = Propagator {
+            decl_idx,
+            decl,
+            root_body: body,
+            registry,
+            coercions,
+            forms,
+            changed: &mut changed,
+        };
+        prop.walk(body, &decl.sort);
+    }
+    changed
+}
+
+struct Propagator<'a, 'd> {
+    decl_idx: usize,
+    decl: &'a Decl<'d>,
+    root_body: &'a Value,
+    registry: &'a Registry,
+    coercions: &'a [Coercion],
+    forms: &'a mut WrittenForms,
+    changed: &'a mut bool,
+}
+
+impl Propagator<'_, '_> {
+    /// Walks a Template's `body` before the main resolution pass so every
+    /// `Resolver::call` sees the transitive closure regardless of declaration
+    /// order. Unresolved heads, ambiguous coercions, and unbound or duplicate
+    /// arguments are skipped here because `Resolver::value_at` and
+    /// `Resolver::call` check and refuse them on the main pass.
+    fn walk(&mut self, value: &Value, expected: &SortKey) {
+        let at = expected.option_inner().unwrap_or(expected);
+        match &value.kind {
+            ValueKind::Call(call) => {
+                let head = call.head.ident.as_str();
+                if head == "none" || (head == "some" && expected.option_inner().is_some()) {
+                    return;
+                }
+                let signature = self
+                    .registry
+                    .get(&(head.to_owned(), expected.clone()))
+                    .or_else(|| {
+                        expected
+                            .option_inner()
+                            .and_then(|inner| self.registry.get(&(head.to_owned(), inner.clone())))
+                    })
+                    .or_else(|| {
+                        let mut via = self.coercions.iter().filter(|c| {
+                            c.to == *at
+                                && self
+                                    .registry
+                                    .contains_key(&(head.to_owned(), c.from.clone()))
+                        });
+                        match (via.next(), via.next()) {
+                            (Some(c), None) => {
+                                self.registry.get(&(head.to_owned(), c.from.clone()))
+                            }
+                            _ => None,
+                        }
+                    });
+                let Some(sig) = signature.filter(|sig| !sig.secondary) else {
+                    return;
+                };
+                let mut bound_indices = vec![false; sig.params.len()];
+                for arg in call.args.iter().filter_map(Item::node) {
+                    let index = match arg.name {
+                        Some(name) => sig
+                            .params
+                            .iter()
+                            .position(|p| p.name == name.ident.as_str()),
+                        None => (0..sig.params.len())
+                            .find(|&i| !sig.params[i].optional && !bound_indices[i]),
+                    };
+                    let Some(callee_param) = index.filter(|&i| !bound_indices[i]) else {
+                        continue;
+                    };
+                    bound_indices[callee_param] = true;
+                    if let ValueKind::Parameter(pname) = &arg.value.kind
+                        && let Some(callee_instead) = self
+                            .forms
+                            .two_or_more
+                            .get(&(sig.decl, callee_param))
+                            .cloned()
+                        && let Some(caller_param) = self
+                            .decl
+                            .params
+                            .iter()
+                            .position(|p| p.name == pname.ident.as_str())
+                        && self.decl.params[caller_param].sort.list_inner().is_some()
+                        && !self
+                            .forms
+                            .two_or_more
+                            .contains_key(&(self.decl_idx, caller_param))
+                    {
+                        let instead = if self.decl.params[caller_param].sort.list_inner()
+                            == Some(&self.decl.sort)
+                        {
+                            None
+                        } else {
+                            callee_instead.or_else(|| Some(single_item_form(self.root_body)))
+                        };
+                        self.forms
+                            .two_or_more
+                            .insert((self.decl_idx, caller_param), instead);
+                        *self.changed = true;
+                    }
+                    self.walk(&arg.value, &sig.params[callee_param].sort);
+                }
+            }
+            ValueKind::List(items) => {
+                if let Some(inner) = at.list_inner() {
+                    for item in items.iter().filter_map(Item::node) {
+                        self.walk(item, inner);
+                    }
+                }
+            }
+            ValueKind::Record(record) => {
+                if let Some(spec) = schema::RECORDS
+                    .iter()
+                    .find(|spec| at.args.is_empty() && spec.sort == at.head)
+                {
+                    for field in record.nodes() {
+                        if let Some((_, fsort, _)) = spec
+                            .fields
+                            .iter()
+                            .find(|(name, _, _)| *name == field.name.ident.as_str())
+                        {
+                            self.walk(&field.value, &SortKey::table(fsort));
+                        }
+                    }
+                }
+            }
+            ValueKind::Parameter(_) | ValueKind::String(_) | ValueKind::Integer(_) => {}
+        }
+    }
+}
+
+fn single_item_form(value: &Value) -> String {
+    match &value.kind {
+        ValueKind::Parameter(name) => format!("${}", name.ident.as_str()),
+        ValueKind::String(text) => format!("{text:?}"),
+        ValueKind::Integer(number) => number.to_string(),
+        ValueKind::List(_) => "[...]".to_owned(),
+        ValueKind::Record(_) => "{...}".to_owned(),
+        ValueKind::Call(call) => {
+            let head = call.head.ident.as_str();
+            if call.is_bare() { head.to_owned() } else { format!("{head}(...)") }
+        }
+    }
+}
 
 impl Resolver<'_> {
     /// Binds a call's arguments to its signature's parameters and resolves
     /// each at its parameter's sort.
-    pub(super) fn call(&mut self, call: &Call, signature: &Signature) {
+    pub(super) fn call(&mut self, call: &Call, at: &SortKey, signature: &Signature) {
         let word = call.head.ident.as_str();
         // Temporary: `syl-ring-tempts-you-raw-scope` deletes this exception.
         if signature.ring_only && !self.ring {
@@ -127,6 +367,99 @@ impl Resolver<'_> {
             }
         }
         self.redundant_defaults(word, params, &bound);
+        self.written_form(call, at, signature, &bound);
+    }
+
+    fn written_form(
+        &mut self,
+        call: &Call,
+        at: &SortKey,
+        signature: &Signature,
+        bound: &[(usize, &Arg)],
+    ) {
+        if signature.secondary {
+            return;
+        }
+        let word = call.head.ident.as_str();
+        for &(param_index, arg) in bound {
+            if self
+                .forms
+                .triggered_condition
+                .contains(&(signature.decl, param_index))
+                && let ValueKind::Call(cond_call) = &arg.value.kind
+            {
+                let cond_word = cond_call.head.ident.as_str();
+                let trig_sort = SortKey::named(schema::TRIGGER_CONDITION_SORT);
+                if schema::SINGLE_TRIGGER_WORDS.contains(&cond_word)
+                    && self
+                        .registry
+                        .contains_key(&(cond_word.to_owned(), trig_sort))
+                {
+                    let is_defining_template_body =
+                        self.ability_template_body
+                            .is_some_and(|(tpl_name, body_call)| {
+                                tpl_name == cond_word && std::ptr::eq(call, body_call)
+                            });
+                    if !is_defining_template_body {
+                        self.refuse(
+                            call.span,
+                            RefusalKind::SingleConditionTriggered(cond_word.to_owned()),
+                        );
+                    }
+                }
+            }
+            if let Some(wrapper_instead) =
+                self.forms.two_or_more.get(&(signature.decl, param_index))
+                && let ValueKind::List(items) = &arg.value.kind
+            {
+                let nodes: Vec<&Value> = items.iter().filter_map(Item::node).collect();
+                match nodes.as_slice() {
+                    [] => self.refuse(
+                        call.span,
+                        RefusalKind::EmptyCoordination {
+                            word: word.to_owned(),
+                            sort: at.to_string(),
+                        },
+                    ),
+                    [only] => {
+                        let instead = wrapper_instead
+                            .clone()
+                            .unwrap_or_else(|| single_item_form(only));
+                        self.refuse(
+                            call.span,
+                            RefusalKind::SingleItemCoordination {
+                                word: word.to_owned(),
+                                sort: at.to_string(),
+                                instead,
+                            },
+                        );
+                    }
+                    [_, _, ..] => {
+                        if self.forms.trigger_disjunctions.contains(&signature.decl) {
+                            let trig_sort = SortKey::named(schema::TRIGGER_CONDITION_SORT);
+                            for item in nodes {
+                                if let ValueKind::Call(item_call) = &item.kind
+                                    && let Some(item_sig) = self.registry.get(&(
+                                        item_call.head.ident.as_str().to_owned(),
+                                        trig_sort.clone(),
+                                    ))
+                                    && !item_sig.secondary
+                                    && self.forms.trigger_disjunctions.contains(&item_sig.decl)
+                                {
+                                    self.refuse(
+                                        item.span,
+                                        RefusalKind::NestedTriggerCondition {
+                                            outer: word.to_owned(),
+                                            inner: item_call.head.ident.as_str().to_owned(),
+                                        },
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /// Refuses every named argument whose value is its parameter's default.

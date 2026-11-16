@@ -51,6 +51,7 @@ use sylex_syl::Span;
 use sylex_syl::Value;
 use sylex_syl::ValueKind;
 
+use self::call::WrittenForms;
 use self::coercion::Coercion;
 pub use self::refusal::CheckError;
 pub use self::refusal::Refusal;
@@ -267,19 +268,18 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     let registry = register(&decls, &mut refusals);
     unknown_sorts(&decls, &known_sorts(&decls, &registry), &mut refusals);
     let coercions = coercion::coercions(&decls, &registry, &mut refusals);
+    let forms = call::written_forms(&decls, &registry, &coercions);
     let shared_verbs = shared_verb_lemmas(&decls, &mut refusals);
+    let tables = Tables {
+        registry: &registry,
+        coercions: &coercions,
+        forms: &forms,
+        shared_verbs: &shared_verbs,
+    };
     let mut edges = vec![Vec::new(); decls.len()];
     let mut resolutions = Resolutions::default();
     for (decl, edges) in decls.iter().zip(&mut edges) {
-        resolve(
-            decl,
-            &registry,
-            &coercions,
-            &shared_verbs,
-            &mut refusals,
-            edges,
-            &mut resolutions,
-        );
+        resolve(decl, &tables, &mut refusals, edges, &mut resolutions);
     }
     for cycle in cycles::cycles(&edges) {
         // A cycle names a declaration by its name, a nameless one by its label.
@@ -600,10 +600,7 @@ fn verb_record_lemma(record: &Record) -> Option<(&str, Span)> {
 /// name), refusing a `verb` declaration without a `lexical` record defining a
 /// non-empty `lemma` and `frames`, or two `verb` declarations for the same
 /// lemma.
-fn shared_verb_lemmas(
-    decls: &[Decl<'_>],
-    refusals: &mut Vec<Refusal>,
-) -> BTreeMap<String, String> {
+fn shared_verb_lemmas(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> BTreeMap<String, String> {
     let mut lemmas: BTreeMap<String, String> = BTreeMap::new();
     for decl in decls.iter().filter(|d| d.kind.word == "verb") {
         let name = decl.name.as_deref().expect("a verb declaration has a name");
@@ -615,7 +612,8 @@ fn shared_verb_lemmas(
             continue;
         };
         let ValueKind::Record(record) = &lexical.kind else {
-            // `Resolver::lexical` refuses non-record `lexical` across all declarations.
+            // `Resolver::lexical` refuses non-record `lexical` across all
+            // declarations.
             continue;
         };
         let Some((lemma, span)) = verb_record_lemma(record) else {
@@ -641,12 +639,17 @@ fn shared_verb_lemmas(
     lemmas
 }
 
+struct Tables<'r> {
+    registry: &'r Registry,
+    coercions: &'r [Coercion],
+    forms: &'r WrittenForms,
+    shared_verbs: &'r BTreeMap<String, String>,
+}
+
 /// Resolves one declaration's parameter defaults and block or value.
 fn resolve(
     decl: &Decl<'_>,
-    registry: &Registry,
-    coercions: &[Coercion],
-    shared_verbs: &BTreeMap<String, String>,
+    tables: &Tables<'_>,
     refusals: &mut Vec<Refusal>,
     edges: &mut Vec<usize>,
     record: &mut Resolutions,
@@ -659,13 +662,15 @@ fn resolve(
                 let sort = &decl.params[index].sort;
                 let params = &decl.params[..index];
                 Resolver {
-                    registry,
-                    coercions,
-                    shared_verbs,
+                    registry: tables.registry,
+                    coercions: tables.coercions,
+                    forms: tables.forms,
+                    shared_verbs: tables.shared_verbs,
                     refusals: &mut *refusals,
                     edges: &mut *edges,
                     record: &mut *record,
                     params,
+                    ability_template_body: None,
                     ring,
                 }
                 .value(default, sort);
@@ -686,14 +691,28 @@ fn resolve(
             .collect(),
         Shape::Value(_) => Vec::new(),
     };
+    let ability_template_body = match (
+        decl.kind.word,
+        decl.name.as_deref(),
+        decl.field("body").map(|v| &v.kind),
+    ) {
+        (schema::TEMPLATE, Some(name), Some(ValueKind::Call(body_call)))
+            if decl.sort == SortKey::named(schema::TRIGGERED_ABILITY.0) =>
+        {
+            Some((name, body_call))
+        }
+        _ => None,
+    };
     Resolver {
-        registry,
-        coercions,
-        shared_verbs,
+        registry: tables.registry,
+        coercions: tables.coercions,
+        forms: tables.forms,
+        shared_verbs: tables.shared_verbs,
         refusals,
         edges,
         record,
         params: &block_params,
+        ability_template_body,
         ring,
     }
     .body(decl);
@@ -702,7 +721,8 @@ fn resolve(
 /// Where a `{ ... }` field list stands.
 #[derive(Clone, Copy)]
 enum FieldHost<'a, 'd> {
-    /// A declaration's `{ ... }` block, which may carry `lexical` and `spelling`.
+    /// A declaration's `{ ... }` block, which may carry `lexical` and
+    /// `spelling`.
     DeclarationBlock(&'d Decl<'a>),
     /// A record value `{ ... }`, which carries only its record sort's fields.
     RecordValue,
@@ -712,6 +732,7 @@ enum FieldHost<'a, 'd> {
 struct Resolver<'r> {
     registry: &'r Registry,
     coercions: &'r [Coercion],
+    forms: &'r WrittenForms,
     shared_verbs: &'r BTreeMap<String, String>,
     refusals: &'r mut Vec<Refusal>,
     /// The dependency nodes the declaration reaches.
@@ -719,6 +740,10 @@ struct Resolver<'r> {
     record: &'r mut Resolutions,
     /// The parameters a `$name` may read.
     params: &'r [Slot],
+    /// When resolving `template <name>: Ability`, `<name>` and its root `body`
+    /// call so `when`, `whenever` and `at` may expand to
+    /// `triggered(<name>(…))`.
+    ability_template_body: Option<(&'r str, &'r Call)>,
     ring: bool,
 }
 
@@ -769,7 +794,9 @@ impl Resolver<'_> {
                 && METADATA_FIELDS.contains(&name)
             {
                 match name {
-                    "spelling" => spelling::check(decl, &field.value, self.coercions, self.refusals),
+                    "spelling" => {
+                        spelling::check(decl, &field.value, self.coercions, self.refusals);
+                    }
                     "lexical" => self.lexical(&field.value),
                     other => unreachable!("unhandled metadata field `{other}`"),
                 }
@@ -906,7 +933,7 @@ impl Resolver<'_> {
                     self.record
                         .calls
                         .insert(std::ptr::from_ref(call), expected.clone());
-                    return self.call(call, signature);
+                    return self.call(call, expected, signature);
                 }
             }
             ValueKind::String(_)
@@ -1072,6 +1099,7 @@ mod tests {
             written.push(record.sort);
             written.extend(record.fields.iter().map(|(_, sort, _)| *sort));
         }
+        written.extend([schema::TRIGGERED_ABILITY.0, schema::TRIGGER_CONDITION_SORT]);
         for sort in written {
             let mut heads = BTreeSet::new();
             let key = SortKey::table(sort);
