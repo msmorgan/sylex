@@ -1,12 +1,12 @@
 ---
-needs: [syl-spelling-conventions, syl-spelling-optional-segments]
+needs: [cleanup-step6-surface, syl-shared-phrase-written-once, syl-replacement-stated-as-clause, syl-token-records-to-templates]
 ---
 
 # Recover `.syl` terms from `sylex_english` Readings
 
 ## Why
 
-A card's meaning is a `.syl` term written by hand today. Spelling is meant to be a
+A card's `.syl` term is written by hand today. Spelling is meant to be a
 construction grammar: each Template or Definition with its printed wording pairs English structure
 with semantic structure, so the same grammar recovers a surface term from a Reading and spells a
 term back as English (`architecture.md`, "Spelling is a construction grammar"). Recovery reads
@@ -16,8 +16,10 @@ each Template's and Definition's `spelling`, so it needs the spelling convention
 `sylex_english` Reading to a `.syl` term yet, and the Rust structures it would build do not
 exist yet either.
 
-Recovery does not wait for the rest of step 6 (`cleanup-step6-syl`). It reads whichever
-declarations have a wording when it runs, so its report changes as the corpus is reshaped.
+Recovery is written against the surface (`cleanup-step6-surface`), which has the nominal
+descriptions, the spellings in the settled notation and the clause and voice words, and against
+the three tickets after it that write shared phrases, clause-form replacements and tokens as
+printed. It does not wait for the rest of step 6 (`cleanup-step6-syl`).
 
 ## Done when
 
