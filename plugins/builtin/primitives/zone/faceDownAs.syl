@@ -1,4 +1,5 @@
-# "face down", as `spec` lists its characteristics [CR#708.2,406.3a].
-primitive faceDownAs(spec: FaceDown): MoveRider = FaceDown {
+# "face down", as `spec` lists its characteristics, or with the destination zone's default
+# face-down characteristics when `spec` is `none` [CR#708.2,708.2a,406.3a].
+primitive faceDownAs(spec: Option(FaceDown)): MoveRider = FaceDown {
   spelling = "face down"
 }

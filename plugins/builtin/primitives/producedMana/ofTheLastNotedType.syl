@@ -1,4 +1,4 @@
-# "mana of the last noted type"
+# "mana of <subject>'s last noted type"
 primitive ofTheLastNotedType(subject: NounPhrase): ProducedMana = LastNoted {
-  spelling = "mana of the last noted type"
+  spelling = "mana of $subject's last noted type"
 }
