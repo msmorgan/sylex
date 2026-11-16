@@ -47,12 +47,13 @@ Written against the spine (`cleanup-step6-spine`).
   crate exists, and `docs/design/architecture.md` says `sylex_spelling` parses the `spelling`
   notation, beside its sentence that `sylex_syl` parses `.syl`.
 - Every `TODO(spelling)` that needed an optional or repeated segment is written with it.
-- A move's riders print as cards print them, each wording checked against Oracle text. "Onto the
-  battlefield tapped and attacking" (40 Oracle lines by a regular expression, not restricted to
-  Vintage-legal cards) coordinates two riders with "and", "onto the battlefield tapped under
-  their control" sets two side by side, and no line prints "tapped attacking": so a riders list
-  is not one list under one join, and `putInto`'s marker ("Format and coordinate the riders list
-  entries") is resolved with the coordination written as its own word.
+- A move's riders are left unspelled. "Onto the battlefield tapped and attacking" (40 Oracle
+  lines by a regular expression, not restricted to Vintage-legal cards) coordinates two riders
+  with "and", "onto the battlefield tapped under their control" sets two side by side, and no
+  line prints "tapped attacking", so a riders list is not one list under one join. They are
+  depictives, which the design of a verb phrase's dependents replaces
+  (`docs/design/semantics.md` §6 item 17). `putInto`'s marker and the markers of the Templates
+  over it stay, each rewritten to name that as what it waits on.
 - The notation has no mark for the Holes of the words that take a `Subject` and a verb phrase
   (`does`, `would`, `did`, `cant`, `must`, `can`, `gatedBy`, `doesnt`), whose `Subject` selects
   the voice the verb phrase prints. Their optional parts are written like any other, no mark is
@@ -79,6 +80,9 @@ Written against the spine (`cleanup-step6-spine`).
   `cargo test -p xtask` pass.
 
 ## Not in scope
+
+The wording of a move's riders ("tapped and attacking", "under your control"): the depictives
+design (`docs/design/semantics.md` §6 item 17).
 
 The other spelling conventions (verb inflection, the hole syntax): `syl-spelling-conventions`.
 
