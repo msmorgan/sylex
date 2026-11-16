@@ -43,6 +43,25 @@ A card is in scope when mtgjson lists it as `Legal` or `Restricted` in Vintage (
 - `docs/specs/`: accepted designs not yet in code. `docs/unusual-cards.md`: cards whose text defeats
   a natural modeling assumption.
 
+## Card text
+
+- Structure comes from the parse: a text's constituents, heads, attachments and ambiguities are
+  read from the English parser's output, and `data/mtgjson/AllPrintings.sqlite` answers legality
+  and raw wording only. A string or regex match on Oracle text shows that words occur, never how
+  they attach.
+- One unit: `cargo xtask english forestwalk --card NAME --line N` (or `--type-line`, or
+  `--as-card NAME 'TEXT'`) prints its settled spine and its forks, and `--pick` / `--exclude`
+  narrow it; `cargo xtask english parse --card NAME` lists a card's units and Readings. Both parse
+  live, in about two seconds.
+- Across the pool: SQL over `data/derived/english-forests.sqlite`, every unit's Packed Forest,
+  written by `cargo xtask english forests` in about 35 s. Its schema and example queries are in
+  `crates/english/README.md`, "The forest database".
+- The forest database is a snapshot, and every workspace shares the one under `data/`. It holds
+  the parses of `default`: rerun `cargo xtask english forests` there after integrating a change to
+  `crates/{english,syntax,lexicon,vocabulary,upstream}` or refreshing the card data. In a
+  workspace whose own changes alter parses, write `--output target/english/forests.sqlite` and
+  query that file.
+
 ## Writing
 
 - American spelling everywhere (code, identifiers, docs, tickets, messages); verbatim quotations
