@@ -1,1 +1,3 @@
-primitive game: Period = Game
+primitive game: Period = Game {
+  spelling = "game"
+}

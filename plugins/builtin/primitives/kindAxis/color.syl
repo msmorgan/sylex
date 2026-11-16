@@ -1,1 +1,3 @@
-primitive color: KindAxis = Color
+primitive color: KindAxis = Color {
+  spelling = "color"
+}

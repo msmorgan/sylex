@@ -1,6 +1,7 @@
-# "spend mana as though it were mana of <as> [to <purpose>]" [CR#609.4b]
-# TODO(spelling): Include or omit the clauses supplied by what, purpose.
+# "spend [<what>] mana as though it were mana of <as> [to <purpose>]" [CR#609.4b]
 primitive spendManaAs(
   what: Option(ColorOrColorless),
   as: ManaMatch,
-  purpose: Option(SpendPurpose)): AsThough = Mana
+  purpose: Option(SpendPurpose)): AsThough = Mana {
+  spelling = "spend< $what> mana as though it were mana of $as< to $purpose>"
+}

@@ -1,1 +1,3 @@
-primitive anyNumberOfTimes: PayTimes = AnyNumberOfTimes
+primitive anyNumberOfTimes: PayTimes = AnyNumberOfTimes {
+  spelling = "any number of times"
+}

@@ -1,7 +1,7 @@
 # "copy <subject> [<times> times] [except …]": copies a spell or ability onto the stack
 # (`copyOnStack`, over `fromStack` [CR#707.10]), a card in its own zone (`fromCardZone`
 # [CR#707.12]), or an object into a named zone (`inZone` [CR#702.192a]).
-# TODO(spelling): Format and coordinate the exceptions list entries, including the empty case.
+# TODO(spelling): Copy exception wording waits on `syl-copy-exceptions`.
 primitive copy(
   sort: CopySort,
   subject: NounPhrase,

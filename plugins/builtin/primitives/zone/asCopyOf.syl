@@ -1,4 +1,4 @@
 # "as a copy of <source> [except …]" [CR#614.1c,707.9]; `mayHaveEnter` makes the entering this
 # way optional ("you may have this creature enter as a copy of …").
-# TODO(spelling): Format and coordinate the exceptions list entries, including the empty case.
+# TODO(spelling): Copy exception wording waits on `syl-copy-exceptions`.
 primitive asCopyOf(source: NounPhrase, exceptions: List(CopyExcept)): MoveRider = AsCopyOf

@@ -1,3 +1,4 @@
 # "with a counter on it", or "with a <kind> counter on it".
-# TODO(spelling): Include or omit the clauses supplied by kind.
-primitive hasCounter(kind: Option(CounterKind) = none): Predicate = HasCounters
+primitive hasCounter(kind: Option(CounterKind) = none): Predicate = HasCounters {
+  spelling = "with a< $kind> counter on it"
+}

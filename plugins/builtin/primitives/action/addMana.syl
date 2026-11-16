@@ -1,6 +1,7 @@
 # "add <produced>": put the produced mana into the actor's mana pool [CR#106.4]. Its amount is
 # part of the produced mana (`counted`).
-# TODO(spelling): Print each rider as its own sentence after the clause.
+# TODO(spelling): Printing each rider as a sentence after the clause waits on
+# `syl-spelling-forms-and-runs`.
 primitive addMana(produced: ProducedMana, riders: List(ManaRider) = []): VerbPhrase = AddMana {
   spelling = "add $produced"
 }

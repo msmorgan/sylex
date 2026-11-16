@@ -1,3 +1,4 @@
-# "to activate abilities [of <source>]"
-# TODO(spelling): Include or omit the clauses supplied by source.
-primitive toActivate(source: Option(Predicate)): SpendPurpose = ToActivate
+# "activate abilities [of <source>]"
+primitive toActivate(source: Option(Predicate)): SpendPurpose = ToActivate {
+  spelling = "activate abilities< of $source>"
+}

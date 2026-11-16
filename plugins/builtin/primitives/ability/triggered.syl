@@ -2,9 +2,10 @@
 # condition prints its own trigger word ("When this creature enters", `when`); joined ones
 # ("When this creature enters and whenever it attacks while saddled") are one disjunction of
 # trigger conditions, printed with "and" (`and`) or "or" (`or`) [CR#603.1b].
-# TODO(spelling): Include or omit the clauses supplied by intervening and limit.
 primitive triggered(
   condition: TriggerCondition,
   intervening: Option(Condition) = none,
   action: VerbPhrase,
-  limit: Option(UsageLimit) = none): Ability = Triggered
+  limit: Option(UsageLimit) = none): Ability = Triggered {
+  spelling = "$condition, <if $intervening, >$action.< This ability triggers $limit.>"
+}

@@ -7,10 +7,10 @@ card singleFaced({
       activated(
         compound([mana([pip(red)]), tapSymbol]),
         sequentially([
-            chooseWhile(
+            choose(
               target(
                 and([isOpponent, compare(greater, lifeTotalOf(you), [playerStat(lifeTotal)])])),
-              whileDoing(does(actor(you), activate(thisAbility)))),
+              when = whileDoing(does(actor(you), activate(thisAbility)))),
             instruct(thisCreature, dealDamage(amount = 2, recipient = that(player)))]))],
     power = 1,
     toughness = 2})

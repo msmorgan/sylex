@@ -1,7 +1,8 @@
 # "prevent <cut> [of <damage>]. [<also>]": prevent `cut` of the damage `damage` names, or of
 # "that damage", the damage in scope, then do `also`, the prevention's additional effect
 # [CR#615.1,615.5]. Under `cant`, "<damage> can't be prevented" [CR#615.12].
-# TODO(spelling): Include or omit the clauses supplied by damage, also.
+# TODO(spelling): Taking the prevented damage as a noun phrase and placing `also` as a coordinated
+# phrase or following sentence wait on `syl-prevent-damage-phrase` and `syl-spelling-forms-and-runs`.
 primitive preventDamage(
   cut: PreventCut,
   damage: Option(WouldClause) = none,

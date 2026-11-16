@@ -1,3 +1,4 @@
 # "in any order", "in a random order" [CR#401.4]
-# TODO(spelling): The arrangement selects chosen, random, or otherwise specified ordering.
+# TODO(spelling): Move riders are depictives, waiting on the depictives design
+# (`docs/design/semantics.md` §6 item 13).
 primitive inOrder(arrangement: Arrangement): MoveRider = InOrder

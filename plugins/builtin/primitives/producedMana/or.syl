@@ -1,5 +1,6 @@
 # "<a>, <b>, or <c>": one of the alternatives, as "{U}{U}, {U}{R}, or {R}{R}". Inside `counted`
 # it is chosen once for each counted mana; producing several symbols together is `symbols`, so
 # `ProducedMana` has `or` alone rather than `coord(Coordinator, …)`.
-# TODO(spelling): Format and coordinate the alternatives list entries.
-primitive or(alternatives: List(ProducedMana)): ProducedMana = Or
+primitive or(alternatives: List(ProducedMana)): ProducedMana = Or {
+  spelling = "$alternatives#<or>"
+}

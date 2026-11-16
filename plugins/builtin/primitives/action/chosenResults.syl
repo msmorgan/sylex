@@ -1,3 +1,4 @@
 # "ignore <amount> of the results of [<chooser>'s] choice"
-# TODO(spelling): Include or omit the clauses supplied by chooser.
+# TODO(spelling): Unused declaration whose wording no Vintage-legal card prints; waits on
+# `syl-dead-weight-sweep`.
 primitive chosenResults(chooser: Option(NounPhrase), amount: Amount): IgnoredOutcomes = Chosen

@@ -1,2 +1,3 @@
-# TODO(spelling): Include or omit the clauses supplied by defender.
-primitive attackUnblocked(defender: Option(NounPhrase)): VerbPhrase = AttackUnblocked
+primitive attackUnblocked(defender: Option(NounPhrase)): VerbPhrase = AttackUnblocked {
+  spelling = "attack< $defender> and isn't blocked"
+}

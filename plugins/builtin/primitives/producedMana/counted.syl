@@ -5,8 +5,8 @@
 # inner term says the mana share a color (`ofAnyColor(sameColor)`: "two mana of any one color").
 # An `or` of counts is chosen once ("X {G} or X {W}"). A written sequence is `symbols`, never a
 # count: "{R}{R}{R}" and "three {R}" are two terms.
-# TODO(spelling): An amount that is neither a number nor a letter prints "an amount of <produced>
-# equal to <amount>".
+# TODO(spelling): Non-numeric amounts printing "an amount of <produced> equal to <amount>" wait on
+# `syl-spelling-conventions`.
 primitive counted(amount: Amount, produced: ProducedMana): ProducedMana = Counted {
   spelling = "$amount $produced"
 }

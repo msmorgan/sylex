@@ -1,6 +1,7 @@
 # "<subject> deals [<amount>] [<kind>] damage [to <recipient>]"
-# TODO(spelling): Include or omit the clauses supplied by kind.
 primitive dealDamage(
   amount: Amount = anyAmount,
   recipient: NounPhrase = any,
-  kind: Option(DamageKind) = none): VerbPhrase = DealDamage
+  kind: Option(DamageKind) = none): VerbPhrase = DealDamage {
+  spelling = "deal< $amount>< $kind> damage< to $recipient>"
+}

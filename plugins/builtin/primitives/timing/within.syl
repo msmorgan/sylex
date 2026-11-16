@@ -1,3 +1,4 @@
 # "this turn", "this game": the span a historical clause looks back over.
-# TODO(spelling): Include or omit the clauses supplied by timing.
-primitive within(d: Duration, timing: Option(Timing) = none): LookbackSpan = Duration
+primitive within(d: Duration, timing: Option(Timing) = none): LookbackSpan = Duration {
+  spelling = "$d< $timing>"
+}

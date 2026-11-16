@@ -1,7 +1,8 @@
-# "choose <chosen>"
-# TODO(spelling): Include or omit the clauses supplied by first, when.
+# "[<disclosure>] choose <chosen> [<when>]"
 primitive choose(
   chosen: NounPhrase,
   disclosure: Disclosure = openly,
   first: Option(NounPhrase) = none,
-  when: Option(Timing) = none): VerbPhrase = Choose
+  when: Option(Timing) = none): VerbPhrase = Choose {
+  spelling = "<$disclosure >choose $chosen< $when>"
+}

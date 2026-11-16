@@ -1,6 +1,7 @@
 # "As an additional cost to cast <subject>, <cost>" [CR#118.8], `optional` ("you may <cost>") or
 # `mandatory` ("<cost>") [CR#118.8b,118.8c].
-# TODO(spelling): Spell `plusAdditional(<cost>)` here as "<cost>".
+# TODO(spelling): Unwrapping `plusAdditional(<cost>)` and choosing optional vs mandatory wording
+# wait on `syl-spelling-conventions`.
 primitive addedCost(
   subject: NounPhrase,
   optionality: CostOptionality,

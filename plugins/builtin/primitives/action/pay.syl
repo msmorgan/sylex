@@ -1,7 +1,8 @@
 # "pay <cost>": the actor pays the given cost, carrying out its instructions [CR#118.1]. A cost
 # that is itself one plain payment ("Pay 5 life", `payLife`) is paid by making that payment once
 # (`Cost.payment`), not by paying a payment.
-# TODO(spelling): Include or omit the clauses supplied by whose, keyword.
+# TODO(spelling): `whose`, `keyword`, and `outcome` replace `$cost` with keyword-cost wordings
+# rather than adding an optional part; waits on `syl-spelling-conventions`.
 primitive pay(
   cost: Cost,
   times: PayTimes,

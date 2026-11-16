@@ -1,6 +1,7 @@
 # "<cut> [of <damage>] is dealt to <to> instead": a redirection effect [CR#614.9]. Under
 # `cant`, "<damage> can't be dealt instead to <to>".
-# TODO(spelling): Include or omit the clauses supplied by damage.
+# TODO(spelling): Redirection clauses over a `would` subject or under `instead` wait on
+# `syl-replacement-stated-as-clause`.
 primitive redirectDamage(
   cut: PreventCut,
   to: NounPhrase,

@@ -1,6 +1,6 @@
 # "with N <kind> counters on it"
-# TODO(spelling): The mark selects ordinary, additional, or fewer counters, changing the
-# placement of amount and kind.
+# TODO(spelling): Move riders are depictives, waiting on the depictives design
+# (`docs/design/semantics.md` §6 item 13), and counter phrases wait on `syl-counters-noun-phrase`.
 primitive withCounters(
   amount: Amount,
   kind: CounterKindSource,

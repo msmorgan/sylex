@@ -1,7 +1,6 @@
 # "<event> or <event>": met when any one of the events happens, so a trigger condition over it is
 # met when a game event matches any of them [CR#603.2]. Several trigger conditions are the `or` at
 # `TriggerCondition`.
-# TODO(spelling): Format and coordinate the events list entries. Arms with one subject print it
-# once ("attacks or blocks"), even when it stands in two roles ("blocks or becomes blocked",
-# "dies or is exiled").
+# TODO(spelling): Coordinated verb phrases sharing one subject or object wait on
+# `syl-shared-phrase-written-once`.
 primitive or(events: List(GameEvent)): GameEvent = Or

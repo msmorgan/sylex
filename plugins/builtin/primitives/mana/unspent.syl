@@ -1,3 +1,4 @@
 # "unspent [<type>] mana"
-# TODO(spelling): Include or omit the clauses supplied by type.
-primitive unspent(type: Option(ColorOrColorless)): ManaHeld = Unspent
+primitive unspent(type: Option(ColorOrColorless)): ManaHeld = Unspent {
+  spelling = "unspent< $type> mana"
+}

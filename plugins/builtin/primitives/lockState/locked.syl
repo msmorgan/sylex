@@ -1,1 +1,3 @@
-primitive locked: LockState = Locked
+primitive locked: LockState = Locked {
+  spelling = "locked"
+}

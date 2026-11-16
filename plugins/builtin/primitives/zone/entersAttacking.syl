@@ -1,3 +1,4 @@
 # "enters attacking [<defender>]"
-# TODO(spelling): Include or omit the clauses supplied by defender.
+# TODO(spelling): Move riders are depictives, waiting on the depictives design
+# (`docs/design/semantics.md` §6 item 13).
 primitive entersAttacking(defender: Option(NounPhrase)): MoveRider = EntersAttacking

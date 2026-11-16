@@ -1,5 +1,6 @@
 # "If that mana is spent to cast <spell>, <says>"; "that spell <says>" (`mode`): an additional
 # effect on the spell the mana is spent on [CR#106.6]. A restriction on what the mana can be spent
 # on is `spendOnly`.
-# TODO(spelling): The mode chooses cast, activation, or resolution wording.
+# TODO(spelling): Selecting cast, activation, or resolution wording from `mode` waits on
+# `syl-spelling-conventions`.
 primitive whenSpentOn(mode: SpentMode, spell: NounPhrase, says: VerbPhrase): ManaRider = OnSpent
