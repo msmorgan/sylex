@@ -47,8 +47,6 @@ difference, but `compareOver` is a `Nominal` filter with no branch, and both cal
 - `thatMuch`'s doc comment cites rules that support a completed event's group count and a `would`
   clause's prospective amount, where it now cites [CR#608.2c] and [CR#614.6].
 - `semantics.md` §3.3 cites infect's marking rule [CR#702.90c] for the marking result.
-- `docs/tickets/wip/syl-counters-noun-phrase.md`, or wherever that ticket then is, quotes *Hardened
-  Scales* and *Winding Constrictor* as `plus(thatMany, 1)`.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Pointers

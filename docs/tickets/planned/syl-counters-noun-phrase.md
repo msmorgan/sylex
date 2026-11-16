@@ -13,9 +13,9 @@ there is not in the term:
 
 | Card | Oracle | Today |
 |---|---|---|
-| *Hardened Scales* | "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on it instead." | `putCounters(anyAmount, printedKind(p1p1Counter), …)`, then `putCounters(plus(thatMuch, 1), printedKind(p1p1Counter), it)` |
+| *Hardened Scales* | "If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on it instead." | `putCounters(anyAmount, printedKind(p1p1Counter), …)`, then `putCounters(plus(thatMany, 1), printedKind(p1p1Counter), it)` |
 | *Solemnity* | "Counters can't be put on artifacts, creatures, enchantments, or lands." | `putCounters(anyAmount, anyKind, bare(or([…])))` |
-| *Winding Constrictor* | "that many plus one of each of those kinds of counters are put on that permanent instead" | `putCounters(plus(thatMuch, 1), thoseCounters, that(permanent))` |
+| *Winding Constrictor* | "that many plus one of each of those kinds of counters are put on that permanent instead" | `putCounters(plus(thatMany, 1), thoseCounters, that(permanent))` |
 
 Each phrase is a clause's subject on its card, and none can be one while it is three arguments;
 the passive of "put" has nothing to promote until the counters are a phrase (spec §3, §6).
