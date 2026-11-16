@@ -36,12 +36,12 @@ parts one printed phrase could fill, a list with no join.
 - The open question is answered.
 - `cargo xtask dsl check` refuses a `spelling` that breaks any of the eight rules, with a
   negative test for each, and every declaration under `plugins/` passes.
-- Each declaration that breaks a rule when this ticket is claimed is resolved against its
-  card's Oracle text or its rule's text, by changing its `spelling` or its parameters; the
-  landing lists each with the rule it broke and what was done. Four break rule 7 today
-  (`colored`, `ofTheLastNotedType`, `faceDownAs`, `doUnlessKeywordCost`; re-run the scan when
-  claimed).
-- `docs/design/spelling.md` §7 states rule 1 among its refusals, takes "a lone list would word
+- Each declaration that breaks a rule when this ticket is claimed is resolved against its card's
+  Oracle text or its rule's text, by changing its `spelling` or its parameters; the landing lists
+  each with the rule it broke and what was done. Four have an unprinted parameter that is not
+  omissible today (`colored`, `ofTheLastNotedType`, `faceDownAs`, `doUnlessKeywordCost`; re-run the
+  scan when claimed).
+- `docs/design/spelling.md` §7 states the first of them among its refusals, takes "a lone list would word
   as its element" out of them, since it limits what such a declaration spells and refuses
   nothing, says a list parameter with no
   Hole is fixed at the empty list, where it says an empty list is spelled only as the absent
