@@ -10,6 +10,8 @@
 +Nominal creature attacking you => VerbPhrase "attacking you" as Modifier of creature; NounPhrase "you" as Object of attack; readings 1
 +NounPhrase target creature blocking this creature => VerbPhrase "blocking this creature" as Modifier of creature; NounPhrase "this creature" as Object of block; readings 1
 +Nominal player being attacked => VerbPhrase "being attacked" as Modifier of player
+# from: Devout Harpist
++ Destroy target Aura attached to a creature. => VerbPhrase "attached to a creature" as Modifier of Aura || AdjectivePhrase "attached to a creature" as Adjunct of destroy; !AdjectivePhrase "attached to a creature" as Modifier of Aura; readings 2
 +Nominal tokens that are tapped and attacking => RelativeClause "that are tapped and attacking" gap "tokens"; AdjectivePhrase "tapped"; VerbPhrase "attacking"; !Predicative "tapped and attacking" as Adjunct of be
 +VerbPhrase put it onto the battlefield attacking => VerbPhrase "attacking" as Adjunct of put || VerbPhrase "attacking" as Modifier of battlefield
 +VerbPhrase put a Soldier creature card from your hand onto the battlefield tapped and attacking => Predicative "tapped and attacking" as Adjunct of put; PrepositionPhrase "from your hand" as Modifier of card; PrepositionPhrase "onto the battlefield" as Complement of put

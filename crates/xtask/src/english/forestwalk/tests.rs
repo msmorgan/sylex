@@ -309,14 +309,14 @@ fn picks_and_exclusions_narrow_to_the_enumerated_readings_that_agree() {
     });
 }
 
-/// *Remove Enchantments*' only line (9,216 Derivations) narrows to one
+/// *Remove Enchantments*' only line (1,536 Derivations) narrows to one
 /// Derivation without enumerating, and each count the command prints is the
 /// Derivations the survey's option counts leave.
 #[test]
 fn a_large_forest_narrows_by_the_surveys_option_counts() {
     with_unit("Remove Enchantments", 1, |_, _, parse| {
         let forest = parse.fork_forest().unwrap();
-        assert_eq!(forest.total(), 9216);
+        assert_eq!(forest.total(), 1536);
         let steps = plan(&forest);
         assert!(steps.len() >= 4, "{} steps", steps.len());
         let taken: Vec<&Step> = steps.iter().map(|(s, _)| s).collect();
@@ -508,13 +508,13 @@ fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
         "--pick",
         "dependency \"both\"#1 correlative of VerbPhrase \"and\"#1",
         "--pick",
-        "lexical \"attached\"#1 adj:attached Invariant",
+        "lexical \"attached\"#1 action:attach PastParticiple {finiteness=Nonfinite}",
         "--pick",
         "dependency \"attached\"#1 modifier of Nominal \"Auras\"#1",
         "--pick",
         "dependency \"control\"#2 modifier of Nominal \"permanents\"#1",
         "--pick",
-        "lexical \"attached\"#2 adj:attached Invariant",
+        "lexical \"attached\"#2 action:attach PastParticiple {finiteness=Nonfinite}",
         "--pick",
         "dependency \"attached\"#2 modifier of Nominal \"Auras\"#2",
         "--pick",
@@ -522,11 +522,9 @@ fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
         "--pick",
         "dependency \"control\"#3 modifier of Nominal \"creatures\"#1",
         "--pick",
-        "lexical \"attached\"#3 adj:attached Invariant",
-        "--pick",
         "dependency \"control\"#5 modifier of Nominal \"permanents\"#2",
         "--pick",
-        "lexical \"attached\"#4 adj:attached Invariant",
+        "lexical \"attached\"#4 action:attach PastParticiple {finiteness=Nonfinite}",
         "--pick",
         "dependency \"attached\"#4 modifier of Nominal \"Auras\"#4",
         "--pick",
@@ -640,9 +638,10 @@ fn limit_zero_folds_a_single_reading_and_still_isolates_assertions() {
     );
 }
 
-/// *Remove Enchantments*' `lexical "attached"#1` fork has the alias
-/// `dependency "to"#2`: each option prints that alias's answer on its own line
-/// under it, in the header's order, a whole selector that `--pick` narrows by.
+/// *Remove Enchantments*' `lexical "attached"#1` fork has the aliases
+/// `dependency "attached"#1` and `dependency "to"#2`: each option prints each
+/// alias's answer on its own line under it, in the header's order, a whole
+/// selector that `--pick` narrows by.
 #[test]
 fn an_aliased_fork_prints_each_alias_answer_on_its_own_selector_line() {
     let card = ["--card", "Remove Enchantments", "--line", "1"];
@@ -652,32 +651,35 @@ fn an_aliased_fork_prints_each_alias_answer_on_its_own_selector_line() {
         .iter()
         .position(|l| l.starts_with("  lexical \"attached\"#1"))
         .unwrap_or_else(|| panic!("no attached fork: {output}"));
+    let aliases = ["dependency \"attached\"#1 ", "dependency \"to\"#2 "];
     assert!(
-        lines[header].ends_with(", aliases: dependency \"to\"#2"),
+        lines[header].ends_with(", aliases: dependency \"attached\"#1, dependency \"to\"#2"),
         "{output}"
     );
-    let mut aliased = 0;
+    let mut options = 0;
     let mut at = header + 1;
     while at < lines.len() && lines[at].starts_with("    ") {
         let option = lines[at];
         assert!(!option.contains(" = "), "{output}");
         let column = option.find(char::is_alphabetic).unwrap();
-        let alias = lines[at + 1];
-        let indent = " ".repeat(column + 2);
-        let selector = alias
-            .strip_prefix(indent.as_str())
-            .unwrap_or_else(|| panic!("alias line `{alias}` is not indented to {column}+2"));
-        assert!(selector.starts_with("dependency \"to\"#2 "), "{output}");
         let count = option[..column].trim();
-        let picked = survey(&[card[0], card[1], card[2], card[3], "--pick", selector]).unwrap();
-        assert!(
-            picked.contains(&format!("Derivations: {count}\n")),
-            "`{selector}` should leave {count} Derivations:\n{picked}"
-        );
-        aliased += 1;
-        at += 2;
+        let indent = " ".repeat(column + 2);
+        for (offset, alias) in aliases.iter().enumerate() {
+            let line = lines[at + 1 + offset];
+            let selector = line
+                .strip_prefix(indent.as_str())
+                .unwrap_or_else(|| panic!("alias line `{line}` is not indented to {column}+2"));
+            assert!(selector.starts_with(alias), "{output}");
+            let picked = survey(&[card[0], card[1], card[2], card[3], "--pick", selector]).unwrap();
+            assert!(
+                picked.contains(&format!("Derivations: {count}\n")),
+                "`{selector}` should leave {count} Derivations:\n{picked}"
+            );
+        }
+        options += 1;
+        at += 1 + aliases.len();
     }
-    assert!(aliased >= 2, "{output}");
+    assert!(options >= 2, "{output}");
 }
 
 #[test]

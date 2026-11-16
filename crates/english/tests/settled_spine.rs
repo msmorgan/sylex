@@ -30,7 +30,7 @@ use sylex_vocabulary::LexicalEnvironment;
 
 /// Real units, each for what it exercises:
 /// - *Draugr Necromancer* (3,312 Derivations), *Maralen, Fae Ascendant* (5,955)
-///   and *Remove Enchantments* (9,216): large forests, and on narrowing a spine
+///   and *Remove Enchantments* (1,536): large forests, and on narrowing a spine
 ///   that grows to the whole tree;
 /// - *Crook of Condemnation*: a spine that stops where one dependency fork
 ///   begins;

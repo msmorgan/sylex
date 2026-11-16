@@ -190,7 +190,7 @@ fn false_judgments_fail() {
     }
 }
 
-/// *Remove Enchantments* (9,216 Derivations) and *Maralen, Fae Ascendant*
+/// *Remove Enchantments* (1,536 Derivations) and *Maralen, Fae Ascendant*
 /// (5,955) are evaluated like any unit: their entries hold, and a false
 /// assertion on them fails on the assertion, not on their size.
 #[test]
@@ -207,7 +207,7 @@ fn units_of_thousands_of_derivations_are_evaluated() {
     assert_eq!(entries.len(), 2);
     for entry in &entries {
         let derivations = judge.parse(entry).unwrap().derivation_count();
-        assert!(derivations > 4096, "{}: {derivations}", entry.text);
+        assert!(derivations > 1000, "{}: {derivations}", entry.text);
         assert_eq!(judge.evaluate(entry), Outcome::Holds, "{}", entry.text);
         let mut false_entry = entry.clone();
         false_entry.groups = vec![vec![false_entry.groups[0][0].clone()]];

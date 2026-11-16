@@ -50,7 +50,7 @@ use sylex_vocabulary::LexicalEnvironment;
 /// - *Crook of Condemnation*: one dependency fork ("from" modifies "card" or
 ///   adjoins the Verb Phrase) behind a vertex five levels up.
 /// - *Draugr Necromancer* (3,312 Derivations), *Maralen, Fae Ascendant* (5,955)
-///   and *Remove Enchantments* (9,216): many forks on large forests.
+///   and *Remove Enchantments* (1,536): many forks on large forests.
 /// - *Counterbore*: two attachments ("with", "as") that one vertex packs as a
 ///   disjunction.
 /// - *Ensnared by the Mara* and *Heart of Bogardan*: a Clause coordination that

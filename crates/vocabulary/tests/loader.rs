@@ -231,3 +231,30 @@ fn a_plural_complement_marks_every_frame_of_its_preposition() {
         .1;
     assert!(among.iter().all(|frame| !frame.plural_complement));
 }
+
+/// A declared Adjective spelled like a verb's past participle is that verb's
+/// Adjectival Passive, and the loader marks both: *attached* and *attach*.
+/// *Tied* has no verb, and an attributive-only Adjective (*the left half*)
+/// is no Adjectival Passive of *leave*, so none of these is marked.
+#[test]
+fn an_adjectival_passive_marks_its_adjective_and_its_verb() {
+    let env = LexicalEnvironment::load().unwrap();
+    let marked = |id: &str| {
+        let lexeme = env
+            .lexicon
+            .lexemes()
+            .values()
+            .find(|lexeme| lexeme.id.as_str() == id)
+            .unwrap_or_else(|| panic!("no lexeme {id}"));
+        lexeme
+            .properties
+            .features
+            .get("AdjectivalPassive")
+            .is_some_and(|value| value.as_str() == "Lexical")
+    };
+    assert!(marked("adj:attached"));
+    assert!(marked("action:attach"));
+    assert!(!marked("adj:tied"));
+    assert!(!marked("adj:left"));
+    assert!(!marked("verb:leave"));
+}

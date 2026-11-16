@@ -36,7 +36,9 @@ feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
 feature ClauseMarking = Unmarked | To | Relative
 feature Voice = Active | Passive
 // Privative: a verb whose Adjectival Passive is a declared Adjective
-// (*tapped*).
+// (*tapped*), and that Adjective. The grammar does not derive the Adjective
+// from the verb's participle again, and the participle, not the Adjective,
+// postmodifies with a Complement (*Aura attached to a creature*).
 feature AdjectivalPassive = Lexical
 // Privative: auxiliary verbs (CGEL's NICE verbs).
 feature VerbKind = Auxiliary
@@ -384,6 +386,7 @@ category PrepositionPhrase [
 // only, never a depictive Adjunct or a premodifier.
 category AdjectivePhrase [
     Determination, AdjectivePosition, Voice, ComplementKind, Grade, Polarity, QualityHead,
+    AdjectivalPassive,
 ] { gap }
 category AdverbPhrase [AdjunctPosition]
 // The predicative Complement function; its head bears it too, and a Gap
@@ -1812,9 +1815,14 @@ DegreePartitive: PartitiveHead -> DeterminerPhrase complement:Selected(Prepositi
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
+// A declared Adjectival Passive is no postmodifier: its verb's participial
+// Verb Phrase is (ParticipialPostmodifier), which keeps *all other Auras
+// attached to permanents you control* (Remove Enchantments) from a second,
+// identical Reading through the Adjective *attached*.
 PostpositiveAdjective: Nominal -> Nominal modifier:AdjectivePhrase { heavy: [modifier] }
     where modifier.ComplementKind = PP,
-          modifier.Voice != Passive
+          modifier.Voice != Passive,
+          modifier.AdjectivalPassive != Lexical
 // *Creatures able to block it* (CGEL 5§14.2:445).
 PostpositiveInfinitivalAdjective: Nominal -> Nominal modifier:AdjectivePhrase { heavy: [modifier] }
     where modifier.ComplementKind = ToInf,
@@ -3733,13 +3741,19 @@ coordination Participle {
 // writes `:=` (*red or green* is no comparative). A coordination whose last
 // coordinate is comparative is the next schema's alone: one tree per
 // analysis.
-coordination AdjectivePhrase { coordinators: Coordinator, unshared: [Grade, Polarity] }
+coordination AdjectivePhrase {
+    coordinators: Coordinator,
+    unshared: [Grade, Polarity, AdjectivalPassive],
+}
     where last.Grade != Comparative
 // Oracle prints a comparative coordinated with a non-comparative before a
 // *than* Complement only the last coordinate licenses (*equal or lesser mana
 // value than that spell*, Saruman of Many Colors), which CGEL marks ?
 // (CGEL 15§4.4:1343 n. 66).
-coordination AdjectivePhrase { coordinators: Coordinator, unshared: [Grade, Polarity] }
+coordination AdjectivePhrase {
+    coordinators: Coordinator,
+    unshared: [Grade, Polarity, AdjectivalPassive],
+}
     where last.Grade := Comparative,
           $.Grade = Comparative
 coordination PrepositionPhrase {

@@ -953,8 +953,10 @@ impl Sources {
 }
 
 /// Marks each verb whose past participle is spelled like a declared
-/// Adjective (*tapped*, *transformed*): that Adjective is its Adjectival
-/// Passive, which the grammar then does not derive from the participle again.
+/// Adjective (*tapped*, *transformed*), and that Adjective, which is the
+/// verb's Adjectival Passive: the grammar then does not derive the Adjective
+/// from the participle again, and the participle, not the Adjective,
+/// postmodifies with a Complement (*Aura attached to a creature*).
 fn mark_lexical_adjectival_passives(lexemes: &mut [Lexeme]) -> Result<(), SourceError> {
     let lexicon = Lexicon::new(lexemes.to_vec())?;
     let mut marked = std::collections::BTreeSet::new();
@@ -981,6 +983,7 @@ fn mark_lexical_adjectival_passives(lexemes: &mut [Lexeme]) -> Result<(), Source
                 && lexicon.lexemes()[&word.lexeme].category == Category::Verb
             {
                 marked.insert(word.lexeme);
+                marked.insert(adjective.id);
             }
         }
     }

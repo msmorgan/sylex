@@ -319,8 +319,10 @@ impl NounDecl {
 ///
 /// An adjective not restricted to attributive use and spelled like a verb's
 /// past participle (*tapped*, *attached*) is that verb's Adjectival Passive:
-/// the loader marks the verb `AdjectivalPassive: Lexical`, and the grammar
-/// does not derive the adjective from the participle again. An action's
+/// the loader marks the verb and the adjective `AdjectivalPassive: Lexical`,
+/// and the grammar does not derive the adjective from the participle again,
+/// nor postmodifies with the adjective where the participle does (*Aura
+/// attached to a creature*). An action's
 /// adjective (*transformed*) is declared on its `KeywordAction`, a status's on
 /// its `Status`.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
