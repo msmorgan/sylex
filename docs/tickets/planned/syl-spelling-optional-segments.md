@@ -13,7 +13,8 @@ is anywhere" is typical). Without it,
 wordings that differ only by such a part become near-duplicate Template families: `enters…`,
 `activatedOnly…`, `prevent…`, `defines…`.
 
-`syl-at-turn-point`, which lands first, settles `at`'s base spelling "At $point, $action"; `at.syl`'s remaining `TODO(spelling)`, for its limit and if clauses, is this ticket's.
+`at`'s base spelling is settled (`syl-at-turn-point`); `at.syl`'s remaining `TODO(spelling)`, for
+its limit and if clauses, is this ticket's.
 
 Written against the spine (`cleanup-step6-spine`).
 
@@ -21,11 +22,13 @@ Written against the spine (`cleanup-step6-spine`).
 
 - The notation is settled in `docs/design/spelling.md` §7 (`$name` Holes, `$name@Form` printed
   forms, `$name*` run Holes, `~` ties, `$xs#<join>` lists, `< … >` optional parts, `%Category: …`
-  Tails, the `^` Gap mark) with its load rules; where this ticket's text differs, §7 governs.
+  Tails, the `^` Gap mark); where this ticket's text differs, §7 governs. The parser built here
+  checks the notation's syntax. §7's load rules that need a declaration or the English grammar
+  are checked by no ticket yet.
 - The notation is parsed by a new crate, `sylex_spelling` (`crates/spelling/`), whose first
   module it is. `sylex_syl` parses the `.syl` language and nothing else: a `spelling` stays a
-  string to it. `cargo xtask dsl check` parses every `spelling` with it once no `<name>` Hole is
-  left (`syl-spelling-conventions`).
+  string to it. `cargo xtask dsl check` parses every `spelling` with it, once this
+  ticket has migrated the `<name>` Holes.
 - `cargo xtask dsl fmt` does not normalize a `spelling`: `sylex_syl`'s printer writes the string
   as it stands, and `sylex_spelling` parses and has no printer.
 
@@ -63,15 +66,15 @@ Written against the spine (`cleanup-step6-spine`).
 - The optional parts this ticket writes leave form labels, `*` and `#<.>` joins unwritten; that
   is `syl-spelling-forms-and-runs`'s.
 - The parser refuses a join chosen by a parameter (`$xs#<$name>`), with a negative test.
-- No `coord` primitive has a `spelling` (`plugins/builtin/primitives/{noun,predicate,zone}/coord.syl`
-  have none today; each takes its `coordinator` as an argument), and the coordinator word is the
-  Template's: the `and`, `or` and `andOr` Templates at `NounPhrase`, `Predicate` and `Location`,
-  unspelled today, are spelled `$xs#<and>`, `$xs#<or>` and `$xs#<and/or>` over their list, and the
-  `or` at `TriggerCondition` `$conditions#<or>`, replacing its `TODO(spelling)`. `isOutlaw`
-  ("outlaw") keeps its own wording over an unspelled `coord(andOr, …)` in its body. The
-  `Predicate` `coord` and its Templates are what `syl-nominal-descriptions` replaces in
-  descriptions; whatever coordination at `Nominal` and `PreModifier` it adds follows the same
-  rule.
+- No `coord` primitive has a `spelling`
+  (`plugins/builtin/primitives/{noun,predicate,zone}/coord.syl` have none today; each takes its
+  `coordinator` as an argument), and the coordinator word is the Template's: the `and`, `or` and
+  `andOr` Templates at `NounPhrase`, `Predicate` and `Location`, unspelled today, are spelled
+  `$xs#<and>`, `$xs#<or>` and `$xs#<and/or>` over their list, and the `or` at `TriggerCondition`
+  `$conditions#<or>`, replacing its `TODO(spelling)`. `isOutlaw` ("outlaw") keeps its own wording
+  over an unspelled `coord(andOr, …)` in its body. The `Predicate` `coord` and its Templates are
+  what `syl-nominal-descriptions` replaces in descriptions; whatever coordination at `Nominal` and
+  `PreModifier` it adds follows the same rule.
 - The near-duplicate Template families that differed only by such a segment are each one
   Template; the landing lists the merges.
 - Declaration order stays the printed order (`syl.md` §5).
@@ -84,7 +87,7 @@ Written against the spine (`cleanup-step6-spine`).
 The wording of a move's riders ("tapped and attacking", "under your control"): the depictives
 design (`docs/design/semantics.md` §6 item 17).
 
-The other spelling conventions (verb inflection, the hole syntax): `syl-spelling-conventions`.
+The other spelling conventions (verb inflection): `syl-spelling-conventions`.
 
 ## Pointers
 

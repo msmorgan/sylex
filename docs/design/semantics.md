@@ -15,7 +15,7 @@ as a contract the code keeps.
 
 A card is written as a `.syl` term that follows its English phrase by phrase, and its meaning is
 read from that term. The pipeline
-has four steps:
+has four stages:
 
 1. Parse the `.syl` files ([`syl.md`](./syl.md) §2).
 2. Resolve names by expected sort, and expand Templates and Definitions ([`syl.md`](./syl.md)
@@ -314,8 +314,9 @@ is open (§6).
      controller pays {3}." [CR#118.12a];
    - a static ability's clause is a continuous effect, a deontic rule, a replacement effect, a
      cost statement or one of the other static statements, by its verb phrase;
-   - a sentence with `instead` is a replacement effect [CR#614.1a] and one with `prevent` a
-     prevention effect [CR#615.1a]. The event is the clause it answers, which usually holds a
+   - a sentence with `instead` is a replacement effect [CR#614.1a], and one that has damage
+     prevented is a prevention effect [CR#615.1a]; one that says damage can't be prevented is
+     not. The event is the clause it answers, which usually holds a
      `would` (*Phytohydra*) and sometimes does not (*Contamination*'s "If a land is tapped for
      mana, it produces {B} instead of any other type and amount."). A clause whose subject
      carries a `would` relative is one too (`voice-and-object-phrases.md` §8);
@@ -380,9 +381,14 @@ is reported as that, and is never dropped as though it had been refused (§5).
    it has no meaning to class or rank, and the right reading may be the one not understood.
 3. **Candidates with one meaning are one class.** Two surface terms that assemble to the same
    meaning differ in nothing the game can see.
-4. **Pragmatics ranks the classes** when more than one is left ([`pragmatics.md`](./pragmatics.md)).
+4. **Pragmatics ranks the classes** when more than one is left
+   ([`pragmatics.md`](./pragmatics.md)). Two classes ranked equal are a tie: it is reported and
+   no term is stored.
 5. **The top class's term is stored** as the card's `.syl`. Within a class the term is chosen by
    a fixed rule, so the same text always stores the same term.
+
+Where no candidate is left, the card is reported and nothing is stored. The pipeline stores a
+term only for a card that has none: it never writes over a stored term.
 
 **The stored term is the decision, and rank only proposes it.** Reading a stored term to play
 it runs semantics and never pragmatics; the check of a stored card may run pragmatics to report
@@ -477,3 +483,14 @@ are found over enumerated candidates or over a packed form is open (§6).
     means on each verb (an Entry Rider on an entering) is classification's. It belongs with the
     verb phrase's other unselected dependents (`voice-and-object-phrases.md` §13 item 1) and is
     not designed.
+18. **An anaphor whose antecedent is printed after it.** §1 item 2 says reading order does not
+    limit the direction of reference, and §4 step 3 resolves each mention in printed order by
+    the rules of §2.4, which say nothing of a later mention.
+19. **No way to correct an antecedent.** If the fixed rule of item 13 picks the wrong Referent
+    on some card, the card's term cannot say so: it holds no labels, and pragmatics does not run
+    on a stored term.
+20. **A stray candidate that is not understood.** Recovery gives every term the wording allows,
+    and one of them that semantics has no rule for keeps a card from storing its right term
+    (§5 step 2). Refusing what is not understood instead would drop real constructions.
+21. **Boxes for modes.** §2.2 has no box for `chooseModes`: a mode is neither a branch that
+    closes nor top-level text.

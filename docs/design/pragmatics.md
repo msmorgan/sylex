@@ -79,6 +79,13 @@ The lines the hypotheses are tried against, each with the reading it means:
 | *Exorcise*: "Exile target artifact, enchantment, or creature with power 4 or greater." | narrow |
 | *Airlift Chaplain*: "a Plains card or a creature card with mana value 3 or less" | narrow |
 | *Detection Tower*: "your opponents and creatures your opponents control with hexproof can be the targets of spells and abilities you control as though they didn't have hexproof" | wide |
+| "Gain control of all Auras and Equipment that were attached to it" | wide |
+| "Auras, Equipment, and modified creatures you control gain hexproof until end of turn." | wide |
+| *Harmonic Prodigy*: "a triggered ability of a Shaman or another Wizard you control" | wide |
+| *One with the Kami*: "Whenever enchanted creature or another modified creature you control dies" | narrow |
+| *Nissa, Steward of Elements*: "a land card or a creature card with mana value less than or equal to …" | narrow |
+| *Slinza, the Spiked Stampede*: "Whenever Slinza or another creature with power 4 or greater enters" | narrow |
+| "Whenever you discard a Spirit card or a card with disturb" | narrow |
 
 Wide is the modifier over the whole coordination and narrow over its last arm. The lines come
 from regular expressions over Oracle text that is not restricted to Vintage-legal cards, so they
@@ -107,9 +114,23 @@ are attested wordings and not counts.
   value and power lines: each other kind of modifier ("with mana value
   …", "with power …", a relative clause, "named …") needs its own row.
 
-No hypothesis reads every line above as it means. In the *Airlift Chaplain* line the two
-readings pick out the same cards, since a land card's mana value is 0, so whether it reaches
-pragmatics at all depends on when two meanings are the same ([Semantics](semantics.md) §6).
+- **E. Narrow where the last arm is a noun phrase of its own; otherwise as C.** An arm that
+  brings its own determiner ("a creature card", "another modified creature", "a card") or names
+  one thing ("Slinza", "enchanted creature" beside "another …") is a whole noun phrase, and a
+  modifier printed after a coordination of whole noun phrases describes the last. A coordination
+  under one determiner ("target artifact, enchantment, or creature", "all Auras and Equipment")
+  is one noun phrase, read wide unless a preference or the subset test narrows it. It reads the
+  flash, disturb, *Airlift Chaplain*, *Nissa*, *Slinza* and *One with the Kami* lines narrow with
+  no data, and *Harmonic Prodigy* narrow, wrongly: there "another" is printed only because the
+  card is itself a Wizard, and "you control" is meant of both.
+
+The four lines "with mana value …" are two wide and two narrow, so no rule by kind of modifier (D)
+reads them all. In the *Detection Tower* line, as in the *Airlift Chaplain* line, the two readings
+play the same: an opponent without hexproof can be targeted either way. No hypothesis reads every
+line above as it means. In the *Airlift Chaplain* line the two readings pick out the same cards,
+since no Plains card printed has a mana cost and a card with none has mana value 0 [CR#202.3a],
+which is a fact about the cards and not a rule about lands, so whether it reaches pragmatics at all
+depends on when two meanings are the same ([Semantics](semantics.md) §6).
 
 ## 5. Open
 

@@ -532,17 +532,17 @@ form of its head word, `*` a Hole a run of sentences may fill, `~` ties a Hole t
 angle brackets mark an optional part, `#< … >` a list's join, `%` a Tail, and `^` a Gap.
 
 ```
-spelling := part*
-part     := text | hole | optional | tail | gap
+spelling := gap | part* [tail]
+part     := text | hole | optional
 hole     := [affix "~"] "$" name [mark] ["~" affix]   -- a parameter's argument
           | "$" name "#<" join ">"                    -- a List parameter
 mark     := "@" form | "*"
 form     := "Cardinal" | "Arabic" | "Ordinal" | "Roman" | "Counting"
           | "Present" | "Preterite" | "PastParticiple" | "GerundParticiple"
 join     := "" | "," | "." | "and" | "or" | "and/or" | "then"
-optional := "<" part+ ">"
-tail     := "%" ["inner"] Category ":" part+        -- runs to the end of its part
-gap      := "^"                                     -- no word; a Gap in the Reading
+optional := "<" part* [tail] ">"                    -- not empty
+tail     := "%" ["inner "] Category ": " part+       -- last in its spelling or optional part
+gap      := "^"                                     -- the whole spelling of a Gap's word
 affix    := letter+
 text     := any characters except "$", "~", "@", "*", "^", "#", "%", "<" and ">"
 ```
@@ -680,7 +680,8 @@ and are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and 
 
 - **A parameter has no Hole and is not omissible.** A parameter with no Hole is fixed at its
   absent value by that `spelling`, and a term that supplies another value has no wording by it.
-- **An optional part directly holds no Hole.** Fixed words alone recover no argument.
+- **An optional part directly holds no Hole.** Fixed words alone recover no argument. A Hole in
+  the part's own Tail counts as directly in it.
 - **Nothing is certain to print.** Outside every optional part there is text, a Hole, a Tail
   or a Gap.
 - **A variant is not English.** Every variant, which is each consistent choice of optional
@@ -725,7 +726,7 @@ things are known limits:
 The declarations under `plugins/` still write a Hole `<name>`: 784 Holes on 601 `spelling`
 lines, three of which need a tie (`landwalk`, `typecycling` and `non`) and two an ordinal
 (`fromTop` and `fromBottom`, "$n@Ordinal from …"). No declaration writes a form label, a `*` or
-a `#<.>` join yet. The `syl-spelling-conventions` ticket migrates the Holes, and
+a `#<.>` join yet. The `syl-spelling-optional-segments` ticket migrates the Holes, and
 `syl-spelling-forms-and-runs` writes the labels, marks and joins.
 
 ## 8. Capacity and cost

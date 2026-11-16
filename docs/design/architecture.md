@@ -161,15 +161,16 @@ several terms may word identically, and one sentence has several grammatical
 Readings, which the parser keeps rather than choosing ([English](english.md)
 §4). Semantics and pragmatics resolve the ambiguity, never rule order. Recovery
 gives every candidate term, and semantics drops each one it refuses. Where more
-than one meaning is left, a pragmatics step ranks them and the top one is
-stored; two ranked equal are reported and no term is stored
+than one meaning is left, a pragmatics step ranks them and the term of the top
+one is stored; two ranked equal are reported and no term is stored
 ([Pragmatics](pragmatics.md)). This pipeline is part of the direction ("The
 layers"). The stored term is the decision: reading it to play it never ranks
 anything, and what is checked for every card is that its stored term is among
 the candidates of its text, that semantics accepts it and that it spells back
 to the text ([Semantics](semantics.md) §5). A choice among antecedents is no
-such decision: one surface term holds both, and semantics makes it by a fixed
-rule on every reading ([Semantics](semantics.md) §6).
+such decision: one surface term holds both, and semantics makes it on every
+reading, by a fixed rule that is not yet designed ([Semantics](semantics.md)
+§6).
 
 ## Exact round trip
 

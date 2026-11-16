@@ -45,7 +45,7 @@ claimed). Oracle prints "one" where `Counting` prints the article (*Melira, the 
 The wording of a passive (`done`) and of a phrase that coordinated verb phrases share (`shared`),
 which their own tickets state (`syl-passive-participle-and-trigger-events`,
 `syl-shared-phrase-written-once`). The ordinal of `fromTop` and `fromBottom`, which
-`syl-spelling-conventions` writes `$n@Ordinal`.
+`syl-spelling-optional-segments` writes `$n@Ordinal`.
 
 ## Pointers
 
