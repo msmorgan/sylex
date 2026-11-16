@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-degree-determinative-distribution]
 ---
 # Retire `SingularOrQuantified` onto `IndefiniteArticle`
 

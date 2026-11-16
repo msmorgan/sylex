@@ -34,8 +34,9 @@ forks_agree_with_enumerated_readings_on_the_pool -- --ignored --nocapture 2>&1 |
 - Canonicalize one nesting order per category in `english.fug` (`docs/design/english.md` §8), with
   no new fork kind in `forks.rs`:
   - `VerbPhrase`: `CentralAdverbial` sits outermost over post-head VP adjuncts.
-  - `Nominal`: postmodifiers (`NominalPostmodifier`) sit outermost over `CoordinationPremodifier`
-    (matching single-head `NominalPostmodifier(Unmodified(Premodifier(...)))`).
+  - `Nominal`: postmodifiers (`NominalPostmodifier`, `PostpositiveAdjective`, `Adjunct:Nominal`
+    Preposition Phrases, `CoordinatedPostmodifier`, `TemporalPostmodifier`) sit outermost over
+    `CoordinationPremodifier` (matching single-head `NominalPostmodifier(Unmodified(Premodifier(...)))`).
   - `NounPhrase`: `NounPhraseArithmetic` (*plus*, *minus*) sits outermost over
     `MultipliedNounPhrase`, giving *Heart of Bogardan* `[[twice the number of age counters on this
     enchantment] minus 2]` (`(2 * N) - 2`).

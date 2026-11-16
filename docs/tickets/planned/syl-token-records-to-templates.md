@@ -54,6 +54,12 @@ many of those tokens are created instead" each print them as one (spec §6).
   black Zombie creature token" and "colorless" are premodifiers like any other.
 - `create` and `createObject` take the tokens as one noun phrase, whose determiner is the count
   (spec §6).
+- A token created by name with no other characteristics (*Tarmogoyf Nest*'s `"Create a Tarmogoyf
+  token."`, *Mutable Explorer*'s `"create a tapped Mutavault token."`) takes the characteristics of
+  the Oracle card of that name [CR#111.11]: `<OtherCardName>` premodifying *token(s)* in the Object
+  of *create* opts in to `OtherCardName()` (`docs/design/lexicon.md` §6), refused where a predefined
+  token or subtype spells the name, and the `.syl` value is that card's name (while a predefined
+  token such as `"a Treasure token"` stays its `token` Definition).
 
 ## Open questions
 
@@ -84,13 +90,6 @@ many of those tokens are created instead" each print them as one (spec §6).
   `syl-self-name-references`'s name forms name the enclosing face, which here is the card that
   creates the token, not the token. Recommendation: settle it in `syl-self-name-references`,
   which lists the case among its open questions; this ticket writes these cards after it.
-- **A token named for a card** (*Tarmogoyf Nest*'s granted "{1}{G}, {T}: Create a Tarmogoyf
-  token."): a token created by name with no other characteristics takes the characteristics of
-  the Oracle card of that name [CR#111.11]. With `english-names-read-from-text` deleting
-  `introduced_names.ron`, `create [det] <OtherCardName> token(s)` opts in to `OtherCardName()`
-  (`docs/design/lexicon.md` §6), refused where a predefined token or subtype spells the name, so the
-  `.syl` value is that card's name (whose lowering looks up the Oracle card's characteristics per
-  [CR#111.11]); a predefined token ("a Treasure token") stays its `token` Definition.
 - **Chosen qualities** (*Volrath's Laboratory*, *Riptide Replicator*, *Sarpadian Empires, Vol.
   VII*, which print "creature token of the chosen color and type"). Recommendation: a
   postmodifier "of the chosen color and type".

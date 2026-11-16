@@ -34,12 +34,12 @@ every one starts with `A–Z` or `0–9`.
   `over`, `and`, `a`, `vs.`, `&`, `/`, `×`) — stops before `" expansion"` across all 121 `expansion`
   sets and 881 of 882 sets in `SetList.json` (all except *The List (Unfinity Foil Edition)*, whose
   parentheses reminder-text removal strips in `lexicon.md` §1).
-- `english.fug` admits that open leaf only in `"the <SetName> expansion"`, a dedicated
-  expansion-citation production modifying `ClosedWord(Expansion)` rather than general
-  `NamePremodifier` (matching [CR#206.3a..206.3c]), so it never stands in `Name` positions and
-  builds no second tree (`docs/design/english.md` §8) where a card's own name matches the set name.
+- `nouns.ron` declares a prenominal `parameters` pattern (or frame) on `expansion` whose slot
+  admits that open `<SetName>` leaf in `"the <SetName> expansion"` (matching [CR#206.3a..206.3c])
+  without naming `expansion` as a closed word in `english.fug` (`crates/english/tests/catalog_leak.rs`),
+  so it never stands in general `Name` positions and builds no second tree
+  (`docs/design/english.md` §8) where a card's own name matches the set name.
 - `cited_names.ron`, `Sources::cited_names` and the `cited_name:` loader path are deleted.
-  `ScopedName` is deleted in `english-vote-options-read-from-text`.
 
 ## Done when
 
@@ -57,10 +57,9 @@ every one starts with `A–Z` or `0–9`.
   prepositions (*Adventures in the Forgotten Realms*, *Shadows over Innistrad*), digits and commas
   (*Warhammer 40,000 Commander*, *30th Anniversary Edition*), and admission's refusal of the open
   leaf off *expansion*.
-- `docs/design/lexicon.md` §2 (open lexical slots, beside Flavor Word [CR#207.2d]),
+- `docs/design/lexicon.md` §2 (open lexical slots, beside Flavor Word [CR#207.2d]) and
   `docs/contexts/oracle-english/CONTEXT.md` (Proper Name dropping `"a cited name"`, Flavor Word no
-  longer `"the one open lexical slot"`) and `docs/tickets/planned/catalogs-into-plugins.md`
-  (dropping `cited_names.ron` and its open bullet on a set-name Catalog) state the design.
+  longer `"the one open lexical slot"`) state the design.
 - `cargo xtask english strata --check` passes, the census is unchanged, and `cargo test` and
   `cargo clippy --tests -- -D warnings` pass for `sylex_lexicon`, `sylex_vocabulary`,
   `sylex_syntax`, `sylex_english` and `xtask`.
@@ -69,7 +68,8 @@ every one starts with `A–Z` or `0–9`.
 
 - Authoring or evaluating `"with a name originally printed in"` in `.syl` or the engine
   (`syl-name-originally-printed-in`, `engine-name-originally-printed-in`).
-- Introduced token and object names (`english-names-read-from-text`) and `vote_options.ron`.
+- Introduced token and object names (`english-names-read-from-text`), and `vote_options.ron` and
+  `ScopedName` (`english-vote-options-read-from-text`).
 
 ## Pointers
 
@@ -80,9 +80,8 @@ every one starts with `A–Z` or `0–9`.
   `stands_in`), `crates/lexicon/src/types.rs` (`Category`, `LexicalReading`).
 - `crates/syntax/src/step.rs`, `crates/syntax/src/prediction.rs`,
   `crates/syntax/src/alternatives.rs`.
-- `crates/english/grammar/english.fug` (`NamePremodifier`), `crates/english/src/profile.rs`,
-  `crates/english/judgments/mentions_and_votes.txt`.
+- `crates/english/grammar/english.fug`, `crates/english/src/profile.rs`,
+  `crates/english/judgments/mentions_and_votes.txt`, `crates/english/tests/catalog_leak.rs`.
 - `data/mtgjson/SetList.json`, `docs/design/lexicon.md` §2, `docs/design/english.md` §7–8,
   `docs/contexts/oracle-english/CONTEXT.md`,
-  `docs/tickets/planned/syl-name-originally-printed-in.md`,
-  `docs/tickets/planned/catalogs-into-plugins.md`.
+  `docs/tickets/planned/syl-name-originally-printed-in.md`.

@@ -7,18 +7,16 @@ needs: [v1-retirement, lexicon-dungeon-names, english-names-read-from-text, engl
 
 Every game word is a `.syl` declaration under `plugins/`, its `lexical` field beside its spelling
 and meaning (`docs/design/lexicon.md` §3). The Catalogs still live in
-`crates/vocabulary/catalogs/*.ron`. Some are declared twice: card types, subtypes, counters,
-designations, keyword abilities and keyword actions also have `plugins/builtin/definitions/`
-declarations, so `ageCounter.syl` and the `age` entry of `counters.ron` both declare the age
-counter. Others (`ability_words.ron`, `statuses.ron`, `turn_parts.ron`, `tokens.ron`,
-`plural_names.ron`) have no `.syl` declaration yet, while the card-scoped name lists
-(`introduced_names.ron`, `cited_names.ron`, `anchor_words.ron`, `vote_options.ron`) are retired by
-their `*-read-from-text` tickets.
+`crates/vocabulary/catalogs/*.ron`. Some are declared twice: card types and supertypes (`types.ron`),
+subtypes, counters, designations, predefined tokens (`tokens.ron`), keyword abilities and keyword
+actions also have `plugins/builtin/definitions/` declarations, so `ageCounter.syl` and the `age`
+entry of `counters.ron` both declare the age counter. The rest (`ability_words.ron`,
+`statuses.ron`, `turn_parts.ron`) have no `.syl` declaration yet.
 
 ## Done when
 
-- Every remaining Catalog item is declared in `plugins/` (or generated from Oracle data for card
-  and dungeon names per `lexicon.md` §3), and `sylex_vocabulary` reads it from there.
+- Every Catalog item is declared in `plugins/` (or generated from Oracle data for card and dungeon
+  names per `lexicon.md` §3), and `sylex_vocabulary` reads it from there.
 - `crates/vocabulary/catalogs/` is gone, and `sylex_vocabulary` declares only Core English.
 - Each Catalog with no declaration today gets a declaration sort, recorded in `lexicon.md` §3, and
   no declaration names a specific card.

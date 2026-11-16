@@ -15,10 +15,12 @@ is a determined size (`+NounPhrase a 2/2 or 3/3`, `+NounPhrase a white 2/2 and b
 
 ## Design
 
-- Value `SharedHeadCompound` nominals as `CompoundPart = Whole` on `BareNominal` (matching
-  `WholeCompound` inside `CompoundCoordination`), put `CompoundPart` in `proximate:` on both
-  `coordination Nominal` schemas, and narrow `first.CompoundPart != Base` to
-  `!(first.CompoundPart = Base & last.CompoundPart = Whole)`.
+- Value `SharedHeadCompound` (`counter:*`) nominals as `CompoundPart = Whole` on `BareNominal` (via
+  lexical feature projection from `crates/vocabulary/src/lib.rs` or a `Class(SharedHeadCompound)`
+  projection, matching `WholeCompound` inside `CompoundCoordination`) and set `$.CompoundPart =
+  Whole` on `WordPartCoordination`, put `CompoundPart` in `proximate:` on both `coordination
+  Nominal` schemas, and narrow `first.CompoundPart != Base` to `!(first.CompoundPart = Base &
+  last.CompoundPart = Whole)`.
 
 ## Done when
 
@@ -26,11 +28,12 @@ is a determined size (`+NounPhrase a 2/2 or 3/3`, `+NounPhrase a white 2/2 and b
   `+NounPhrase a +2/+0, +1/+1, or +0/+2 counter` and `+NounPhrase a +1/+1 or -1/-1 counter` each
   keep 1 Reading (`WordPartCoordination`).
 - The census shows no Reading lost on the supported corpus, and `cargo xtask english strata
-  --check`, `cargo test -p sylex_english` and `cargo clippy -p sylex_english --tests -- -D warnings`
-  pass.
+  --check`, `cargo test` and `cargo clippy --tests -- -D warnings` pass for every changed crate
+  (`sylex_vocabulary`, `sylex_syntax`, `sylex_english`).
 
 ## Pointers
 
 - `crates/english/grammar/english.fug`: `MeasureNominal`, `feature CompoundPart`,
   `coordination Nominal` (both schemas), `WordPartCoordination`, `MeasureBase`, `WholeCompound`,
   `Premodifier`.
+- `crates/vocabulary/src/lib.rs` (`SharedHeadCompound`), `crates/syntax/src/projection.rs`.

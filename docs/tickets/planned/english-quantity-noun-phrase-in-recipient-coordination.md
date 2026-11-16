@@ -13,11 +13,12 @@ Complement of the first *to*, which leaves *to you* a second recipient of *X dam
 
 ## Design
 
-- Assign `NounKind = Resource` to measured-quantity Noun Phrase Productions (`MeasuredMass`,
-  `MaximumMeasuredMass`, `ComparativeQuantityMassDetermined`, `DistributiveMeasure`) and
-  `SymbolNominalPhrase` (`{R}`, `{1}`), leaving definite property Noun Phrases (*the planeswalker's
-  loyalty* on *Soul Burn* and *Drain Life*) `Ordinary`, and remove `NounKind` from `proximate:` on
-  `coordination NounPhrase` so coordinates share `NounKind`.
+- Add `Resource` to `feature NounKind` and at the matching variant index of `feature
+  ObliqueNounKind`, assign `NounKind = Resource` to measured-quantity Noun Phrase Productions
+  (`MeasuredMass`, `MaximumMeasuredMass`, `ComparativeQuantityMassDetermined`,
+  `DistributiveMeasure`) and `SymbolNominalPhrase` (`{R}`, `{1}`) while leaving definite property
+  Noun Phrases (*the planeswalker's loyalty* on *Soul Burn* and *Drain Life*) `Ordinary`, and remove
+  `NounKind` from `proximate:` on `coordination NounPhrase` so coordinates share `NounKind`.
 
 ## Done when
 
@@ -31,6 +32,7 @@ Complement of the first *to*, which leaves *to you* a second recipient of *X dam
 
 ## Pointers
 
-- `crates/english/grammar/english.fug`: the `NounPhrase` coordination schema,
-  `DeterminedQuantity`.
-- `crates/english/judgments/targeting_projection.txt`, the Eternal Flame entry.
+- `crates/english/grammar/english.fug`: `feature NounKind`, `feature ObliqueNounKind`,
+  `MeasuredMass`, `MaximumMeasuredMass`, `ComparativeQuantityMassDetermined`, `DistributiveMeasure`,
+  `SymbolNominalPhrase`, `coordination NounPhrase`.
+- `crates/english/judgments/targeting_projection.txt`, the *Eternal Flame* entry.

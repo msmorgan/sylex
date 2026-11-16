@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-shortened-name-without-attestation]
 ---
 
 # Names a card's text introduces are read from the text
@@ -98,15 +98,19 @@ in the middle of a sentence at several positions. And it is used again after its
   card holds it.
 - `sylex_lexicon` proposes one longest title run per capitalized start at word boundaries (using the
   shape rule and three card-name refusals above, with the `", "` card-name refusal checking
-  `WordForm::Full` only so a `Shortened` form such as *Icingdeath* never truncates `"Icingdeath,
-  Frost Tongue"`), and `english.fug` admits the read-name leaf only at the introducing positions:
-  the complement of *named*, the Object of *create* before a token-description Supplement, and the
-  complement of `its name is` in a copy's exception.
-- Reuse is unit-local in two passes: names read at licensing positions on the unit's first pass
-  stand across all `Name` positions of that unit on a second pass, covering quoted abilities and
-  later sentences on the introducing unit.
-- `create [det] <OtherCardName> token(s)` [CR#111.11] opts in to `OtherCardName()`
-  (`docs/design/lexicon.md` §6) as the name premodifying the head *token* in the Object of *create*,
+  `NameForm::Full` only so a `Shortened` form such as *Icingdeath* never truncates `"Icingdeath,
+  Frost Tongue"`), computing phonological `Edges` for genitive `'s` and `a`/`an`, and `english.fug`
+  admits the read-name leaf only at the introducing positions: the complement of *named*, the Object
+  of *create* before a token-description Supplement, and the complement of `its name is` in a copy's
+  exception.
+- Reuse is unit-local in two passes: Pass 1 harvests names licensed by completed introducing
+  constituents on the unit (even when a later sentence in the unit cannot yet parse), and Pass 2
+  admits those names across `Name` positions of that unit, verifying in both Pass 2 and
+  `CompiledGrammar::admit` (`docs/design/english.md` §7, round-trip law 2) that any non-licensing
+  read-name leaf co-occurs with a licensing introduction of that exact name in the same `Reading`.
+- `<OtherCardName>` premodifying the head *token(s)* inside a modifiable `Nominal` in the Object of
+  *create* (*Disa the Restless*'s `"create a Tarmogoyf token"`, *Mutable Explorer*'s `"create a
+  tapped Mutavault token"` [CR#111.11]) opts in to `OtherCardName()` (`docs/design/lexicon.md` §6),
   refused where a predefined token or a subtype spells the name (*Blood Fountain*'s `"create a Blood
   token"` keeps its single Reading).
 - A read name is a Proper Name, unmarked for Number (`lexicon.md` §6). Its genitive is formed as a
@@ -144,8 +148,9 @@ in the middle of a sentence at several positions. And it is used again after its
   - §2's "The one open slot is the Flavor Word" names read names among the open slots.
   - §6's "A name a card gives an object, or a vote option, spelled like another card's name is
     listed as that card's Introduced Name or vote option (*create a Tarmogoyf token*, …)" no
-    longer says such a name is listed. §6's list of positions that opt in to `OtherCardName()`
-    follows the ruling on `create a NAME token`.
+    longer says such a name is listed, and §6's list of positions that opt in to `OtherCardName()`
+    includes `<OtherCardName>` premodifying *token(s)* in the Object of *create* (refused where a
+    predefined token or subtype spells the name).
   - In §6's first paragraph, "never one that other vocabulary in scope on that card already
     spells: a token name or Introduced Name always" no longer refers to a listed Introduced
     Name.

@@ -8,7 +8,8 @@ needs: []
 
 `docs/design/english.md` §1 keeps `sylex_syntax` ignorant of grammar features, values and
 Categories outside the lexicon feature-bundle mapping table. `PrepositionFrame` carries two
-booleans used by `prep:among` alone (`plural_complement` and `named_only`). To compile
+booleans (`plural_complement`, used by `prep:among` alone, and `named_only`, used by `among`, `for`
+and `into`). To compile
 `plural_complement`, `sylex_syntax::compile::plural_complement` hardcodes the feature value
 `"Plural"`, branches on specific `SlotKind` variants (`KeywordPhrase`, `MeasureNP`, `Name`,
 `Unlike`, `NP`), splits each frame into `/coordinated` and `/number` twin Productions, and adds
@@ -34,9 +35,9 @@ new `PrepositionFrame` flag and compiler branch in `sylex_syntax` per prepositio
   `crates/english/judgments/plural_among_complement.txt` passes.
 - The Census shows no verdict loss on the supported corpus, and every Corpus Unit whose Readings
   change is checked.
-- `cargo test -p sylex_syntax -p sylex_vocabulary -p sylex_english` and
-  `cargo clippy -p sylex_syntax -p sylex_vocabulary -p sylex_english --tests -- -D warnings`
-  pass.
+- `cargo xtask english strata --check`, `cargo test -p sylex_syntax -p sylex_vocabulary -p
+  sylex_english` and `cargo clippy -p sylex_syntax -p sylex_vocabulary -p sylex_english --tests --
+  -D warnings` pass.
 
 ## Pointers
 
@@ -45,4 +46,4 @@ new `PrepositionFrame` flag and compiler branch in `sylex_syntax` per prepositio
 - `crates/syntax/src/compile.rs`: `preposition_valence`, `plural_complement`,
   `unlike_preposition_frames`.
 - `crates/syntax/src/step.rs`: `Summary::whole_coordination`, `State::only_head_coordination`.
-- `crates/vocabulary/lexicon/english/prepositions.ron`: `among`.
+- `crates/vocabulary/lexicon/english/prepositions.ron`: `among`, `for`, `into`.

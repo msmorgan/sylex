@@ -19,9 +19,9 @@ clause under a past host with a present verb would be refused as a time mismatch
 - Add a `Predicate`-only, non-`TimeGiving` manner-clause frame on `prep:as` requiring `Gap = NP`
   (neither `Gap = Adjunct`, which would give complete clauses a manner Reading, nor `Code`
   `Gap = None`, which would add a manner Reading on *Land Equilibrium*'s `"controls at least as many
-  lands as you do"`), while `TemporalClause` keeps `NominalAndPredicate` and `Gap = None`. With
-  `Intransitive` removed from `verb:choose` in `english-comparative-clause-gap`, `"divided as you
-  choose"` parses only as a manner clause (`Gap = NP`) and complete clauses parse only as temporal.
+  lands as you do"`), while `TemporalClause` keeps `NominalAndPredicate` and `Gap = None`. Since
+  `verb:choose` is transitive, `"divided as you choose"` parses only as a manner clause (`Gap = NP`)
+  and complete clauses parse only as temporal.
 
 ## Done when
 
@@ -36,5 +36,3 @@ clause under a past host with a present verb would be refused as a time mismatch
 
 - `crates/vocabulary/lexicon/english/prepositions.ron` (*as*).
 - `crates/english/grammar/english.fug` (`TemporalClause`, `dependents TimeGiving`).
-- `docs/tickets/planned/english-comparative-clause-gap.md`, which gives a comparative *as*
-  clause its gap.

@@ -22,9 +22,10 @@ Written against the surface (`cleanup-step6-surface`).
 - The check ("If you don't control a Jace planeswalker token") and the choice ("Choose a Jace
   planeswalker token you control") [CR#701.71a] match the subtype the token Definition declares,
   not a hard-coded `jace` and not the whole token.
-- Switching `keyword_actions.ron`'s lemma from `"empower Jace"` to `"empower"` requires licensing a
-  bare singular planeswalker subtype (`subtype:Jace`) in the keyword action's token parameter slot
-  (`crates/english/grammar/english.fug`), since `BarePlural` refuses singular count subtypes.
+- Switching `keyword_actions.ron`'s lemma from `"empower Jace"` to `"empower"` with the token
+  complement before the amount licenses a bare singular `Class(PlaneswalkerType)` (`subtype:Jace`)
+  through general frame/slot machinery in `crates/english/grammar/english.fug` (`docs/design/english.md`
+  §2), since `BarePlural` refuses singular count subtypes.
 
 ## Done when
 
@@ -35,18 +36,21 @@ Written against the surface (`cleanup-step6-surface`).
   and tests and chooses by the token Definition's declared subtype.
 - `plugins/canon/cards/Countersculpt.syl` calls `empower(jaceToken, 1)`.
 - The lemma is "empower" with the token complement before the amount, both in the declaration's
-  `lexical` block and in `crates/vocabulary/catalogs/keyword_actions.ron`'s [CR#701.71] entry.
+  `lexical` block and in `crates/vocabulary/catalogs/keyword_actions.ron`'s [CR#701.71] entry, and
+  `"Empower Jace 1."` (*Countersculpt*) parses cleanly in `sylex_english`.
 - Declaration order stays the printed order (`syl.md` §5).
-- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo xtask english strata --check`, and
+  `cargo test` and `cargo clippy --tests -- -D warnings` for `sylex_vocabulary`, `sylex_english` and
+  `xtask` pass.
 
 ## Not in scope
 
-How the printed "Jace" in this slot parses to `jaceToken`; it must parse, but its design is the
-spelling layer's.
+- The spelling-layer mapping between printed `"Jace"` and `jaceToken`.
 
 ## Pointers
 
 - `plugins/builtin/definitions/keyword_action/empowerJace.syl`,
-  `plugins/builtin/definitions/keyword_action/amass.syl`
+  `plugins/builtin/definitions/keyword_action/amass.syl`,
+  `plugins/builtin/definitions/token/jaceToken.syl`
 - `plugins/canon/cards/Countersculpt.syl`
-- `crates/vocabulary/catalogs/keyword_actions.ron`
+- `crates/vocabulary/catalogs/keyword_actions.ron`, `crates/english/grammar/english.fug`

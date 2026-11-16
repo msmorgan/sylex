@@ -21,20 +21,23 @@ and `ComparativeMassCluster`). The copies have drifted and leak two bugs:
 ## Design
 
 - Fold comparative determinatives (*more*, *fewer*, *less*) with their *than* frame and degree
-  modifier (*no*) into `valence DeterminerPhrase` (after `english-frames-held-in-grammar`), and
-  collapse the Count/Mass/Cluster comparative copies using joint `!(...)` exclusions.
+  modifier (*no*) into `valence DeterminerPhrase`, and collapse the Count/Mass/Cluster comparative
+  copies using joint `!(...)` exclusions.
 - Keep `ComparativeAmount` as an `Amount` for `prep:to`'s `Amount` frame (*reduce your life total to
   less than 1*, avoiding `NounPhrase`/`AdjectivePhrase` duplication with scalar *less* after copular
-  *be*), and move the `ComplementKind != PP` guard from `Unmodified` onto `BareNominal`'s `Amount`
-  slot so `NumericNounPhrase`'s and `Unmodified`'s local patches go away.
+  *be*) and keep `NumericNounPhrase`'s `head.ComplementKind != PP | Amount` guard, while moving the
+  `ComplementKind != PP` restriction onto `valence BareNominal`'s `Amount` complement (preserving
+  `prep:to`'s `Amount` frame) so `Unmodified`'s local `!(head.ComplementKind = Amount &
+  head.ObliqueKind = PP)` patch goes away.
 
 ## Done when
 
 - Comparative determinatives and clusters build through `valence DeterminerPhrase` without the
   hand-copied Count/Mass cross-product, and `*each more than two creatures` has no Reading.
-- `BareNominal`'s `Amount` slot refuses `ComparativeAmount` directly (`*the mana value less than
-  3's owner` has no Reading), and `Unmodified`'s `!(head.ComplementKind = Amount &
-  head.ObliqueKind = PP)` exclusion is gone.
+- `valence BareNominal`'s `Amount` complement refuses `ComparativeAmount` directly (`*the mana value
+  less than 3's owner` has no Reading while `"reduce your life total to less than 1"` keeps its
+  Reading), and `Unmodified`'s `!(head.ComplementKind = Amount & head.ObliqueKind = PP)` exclusion
+  is gone.
 - The census shows no Reading lost on the supported corpus, and `cargo xtask english strata
   --check`, `cargo test -p sylex_english` and `cargo clippy -p sylex_english --tests -- -D warnings`
   pass.
@@ -50,5 +53,5 @@ and `ComparativeMassCluster`). The copies have drifted and leak two bugs:
   `ComparativeIndirectComplement`, `ExceptiveFusedHead`, `ComparativeFusedHead`,
   `ComparativeDeterminedStandard`, `MeasuredComparativeStandard`, `MeasuredComparativeDetermined`,
   `MeasuredComparativeDeterminer`, `ComparativeQuantityCountDetermined`,
-  `ComparativeQuantityMassDetermined`, `NumericNounPhrase`, `Unmodified`.
+  `ComparativeQuantityMassDetermined`, `NumericNounPhrase`, `Unmodified`, `valence BareNominal`.
 - `docs/design/english.md` §1.

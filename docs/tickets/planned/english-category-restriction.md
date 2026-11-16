@@ -18,25 +18,25 @@ above `RelativeSubjectPredicate`:
 - `AdjunctGap` / `RelativeAdjunctGap`
 
 `category QuotedCostNominal` likewise restates `Determined` as `DeterminedQuotedCost` (flagged
-`// Twin: Determined`, for Brutal Suppression and Drought) to keep `QuotedCost` out of `Nominal`
-coordination. Other Categories say in their comments that they restate Productions without naming
-twins: `category Possessor` (the Noun Phrase Productions over `BareNominal`) and
-`category RelativeTemporalNominal` (`RelativeTime` and `RelativeTimePostmodifier` restating
-`NominalPostmodifier` and `TemporalPostmodifier`). `TemporalNounPhrase` and
-`TargetedNounPhrase` may be further cases.
+`// Twin: Determined`, for *Brutal Suppression* and *Drought*) to keep `QuotedCost` out of `Nominal`
+coordination. Other Categories restate Productions without naming twins: `category Possessor` (the
+Noun Phrase Productions over `BareNominal`), `category RelativeTemporalNominal` (`RelativeTime` and
+`RelativeTimePostmodifier` restating `NominalPostmodifier` and `TemporalPostmodifier`),
+`PerfectParticiple`, `TemporalComplementClause`, `InternalizedInterleaved`, `NominalModifier`, and
+`ContrastConjunct` / `ContrastCoordination` / `ContrastPrepositionConjunct` /
+`ContrastPrepositionCoordination`.
 
 ## Design
 
 - Unify restricted twin categories onto their base categories via `State` features/summaries and a
   shared `Premodifier` category rather than cloning categories across the Earley chart: fold
-  `SubjectInitialClause` onto `Clause`, `Possessor` (via `Postmodification` / `Postmodified`, which
-  also closes `*the mana value less than 3's owner`), `QuotedCostNominal`, `TargetedNounPhrase`,
+  `SubjectInitialClause` onto `Clause`, `Possessor` onto `NounPhrase` (via `Postmodification` /
+  `Postmodified`, which also closes `*the mana value less than 3's owner`), `QuotedCostNominal`,
   `PerfectParticiple`, `TemporalComplementClause`, `InternalizedInterleaved`, `NominalModifier`,
   `RelativeTemporalNominal` and consumer-gated `TemporalNounPhrase` cases.
 - Extend `coordination` in `sylex_syntax` and `.fug` to factor multi-shape coordination declarations
-  (`over [...]`) and contrastive `but not` (`ContrastConjunct` / `ContrastCoordination` /
-  `ContrastPrepositionConjunct` / `ContrastPrepositionCoordination` on *Drain Life*, *Soul Burn* and
-  *Haakon, Stromgald Scourge*), deleting the hand-copied category pairs and coordination blocks.
+  (`over [...]`) and contrastive `but not` (`Contrast*` on *Drain Life*, *Soul Burn* and *Haakon,
+  Stromgald Scourge*), deleting the hand-copied category pairs and coordination blocks.
 
 ## Done when
 
@@ -47,10 +47,17 @@ twins: `category Possessor` (the Noun Phrase Productions over `BareNominal`) and
   (such as closing `Possessor` leaks) is checked, and `cargo xtask english strata --check`, `cargo
   test` and `cargo clippy --tests -- -D warnings` pass for `sylex_syntax` and `sylex_english`.
 
+## Not in scope
+
+- `TargetedNounPhrase` (`english-targeting-marker-number`), which builds plural phrases with
+  unquantified *target* admitted only inside `TargetedQuantity` (*any number of target creatures*)
+  and never as standalone `NounPhrase`s.
+
 ## Pointers
 
-- `crates/english/grammar/english.fug`: the Productions above, `category SubjectInitialClause`,
-  `category QuotedCostNominal`, `DeterminedQuotedCost`, `category Possessor`,
-  `category RelativeTemporalNominal`, `category TemporalNounPhrase`,
-  `category TargetedNounPhrase`.
-- `crates/syntax/src/fug.rs`, `crates/syntax/src/grammar.rs`.
+- `crates/english/grammar/english.fug`: `SubjectInitialClause`, `QuotedCostNominal`,
+  `DeterminedQuotedCost`, `Possessor`, `RelativeTemporalNominal`, `TemporalNounPhrase`,
+  `PerfectParticiple`, `TemporalComplementClause`, `InternalizedInterleaved`, `NominalModifier`,
+  and the `Contrast*` categories and coordinations.
+- `crates/syntax/src/fug.rs`, `crates/syntax/src/grammar.rs`, `crates/syntax/src/compile.rs`,
+  `crates/syntax/src/step.rs`.

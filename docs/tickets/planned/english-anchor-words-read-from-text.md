@@ -68,8 +68,8 @@ holds the label.
   `anchor_words.ron`-backed tests in `crates/vocabulary/tests/labels.rs`,
   `crates/vocabulary/tests/loader.rs` and `crates/lexicon/tests/analysis.rs`.
 - `docs/design/lexicon.md` (§2 open slots, §3 dropping the `khans.syl` `AnchorWord`-sort
-  example), `docs/contexts/oracle-english/CONTEXT.md` (Anchor Word, Card Scope, Proper Name) and
-  `docs/tickets/planned/catalogs-into-plugins.md` state the design.
+  example) and `docs/contexts/oracle-english/CONTEXT.md` (Anchor Word, Card Scope, Proper Name)
+  state the design.
 - `cargo xtask english strata --check` passes, and `cargo test` and `cargo clippy --tests -- -D
   warnings` pass for `sylex_lexicon`, `sylex_vocabulary`, `sylex_syntax`, `sylex_english` and
   `xtask`.
@@ -86,7 +86,7 @@ holds the label.
 - `crates/lexicon/src/analysis.rs` (`ItalicHead`, `stands_in`, `flavor_word_matches`),
   `crates/lexicon/src/scope.rs` (`CardScope`).
 - `crates/english/grammar/english.fug` (`AnchorWord`, `AnchoredAbility`, `FlavorLabeledAbility`,
-  `ModeBullet`), `crates/english/src/census.rs` (`run`, `cleave_texts`),
+  `ModeBullet`), `crates/english/src/census.rs` (`run`),
   `crates/english/src/profile.rs`, `crates/english/src/judgment.rs`,
   `crates/english/judgments/anchored_abilities.txt`.
 - `crates/xtask/src/english.rs`, `crates/xtask/src/english/forests.rs`.

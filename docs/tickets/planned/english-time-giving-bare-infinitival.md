@@ -39,5 +39,7 @@ time.
 
 ## Pointers
 
-- `crates/english/grammar/english.fug` (`dependents TimeGiving`, `BareInf`).
-- `crates/syntax/src/compile.rs` (`dependents`).
+- `crates/english/grammar/english.fug` (`feature PastTime`, `feature NonPastTime`,
+  `dependents TimeGiving`, `BareInf`, `PastPart`, `PastParticipial`, time-bearing `coordination`
+  schemas).
+- `crates/syntax/src/compile.rs` (`dependents`, `resolve`).

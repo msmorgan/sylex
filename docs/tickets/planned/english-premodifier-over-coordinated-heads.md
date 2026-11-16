@@ -38,12 +38,14 @@ coordination nodes of every Reading:
 - Generalize `CoordinationPremodifier` over the shared `Premodifier` category and drop
   `head.Number = Plural` and `head.ConjunctNumber := Singular` so any coordinated `Nominal` (*Mox
   Amber*, *Justice*, *Ghostly Flame*) admits both the wide-scope premodifier Reading (nested inside
-  `NominalPostmodifier` per `english-pre-post-dependent-nesting`) and the first-conjunct Reading.
+  postmodifiers) and the first-conjunct Reading.
 - Drop `modifier.Polarity := Negative` on `adjunct NounPremodifier { host: NounPremodifierConjunct }`
-  (restricting conjunct-internal noun modifiers to single-word `AttributiveNoun` so uncoordinated
-  noun stacks stay right-branching) and remove `Fronting::Wide` from `Nominal` premodifiers in
-  `sylex_syntax` so *Brimaz*'s `"Phyrexian creature or artifact creature spell"`, `"instant or
-  artifact creature spell"` and `"[legendary artifact] or enchantment card"` parse symmetrically.
+  (restricting conjunct-internal noun modifiers to single-noun `AttributiveNoun` or `non-`-prefixed
+  `AttributiveNoun` so *Abuelo's Awakening*'s `"non-Aura enchantment"` keeps its Reading while
+  uncoordinated noun stacks stay right-branching) and remove `Fronting::Wide` from `Nominal`
+  premodifiers in `sylex_syntax` so *Brimaz*'s `"Phyrexian creature or artifact creature spell"`,
+  `"instant or artifact creature spell"` and `"[legendary artifact] or enchantment card"` parse
+  symmetrically.
 
 ## Done when
 
@@ -51,10 +53,12 @@ coordination nodes of every Reading:
   premodifier over the whole coordination of heads, and keep their Reading with it over the first
   conjunct only, in grammar tests.
 - *Brimaz, Blight of Oreskos*'s line has a Reading in which "Phyrexian creature or artifact
-  creature" premodifies "spell", in a grammar test.
+  creature" premodifies "spell", and *Abuelo's Awakening* keeps its `"target artifact or non-Aura
+  enchantment card"` Reading, in grammar tests.
 - The leading-premodifier sites of the survey are re-parsed, and the landing reports how many
   have both readings, with each that still lacks one explained.
-- `cargo xtask english strata --check` and `cargo test -p sylex_english` pass.
+- `cargo xtask english strata --check`, `cargo test -p sylex_syntax -p sylex_english` and
+  `cargo clippy -p sylex_syntax -p sylex_english --tests -- -D warnings` pass.
 
 ## Not in scope
 
@@ -63,9 +67,10 @@ artifact or creature you control"), which already get both readings.
 
 ## Pointers
 
-- `crates/english/grammar/english.fug`: `Premodifier`, `CoordinationPremodifier` (an
-  *and*-coordination of singular nominals only), `NominalPremodifier`, the `Nominal` and
-  `NounPremodifier` coordinations.
+- `crates/english/grammar/english.fug`: `Premodifier`, `CoordinationPremodifier`,
+  `NominalPremodifier`, `NounPremodifierConjunct`, the `Nominal` and `NounPremodifier`
+  coordinations.
+- `crates/syntax/src/compile.rs`, `crates/syntax/src/step.rs` (`Fronting::Wide`).
 - `docs/design/english.md` §4.
 - Local evidence (gitignored): `docs/evidence/cleanup-step6-syl/coordination-attachment-research.md`
   (§3, §3.1 and §4 Q3, with the site list).

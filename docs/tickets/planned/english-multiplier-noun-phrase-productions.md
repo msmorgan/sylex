@@ -20,12 +20,13 @@ many* each keep such a Reading beside the correct one.
 
 ## Design
 
-- Fold `DeterminativeDistribution = Multiplier` (*half*, *double*) into `Multiplier`, replace
-  `MultiplierPredetermination`, `AdverbMultipliedNounPhrase` and `MultipliedNounPhrase` with one
-  `MultipliedNounPhrase: NounPhrase -> multiplier:Multiplier NounPhrase` requiring
+- Fold `DeterminativeDistribution = Multiplier` (*half*, *double*, *triple*) into `Multiplier`,
+  replace `MultiplierPredetermination`, `AdverbMultipliedNounPhrase` and `MultipliedNounPhrase` with
+  one `MultipliedNounPhrase: NounPhrase -> multiplier:Multiplier NounPhrase` requiring
   `head.Determination = Overt`, `head.Case = Plain` and
   `head.DeterminativeDistribution != Numerical | Degree`, license `multiplier:Multiplier Symbols`
-  for `twice {X}` (*Thassa's Intervention*), and delete unused `MultipliedAmount`.
+  projecting to `FusedNounPhrase` (`NounPhrase`) for `"pays twice {X}"` (*Thassa's Intervention*),
+  and delete unused `MultipliedAmount`.
 - Exclude `Multiplying` (`head.AdjunctPosition != Multiplying`) from `InterleavedAdverb` and
   `Serial` (`head.NounDistribution != Serial`) from `InterleavedTemporal`, so heavy-NP shift never
   reads pre-object *twice* or *three times* as an interleaved frequency Adjunct.

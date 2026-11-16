@@ -49,33 +49,41 @@ token*) is a different matter with its own ticket; this one is about a card's ow
   collision filter (*Sliver* in *Sliver Queen*).
 - `shortening::rule` rejects non-comma candidates ending in or preceding a possessive (`'s`, `’s`,
   `s'`, `s’`), so legendary possessives (*Urza's Saga*, *Marit Lage's Slumber*, *Gaea's Cradle*)
-  never derive `"Urza's"` or `"Marit"`.
+  never derive `"Urza's"` or `"Marit"`, and handles two-word `SURNAME_TITLES` (`[title, surname]` on
+  *Dr. Eggman*) without falling through to a bare title with a trailing period (`"Dr."`).
 - Longer titles in the card's own text (*Mishra, Lost to Phyrexia* on *Mishra, Claimed by Gix*) are
   not withheld from `CardScope`; `OtherCardName()` / longest-title admission handles the full title
   at its `named` position.
 - Standalone single-line inputs (`--as-card NAME` and `<card=NAME>`) admit any stated name as the
-  card's own Full name in `CardScope` (including unprinted names such as *Abuelo the Brave*) and
-  derive its `Shortened` form when an explicit `--legendary` / `<legendary>` (or `--type-line`)
-  flag is given; `CardScope` continues to track Full vs Shortened availability accordingly, and
-  existing shortened-name judgment entries add `<legendary>`.
+  card's own Full name in `CardScope` (including unprinted names such as *Abuelo the Brave*, via a
+  self-contained `LexicalReading` or scope-independent realization so `CompiledGrammar::realize` and
+  `admit` preserve both round-trip laws) and derive its `Shortened` form when an explicit
+  `--legendary` / `<legendary>` (or `--type-line`) flag is given; `CardScope` continues to track
+  Full vs Shortened availability accordingly, and existing shortened-name judgment entries add
+  `<legendary>`.
 
 ## Done when
 
 - `--as-card "Abuelo, Ancestral Echo" --legendary "When Abuelo enters, draw a card."` (and an
   unprinted `--as-card "Abuelo the Brave" --legendary`) reads *Abuelo* as that card's own name in
-  its Shortened form, while without `--legendary` (and no legendary permanent type line) only the
-  Full form stands.
+  its Shortened form and round-trips under Laws 1 and 2, while without `--legendary` (and no
+  legendary permanent type line) only the Full form stands.
 - `LexicalEnvironment::load` reads no card text, and an `english parse` call that fetches no
   card reads no `oracle-cards.jsonl`.
-- The pool census is compared before and after, and every unit whose verdict or count changes is
-  checked and reported.
-- `cargo test` and `cargo clippy --tests -- -D warnings` pass for every crate changed.
+- `docs/design/lexicon.md` §3 and §6 and `docs/contexts/oracle-english/CONTEXT.md` (Shortened Name)
+  drop the Oracle-text attestation condition.
+- The pool census is compared before and after, every unit whose verdict or count changes is checked
+  and reported, and `cargo xtask english strata --check`, `cargo test` and
+  `cargo clippy --tests -- -D warnings` pass for every crate changed.
 
 ## Pointers
 
 - `crates/vocabulary/src/shortening.rs` (`short_name`, `attested_short_name`,
   `AttestedShortenings`, `SURNAME_TITLES`), `crates/vocabulary/src/names.rs` (`shortened_name`,
   `card_names`), `crates/vocabulary/src/lib.rs` (`LexicalEnvironment::load`).
+- `crates/lexicon/src/scope.rs`, `crates/lexicon/src/types.rs` (`LexicalReading`),
+  `crates/lexicon/src/analysis.rs`, `crates/syntax/src/reading.rs` (`realize`, `admit`).
 - `crates/english/src/judgment.rs` (`Judgment::scope`), `crates/xtask/src/english.rs`
-  (`stated_items`), `crates/lexicon/src/scope.rs`.
-- `docs/design/lexicon.md` §6, `docs/oracle-style-guide.md` §5.
+  (`stated_items`).
+- `docs/design/lexicon.md` §3, §6; `docs/contexts/oracle-english/CONTEXT.md`;
+  `docs/oracle-style-guide.md` §5.
