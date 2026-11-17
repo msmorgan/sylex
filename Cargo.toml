@@ -90,6 +90,12 @@ opt-level = 2
 [profile.dev.package.xtask]
 opt-level = 2
 
+[profile.dev.package.serde]
+opt-level = 2
+
+[profile.dev.package.serde_core]
+opt-level = 2
+
 [profile.dev.package.serde_json]
 opt-level = 2
 
@@ -132,8 +138,22 @@ opt-level = 2
 [profile.dev.package.quote]
 opt-level = 2
 
-# `dpsi` interns the identifiers the parser and lexicon compare and hash.
+# `dpsi` interns the identifiers the parser and lexicon compare and hash;
+# `hashbrown`, `rayon` and `unicode-ident` back the chart/forest tables,
+# parallel census/forests runs and lexical identifier scanning.
 [profile.dev.package.dpsi]
+opt-level = 2
+
+[profile.dev.package.hashbrown]
+opt-level = 2
+
+[profile.dev.package.rayon]
+opt-level = 2
+
+[profile.dev.package.rayon-core]
+opt-level = 2
+
+[profile.dev.package.unicode-ident]
 opt-level = 2
 
 # `cargo xtask english forests` writes millions of rows through SQLite.
