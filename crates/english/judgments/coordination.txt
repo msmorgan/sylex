@@ -24,7 +24,7 @@
 + <card=Shapeshifter> As this creature enters, choose a number between 0 and 7. => Amount "0 and 7" as Complement of between
 + Whenever a creature you control but don't own dies, return it to the battlefield under its owner's control and you draw a card. => VerbPhrase "control but don't own"
 + Prevent all combat damage that would be dealt to and dealt by enchanted creature. => NounPhrase "enchanted creature" as Complement of to; NounPhrase "enchanted creature" as Complement of by
-+NounPhrase its power and toughness => Nominal "power and toughness"; readings 1
++NounPhrase its power and toughness => Nominal "power and toughness" || NounPhrase "its power"; NounPhrase "toughness"; readings 2
 +NounPhrase base power and base toughness each equal to its mana value => Nominal "base power and base toughness"
 +NounPhrase target creature with power or toughness 4 or greater => Nominal "power or toughness 4 or greater"; Amount "4 or greater"
 # from: Great Divide Guide
@@ -77,3 +77,7 @@
 + <card=Lush Growth> Enchanted land is a Mountain, Forest, and Plains. => NounPhrase "a Mountain, Forest, and Plains" as PredicativeComplement of be; Nominal "Mountain, Forest, and Plains"
 + <card=Wild Shape> Choose one. Until end of turn, target creature you control has that base power and toughness, becomes that creature type, and gains that ability. => NounPhrase "that base power and toughness" as Object of have; Nominal "base power and toughness"
 + <card=Illusionary Mask> {X}: You may choose a creature card in your hand whose mana cost could be paid by some amount of, or all of, the mana you spent on {X}. If you do, you may cast that card face down as a 2/2 creature spell without paying its mana cost. If the creature that spell becomes as it resolves has not been turned face up and would assign or deal damage, be dealt damage, or become tapped, instead it's turned face up and assigns or deals damage, is dealt damage, or becomes tapped. Activate only as a sorcery. => NounPhrase "some amount of, or all of, the mana you spent on {X}" as Complement of by; NounPhrase "some amount of" head amount; NounPhrase "all of" head all; PrepositionPhrase "of" gap "the mana you spent on {X}"; PrepositionPhrase "of"#2 gap "the mana you spent on {X}"
++ Exile target card from your graveyard or exile. => NounPhrase "your graveyard or exile" as Complement of from
++ Destroy target permanent you own and an opponent controls. => RelativeClause "you own and an opponent controls" as Modifier of permanent
++ Destroy target permanent you own or an opponent controls. => RelativeClause "you own or an opponent controls" as Modifier of permanent
++ Destroy target permanent you own and/or an opponent controls. => RelativeClause "you own and/or an opponent controls" as Modifier of permanent

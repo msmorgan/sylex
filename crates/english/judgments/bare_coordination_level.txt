@@ -1,7 +1,8 @@
 # A coordination of bare Noun Phrases with nothing outside it to share is one coordination of Noun Phrases; a shared determiner or dependent takes a coordination of Nominals (`docs/design/english.md` §8; CGEL, Ch. 15 §2.1, p. 1291)
 + Destroy creatures and lands. => NounPhrase "creatures"; NounPhrase "lands"; readings 1
 +NounPhrase damage and life => NounPhrase "damage"; NounPhrase "life"; readings 1
-+NounPhrase your devotion to white and black => NounPhrase "white"; NounPhrase "black"; readings 1
++PrepositionPhrase to white and black => NounPhrase "white"; NounPhrase "black"; !Nominal "white and black"; readings 1
++NounPhrase your devotion to white and black => PrepositionPhrase "to white and black" || NounPhrase "your devotion to white"; NounPhrase "black"; !Nominal "white and black"; readings 2
 + Choose black or red. => NounPhrase "black"; NounPhrase "red"; !Nominal "black or red"
 + Destroy all creatures and lands. => Nominal "creatures and lands"
 + Untap creatures and lands you control. => Nominal "creatures and lands"

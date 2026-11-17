@@ -229,8 +229,6 @@ category AdjunctGapClause : Clause [VerbForm] { gap }
 // come up heads* from an adverbial relative of *The first time you flip one
 // or more coins* (Edgar, King of Figaro).
 category SubjectInitialClause : Clause [VerbForm, Inflection] { gap }
-// A coordination of bare adverbial relatives' Clauses.
-category SubjectInitialCoordination : Clause [VerbForm, Inflection] { gap }
 // A participle premodifying a nominal (*attacking creature*).
 category Participle : VerbPhrase [Inflection, Polarity]
 category VerbPhrase [
@@ -3142,10 +3140,6 @@ AdverbialRelative: RelativeClause -> clause:SubjectInitialClause
     where $.ClauseMarking = Unmarked,
           clause.Gap = Adjunct,
           $.NounKind = Temporal
-CoordinatedAdverbialRelative: RelativeClause -> clause:SubjectInitialCoordination
-    where $.ClauseMarking = Unmarked,
-          clause.Gap = Adjunct,
-          $.NounKind = Temporal
 // Twin: AdjunctGap, over SubjectInitialClause.
 RelativeAdjunctGap: SubjectInitialClause -> SubjectInitialClause where $.Gap = Adjunct
 // Twin: RelativeAdjunctGap.
@@ -3688,9 +3682,7 @@ coordination Clause {
 // when every conjunct is, and `Mixed` when they differ, so *all artifacts and
 // enchantments* has no predeterminer over coordinated bare Noun Phrases while
 // a mixed coordination (*Your opponents and permanents your opponents control
-// with hexproof*) keeps its own wide postmodifier site. After a determined
-// Noun Phrase a bare mass one is no conjunct: the determiner scopes over both
-// (*its power and toughness*).
+// with hexproof*) keeps its own wide postmodifier site.
 // *And* is plural, singular between distributive ones; *or* has its
 // conjuncts' Number.
 coordination NounPhrase {
@@ -3699,8 +3691,7 @@ coordination NounPhrase {
     proximate: [Case, NounKind, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
-    where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
-          $.Number = Plural,
+    where $.Number = Plural,
           $.Person = Third,
           $.FirstConjunctNumber = first.Number,
           first.NounKind != Quantity,
@@ -3725,8 +3716,7 @@ coordination NounPhrase {
     proximate: [Person, Case, NounKind, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
-    where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
-          last.Number := Plural,
+    where last.Number := Plural,
           $.Number = Plural
 coordination NounPhrase {
     coordinators: AndOr,
@@ -3734,8 +3724,7 @@ coordination NounPhrase {
     proximate: [Person, Case, NounKind, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
-    where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
-          last.Number = Singular
+    where last.Number = Singular
 // An admission gate (english.md §6): a Numeric Noun Phrase is no first conjunct,
 // which keeps *lost [3] or [more life]* from a Noun Phrase coordination
 // (Davros, Dalek Creator); numbers alone are an Amount coordination.
@@ -3748,8 +3737,7 @@ coordination NounPhrase {
     proximate: [Number, Person, Case, NounKind, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
-    where !(first.Determination = Overt & last.Determination = Bare & last.Countability = Mass),
-          first.NounKind != Numeric | Quantity,
+    where first.NounKind != Numeric | Quantity,
           last.NounKind != Quantity
 coordination Nominal {
     coordinators: And,
@@ -3776,18 +3764,11 @@ coordination PossessorNominals {
     proximate: [Number, Countability, NounKind],
     conjunct: BareNominal,
 }
-// Each conjunct with its relative word (*tokens that are copies of it and
-// that are tapped and attacking*).
-coordination RelativeClause { coordinators: Coordinator } where last.ClauseMarking = Relative
+// Marked or bare relative clauses (*tokens that are copies of it and that are
+// tapped and attacking*, *permanent you own and an opponent controls*, *any
+// time you could mulligan and this card is in your hand*).
+coordination RelativeClause { coordinators: Coordinator }
 coordination RelativeClause { coordinators: But }
-// *Any time [you could mulligan and this card is in your hand]*. Its own
-// Category, so RelativeAdjunctGap states the Gap once per conjunct and
-// never over the coordination (english.md §8).
-coordination SubjectInitialCoordination {
-    coordinators: Coordinator,
-    unshared: [Inflection],
-    conjunct: SubjectInitialClause,
-}
 // *Which creatures block and how those creatures block*.
 coordination InterrogativeClause { coordinators: Coordinator }
 coordination NounPremodifier {

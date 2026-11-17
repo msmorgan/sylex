@@ -124,9 +124,8 @@
     // "each point of bushido it has".
     (lemma: "point", frames: [Complement(PP(["of"]))]),
     "pool",
-    // A bare *power* or *toughness* is never a Noun Phrase by itself (*[its
-    // power] and [toughness]*), only with a value (*power 3 or less*) or a
-    // postmodifier (*power equal to …*).
+    // Count across creatures (*different powers*) and mass as an unquantified
+    // characteristic (*power and toughness*, *power 3 or less*, *power equal to …*).
     (lemma: "power", countability: [Count, Mass], frames: [Complement(PP(["of"])), Complement(Amount)]),
     "process",
     "quality",
