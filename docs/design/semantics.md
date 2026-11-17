@@ -324,7 +324,7 @@ since a "can't" outranks anything that allows the thing ([CR#101.2]).
   effect of the enclosing spell or ability.
 - **Damage is composed, not special.** Damage results are conferred properties
   ([CR#120.3a,120.3c,120.3e,120.4c]). Wither and infect replace the marking results
-  ([CR#702.80a,702.90b]). Prevention, redirection and scaling replace the damage event
+  ([CR#702.80a,702.90c]). Prevention, redirection and scaling replace the damage event
   ([CR#615.1,614.9]).
 - **`statOf` for loyalty and defense reads by zone:** counters on the battlefield, the printed
   number elsewhere ([CR#306.5c,310.4c]).
