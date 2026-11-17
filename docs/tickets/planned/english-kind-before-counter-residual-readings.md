@@ -18,8 +18,8 @@ have more Readings than they had when "time counter" was one compound word, each
 - **A fused measure under a determiner before "counter"** (2 units): *Fangs of Kalonia* ("had [a
   +1/+1] [counter put on it]", 123 to 127) and *Hindervines* ("with [no +1/+1] …", 60 to 65).
 
-Each structure is one English admits, and the compound word's atomicity was what excluded it. No
-constraint stated over the grammar's categories was found that is true of the language.
+Each structure is grammatical where it stands by itself; what makes the Reading wrong is that
+the word before "counter" is a kind name, which the compound word's atomicity used to enforce.
 
 In Oracle text every word ending in "-ing" or "-ed" printed before "counter" or "counters" is a
 kind name in `crates/vocabulary/catalogs/counters.ron` (flying, hatchling, healing, mining,
