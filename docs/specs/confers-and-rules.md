@@ -34,11 +34,11 @@ write a once-per-entity rule on a counter or a keyword.
 | `supertype` `confers`: `legendary`, `world` (`basic` and `snow` have none) | per holder |
 | `designation` `confers`: `monarch`, `initiative` | per holder |
 | `counter` `confers`: `p1p1Counter`, `m1m1Counter`, `flyingCounter` | per counter |
-| `sba deathtouchDestruction` (`scope = isCreature`) | per creature |
-| `sba legendRule` (`scope = isPlayer`) | per player |
-| `conferral phasingTurnBased` (`scope = isPermanent`) | per permanent |
-| `conferral playerDamageLifeLoss` (`scope = isPlayer`) | per player |
-| `conferral toxicPoison` (`scope = and([isCreature, hasKeyword(theKeyword(toxic))])`) | per creature with toxic |
+| `sba deathtouchDestruction` (`scope = creature`) | per creature |
+| `sba legendRule` (`scope = player`) | per player |
+| `conferral phasingTurnBased` (`scope = permanent`) | per permanent |
+| `conferral playerDamageLifeLoss` (`scope = player`) | per player |
+| `conferral toxicPoison` (`scope = nominal(creature, post = [hasKeyword(theKeyword(toxic))])`) | per creature with toxic |
 | `conferral foretoldCardCast`, `conferral foretoldCardLook`, `conferral plottedCardCast` (foretold or plotted cards in exile) | per such card |
 
 A counter's `confers` can only be per counter, so a rule the CR gives "one or more" counters
@@ -51,16 +51,16 @@ counters cause one trigger [CR#122.1i], the +1/+1 and -1/-1 annihilation removes
 
 One declaration can carry both multiplicities. `p1p1Counter` gives +1/+1 per counter (`confers`)
 and is annihilated against -1/-1 counters once per permanent [CR#704.5q] (`rules`, with
-`scope = and([isPermanent, hasCounter(p1p1Counter), hasCounter(m1m1Counter)])`). A flag on the
-declaration would make both per counter or both once.
+`scope = nominal(permanent, post = [hasCounter(kind = p1p1Counter), hasCounter(kind =
+m1m1Counter)])`). A flag on the declaration would make both per counter or both once.
 
 Counter rules are therefore split this way:
 
 - In `confers`, per counter: the +1/+1 and -1/-1 boosts [CR#122.1a], hone [CR#122.1j], and every
   keyword counter's keyword [CR#122.1b].
-- In `rules`, with a `hasCounter(<kind>)` scope: shield, stun, finality and rad
-  [CR#122.1c,122.1d,122.1h,122.1i], the annihilation [CR#704.5q] and the ten-poison loss
-  [CR#122.1f,704.5c].
+- In `rules`, with a scope whose postmodifier is `hasCounter(kind = <kind>)`: shield, stun,
+  finality and rad [CR#122.1c,122.1d,122.1h,122.1i], the annihilation [CR#704.5q] and the
+  ten-poison loss [CR#122.1f,704.5c].
 
 ## 4. Named rows
 
@@ -73,8 +73,8 @@ Gravemother*, *Spider-Verse*, *The Master, Multiplied*).
 ## 5. Exempting objects from a named rule
 
 "The "legend rule" doesn't apply to tokens you control" (*Cadric, Soul Kindler*) is written with
-a NEW `doesntApply(rule, to)`: `rule` names a row, and `to` is a `Predicate` over the objects it
-exempts. Exempt objects are outside the rule: neither counted nor choosable. The *Cadric* rulings
+a NEW `doesntApply(rule, to)`: `rule` names a row, and `to` is a `Nominal` naming the objects it
+exempts, as a row's `scope` is. Exempt objects are outside the rule: neither counted nor choosable. The *Cadric* rulings
 say so: with a token and one nontoken legendary permanent of a name, "the legend rule will not
 cause you to put either one into your graveyard"; with more nontoken ones, "the legend rule
 applies to only the nontoken permanents … You may not choose one of the token permanents and you
@@ -104,10 +104,10 @@ and toxic 1 gives three poison counters once [CR#702.164c]. Its scope names `tox
       number = $amount,                      # NEW field
       body = [],
       rules = [{                             # NEW field
-        scope = and([isCreature, hasKeyword(theKeyword(toxic))]),
+        scope = nominal(creature, post = [hasKeyword(theKeyword(toxic))]),
         confer = property(
           asEvent(
-            does(actor(this), dealDamage(recipient = a(isPlayer), kind = combat)),
+            does(actor(this), dealDamage(kind = combat, recipient = a(player))),
             putCounters(totalToxicValue(this), printedKind(poison), that(player))))}]
     }
 

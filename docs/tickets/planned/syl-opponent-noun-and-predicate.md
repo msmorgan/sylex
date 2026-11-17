@@ -6,11 +6,9 @@ needs: [cleanup-step6-surface]
 
 ## Why
 
-`syl-nominal-descriptions` merges the head nouns at `NounWord` into `Nominal`, where each head word
-means what today's description word of that name means: `opponent` what `isOpponent`
-(`isOpponentOf(you)`) means, `player` what `isPlayer` means, `permanent` what `isPermanent` means.
-So "that opponent" (`that(opponent)`) requires an opponent, which `that(opponent)` over today's
-wording-only `NounWord` does not. Two things are left:
+Each head word at `Nominal` means what its description means: `opponent` an opponent of you
+(`opponentOf(you)`), `player` a player, `permanent` a card or token on the battlefield. So "that
+opponent" (`that(opponent)`) requires an opponent. Two things are left:
 
 - "That player" and "they" read an opponent: *Tenuous Truce*'s `that(player)` and `they` read
   `enchanted(opponent)`, *Oath of Kaya*'s `that(player)` reads `anOpponent`, and *Black Vise*'s
@@ -37,7 +35,8 @@ wording-only `NounWord` does not. Two things are left:
 
 ## Pointers
 
-`plugins/builtin/primitives/noun/{opponent,player,permanent,spell,card,token}.syl`,
+`plugins/builtin/templates/nominal/opponent.syl`,
+`plugins/builtin/primitives/nominal/{player,permanent,spell,card,token}.syl`,
 `plugins/builtin/templates/pronoun/{that,those}.syl`,
 `plugins/builtin/definitions/keyword_ability/encore.syl`; `docs/design/semantics.md` §2.4;
 `syl-nominal-descriptions`, `syl-card-head-noun-sweep`.

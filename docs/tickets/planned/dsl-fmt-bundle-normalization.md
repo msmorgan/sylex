@@ -6,26 +6,26 @@ needs: [cleanup-step6-syl]
 
 ## Why
 
-`.syl` declares three coercions (`docs/design/syl.md` §2): a card type and a subtype stand at
-`NounWord` through `type` and `subtype`, and an integer at `Amount` through `lit`. The bare form
-is the corpus's spelling, and the wrapped primitive stays callable, so `lit(3)` and `3`, and
+`.syl` declares eight coercions (`docs/design/syl.md` §2): a card type and a subtype stand at
+`Nominal` through `type` and `subtype`; a card type, a subtype, a supertype and a color at
+`PreModifier` through `hasType`, `hasSubtype`, `hasSupertype` and `hasColor`; a status at
+`Predicative` through `hasStatus`; and an integer at `Amount` through `lit`. The bare form is the
+corpus's spelling, and the wrapped primitive stays callable, so `lit(3)` and `3`, and
 `type(creature)` and `creature`, are both valid and resolve to one term. Nothing normalizes
 them, so the corpus can drift back to two spellings of one term. Recovery already yields the
 bare form (`docs/design/spelling.md` §4); the written corpus should match it.
 
 The `.syl` formatter (`sylex_syl`'s printer, which `cargo xtask dsl fmt` runs) cannot do it: it
-reads one file's syntax and resolves no sort, and `subtype(goblin)` is the `NounWord` primitive
+reads one file's syntax and resolves no sort, and `subtype(goblin)` is the `Nominal` primitive
 at a head noun but the `TextWord` one in a text change, with identical syntax. `cargo xtask dsl
 check` cannot refuse the wrapped form without making the primitive uncallable at its to-sort.
-This follows step 6 (`cleanup-step6-syl`), in which `syl-nominal-descriptions` replaces the two
-`NounWord` coercions with coercions into `Nominal` and `PreModifier`; the rewrite covers whichever
-coercions exist then.
 
 ## Design
 
 - `cargo xtask dsl fmt` resolves the whole bundle with the xtask resolver and rewrites each
   explicit call whose wrap a declared coercion would supply at that position (today `type(…)`,
-  `subtype(…)` or `lit(…)`) to the bare form, deciding by the resolved call, never by text.
+  `subtype(…)`, `hasType(…)`, `hasSubtype(…)`, `hasSupertype(…)`, `hasColor(…)`, `hasStatus(…)`
+  or `lit(…)`) to the bare form, deciding by the resolved call, never by text.
 - `cargo xtask dsl fmt --check` refuses a file that holds such a wrapped call, naming the call
   and the coercion that supplies it.
 

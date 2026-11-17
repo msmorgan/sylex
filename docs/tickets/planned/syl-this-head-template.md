@@ -34,9 +34,8 @@ and leaves the "this spell" sites (*Abolish*'s `altCost(this, …)`, *Embercleav
 
 This ticket lands after `syl-single-face-card-call`, which re-indents every single-faced canon card it edits.
 
-`syl-nominal-descriptions` merges `NounWord`, the sort of `headed`'s head and of the head this
-ticket's `this` takes, into `Nominal`, and lands first, so the `this<Head>` sites are rewritten
-against the head's final sort.
+`headed`'s head, and the head this ticket's `this` takes, is a `Nominal` head word (`creature`,
+`card`, `spell`, `permanent`).
 
 ## Design
 
