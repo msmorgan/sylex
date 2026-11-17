@@ -13,10 +13,16 @@ no declaration spells: *Coat of Arms*'s "that shares at least one creature type 
 `superlative(min, stat(manaValue), …)`, *Keeper of the Flame*'s "who has more life than you do"
 is `compare(…)`, *Gnarlback Rhino*'s "that targets this creature" is `targeting(…)`, and *Autarch
 Mammoth*'s "while saddled" is `hasDesignation(…)`. A test has no spelling, so none of these terms
-prints its card. Three declarations at a kind have no spelling either (`ofChosen` and
-`ofYourChoice`, called bare from 47 canon files, and `actorControls`), and `tapOrUntapInCost`
-stays at `PostModifier` because its body is an `or` of two with-phrases, which a kind sort has no
-coordinator for.
+prints its card. Three declarations at a kind have no spelling either: `ofChosen` and
+`ofYourChoice`, called bare from 47 canon files, and `actorControls`. And `tapOrUntapInCost`
+("with the tap symbol or the untap symbol in its activation cost") stays at `PostModifier`,
+because its body is an `or` of two with-phrases and a kind sort has no coordinator.
+
+## Open questions
+
+- **How `tapOrUntapInCost` reaches `PrepositionPhrase`.** Recommendation: `activationCostHas`
+  becomes a Template over a new test `hasActivationCost`, and `tapOrUntapInCost`'s body is
+  `coord(or, [hasActivationCost(…), hasActivationCost(…)])` at `Test`.
 
 ## Done when
 
@@ -24,11 +30,12 @@ coordinator for.
   phrase at the kind the parse gives it, declared once per wording; the landing lists each site
   with its line and the declaration it took. A wording the clause, passive, lookback or `have`
   tickets compose is named with its ticket and left.
+- The open question is answered in the declaration's doc comment.
 - `ofChosen`, `ofYourChoice` and `actorControls` are spelled, or replaced by the phrases their
-  callers print. `tapOrUntapInCost` stands at `PrepositionPhrase`, with what its body needs
-  decided here.
-- `cargo xtask dsl check` refuses a declaration with no `spelling` in a `card`'s term, a test or
-  any other, with the sites left to those tickets listed in the check as its only exceptions.
+  callers print, and `tapOrUntapInCost` stands at `PrepositionPhrase`.
+- `cargo xtask dsl check` refuses, in a `card`'s term, a declaration at `Test` and an unspelled
+  declaration at `AdjectivePhrase`, `PrepositionPhrase`, `RelativeClause` or `Participle`, with
+  the sites left to those tickets listed in the check as its only exceptions.
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

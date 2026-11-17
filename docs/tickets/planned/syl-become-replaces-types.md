@@ -60,6 +60,9 @@ three parts, where the card prints one subject and no "it".
   caller is checked against its Oracle text and calls the form it prints, and the landing lists
   each with its printed wording.
 - No Template whose name says "become" keeps the old types unless its name says so.
+- If "become" takes a `Predicative` complement, `becomeStatus` is gone and its callers write that
+  form, so "becomes tapped" has one written form
+  (`docs/specs/kind-sorts-and-position-unions.md` §2).
 - *Gift of Tusks* ("Until end of turn, target creature loses all abilities and becomes a green
   Elephant with base power and toughness 3/3.") is written in `plugins/canon/` with plain
   `become`, the replacing form's first caller.

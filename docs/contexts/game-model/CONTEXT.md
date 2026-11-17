@@ -238,6 +238,8 @@ description's Head Noun, alone or combined with its `PreModifier`s and `PostModi
 **PreModifier**:
 The sort `PreModifier`: a modifier printed before a Nominal's head ("other", "nonland", "legendary",
 "tapped", an attributive Card Type, Subtype or Color).
+`docs/specs/kind-sorts-and-position-unions.md` makes it, **PostModifier** and **Predicative**
+position sorts whose members are kinds of phrase.
 
 **PostModifier**:
 The sort `PostModifier`: a modifier printed after a Nominal's head ("with flying", "you control",

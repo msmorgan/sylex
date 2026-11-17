@@ -185,7 +185,7 @@ endophora. Whatever the technique, a referent is accessible to an anaphor only i
 A description is a `Nominal`, `nominal(pre, head, post)`, and its head sets the domain it ranges
 over. A card type or subtype at `Nominal` means a permanent of that card type or subtype on the
 battlefield ([CR#109.2,110.1]); at `PreModifier` it tests the characteristic alone, with no zone
-implied. `permanent` means a card or token on the battlefield ([CR#110.1]); a printed "on the
+implied (one word read by position, once `docs/specs/kind-sorts-and-position-unions.md` is built). `permanent` means a card or token on the battlefield ([CR#110.1]); a printed "on the
 battlefield" stays the postmodifier `in(battlefield)`. `card` means a Magic card or an object
 represented by one, never a token ([CR#108.2,108.2b]), and carries no zone of its own: a stated
 zone comes from its postmodifiers or its verb ([CR#109.2a]). `spell` means a spell on the stack

@@ -25,7 +25,8 @@ knows a membership yet.
   value by the spec's step 4, computes Reaches over members transitively, and enforces the spec's
   load rules: no cycle and no second path; a word at two sorts of one Reaches set, with the
   position sort's own words excepted; no `spelling` at `Test`; a Template body at its kind or at
-  `Test`; a parameter typed by a kind that `expands`; a `nominal(…)` with modifiers of its own, or
+  `Test`; a parameter typed by a kind that `expands`, and a word at such a kind that a position
+  sort it is a member of declares itself; a `nominal(…)` with modifiers of its own, or
   a coordinated one, in `pre` outside a coordination's arm; a declaration at a position sort that
   is neither its own word, a position-bound Template, nor one of the spec's staying declarations,
   each named in the check with its ticket; and the spelling-skeleton rule over Reaches. Each rule has a test that it refuses what the spec says it
@@ -59,8 +60,9 @@ knows a membership yet.
 ## Pointers
 
 `docs/specs/kind-sorts-and-position-unions.md`;
-`docs/evidence/syl-kind-sorts/test-sort-check.md` (the computed placement of all 135
-declarations, with the script that produced it);
+`docs/evidence/syl-kind-sorts/test-sort-check.md` in the default workspace (the computed
+placement of all 135 declarations, with its script; `move_or_stay.py`'s docstring describes the
+dump of the checker's resolutions both scripts read, which a fresh workspace regenerates);
 `crates/syl/src/{parse,check}.rs`, `crates/xtask/src/dsl_check/`, `crates/xtask/src/dsl_expand.rs`;
 `plugins/builtin/{primitives,templates}/{preModifier,postModifier,predicative}/`,
 `plugins/builtin/coercions/`; `docs/design/syl.md` §3, `docs/design/spelling.md` §7.

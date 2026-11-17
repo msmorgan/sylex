@@ -472,7 +472,8 @@ recovery admits the wording only when the two printings agree.
 
 One wording recovers one written form. Where `.syl` admits two written forms of one term, the
 bare word a coercion wraps and the written call of the primitive it wraps through, recovery
-yields the bare form, which is the corpus's ([`.syl`](syl.md) §2). Likewise, when a Template's
+yields the bare form, which is the corpus's ([`.syl`](syl.md) §2;
+`docs/specs/kind-sorts-and-position-unions.md` leaves the bare word the only form). Likewise, when a Template's
 expansion is a call that could also be written directly, the written form is the Template: a
 one-condition trigger is the Ability `when`, `whenever` or `at`, and `triggered` is written only
 over a disjunction of trigger conditions. And when a Tail's host has no other trailing dependent,

@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-spelling-conventions, syl-clause-and-imperative]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-spelling-conventions, syl-clause-and-imperative, syl-union-membership]
 specs: [voice-and-object-phrases]
 ---
 
@@ -108,8 +108,7 @@ Corpse-Born* prints "Grimgrin enters tapped and doesn't untap during your untap 
 
 - The open questions are answered and written in `docs/design/surface.md` §7.6 and the
   declarations' doc comments.
-- `Clause` stands at `StaticSpec` (a coercion, or a membership once `syl-union-membership` has
-  replaced coercion), so a static ability's statement is `static(clause(…))`. The declarations that wrap a `StaticSpec` (`asLongAs`, `if`,
+- `Clause` is a member of `StaticSpec` (`docs/specs/kind-sorts-and-position-unions.md` §2), so a static ability's statement is `static(clause(…))`. The declarations that wrap a `StaticSpec` (`asLongAs`, `if`,
   `conditionally`, `conjunction`, `onlyWhile` and the others) keep their sort and wrap a clause
   through it. `docs/design/syl.md` §2 and the glossary list it.
 - No declaration whose wording prints its subject takes it as a parameter; each is a

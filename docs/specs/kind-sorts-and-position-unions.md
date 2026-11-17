@@ -85,8 +85,9 @@ cards also call them bare. A test is no kind of phrase, so it is declared once, 
 
   The body resolves at the Template's own sort when its root word stands in that sort's Reaches,
   and otherwise at `Test`. The choice is never open: the kind and `Test` reach one position sort,
-  so §3 refuses a word declared at both, and none of the four kinds declares a coordinator or a
-  negation, the words §3 lets a position sort share. A parameter typed by one of the four must
+  so §3 refuses a word declared at both, and load refuses, at any of the four kinds, a word that
+  a position sort it is a member of declares itself (a coordinator, a negation), the one case §3
+  would let through. A parameter typed by one of the four must
   also admit a `Test`, since expansion puts one there; none is typed so today, and load refuses
   one that is. When `VerbPhrase` takes `Participle`'s place its Templates are verbs with no test
   under them, and `expands(Participle)` goes with the sort.
@@ -104,8 +105,8 @@ refuses a test in a card's term.
 **`Participle` (NEW) holds a participle that modifies a head.** "Attacking", "blocked",
 "enchanted", "named X", "attached to it" and "controlled by X" are verb phrases in their
 participle form (*Smite*'s "target blocked creature" parses so). Until the passive is built each
-is a fixed Template over a test, or a primitive of its own (`named`, `notChosen`), and they stand
-at `Participle`, a member of
+is a fixed Template over a test, or a primitive of its own (`named`, `notChosen`, and the new
+`notNamed`, which has its own constructor as `notChosen` has), and they stand at `Participle`, a member of
 `PreModifier` and `PostModifier` and not of `Predicative`, where "be" with a participle is the
 passive. One `attacking(defender = none)` then serves "attacking creature" and "creature
 attacking you". `syl-passive-participle-and-trigger-events` replaces each fixed participle with
@@ -168,9 +169,10 @@ declared at two sorts of Reaches(`T`) is refused, and so is a literal that stand
 integer when `Int` and `Nat` both reach `T`). So step 4 finds at most one sort, with no
 backtracking. The side table that records the sort each call resolved at already says where the
 value stands. `docs/evidence/syl-kind-sorts/test-sort-check.md` computes the placement for a
-declaration set that differs from §4's in five rows (`tapOrUntapInCost`, `outsideTheGame`,
-`copied`, `plotted`, `notNamed`) and finds no collision; `syl-union-membership` reruns it for
-§4's.
+declaration set close to §4's and finds no collision. It differs in five rows
+(`tapOrUntapInCost`, `outsideTheGame`, `copied`, `plotted`, `notNamed`), in two tests it adds
+that §4 does not need (`inLocation`, `hasActivationCost`) and in one name
+(`legalAttachmentTest`); `syl-union-membership` reruns it for §4's.
 
 **A position sort's own declarations.** A declaration at `PreModifier`, `PostModifier` or
 `Predicative` is one of two things:
@@ -328,11 +330,12 @@ Built by:
    **`syl-unplaced-describing-kinds`** (NEW).
 
 Changed by this spec: `syl-passive-participle-and-trigger-events` (the fixed participles become
-their verbs, `VerbPhrase` replaces `Participle`, and the two renames of §2),
+their verbs, `VerbPhrase` replaces `Participle`, and the three renames of §2),
 `syl-lookback-operator-and-holds` and `syl-clause-and-imperative` (`did` and `was`; a relative
 composed from a clause with a gap, at `RelativeClause`), `syl-zone-words` (a location phrase is a
 `PrepositionPhrase`), `syl-damage-and-life-noun-phrases` (its modifiers are declared at kinds),
-`syl-become-replaces-types` and `syl-token-records-to-templates` (they consume `Predicative`),
+`syl-become-replaces-types` (it consumes `Predicative`, and `becomeStatus` goes with it) and
+`syl-token-records-to-templates`,
 `syl-canon-wording-defects` (`copied`, `choseExtreme`), `syl-continuous-effect-subject` and
 `syl-counters-noun-phrase` (a membership where each plans a coercion), and
 `syl-name-originally-printed-in`,
