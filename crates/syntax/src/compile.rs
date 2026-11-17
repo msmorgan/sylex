@@ -3003,41 +3003,10 @@ impl<'a> Binder<'a> {
                             })?;
                             ("complement", Symbol::Leaf(Test::Words(words)))
                         }
-                        ParameterPart::ModifiedWords(words, modifier, target) => {
-                            let words = self.word_class(words).ok_or_else(|| {
-                                invalid(format!("invalid modified word class of `{id}`"))
-                            })?;
-                            let target = self.slot_category(*target)?;
-                            let modifier = self.slot_category(*modifier)?;
-                            let category = self.private_category(target);
-                            let mut base = Draft::new(format!("{}/Stem", draft.id), category, 0);
-                            base.child("head", Symbol::Leaf(Test::Words(words)), GapRule::Closed);
-                            drafts.push(base);
-                            let mut recursive =
-                                Draft::new(format!("{}/ModifiedStem", draft.id), category, 0);
-                            for (name, category) in [("modifier", modifier), ("head", category)] {
-                                recursive.child(
-                                    name,
-                                    Symbol::Cat {
-                                        category,
-                                        binding: None,
-                                        prepositions: None,
-                                        host: None,
-                                    },
-                                    GapRule::Closed,
-                                );
-                            }
-                            drafts.push(recursive);
-                            (
-                                "complement",
-                                Symbol::Cat {
-                                    category,
-                                    binding: None,
-                                    prepositions: None,
-                                    host: None,
-                                },
-                            )
-                        }
+                        part @ ParameterPart::ModifiedWords { .. } => (
+                            "complement",
+                            self.modified_words(&draft.id, id, part, &mut drafts)?,
+                        ),
                         ParameterPart::Mark(c, binding) => ("", Symbol::Punct(*c, *binding, None)),
                     };
                     draft.child(name, symbol, GapRule::Closed);
@@ -3071,6 +3040,95 @@ impl<'a> Binder<'a> {
             }
         }
         Ok(drafts)
+    }
+
+    fn modified_words(
+        &mut self,
+        draft_id: &str,
+        id: &LexemeId,
+        part: &crate::frames::ParameterPart,
+        drafts: &mut Vec<Draft>,
+    ) -> Result<Symbol, LoadError> {
+        let crate::frames::ParameterPart::ModifiedWords {
+            bare,
+            modified_only,
+            modifier,
+            target,
+        } = part
+        else {
+            unreachable!()
+        };
+        if bare.is_empty() && modified_only.is_empty() {
+            return Err(invalid(format!("invalid modified word class of `{id}`")));
+        }
+        let bare_words = if bare.is_empty() {
+            BTreeSet::new()
+        } else {
+            self.word_class(bare)
+                .ok_or_else(|| invalid(format!("invalid modified word class of `{id}`")))?
+        };
+        let modified_words = if modified_only.is_empty() {
+            BTreeSet::new()
+        } else {
+            self.word_class(modified_only)
+                .ok_or_else(|| invalid(format!("invalid modified word class of `{id}`")))?
+        };
+        if !bare_words.is_disjoint(&modified_words) {
+            return Err(invalid(format!(
+                "overlapping bare and modified-only stems in `{id}`"
+            )));
+        }
+        let target = self.slot_category(*target)?;
+        let modifier = self.slot_category(*modifier)?;
+        let category = self.private_category(target);
+        if !bare_words.is_empty() {
+            let mut plain = Draft::new(format!("{draft_id}/Stem"), category, 0);
+            plain.child(
+                "head",
+                Symbol::Leaf(Test::Words(bare_words)),
+                GapRule::Closed,
+            );
+            drafts.push(plain);
+        }
+        if !modified_words.is_empty() {
+            let mut guarded = Draft::new(format!("{draft_id}/ModifiedOnlyStem"), category, 0);
+            guarded.child(
+                "modifier",
+                Symbol::Cat {
+                    category: modifier,
+                    binding: None,
+                    prepositions: None,
+                    host: None,
+                },
+                GapRule::Closed,
+            );
+            guarded.child(
+                "head",
+                Symbol::Leaf(Test::Words(modified_words)),
+                GapRule::Closed,
+            );
+            drafts.push(guarded);
+        }
+        let mut recursive = Draft::new(format!("{draft_id}/ModifiedStem"), category, 0);
+        for (name, category) in [("modifier", modifier), ("head", category)] {
+            recursive.child(
+                name,
+                Symbol::Cat {
+                    category,
+                    binding: None,
+                    prepositions: None,
+                    host: None,
+                },
+                GapRule::Closed,
+            );
+        }
+        drafts.push(recursive);
+        Ok(Symbol::Cat {
+            category,
+            binding: None,
+            prepositions: None,
+            host: None,
+        })
     }
 
     /// A pattern's final marker and parameter, coordinated: binary (*from

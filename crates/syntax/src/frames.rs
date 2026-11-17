@@ -514,8 +514,15 @@ pub enum ParameterPart {
     Slot(SlotKind),
     Word(LexemeId),
     Words(Vec<LexemeId>),
-    /// A word set with recursive premodification, projected as a constituent.
-    ModifiedWords(Vec<LexemeId>, SlotKind, SlotKind),
+    /// A word set with recursive premodification, projected as a constituent:
+    /// stems that may stand bare, stems that require at least one premodifier,
+    /// the premodifier slot, and the projected constituent slot.
+    ModifiedWords {
+        bare: Vec<LexemeId>,
+        modified_only: Vec<LexemeId>,
+        modifier: SlotKind,
+        target: SlotKind,
+    },
     Mark(char, sylex_lexicon::Binding),
     /// A value the pattern gives a feature of its phrase, as no word: the
     /// kind of a keyword form's final Keyword Parameter, or whether the form

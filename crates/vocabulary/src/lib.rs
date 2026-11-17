@@ -924,7 +924,7 @@ impl Sources {
                 ParameterPart::Slot(_)
                 | ParameterPart::Word(_)
                 | ParameterPart::Words(_)
-                | ParameterPart::ModifiedWords(..)
+                | ParameterPart::ModifiedWords { .. }
                 | ParameterPart::Mark(..) => true,
             });
             let form = if parametric { "Parametric" } else { "Bare" };
@@ -942,22 +942,37 @@ impl Sources {
             }
             if let Some(bound) = &ability.bound {
                 let patterns = patterns(&ability.parameters);
-                let stems: std::collections::BTreeSet<_> = bound
-                    .stems
-                    .iter()
-                    .flat_map(|class| self.stems(*class))
-                    .map(|stem| sylex_lexicon::LexemeId::new(&format!("stem:{stem}")))
-                    .collect();
+                let free_lemmas: std::collections::BTreeSet<_> =
+                    std::iter::once(ability.lemma.to_ascii_lowercase())
+                        .chain(
+                            ability
+                                .variants
+                                .iter()
+                                .map(|v| v.lemma.to_ascii_lowercase()),
+                        )
+                        .collect();
+                let mut bare = std::collections::BTreeSet::new();
+                let mut modified_only = std::collections::BTreeSet::new();
+                for stem in bound.stems.iter().flat_map(|class| self.stems(*class)) {
+                    let id = sylex_lexicon::LexemeId::new(&format!("stem:{stem}"));
+                    let combined = format!("{stem}{}", bound.surface).to_ascii_lowercase();
+                    if free_lemmas.contains(&combined) {
+                        modified_only.insert(id);
+                    } else {
+                        bare.insert(id);
+                    }
+                }
                 let bound_patterns = patterns
                     .into_iter()
                     .map(|mut parts| {
                         parts.insert(
                             0,
-                            ParameterPart::ModifiedWords(
-                                stems.iter().copied().collect(),
-                                SlotKind::TypeModifier,
-                                SlotKind::Quality,
-                            ),
+                            ParameterPart::ModifiedWords {
+                                bare: bare.iter().copied().collect(),
+                                modified_only: modified_only.iter().copied().collect(),
+                                modifier: SlotKind::TypeModifier,
+                                target: SlotKind::Quality,
+                            },
                         );
                         with_form(parts)
                     })
