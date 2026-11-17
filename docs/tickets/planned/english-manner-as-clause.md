@@ -22,11 +22,17 @@ clause under a past host with a present verb would be refused as a time mismatch
   lands as you do"`), while `TemporalClause` keeps `NominalAndPredicate` and `Gap = None`. Since
   `verb:choose` is transitive, `"divided as you choose"` parses only as a manner clause (`Gap = NP`)
   and complete clauses parse only as temporal.
+- Remove `Intransitive` from `verb:choose` in `verbs.ron`: *divided as you choose* and *reorder
+  your graveyard as you choose* (*Fossil Find*) read today only as a temporal clause over
+  intransitive *choose*, and with the manner frame they no longer need it.
 
 ## Done when
 
 - *Divided as you choose* has a manner Reading and no temporal one, and no Reading in which the
   clause modifies a Nominal; a judgment pins it on a real card.
+- `"Choose odd or even."` (*Extinction Event*) has one Reading, with *odd or even* the Object of
+  *choose*, and *as many times as you choose* (*Trade Secrets*) has no temporal Reading of *as you
+  choose*.
 - *As you cast this spell* (*Jeska's Will*) and *as the turn began* (*Sengir, the Dark Baron*)
   keep their temporal Readings and gain no manner one.
 - `cargo xtask english strata --check` passes, and `cargo test` and

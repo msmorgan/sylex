@@ -24,10 +24,10 @@ reads only as a temporal clause.
   `Intransitive` on `verb:do so`, CGEL, Ch. 17, §7.5, p. 1531), and mark `StrandedModal`,
   `StrandedBe`, `StrandedPerfect` and `StrandedDo` with an ellipsis feature (`Code`) while keeping
   `Gap = None` so relative clauses (`Gap = NP`) never admit them.
-- Remove `Intransitive` from `verb:choose` in `verbs.ron`, set `fused_quality: true` on `odd` and
-  `even` in `adjectives.ron`, and license `QualityHead := Fused` adjectives in `Mention` (or bare
-  `FusedNounPhrase`) so `"Choose odd or even."` takes a direct Object and `"you choose"` has a
-  complement `Gap = NP` rather than a gapless `Clause` parse.
+- Set `fused_quality: true` on `odd` and `even` in `adjectives.ron`, and license
+  `QualityHead := Fused` adjectives in `Mention` so `"Choose odd or even."` takes a direct Object.
+  `verb:choose` keeps `Intransitive` here: *divided as you choose* reads only through it until
+  `english-manner-as-clause` gives the manner clause its frame and removes it.
 - Replace `Clause(Finite)` on `prep:than` and equative `prep:as` with `ComparativeClause`
   (`ComplementOnly`), licensed by either `Gap = NP` (*Forget* `"as many cards as they discarded __
   this way"`, *Lim-Dûl's Vault* `"as many times as you choose __"`) or `Gap = None` with `Code`
