@@ -1,4 +1,5 @@
-//! Scope rules on `ownName` and `shortenedName` (`docs/tickets/wip/syl-self-name-references.md`).
+//! Scope rules on `ownName` and `shortenedName`
+//! (`docs/tickets/wip/syl-self-name-references.md`).
 //!
 //! Checks two invariants after names and sorts have resolved:
 //! - neither `ownName` nor `shortenedName` (nor any word with `spelling` `"#"`
@@ -246,7 +247,8 @@ impl<'a> SelfNameChecker<'a, '_> {
                 Shape::Header(h) => h.constructor.is_some_and(|c| c.ident == "True"),
                 Shape::Value(_) => false,
             };
-            // `sylex_vocabulary::short_name` reads only `name` and `permanent_type`.
+            // `sylex_vocabulary::short_name` reads only `name` and
+            // `permanent_type`.
             out.push(TypeDef {
                 name: canonical.into(),
                 permanent_type,

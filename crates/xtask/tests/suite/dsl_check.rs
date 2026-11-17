@@ -2822,7 +2822,8 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
         refusals(&[("a.syl", &invalid)]),
         [
             vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames")); 11],
-            // Inside a Template's body, at the call that supplies the determiner.
+            // Inside a Template's body, at the call that supplies the
+            // determiner.
             vec![(
                 RefusalKind::AgreementWithoutGroup,
                 s("differentCards(each)")

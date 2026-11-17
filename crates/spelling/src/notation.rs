@@ -288,7 +288,8 @@ pub enum ErrorKind {
     UnexpectedMark(char),
 }
 
-/// Parses `input` as a `spelling` in the notation of `docs/design/spelling.md` §7.
+/// Parses `input` as a `spelling` in the notation of `docs/design/spelling.md`
+/// §7.
 ///
 /// # Errors
 ///

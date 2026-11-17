@@ -287,7 +287,10 @@ fn a_central_adjunct_shifts_an_unlike_slot() {
     )
     .unwrap();
     let valid = "Have still banding and abilities.";
-    let parsed = grammar.parse(&lexicon, valid).readings().collect::<Vec<_>>();
+    let parsed = grammar
+        .parse(&lexicon, valid)
+        .readings()
+        .collect::<Vec<_>>();
     assert_eq!(parsed.len(), 1, "{valid}: {parsed:#?}");
     assert_eq!(
         grammar.admit(&parsed[0], &lexicon, &sylex_lexicon::CardScope::default()),

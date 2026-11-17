@@ -4,8 +4,8 @@
 //! Runs only on bundles every earlier rule accepted, so every call, argument
 //! and coercion it reads is resolved; a missing resolution is a defect in this
 //! validator and panics. Checks four invariants:
-//! - `nominal` writes at least one modifier list (`pre` or `post`), read on
-//!   the written call;
+//! - `nominal` writes at least one modifier list (`pre` or `post`), read on the
+//!   written call;
 //! - a nominal has one tree: no `Nominal = Nominal` stands as the `head` of
 //!   another once Templates and their arguments are expanded (a coordination of
 //!   nominals may);
@@ -509,7 +509,8 @@ impl<'a> NominalChecker<'a, '_> {
             // A coordination of nominals hands Agreement to its enclosing
             // consumer. An aggregate, a superlative or a comparison ranges over
             // its whole domain at once, as "all" does (`countOf` is `numberOf`
-            // over a bare plural), so an Agreement in the domain constrains that group.
+            // over a bare plural), so an Agreement in the domain constrains
+            // that group.
             Some(
                 ("Nominal", "Coordination" | "CompareOver")
                 | ("Amount", "AggregateOver")

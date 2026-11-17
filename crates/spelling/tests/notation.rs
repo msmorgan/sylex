@@ -1,4 +1,5 @@
-//! Syntax acceptance and refusal tests for `sylex_spelling` (`docs/design/spelling.md` §7).
+//! Syntax acceptance and refusal tests for `sylex_spelling`
+//! (`docs/design/spelling.md` §7).
 
 use sylex_spelling::Affix;
 use sylex_spelling::ErrorKind;
@@ -350,7 +351,8 @@ fn parses_optional_parts_and_tails() {
     };
     assert_eq!(opt_tail.category, "VerbPhrase");
 
-    // Optional part consisting solely of a Tail (`part*` empty, `tail` present).
+    // Optional part consisting solely of a Tail (`part*` empty, `tail`
+    // present).
     let tail_only_opt = parse("create $token<%Clause: , $spec>").unwrap();
     let Spelling::Parts { parts, .. } = tail_only_opt else {
         panic!("expected Parts");

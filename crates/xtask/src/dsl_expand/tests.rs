@@ -524,7 +524,8 @@ fn performed_targets<'a>(
 /// call's performer, while the one who puts it (`instruct`'s subject) is that
 /// permanent's controller; a nested `action` Definition (`connive`'s `discard`)
 /// binds its own `$actor` to the performer at its call (`controllerOf($x)`
-/// under `instruct`, `<unnamed>` under `was`), never leaking the outer `$actor`.
+/// under `instruct`, `<unnamed>` under `was`), never leaking the outer
+/// `$actor`.
 #[test]
 fn permanent_actions_put_counters_on_performer_by_its_controller() {
     let probes = vec![
