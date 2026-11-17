@@ -6,10 +6,10 @@ card singleFaced({
     text = [
       trample,
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         if = exists(nominal(pre = [ral], planeswalker, post = [youControl])),
         get(
-          thisCreature,
+          this(creature),
           up(forEachInner(1, nominal(card, post = [in(yourHand)]))),
           up(0),
           duration = untilEndOfTurn))],
