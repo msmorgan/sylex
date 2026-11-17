@@ -8,8 +8,6 @@ action detain(subject: NounPhrase) {
     conjunction([
         cant(actor($subject), attack),
         cant(actor($subject), block),
-        cant(
-          any,
-          activate(allOf(nominal(abilityHead(anyActivated), post = [ofSource($subject)]))))]),
+        cant(any, activate(possessive($subject, abilityHead(anyActivated))))]),
     untilYourNextTurn)
 }

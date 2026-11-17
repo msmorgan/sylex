@@ -8,10 +8,9 @@ card singleFaced({
       equip(mana([generic(3)])),
       static(
         costShift(
-          allOf(
+          possessive(
+            thisEquipment,
             nominal(
               abilityHead(keyword(equip)),
-              post = [
-                ofSource(this),
-                targeting(a(nominal(pre = [colorless], creature)), someTarget)])),
+              post = [targeting(a(nominal(pre = [colorless], creature)), someTarget)])),
           less(2)))]})

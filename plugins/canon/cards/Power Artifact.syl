@@ -7,5 +7,5 @@ card singleFaced({
       enchant(hasType(artifact)),
       static(
         costShift(
-          allOf(nominal(abilityHead(anyActivated), post = [ofSource(enchanted(artifact))])),
+          possessive(enchanted(artifact), abilityHead(anyActivated)),
           less(2, floor = 1)))]})
