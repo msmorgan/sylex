@@ -18,8 +18,9 @@ feature Number = Singular | Plural
 feature ObliqueNumber = Singular | Plural
 // `Equative` and `NonScalarInequality` are the comparisons a non-scalar
 // governor marks: *as* (*same*), *than* (*different*, *other*; CGEL
-// 13§1.1:1100).
-feature Grade = Plain | Comparative | Superlative | Equative | NonScalarInequality
+// 13§1.1:1100). `Mixed` resolves coordinates of differing grades (*less than
+// or equal to …*).
+feature Grade = Plain | Comparative | Superlative | Equative | NonScalarInequality | Mixed
 // Internal numeral–noun agreement survives external group respecification.
 feature QuantityNumber = Singular | Plural
 // The Number of each conjunct of an *and*-coordination of nominals; the
@@ -1331,13 +1332,15 @@ InterleavedSupplement: Interleaved -> ',' supplement:VerbPhrase ',' { cost: 3, h
 InterleavedDepictive: Interleaved -> AdjectivePhrase { cost: 0 }
     where head.ComplementKind = Intransitive,
           head.Voice != Passive,
-          head.AdjectivePosition != Attributive
+          head.AdjectivePosition != Attributive,
+          head.Grade != Equative | Mixed
 // *Onto the battlefield tapped and attacking and the rest on the bottom*.
 InterleavedCoordinatedDepictive: Interleaved -> DepictiveCoordination { cost: 0 }
 AdjectivalDepictive: Depictive -> filler:AdjectivePhrase
     where filler.Voice != Passive,
           filler.ComplementKind != Amount,
           filler.AdjectivePosition != Attributive,
+          filler.Grade != Equative | Mixed,
           $.ComplementKind = AdjP
 GerundDepictive: Depictive -> filler:Gerund where $.ComplementKind = Gerund
 // *A token that's tapped and attacking*.
@@ -1353,6 +1356,7 @@ DepictiveAdjunct: PredicateAdjunct -> filler:AdjectivePhrase
     where filler.Voice != Passive,
           filler.ComplementKind != Amount,
           filler.AdjectivePosition != Attributive,
+          filler.Grade != Equative | Mixed,
           $.ComplementKind = AdjP
 // A trailing Preposition Phrase Adjunct scopes over every conjunct of a
 // Clause coordination (*[untap target creature and gain control of it]
@@ -1370,13 +1374,22 @@ CoordinatedAdjunct: VerbPhrase -> VerbPhrase adjunct:AdjunctCoordination {
     cost: 2,
     transparent: [head],
 }
+// Predicative adjuncts are a subset of predicative complements (CGEL
+// 6§2.1:529; 4§5.3:261–263): relational equality (*equal to …*, *same as …*)
+// denotes no depictive or resultative state, and a coordination with an
+// equative coordinate fills no adjunct function its coordinates cannot each
+// fill (CGEL 15§3.1:1323, rule [1]). Excludes *deals damage to target creature
+// [equal to …]* as a depictive beside PostposedAdjective (Skred) and *exile …
+// [less than or equal to …]* as a depictive of *exile* (Sphere of
+// Annihilation).
 DepictiveAdjective: VerbPhrase -> VerbPhrase adjunct:AdjectivePhrase {
     cost: 2,
     transparent: [head],
 }
     where adjunct.Voice != Passive,
           adjunct.ComplementKind != Amount,
-          adjunct.AdjectivePosition != Attributive
+          adjunct.AdjectivePosition != Attributive,
+          adjunct.Grade != Equative | Mixed
 
 PhrasalAdverb: AdverbPhrase -> Class(PhrasalAdverb) where $.AdjunctPosition = Phrasal
 MultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb) where $.AdjunctPosition = Multiplying
@@ -3737,16 +3750,26 @@ coordination Participle {
     serial: true,
     unlike: Inflection,
 }
-// This coordination leaves Grade unvalued, so a gate that needs a Grade
-// writes `:=` (*red or green* is no comparative). A coordination whose last
-// coordinate is comparative is the next schema's alone: one tree per
-// analysis.
+// Differing coordinate grades resolve to `Mixed` (*less than or equal to …*);
+// coordinates with no lexical Grade (*tapped and transformed*) leave Grade
+// unvalued, so a gate that needs a Grade writes `:=`. A coordination whose
+// last coordinate is comparative is handled below: one tree per analysis.
 coordination AdjectivePhrase {
     coordinators: Coordinator,
-    unshared: [Grade, Polarity, AdjectivalPassive],
+    unshared: [Polarity, AdjectivalPassive],
+    resolve: [Grade -> Mixed],
 }
     where last.Grade != Comparative
-// Oracle prints a comparative coordinated with a non-comparative before a
+// A comparative final coordinate with a PP Complement (*equal to or greater
+// than …*) resolves differing grades to `Mixed` like the schema above.
+coordination AdjectivePhrase {
+    coordinators: Coordinator,
+    unshared: [Polarity, AdjectivalPassive],
+    resolve: [Grade -> Mixed],
+}
+    where last.Grade := Comparative,
+          last.ComplementKind := PP
+// Oracle prints a bare comparative coordinated with a non-comparative before a
 // *than* Complement only the last coordinate licenses (*equal or lesser mana
 // value than that spell*, Saruman of Many Colors), which CGEL marks ?
 // (CGEL 15§4.4:1343 n. 66).
@@ -3755,6 +3778,7 @@ coordination AdjectivePhrase {
     unshared: [Grade, Polarity, AdjectivalPassive],
 }
     where last.Grade := Comparative,
+          last.ComplementKind != PP,
           $.Grade = Comparative
 coordination PrepositionPhrase {
     coordinators: Coordinator,
