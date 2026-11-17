@@ -1,0 +1,12 @@
+# A relative or participial clause after coordinated Noun Phrases that each have a determiner modifies the last conjunct or the whole coordination (CGEL, Ch. 15 §1.3.4, pp. 1285–1286)
++ <card=Harmonic Prodigy> If a triggered ability of a Shaman or another Wizard you control triggers, that ability triggers an additional time. => NounPhrase "a Shaman or another Wizard you control"; NounPhrase "a Shaman or another Wizard"; Clause "you control" || NounPhrase "a Shaman or another Wizard you control"; Nominal "Wizard you control"
++ <card=Gandalf the White> If a legendary permanent or an artifact entering or leaving the battlefield causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time. => NounPhrase "a legendary permanent or an artifact entering or leaving the battlefield" as Subject of cause; NounPhrase "a legendary permanent or an artifact"; VerbPhrase "entering or leaving the battlefield" || Nominal "artifact entering or leaving the battlefield"
++ <card=Hubris> Return target creature and all Auras attached to it to their owners' hands. => NounPhrase "target creature and all Auras attached to it" as Object of return; NounPhrase "target creature and all Auras"; VerbPhrase "attached to it" || Nominal "Auras attached to it"; readings 2
+# A subject relative agrees with the coordination: *and* between distributive conjuncts is singular (CGEL, Ch. 5 §18.4, p. 508)
++ <card=Disorder> Disorder deals 2 damage to each white creature and each player who controls a white creature. => NounPhrase "each white creature and each player who controls a white creature"; NounPhrase "each white creature and each player" || Nominal "player who controls a white creature"
+* <card=Disorder> Disorder deals 2 damage to each white creature and each player who control a white creature.
+# "you control" is no Modifier of "you or a permanent": a personal pronoun takes no bare relative (CGEL, Ch. 5 §10.2, p. 430, has only *who* relatives on one)
++ <card=Leovold, Emissary of Trest> Whenever you or a permanent you control becomes the target of a spell or ability an opponent controls, you may draw a card. => Nominal "permanent you control"; !NounPhrase "you or a permanent"
+# An all-bare coordination has its wide site in the Nominal coordination alone
+# from: Boom Scholar
++ Creatures and Vehicles you control gain trample until end of turn. => Nominal "Creatures and Vehicles" || NounPhrase "Creatures"; Nominal "Vehicles you control"; readings 2

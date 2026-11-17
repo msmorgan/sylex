@@ -2314,6 +2314,31 @@ CoordinatedNounPhrasePostmodifier: NounPhrase ->
 }
     where head.Determination != Bare,
           head.Postmodification != Closed
+// A relative or participial clause over a whole coordination of Noun Phrases
+// (*a triggered ability of [a Shaman or another Wizard] you control*, Harmonic
+// Prodigy; CGEL 15§1.3.4:1285–1286), with CoordinatedNounPhrasePostmodifier's
+// sites: an all-bare coordination has the Nominal coordination's, so
+// without `head.Determination != Bare` *[Angel spells and Human spells] you
+// cast* has a second tree (Herald of War; english.md §8). So a participial
+// clause (*[a legendary permanent or an artifact] entering or leaving the
+// battlefield*, Gandalf the White). The clause's NounKind is the
+// coordination's, as it is a nominal's in NominalPostmodifier. A subject
+// relative agrees with the coordination's Number: singular after distributive
+// conjuncts (*[each white creature and each player] who controls a white
+// creature*, Disorder; 5§18.4:508), plural after other *and* ones, as a verb
+// agrees with the coordination as its Subject.
+// Excluding `Postmodification = Closed` is an admission gate (english.md §6),
+// as it is there: without it *[you or a permanent] you control* reads
+// (Leovold, Emissary of Trest), and *[Radagast or another nontoken creature]
+// you control* (Radagast the Brown; a proper name takes no integrated
+// relative, CGEL 12§4.1:1060).
+CoordinatedNounPhraseClausePostmodifier: NounPhrase -> NounPhrase modifier:Postmodifier {
+    coordinated: [head],
+}
+    where head.Determination != Bare,
+          head.Postmodification != Closed,
+          head.Number = modifier.Number,
+          head.NounKind = modifier.NounKind
 // *Any number of target players may each search ...*.
 AuxiliaryFloatedEach: VerbPhrase -> adjunct:Class(FloatingQuantifier) VerbPhrase {
     cost: 2,
