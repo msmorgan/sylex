@@ -2770,9 +2770,10 @@ GenitivePossessor: NounPhrase -> Possessor marker:Word(Genitive) { unshared: [Ca
           $.Case = Genitive,
           head.Case := Plain
 // A genitive with its head understood (*power less than Mirko's*; CGEL
-// 5§16.3:467–468). A following nominal that can be the head ranks first
-// (*during [its controller's next untap step]*). Number is the understood
-// head's (5§16.3:468), and Person and Case are the Noun Phrase's own.
+// 5§16.3:467–468). A following temporal determinative (*during [its
+// controller's] [last turn]*, Halls of Mist) builds an Adjunct beside it,
+// while GenitiveDetermined ranks first. Number is the understood head's
+// (5§16.3:468), and Person and Case are the Noun Phrase's own.
 FusedSubjectDeterminerHead: NounPhrase -> Possessor marker:Word(Genitive) {
     unshared: [Number, Person, Case],
 }

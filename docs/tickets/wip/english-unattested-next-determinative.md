@@ -10,7 +10,7 @@ needs: []
 ## Design
 
 - Delete `(lemma: "next", distribution: Deictic, noun_kind: Some(Temporal))` from `determinatives` in `crates/vocabulary/lexicon/english/closed_class.ron`, keeping `det:last`, `adj:next`, and `adv:next`.
-- Update the comments on `FusedSubjectDeterminerHead` in `crates/english/grammar/english.fug` and in `crates/english/judgments/genitive_heads.txt` so they no longer claim *during its controller's next untap step* admits a fused-head genitive plus Adjunct Reading, and assert `!NounPhrase "this turn's"` and `!NounPhrase "its controller's"` on *Triton Tactics*.
+- Update the comments on `FusedSubjectDeterminerHead` in `crates/english/grammar/english.fug` and in `crates/english/judgments/genitive_heads.txt` so they no longer claim *during its controller's next untap step* admits a fused-head genitive plus Adjunct Reading, and assert `!NounPhrase "this turn's" as Complement of at` and `!NounPhrase "its controller's" as Complement of during` on *Triton Tactics*.
 
 ## Done when
 

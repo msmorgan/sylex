@@ -5,7 +5,6 @@
     // determinative here, so each attested form is its own lemma.
     determinatives: [
         (lemma: "last", distribution: Deictic, noun_kind: Some(Temporal)),
-        (lemma: "next", distribution: Deictic, noun_kind: Some(Temporal)),
         (lemma: "a", distribution: IndefiniteArticle, number: Singular, countability: Count, allomorphs: {Consonant: "a", Vowel: "an"}),
         // *All* quantifies a count plural or a non-count singular (CGEL, Ch. 5
         // §7.3, p. 375); its count-singular use over parts (*all the book*)
