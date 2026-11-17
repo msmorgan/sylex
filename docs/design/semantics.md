@@ -207,10 +207,10 @@ Only a Participial Description written without "this way" reaches a linked abili
 
 **Numeric anaphors** read back a number within the current ability ([CR#607.1,608.2c]).
 `thatMuch(sort)` covers both scalar outcomes and the size of an event's or action's group — whether
-a `would` clause's prospective group or amount ([CR#614.6]) or a completed one — because English
-selects "that much" (`thatMuch`) against "that many" (`thatMany`) by the noun quantified rather
-than by whether the antecedent was a scalar or a group (*Ingenious Artillerist*, *Ageless Entity*,
-*Doubling Season*). Unqualified (`sort = none`), it excludes clause-mate subjects, ranks accessible
+a `would` clause's prospective group or amount ([CR#701.10g,702.150a]) or a completed one
+([CR#120.3a,120.3c,701.24f]) — because English selects "that much" (`thatMuch`) against "that
+many" (`thatMany`) by the noun quantified rather than by whether the antecedent was a scalar or a
+group (*Ingenious Artillerist*, *Ageless Entity*, *Doubling Season*). Unqualified (`sort = none`), it excludes clause-mate subjects, ranks accessible
 numeric antecedents by clause prominence (*Neheb, Dreadhorde Champion*, *Memory Vampire*), and is
 refused when two tie; a sort-qualified read (`preventedThisWay`, `removedThisWay`, or `infect`'s
 `damageDealt` [CR#702.90b]) filters by `OutcomeSort`. `theDifference` is separate: a strict

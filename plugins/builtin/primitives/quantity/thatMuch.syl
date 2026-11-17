@@ -3,8 +3,8 @@
 # ("that much damage prevented this way", "the number of counters removed this way") or in a rule
 # body where two outcomes stand in scope (`infect` [CR#702.90b]). Unqualified, it resolves to the
 # most prominent bare-eligible numeric antecedent in scope (both a `would` clause's prospective
-# group or amount [CR#614.6] and a completed event's or action's [CR#608.2c]), excluding
-# clause-mate subjects, and is refused when two tie.
+# group or amount [CR#701.10g,702.150a] and a completed event's or action's
+# [CR#120.3a,120.3c,701.24f]), excluding clause-mate subjects, and is refused when two tie.
 primitive thatMuch(sort: Option(OutcomeSort) = none): Amount = ThatMuch {
   spelling = "that much"
 }
