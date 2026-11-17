@@ -286,10 +286,11 @@ v is independently constructed and grammatical     =>  v is a Reading of parse(r
 ```
 
 Equality in the second law preserves structure, lexical identities and
-features, which fix each word's spelling. Computed source positions are not identity,
-and no echo of the source buffer or opaque catch-all leaf counts as
-realization. Why: these laws carry the system's exact round trip at this layer
-([Architecture](architecture.md), "Exact round trip").
+features, which with the structure around each word fix its spelling.
+Computed source positions are not identity, and no echo of the source buffer
+or opaque catch-all leaf counts as realization. Why: these laws carry the
+system's exact round trip at this layer ([Architecture](architecture.md),
+"Exact round trip").
 
 **A Reading stores no punctuation.** Punctuation may decide an analysis, and
 realization derives it from structure. Why: each Production fixes its own
@@ -297,6 +298,34 @@ punctuation, and where the grammar admits two punctuation forms they are
 distinct Productions, so the tree already says which was written. That works
 because Oracle's punctuation is uniform, and the Editorial Corrections
 ([`corrections.txt`](../../crates/english/corrections.txt)) fix its exceptions.
+
+**A Reading stores no capitalization.** No leaf records which case a word was
+written in, and realization derives each capital from structure, as it
+derives punctuation. A Production states which of its children open with a
+capital (`capital`): a sentence's Clause, a line, an activated ability's
+effect, an ability after an em dash, a bullet or a table bar, each verbal item
+of a cost, a quoted ability, every word of a Type Line, and a Keyword
+Parameter set off by an em dash (the `parameters` schema's `capital_after`).
+The first word of such a child is written with an initial capital where its
+Lexeme takes one; any other child opens in lower case, except the first child
+with an atom, which opens as its mother does. The engine supplies no position
+of its own, so a Constituent parsed alone opens as one inside a sentence does.
+Lexical analysis still offers a Lexeme that takes an initial capital in either
+case, and the parse admits the capitalized spelling only where the structure
+calls for one, as Adjacency Agreement admits *an* only before a vowel Onset; a
+Lexeme spelled exactly (a name, a symbol) keeps its spelling in every
+position. Why: Oracle's capitals are positional, so the tree already says
+where each one goes, and a capital the text puts elsewhere reads only as a
+second, spurious tree (*When The Eighth Doctor enters* with *The* a
+determiner). A text whose capitals are not the derived ones is in error, and an
+Editorial Correction reads it.
+
+Quotation marks around a Keyword Phrase are a `QuotedKeywordPhrase`, beside the
+quoted ability (`QuotedAbility`). The phrase stands wherever a bare Keyword
+Phrase does and is lower case, as it is printed bare (*have "bands with other
+legendary creatures."*, *loses "enchant creature card in a graveyard"*), while
+a quoted ability opens with a capital (*have "Ward—Pay 2 life."*), so no text
+is both.
 
 ## 8. Readings
 

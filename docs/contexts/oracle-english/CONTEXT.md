@@ -180,8 +180,9 @@ naming its Catalog.
 **Editorial Correction**:
 A recorded replacement for part of a face's Oracle text that the census reads
 instead. It is only for a data error against the printed card, such as a
-dropped character or wrong symbol, or for ungrammatical English, and never for
-a template difference.
+dropped character or wrong symbol, for ungrammatical English, or for a capital
+the text's structure does not call for or a missing one, and never for a
+template difference.
 _Avoid_: erratum (an official Oracle change)
 
 **Judgment**:
