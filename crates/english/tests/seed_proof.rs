@@ -28,7 +28,9 @@ fn seed() -> Seed {
 }
 
 /// One Constituent of a Reading, seen from outside: its Category, surface,
-/// Gap, and the surfaces of its children.
+/// Gap, and the surfaces of its children. Each surface is the Constituent
+/// realized alone, which opens as one inside a sentence does: a Reading
+/// stores no case, and only its position gives a word its capital.
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Constituent {
     category: dpsi::Ident,
@@ -143,7 +145,7 @@ fn active_complement_from_a_frame() {
         .into_iter()
         .find(|c| c.category == "VerbPhrase")
         .unwrap();
-    assert_eq!(vp.children, ["Put", "the card", "into your hand"]);
+    assert_eq!(vp.children, ["put", "the card", "into your hand"]);
 }
 
 #[test]
@@ -156,7 +158,7 @@ fn same_head_complement_priority() {
         .into_iter()
         .find(|c| c.category == "VerbPhrase")
         .unwrap();
-    assert_eq!(vp.children, ["Search", "your library", "for a card"]);
+    assert_eq!(vp.children, ["search", "your library", "for a card"]);
     assert_eq!(s.hosts(&readings[0], "for a card"), Vec::<String>::new());
 }
 
@@ -183,7 +185,7 @@ fn cross_head_with_attachment_is_retained_and_ranked() {
         sites,
         [
             vec!["creature".to_owned()],
-            vec!["Exile target creature".to_owned()]
+            vec!["exile target creature".to_owned()]
         ],
         "both hosts retained, the nominal postmodifier ranked first"
     );
@@ -287,8 +289,8 @@ fn seedborn_muse_keeps_both_temporal_attachments() {
     assert_eq!(
         sites,
         [
-            vec!["Untap all permanents you control".to_owned()],
-            vec!["control".to_owned()]
+            vec!["control".to_owned()],
+            vec!["untap all permanents you control".to_owned()]
         ]
     );
 }
@@ -402,7 +404,7 @@ fn right_node_raising_shares_a_complement() {
     s.reparses(&finite[0]);
     let imperative = s.readings("Put into your hand or exile the card.");
     assert_eq!(imperative.len(), 1);
-    assert!(s.has(&imperative[0], "VerbPhrase", "Put into your hand or exile"));
+    assert!(s.has(&imperative[0], "VerbPhrase", "put into your hand or exile"));
     // A focused Object may follow the selected PP without coordination.
     let shifted = s.readings("Put into your hand the card.");
     assert_ne!(shifted, [] as [Reading; 0]);

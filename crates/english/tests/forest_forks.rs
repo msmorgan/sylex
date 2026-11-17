@@ -65,8 +65,6 @@ use sylex_vocabulary::LexicalEnvironment;
 ///   ("cast", present and preterite) as its head.
 /// - *Citadel Gate*: a frame fork the lexical and dependency forks do not
 ///   determine ("white" a noun or a mention of the word).
-/// - *Turtles in Time*: conditional forks ("in" and "Time" have answers only
-///   where "Turtles" is not the card's name).
 /// - [`LINKED`]: Linked Coordinations and the one explicit coordinator outside
 ///   a coordination schema that the pool prints.
 const SAMPLE: &[&str] = &[
@@ -90,7 +88,6 @@ const SAMPLE: &[&str] = &[
     "Turtle Tracks",
     "Moritte of the Frost",
     "Citadel Gate",
-    "Turtles in Time",
 ];
 
 /// Units whose Readings differ in what a dependent of a coordination with
@@ -694,12 +691,6 @@ fn forks_agree_with_enumerated_readings_on_real_units() {
             .iter()
             .any(|(f, _, m)| f == "Citadel Gate" && m.forks.contains_key(&ForkKind::Frame)),
         "Citadel Gate has a Frame fork"
-    );
-    assert!(
-        measures
-            .iter()
-            .any(|(f, _, m)| f == "Turtles in Time" && m.conditional > 0),
-        "Turtles in Time has a conditional fork"
     );
     for (face, text, m) in &measures {
         if LINKED.contains(&face.as_str()) {

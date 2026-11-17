@@ -60,8 +60,8 @@ const SEQUENCE: &str = r"
     Text: Document -> Sentences
     Single: Sentences -> Sentence
     Sequence: Sentences -> first:Sentence rest:Sentences
-    Plain: Sentence -> word:Word '.'
-    Nested: Sentence -> word:Word '[':Prefix inner:Sentences ']' '.'
+    Plain: Sentence -> word:Word '.' { capital: [word] }
+    Nested: Sentence -> word:Word '[':Prefix inner:Sentences ']' '.' { capital: [word] }
     Noun: Word -> word:Lex(Noun)
     Adjective: Word -> word:Lex(Adjective)
 ";
@@ -102,9 +102,9 @@ fn sentences_of_a_sequence_are_segments_whose_counts_multiply() {
 #[test]
 fn a_nested_sequence_multiplies_into_its_segment() {
     let grammar = bind(SEQUENCE);
-    let (derivations, segmentation) = segments(&grammar, "Card [cast. cast.].");
+    let (derivations, segmentation) = segments(&grammar, "Card [Cast. Cast.].");
     assert_eq!(derivations, 4);
-    assert_eq!(counts(&segmentation), [("Card [cast. cast.]", 4)]);
+    assert_eq!(counts(&segmentation), [("Card [Cast. Cast.]", 4)]);
     assert_eq!(segmentation.surplus(derivations), 3);
 }
 
@@ -127,8 +127,8 @@ fn segment_boundaries_that_differ_between_derivations_are_reported() {
             category Pair
             category Sentences
             category Word
-            Words: Document -> first:Word second:Word '.'
-            Paired: Document -> Pair '.'
+            Words: Document -> first:Word second:Word '.' { capital: [first] }
+            Paired: Document -> Pair '.' { capital: [head] }
             Pair: Pair -> first:Word second:Word
             Noun: Word -> word:Lex(Noun)
         ",
@@ -152,9 +152,9 @@ fn several_outer_structures_over_one_segmentation_are_reported() {
             category Document
             category Sentences
             category Word
-            Direct: Document -> Word '.'
+            Direct: Document -> Word '.' { capital: [head] }
             Listed: Document -> Sentences
-            Single: Sentences -> Word '.'
+            Single: Sentences -> Word '.' { capital: [head] }
             Noun: Word -> word:Lex(Noun)
         ",
     );

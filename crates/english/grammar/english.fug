@@ -507,6 +507,12 @@ category RelativeNounPhrase : NounPhrase [Number]
 // A preposition and its relative pronoun, fronted (*for which*).
 category RelativePrepositionPhrase : PrepositionPhrase
 category KeywordPhrase [KeywordForm, FinalParameter, KindLicense]
+// A Keyword Phrase in quotation marks (*have "bands with other legendary
+// creatures."*, *loses "enchant creature card in a graveyard"*), beside
+// the quoted ability. It is lower case, as the phrase is printed bare
+// (*has enchant creature and "…"*, The Rani), where a quoted ability opens
+// with a capital, so no text is both.
+category QuotedKeywordPhrase [KeywordForm, FinalParameter, KindLicense]
 category KeywordLineItem [KeywordForm, FinalParameter]
 category KeywordParameters [KeywordForm, FinalParameter, KindLicense]
 category BoundKeyword [KeywordForm, FinalParameter]
@@ -758,24 +764,25 @@ slot Mention = Mention
 // clause, as a comma-set Supplement does (english.md §5, AttachmentClass).
 high_attachment PrepositionPhrase where $.DeterminativeDistribution = Distributive
 
-TextMode: Document -> Mode
-TextModalHeader: Document -> ModalHeader
-ModalAbility: ModalAbility -> header:ModalHeader '\n':Bound modes:Modes
+TextMode: Document -> Mode { capital: [head] }
+TextModalHeader: Document -> ModalHeader { capital: [head] }
+ModalAbility: ModalAbility -> header:ModalHeader '\n':Bound modes:Modes { capital: [modes] }
 ModalTextAbility: Ability -> ModalAbility
 ModalEffect: Effect -> ModalAbility
-ActivatedModalHeader: Document -> cost:ActivationCost ':' ModalHeader
+ActivatedModalHeader: Document -> cost:ActivationCost ':' ModalHeader { capital: [cost, head] }
 ActivationPayment: ActivationCost -> Cost
 SingleMode: Modes -> Mode
-ModeSequence: Modes -> first:Mode '\n':Bound rest:Modes
+ModeSequence: Modes -> first:Mode '\n':Bound rest:Modes { capital: [rest] }
 AbilityParagraph: Paragraphs -> Ability
 HeaderParagraph: Paragraphs -> Header
-AbilityParagraphSequence: Paragraphs -> first:Ability '\n':Bound rest:Paragraphs
-HeaderParagraphSequence: Paragraphs -> first:Header '\n':Bound rest:Paragraphs
+AbilityParagraphSequence: Paragraphs -> first:Ability '\n':Bound rest:Paragraphs { capital: [rest] }
+HeaderParagraphSequence: Paragraphs -> first:Header '\n':Bound rest:Paragraphs { capital: [rest] }
 
 CardTypeModifier: TypeModifier -> Class(CardType) where head.Number = Singular
 SupertypeModifier: TypeModifier -> Class(Supertype)
 NegativeTypeModifier: TypeModifier -> prefix:Lex(Affix) TypeModifier
-IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal where head.Number = Singular
+IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal { capital: [head] }
+    where head.Number = Singular
 // A keyword premodifies only without its Keyword Parameters (*a disturb
 // cost*), never with them (*[protection from each of the exiled card's]
 // card types*, Mirror Golem). `=`, so a keyword coordination, which leaves
@@ -787,21 +794,19 @@ IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal where head.Number = Si
 KeywordPremodifier: BareNominal -> modifier:KeywordPhrase BareNominal
     where modifier.KeywordForm = Bare,
           head.KindLicense != Head
-// Quoted wording mentioned as a term: a keyword or cited-word premodifier
-// (*all "bands with other" abilities*, *a "left" pile*), a cited word
-// (*choose "left" or "right."*) or a singular nominal (*the "legend rule"*,
-// [CR#704.5j]), with no period of its own. A quoted plural is a granted
-// ability's (*have "bands with other legendary creatures."*), never a
-// term's. A quoted keyword premodifier is bare, as a KeywordPremodifier is.
-QuotedKeywordPremodifier: BareNominal -> modifier:"KeywordPhrase" BareNominal
-    where modifier.KeywordForm = Bare
+// Quoted wording mentioned as a term: a cited-word premodifier (*a "left"
+// pile*), a cited word (*choose "left" or "right."*) or a singular nominal
+// (*the "legend rule"*, [CR#704.5j]), with no period of its own. A quoted
+// plural is a granted keyword's (*have "bands with other legendary
+// creatures."*), never a term's. A quoted keyword premodifies as a
+// KeywordPremodifier (*all "bands with other" abilities*).
 QuotedMentionPremodifier: BareNominal -> modifier:"Mention" BareNominal
 QuotedMention: Mention -> "Mention"
 QuotedNominal: BareNominal -> "BareNominal" where head.Number = Singular
 // A quoted imperative naming a cost (*cost an additional "Sacrifice a land"
 // to activate*, Brutal Suppression, Drought; [CR#118.8]): a singular count
 // noun under a determiner. Any other quoted clause is a QuotedAbility.
-QuotedCost: QuotedCost -> "Clause" where head.VerbForm := Plain
+QuotedCost: QuotedCost -> "Clause" { capital: [head] } where head.VerbForm := Plain
 QuotedCostHead: QuotedCostNominal -> QuotedCost
     where $.Number = Singular,
           $.Countability = Count,
@@ -824,7 +829,7 @@ DeterminedQuotedCost: NounPhrase -> determiner:DeterminerPhrase QuotedCostNomina
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
 
-TextSymbols: Document -> Symbols
+TextSymbols: Document -> Symbols { capital: [head] }
 // A symbol sequence as a noun under a determiner (*each {B} in a cost*,
 // *six {E}*).
 SymbolNominal: BareNominal -> Symbols
@@ -907,34 +912,37 @@ VariableDeterminer: NumericalDeterminer -> Class(Variable) where $.Countability 
 ArabicDeterminer: NumericalDeterminer -> Numeral(Arabic(false)) where $.Countability = Count
 GroupedArabicDeterminer: NumericalDeterminer -> Numeral(Arabic(true)) where $.Countability = Count
 NegativeAdjective: AdjectivePhrase -> prefix:Lex(Affix) AdjectivePhrase where $.Polarity = Negative
-LabeledModalHeader: Document -> label:Class(AbilityWord) '—':Free ModalHeader
+LabeledModalHeader: Document -> label:Class(AbilityWord) '—':Free ModalHeader { capital: [label, head] }
 // A flavor word carries its own dash (*Trick Arrows — Whenever ..., choose
 // one —*), as in FlavorLabeledAbility.
-FlavorLabeledModalHeader: Document -> label:Lex(FlavorWord) ModalHeader
-ChapterModalHeader: Document -> chapters:Chapters '—':Free ModalHeader
+FlavorLabeledModalHeader: Document -> label:Lex(FlavorWord) ModalHeader { capital: [label, head] }
+ChapterModalHeader: Document -> chapters:Chapters '—':Free ModalHeader { capital: [chapters, head] }
 
 CompleteKeywordPhrase: KeywordPhrase -> KeywordParameters
 CompleteKeywordItem: KeywordLineItem -> KeywordParameters
 BareKeywordMention: KeywordPhrase -> Class(ParameterizedKeyword) where $.KeywordForm = Bare
+// A Keyword Phrase in quotation marks stands wherever the bare phrase does.
+QuotedKeyword: KeywordPhrase -> QuotedKeywordPhrase
+QuotedKeywordPhrase: QuotedKeywordPhrase -> "KeywordPhrase"
 // A granted ability quoted whole, its period inside the closing mark (*has
 // "{T}: Add {G}."*; [CR#113.1a]).
-QuotedAbility: QuotedAbility -> "Ability"
-TextAbility: Document -> Ability
-TextTypeLine: Document -> TypeLine
-TextHeader: Document -> Header
-HeaderSequence: Document -> first:Header '\n':Bound rest:Paragraphs
-TextSequence: Document -> first:Ability '\n':Bound rest:Paragraphs
+QuotedAbility: QuotedAbility -> "Ability" { capital: [head] }
+TextAbility: Document -> Ability { capital: [head] }
+TextTypeLine: Document -> TypeLine { capital: [head] }
+TextHeader: Document -> Header { capital: [head] }
+HeaderSequence: Document -> first:Header '\n':Bound rest:Paragraphs { capital: [first, rest] }
+TextSequence: Document -> first:Ability '\n':Bound rest:Paragraphs { capital: [first, rest] }
 SentenceAbility: Ability -> Sentences
 KeywordAbilityList: Ability -> KeywordList
 SingleKeyword: KeywordList -> KeywordLineItem
 CommaKeywords: KeywordList -> first:KeywordLineItem ',' rest:KeywordList
 TypesOnly: TypeLine -> CardTypes
 TypesWithSubtypes: TypeLine -> CardTypes '—':Free subtypes:Subtypes
-SupertypePrefix: TypeLine -> modifier:Class(Supertype) TypeLine
-SingleCardType: CardTypes -> Class(CardType) where head.Number = Singular
-MultipleCardTypes: CardTypes -> first:Class(CardType) rest:CardTypes where first.Number = Singular
-SingleSubtype: Subtypes -> Class(Subtype) where head.Number = Singular
-MultipleSubtypes: Subtypes -> first:Class(Subtype) rest:Subtypes where first.Number = Singular
+SupertypePrefix: TypeLine -> modifier:Class(Supertype) TypeLine { capital: [modifier] }
+SingleCardType: CardTypes -> Class(CardType) { capital: [head] } where head.Number = Singular
+MultipleCardTypes: CardTypes -> first:Class(CardType) rest:CardTypes { capital: [first] } where first.Number = Singular
+SingleSubtype: Subtypes -> Class(Subtype) { capital: [head] } where head.Number = Singular
+MultipleSubtypes: Subtypes -> first:Class(Subtype) rest:Subtypes { capital: [first] } where first.Number = Singular
 NumericAmount: Amount -> Numeral(Arabic(false)) where $.QuantityNumber = head.Number
 VariableAmount: Amount -> Class(Variable) where $.QuantityNumber = head.Number
 SingleSymbol: Symbols -> Class(BracedSymbol)
@@ -955,28 +963,28 @@ LoyaltyNominal: BareNominal -> LoyaltySymbol
           $.Countability = Count,
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
-VerbalCost: NonManaCost -> VerbPhrase where head.VerbForm = Plain
+VerbalCost: NonManaCost -> VerbPhrase { capital: [head] } where head.VerbForm = Plain
 CompositeNonManaCost: NonManaCost -> first:Symbols ',' rest:NonManaCost
 NonManaCost: Cost -> NonManaCost
-ActivatedAbility: Ability -> cost:ActivationCost ':' effect:Effect
-LabeledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability
+ActivatedAbility: Ability -> cost:ActivationCost ':' effect:Effect { capital: [effect] }
+LabeledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability { capital: [head] }
 // *• Khans — ...*: an ability under an Anchor Word, after the ability
 // offering the choice [CR#607.2m]; the bullet is part of it [CR#614.12c].
 // Never a mode: no instruction to choose options precedes it [CR#700.2].
-AnchoredAbility: Ability -> '•':Free label:Class(AnchorWord) '—':Free Ability
-FlavorLabeledAbility: Ability -> label:Lex(FlavorWord) Ability
-NominalMode: Mode -> '•':Free Nominal '.'
-NounPhraseMode: Mode -> '•':Free NounPhrase '.'
+AnchoredAbility: Ability -> '•':Free label:Class(AnchorWord) '—':Free Ability { capital: [label, head] }
+FlavorLabeledAbility: Ability -> label:Lex(FlavorWord) Ability { capital: [head] }
+NominalMode: Mode -> '•':Free Nominal '.' { capital: [head] }
+NounPhraseMode: Mode -> '•':Free NounPhrase '.' { capital: [head] }
 // A keyword whose em-dash cost ends in its own period, then its instruction
 // (*Equip— Sacrifice another nonland permanent. Activate only once each
 // turn.*). No other keyword form is followed by a sentence on its line.
 KeywordFollowedBySentences: Ability -> first:KeywordLineItem rest:Sentences
     where first.FinalParameter := SetOffCost
 NamePremodifier: BareNominal -> modifier:Name BareNominal
-ModeBullet: Mode -> '•':Free Ability
-PlusCostedMode: Mode -> '+':Free:Spoken cost:Cost '—':Free ModeEffect
-LabeledCostedMode: Mode -> '•':Free label:Lex(FlavorWord) cost:Cost '—':Free ModeEffect
-PawprintMode: Mode -> quantity:Pawprints '—':Free ModeEffect
+ModeBullet: Mode -> '•':Free Ability { capital: [head] }
+PlusCostedMode: Mode -> '+':Free:Spoken cost:Cost '—':Free ModeEffect { capital: [head] }
+LabeledCostedMode: Mode -> '•':Free label:Lex(FlavorWord) cost:Cost '—':Free ModeEffect { capital: [label, head] }
+PawprintMode: Mode -> quantity:Pawprints '—':Free ModeEffect { capital: [head] }
 SinglePawprint: Pawprints -> Class(Pawprint)
 PawprintSequence: Pawprints -> first:Class(Pawprint) rest:Attached(Pawprints, Suffix)
 SingleSentence: Sentences -> Sentence
@@ -1009,13 +1017,13 @@ RangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '-':Bound upper:Am
 OpenRangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '+'
 SingleChapter: Chapters -> Numeral(Roman)
 ChapterSequence: Chapters -> first:Numeral(Roman) ',' rest:Chapters
-ChapterAbility: Ability -> chapters:Chapters '—':Free Ability
+ChapterAbility: Ability -> chapters:Chapters '—':Free Ability { capital: [head] }
 // *When this creature enters, choose one —*.
 ChoiceHeader: ModalHeader -> Clause '—':Free where head.Inflection != Irrealis
 // A modal header as a reflexive trigger [CR#603.12], after the sentence it
 // depends on (*You may pay {E}{E}. When you do, choose one —*). Right
 // recursion gives one grouping, as SentenceSequence does.
-SentencePrefixedModalHeader: ModalHeader -> first:Sentence ModalHeader
+SentencePrefixedModalHeader: ModalHeader -> first:Sentence ModalHeader { capital: [head] }
 
 // An adverb before a bare imperative is its Clause's front Adjunct, never
 // its Verb Phrase's central one (CentralPosition).
@@ -1030,7 +1038,7 @@ Imperative: Clause -> VerbPhrase { uncoordinated: [head] }
           head.CentralPosition != Occupied,
           head.PastTime != Past,
           $.NonPastTime = NonPast
-Declarative: Sentence -> clause:Clause '.'
+Declarative: Sentence -> clause:Clause '.' { capital: [clause] }
     where clause.ClauseMarking = Unmarked,
           clause.Inflection != Irrealis
 SubjectRemnant: SubjectRemnant -> VerbPhrase
@@ -1171,6 +1179,7 @@ NounPhraseSupplement: Clause -> Clause ',' supplement:NounPhrase
 // turn]*).
 AddedElement: Sentence ->
     clause:Clause coordinator:Class(AddingCoordinator) fragment:QualifyingFragment '.' {
+    capital: [clause],
     cost: 2,
     unadjoined: [
         clause -> [PrepositionPhrase, AdjectivePhrase, TemporalNounPhrase, AdverbPhrase, AdjunctCoordination],
@@ -2322,13 +2331,14 @@ PreposedAdverbAndPreposition: Clause ->
           $.FrontPosition = Occupied
 // *Pay half your life, rounded up:*.
 SupplementedVerbalCost: NonManaCost -> VerbPhrase ',' supplement:VerbPhrase {
+    capital: [head],
     cost: 3,
     heavy: [supplement],
 }
     where head.VerbForm = Plain,
           supplement.VerbForm = PastParticiple,
           supplement.Voice = Passive
-NominalInstruction: Sentence -> IndexedNominal '.'
+NominalInstruction: Sentence -> IndexedNominal '.' { capital: [head] }
 // *When this Class becomes level 2*.
 IndexedNounPhrase: NounPhrase -> IndexedNominal
     where head.Number = Singular,
@@ -2377,11 +2387,12 @@ DefiniteFusedAdjectiveHead: NounPhrase -> determiner:Word(The) Class(DefiniteFus
 SingleRowHeader: RowHeader -> Amount
 OpenRowHeader: RowHeader -> Amount '+'
 UnicodeRangeRowHeader: RowHeader -> lower:Amount '—':Bound upper:Amount
-TableRow: Ability -> header:RowHeader '|':Free Ability
-SequentialVerbalCosts: NonManaCost -> first:VerbPhrase ',' rest:Cost where first.VerbForm = Plain
-DeclarativeCost: NonManaCost -> Clause where head.VerbForm = Finite, head.Inflection != Irrealis
+TableRow: Ability -> header:RowHeader '|':Free Ability { capital: [head] }
+SequentialVerbalCosts: NonManaCost -> first:VerbPhrase ',' rest:Cost { capital: [first] } where first.VerbForm = Plain
+DeclarativeCost: NonManaCost -> Clause { capital: [head] }
+    where head.VerbForm = Finite, head.Inflection != Irrealis
 ClauseCondition: Condition -> Clause
-KeywordInstruction: Sentence -> KeywordLineItem '.' where head.KeywordForm = Parametric
+KeywordInstruction: Sentence -> KeywordLineItem '.' { capital: [head] } where head.KeywordForm = Parametric
 // A floating quantifier after a plural Subject (*they each*) or *you*,
 // singular in Oracle but with plural verb forms (*You each lose life*).
 // Twin: RelativeFloatedEach.
@@ -3200,7 +3211,7 @@ MarkedExpandableClause: ExpandableClause -> marker:Word(ContentMarker) FiniteCla
 // A dash-set Clause or Clause coordination giving the content of the Object
 // before it: villainous choice options [CR#701.55a]. The sentence end
 // absorbs the closing dash.
-SetOffComplementClause: SetOffClause -> '—':Free Clause { unclosed }
+SetOffComplementClause: SetOffClause -> '—':Free Clause { unclosed, capital: [head] }
     where head.ClauseMarking = Unmarked,
           head.Inflection != Irrealis
 VerblessComplementClause: VerblessClause -> Predicative
@@ -3290,11 +3301,15 @@ premodification Participle {
     equations: [PastParticiple -> [head.AdjectivalPassive != Lexical]],
 }
 parameters IndexedNominal { head: Noun }
+// A Keyword Parameter set off by an em dash opens with a capital
+// (*Ward—Pay 2 life.*, *Modular—Sunburst*, *Companion — Each nonland card
+// ...*).
 parameters KeywordParameters {
     head: Keyword,
     binding: Free,
     coordinators: Coordinator,
     remnant: ParameterRemnant,
+    capital_after: ['—'],
 }
 parameters BoundKeyword { head: Keyword, binding: Suffix }
 // `passive`: *by* plus the active's Subject; a *by* gerund is a means

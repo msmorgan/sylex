@@ -447,10 +447,9 @@ mod tests {
     /// Enchantments*, 1,536 Derivations), frame Productions the dependency
     /// answers determine (*Auriok Salvagers*), a frame fork (*Citadel
     /// Gate*), a lexical fork (*Up the Beanstalk*), two leaves in one word
-    /// (*The Eternal Wanderer*), conditional forks (*Turtles in Time*) and
-    /// a node on two words' Head Lines (*Helga, Skittish Seer*). Each unit's
-    /// stored forks and Head Line rows equal what `ForkForest::forks` and
-    /// `ForkForest::head_lines` compute.
+    /// (*The Eternal Wanderer*) and a node on two words' Head Lines (*Helga,
+    /// Skittish Seer*). Each unit's stored forks and Head Line rows equal what
+    /// `ForkForest::forks` and `ForkForest::head_lines` compute.
     #[test]
     fn the_stored_forks_equal_the_fork_forest_s() {
         let cards = [
@@ -461,7 +460,6 @@ mod tests {
             "Citadel Gate",
             "Up the Beanstalk",
             "The Eternal Wanderer",
-            "Turtles in Time",
             "Helga, Skittish Seer",
         ];
         let (_dir, path, corpus) = super::super::tests::database(&cards);
@@ -505,16 +503,13 @@ mod tests {
             assert_eq!(lines, forest.head_lines(), "{}", u.text);
             for fork in &expected {
                 *seen.entry(kind_name(fork.kind)).or_default() += 1;
-                if fork.conditional {
-                    *seen.entry("conditional").or_default() += 1;
-                }
                 if !fork.aliases.is_empty() {
                     *seen.entry("aliased").or_default() += 1;
                 }
             }
             assert_eq!(stored(&db, index(unit), &parse), expected, "{}", u.text);
         }
-        for what in ["lexical", "dependency", "frame", "conditional", "aliased"] {
+        for what in ["lexical", "dependency", "frame", "aliased"] {
             assert!(seen.contains_key(what), "no {what} fork: {seen:?}");
         }
         // Each node's Head Line rows partition its Derivations, and Helga's

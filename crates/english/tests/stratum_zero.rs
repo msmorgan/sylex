@@ -5,7 +5,6 @@ use std::collections::BTreeMap;
 use sylex_lexicon::FeatureBundle;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::LexicalValue;
-use sylex_lexicon::SurfaceCase;
 use sylex_lexicon::WordForm;
 use sylex_syntax::Gap;
 use sylex_syntax::Reading;
@@ -30,12 +29,12 @@ fn node(production: &str, category: &str, children: Vec<Reading>) -> Reading {
     })
 }
 
-fn keyword(lemma: &str, capitalization: SurfaceCase) -> Reading {
+/// A keyword line item, its leaf stating no case: its position decides it.
+fn keyword(lemma: &str) -> Reading {
     let leaf = Reading::Leaf(LexicalReading::Word(LexicalValue {
         lexeme: format!("keyword:{lemma}").as_str().into(),
         form: WordForm::Invariant,
         features: FeatureBundle::default(),
-        capitalization,
     }));
     let mut parameters = node(
         &format!("Parameters:KeywordParameters/keyword:{lemma}/0"),
@@ -56,15 +55,11 @@ fn keyword(lemma: &str, capitalization: SurfaceCase) -> Reading {
 fn independently_constructed_keyword_list_round_trips() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let tail = node(
-        "SingleKeyword",
-        "KeywordList",
-        vec![keyword("vigilance", SurfaceCase::Declared)],
-    );
+    let tail = node("SingleKeyword", "KeywordList", vec![keyword("vigilance")]);
     let list = node(
         "CommaKeywords",
         "KeywordList",
-        vec![keyword("flying", SurfaceCase::Initial), tail],
+        vec![keyword("flying"), tail],
     );
     let reading = node(
         "TextAbility",
@@ -74,6 +69,7 @@ fn independently_constructed_keyword_list_round_trips() {
     grammar
         .admit(&reading, &env.lexicon, &sylex_lexicon::CardScope::default())
         .unwrap();
+    // The line opens with a capital, and the keyword after the comma does not.
     let surface = "Flying, vigilance";
     assert_eq!(grammar.realize(&reading, &env.lexicon).unwrap(), surface);
     let parse = grammar.parse(&env.lexicon, surface);
@@ -121,7 +117,10 @@ fn new_catalog_keyword_parameters_need_no_grammar_change() {
         let document = grammar.parse(&env.lexicon, text);
         assert!(document.derivation_count() > 0, "{text}");
         document.verify_realization(&env.lexicon).unwrap();
-        let analyzed = env.lexicon.analyze(text);
+        // Parsed alone, the phrase opens as one inside a sentence does, in
+        // lower case; the cost after its em dash keeps its capital.
+        let text = format!("t{}", &text[1..]);
+        let analyzed = env.lexicon.analyze(&text);
         let parse = grammar
             .parse_category(&analyzed, "KeywordParameters")
             .unwrap();

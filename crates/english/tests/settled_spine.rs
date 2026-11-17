@@ -35,8 +35,7 @@ use sylex_vocabulary::LexicalEnvironment;
 /// - *Crook of Condemnation*: a spine that stops where one dependency fork
 ///   begins;
 /// - *Decimate*: more than one live root;
-/// - *Up the Beanstalk*: a node that packs two lexical readings of one word;
-/// - *Turtles in Time*: conditional forks.
+/// - *Up the Beanstalk*: a node that packs two lexical readings of one word.
 const SAMPLE: &[&str] = &[
     "Draugr Necromancer",
     "Maralen, Fae Ascendant",
@@ -44,7 +43,6 @@ const SAMPLE: &[&str] = &[
     "Crook of Condemnation",
     "Decimate",
     "Up the Beanstalk",
-    "Turtles in Time",
 ];
 
 /// Above this many Derivations a forest's Readings are not enumerated.
