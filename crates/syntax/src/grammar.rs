@@ -565,13 +565,16 @@ pub enum SchemaDecl {
         /// satisfies, beside ending in a dependent or being a coordination.
         #[serde(default)]
         shifted_object: Vec<Equation>,
-        /// Function Category of a Modifier postposed out of the Object past
-        /// the selected Preposition Phrase Complements after it, at the end
-        /// of the phrase (*put a number of counters [on it] [equal to …]*;
-        /// CGEL, Ch. 12 §4, p. 1066). It bears Modifier in the Object too,
-        /// and agrees with the Object in each feature they both carry.
+        /// Function Categories of Modifiers postposed out of the Object past
+        /// the selected Preposition Phrase Complements after it, or, when none
+        /// follow it, past a Predicate Preposition Phrase Adjunct, at the end
+        /// of the phrase (*put a number of counters [on it] [equal to …]*,
+        /// *choose a card [at random] [that …]*; CGEL, Ch. 12 §4, p. 1066),
+        /// each with equations over the phrase (`adjunct.ComplementKind =
+        /// AdjP`). Each bears Modifier in the Object too, and agrees with the
+        /// Object in each feature they both carry. Verbs only.
         #[serde(default)]
-        postposed: Option<Ident>,
+        postposed: Vec<(Ident, Vec<Equation>)>,
         /// A non-verbal head that declares a Frame realizes one of them in
         /// this phrase: only a head declaring none, or an Intransitive one,
         /// forms its bare phrase.

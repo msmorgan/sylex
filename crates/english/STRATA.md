@@ -164,10 +164,14 @@ spell*); *the turn* and *your turn* are ordinary Noun Phrases. A period noun
 with a deictic or distributive determinative is also an ordinary Noun Phrase
 (*skips that turn*, *the beginning of each end step*, *after this phase*), so
 *can't block this turn* has an Object Reading beside the Adjunct one, which
-semantics rejects. A postpositive Adjective Phrase with its own Complement may
+semantics rejects. A postpositive Adjective Phrase with its own Complement, a
+marked relative clause, or, past an `AdjP`-Complement Preposition Phrase
+Adjunct (*at random*), a bare relative clause or passive participial phrase may
 be postposed out of the Object past the verb's selected Preposition Phrase
-Complements (*put a number of counters on it equal to the result*), still the
-Object's Modifier, ranked behind the Adjective Phrase in place. A copular verb
+Complements or a Predicate Preposition Phrase Adjunct (*put a number of counters
+on it equal to the result*, *reveals a number of cards from their hand equal to
+…*, *choose a card at random that …*), still the Object's Modifier, ranked
+behind the Modifier in place. A copular verb
 takes a central adverb before its predicative Complement (*become no longer
 suspected*); a symbol sequence takes a postmodifier (*each {G}{G} spent to cast
 it*); a bracketed loyalty symbol is also a counted noun (*an additional [+1]*).

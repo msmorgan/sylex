@@ -20,6 +20,9 @@
 + Starting with the next opponent in turn order, each player chooses a creature you don't control. => PrepositionPhrase "in turn order"; NounPhrase "turn order"
 + <card=Skyship Weatherlight> {4}, {T}: Choose a card at random that was exiled with Skyship Weatherlight. Put that card into its owner's hand. => NounPhrase "a card" as Object of choose; PrepositionPhrase "at random" as Adjunct of choose; RelativeClause "that was exiled with Skyship Weatherlight" gap "card"
 + <card=Metzali, Tower of Triumph> {2}{W}, {T}: Choose a creature at random that attacked this turn. Destroy that creature. => NounPhrase "a creature" as Object of choose; RelativeClause "that attacked this turn" gap "creature"
++ <card=Illuminated Folio> {1}, {T}, Reveal two cards from your hand that share a color: Draw a card. => NounPhrase "two cards" as Object of reveal; PrepositionPhrase "from your hand" as Adjunct of reveal; RelativeClause "that share a color" gap "cards" || NounPhrase "two cards from your hand that share a color" as Object of reveal
+# from: Illusionary Mask
++ You may choose a creature card in your hand whose mana cost could be paid by the mana you spent on {X}. => NounPhrase "a creature card" as Object of choose; !NounPhrase "a creature card" as Object of may
 + Discard a card at random. => PrepositionPhrase "at random" as Adjunct of discard; readings 1
 + <card=Clay Champion> This creature enters with three +1/+1 counters on it for each {G}{G} spent to cast it. => NounPhrase "each {G}{G} spent to cast it" as Complement of for; Nominal "{G}{G} spent to cast it"; VerbPhrase "spent to cast it"
 # A token that is attacking or blocking, without tapped: the combat clause is a relative clause modifying the token NounPhrase

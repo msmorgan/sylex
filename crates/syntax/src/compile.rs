@@ -2529,6 +2529,11 @@ impl<'a> Binder<'a> {
                         "valence `{phrase}`: `closed_complement` on a non-preposition head"
                     )));
                 }
+                if !postposed.is_empty() && *head != LexicalCategory::Verb {
+                    return Err(invalid(format!(
+                        "valence `{phrase}`: `postposed` on a non-verb head"
+                    )));
+                }
                 let derivations = self.valence_derivations(schema)?;
                 let mut drafts = self.valence(
                     *head,
@@ -2566,7 +2571,6 @@ impl<'a> Binder<'a> {
                         clustered.extend(complement_clusters(draft, &categories));
                     }
                 }
-                let postposed = postposed.as_deref().map(|p| self.category(p)).transpose()?;
                 // A verb's interleaved Adjunct is a Predicate's; a noun's
                 // interleaved Modifier, before the Complement it selects, a
                 // Nominal's (CGEL, Ch. 5 §15, p. 454 [12]–[13]).
@@ -2581,9 +2585,7 @@ impl<'a> Binder<'a> {
                 };
                 let shifted = heavy_shift.then_some(shifted_object.as_slice());
                 let mut ordered = self.valence_order(drafts.clone(), interleaved, shifted, host)?;
-                if let Some(modifier) = postposed {
-                    ordered.extend(self.postposed_modifiers(&drafts, modifier));
-                }
+                ordered.extend(self.postposed_modifiers(phrase, &drafts, postposed)?);
                 // An Adjunct interleaves in a Complement Cluster as in the
                 // phrase (*deals [half X damage, rounded down, to any target],
                 // and [half X damage, rounded up, to you]*).
@@ -2703,27 +2705,75 @@ impl<'a> Binder<'a> {
     }
 
     /// The phrases of `drafts` with a Modifier of their Object postposed
-    /// after its selected Preposition Phrase Complements
+    /// after its selected Preposition Phrase Complements or, when none follow
+    /// it, after a Predicate Preposition Phrase Adjunct
     /// ([`postposed_modifier`]). The Modifier agrees with the Object in each
     /// feature they both carry, as a postposed relative clause does.
-    fn postposed_modifiers(&self, drafts: &[Draft], modifier: usize) -> Vec<Draft> {
-        let shared = &self.out.category_features[modifier];
-        drafts
-            .iter()
-            .filter_map(|d| postposed_modifier(d, modifier))
-            .map(|mut draft| {
-                let last = draft.children.len() - 1;
+    fn postposed_modifiers(
+        &self,
+        phrase: &str,
+        drafts: &[Draft],
+        postposed: &[(Ident, Vec<Equation>)],
+    ) -> Result<Vec<Draft>, LoadError> {
+        if postposed.is_empty() {
+            return Ok(Vec::new());
+        }
+        let np = self.slot_category(SlotKind::NP)?;
+        let pp = self.slot_category(SlotKind::PP)?;
+        let pp_unfit = self.unfit(pp)?;
+        let mut seen = BTreeSet::new();
+        let mut out = Vec::new();
+        for (modifier_name, equations) in postposed {
+            let modifier = self.category(modifier_name)?;
+            if !self.grammar.categories[modifier_name].function {
+                return Err(invalid(format!(
+                    "valence `{phrase}`: postposed `{modifier_name}` is not a function Category"
+                )));
+            }
+            if !seen.insert(modifier) {
+                return Err(invalid(format!(
+                    "valence `{phrase}`: duplicate postposed Category `{modifier_name}`"
+                )));
+            }
+            let shared = &self.out.category_features[modifier];
+            let mut applied = false;
+            for draft in drafts {
+                let Some(mut postposing) =
+                    postposed_modifier(draft, np, pp, &pp_unfit, modifier, modifier_name)
+                else {
+                    continue;
+                };
+                if !self.carries_paths(&postposing, equations).map_err(|e| {
+                    invalid(format!(
+                        "valence `{phrase}` postposed `{modifier_name}`: {e}"
+                    ))
+                })? {
+                    continue;
+                }
+                self.equations(&mut postposing, equations).map_err(|e| {
+                    invalid(format!(
+                        "valence `{phrase}` postposed `{modifier_name}`: {e}"
+                    ))
+                })?;
+                applied = true;
+                let last = postposing.children.len() - 1;
                 for &feature in shared {
-                    if self.carries(&draft.children[1].symbol, feature) {
-                        draft.equations.push((
+                    if self.carries(&postposing.children[1].symbol, feature) {
+                        postposing.equations.push((
                             Path::Child(1, feature),
                             Target::Path(Path::Child(last, feature)),
                         ));
                     }
                 }
-                draft
-            })
-            .collect()
+                out.push(postposing);
+            }
+            if !equations.is_empty() && !applied {
+                return Err(invalid(format!(
+                    "valence `{phrase}`: postposed `{modifier_name}` equations apply to no derived phrase"
+                )));
+            }
+        }
+        Ok(out)
     }
 
     /// Adds a Valence Schema's `agree` equations: each `(phrase, slot)`
@@ -4967,30 +5017,58 @@ impl Conjoin {
     }
 }
 
-/// An active phrase whose Object is followed only by selected Preposition
-/// Phrase Complements, with a Modifier of that Object postposed after them,
-/// a `modifier` of the `postposed` function Category (*put a number of
-/// counters [on it] [equal to …]*; CGEL, Ch. 12 §4, p. 1066). The Modifier
-/// would otherwise stand inside the Object, before the Complements it
-/// crosses; it is never interleaved.
-fn postposed_modifier(draft: &Draft, postposed: usize) -> Option<Draft> {
+/// An active phrase whose Noun Phrase Object is followed either only by
+/// selected Preposition Phrase Complements or by none (adding a Predicate
+/// Preposition Phrase Adjunct), with a Modifier of that Object postposed
+/// after them, a `modifier` of the `postposed` function Category (*put a
+/// number of counters [on it] [equal to …]*, *choose a card [at random]
+/// [that …]*; CGEL, Ch. 12 §4, p. 1066). The Modifier would otherwise stand
+/// inside the Object, before what it crosses; it is never interleaved.
+fn postposed_modifier(
+    draft: &Draft,
+    np: usize,
+    pp: usize,
+    pp_unfit: &[(SlotKind, usize, u16)],
+    postposed: usize,
+    modifier_name: &str,
+) -> Option<Draft> {
+    if draft.gap_slot.is_some() {
+        return None;
+    }
     let crossed = draft.children.get(2..)?;
     if draft.children[1].name != "object"
-        || crossed.is_empty()
-        || !crossed.iter().all(|c| {
-            matches!(
-                c.symbol,
-                Symbol::Cat {
-                    prepositions: Some(_),
-                    ..
-                }
-            )
-        })
+        || !matches!(draft.children[1].symbol, Symbol::Cat { category, .. } if category == np)
     {
         return None;
     }
     let mut postposing = draft.clone();
-    postposing.extend_id("postposed");
+    if crossed.is_empty() {
+        postposing.extend_id(&format!("postposed-adjunct/{modifier_name}"));
+        let adjunct = postposing.child(
+            "adjunct",
+            Symbol::Cat {
+                category: pp,
+                host: Some(HostKind::Predicate),
+                binding: None,
+                prepositions: None,
+            },
+            GapRule::Closed,
+        );
+        postposing.host_check = Some((0, adjunct, HostKind::Predicate));
+        postposing.adjunct_unfit = pp_unfit.to_vec();
+    } else if crossed.iter().all(|c| {
+        matches!(
+            c.symbol,
+            Symbol::Cat {
+                prepositions: Some(_),
+                ..
+            }
+        )
+    }) {
+        postposing.extend_id(&format!("postposed/{modifier_name}"));
+    } else {
+        return None;
+    }
     postposing.child(
         "modifier",
         Symbol::Cat {

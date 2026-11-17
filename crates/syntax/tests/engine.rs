@@ -530,6 +530,45 @@ fn cheapest_tier_counts_its_derivations_without_building_trees() {
     assert_eq!(grammar.parse(&lexicon, "See see.").cheapest_tier(), None);
 }
 
+/// One forest item packs prefixes that divide its text differently: `Extended`
+/// packs `(VerbPhrase "See the man", object "on the hill with the telescope")`
+/// and `(VerbPhrase "See the man on the hill", object "with the telescope")`
+/// into one item spanning `"See the man on the hill with the telescope"`, and
+/// the trailing `adjunct` (`"in the card"`) reads its own `head`'s words.
+#[test]
+fn forest_keys_follow_each_packed_prefix_s_own_division_of_the_text() {
+    let lexicon = lexicon();
+    let text = format!(
+        "{GRAMMAR}\n    \
+         Extended: VerbPhrase -> VerbPhrase object:PrepositionPhrase adjunct:PrepositionPhrase {{ cost: 5 }}\n"
+    );
+    let grammar = bind(&text, &lexicon).unwrap();
+    let parse = grammar.parse(
+        &lexicon,
+        "See the man on the hill with the telescope in the card.",
+    );
+    let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
+    let mut objects = std::collections::BTreeSet::new();
+    for (key, reading) in &ranked {
+        assert_eq!(grammar.ranking_key(reading, &lexicon), Ok(*key));
+        let (realized, constituents) = grammar.constituents(reading, &lexicon).unwrap();
+        for c in &constituents {
+            if c.category.as_str() == "PrepositionPhrase"
+                && c.function.is_some_and(|f| f.as_str() == "object")
+            {
+                objects.insert(realized[c.span.clone()].to_owned());
+            }
+        }
+    }
+    assert!(
+        objects.contains("on the hill with the telescope"),
+        "{objects:?}"
+    );
+    assert!(objects.contains("with the telescope"), "{objects:?}");
+    let (least, _) = parse.cheapest_tier().unwrap();
+    assert_eq!(least, ranked[0].0);
+}
+
 #[test]
 fn best_readings_do_not_enumerate_every_attachment() {
     let lexicon = lexicon();

@@ -490,9 +490,14 @@ category CentralAdjunct { function }
 // A relative clause before the Complement its noun selects (*Equip
 // abilities [you activate] [of other Equipment]*; CGEL 5§15:454).
 category InterleavedModifier [Number, NounKind] { function }
-// An Object's Modifier postposed past the Complements that follow it (CGEL
-// 12§4:1066), with the Case its Object agrees in.
-category PostposedModifier [Case] { function }
+// An Object's Modifier postposed past the Complements that follow it or a
+// Predicate Preposition Phrase Adjunct (CGEL 12§4:1066), with the Case and
+// Number its Object agrees in.
+category PostposedModifier [Case, Number] { function }
+// An unmarked relative or bare passive past-participial Modifier postposed
+// out of the Object past an AdjP-Complement Preposition Phrase Adjunct (*at
+// random*).
+category BarePostposedModifier : PostposedModifier [Number] { function }
 // The Modifier function after a nominal head: a relative clause or a
 // participial clause.
 category Postmodifier [Number, NounKind] { function }
@@ -3153,41 +3158,25 @@ AdverbialRelative: RelativeClause -> clause:SubjectInitialClause
 RelativeAdjunctGap: SubjectInitialClause -> SubjectInitialClause where $.Gap = Adjunct
 // Twin: RelativeAdjunctGap.
 AdjunctGap: AdjunctGapClause -> Clause where head.VerbForm = Finite, $.Gap = Adjunct
-// A marked relative postposed past a predicate adjunct (*Choose a card at
-// random that was exiled with ...*; CGEL 12§4:1066). It ranks behind the
-// relative clause in place.
-PostposedRelative: VerbPhrase ->
-    VerbPhrase object:ComplementNounPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
-    modifier:RelativeClause { cost: 5 }
-    where head.Gap = NP,
-          modifier.ClauseMarking = Relative,
-          object.Number = modifier.Number
+// A marked relative postposed out of its Object (*Choose a card at random
+// that was exiled with ...*; CGEL 12§4:1066). It ranks behind the relative
+// clause in place.
+PostposedRelative: PostposedModifier -> RelativeClause { cost: 5 }
+    where head.ClauseMarking = Relative
 // A bare relative postposed past *at random* (*choose a creature at random
 // this Aura can enchant*, Infectious Rage; Volatile Chimera).
-// `adjunct.ComplementKind = AdjP`: an admission gate (english.md §6) against a
-// relative postposed onto the Object past any other Preposition Phrase
-// (*Draw a card for each Human [you control]*, Mass Appeal).
-PostposedBareRelative: VerbPhrase ->
-    VerbPhrase object:ComplementNounPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
-    modifier:RelativeClause { cost: 2, heavy: [modifier] }
-    where head.Gap = NP,
-          adjunct.ComplementKind = AdjP,
-          modifier.ClauseMarking = Unmarked,
-          object.Number = modifier.Number
+PostposedBareRelative: BarePostposedModifier -> RelativeClause { cost: 2, heavy: [head] }
+    where head.ClauseMarking = Unmarked
 // *Choose a card at random exiled with ...* (Gorex, the Tombshell; Omenpath
 // Journey): a bare passive postposed past *at random*.
-// `adjunct.ComplementKind = AdjP`: PostposedBareRelative's gate.
-PostposedParticipialModifier: VerbPhrase ->
-    VerbPhrase object:ComplementNounPhrase adjunct:Hosted(PrepositionPhrase, Predicate)
-    modifier:VerbPhrase { cost: 2, heavy: [modifier] }
-    where head.Gap = NP,
-          adjunct.ComplementKind = AdjP,
-          modifier.VerbForm = PastParticiple,
-          modifier.Voice = Passive,
-          modifier.VerbKind != Auxiliary
+PostposedParticipialModifier: BarePostposedModifier -> VerbPhrase { cost: 2, heavy: [head] }
+    where head.VerbForm = PastParticiple,
+          head.Voice = Passive,
+          head.VerbKind != Auxiliary
 // An equative Adjective Phrase postposed out of its Object (*deals damage
-// to any target equal to …*). The Object is in plain case: never a personal
-// pronoun. It ranks behind the Adjective Phrase in place.
+// to any target equal to …*, *reveals a number of cards from their hand
+// equal to …*). The Object is in plain case: never a personal pronoun. It
+// ranks behind the Adjective Phrase in place.
 PostposedAdjective: PostposedModifier -> AdjectivePhrase { cost: 5, heavy: [head] }
     where head.ComplementKind = PP,
           head.Grade := Equative,
@@ -3328,7 +3317,14 @@ valence VerbPhrase {
     central_families: [Copular],
     heavy_shift,
     shifted_object: [object.Determination := Overt],
-    postposed: PostposedModifier,
+    // `adjunct.ComplementKind = AdjP`: an admission gate (english.md §6)
+    // against a bare relative or passive participle postposed onto the Object
+    // past any other Preposition Phrase (*Draw a card for each Human [you
+    // control]*, Mass Appeal).
+    postposed: [
+        PostposedModifier -> [],
+        BarePostposedModifier -> [adjunct.ComplementKind = AdjP],
+    ],
     clusters: {
         cluster: ComplementCluster,
         coordination: ClusterCoordination,

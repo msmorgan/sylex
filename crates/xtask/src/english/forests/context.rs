@@ -32,12 +32,12 @@ pub(crate) enum Context {
     /// relatives `FusedRelative` and `FusedSubjectRelative` (*whichever*).
     RelativeClause,
     /// The head of a `Postmodifier` Production (`ParticipialPostmodifier`,
-    /// `GerundParticipialPostmodifier`), the `filler` of one
+    /// `GerundParticipialPostmodifier`) or a `PostposedModifier` one
+    /// (`PostposedParticipialModifier`), the `filler` of a `Postmodifier`
     /// (`PastParticipialConjunct`, `GerundParticipialConjunct`, whose
     /// `PostmodifierConjunct` Category is a `Postmodifier`), or a verb phrase
     /// that is a `modifier` (`SingleParticipialPostmodifier`,
-    /// `SingleGerundParticipialPostmodifier`, `FusedParticipialPostmodifier`,
-    /// `PostposedParticipialModifier`).
+    /// `SingleGerundParticipialPostmodifier`, `FusedParticipialPostmodifier`).
     ParticipialPostmodifier,
     /// Anything else, as the clause of *if*, *unless* or *as long as*, a cost,
     /// or a catenative such as *choose to*.
@@ -73,6 +73,7 @@ impl<'a> Reader<'a> {
             "PrepositionPhrase",
             "RelativeClause",
             "Postmodifier",
+            "PostposedModifier",
             "VerbPhrase",
         ] {
             assert!(
@@ -166,8 +167,10 @@ impl<'a> Reader<'a> {
             )
         {
             Context::RelativeClause
-        } else if self.category(step.projection) == "Postmodifier"
-            || self.category(step.governor) == "Postmodifier"
+        } else if matches!(
+            self.category(step.projection),
+            "Postmodifier" | "PostposedModifier"
+        ) || self.category(step.governor) == "Postmodifier"
             || (function == "modifier" && self.category(step.projection) == "VerbPhrase")
         {
             Context::ParticipialPostmodifier
