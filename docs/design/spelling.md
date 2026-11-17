@@ -128,13 +128,16 @@ has, or a Template holds the word in its one fixed fragment:
   `nominal(pre = [], head, post = [])`, each list in its own list Hole (§3.1) on its own side of
   the head's Hole (`"<$pre#<> >$head< $post#<>>"`). In "other nonland permanents you control"
   (*Abdel Adrian, Gorion's Ward*), "other" and "nonland" are premodifiers and "you control" a
-  postmodifier. A `nominal` call with neither modifier list, or with another `nominal` directly as
-  its `head`, is refused so each nominal has one tree; a coordinated head is allowed, as "target
+  postmodifier. A `nominal` call with neither modifier list is refused, and so is a `nominal` whose
+  `head` is another `nominal` once Templates and their arguments are expanded, whether written
+  there, reached through a Template's body or passed through a Template's parameter, so each
+  nominal has one tree; a coordinated head is allowed, as "target
   white creature or black Zombie you control" writes
   `nominal(or([nominal(pre = [white], creature), nominal(pre = [black], zombie)]), post =
   [youControl])`. Inside a `PreModifier` coordination, a stacked arm of two or more premodifiers is
   `stacked([…])` (`"$modifiers#<>"`, *Acclaimed Contender*'s "Knight, Aura, Equipment, or legendary
-  artifact card"), refused outside such an arm or with fewer than two elements. An Agreement phrase
+  artifact card"), refused with fewer than two elements, and refused, as is any `PreModifier`
+  `and` coordination, outside an item of an "or" or "and/or" coordination. An Agreement phrase
   printed among postmodifiers (`withDifferentNames`, `withTheSameName`) stands in `post` in its
   printed place (*Eerie Ultimatum*'s "permanent cards with different names from your graveyard") and
   is refused when its enclosing consumer forms no plural group. Where one construction prints its
