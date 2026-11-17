@@ -1,8 +1,8 @@
-# A slash measure is a Noun Phrase only where a head selects one (*gets +2/+2*, *your choice of 5/1 or 1/5*), a noun only under a determiner, a size before a noun, or a predicative; never a general Object, Manner Adjunct or attributive noun's head
+# A slash measure is a MeasureNounPhrase only where a head selects one (*gets +2/+2*, *gets an additional +2/+2*, *your choice of 5/1 or 1/5*), a size before a noun, or a predicative; never a general Object, Manner Adjunct or nominal head
 + Target creature gets +2/+2 until end of turn. => NounPhrase "+2/+2" as Object of get; readings 1
 + <card=Nuclear Fallout> Each creature gets twice -X/-X until end of turn. => NounPhrase "twice -X/-X" as Object of get; AdverbPhrase "twice" head twice; readings 1
 + <card=Aspect of Wolf> Enchanted creature gets +X/+Y, where X is half the number of Forests you control, rounded down, and Y is half the number of Forests you control, rounded up. => NounPhrase "+X/+Y" as Object of get
-+ <card=Aquamorph Entity> As this creature enters or is turned face up, it becomes your choice of 5/1 or 1/5. => NounPhrase "5/1 or 1/5" as Complement of of
++ <card=Aquamorph Entity> As this creature enters or is turned face up, it becomes your choice of 5/1 or 1/5. => NounPhrase "5/1 or 1/5" as Complement of of; readings 1
 + <card=Mindlink Mech> Whenever this Vehicle becomes crewed for the first time each turn, until end of turn, this Vehicle becomes a copy of target nonlegendary creature that crewed it this turn, except it's 4/3, it's a Vehicle artifact in addition to its other types, and it has flying. => Predicative "4/3" as PredicativeComplement of be
 + <card=Endless Evil> At the beginning of your upkeep, create a token that's a copy of enchanted creature, except the token is 1/1. => Predicative "1/1" as PredicativeComplement of be
 + <card=Mirkwood Meditator> Landfall — Whenever a land you control enters, you may have this creature's base power and toughness become 4/2 until end of turn. => Predicative "4/2" as PredicativeComplement of become

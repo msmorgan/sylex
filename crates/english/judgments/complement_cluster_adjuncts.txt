@@ -8,9 +8,8 @@
 # The Clusters are parallel in function, not in category: a keyword phrase
 # and a quoted ability are each the Object of *have*.
 + This creature has trample as long as you control a Beast, haste as long as you control a Goblin, first strike as long as you control a Soldier, flying as long as you control a Wizard, and "{B}: Regenerate this creature" as long as you control a Zombie. => ComplementCluster "trample as long as you control a Beast"; ComplementCluster "\"{B}: Regenerate this creature\" as long as you control a Zombie"; QuotedAbility "\"{B}: Regenerate this creature\"" as Object of have; PredicateAdjunct "as long as you control a Zombie" as Adjunct of have; KeywordPhrase "haste" as Object of have
-# Gapped *get* over two Object + Adjunct Clusters, beside the attachment of the
-# second measure inside the first *for each* phrase.
-+ This creature and enchanted creature each get +1/+1 for each creature you control and +1/+1 for each Aura you control. => ComplementCluster "+1/+1 for each creature you control"; ComplementCluster "+1/+1 for each Aura you control"; PredicateAdjunct "for each Aura you control" as Adjunct of get || PrepositionPhrase "for each creature you control and +1/+1"
+# Gapped *get* over two Object + Adjunct Clusters.
++ This creature and enchanted creature each get +1/+1 for each creature you control and +1/+1 for each Aura you control. => ComplementCluster "+1/+1 for each creature you control"; ComplementCluster "+1/+1 for each Aura you control"; PredicateAdjunct "for each Aura you control" as Adjunct of get; readings 1
 # A Cluster may end in an Adjunct that its parallel Clusters lack, and each
 # Cluster may end in its own.
 # from: Ransack

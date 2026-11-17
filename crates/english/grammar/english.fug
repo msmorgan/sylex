@@ -145,8 +145,9 @@ feature CentralPosition = Occupied
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
-// A slash measure as the fused head of its nominal (*a 3/3*).
-feature MeasureHead = Fused
+// A slash measure with `+` or `-` signs (*+2/+0*, *-1/-1*), as opposed to an
+// unsigned power/toughness (*2/2*).
+feature Adjustment = Signed
 // A Determiner Phrase headed by `TargetingMarker` (*two target*, *up to one
 // other target*), which determines a nominal and never nests inside another
 // determiner, quantity or partitive.
@@ -193,7 +194,7 @@ category Name [Number]
 // (`docs/design/lexicon.md` §6).
 category NameComplement
 category Condition
-category Measure
+category Measure [Adjustment]
 category Symbols
 // An Arabic numeral named as a noun, without the numeral's Number.
 category NumeralName
@@ -259,10 +260,13 @@ category SymbolHead : NounPhrase [Number, Person, Case, Determination, NounKind,
 category PartitiveHead : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
 ] { gap }
-// A slash measure as a Noun Phrase (*gets +2/+2*), only where a head
-// selects one or beside keyword phrases naming counter kinds; never a
-// general Object.
+// A slash measure as a Noun Phrase (*gets +2/+2*, *gets an additional
+// +2/+2*), only where a head selects one or beside keyword phrases naming
+// counter kinds; never a general Object.
 category MeasureNounPhrase : NounPhrase
+// A signed slash adjustment under an attributive premodifier (*additional
+// +2/+2*), determined into MeasureNounPhrase.
+category ModifiedAdjustment [Determination]
 // A compound locative determinative, which a Preposition Phrase may
 // postmodify (*anywhere else*).
 category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKind, Countability]
@@ -288,7 +292,7 @@ category ComplementNounPhrase : NounPhrase [
 // Complement's.
 category Nominal [
     Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead, KindLicense,
+    ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, Determination, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
@@ -306,7 +310,7 @@ category RelativeTemporalNominal : Nominal [
 ]
 category BareNominal : Nominal [
     Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueNounKind, MeasureHead, KindLicense,
+    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense,
 ] { gap }
 // The singular count nominals that share a determiner before the
 // final, determined conjunct of a SharedDeterminerCoordination.
@@ -509,7 +513,7 @@ category BoundKeyword [KeywordForm, FinalParameter]
 // QuantityNumber agrees with a counted noun (*two cards*); as a Noun Phrase
 // an Amount is singular (*X can't be 0*).
 category Amount [QuantityNumber, Sign, ComplementKind]
-category SignedAmount
+category SignedAmount [Adjustment]
 category Cost
 category FiniteClause : Clause
 // A temporal preposition's Clause, whose time its Preposition Phrase takes
@@ -850,8 +854,8 @@ AdverbModifiedAmount: Amount -> modifier:AdverbPhrase Amount
 // A sign is spoken, *plus* or *minus* (*a +1/+1 counter*), so its mark is
 // a word to Adjacency Agreement; a range's dash (`RangeHeader`) is not.
 UnsignedMeasureAmount: SignedAmount -> Amount where head.Sign != Negative
-PositiveMeasureAmount: SignedAmount -> '+':Prefix:Spoken Amount
-NegativeMeasureAmount: SignedAmount -> '-':Prefix:Spoken Amount
+PositiveMeasureAmount: SignedAmount -> '+':Prefix:Spoken Amount where $.Adjustment = Signed
+NegativeMeasureAmount: SignedAmount -> '-':Prefix:Spoken Amount where $.Adjustment = Signed
 
 BoundKeywordItem: KeywordParameters -> BoundKeyword
 // A comparative bound on a number is no Noun Phrase: predicated, it
@@ -998,6 +1002,8 @@ NamedParameter: Name -> Lex(Catalog) where head.KindLicense != Kind
 NameAsComplement: NameComplement -> Name { cost: 0 }
 OtherCardNameComplement: NameComplement -> OtherCardName()
 SlashMeasure: Measure -> first:SignedAmount '/':Bound second:SignedAmount
+    where first.Adjustment = second.Adjustment,
+          $.Adjustment = first.Adjustment
 MeasureHeader: Header -> Measure
 RangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '-':Bound upper:Amount
 OpenRangeHeader: Header -> marker:Class(RangeMarker) lower:Amount '+'
@@ -1298,21 +1304,29 @@ KindName: Kind -> Lex(Catalog)
 PawprintPremodifier: BareNominal -> modifier:Pawprints BareNominal
 // *its {1}{G} kicker*.
 SymbolPremodifier: BareNominal -> modifier:Symbols BareNominal
-// A slash measure is a noun only under a determiner (*an additional
-// +2/+2*); bare, it is a MeasureNounPhrase. A fused head (*a 3/3*
-// [creature]), so never coordinated with a final *counter* Conjunct, an
-// admission gate (english.md §6): it keeps *[a +2/+0], [+1/+1], or [+0/+2
-// counter]* from beside the coordination of the counter's kinds *a [+2/+0,
-// +1/+1, or +0/+2] counter* (Frankenstein's Monster) while admitting *a
-// 2/2 or 3/3* and *a white 2/2 and blue 3/3*.
-MeasureNominal: BareNominal -> Measure
-    where $.MeasureHead = Fused,
-          $.Determination = Overt,
-          $.Number = Singular,
-          $.Countability = Count,
-          $.NounKind = Ordinary,
-          $.NounDistribution = Ordinary
+// A bare slash measure (*gets +2/+2*, *your choice of 5/1 or 1/5*) or a
+// determined, premodified signed adjustment (*gets an additional +2/+2*,
+// Akawalli, the Seething Tower) is a MeasureNounPhrase, admitted only where
+// a head selects one; an unsigned size (*2/2*) is no determined Noun Phrase
+// (*Create [X 2/2]*, Germinate Recruits).
 MeasureNounPhrase: MeasureNounPhrase -> Measure
+PremodifiedAdjustment: ModifiedAdjustment -> modifier:AdjectivePhrase Measure { transparent: [head] }
+    where head.Adjustment := Signed,
+          modifier.ComplementKind = Intransitive,
+          modifier.Determination = $.Determination,
+          modifier.AdjectivePosition != Predicative
+StackedAdjustmentPremodifier: ModifiedAdjustment ->
+    modifier:AdjectivePhrase ModifiedAdjustment { transparent: [head] }
+    where modifier.ComplementKind = Intransitive,
+          modifier.Determination = $.Determination,
+          modifier.AdjectivePosition != Predicative
+DeterminedAdjustment: MeasureNounPhrase -> determiner:DeterminerPhrase ModifiedAdjustment {
+    transparent: [head],
+}
+    where determiner.DeterminativeDistribution != Independent | FreeChoice,
+          determiner.ComplementKind != PP,
+          determiner.Countability = Count,
+          determiner.Number = Singular
 // *Gets twice -X/-X*.
 AdverbModifiedMeasure: MeasureNounPhrase -> modifier:AdverbPhrase MeasureNounPhrase
     where modifier.AdjunctPosition = Phrasal
@@ -3761,19 +3775,17 @@ coordination NounPhrase {
           last.NounKind != Quantity
 coordination Nominal {
     coordinators: And,
-    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead],
+    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber],
     proximate: [NounDistribution, KindLicense],
 }
-    where !(first.MeasureHead = Fused & last.KindLicense = Head),
-          $.Number = Plural,
+    where $.Number = Plural,
           $.ConjunctNumber = first.Number
 coordination Nominal {
     coordinators: Disjunctive,
-    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead],
+    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber],
     proximate: [NounDistribution, KindLicense],
 }
-    where !(first.MeasureHead = Fused & last.KindLicense = Head),
-          $.ConjunctNumber = $.Number
+    where $.ConjunctNumber = $.Number
 coordination GenitiveNominals {
     coordinators: Coordinator,
     proximate: [Number, Countability, NounKind],
