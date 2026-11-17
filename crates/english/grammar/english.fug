@@ -150,10 +150,10 @@ feature QualityHead = Fused
 feature QuantityKind = Degree
 // A slash measure as the fused head of its nominal (*a 3/3*).
 feature MeasureHead = Fused
-// A license feature (english.md §3), which the counter catalog declares: a
-// counter's kind name (*charge*, *time*), which stands only as the kind of
-// the noun *counter*, and *counter*, the one noun a kind premodifies
-// [CR#122.1].
+// A license feature (english.md §3), which the counter catalog declares:
+// `Kind` on a counter's kind name (*charge*, *time*), which stands only as
+// the kind of the noun *counter*, and on a keyword a keyword counter can be
+// [CR#122.1b]; `Head` on *counter*, the one noun a kind premodifies.
 feature KindLicense = Kind | Head
 feature Inflection =
     | Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis
@@ -499,9 +499,9 @@ category Postmodifier [Number, NounKind] { function }
 category RelativeNounPhrase : NounPhrase [Number]
 // A preposition and its relative pronoun, fronted (*for which*).
 category RelativePrepositionPhrase : PrepositionPhrase
-category KeywordPhrase [KeywordForm, FinalParameter]
+category KeywordPhrase [KeywordForm, FinalParameter, KindLicense]
 category KeywordLineItem [KeywordForm, FinalParameter]
-category KeywordParameters [KeywordForm, FinalParameter]
+category KeywordParameters [KeywordForm, FinalParameter, KindLicense]
 category BoundKeyword [KeywordForm, FinalParameter]
 // QuantityNumber agrees with a counted noun (*two cards*); as a Noun Phrase
 // an Amount is singular (*X can't be 0*).
@@ -766,7 +766,10 @@ IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal where head.Number = Si
 // cost*), never with them (*[protection from each of the exiled card's]
 // card types*, Mirror Golem). `=`, so a keyword coordination, which leaves
 // KeywordForm unvalued, passes (*an eternalize or embalm ability*). Before
-// *counter*, a keyword is the counter's kind (KindPremodifier).
+// *counter*, a keyword is the counter's kind (KindPremodifier): an admission
+// gate (english.md §3, §6) that keeps a second tree, the keyword as a
+// general keyword premodifier of *counter*, off *Put a double strike
+// counter on Mai* (Mai, Jaded Edge).
 KeywordPremodifier: BareNominal -> modifier:KeywordPhrase BareNominal
     where modifier.KeywordForm = Bare,
           head.KindLicense != Head
@@ -978,6 +981,9 @@ NominalPhraseQuality: Quality -> NounPhrase
 // *protection from snow*, [CR#205.4a]). Never a color word, whose noun
 // conversion is the Quality (*protection from red*; one tree, english.md §8).
 AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
+// A counter's kind name names nothing: an admission gate (english.md §3,
+// §6) that keeps the kind name *dread* from a Name Complement of *manifest*
+// in *Manifest dread* (Under the Skin).
 NamedParameter: Name -> Lex(Catalog) where head.KindLicense != Kind
 NameAsComplement: NameComplement -> Name { cost: 0 }
 OtherCardNameComplement: NameComplement -> OtherCardName()
@@ -1267,19 +1273,32 @@ HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
 // suspected*.
 CentralAdverbAdjunct: CentralAdjunct -> AdverbPhrase { cost: 0 } where head.AdjunctPosition = Central
 
-// Before *counter*, a measure is the counter's kind (KindPremodifier).
+// Before *counter*, a measure is the counter's kind (KindPremodifier): an
+// admission gate (english.md §3, §6), which keeps a second tree, the
+// measure as a general measure premodifier of *counter*, off *Put a +1/+1
+// counter on each of up to two target creatures* (Travel Preparations).
 MeasurePremodifier: BareNominal -> modifier:Measure BareNominal
     where head.KindLicense != Head
-// A counter's kind premodifies the noun *counter* [CR#122.1]: a slash
-// measure for a +X/+Y counter [CR#122.1a], a keyword for a keyword counter
-// [CR#122.1b], or a kind name. A keyword kind is bare, as a
-// KeywordPremodifier is, and one keyword (`:=`): keywords coordinate as
-// kinds, so a list of kinds is one coordination whatever its kinds are.
+// A counter's kind premodifies the noun *counter*: a slash measure for a
+// +X/+Y counter [CR#122.1a], a keyword for a keyword counter [CR#122.1b], or
+// a kind name. Only *counter* takes it (`:= Head`), an admission gate
+// (english.md §3, §6) that keeps the kind name *treasure* from premodifying
+// *token* beside the subtype in *Create a Treasure token* (Craft with Pride).
 KindPremodifier: BareNominal -> modifier:Kind BareNominal
     where head.KindLicense := Head
 MeasureKind: Kind -> Measure
-KeywordKind: Kind -> KeywordPhrase where head.KeywordForm := Bare
-KindName: Kind -> Lex(Catalog) where head.KindLicense := Kind
+// A keyword kind is one bare keyword a keyword counter can be [CR#122.1b].
+// Two admission gates (english.md §3, §6): `KindLicense := Kind` keeps
+// *fuse*, a keyword no keyword counter is, from a second kind beside the
+// kind name in *Put a fuse counter on target creature* (Bomb Squad), and
+// `KeywordForm := Bare`, which a keyword coordination leaves unvalued, keeps
+// *[reach, menace, trample, or haste]* from one kind beside the coordination
+// of four kinds (Owen Grady, Raptor Trainer).
+KeywordKind: Kind -> KeywordPhrase
+    where head.KeywordForm := Bare,
+          head.KindLicense := Kind
+// *A charge counter*.
+KindName: Kind -> Lex(Catalog)
 // *five {P} worth of modes*.
 PawprintPremodifier: BareNominal -> modifier:Pawprints BareNominal
 // *its {1}{G} kicker*.
@@ -2046,11 +2065,15 @@ FrequencyAdverbArithmetic: AdverbPhrase ->
           modifier.NounKind = Temporal
 // Its operand is never QuantityPartitiveOfEach's *one of each*, which would
 // strand the *of* phrase after *each* (*[that many plus one of each] [of
-// those kinds of counters]*, Winding Constrictor).
+// those kinds of counters]*, Winding Constrictor). It adds a number, so its
+// operand is a quantity (*one*), never an ordinary Noun Phrase: an admission
+// gate (english.md §6) that keeps *[that many plus [one +1/+1]] counters*,
+// a fused measure noun as the operand, off Hardened Scales.
 DegreeArithmetic: DeterminerPhrase ->
     DeterminerPhrase modifier:Selected(PrepositionPhrase, Plus, Minus) { heavy: [head] }
     where head.ComplementKind = Intransitive,
-          modifier.DeterminativeDistribution != Distributive
+          modifier.DeterminativeDistribution != Distributive,
+          modifier.NounKind != Ordinary | Temporal | Manner
 // *Half their life*, *double that damage*. A head determined by a number or
 // degree determinative is excluded: *half X damage* (Banshee) is
 // MultipliedNumber's *[half X] damage*, and *half that many +1/+1 counters*
@@ -2449,7 +2472,10 @@ AttributeSequence: AttributeChain -> first:Attribute ',' rest:AttributeChain
     where first.Polarity := Negative
 FinalAttribute: AttributeChain -> last:Attribute where last.Polarity := Negative
 AttributedNominal: BareNominal -> modifier:Attributes BareNominal
-// *Counter* takes no noun premodifier but its kind (KindLicense).
+// *Counter* takes no noun premodifier but its kind: an admission gate
+// (english.md §3, §6) that keeps the noun *loyalty* from premodifying
+// *counter* beside the kind name in *Put a loyalty counter on target Gideon
+// planeswalker* (Gideon's Company).
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
     where head.Determination != Overt,
           head.KindLicense != Head

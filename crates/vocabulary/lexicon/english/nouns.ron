@@ -27,7 +27,9 @@
     "characteristic",
     // The event of the keyword action [CR#701.30]: *Whenever you win a clash*.
     "clash",
-    (lemma: "choice", frames: [Complement(PP(["of"]))]),
+    // *your choice of a flying counter or a first strike counter*; *your
+    // choice of 5/1 or 1/5*.
+    (lemma: "choice", frames: [Complement(PP(["of"])), Complement(PPWith(["of"], MeasureNP))]),
     "coin",
     "color",
     // "until end of combat" (mass); "attacks each combat" (count).

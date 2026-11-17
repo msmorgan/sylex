@@ -573,15 +573,10 @@ impl Sources {
     /// a +X/+Y counter [CR#122.1a], a keyword for a keyword counter
     /// [CR#122.1b], and any other kind its kind name, a word of its own (*a
     /// charge counter*). A kind name stands only there: it is a catalog word,
-    /// never a noun, and it and *counter*, the one noun that takes it, carry
-    /// the license feature `KindLicense` (`docs/design/english.md`
-    /// §3).
+    /// never a noun. The kind names, the keywords a keyword counter can be
+    /// and *counter*, the one noun that takes a kind, carry the license
+    /// feature `KindLicense` (`docs/design/english.md` §3).
     fn counter_kinds(&self, builder: &mut Builder) -> Result<(), SourceError> {
-        let keywords: std::collections::BTreeSet<&str> = self
-            .keyword_abilities
-            .iter()
-            .map(|ability| ability.lemma.as_str())
-            .collect();
         let keyword_counters = schema::Rule::try_from("[CR#122.1b]".to_owned())
             .expect("a bracketed CR citation is a rule");
         for counter in &self.counters {
@@ -590,11 +585,20 @@ impl Sources {
                 continue;
             }
             if counter.rule.as_ref() == Some(&keyword_counters) {
-                if !keywords.contains(kind) {
-                    return Err(SourceError::Invalid(format!(
-                        "keyword counter `{kind}` names no declared keyword ability"
-                    )));
-                }
+                let id = format!("keyword:{kind}");
+                let keyword = builder
+                    .lexemes
+                    .iter_mut()
+                    .find(|lexeme| lexeme.id.as_str() == id)
+                    .ok_or_else(|| {
+                        SourceError::Invalid(format!(
+                            "keyword counter `{kind}` names no declared keyword ability"
+                        ))
+                    })?;
+                keyword
+                    .properties
+                    .features
+                    .insert(KIND_LICENSE.into(), Ident::new("Kind"));
                 continue;
             }
             let id = format!("counter:{kind}");

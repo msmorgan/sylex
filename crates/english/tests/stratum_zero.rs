@@ -37,11 +37,18 @@ fn keyword(lemma: &str, capitalization: SurfaceCase) -> Reading {
         features: FeatureBundle::default(),
         capitalization,
     }));
-    let parameters = node(
+    let mut parameters = node(
         &format!("Parameters:KeywordParameters/keyword:{lemma}/0"),
         "KeywordParameters",
         vec![leaf],
     );
+    // Both keywords this file builds, *flying* and *vigilance*, are keywords a
+    // keyword counter can be [CR#122.1b], which the counter catalog licenses
+    // as a counter's kind (`KindLicense`).
+    let Reading::Node(phrase) = &mut parameters else {
+        unreachable!("`node` builds a node")
+    };
+    phrase.features.insert("KindLicense".into(), "Kind".into());
     node("CompleteKeywordItem", "KeywordLineItem", vec![parameters])
 }
 
