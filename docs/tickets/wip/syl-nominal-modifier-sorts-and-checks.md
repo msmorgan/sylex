@@ -35,9 +35,10 @@ does not give it, or spell words no caller prints:
 plural group by matching constructor names and falling through catch-all arms, so
 `targets(upToOf(1), nominal(creature, post = [withDifferentNames]))` is accepted.
 `check_nominal_call` returns without an error when a resolution is missing, `elaborate` skips a
-declaration's whole Agreement check through its `?`s, and `forEach` and `stacked` are recognized
-by Template name. The one-tree refusal sees only a literal nested `nominal`, so *Saga*'s
-`nominal(chapterAbilityOf(thisSaga), post = [triggeredNotLeftStack])` has two trees.
+declaration's whole Agreement check through its `?`s, `forEach` and `stacked` are recognized by
+Template name, and a Definition's body is never checked with its callers' arguments. The one-tree
+refusal sees only a literal nested `nominal`, so *Saga*'s `nominal(chapterAbilityOf(thisSaga),
+post = [triggeredNotLeftStack])` has two trees.
 
 `docs/evidence/syl-nominal-descriptions/number-snapshot-diff.txt` lists 47 flagged lines that
 nothing explains.
@@ -54,17 +55,22 @@ nothing explains.
   `the` takes, and `plural` is to `a` what `thePlural` is to `the`, distinct from the universal
   `bare`.
 - "Can't be enchanted / equipped / fortified [by …]" is `cantBeAttached(host, word, by)`, a
-  standing limit on what the host can be enchanted, equipped or fortified by [CR#303.4]. Host
-  legality is one relation: a `mayBeAttachedTo` permission less any `cantBeAttached` limit, read
-  by `legalHostOf`, `legalAttachment`, `isAttached`, entry, attaching and the state-based actions
-  (`semantics.md` §3.3). Protection's enchant and equip/fortify clauses use it
-  [CR#702.16c,702.16d].
+  standing limit on what the host can be enchanted by [CR#303.4], or equipped or fortified by
+  [CR#702.16d]. Host legality is one relation: a `mayBeAttachedTo` permission less any
+  `cantBeAttached` limit, read by `legalHostOf`, `legalAttachment`, `legallyAttached`, entry,
+  attaching and the attachment state-based actions (`semantics.md` §3.3). Protection's enchant and
+  equip/fortify clauses use it [CR#702.16c,702.16d].
 - "Its <abilities>" is `possessive(owner, p)` over a `possessive(owner)` determiner, which takes
   every member that belongs to its owner, an ability belonging to its source [CR#113.7].
-- `forEach` and `countOf` expand to one tree, so the Agreement check treats them alike.
+- A chapter ability is the `AbilityClass` `chapter` [CR#715.2], so *Saga* and read ahead write
+  "chapter ability of …" as one nominal.
+- `forEach` and `countOf` expand to one tree, so the Agreement check treats them alike. An
+  aggregate, a superlative or a comparison ranges over its whole domain, as "all" does, so its
+  domain forms a group for Agreement.
 - `dsl check` runs the nominal rules only on bundles every earlier rule accepted, on terms with
-  every Template expanded; a determiner, plurality, slice count, quantity or coordinator it does
-  not classify is refused by name.
+  every Template expanded and every Definition's body checked with each call's arguments; a
+  determiner, plurality, slice count, quantity or coordinator it does not classify is refused by
+  name.
 
 ## Done when
 
@@ -73,18 +79,23 @@ nothing explains.
 - *Battlegate Mimic*, *Fry*, *Crippling Fear*, *Benevolent Blessing* and the Vintage-legal
   *Glistening Deluge* write their copular relatives through `thatIs`; `thatIsBoth` and
   `postModifier/hasColor` are gone, and every new declaration has a canon caller.
-- No `Predicative` spells a clause: `predicative/youControl` is gone, `predicative/controlledBy`
-  spells "controlled by $who", and its callers write `controls` or the participle.
+- No `Predicative` spells a clause other than `did` ("that $subj $action"), which
+  `syl-lookback-operator-and-holds` owns: `predicative/youControl` is gone,
+  `predicative/controlledBy` spells "controlled by $who", and its callers write `controls` or the
+  participle. `predicative/was` spells a participle ("cast from your hand"), not a clause.
 - *Gaea's Revenge*, `protection` and `hexproofFrom` print "from" through `fromSource`; `abilityOf`
-  is gone; *Arrest*, *Demotion*, *Viper's Kiss*, `haste` and `creature` write `possessive`; every
-  remaining `ofSource` caller prints "of".
+  is gone; *Arrest*, *Demotion*, *Viper's Kiss*, *Power Artifact*, *Stupefying Touch*, *Ghostfire
+  Blade*, `detain`, `haste` and `creature` write `possessive`; every remaining `ofSource` caller
+  prints "of"; *Saga* and read ahead write `abilityHead(chapter)`, and `chapterAbilityOf` is
+  gone.
 - *Tithe Taker* and *Suppression Field* write `costShift(…, unless = is(them, noun(plural(…))))`;
   *Pithing Needle* and *Damping Matrix* write `plural`; *Guardian Beast* and `protection` write
-  `cantBeAttached`.
+  `cantBeAttached`; the Aura, Equipment and Fortification state-based actions test
+  `legallyAttached`.
 - `nominal.rs` classifies every determiner, plurality, slice-count, quantity and coordinator form
   by an exhaustive match or refuses it by name, with no `?`, early return or Template name test; a
   test covers each form, `upToOf(1)` among them; a nominal reached through a Template's body or
-  parameter in `nominal.head` is refused.
+  parameter in `nominal.head` is refused; a Definition's body is checked at each call.
 - Every flagged line of `number-snapshot-diff.txt` is explained in
   `docs/evidence/syl-nominal-descriptions/summary.md`; none is a lost referent.
 - The `preModifier/` status and designation Templates, `non`, `or`, `andOr` and each
@@ -107,6 +118,8 @@ nothing explains.
   `syl-become-replaces-types`, `syl-damage-and-life-noun-phrases`. "Already":
   `syl-already-attached`.
 - Retyping the `Predicate` consumers (`enchant`, spend purposes, keyword qualities) to `Nominal`.
+- The Predicative `did`, which spells a relative clause after the copula until lookbacks are one
+  operator: `syl-lookback-operator-and-holds`.
 
 ## Pointers
 
