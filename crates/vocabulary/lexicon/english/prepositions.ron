@@ -309,10 +309,13 @@
         (complement: Gerund, hosts: Predicate),
     ]),
     // An Absolute Clause Complement, a Subject and its predicate (*play with
-    // your hand revealed*), is an Adjunct of a clause or a Modifier in a Noun
-    // Phrase, never a selected Complement (CGEL, Ch. 14 §10(a), p. 1267).
+    // your hand revealed*), is an Adjunct of a predicate, never a selected
+    // Complement (CGEL, Ch. 14 §8.3, p. 1262; §10(a), p. 1267). Where *with*
+    // modifies a Nominal (*creature with another Aura attached to it*,
+    // Daybreak Coronet), its Noun Phrase Complement carries the participial
+    // postmodifier instead.
     (lemma: "with", frames: [
-        (complement: AbsoluteClause, hosts: NominalAndPredicate),
+        (complement: AbsoluteClause, hosts: Predicate),
         // A keyword after *with* is a Modifier of a Nominal, and an Adjunct
         // of a predicate only coordinated with a *with*-phrase that is one
         // on its own (*enters with flying and with X +1/+1 counters on it*;
@@ -327,7 +330,7 @@
     // *each creature without a +1/+1 counter on it*; *creatures without
     // flying*; *cast it without paying its mana cost*
     (lemma: "without", frames: [
-        (complement: AbsoluteClause, hosts: NominalAndPredicate),
+        (complement: AbsoluteClause, hosts: Predicate),
         (complement: NP, hosts: Nominal),
         (complement: KeywordPhrase, hosts: Nominal),
         (complement: Gerund, hosts: Predicate),

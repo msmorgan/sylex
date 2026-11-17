@@ -12,4 +12,6 @@
 + Players play with their hands revealed. => PrepositionPhrase "with their hands revealed" as Adjunct of play
 + It enters with a +1/+1 counter on it.
 + <card=Play with Fire> Play with Fire deals 2 damage to any target. => NounPhrase "Play with Fire" as Subject of deal
++ <card=Cemetery Prowler> Spells you cast cost {1} less to cast for each card type they share with cards exiled with this creature. => VerbPhrase "exiled with this creature" as Modifier of card; !Clause "cards exiled with this creature"
++ <card=Protective Sphere> {1}, Pay 1 life: Prevent all damage that would be dealt to you this turn by a source of your choice that shares a color with the mana spent on this activation cost. => VerbPhrase "spent on this activation cost" as Modifier of mana; !Clause "the mana spent" as Modifier of color
 *VerbPhrase play with their hands revealing

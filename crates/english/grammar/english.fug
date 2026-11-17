@@ -3216,10 +3216,16 @@ ParticipialVerblessClause: VerblessClause -> VerbPhrase { heavy: [head], uncoord
           head.Voice = Passive,
           head.VerbKind != Auxiliary,
           head.CentralPosition != Occupied
-// *With your hand revealed*: a Subject, never nominative, and a
-// past-participial predicate (CGEL 14§8.3:1262).
+// *With your hand revealed*: an overtly determined Subject, never nominative,
+// and a past-participial predicate (CGEL 14§8.3:1262). Requiring
+// `subject.Determination := Overt` is an admission gate (english.md §6):
+// without it, bare nominals after *with* split into Subject and passive
+// predicate (*with [mana value ... from among cards] [exiled with Maralen]*,
+// Maralen, Fae Ascendant; *share a card type with [cards] [exiled with
+// Cemetery Prowler]*, Cemetery Prowler).
 PastParticipialAbsolute: AbsoluteClause -> subject:ComplementNounPhrase VerbPhrase
-    where head.VerbForm = PastParticiple,
+    where subject.Determination := Overt,
+          head.VerbForm = PastParticiple,
           head.Voice = Passive,
           head.VerbKind != Auxiliary
 
