@@ -36,6 +36,16 @@ Each of these terms writes words its card does not print, or cannot print what i
 - *Lava Axe*, *Mogg Maniac* and *Searing Flesh* print "player or planeswalker" (or "opponent or
   planeswalker") and write the arms in the other order, `or([planeswalker, player])`.
 - *Tide Shaper* and *Briarblade Adept* print "an opponent controls" and write `opponentsControl`.
+- `allOf` stands where the text prints neither "all" nor a bare plural: `shadow`'s second clause
+  ("a creature without shadow can't be blocked by creatures with shadow" [CR#702.28b], its
+  attacker written `allOf(…)`), `equipment` and `fortification` ("can be attached to a creature",
+  "to a land" [CR#301.5,301.6]), `theRingTemptsYou` ("Your Ring-bearer" [CR#701.54c]), the
+  `yourOpponents` Template ("your opponents", over `allOf(opponent)`), and *Duel for Dominance*
+  ("three or more creatures with different powers", written as a count of different powers among
+  `allOf(…)`).
+- Thirteen canon cards write the discarded card with an unprinted "in your hand":
+  `discard(a(nominal(…, card, post = [in(yourHand)])))` in *Crypt Lurker*, *Abolish*, *Charnel
+  Troll* and others, where the cards print "discard a creature card" and the like.
 - `soulbond` writes its intervening condition as `is(thisCreature, and([controlledBy(you), …]))`,
   "this creature is controlled by you", where [CR#702.95a] prints "if you control both this
   creature and another creature and both are unpaired". No plural anaphor spells "both", and no
@@ -66,6 +76,9 @@ Each of these terms writes words its card does not print, or cannot print what i
   and fixed with them.
 - *Lava Axe*, *Mogg Maniac* and *Searing Flesh* write their coordination in printed order.
 - *Tide Shaper* and *Briarblade Adept* print "an opponent controls".
+- No `allOf` in `plugins/` stands for text that prints no "all": each site above writes the
+  determiner its rule or card prints.
+- No `discard` in canon writes a location its card does not print.
 - `soulbond`'s conditions print [CR#702.95a]'s words, with the declarations and the accessibility
   rule that needs.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
