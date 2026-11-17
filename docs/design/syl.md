@@ -73,13 +73,13 @@ location is not stated by the declaration, and it can disagree with what the dec
   site, `actor(…)` included. A coercion is a declaration with no name,
   `coercion(type: CardType): Nominal { body = type($type) }`: its one parameter's sort reaches its
   result sort through a primitive at that sort, so it builds no constructor of its own. There are
-  eight:
+  nine:
   - `CardType` and `Subtype` stand at `Nominal` (through `type` and `subtype`, each a permanent of
     that type or subtype on the battlefield [CR#109.2,110.1]);
   - `CardType`, `Subtype`, `Supertype` and `Color` stand at `PreModifier` (through `hasType`,
     `hasSubtype`, `hasSupertype` and `hasColor`, testing the characteristic alone [CR#105.1,205.4a]);
-  - `Status` stands at `Predicative` (through `hasStatus`, as "is tapped" or "is phased out"
-    [CR#110.5]);
+  - `Status` and `Color` stand at `Predicative` (through `hasStatus` and `hasColor`, as "is
+    tapped", "is phased out" or "that's white or blue" [CR#110.5,105.2]);
   - `Int` stands at `Amount` (through `lit`).
   `Status` does not coerce into `PreModifier`, where "face-down" and "phased-out" spell with a
   hyphen through `PreModifier` Templates over an unspelled `hasStatus`; `DesignationLabel` has no

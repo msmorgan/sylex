@@ -26,7 +26,7 @@ carries none. A Defined Token's takes no arguments, so its scope holds nothing o
 **Coercion**:
 A nameless `.syl` declaration through which a value of one sort stands at another by way of an
 existing Primitive: a Card Type or Subtype as a Nominal, a Card Type, Subtype, Supertype or Color
-as a PreModifier, a Status as a Predicative, an integer as an Amount. It applies only where the
+as a PreModifier, a Status or Color as a Predicative, an integer as an Amount. It applies only where the
 value does not stand at the expected sort itself, and never twice in a row.
 
 **Defined Token**:

@@ -1,0 +1,5 @@
+# A color as a predicative adjective ("is red", "that's white or blue"): the subject is that color
+# [CR#105.2].
+primitive hasColor(color: Color): Predicative = ColorIs {
+  spelling = "$color"
+}

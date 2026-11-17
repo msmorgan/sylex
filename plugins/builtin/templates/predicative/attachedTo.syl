@@ -1,0 +1,6 @@
+# "attached to <host>" after a copula ("that are attached to it"): the subject is attached to
+# `host` [CR#701.3a].
+template attachedTo(host: NounPhrase): Predicative {
+  spelling = "attached to $host",
+  body = attachment(attachment, counterpart = $host)
+}

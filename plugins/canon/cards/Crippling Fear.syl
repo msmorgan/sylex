@@ -7,7 +7,7 @@ card singleFaced({
         sequentially([
             choose(a(quality(subtype(creature)))),
             get(
-              bare(nominal(creature, post = [not(ofChosen(subtype(creature)))])),
+              bare(nominal(creature, post = [thatIs(not(ofChosen(subtype(creature))))])),
               down(3),
               down(3),
               duration = untilEndOfTurn)]))]})

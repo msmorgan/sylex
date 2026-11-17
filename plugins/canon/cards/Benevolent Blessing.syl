@@ -16,4 +16,7 @@ card singleFaced({
             doesnt(
               actor(thisEffect),
               remove(
-                bare(nominal(or([aura, equipment]), post = [youControl, attachedTo(it)]))))]))]})
+                bare(
+                  nominal(
+                    or([aura, equipment]),
+                    post = [youControl, thatIs(attachedTo(it))]))))]))]})

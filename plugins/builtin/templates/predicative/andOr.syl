@@ -1,0 +1,6 @@
+# "<p> and/or <q>" after a copula ("that are green and/or white"): as `or`, the subject matches
+# some arm, the arms printed with "and/or".
+template andOr(disjuncts: List(Predicative)): Predicative {
+  spelling = "$disjuncts#<and/or>",
+  body = or($disjuncts)
+}

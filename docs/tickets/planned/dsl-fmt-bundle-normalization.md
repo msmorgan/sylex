@@ -6,10 +6,10 @@ needs: [cleanup-step6-syl]
 
 ## Why
 
-`.syl` declares eight coercions (`docs/design/syl.md` §2): a card type and a subtype stand at
+`.syl` declares nine coercions (`docs/design/syl.md` §2): a card type and a subtype stand at
 `Nominal` through `type` and `subtype`; a card type, a subtype, a supertype and a color at
-`PreModifier` through `hasType`, `hasSubtype`, `hasSupertype` and `hasColor`; a status at
-`Predicative` through `hasStatus`; and an integer at `Amount` through `lit`. The bare form is the
+`PreModifier` through `hasType`, `hasSubtype`, `hasSupertype` and `hasColor`; a status and a
+color at `Predicative` through `hasStatus` and `hasColor`; and an integer at `Amount` through `lit`. The bare form is the
 corpus's spelling, and the wrapped primitive stays callable, so `lit(3)` and `3`, and
 `type(creature)` and `creature`, are both valid and resolve to one term. Nothing normalizes
 them, so the corpus can drift back to two spellings of one term. Recovery already yields the

@@ -140,9 +140,13 @@ has, or a Template holds the word in its one fixed fragment:
   `and` coordination, outside an item of an "or" or "and/or" coordination. An Agreement phrase
   printed among postmodifiers (`withDifferentNames`, `withTheSameName`) stands in `post` in its
   printed place (*Eerie Ultimatum*'s "permanent cards with different names from your graveyard") and
-  is refused when its enclosing consumer forms no plural group. Where one construction prints its
-  own words on both sides of the head, it is a Template at `Nominal` with Holes on both sides of
-  `$head` (`ordinalRelative`, *Highspire Bell-Ringer*'s "second spell you cast each turn").
+  is refused when its enclosing consumer forms no plural group. A copular relative after the head
+  ("that's <predicative>") is `thatIs(predicative)`, its complement a `Predicative` as the copula's
+  is: *Battlegate Mimic*'s "a spell that's both red and white" is `nominal(spell, post =
+  [thatIs(both(red, white))])`, a color standing at `Predicative` through its coercion and the
+  correlative "both" being `both`. Where one construction prints its own words on both sides of the
+  head, it is a Template at `Nominal` with Holes on both sides of `$head` (`ordinalRelative`,
+  *Highspire Bell-Ringer*'s "second spell you cast each turn").
 - **A word printed in several places is a Template per placement.** "Also" stands between a
   subject and its verb ("it also deals 4 damage", *Goblin Barrage*), after a copula or passive
   auxiliary ("Burakos is also a Cleric, Rogue, Warrior, and Wizard", *Burakos, Party Leader*;
