@@ -3,7 +3,7 @@ needs: [syl-kind-sorts-and-position-unions]
 specs: [kind-sorts-and-position-unions]
 ---
 
-# Membership between sorts, a sort for the unspelled tests, and every describing phrase at its kind
+# Membership, two resolution modes, one coordinator: every describing phrase at its kind
 
 ## Why
 
@@ -21,30 +21,36 @@ knows a membership yet.
 
 ## Done when
 
-- `sylex_syl` parses `member(S): T` and `expands(K): T`, and `cargo xtask dsl check` resolves a
-  value by the spec's step 4, computes Reaches over members transitively, and enforces the spec's
-  load rules: no cycle and no second path; a word at two sorts of one Reaches set, with the
-  position sort's own words excepted; no `spelling` at `Test`; a Template body at its kind or at
-  `Test`; a parameter typed by a kind that `expands`, and a word at such a kind that a position
-  sort it is a member of declares itself; a `nominal(…)` with modifiers of its own, or
-  a coordinated one, in `pre` outside a coordination's arm; a declaration at a position sort that
-  is neither its own word, a position-bound Template, nor one of the spec's staying declarations,
-  each named in the check with its ticket; and the spelling-skeleton rule over Reaches. Each rule has a test that it refuses what the spec says it
-  refuses. `coercion` is no declaration kind.
-- The sorts and memberships are the spec's §1 and §2, and every declaration at `PreModifier`,
-  `PostModifier` and `Predicative` is what the spec's §4 says: moved, declared once at `Test`,
-  deleted, renamed, or staying. `plugins/` is rewritten where a name or a form changes, and each
-  former caller of `not` at `PostModifier` writes what its card or rule prints.
+- `sylex_syl` parses `member(S): T`, `denotes(K): T` and a declaration's `at` list with `Self`,
+  and `cargo xtask dsl check` resolves a card's term in surface mode and a body in body mode
+  (spec §3), a word with an `at` list at the lowest of its sorts that holds its arms (spec §4),
+  and enforces the spec's load rules: no cycle and no second path; a word at two sorts of one
+  Reaches set in either mode; no `spelling` at `Test`; a `nominal(…)` with modifiers of its own
+  in `pre` outside a coordination's arm; a declaration at a position sort that is neither a
+  position-bound Template nor one of the spec's staying declarations, each named in the check
+  with its ticket; a test in a card's term outside the named exceptions; and the
+  spelling-skeleton rule over Reaches. Each rule has a test that it refuses what the spec says
+  it refuses. `coercion` is no declaration kind.
+- The sorts, memberships, coordinators and negations are the spec's §1 to §4, and every
+  declaration at `PreModifier`, `PostModifier` and `Predicative` is what the spec's §5 says.
+  `plugins/` is rewritten where a name or a form changes: each former caller of `not` at
+  `PostModifier` writes what its card or rule prints, and *Solemnity*, *Clarion Conqueror*,
+  *Damping Matrix* and *Grand Abolisher* coordinate their bare plurals as noun phrases.
 - *Blessed Reversal*, *Tidal Flats*, *Beckoning Will-o'-Wisp* and *Triarch Stalker* write
-  `attacking(…)` or `blocking(…)` where they call `inCombat`, and each new route a membership
-  opens that no existing call takes (a supertype after a copula, a participle with a dependent
-  after a head, "face down" after a copula) has one card authored or rewritten to take it.
-- `docs/evidence/syl-kind-sorts/test_sort_check.py` is rerun for the spec's §4 as built, and the
-  landing reports its collisions and unresolved bodies, which are none.
-- The landing lists every call whose written form changed, by declaration. It runs the `syl-number-snapshot` diff and explains every flagged line.
+  `attacking(…)` or `blocking(…)` where they call `inCombat`, and each new route the design
+  opens that no existing call takes has one card authored or rewritten to take it: a supertype
+  after a copula, "nonbasic" after a copula (*Molten Rain*), "not" before a preposition phrase
+  (*Anafenza, the Foremost*), "aren't" (*Crippling Fear*), a participle with a dependent after a
+  head, "face-up" before a head, "face down" after a copula.
+- `docs/evidence/syl-kind-sorts/reframe_check.py` and `test_sort_check.py` are rerun for the
+  spec's §5 as built, and the landing reports their collisions, unresolved bodies and
+  coordinator calls with no common sort, which are none.
+- The landing lists every call whose written form changed, by declaration, and every coordinator
+  call whose resolved sort changed. It runs the `syl-number-snapshot` diff and explains every
+  flagged line.
 - What stays true of the spec is in `syl.md`, `surface.md`, `spelling.md`, `semantics.md` and the
-  glossary (spec §8), and `docs/tickets/planned/dsl-fmt-bundle-normalization.md` is deleted, since
-  no wrapped form is left to normalize.
+  glossary (spec §10), and `docs/tickets/planned/dsl-fmt-bundle-normalization.md` is deleted,
+  since no wrapped form is left to normalize.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check`, `cargo test -p xtask` (the `dsl expand`
   tests that assert a coercion's wrap and the coercion tests in `dsl_check.rs` among them, each
   rewritten for membership or retired with its reason), `cargo test -p sylex_syl` and
@@ -60,8 +66,9 @@ knows a membership yet.
 ## Pointers
 
 `docs/specs/kind-sorts-and-position-unions.md`;
-`docs/evidence/syl-kind-sorts/test-sort-check.md` in the default workspace (the computed
-placement of all 135 declarations, with its script; `move_or_stay.py`'s docstring describes the
+`docs/evidence/syl-kind-sorts/{test-sort-check,reframe-check}.md` in the default workspace (the
+computed placement of all 135 declarations, the two modes and the coordinator calls, with their
+scripts; `move_or_stay.py`'s docstring describes the
 dump of the checker's resolutions both scripts read, which a fresh workspace regenerates);
 `crates/syl/src/{parse,check}.rs`, `crates/xtask/src/dsl_check/`, `crates/xtask/src/dsl_expand.rs`;
 `plugins/builtin/{primitives,templates}/{preModifier,postModifier,predicative}/`,

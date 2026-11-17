@@ -5,6 +5,11 @@ clause says is its verb phrase: the verb with its complements, a passive, a moda
 counters, life and tokens are noun phrases like any other. A phrase that coordinated verb phrases
 share is written once, after them.
 
+`docs/specs/kind-sorts-and-position-unions.md` §2 changes one thing here: a participle is a
+sort of its own. `done` produces a `Participle`, as does `ing` for the active participle, `be`
+takes one, and where this spec says a verb phrase stands in a nominal's `post` as a participle,
+a `Participle` does.
+
 The `.syl` below is the shape of the design. It has not been run through `cargo xtask dsl check`.
 A word is marked NEW where this spec adds it and SKETCH where another ticket owns its final form
 (`nominal` and its modifiers, the relative words, the coordinators and sequencing words at each

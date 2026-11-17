@@ -29,8 +29,8 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 - The kinds of phrase are sorts: `AdjectivePhrase` ("red", "legendary", "tapped", "other than
   X"), `PrepositionPhrase` ("in your graveyard", "with flying", "face down"), `RelativeClause`
   ("you control", "that's white or blue"), `Participle` ("attacking", "exiled", "controlled by
-  X") until the passive makes it `VerbPhrase`, and the existing `NounPhrase` and `Nominal`. Each
-  phrase is declared once, at its kind.
+  X"), and the existing `NounPhrase` and `Nominal`. Each phrase is declared once, at its kind. A
+  verb phrase is no member of a position sort; `done` and `ing` make a participle of one.
 - A sort may have member sorts: a member's values are the sort's values, written as themselves,
   with no body. Membership is transitive and replaces coercion: `Color` and `Supertype` are
   members of `AdjectivePhrase`, `CardType` and `Subtype` of `Nominal`, `Int` of `Amount`, and the
@@ -38,26 +38,26 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 - `PreModifier`, `PostModifier` and `Predicative` are position sorts, whose members are the kinds
   that stand there.
 - The unspelled tests (`hasPossessor`, `inCombat`, `compare`, …) are declared once at `Test`, a
-  member of the three position sorts, and a Template at a kind may have its body there.
+  member of nothing. A card's term resolves in surface mode and cannot reach one; a body
+  resolves in body mode, where a kind and a test stand for each other.
+- A coordinator is declared once for the sorts it coordinates and resolves at the lowest of them
+  that holds its arms. "Non-" attaches to an adjective, a nominal or a participle; "not" stands
+  before an adjective phrase, a preposition phrase, a noun phrase or a participle, never before a
+  head; "isn't" negates the copula.
 - Membership is by kind. It admits a wording English does not print in that position; no finer
   sort refuses it.
 - A type or subtype word is one word wherever it stands, and `token` and `permanent` are one
   declaration as head and as modifier. That a description with a type word and no "card", "spell"
   or "source" means a permanent on the battlefield [CR#109.2] is read by semantics from where the
   word stands, not written by the term.
-- A position sort declares only words from the sort to itself (coordination, negation, a prefix)
-  and Templates for wordings bound to that position, and its own declaration is the one a name
-  resolves to there. A declaration another ticket has yet to compose stays at the position sort
-  it is at until that ticket lands.
+- A position sort declares only Templates for wordings bound to that position. A declaration
+  another ticket has yet to compose stays at the position sort it is at until that ticket lands.
 - `post` holds every dependent printed after the head in printed order, a complement the head
   selects ("half of this split card") and a modifier alike; the term does not mark which.
 - `Status` stays the sort of the game's statuses and is a member of nothing: "tapped" and "untapped"
   are adjective phrases over the status, "face down", "face up", "phased in" and
   "phased out" preposition phrases, and "face-down" and "phased-out" Templates bound to the place
   before a head.
-- `not` at `PostModifier` goes. Each caller writes what it prints: a `without` preposition phrase,
-  "with no …" as its own wording, or a relative clause over the predicative `not`. `non-` stays at
-  `PreModifier` and `not` at `Predicative`.
 - Keyword parameters stay at `Predicate`; `syl-keyword-quality-union` decides their sort.
 - A depictive ("enters tapped", "put onto the battlefield face down") is built from the same
   kinds; `MoveRider` stays as it is until `syl-verb-phrase-dependents` replaces it.

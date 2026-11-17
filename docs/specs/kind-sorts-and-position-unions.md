@@ -1,12 +1,12 @@
-# Kind sorts and membership: a describing phrase is declared once, at its kind of phrase
+# Kind sorts, membership and two modes: a describing phrase is declared once, at its kind of phrase
 
 A phrase that describes something is declared at the sort that names its kind: an adjective
-phrase, a preposition phrase, a relative clause, a verb phrase, a nominal or a noun phrase. The
+phrase, a preposition phrase, a relative clause, a participle, a nominal or a noun phrase. The
 places such a phrase stands (before a head, after it, after a copula) are sorts whose members are
 those kinds, so one declaration serves every place its kind is admitted. Membership replaces
-coercion: a color word is a member of the adjective phrases as an adjective phrase is a member of
-the premodifiers, and nothing wraps either. What such a phrase means is an unspelled test,
-declared once at a sort of its own.
+coercion. What a describing phrase means is an unspelled test at a sort of its own, which a
+card's term cannot reach and a Template's body can. A coordinator is declared once for the sorts
+it coordinates and stands at the lowest sort that holds its arms.
 
 The `.syl` below is the shape of the design. It has not been run through `cargo xtask dsl check`.
 Counts are Corpus Units of Vintage-legal cards in `data/derived/english-forests.sqlite` in which
@@ -23,7 +23,7 @@ Each is named for the English grammar's Category of the same name
 | `AdjectivePhrase` (NEW) | "red", "legendary", "tapped", "other", "other than X", "tied for …" | bare: before a head and after a copula ("tapped": 353 before, 230 after); with a complement: after a head and after a copula ("other than": 167 after a head) |
 | `PrepositionPhrase` (NEW) | "in your graveyard", "with flying", "of the chosen type", "face down" | after a head ("in": 1,624); after a copula for some ("in": 313) |
 | `RelativeClause` (NEW) | "you control", "that's white or blue", "that could enchant it" | after a head only ("control" as a bare relative: 9,044; *Glorious Anthem*) |
-| `VerbPhrase` | as a participle: "attacking", "blocked", "named X", "attached to it" | bare before a head (*Smite*'s "target blocked creature"; "attacking" 485, "chosen" 411, "exiled" 228), with dependents after it; under "be" it is the passive or the progressive, not a predicative complement |
+| `Participle` (NEW) | "attacking", "blocked", "named X", "attached to it", "controlled by X" | a verb phrase in a participle form: bare before a head (*Smite*'s "target blocked creature"; "attacking" 604, "chosen" 411, "exiled" 228), with dependents after it; under "be" it is the passive or the progressive |
 | `Nominal` | "creature", "Goblin", "token", "permanent" | before a head ("creature": 5,047), and as a head |
 | `NounPhrase` | "the monarch", "a Kree" | after a copula |
 
@@ -31,7 +31,7 @@ A phrase is declared once, at its kind. "Become" and "remain" take the complemen
 ("tapped": 65 under be, 123 under become, 42 under remain), and so does "turn" ("turn target
 creature face down", about 180 units).
 
-## 2. Membership, and the unspelled tests
+## 2. Membership
 
 **A sort may have member sorts.** Every value of a member is a value of the sort, written as
 itself: membership has no body and builds nothing. It is transitive, and it replaces coercion.
@@ -44,14 +44,15 @@ subject is a sort, which `sylex_syl`'s parser learns to read in that place:
 
 | Sort | Members |
 |---|---|
-| `PreModifier` | `AdjectivePhrase`, `Nominal`, `Participle`, `Test` |
-| `PostModifier` | `PrepositionPhrase`, `RelativeClause`, `AdjectivePhrase`, `Participle`, `Test` |
-| `Predicative` | `AdjectivePhrase`, `PrepositionPhrase`, `NounPhrase`, `Test` |
+| `PreModifier` | `AdjectivePhrase`, `Nominal`, `Participle` |
+| `PostModifier` | `PrepositionPhrase`, `RelativeClause`, `AdjectivePhrase`, `Participle` |
+| `Predicative` | `AdjectivePhrase`, `PrepositionPhrase`, `NounPhrase` |
 | `AdjectivePhrase` | `Color`, `Supertype` |
 | `Nominal` | `CardType`, `Subtype` |
 | `Amount` | `Int` |
 
-No sort reaches another by two paths.
+Under each sort its members form a tree: no sort reaches another by two paths, and load refuses
+a cycle or a second path.
 
 - `PreModifier` and `PostModifier` type the `pre` and `post` lists of `nominal`, and `Predicative`
   the complement of `is` and `thatIs`, as today. They are the **position sorts**: each names a
@@ -63,66 +64,24 @@ No sort reaches another by two paths.
   wordings English does not print there: "is other", "other than X creature", "legendary" after a
   head. No finer sort refuses them; semantics rejects what means nothing.
 
-**`Test` (NEW) holds the unspelled tests.** About thirty primitives say what a describing phrase
-means and print nothing: `hasPossessor`, `inCombat`, `compare`, `shares`, `superlative`,
-`colorCount`, `currentFace`, `hasDesignation`. Today each is copied per position sort, the
-Templates that carry the wordings are written over them ("you control" is `hasPossessor(…)`,
-"with power 3 or less" is `compare(…)`, "attacking" is `inCombat(…)`), and rule bodies and 44
-cards also call them bare. A test is no kind of phrase, so it is declared once, at `Test`:
-
-- A declaration at `Test` has no `spelling`; one that has is refused at load. So recovery never
-  yields a test. A rule body may still write a test where a spelled phrase over it exists
-  (`hasKeyword(…)` beside `withKeyword(…)`); a card's term may not, once
-  `syl-spelled-test-phrases` lands.
-- `Test` is a member of the three position sorts directly, beside the kinds, so a bare test still
-  stands wherever it is called today.
-- **A Template at a kind may have its body at `Test`**, declared per kind:
-
-      expands(AdjectivePhrase): Test
-      expands(PrepositionPhrase): Test
-      expands(RelativeClause): Test
-      expands(Participle): Test
-
-  The body resolves at the Template's own sort when its root word stands in that sort's Reaches,
-  and otherwise at `Test`. The choice is never open: the kind and `Test` reach one position sort,
-  so §3 refuses a word declared at both, and load refuses, at any of the four kinds, a word that
-  a position sort it is a member of declares itself (a coordinator, a negation), the one case §3
-  would let through. A parameter typed by one of the four must
-  also admit a `Test`, since expansion puts one there; none is typed so today, and load refuses
-  one that is. When `VerbPhrase` takes `Participle`'s place its Templates are verbs with no test
-  under them, and `expands(Participle)` goes with the sort.
-- `Test` has `coord` and `not` of its own, and unspelled `hasType`, `hasSubtype`, `hasSupertype`
-  and `hasColor`, for bodies that combine tests: `historic` is `coord(or, [hasType(artifact),
-  hasSupertype(legendary), hasSubtype(saga)])`, an adjective phrase that stands before a head and
-  after a copula (*Curator's Ward*'s "if it was historic", *Desynchronization*'s "that's not
-  historic").
-
-A card that calls a test bare writes something it does not print: *Blessed Reversal*'s "creature
-attacking you" is `inCombat(attackerOf, counterpart = you)` today. Each such site takes the
-spelled phrase once one exists (§4), and `syl-spelled-test-phrases` writes the rest and then
-refuses a test in a card's term.
-
-**`Participle` (NEW) holds a participle that modifies a head.** "Attacking", "blocked",
-"enchanted", "named X", "attached to it" and "controlled by X" are verb phrases in their
-participle form (*Smite*'s "target blocked creature" parses so). Until the passive is built each
-is a fixed Template over a test, or a primitive of its own (`named`, `notChosen`, and the new
-`notNamed`, which has its own constructor as `notChosen` has), and they stand at `Participle`, a member of
-`PreModifier` and `PostModifier` and not of `Predicative`, where "be" with a participle is the
-passive. One `attacking(defender = none)` then serves "attacking creature" and "creature
-attacking you". `syl-passive-participle-and-trigger-events` replaces each fixed participle with
-its verb and `Participle` with `VerbPhrase` in the two memberships, stating the form on the
-membership (`lexical = {form = Participle}`: the gerund-participle of an active phrase, the past
-participle of a `done` phrase with no "be"), so a Hole typed by the position sort takes no form
-label (`spelling.md` §7). It also renames one of each pair `VerbPhrase` then collides with: `copy`
-(a `Nominal` and a verb), `attachment` (a verb and a test), and `counter` (a verb, and a
-`Nominal` once `syl-counters-noun-phrase` lands). "Tapped" before a head is two Readings, the
-status adjective and the participle of `tap` (harmonize's "the tapped creature" is `was(tap(which))`,
-the creature tapped for the cost), and each has its term, as today.
+**A verb phrase is never a member of a position sort; a participle is.** A participle is a form
+of a verb phrase, not a subset of the verb phrases: "copy target spell" cannot modify a head, and
+"copied" can. The pool prints a gerund-participle before a head for three verbs only (`attack`
+604 units, `block` 150, `defend` 7) and a past participle for many ("chosen" 411, "exiled" 228,
+"dealt" 196). So `Participle` is a kind sort of its own, and the operators that make one from a
+verb phrase produce it: `done(phrase, by)`, the passive participle
+(`docs/specs/voice-and-object-phrases.md` §3), and `ing(phrase)` (NEW), the active one, spelled
+"$phrase@GerundParticiple". "The copied creature" is `done(copy(subject))` in `pre`, and "a
+creature attacking you" `ing(attack(defender = you))` in `post`. `be` takes a `Participle`. A
+noun and a verb of one name (`copy` today; `counter`, `die`, `flip`, `roll`, `vote` and `target`
+as their nouns are declared) therefore never meet in one position. Until
+`syl-passive-participle-and-trigger-events` declares `done` and `ing`, each participle the bundle
+needs is a fixed Template or primitive at `Participle` (`attacking`, `blocked`, `named`,
+`attachedTo`, `controlledBy`).
 
 What a position sort does not hold: the passive and the progressive ("is attached to it", "isn't
-being declared as an attacker", "that's attacking you") are verb phrases under "be"
-(`docs/specs/voice-and-object-phrases.md` §3), and a "has …" clause is a verb phrase headed by
-"have".
+being declared as an attacker", "that's attacking you") are `be` over a participle, and a "has …"
+clause is a verb phrase headed by "have".
 
 **What the nine coercions become.** Each wrapped a word through a primitive (`hasColor($color)`,
 `type($type)`, `lit($value)`); the word is now a member and the wrapper goes, so the bare word is
@@ -137,148 +96,223 @@ the only written form.
   or "source" means a permanent on the battlefield [CR#109.2]; the term does not write it. The
   `Nominal` primitives `type` and `subtype` go.
 - `Color` and `Supertype` are members of `AdjectivePhrase`, so a supertype word stands after a
-  copula as a color does: `is(…, not(legendary))` for "isn't legendary" (48 units), which today
-  only the ability Template `isntLegendary` writes.
+  copula as a color does.
 - `Int` is a member of `Amount`, and `lit` goes.
 - `Status` is a member of nothing. It stays the sort of the game's statuses, which `setStatus`,
-  `becomeStatus`, `entersAs` and the test `hasStatus` take. Its words are not one kind of phrase,
-  so each wording is a Template at its kind over `hasStatus`: `tapped` and `untapped` at
+  `becomeStatus`, `entersAs` and the test `hasStatus` take, and its words carry no spelling. Each
+  wording is a Template at its kind over `hasStatus`: `tapped` and `untapped` at
   `AdjectivePhrase`; `faceDown`, `faceUp`, `phasedIn` and `phasedOut` at `PrepositionPhrase`,
-  spelled "face down", "face up", "phased in" and "phased out". The hyphenated "face-down" and
-  "phased-out" stand only before a head (60 units and 1) and stay the `PreModifier` Templates of
-  those names. A status word and the Template of its name share no Reaches set. When
-  `syl-become-replaces-types` gives "become" a `Predicative` complement, `becomeStatus` goes, so
-  "becomes tapped" keeps one written form.
+  spelled "face down", "face up", "phased in" and "phased out". The hyphenated "face-down" (60
+  units), "face-up" (17) and "phased-out" (1) stand only before a head and are `PreModifier`
+  Templates, `faceDown`, `faceUp` and `phasedOut`; `PrepositionPhrase` is no member of
+  `PreModifier`, so the two `faceDown`s share no position. When `syl-become-replaces-types` gives
+  "become" a `Predicative` complement, `becomeStatus` goes, so "becomes tapped" keeps one written
+  form.
 - The words of the wrappers' names at `Predicate` (`hasType`, `hasColor` and the rest) and
   `subtype` at the sorts a text change and a choice read are not wrappers and stay.
 
-## 3. Resolution
+## 3. Tests, and the two modes
 
-`syl.md` §3's order keeps four steps, and its fourth changes. At expected sort `T`, a value
-resolves:
+**`Test` (NEW) holds what a describing phrase means.** About thirty primitives say what a phrase
+tests and print nothing: `hasPossessor`, `inCombat`, `compare`, `shares`, `superlative`,
+`colorCount`, `currentFace`, `hasDesignation`. Today each is copied per position sort, the
+Templates that carry the wordings are written over them ("you control" is `hasPossessor(…)`,
+"with power 3 or less" is `compare(…)`, "attacking" is `inCombat(…)`), and rule bodies and 44
+card files also call them bare. A test is no kind of phrase. It is declared once, at `Test`, and
+`Test` is a member of nothing.
+
+**A term is resolved in one of two modes.**
+
+- **Surface mode** resolves a `card`'s term. At expected sort `T` a value stands at `T` or at a
+  sort that reaches `T` through membership, and nowhere else. No surface sort reaches `Test`, so
+  a card cannot write a test: *Propaganda*'s `inCombat(attackerOf, counterpart = you)` in `post`
+  is refused by its sort, where today nothing refuses it and nothing prints it.
+- **Body mode** resolves the body of a Template, a Definition or a rule, and a parameter's
+  default. It adds one relation, declared per kind:
+
+      denotes(AdjectivePhrase): Test
+      denotes(PrepositionPhrase): Test
+      denotes(RelativeClause): Test
+      denotes(Participle): Test
+
+  A kind that denotes `Test` expands to a test. In body mode a slot typed by such a kind, or by a
+  position sort, also admits a `Test`, and a slot typed `Test` also admits a phrase of such a
+  kind. So `colorless`, an `AdjectivePhrase`, has the body `colorCount(equal, 0)`;
+  `youDontControl` is `not(controls(you))`, a test's `not` over a relative clause; and a rule
+  body writes `post = [hasPossessor(controller, $player)]` as it does now. `Nominal`,
+  `NounPhrase` and `VerbPhrase` denote themselves: a type word before a head is read where it
+  stands (§2), not expanded to a test.
+
+A declaration's signature and `spelling` are surface; its body is in body mode. After expansion
+every describing phrase is a `Test`, so expansion keeps each slot well sorted, and a parameter
+may be typed by a kind.
+
+**Reaches.** SurfaceReaches(`T`) is `T` and every sort that reaches it through `member`.
+BodyReaches(`Test`) is `Test` and SurfaceReaches of each kind that denotes it; BodyReaches of
+such a kind, or of a position sort, is its SurfaceReaches and `Test`; BodyReaches of any other
+sort is its SurfaceReaches. A word declared at two sorts of one Reaches set, in either mode, is
+refused at load, as `syl.md` §3 refuses it for coercions today, and so is a literal that stands
+at two (an integer when `Int` and `Nat` both reach a sort). Over §5's placement no word is
+(`docs/evidence/syl-kind-sorts/reframe-check.md`).
+
+**Resolution.** `syl.md` §3's order keeps four steps, and its fourth changes. At expected sort
+`T`, a value resolves:
 
 1. `none`, if `T` is optional;
 2. what stands at `T` itself;
 3. if `T` is `Option(U)`, the value at `U`, by steps 2 and 4;
-4. at the one sort among `T`'s members, and theirs, that the value stands at.
+4. at the one sort in the mode's Reaches(`T`) that the value stands at.
 
-**Reaches.** Reaches(`T`) is `T` and every sort that is a member of it, directly or through a
-member. Membership has no cycle and no sort reaches another by two paths; load refuses either.
-The load rules of `syl.md` §3 hold over Reaches unchanged, with the exception below: a word
-declared at two sorts of Reaches(`T`) is refused, and so is a literal that stands at two (an
-integer when `Int` and `Nat` both reach `T`). So step 4 finds at most one sort, with no
-backtracking. The side table that records the sort each call resolved at already says where the
-value stands. `docs/evidence/syl-kind-sorts/test-sort-check.md` computes the placement for a
-declaration set close to §4's and finds no collision. It differs in five rows
-(`tapOrUntapInCost`, `outsideTheGame`, `copied`, `plotted`, `notNamed`), in two tests it adds
-that §4 does not need (`inLocation`, `hasActivationCost`) and in one name
-(`legalAttachmentTest`); `syl-union-membership` reruns it for §4's.
+**A position sort's own declarations** are Templates for wordings bound to that position:
+"face-down" before a head; `withMostVotes`, "with the most votes or tied for most votes", a
+coordination of unlike kinds fixed in one wording. Anything else at a position sort is refused at
+load, except the declarations §5 lists as staying, which the check names with their tickets.
 
-**A position sort's own declarations.** A declaration at `PreModifier`, `PostModifier` or
-`Predicative` is one of two things:
+**Nothing at `Test` prints.** No surface sort reaches it, so a `spelling` there would never be
+used; load refuses one, apart from the words of §4, which stand at `Test` as one of several
+sorts.
 
-- a word from the sort to itself: a primitive or Template with a parameter of that sort, or a list
-  of it (coordination `or`, `andOr`, `and`, `both`, `coord`; negation `not`; the prefix `non-`);
-- a Template for a wording bound to that position ("face-down" before a head; `withMostVotes`,
-  "with the most votes or tied for most votes", a coordination of unlike kinds fixed in one
-  wording).
+**Calls of a test in a card.** Forty-nine calls in 44 canon files write a test bare where the
+card prints a phrase no declaration spells. Surface mode refuses each. Four take a spelled phrase
+that this design gives them (§5); the rest are named in the check as exceptions, resolved in body
+mode, until `syl-spelled-test-phrases` writes their phrases.
 
-A word of the first kind is found at the position before any member is tried (step 2 comes
-before step 4), so members' words of the same name are out of reach there and do not collide,
-with it or with each other: `or([white, blue])` in `pre` is `PreModifier`'s `or`, though `Nominal`
-has an `or` too, and `coord` stands at `PreModifier`, `Nominal` and `Test`. That is the one
-written form of a coordination at a position, whether its arms are of one kind or several. The
-grammar parses a coordination of like kinds at the kind ("white or blue" is one coordination of
-adjective phrases) and only unlike kinds at the function, so recovery maps both to the position
-sort's coordinator, and a coordinated `Nominal` is refused in `pre` as a nested one is. No kind
-sort with an `expands` declaration has a coordinator of its own; declaring a coordinator once
-for the sorts it coordinates is not decided here (§7).
+## 4. Coordination and negation
 
-Anything else at a position sort is refused at load. The declarations §4 lists as staying are
-named in the check as its exceptions, each with its ticket, and each ticket removes its own.
+**A coordinator is declared once, for the sorts it coordinates.** Today `or`, `and`, `andOr`,
+`both` and `coord` are separate declarations at each of `Nominal`, `NounPhrase`, `PreModifier`,
+`PostModifier`, `Predicative` and nine other sorts. One declaration lists its sorts, with `Self`
+for the sort it stands at:
 
-**A nominal in `pre`** is a bare head word (`creature`, `goblin`, `token`). `nominal(…)` with a
-`pre` or `post` of its own is refused there, since `nominal(pre = [nominal(pre = [legendary],
-creature)], card)` and `nominal(pre = [legendary, creature], card)` would be two written forms of
-"legendary creature card". The one place it stands is as an arm of a coordination in `pre`:
-*Acclaimed Contender*'s "Knight, Aura, Equipment, or legendary artifact card" has
-`nominal(pre = [legendary], artifact)` as its last arm. `stacked` goes, and so does the
-`coord(and, […])` arm `nominal.rs` admits in its place today. The checker's rules
-on a nominal's lists that are keyed on a position sort's test (`("PostModifier", "Agree")`,
-`("PostModifier", "Superlative")` and the others in `crates/xtask/src/dsl_check/nominal.rs`)
-follow the test to `Test`.
+    template or(items: List(Self)): Self {
+      at = [AdjectivePhrase, PrepositionPhrase, RelativeClause, Participle, Nominal, NounPhrase,
+            PreModifier, PostModifier, Predicative, Test],
+      spelling = "$items#<or>",
+      body = coord(or, $items)
+    }
 
-**Spelling skeletons** (`spelling.md` §7). Two sorts overlap when their Reaches sets intersect, so
-a Hole typed `PreModifier` overlaps one typed `AdjectivePhrase`. Two declarations whose sorts lie
-in one sort's Reaches and whose skeletons are the same are refused as ambiguous, as two at one
-sort are today; a position sort's coordinator and a member's of the same name are one wording
-there, written as the position sort's.
+`and`, `andOr`, `both` and the primitive `coord` are declared the same way, each with the sorts
+the pool coordinates with it. The coordinators at `Cost`, `Condition`, `Timing`, `Location`,
+`GameEvent`, `TriggerCondition`, `ProducedMana` and `Predicate` stay separate declarations;
+`syl-coordinators-outside-descriptions` (NEW) folds them in.
 
-## 4. What each declaration becomes
+**A call of such a word stands at the lowest of its sorts that holds every arm.** Each arm has
+one sort: its head word's, which is unique in Reaches(`T`); a parameter's declared sort; or, for
+a nested coordination, the sort it resolved at. Reaches(`T`) is a tree, so the arms' sorts have
+one lowest common sort, and the call resolves at the lowest sort in the word's `at` list at or
+above it. In body mode `Test` is tried last, when no surface sort holds the arms.
+
+- `or([white, blue])` in `pre` or after "that's": both arms are colors, so it stands at
+  `AdjectivePhrase`. The grammar parses "white or blue" as a coordination of adjective phrases in
+  both places (*Fry*).
+- `or([knight, aura, equipment, nominal(pre = [legendary], artifact)])` in `pre`: the arms are
+  subtypes and a nominal, so it stands at `Nominal`, which is how the grammar parses *Acclaimed
+  Contender*'s "Knight, Aura, Equipment, or legendary artifact card" in the Reading that attaches
+  "legendary" to "artifact". `stacked` goes.
+- A coordination of an adjective and a participle ("tapped and attacking") stands at the position
+  sort, where the grammar puts a coordination of unlike kinds.
+- `or([bare(artifact), bare(creature), bare(enchantment), bare(land)])` is *Solemnity*'s
+  "artifacts, creatures, enchantments, or lands", a coordination of noun phrases. The grammar has
+  no bare plural over coordinated nominals, so `bare(or([…]))`, which *Solemnity*, *Clarion
+  Conqueror*, *Damping Matrix* and *Grand Abolisher* write today, is no Reading's term.
+
+This is the one place resolution reads a call's arguments. It stays one pass with no
+backtracking, because an arm's sort never depends on the coordinator's. Of the 165 coordinator
+calls in `plugins/` at these sorts, 121 stand where they do today, 29 move from `PreModifier` to
+`Nominal`, 3 from `Predicative` to `AdjectivePhrase`, 2 from `PostModifier` to
+`PrepositionPhrase`, 2 from `PreModifier` to `Participle`, and 2 need the rewrites §5 gives them
+(`historic`, *Acclaimed Contender*); each of the 13 sampled calls that lands at a kind has its
+coordination at that Category in the card's parse.
+
+**A nominal in `pre`** is a bare head word (`creature`, `goblin`, `token`) or a coordination.
+`nominal(…)` with a `pre` or `post` of its own is refused there except as an arm of a
+coordination, since `nominal(pre = [nominal(pre = [legendary], creature)], card)` and
+`nominal(pre = [legendary, creature], card)` would be two written forms of "legendary creature
+card".
+
+**Negation is three constructions.**
+
+- **The prefix "non-"** attaches to a nominal ("nonland", 1,813 units), an adjective ("nonbasic",
+  245) or a participle ("nonattacking", 5), and the result is of the same kind: `non` is declared
+  once `at = [AdjectivePhrase, Nominal, Participle]`. So "If that land was nonbasic" (*Molten
+  Rain*) and "nonlands" as a head have terms, which `non` at `PreModifier` did not give them.
+- **"Not" before a phrase** stands before an adjective phrase ("that's not historic",
+  *Desynchronization*), a preposition phrase ("card not on the battlefield", *Anafenza, the
+  Foremost*), a noun phrase ("if it's not a Kree", *Captain Marvel, Apex Avenger*) or a participle
+  ("not named …", *Escaped Shapeshifter*): `not` is declared once `at = [AdjectivePhrase,
+  PrepositionPhrase, NounPhrase, Participle, Test]`. It never stands before a head ("Exile target
+  not green creature." has no Reading), and `not` at `PreModifier` goes.
+- **"Isn't" and "aren't"** negate the copula, not its complement: "Creatures that aren't of the
+  chosen type" (*Crippling Fear*) parses with the verb "aren't" over "of the chosen type". They
+  are `isnt` and `thatIsnt` (NEW) beside `is` and `thatIs`.
+
+## 5. What each declaration becomes
 
 Every declaration at `PreModifier`, `PostModifier` and `Predicative` in `plugins/builtin/`: 135.
-Forty-eight move to a kind, 19 are the tests declared once at `Test`, 39 are deleted, 18 are the
-position sort's own and 11 stay until another ticket composes them. The placement follows the
-checker's own resolutions (`docs/evidence/syl-kind-sorts/test-sort-check.md`). Where a row names
-no card, the declaration is called only from rule bodies and no Reading was checked.
+The placement follows the checker's own resolutions (`docs/evidence/syl-kind-sorts/`:
+`test-sort-check.md` for the placement, `reframe-check.md` for the two modes and the
+coordinators). Where a row names no card, the declaration is called only from rule bodies and no
+Reading was checked.
 
 ### Moves to its kind
 
 | Kind | Declarations | Decided by |
 |---|---|---|
-| `AdjectivePhrase` | `other`, `otherThan`, `split`, `colorless`, `multicolored`, `historic`, `unblocked`, `transformed`, `tiedFor`, `plotted`; the new `tapped` and `untapped`; the color and supertype words by membership | "red" 496 before a head, 21 after a copula (*Fry*); "legendary" 334 / 74; "colorless" 539 / 15; "multicolored" 64 / 1; "historic" 60 / 2; "unblocked" 13 / 4; "other" 1,567 before a head; "other than" 167 after a head; "tied" 34 after a copula; "tapped" 353 / 230; "plotted" only after "becomes" (7 units, *Aven Interrupter*) |
-| `PrepositionPhrase` | `in`, `inPile`, `of`, `fromSource`, `ofChosen`, `ofYourChoice`, `ofTheLastChosen`, `hasPower`, `hasManaValue`, `hasLesserManaValueThan`, `activationCostHas`, `manaCostHas`, `withDifferentNames`, `withTheSameName`; `withCounter` and `withKeyword` (below); the new `faceDown`, `faceUp`, `phasedIn`, `phasedOut` | "in" 1,624 after a head, 313 after a copula; *Aerial Volley* "with flying"; *Abrupt Decay* "with mana value 3 or less"; *Cursed Totem* "of creatures"; *Gaea's Revenge* "from nongreen sources"; *Adaptive Automaton* and *Crippling Fear* "of the chosen type"; *Unable to Scream* "is face down" |
+| `AdjectivePhrase` | `other`, `otherThan`, `split`, `colorless`, `multicolored`, `historic`, `unblocked`, `transformed`, `tiedFor`, `plotted`; the new `tapped` and `untapped`; the color and supertype words by membership | "red" 496 before a head, 21 after a copula (*Fry*); "legendary" 334 / 74; "colorless" 539 / 15; "multicolored" 64 / 1; "historic" 60 / 2 (*Curator's Ward*'s "if it was historic"); "unblocked" 13 / 4; "other" 1,567 before a head; "other than" 167 after a head; "tied" 34 after a copula; "tapped" 353 / 230; "plotted" only after "becomes" (7 units, *Aven Interrupter*) |
+| `PrepositionPhrase` | `in`, `inPile`, `of`, `fromSource`, `ofChosen`, `ofYourChoice`, `ofTheLastChosen`, `hasPower`, `hasManaValue`, `hasLesserManaValueThan`, `activationCostHas`, `manaCostHas`, `withDifferentNames`, `withTheSameName`, `outsideTheGame`; `withCounter` and `withKeyword` (below); the new `faceDown`, `faceUp`, `phasedIn`, `phasedOut` | "in" 1,624 after a head, 313 after a copula; *Aerial Volley* "with flying"; *Abrupt Decay* "with mana value 3 or less"; *Cursed Totem* "of creatures"; *Gaea's Revenge* "from nongreen sources"; *Adaptive Automaton* and *Crippling Fear* "of the chosen type"; *Unable to Scream* "is face down" |
 | `RelativeClause` | `youControl`, `youDontControl`, `youOwn`, `opponentsControl`, `anOpponentControls`, `controls` (below), `ownedBy`, `actorControls`; `thatIs`, `couldEnchant`, `triggeredNotLeftStack`; `did` | *Glorious Anthem* "you control"; *Academy Journeymage* "an opponent controls"; *Fry* "that's white or blue"; *Bruna, Light of Alabaster* "that could enchant it" |
-| `Participle` | `attacking`, `blocking`, `blocked`, `chosen`, `equipped`, `foretold`, `attachedTo`, `named`, `notChosen`; `was`, one Template for its `PreModifier` and `PostModifier` copies; the new `controlledBy` ("controlled by $who") and `notNamed` ("not named $source") | *Smite* "blocked", *Stone Haven Outfitter* "Equipped", *Bioplasm* "exiled"; "attach" passive 178 after a head; "name" passive 333; *Burn at the Stake* "tapped this way"; "controlled" 32 after a head (*Balance*); *Escaped Shapeshifter* "not named …" |
+| `Participle` | `attacking`, `blocking`, `blocked`, `chosen`, `equipped`, `foretold`, `attachedTo`, `named`, `notChosen`; `was`, one Template for its `PreModifier` and `PostModifier` copies; the new `controlledBy` ("controlled by $who") | *Smite* "blocked", *Stone Haven Outfitter* "Equipped", *Bioplasm* "exiled"; "attach" passive 178 after a head; "name" passive 333; *Burn at the Stake* "tapped this way"; "controlled" 32 after a head (*Balance*) |
 
 - **Three renames, each one name for two wordings today.** `controlledBy` at `PostModifier`
   spells "$who control" and at `Predicative` "controlled by $who": the relative is `controls`,
   and `controlledBy` names the participle. `hasCounter` and `hasKeyword` at `PostModifier` spell
   "with a counter on it" and "with $keyword" and at `Predicative` are the unspelled tests: the
   with-phrases are `withCounter` and `withKeyword`, Templates over the tests of the old names.
-- **Bodies rewritten.** `historic` (§2); `youDontControl` is `not(hasPossessor(controller, you))`;
-  `was` is written over `predicateDid`, the test `did` is over.
+- **Bodies rewritten.** `historic` is `or([hasType(artifact), legendary, hasSubtype(saga)])`, a
+  test's `or` over two tests and an adjective; `was` is written over `predicateDid`, the test
+  `did` is over. `youDontControl` and `outsideTheGame` keep the bodies they have, which body mode
+  types.
 - **Cards that take the spelled phrase.** *Blessed Reversal*, *Tidal Flats*, *Beckoning
   Will-o'-Wisp* and *Triarch Stalker* print "attacking X" or "blocking X" after a head and write
   `attacking(…)` and `blocking(…)`, each with an optional counterpart, where they call `inCombat`
-  today. *Propaganda*, *Ghostly Prison* and *Awesome Presence* print a
-  relative, "that's attacking you", and keep the test until the passive ticket.
+  today. *Propaganda*, *Ghostly Prison* and *Awesome Presence* print a relative, "that's
+  attacking you", and are among the exceptions of §3.
 
 ### Declared once at `Test`
 
 `agree`, `attachment`, `choseExtreme`, `chosenRef`, `colorCount`, `compare`, `currentFace`,
 `hasCounter`, `hasDesignation`, `hasKeyword`, `hasPossessor`, `hasStatus`, `inCombat`,
-`legalAttachment` (as `isLegalAttachment`, since a `Nominal` has the name), `predicateDid`, `related`, `shares`,
-`superlative`, `targeting`, with the new `coord`, `not`, `hasType`, `hasSubtype`, `hasSupertype`
-and `hasColor`. Each replaces its copies at the position sorts. Every copy of a test builds one
-constructor, and where signatures differ the longer one has the shorter's parameters with the
-rest optional (`inCombat`, `hasDesignation`, and `attachment` with `word` passed by name), so
-every call resolves unchanged.
+`legalAttachment` (as `isLegalAttachment`, since a `Nominal` has the name), `predicateDid`,
+`related`, `shares`, `superlative`, `targeting`, with the new unspelled `hasType` and
+`hasSubtype`, and `tapOrUntapInCost`, which transcribes [CR#302.6]'s "the tap symbol or the
+untap symbol", printed by no card, and loses its spelling. Each replaces its copies at the
+position sorts. Every copy of a test builds one constructor, and where signatures differ the
+longer one has the shorter's parameters with the rest optional (`inCombat`, `hasDesignation`,
+and `attachment` with `word` passed by name), so every call resolves unchanged.
 
 ### Deleted
 
 - The nine coercions, and the wrappers `hasColor`, `hasSupertype`, `hasType` and `hasSubtype` at
   `PreModifier`, `hasColor` and `hasStatus` at `Predicative`, `type`, `subtype` and `lit`.
 - The copies of each test at a second and third position sort (fourteen).
-- `in`, `ofChosen`, `otherThan` and `transformed` at `Predicative`: the declaration that moves,
-  now reached by membership (*Animate Dead*, *Crippling Fear*).
+- `in`, `ofChosen`, `otherThan`, `outsideTheGame` and `transformed` at `Predicative`: the
+  declaration that moves, now reached by membership.
 - `token`, `permanent` and `outlaw` at `PreModifier`: the `Nominal` word (§2). `tapped` and
   `untapped` at `PreModifier`: the adjective phrase.
 - `noun` at `Predicative`: *Archon of Coronation*'s "you're the monarch" is the noun phrase
   itself.
-- `stacked` (§3), and the `PreModifier` copy of `was`.
-- `not` at `PostModifier`. Each of its callers writes what it prints: a `without` preposition
-  phrase ("without flying"), "with no …" as its own wording, a relative clause over the
-  predicative `not` ("that aren't legendary"), or the participle `notNamed` (*Escaped
-  Shapeshifter*'s "not named …"). Two calls in `soulbond` negate a test and take `Test`'s `not`.
+- The coordinators and negations of the three position sorts (`or`, `andOr`, `and`, `both`,
+  `coord`, `non`, `not`), those of `Nominal` and `NounPhrase`, `stacked`, and the `PreModifier`
+  copy of `was`: §4's declarations stand in their place. Each caller of `not` at `PostModifier`
+  writes what its card prints: `not` before a preposition phrase or a participle, `thatIsnt`, or
+  a `without` preposition phrase ("without flying").
 
 ### The position sort's own
 
-- `PreModifier`: `or`, `andOr`, `coord`, `non`, `not`; the Templates bound to the place before a
-  head, `faceDown` ("face-down") and `phasedOut` ("phased-out").
-- `PostModifier`: `or`, `andOr`, `coord`; `withMostVotes` (*Council's Judgment*).
-- `Predicative`: `and`, `or`, `andOr`, `both`, `coord`, `not`; `hasTypeIgnoringTypeChanges`
-  (sunburst's rule).
+- `PreModifier`: `faceDown` ("face-down"), `faceUp` ("face-up", NEW) and `phasedOut`
+  ("phased-out").
+- `PostModifier`: `withMostVotes` (*Council's Judgment*).
+- `Predicative`: `hasTypeIgnoringTypeChanges` (sunburst's rule).
 
 ### Stays until another ticket composes it
 
@@ -286,22 +320,37 @@ every call resolves unchanged.
 |---|---|---|
 | `attachedTo`, `attachedBy`, `controlledBy`, `named`, `was` at `Predicative` | "are already attached to it" (*Benevolent Blessing*), "was cast from your hand" (*Approach of the Second Sun*): the passive, `be(done(…))` | `syl-passive-participle-and-trigger-events` |
 | `did` at `Predicative` | "if you cast it" (*Arcane Proxy*): `did(phrase, within)` under `holds` | `syl-lookback-operator-and-holds` |
-| `outsideTheGame` at `PostModifier` and `Predicative` | "from outside the game" (19 of 22 units): a place. Its `PostModifier` body becomes `thatIs(outsideTheGame)`, since `not` there is gone | `syl-zone-words` |
-| `tapOrUntapInCost` at `PostModifier` | "with the tap symbol or the untap symbol in its activation cost": an `or` of two with-phrases, which a kind has no coordinator for | `syl-spelled-test-phrases` (NEW) |
-| `copied` at `PreModifier` | its callers print "the copy" (*Rings of Brighthearth*) | `syl-canon-wording-defects` |
 | `hasQuality` at `PreModifier` | 23 rule bodies put a keyword's quality in `pre` through it | `syl-keyword-quality-union` (NEW) |
+| `copied` at `PreModifier` | its callers print "the copy" (*Rings of Brighthearth*) | `syl-canon-wording-defects` |
 
 ### `Predicate`
 
 This spec leaves `Predicate` and its 36 declarations as they are. Thirteen keywords take their
 quality at it (`protection`, `landwalk`, `affinity`, `enchant` and nine more), and about twenty
 other parameters take one (`behold`, `transform`'s `into`, `resulting` on `cast`, `except` on
-`allExcept`, `holders` on `keywordGrant`, `matching`, `oneEachOf` and others). `Test` is not a
-member of it: `Predicate` holds spelled copies of `hasType`, `in`, `youControl` and others that
-would collide. `syl-keyword-quality-union` decides what a keyword's quality is typed by and moves
-what is left of `Predicate`'s tests to `Test`.
+`allExcept`, `holders` on `keywordGrant`, `matching`, `oneEachOf` and others).
+`syl-keyword-quality-union` decides what a keyword's quality is typed by and moves what is left
+of `Predicate`'s tests to `Test`.
 
-## 5. Kinds the pool prints that this spec does not place
+## 6. What a card's term may hold
+
+Surface mode keeps a test out of a card. Two further rules would make "every word a card's term
+may hold has a `spelling`" (`spelling.md` §7) something the checker enforces, and neither holds
+today:
+
+- **No unspelled declaration in a card's text.** All 981 canon card files call one:
+  `singleFaced` (954 files), `static` (420), `actor` (409), `sequentially` (205), `ofChosen`
+  (38), `costShift` (36), `preventDamage` (29), `visibility` (20), `establish` (17). Some are
+  structure that prints nothing of its own (`singleFaced`; `static`, whose wording is its
+  clause's); the rest are wordings not yet spelled.
+- **Every Hole of a `spelling` has a spelled sort.** Thirty-seven Holes are typed by a sort with
+  no spelled declaration. `hasPower` spells "with power $cmp $amt" over `Comparator`, which has
+  none; cards print "with power 2", "with power 4 or greater" (*Elspeth, Sun's Champion*) and
+  "with power greater than …" (*Ensnaring Bridge*), three wordings.
+
+`syl-surface-admissibility` (NEW) builds both.
+
+## 7. Kinds the pool prints that this spec does not place
 
 | Position | Phrase | Units |
 |---|---|---|
@@ -313,54 +362,59 @@ what is left of `Predicate`'s tests to `Test`.
 | after a copula | a measure ("except the token is 1/1", *Endless Evil*) | 23 |
 
 A counter's kind before "counter" is no member of `PreModifier`: it is the argument of the head
-`counter` (`syl-counters-noun-phrase`). The rest are `syl-unplaced-describing-kinds` (NEW).
+`counter` (`syl-counters-noun-phrase`). The rest are `syl-unplaced-describing-kinds` (NEW). A
+second open catalog of words is given a place before a head through a word that wraps it, not
+through membership beside `Subtype`, whose 514 words it would collide with.
 
-## 6. Tickets
+## 8. Tickets
 
 Built by:
 
-1. **`syl-union-membership`** (NEW): `member` and `expands` in `sylex_syl` and `cargo xtask dsl
-   check`, with coercion removed; the sorts of §1 and §2; §4's moves, tests, deletions and
-   renames. It needs none of the verb tickets.
-2. **`syl-spelled-test-phrases`** (NEW): the wordings cards print where they call a test bare
-   (`shares`, `superlative`, `targeting`, `compare`, the designations), and the refusal of a test
-   in a card's term.
-3. **`syl-keyword-quality-union`** (NEW), **`syl-have-verb-phrases`** (NEW) and
-   **`syl-unplaced-describing-kinds`** (NEW).
+1. **`syl-union-membership`** (NEW): `member`, `denotes` and the `at` list in `sylex_syl` and
+   `cargo xtask dsl check`, with coercion removed; the two modes; §4's coordinators and negation;
+   the sorts of §1 to §3; §5's moves, tests, deletions and renames. It needs none of the verb
+   tickets.
+2. **`syl-spelled-test-phrases`** (NEW): the wordings cards print where they call a test bare,
+   each leaving §3's exceptions.
+3. **`syl-surface-admissibility`** (NEW), **`syl-keyword-quality-union`** (NEW),
+   **`syl-have-verb-phrases`** (NEW), **`syl-unplaced-describing-kinds`** (NEW) and
+   **`syl-coordinators-outside-descriptions`** (NEW).
 
-Changed by this spec: `syl-passive-participle-and-trigger-events` (the fixed participles become
-their verbs, `VerbPhrase` replaces `Participle`, and the three renames of §2),
-`syl-lookback-operator-and-holds` and `syl-clause-and-imperative` (`did` and `was`; a relative
-composed from a clause with a gap, at `RelativeClause`), `syl-zone-words` (a location phrase is a
-`PrepositionPhrase`), `syl-damage-and-life-noun-phrases` (its modifiers are declared at kinds),
-`syl-become-replaces-types` (it consumes `Predicative`, and `becomeStatus` goes with it) and
-`syl-token-records-to-templates`,
-`syl-canon-wording-defects` (`copied`, `choseExtreme`), `syl-continuous-effect-subject` (a
-membership where it plans a coercion), and
-`syl-name-originally-printed-in`,
-`syl-daybound-reconfigure-bodies` and `syl-clone-any-on-the-battlefield` (each asks for a new word
-at `Predicate`, which is declared at its kind instead). `syl-verb-phrase-dependents` builds a
-depictive ("enters tapped", "exile it face down") from the same kinds; `MoveRider` stays until it
-does.
+Changed by this spec: `docs/specs/voice-and-object-phrases.md` and
+`syl-passive-participle-and-trigger-events` (`done` and `ing` produce a `Participle`, `be` takes
+one, and a verb phrase is no member of a position sort), `syl-lookback-operator-and-holds` and
+`syl-clause-and-imperative` (`did` and `was`; a relative composed from a clause with a gap, at
+`RelativeClause`), `syl-zone-words` (a location phrase is a `PrepositionPhrase`),
+`syl-damage-and-life-noun-phrases` (its modifiers are declared at kinds),
+`syl-become-replaces-types` (it consumes `Predicative`, and `becomeStatus` goes with it),
+`syl-token-records-to-templates`, `syl-canon-wording-defects` (`copied`, `choseExtreme`),
+`syl-continuous-effect-subject` (a membership where it plans a coercion), and
+`syl-name-originally-printed-in`, `syl-daybound-reconfigure-bodies` and
+`syl-clone-any-on-the-battlefield` (each asks for a new word at `Predicate`, which is declared at
+its kind instead). `syl-verb-phrase-dependents` gives a verb phrase a dependent list typed by one
+more position sort over the same kinds ("enters tapped", "exile it face down", "tapped and
+attacking"), with no test in it and no coordinator of its own to declare; `MoveRider` stays until
+it does.
 
-## 7. Not decided here
+## 9. Not decided here
 
-- Declaring a coordinator once for every sort it coordinates.
 - A typed Rust representation of the surface term, in which a sort with members is an enum over
-  them (`PreModifier::Adjective(Adjective::Color(Color::Red))`, with one `Test` arm per position
-  sort).
+  them (`PreModifier::Adjective(Adjective::Color(Color::Red))`) and the expanded tree has one
+  `Test` type for every describing phrase.
+- "Neither … nor", "but not" and the other correlative and contrastive coordinations.
 
-## 8. What the design docs say once this is built
+## 10. What the design docs say once this is built
 
 | Document | Today | Then |
 |---|---|---|
-| `syl.md` §2 | "No conversions besides `Option` and the declared coercions"; "There are nine" | no conversions; the `member` and `expands` declarations and §2's memberships |
-| `syl.md` §4 | a Template's body is a term of the Template's sort | or of `Test`, where its kind `expands` to it |
-| `syl.md` §3 | step 4 is a coercion, one hop; Reaches(`T`) is `T` and the from-sorts of coercions into it | §3 here |
+| `syl.md` §2 | "No conversions besides `Option` and the declared coercions"; "There are nine" | no conversions; the `member` and `denotes` declarations, §2's memberships, and a declaration's `at` list |
+| `syl.md` §3 | step 4 is a coercion, one hop; Reaches(`T`) is `T` and the from-sorts of coercions into it; a call resolves from its head word and the expected sort alone | §3 here; §4's rule for a word with an `at` list |
+| `syl.md` §4 | a Template's body is a term of the Template's sort | resolved in body mode (§3) |
 | `surface.md` §1 | "`Nominal` and its modifier sorts"; "the sorts of the words a coercion wraps (`CardType` under `Nominal`)" | the kind sorts of §1; a position sort names a place kinds stand; a word sort is a member of its kind |
-| `spelling.md` §2 | `stacked` for an arm of two premodifiers; `thatIs(predicative)` at `PostModifier`; a color at `Predicative` "through its coercion" | a nominal arm (§3); `thatIs` at `RelativeClause`; membership |
+| `surface.md` §4 | "Templates and Definitions are surface to surface. A body is a surface term" | a body is in body mode and may hold a test |
+| `spelling.md` §2 | `stacked` for an arm of two premodifiers; `thatIs(predicative)` at `PostModifier`; a color at `Predicative` "through its coercion" | a nominal arm (§4); `thatIs` at `RelativeClause`; membership |
 | `spelling.md` §4 | the bare word a coercion wraps and the written call are two written forms, and recovery yields the bare one | one written form |
-| `spelling.md` §7 | "A sort is not one Category: a `PreModifier` is a noun in 'creature card' and an adjective in 'tapped creature'" | a kind sort is one Category and a position sort a function; a membership's `form`; the skeleton rule of §3 |
+| `spelling.md` §7 | "A sort is not one Category: a `PreModifier` is a noun in 'creature card' and an adjective in 'tapped creature'" | a kind sort is one Category and a position sort a function; the skeleton rule over Reaches |
 | `semantics.md` §2.4 | "at `PreModifier` it tests the characteristic alone"; "`Predicative`'s noun-phrase form `noun(phrase)`" | the type word's reading is positional (§2); a noun phrase is a member of `Predicative` |
 
 Glossary entries (`docs/contexts/game-model/CONTEXT.md`):
@@ -369,5 +423,5 @@ Glossary entries (`docs/contexts/game-model/CONTEXT.md`):
   a member of.
 - **PreModifier**, **PostModifier**, **Predicative**: each is a position sort, defined by its
   members and the place it types.
-- **Test** (NEW): an unspelled primitive that says what a describing phrase means; **Predicate**
-  keeps its entry until its last consumer leaves.
+- **Test** (NEW): an unspelled primitive that says what a describing phrase means. **Surface
+  mode** and **Body mode** (NEW). **Predicate** keeps its entry until its last consumer leaves.
