@@ -6,18 +6,16 @@ needs: []
 
 ## Why
 
-Tests and their comments state the Derivation count of named real units, and one asserts it:
-`assert_eq!(forest.total(), 3472)` for *Remove Enchantments* in
-`a_large_forest_narrows_by_the_surveys_option_counts`. A unit's forest size changes with any
-grammar change that touches it, so the assertion fails on a change that broke nothing, and the
-comments are wrong until someone notices. What those tests are for is a large forest: that it
-narrows without enumeration, that its forks are counted exactly, that a judgment on it is
-evaluated like any other. None of them is about the number.
+Tests and their comments state the Derivation count of named real units. A unit's forest size
+changes with any grammar change that touches it, so an assertion on it fails on a change that
+broke nothing, and the comments are wrong until someone notices. What those tests are for is a
+large forest: that it narrows without enumeration, that its forks are counted exactly, that a
+judgment on it is evaluated like any other. None of them is about the number.
 
-The known instances: that assertion, and the sizes of *Draugr Necromancer* and *Remove
-Enchantments* in the comments of `crates/english/tests/{forest_alternatives,forest_counts,
-forest_forks,judgments,settled_spine}.rs`, `crates/xtask/src/english/forestwalk/tests.rs` and
-`crates/xtask/src/english/forests/forks.rs`.
+The known instances: `assert_eq!(readings.len(), 3312)` for *Draugr Necromancer* in
+`crates/xtask/src/english/forestwalk/tests.rs`, that unit's size in the comments there and in
+`crates/english/tests/{forest_alternatives,forest_counts,forest_forks,settled_spine}.rs`, and
+the sizes in the header of `crates/english/judgments/large_forests.txt`.
 
 ## Done when
 
