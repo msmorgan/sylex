@@ -130,8 +130,9 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    `eachOf`) introduces a singular referent, and `doForEach` binds one per pass. On leaving that
    scope, its domain and the indefinites, targets and created objects introduced inside it are
    exported as plural (§2.4). Each export is a recorded discourse fact, not derived from stamps.
-5. **Relative clause or comparison**, including the domain `countOf` and `aggregateAll` measure. It is
-   closed on exit, so no later pronoun reads a measured domain. Attachment Hosts ("enchanted",
+5. **Relative clause or comparison**, including the domain `countOf` and `aggregateAll` measure.
+   It is closed on exit, so no later pronoun reads a measured domain; the difference a `compareOver`
+   admits a member by travels with that member (§2.4). Attachment Hosts ("enchanted",
    "equipped") project to the ability's box ([CR#303.4b]).
 6. **Definition Reference Scope:** see §2.3.
 
@@ -261,7 +262,7 @@ prospective amounts such as "that many" exist, but products such as a drawn card
 below: patients have moved, are stamped with the deed, and become new objects where [CR#400.7]
 applies.
 
-Two reads are of the world before the event. A look-back trigger pattern (§3.2) reads its own
+Some reads are of the world before the event. A look-back trigger pattern (§3.2) reads its own
 descriptions as the objects were immediately prior to the event ([CR#603.10,603.10a]), so "Whenever
 a creature dies" matches a permanent that was a creature on the battlefield just before dying; only
 the trigger's body reads after. A lookback's historical subject or patient (§3.4), and a
@@ -273,11 +274,11 @@ graveyard") names the land permanent the special action puts onto the battlefiel
 ([CR#116.2a,305.1]), so a card-type head at `Nominal` keeps its permanent reading in each place.
 
 A cost reduction applies when the spell's total cost is determined, before that cost is paid
-([CR#601.2f,601.2h]), so its read of a cost paid "this way" (§2.4) reads the payment the player
-announced ([CR#601.2b]): *Explosive Singularity*'s "for each creature tapped this way" counts the
-creatures announced for its additional cost. The CR does not say when the number of objects an
-"any number" additional cost uses is fixed. Fixing it with the announcement, as a variable
-additional cost's value is ([CR#601.2b,607.2j]), is an engine choice.
+([CR#601.2f,601.2h]), so its read of a cost paid "this way" (§2.4) cannot read the payment
+itself. The CR does not say when the number of objects an "any number" additional cost uses is
+fixed. Fixing it when the player announces the intention to pay that cost, as a variable
+additional cost's value is ([CR#601.2b,607.2j]), is an engine choice, and under it *Explosive
+Singularity*'s "for each creature tapped this way" counts the number announced.
 
 ### 3.2 The Event Gate
 
@@ -575,13 +576,14 @@ are found over enumerated candidates or over a packed form is open (§6).
 18. **Choosing among numeric antecedents.** How an unqualified `thatMuch` chooses among several
     accessible numeric antecedents (§2.4) is open. A rule must give these readings: *Neheb,
     Dreadhorde Champion*'s "add that much {R}" reads the cards discarded, not the combat damage
-    or the cards drawn (its ruling); *Last Stand*'s "discard that many cards" reads the cards
-    drawn, the last of five amounts; *Bottle-Cap Blast*'s "create that many" reads the excess
-    damage of its if-clause, not the 5 damage; *Tellah, Great Sage*'s "deals that much damage"
+    or the cards drawn (its ruling); *Last Stand*'s "discard that many cards" reads the
+    number of its draw, the last of five amounts; *Bottle-Cap Blast*'s "create that many" reads the
+    excess damage of its if-clause, not the 5 damage; *Tellah, Great Sage*'s "deals that much damage"
     reads the mana spent in its if-clause; *Galvanic Discharge*'s reads the {E} paid, not the
     {E}{E}{E} gotten; *Refraction Trap*'s reads the damage prevented, not the 3 (its ruling);
     *Memory Vampire*'s "any number of target players each mill that many cards" reads the combat
-    damage, not the clause-mate subject. An amount written as an anaphor introduces no new
+    damage, not the clause-mate subject. An anaphor reads the amount the text gave an action,
+    not the number the action produced, so an amount written as an anaphor introduces no new
     antecedent: *Sekki, Seasons' Guide* creates as many tokens as the damage though it may remove
     fewer counters, and *Hordewing Skaab*'s discard is the number of opponents even when another
     effect changed the draw (their rulings).
