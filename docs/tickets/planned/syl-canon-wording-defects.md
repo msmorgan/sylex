@@ -2,7 +2,7 @@
 needs: [cleanup-step6-surface]
 ---
 
-# Four canon terms that do not say what their cards print
+# Canon terms that do not say what their cards print
 
 ## Why
 
@@ -27,6 +27,19 @@ Each of these terms writes words its card does not print, or cannot print what i
   with no type word to print after "target"; *Chandra's Pyrohelix* and *Electrolyze* write
   `targets(oneOrTwo, anyTarget)` for "one or two targets"; and *Screaming Nemesis* writes
   `target(nominal(pre = [other], anyTarget))` for "any other target".
+- A printed "and" that unions two types is written `or`, which prints "or": at `PreModifier` in
+  *Arcane Melee* ("Instant and sorcery spells"), *Aura of Silence*, *Goblin Electromancer*, *Mana
+  Matrix*, *Melek, Izzet Paragon*, *Precognition Field*, *Prismari, the Inspiration* and *Vernal
+  Equinox*, and at `Nominal` in *Benevolent Blessing*, *Clarion Conqueror*, *Damping Matrix* and
+  *Glaring Spotlight* ("spells and abilities"). No `PreModifier` coordination spells "and" with
+  union meaning.
+- *Lava Axe*, *Mogg Maniac* and *Searing Flesh* print "player or planeswalker" (or "opponent or
+  planeswalker") and write the arms in the other order, `or([planeswalker, player])`.
+- *Tide Shaper* and *Briarblade Adept* print "an opponent controls" and write `opponentsControl`.
+- `soulbond` writes its intervening condition as `is(thisCreature, and([controlledBy(you), …]))`,
+  "this creature is controlled by you", where [CR#702.95a] prints "if you control both this
+  creature and another creature and both are unpaired". No plural anaphor spells "both", and no
+  rule lets an anaphor in one conjunct of a condition read an indefinite of the conjunct before it.
 
 ## Open questions
 
@@ -48,6 +61,13 @@ Each of these terms writes words its card does not print, or cannot print what i
 - *Juxtapose*'s term holds one `target(…)` for its one "target player".
 - No call in `plugins/` wraps `anyTarget` in a determiner; every caller writes the form its card
   prints.
+- Each card listed under the union "and" prints "and" where its Oracle text does, with the
+  declaration that needs, and any other canon card with the same defect is found from the parse
+  and fixed with them.
+- *Lava Axe*, *Mogg Maniac* and *Searing Flesh* write their coordination in printed order.
+- *Tide Shaper* and *Briarblade Adept* print "an opponent controls".
+- `soulbond`'s conditions print [CR#702.95a]'s words, with the declarations and the accessibility
+  rule that needs.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

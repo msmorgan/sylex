@@ -111,8 +111,8 @@ nothing explains.
 
 ## Not in scope
 
-- Printed "and" spelled `or` in premodifier and nominal coordinations, reversed coordination
-  order, and unprinted location words: `syl-canon-wording-defects`, `syl-zone-words`.
+- Printed "and" spelled `or` in premodifier and nominal coordinations and reversed coordination
+  order: `syl-canon-wording-defects`. Unprinted location words: `syl-zone-words`.
 - Copular relatives inside created tokens, becomes and damage ("a token that's a copy of …",
   "that's still a planeswalker", "damage that would be dealt"): `syl-token-records-to-templates`,
   `syl-become-replaces-types`, `syl-damage-and-life-noun-phrases`. "Already":
