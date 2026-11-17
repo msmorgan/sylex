@@ -10,7 +10,7 @@ card singleFaced({
         instruct(it, dealDamage(amount = 2, recipient = target(anyTarget)))),
       channel(
         activated(
-          compound([mana([generic(1), pip(red)]), perform(discard(this))]),
+          compound([mana([generic(1), pip(red)]), perform(discard(this(card)))]),
           instruct(it, dealDamage(amount = 2, recipient = target(anyTarget)))))],
     power = 2,
     toughness = 3})

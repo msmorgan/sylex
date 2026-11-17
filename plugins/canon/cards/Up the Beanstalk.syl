@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       triggered(
         and([
-            when(does(actor(this), enter)),
+            when(does(actor(this(enchantment)), enter)),
             whenever(
               does(actor(you), cast(a(nominal(spell, post = [hasManaValue(atLeast, 5)])))))]),
         draw(1))]})

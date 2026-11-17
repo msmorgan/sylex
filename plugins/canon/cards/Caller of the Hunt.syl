@@ -5,7 +5,10 @@ card singleFaced({
     subtypes = [human],
     text = [
       static(
-        addedCost(this, mandatory, plusAdditional(perform(choose(a(quality(subtype(creature)))))))),
+        addedCost(
+          this(spell),
+          mandatory,
+          plusAdditional(perform(choose(a(quality(subtype(creature)))))))),
       static(
         definesPt(
           ownName,

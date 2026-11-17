@@ -15,7 +15,7 @@ card singleFaced({
             once)),
         sequentially([
             instruct(
-              this,
+              this(enchantment),
               dealDamage(
                 amount = letter(x),
                 recipient = and([

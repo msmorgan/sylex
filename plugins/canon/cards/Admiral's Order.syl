@@ -6,5 +6,5 @@ card singleFaced({
       static(
         if(
           did(actor(you), attack, within(soFarThisTurn)),
-          altCost(payingInstead(mana([pip(blue)])), this))),
+          altCost(payingInstead(mana([pip(blue)])), this(spell)))),
       spell(counter(target(spell)))]})

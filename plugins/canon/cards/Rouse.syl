@@ -6,5 +6,5 @@ card singleFaced({
       static(
         if(
           exists(nominal(swamp, post = [youControl])),
-          altCost(payingInstead(perform(payLife(amount = 2))), this))),
+          altCost(payingInstead(perform(payLife(amount = 2))), this(spell)))),
       spell(get(target(creature), up(2), up(0), duration = untilEndOfTurn))]})

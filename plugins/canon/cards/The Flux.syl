@@ -7,7 +7,7 @@ card singleFaced({
       when(
         chapterMark([1]),
         instruct(
-          this,
+          this(saga),
           dealDamage(
             amount = 4,
             recipient = target(nominal(creature, post = [anOpponentControls]))))),

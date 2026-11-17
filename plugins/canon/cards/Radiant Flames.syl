@@ -7,4 +7,4 @@ card singleFaced({
       spell(
         instruct(
           ownName,
-          dealDamage(amount = colorsSpentToCast(this), recipient = each(creature))))]})
+          dealDamage(amount = colorsSpentToCast(this(spell)), recipient = each(creature))))]})

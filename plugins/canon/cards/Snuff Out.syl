@@ -6,7 +6,7 @@ card singleFaced({
       static(
         if(
           exists(nominal(swamp, post = [youControl])),
-          altCost(payingInstead(perform(payLife(amount = 4))), this))),
+          altCost(payingInstead(perform(payLife(amount = 4))), this(spell)))),
       spell(
         doUnderProhibition(
           destroy(target(nominal(pre = [non(black)], creature))),

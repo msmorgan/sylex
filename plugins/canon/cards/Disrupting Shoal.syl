@@ -14,7 +14,7 @@ card singleFaced({
                     pre = [blue],
                     card,
                     post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
-          this)),
+          this(spell))),
       spell(
         doOnlyIf(
           counter(target(spell)),

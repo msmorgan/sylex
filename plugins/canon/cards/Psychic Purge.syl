@@ -7,5 +7,5 @@ card singleFaced({
       when(
         causes(
           bySource(a(nominal(or([spell, abilityHead(anyOnStack)]), post = [anOpponentControls]))),
-          does(actor(you), discard(this))),
+          does(actor(you), discard(this(card)))),
         instruct(that(player), loseLife(5)))]})

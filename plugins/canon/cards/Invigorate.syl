@@ -6,5 +6,5 @@ card singleFaced({
       static(
         if(
           exists(nominal(forest, post = [youControl])),
-          ratherThanPay(this, payingInstead(perform(instruct(anOpponent, gainLife(3))))))),
+          ratherThanPay(this(spell), payingInstead(perform(instruct(anOpponent, gainLife(3))))))),
       spell(get(target(creature), up(4), up(4), duration = untilEndOfTurn))]})

@@ -5,13 +5,13 @@ card singleFaced({
     text = [
       static(
         addedCost(
-          this,
+          this(spell),
           optional,
           plusAdditional(
             perform(
               tap(counted(anyNumber, nominal(pre = [untapped], creature, post = [youControl]))))))),
       static(
         costShift(
-          this,
+          this(spell),
           less(forEach(1, nominal(creature, post = [was(tap(which), within = thisWay)]))))),
       spell(instruct(ownName, dealDamage(amount = 10, recipient = target(anyTarget))))]})

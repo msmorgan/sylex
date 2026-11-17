@@ -5,7 +5,7 @@ card singleFaced({
     types = [creature],
     subtypes = [dragon],
     text = [
-      static(cant(any, counter(this))),
+      static(cant(any, counter(this(spell)))),
       flying,
       haste,
       activated(

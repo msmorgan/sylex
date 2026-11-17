@@ -9,5 +9,5 @@ card singleFaced({
             compound([
                 perform(payLife(amount = 1)),
                 perform(exile(a(nominal(pre = [blue], card, post = [in(yourHand)]))))])),
-          this)),
+          this(spell))),
       spell(counter(target(spell)))]})

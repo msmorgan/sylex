@@ -7,7 +7,7 @@ card singleFaced({
       suspend(4, mana([generic(1), pip(blue)])),
       when(
         timed(
-          does(any, removeCounters(theLast, printedKind(timeCounter), this)),
+          does(any, removeCounters(theLast, printedKind(timeCounter), this(card))),
           whileTrue(is(it, in(exileZone)))),
         establishThroughout(cant(any, block(attacker = bare(creature))), thisTurn))],
     power = 2,

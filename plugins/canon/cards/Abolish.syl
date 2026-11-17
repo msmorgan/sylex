@@ -6,5 +6,5 @@ card singleFaced({
       static(
         altCost(
           payingInstead(perform(discard(a(nominal(pre = [plains], card, post = [in(yourHand)]))))),
-          this)),
+          this(spell))),
       spell(destroy(target(or([artifact, enchantment]))))]})

@@ -8,6 +8,7 @@ card singleFaced({
     subtypes = [human, warrior],
     text = [
       blitz(compound([mana([generic(2), pip(black), pip(black)]), perform(payLife(amount = 2))])),
-      static(can(actor(you), cast(this, from = yourGraveyard, altCost = usingKeyword(blitz))))],
+      static(
+        can(actor(you), cast(this(card), from = yourGraveyard, altCost = usingKeyword(blitz))))],
     power = 3,
     toughness = 2})

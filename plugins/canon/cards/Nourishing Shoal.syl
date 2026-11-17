@@ -14,5 +14,5 @@ card singleFaced({
                     pre = [green],
                     card,
                     post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
-          this)),
+          this(spell))),
       spell(gainLife(letter(x)))]})

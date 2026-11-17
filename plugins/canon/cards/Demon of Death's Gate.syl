@@ -10,7 +10,7 @@ card singleFaced({
             compound([
                 perform(payLife(amount = 6)),
                 perform(sacrifice(counted(exactly(3), nominal(pre = [black], creature))))])),
-          this)),
+          this(spell))),
       flying,
       trample],
     power = 9,

@@ -7,7 +7,7 @@ card singleFaced({
     text = [
       static(
         conjunction([
-            costShift(this, less(letter(x))),
+            costShift(this(spell), less(letter(x))),
             letterDefinition(
               x,
               aggregateAll(sum, stat(power), nominal(creature, post = [youControl])))])),

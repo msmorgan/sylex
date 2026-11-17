@@ -14,5 +14,5 @@ card singleFaced({
                     pre = [red],
                     card,
                     post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
-          this)),
+          this(spell))),
       spell(get(target(creature), up(letter(x)), up(0), duration = untilEndOfTurn))]})

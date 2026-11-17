@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [human, wizard],
     text = [
-      static(onlyIf(costShift(this, less(1)), exists(nominal(wizard, post = [youControl])))),
+      static(onlyIf(costShift(this(spell), less(1)), exists(nominal(wizard, post = [youControl])))),
       when(
         does(actor(this(creature)), enter),
         returnToHand(target(nominal(creature, post = [anOpponentControls]))))],

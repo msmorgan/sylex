@@ -7,5 +7,5 @@ card singleFaced({
         altCost(
           payingInstead(
             perform(returnToHand(counted(exactly(3), nominal(island, post = [youControl]))))),
-          this)),
+          this(spell))),
       spell(counter(target(spell)))]})

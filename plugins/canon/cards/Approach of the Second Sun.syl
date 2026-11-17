@@ -6,7 +6,7 @@ card singleFaced({
       spell(
         doIf(
           and([
-              is(this, was(cast(which, from = yourHand), within = thisObject)),
+              is(this(spell), was(cast(which, from = yourHand), within = thisObject)),
               did(
                 actor(you),
                 cast(

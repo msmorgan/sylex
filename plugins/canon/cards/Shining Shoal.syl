@@ -14,7 +14,7 @@ card singleFaced({
                     pre = [white],
                     card,
                     post = [hasManaValue(equal, letter(x)), in(yourHand)]))))),
-          this)),
+          this(spell))),
       spell(
         establishThroughout(
           replace(

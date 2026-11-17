@@ -5,8 +5,8 @@ card singleFaced({
     types = [creature],
     subtypes = [zombie, knight],
     text = [
-      static(can(actor(you), cast(this, from = yourGraveyard))),
-      static(cant(actor(you), cast(this, from = not(yourGraveyard)))),
+      static(can(actor(you), cast(this(card), from = yourGraveyard))),
+      static(cant(actor(you), cast(this(card), from = not(yourGraveyard)))),
       static(
         asLongAs(
           is(shortenedName, in(battlefield)),

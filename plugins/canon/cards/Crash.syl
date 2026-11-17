@@ -3,5 +3,5 @@ card singleFaced({
     cost = [generic(2), pip(red)],
     types = [instant],
     text = [
-      static(altCost(payingInstead(perform(sacrifice(a(mountain)))), this)),
+      static(altCost(payingInstead(perform(sacrifice(a(mountain)))), this(spell))),
       spell(destroy(target(artifact)))]})

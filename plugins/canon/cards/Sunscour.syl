@@ -8,5 +8,5 @@ card singleFaced({
           payingInstead(
             perform(
               exile(counted(exactly(2), nominal(pre = [white], card, post = [in(yourHand)]))))),
-          this)),
+          this(spell))),
       spell(destroy(allOf(creature)))]})

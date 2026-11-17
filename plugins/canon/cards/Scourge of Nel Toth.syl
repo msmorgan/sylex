@@ -9,7 +9,7 @@ card singleFaced({
         can(
           actor(you),
           cast(
-            this,
+            this(creature),
             from = yourGraveyard,
             altCost = payingInstead(
               compound([
