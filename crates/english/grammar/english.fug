@@ -1260,10 +1260,6 @@ PastParticipial: PastPart -> VerbPhrase { transparent: [head] }
 HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
     where head.VerbForm = Plain,
           head.Gap = NP
-// A purpose adjunct whose object Gap a relative clause binds (*the
-// first spell that mana from a Treasure was spent to cast*).
-GappedPurpose: VerbPhrase -> VerbPhrase adjunct:ToInf { transparent: [adjunct] }
-    where adjunct.Gap = NP
 // *Is still on top of your library*, *is no longer snow*, *become no longer
 // suspected*.
 CentralAdverbAdjunct: CentralAdjunct -> AdverbPhrase { cost: 0 } where head.AdjunctPosition = Central
@@ -3449,8 +3445,16 @@ adjunct Gerund { host: Clause, side: Before, host_kind: Predicate, delimiter: ',
 // attacking*).
 adjunct Gerund { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
     where head.VerbKind != Auxiliary
-// A purpose *to*-infinitival, unless the head's frame selects one.
+// A purpose *to*-infinitival, unless the head's frame selects a
+// *to*-infinitival Complement (*costs {2} less to activate*, Arm-Mounted
+// Anchor).
 adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
+// A purpose *to*-infinitival whose object Gap a relative clause binds (*the
+// first spell that mana from a Treasure was spent to cast*, Rain of Riches),
+// unless the head's frame selects a *to*-infinitival Complement (*Equip
+// abilities you activate ... cost {3} less to activate*, Strong Back).
+adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
+    where adjunct.Gap = NP
 // Conjuncts share Voice and VerbKind, so a selecting auxiliary sees a value
 // (*it has attacked or blocked* is no passive perfect). Only a medial
 // conjunct may be a PredicativeRemnant, so Predicatives under one copula

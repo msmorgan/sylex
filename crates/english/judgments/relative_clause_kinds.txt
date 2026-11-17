@@ -15,7 +15,7 @@
 + <card=Verazol, the Split Current> Verazol enters with a +1/+1 counter on it for each mana spent to cast it. => NounPhrase "each mana spent to cast it"; VerbPhrase "spent to cast it" as Modifier of mana
 # from: Mental Modulation
 + This spell costs {1} less to cast during your turn. => Clause "to cast" as Complement of cost
-+ <card=Rain of Riches> The first spell you cast each turn that mana from a Treasure was spent to cast has cascade. => RelativeClause "that mana from a Treasure was spent to cast" gap "first spell you cast each turn"
++ <card=Rain of Riches> The first spell you cast each turn that mana from a Treasure was spent to cast has cascade. => RelativeClause "that mana from a Treasure was spent to cast" gap "first spell you cast each turn"; Clause "to cast" as Adjunct of spend
 + <card=Sanctum Lurker> Planeswalkers you control aren't put into their owners' graveyards for having 0 loyalty. => NounPhrase "0 loyalty" as Object of have
 + Starting with the next opponent in turn order, each player chooses a creature you don't control. => PrepositionPhrase "in turn order"; NounPhrase "turn order"
 + <card=Skyship Weatherlight> {4}, {T}: Choose a card at random that was exiled with Skyship Weatherlight. Put that card into its owner's hand. => NounPhrase "a card" as Object of choose; PrepositionPhrase "at random" as Adjunct of choose; RelativeClause "that was exiled with Skyship Weatherlight" gap "card"

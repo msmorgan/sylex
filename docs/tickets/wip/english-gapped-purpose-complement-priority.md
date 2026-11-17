@@ -6,23 +6,29 @@ needs: []
 
 ## Why
 
-`GappedPurpose` (`VerbPhrase -> VerbPhrase adjunct:ToInf where adjunct.Gap = NP`) is written as a
-plain `Production` because `SchemaDecl::Adjunct` (`crates/syntax/src/compile.rs`) refuses `.Gap`
-equations. Only `SchemaDecl::Adjunct` populates `Production::adjunct_slot` and `host_check`, so
-same-head complement priority (`docs/design/english.md` §3; `crates/syntax/src/step.rs`) never
-checks `GappedPurpose` against `Extension::Slot(SlotKind::ToInf)`. On 111 Corpus Units
-(*Arm-Mounted Anchor*'s `"This ability costs {2} less to activate …"`, *Agatha of the Vile
-Cauldron*, *Mavinda, Students' Advocate*'s `"costs {8} more to cast"`), `to activate` / `to cast`
-attaches to `cost` twice: once as `verb:cost`'s selected hollow `ToInf` `complement` and once as an
-unselected `GappedPurpose` `adjunct`.
+Same-head complement priority (`docs/design/english.md` §3; `crates/syntax/src/step.rs`) misses two
+unselected purpose *to*-infinitival paths on `verb:cost` (`TransitiveWithComplement(HollowToInf)`):
+
+- `Extension::selects` compares `SlotKind`s by equality, so `Extension::Slot(SlotKind::HollowToInf)`
+  does not select `Extension::Slot(SlotKind::ToInf)`. On 111 Corpus Units (*Arm-Mounted Anchor*'s
+  `"This ability costs {2} less to activate …"`, *Agatha of the Vile Cauldron*, *Mavinda, Students'
+  Advocate*'s `"it costs {8} more to cast this way"`), ungapped `adjunct ToInf` attaches `to
+  activate` / `to cast this way` as an unselected `Adjunct` beside `cost`'s `HollowToInf`
+  `Complement`.
+- `GappedPurpose` (`VerbPhrase -> VerbPhrase adjunct:ToInf where adjunct.Gap = NP`) is written as a
+  plain `Production` because `SchemaDecl::Adjunct` (`crates/syntax/src/compile.rs`) refuses `.Gap`
+  equations, so inside relative clauses (*Strong Back*'s `"Equip abilities you activate that target
+  enchanted creature cost {3} less to activate"`, *Pollywog Symbiote*) `GappedPurpose` carries
+  `adjunct_slot = None` and also attaches `to activate` / `to cast` as an `Adjunct` of `cost`.
 
 ## Design
 
-- Allow `adjunct.Gap` equations on `SchemaDecl::Adjunct` in `crates/syntax/src/compile.rs` and
+- Treat `Extension::Slot(SlotKind::HollowToInf)` as selecting `Extension::Slot(SlotKind::ToInf)` in
+  `Extension::selects` (`crates/syntax/src/step.rs`).
+- Allow `<function>.Gap` equations on non-delimited `SchemaDecl::Adjunct` in
+  `crates/syntax/src/compile.rs` (raising the required Gap to the mother while closing `head`) and
   express `GappedPurpose` in `crates/english/grammar/english.fug` through `adjunct ToInf` (`host:
-  VerbPhrase, side: After, host_kind: Predicate`) with `adjunct.Gap = NP`, so `adjunct_slot =
-  Some(SlotKind::ToInf)` suppresses the unselected purpose adjunct on any head whose frames select
-  `ToInf`.
+  VerbPhrase, side: After, host_kind: Predicate, cost: 2`) with `adjunct.Gap = NP`.
 
 ## Done when
 

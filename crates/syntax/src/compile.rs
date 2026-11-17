@@ -2636,11 +2636,47 @@ impl<'a> Binder<'a> {
                     HostKind::Predicate => "adjunct",
                     HostKind::Supplement => "supplement",
                 };
+                let mut adjunct_gap = GapRule::Closed;
+                for equation in equations {
+                    if let Equation::Require(path, value) = equation
+                        && let Some(child) = path.strip_suffix(".Gap")
+                    {
+                        if child != function {
+                            return Err(invalid(format!(
+                                "adjunct schema `{}`: a Gap requirement may target `{function}` only, got `{child}`",
+                                draft.id
+                            )));
+                        }
+                        if delimiter.is_some() {
+                            return Err(invalid(format!(
+                                "adjunct schema `{}`: a comma-set adjunct raises no Gap",
+                                draft.id
+                            )));
+                        }
+                        let gap = variant::<Gap>(value).ok_or_else(|| {
+                            invalid(format!(
+                                "adjunct schema `{}`: unknown gap `{value}`",
+                                draft.id
+                            ))
+                        })?;
+                        if gap == Gap::None {
+                            return Err(invalid(format!(
+                                "adjunct schema `{}`: `{function}` is already closed to Gaps",
+                                draft.id
+                            )));
+                        }
+                        adjunct_gap = GapRule::Raise(gap);
+                    }
+                }
+                // A comma-set post-adjunct is outside any relative clause
+                // (CGEL, Ch. 12 §4, p. 1058), and a host beside a gapped
+                // adjunct passes up no second Gap.
+                let host_gap = if delimiter.is_some() || adjunct_gap != GapRule::Closed {
+                    GapRule::Closed
+                } else {
+                    GapRule::Transparent
+                };
                 let (h, a) = if *side == Side::After {
-                    // A comma-set post-adjunct is outside any relative clause
-                    // (CGEL, Ch. 12 §4, p. 1058): its host passes up no Gap.
-                    let host_gap =
-                        if delimiter.is_some() { GapRule::Closed } else { GapRule::Transparent };
                     let h = draft.child("head", host_symbol, host_gap);
                     if let Some(c) = delimiter {
                         draft.child(
@@ -2649,9 +2685,9 @@ impl<'a> Binder<'a> {
                             GapRule::Closed,
                         );
                     }
-                    (h, draft.child(function, adjunct_symbol, GapRule::Closed))
+                    (h, draft.child(function, adjunct_symbol, adjunct_gap))
                 } else {
-                    let a = draft.child(function, adjunct_symbol, GapRule::Closed);
+                    let a = draft.child(function, adjunct_symbol, adjunct_gap);
                     if let Some(c) = delimiter {
                         draft.child(
                             "",
@@ -2659,19 +2695,10 @@ impl<'a> Binder<'a> {
                             GapRule::Closed,
                         );
                     }
-                    (draft.child("head", host_symbol, GapRule::Transparent), a)
+                    (draft.child("head", host_symbol, host_gap), a)
                 };
                 draft.host_check = Some((h, a, *host_kind));
                 draft.adjunct_unfit = self.unfit(adjunct_id)?;
-                if equations
-                    .iter()
-                    .any(|e| matches!(e, Equation::Require(p, _) if p.ends_with(".Gap")))
-                {
-                    return Err(invalid(format!(
-                        "adjunct schema `{}`: a Gap requirement",
-                        draft.id
-                    )));
-                }
                 self.equations(&mut draft, equations)
                     .map_err(|e| invalid(format!("adjunct schema `{}`: {e}", draft.id)))?;
                 draft.adjunct_slot = self
@@ -5424,16 +5451,25 @@ fn adjunct_production_id(schema: &SchemaDecl) -> String {
         side,
         host_kind,
         delimiter,
+        equations,
         nonfinal,
         ..
     } = schema
     else {
         unreachable!("an Adjunct schema")
     };
+    let gap = equations
+        .iter()
+        .find_map(|e| match e {
+            Equation::Require(path, value) if path.ends_with(".Gap") => Some(format!("/gap-{value}")),
+            _ => None,
+        })
+        .unwrap_or_default();
     format!(
-        "Adjunct:{host}+{adjunct}/{side:?}/{host_kind:?}{}{}",
+        "Adjunct:{host}+{adjunct}/{side:?}/{host_kind:?}{}{}{}",
         delimiter.map_or(String::new(), |c| format!("/{c}")),
-        if *nonfinal { "/nonfinal" } else { "" }
+        if *nonfinal { "/nonfinal" } else { "" },
+        gap,
     )
 }
 

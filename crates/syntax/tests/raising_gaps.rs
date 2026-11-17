@@ -246,3 +246,119 @@ fn an_adjectival_passive_passes_a_gap_through_its_by_phrase() {
     assert_eq!(parse_count("", "gap, "), 0);
     assert_eq!(parse_count("{ gap }", ""), 0);
 }
+
+#[test]
+fn a_gapped_adjunct_raises_its_gap_and_yields_to_a_selected_infinitival() {
+    let core = || Source {
+        kind: SourceKind::Core,
+        path: "tests/raising_gaps.rs".to_owned(),
+        owner: "test".to_owned(),
+    };
+    let lexicon = Lexicon::new([
+        Lexeme::verb("v:cost", "cost", core()),
+        Lexeme::verb("v:spend", "spend", core()),
+        Lexeme::verb("v:cast", "cast", core()),
+        Lexeme::noun("n:spell", "spell", vec![Countability::Count], core()),
+        Lexeme::noun("n:mana", "mana", vec![Countability::Mass], core()),
+        Lexeme::invariant("s:to", "to", Category::Subordinator, core()),
+    ])
+    .unwrap();
+    let frames = FrameCatalog::from_ron_str(
+        r#"(
+            frames: {
+                "v:cost": [
+                    (family: Monotransitive, slots: [(relation: Object, fill: NP)]),
+                    (family: TransitiveWithComplement, slots: [
+                        (relation: Object, fill: NP),
+                        (relation: Complement, fill: HollowToInf),
+                    ]),
+                ],
+                "v:spend": [(family: Monotransitive, slots: [(relation: Object, fill: NP)])],
+                "v:cast": [
+                    (family: Intransitive, slots: []),
+                    (family: Monotransitive, slots: [(relation: Object, fill: NP)]),
+                ],
+            },
+        )"#,
+    )
+    .unwrap();
+    let source = r#"
+        root Sentence
+        feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
+        category Sentence
+        category NounPhrase { gap }
+        category Nominal { gap }
+        category Clause { gap }
+        category ToInf : Clause { gap }
+        category HollowInf : Clause
+        category VerbPhrase [VerbForm] { gap }
+        slot NP = NounPhrase
+        slot ToInf = ToInf
+        slot HollowToInf = HollowInf
+        word To = "s:to"
+        Statement: Sentence -> subject:NounPhrase clause:VerbPhrase '.' where clause.VerbForm = Finite
+        Bare: NounPhrase -> Nominal { transparent: [head] }
+        Head: Nominal -> Lex(Noun)
+        BareRelative: Nominal -> Nominal modifier:Clause
+            where modifier.Gap = NP
+        RelClause: Clause -> subject:NounPhrase VerbPhrase { transparent: [head] }
+            where head.VerbForm = Finite
+        ToInfinitival: ToInf -> marker:Word(To) VerbPhrase { transparent: [head] }
+            where head.VerbForm = Plain
+        HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
+            where head.VerbForm = Plain,
+                  head.Gap = NP
+        valence VerbPhrase { head: Verb }
+        adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate }
+        adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate }
+            where adjunct.Gap = NP
+    "#;
+    let grammar =
+        CompiledGrammar::bind(&Grammar::from_fug_str(source).unwrap(), &lexicon, &frames).unwrap();
+
+    // Non-selecting *spend* keeps its gapped purpose adjunct inside a relative clause.
+    let spend_readings = grammar
+        .parse(&lexicon, "Spell mana spends mana to cast casts.")
+        .readings()
+        .collect::<Vec<_>>();
+    assert_eq!(spend_readings.len(), 1, "{spend_readings:#?}");
+    assert_eq!(
+        grammar.admit(&spend_readings[0], &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
+
+    // Selecting *cost* (`HollowToInf`) suppresses both ungapped and gapped `adjunct ToInf`:
+    // main-clause `costs mana to cast` takes `HollowInfinitival` alone, and relative-clause
+    // `mana costs mana to cast` cannot license a relative Gap through gapped `adjunct ToInf`.
+    let cost_readings = grammar
+        .parse(&lexicon, "Spell costs mana to cast.")
+        .readings()
+        .collect::<Vec<_>>();
+    assert_eq!(cost_readings.len(), 1, "{cost_readings:#?}");
+    assert_eq!(
+        grammar.admit(&cost_readings[0], &lexicon, &sylex_lexicon::CardScope::default()),
+        Ok(())
+    );
+    assert_eq!(
+        grammar
+            .parse(&lexicon, "Spell mana costs mana to cast casts.")
+            .readings()
+            .count(),
+        0
+    );
+
+    // A `.Gap` requirement on `head` or a comma-delimited adjunct is rejected at bind time.
+    for bad in [
+        "adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate } where head.Gap = NP",
+        "adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, delimiter: ',' } where adjunct.Gap = NP",
+    ] {
+        let bad_source = format!("{source}\n        {bad}");
+        let err = CompiledGrammar::bind(
+            &Grammar::from_fug_str(&bad_source).unwrap(),
+            &lexicon,
+            &frames,
+        )
+        .unwrap_err();
+        assert!(format!("{err:?}").contains("Gap"), "{err:?}");
+    }
+}

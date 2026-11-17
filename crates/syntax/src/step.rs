@@ -82,11 +82,14 @@ pub(crate) enum Extension {
 impl Extension {
     /// Whether a frame selecting `self` selects `phrase`, an adjunct's or a
     /// following phrase's extension: a Preposition Phrase slot that names no
-    /// Complement kind selects its preposition with any Complement.
+    /// Complement kind selects its preposition with any Complement, and a
+    /// hollow *to*-infinitival slot (*cost {1} to activate*, CGEL, Ch. 14
+    /// §6.3(c), p. 1250) selects a *to*-infinitival phrase.
     pub(crate) fn selects(self, phrase: Self) -> bool {
         match (self, phrase) {
             (Self::Preposition(p, None), Self::Preposition(q, _)) => p == q,
             (Self::Preposition(p, Some(k)), Self::Preposition(q, Some(j))) => p == q && k == j,
+            (Self::Slot(SlotKind::HollowToInf), Self::Slot(SlotKind::ToInf)) => true,
             (selected, phrase) => selected == phrase,
         }
     }

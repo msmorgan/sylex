@@ -8,7 +8,7 @@ needs: []
 `PostposedRelative`, `PostposedBareRelative` and `PostposedParticipialModifier` match any
 `VerbPhrase` with `head.Gap = NP`, supplying an `object` child and postposed modifier after a
 predicate PP adjunct (*Choose a card at random that was exiled with …*). Because `VerbPhrase` also
-carries `Gap = NP` from stranded prepositions and `GappedPurpose`, those three Productions steal
+carries `Gap = NP` from stranded prepositions and gapped `adjunct ToInf`, those three Productions steal
 non-Object gaps and build double-Object VPs — both on synthetic inputs (`"Put into your hand a card
 at random that was exiled with it."`, `"Spend mana to cast a card at random that was exiled with
 it."`) and on real corpus cards (*Gerrard's Hourglass Pendant*, *Second Sunrise*, *Storrev,
@@ -37,5 +37,5 @@ field without a `Gap`.
 
 - `crates/english/grammar/english.fug`: `PostposedRelative`, `PostposedBareRelative`,
   `PostposedParticipialModifier`, `PostposedAdjective`, `category PostposedModifier`,
-  `valence VerbPhrase` (`postposed`), `GappedPurpose`.
+  `valence VerbPhrase` (`postposed`), `adjunct ToInf` (`adjunct.Gap = NP`).
 - `crates/syntax/src/compile.rs` (`postposed_modifier`).
