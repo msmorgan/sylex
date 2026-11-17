@@ -1,6 +1,6 @@
 # A menace counter causes its bearer to gain menace [CR#122.1b]; keyword counters apply in layer 6
 # [CR#613.1f].
 counter menaceCounter {
-  lexical = {lemma = "menace counter"},
+  lexical = {lemma = "menace"},
   spelling = "menace counter"
 }

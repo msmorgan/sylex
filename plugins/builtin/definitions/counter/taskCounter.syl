@@ -1,4 +1,4 @@
 counter taskCounter {
-  lexical = {lemma = "task counter"},
+  lexical = {lemma = "task"},
   spelling = "task counter"
 }

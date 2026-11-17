@@ -1,6 +1,6 @@
 # A shadow counter causes its bearer to gain shadow [CR#122.1b]; keyword counters apply in layer 6
 # [CR#613.1f].
 counter shadowCounter {
-  lexical = {lemma = "shadow counter"},
+  lexical = {lemma = "shadow"},
   spelling = "shadow counter"
 }

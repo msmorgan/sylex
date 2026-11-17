@@ -1,4 +1,4 @@
 counter foreshadowCounter {
-  lexical = {lemma = "foreshadow counter"},
+  lexical = {lemma = "foreshadow"},
   spelling = "foreshadow counter"
 }

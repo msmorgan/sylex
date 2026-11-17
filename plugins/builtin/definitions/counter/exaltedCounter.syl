@@ -1,6 +1,6 @@
 # A exalted counter causes its bearer to gain exalted [CR#122.1b]; keyword counters apply in layer 6
 # [CR#613.1f].
 counter exaltedCounter {
-  lexical = {lemma = "exalted counter"},
+  lexical = {lemma = "exalted"},
   spelling = "exalted counter"
 }

@@ -1,6 +1,6 @@
 # A deathtouch counter causes its bearer to gain deathtouch [CR#122.1b]; keyword counters apply in
 # layer 6 [CR#613.1f].
 counter deathtouchCounter {
-  lexical = {lemma = "deathtouch counter"},
+  lexical = {lemma = "deathtouch"},
   spelling = "deathtouch counter"
 }

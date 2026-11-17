@@ -1,4 +1,4 @@
 counter depletionCounter {
-  lexical = {lemma = "depletion counter"},
+  lexical = {lemma = "depletion"},
   spelling = "depletion counter"
 }

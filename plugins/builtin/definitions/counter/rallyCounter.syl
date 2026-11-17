@@ -1,4 +1,4 @@
 counter rallyCounter {
-  lexical = {lemma = "rally counter"},
+  lexical = {lemma = "rally"},
   spelling = "rally counter"
 }

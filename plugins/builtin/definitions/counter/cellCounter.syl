@@ -1,4 +1,4 @@
 counter cellCounter {
-  lexical = {lemma = "cell counter"},
+  lexical = {lemma = "cell"},
   spelling = "cell counter"
 }

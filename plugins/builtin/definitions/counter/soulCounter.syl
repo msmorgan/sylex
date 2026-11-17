@@ -1,4 +1,4 @@
 counter soulCounter {
-  lexical = {lemma = "soul counter"},
+  lexical = {lemma = "soul"},
   spelling = "soul counter"
 }

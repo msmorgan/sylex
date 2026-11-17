@@ -1,4 +1,4 @@
 counter voyageCounter {
-  lexical = {lemma = "voyage counter"},
+  lexical = {lemma = "voyage"},
   spelling = "voyage counter"
 }

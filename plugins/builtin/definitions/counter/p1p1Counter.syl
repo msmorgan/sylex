@@ -11,7 +11,7 @@
 # creature card in a zone other than the battlefield" [CR#122.1a], so no zone is asserted for the
 # bearer of a stat change, a definition's or a card's.
 counter p1p1Counter {
-  lexical = {lemma = "+1/+1 counter"},
+  lexical = {lemma = "+1/+1"},
   spelling = "+1/+1 counter",
 
   confers = [boost(up(1), up(1))]

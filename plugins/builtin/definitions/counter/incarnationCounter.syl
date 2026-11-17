@@ -1,4 +1,4 @@
 counter incarnationCounter {
-  lexical = {lemma = "incarnation counter"},
+  lexical = {lemma = "incarnation"},
   spelling = "incarnation counter"
 }

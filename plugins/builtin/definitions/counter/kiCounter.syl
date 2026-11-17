@@ -1,4 +1,4 @@
 counter kiCounter {
-  lexical = {lemma = "ki counter"},
+  lexical = {lemma = "ki"},
   spelling = "ki counter"
 }

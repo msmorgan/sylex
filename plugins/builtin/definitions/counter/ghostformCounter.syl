@@ -1,4 +1,4 @@
 counter ghostformCounter {
-  lexical = {lemma = "ghostform counter"},
+  lexical = {lemma = "ghostform"},
   spelling = "ghostform counter"
 }

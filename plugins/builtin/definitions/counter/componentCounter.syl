@@ -1,4 +1,4 @@
 counter componentCounter {
-  lexical = {lemma = "component counter"},
+  lexical = {lemma = "component"},
   spelling = "component counter"
 }

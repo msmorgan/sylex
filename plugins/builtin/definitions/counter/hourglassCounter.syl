@@ -1,4 +1,4 @@
 counter hourglassCounter {
-  lexical = {lemma = "hourglass counter"},
+  lexical = {lemma = "hourglass"},
   spelling = "hourglass counter"
 }

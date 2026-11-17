@@ -1,6 +1,6 @@
 # A lifelink counter causes its bearer to gain lifelink [CR#122.1b]; keyword counters apply in layer
 # 6 [CR#613.1f].
 counter lifelinkCounter {
-  lexical = {lemma = "lifelink counter"},
+  lexical = {lemma = "lifelink"},
   spelling = "lifelink counter"
 }

@@ -1,4 +1,4 @@
 counter arrowheadCounter {
-  lexical = {lemma = "arrowhead counter"},
+  lexical = {lemma = "arrowhead"},
   spelling = "arrowhead counter"
 }

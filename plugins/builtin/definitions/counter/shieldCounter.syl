@@ -2,6 +2,6 @@
 # instead of destruction by an effect, and a single prevention effect that prevents damage and
 # removes a shield counter. [CR#122.1c]
 counter shieldCounter {
-  lexical = {lemma = "shield counter"},
+  lexical = {lemma = "shield"},
   spelling = "shield counter"
 }

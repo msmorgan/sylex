@@ -1,4 +1,4 @@
 counter takeoverCounter {
-  lexical = {lemma = "takeover counter"},
+  lexical = {lemma = "takeover"},
   spelling = "takeover counter"
 }

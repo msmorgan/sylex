@@ -1,4 +1,4 @@
 counter matrixCounter {
-  lexical = {lemma = "matrix counter"},
+  lexical = {lemma = "matrix"},
   spelling = "matrix counter"
 }

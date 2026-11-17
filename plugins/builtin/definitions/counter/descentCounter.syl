@@ -1,4 +1,4 @@
 counter descentCounter {
-  lexical = {lemma = "descent counter"},
+  lexical = {lemma = "descent"},
   spelling = "descent counter"
 }

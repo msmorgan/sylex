@@ -1,4 +1,4 @@
 counter memoryCounter {
-  lexical = {lemma = "memory counter"},
+  lexical = {lemma = "memory"},
   spelling = "memory counter"
 }

@@ -2,6 +2,6 @@
 # crosses their threshold [CR#715.2b]; the final chapter number also governs the Saga's sacrifice
 # [CR#715.4].
 counter loreCounter {
-  lexical = {lemma = "lore counter"},
+  lexical = {lemma = "lore"},
   spelling = "lore counter"
 }

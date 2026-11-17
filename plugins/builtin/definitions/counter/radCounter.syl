@@ -2,7 +2,7 @@
 # phase, they mill that many cards, then lose 1 life and remove a rad counter for each nonland
 # card milled this way. [CR#122.1i,729.1]
 counter radCounter {
-  lexical = {lemma = "rad counter"},
+  lexical = {lemma = "rad"},
   spelling = "rad counter",
   holder = player
 }

@@ -1,4 +1,4 @@
 counter shellCounter {
-  lexical = {lemma = "shell counter"},
+  lexical = {lemma = "shell"},
   spelling = "shell counter"
 }

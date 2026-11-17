@@ -1,4 +1,4 @@
 counter oreCounter {
-  lexical = {lemma = "ore counter"},
+  lexical = {lemma = "ore"},
   spelling = "ore counter"
 }

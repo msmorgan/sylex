@@ -54,7 +54,12 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
   measure by rule [CR#122.1a,122.1b], so their `counter` declarations (`flyingCounter`,
   `p1p1Counter`) and the uncalled `grants` Template say nothing the rule does not.
   Recommendation: the two rules are each one conferral over the kind, and those declarations and
-  `grants` are deleted.
+  `grants` are deleted. The `counter` declarations whose `lexical` lemma only repeats a measure
+  or keyword are `p1p1Counter` and `m1m1Counter` (the measures +1/+1 and -1/-1) and
+  `deathtouchCounter`, `decayedCounter`, `doubleStrikeCounter`, `exaltedCounter`,
+  `firstStrikeCounter`, `flyingCounter`, `hasteCounter`, `hexproofCounter`,
+  `indestructibleCounter`, `lifelinkCounter`, `menaceCounter`, `reachCounter`, `shadowCounter`,
+  `trampleCounter` and `vigilanceCounter` (the keyword counters [CR#122.1b]).
 
 ## Done when
 

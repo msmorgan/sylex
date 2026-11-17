@@ -1,4 +1,4 @@
 counter pressureCounter {
-  lexical = {lemma = "pressure counter"},
+  lexical = {lemma = "pressure"},
   spelling = "pressure counter"
 }

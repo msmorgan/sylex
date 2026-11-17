@@ -1,4 +1,4 @@
 counter ribbonCounter {
-  lexical = {lemma = "ribbon counter"},
+  lexical = {lemma = "ribbon"},
   spelling = "ribbon counter"
 }

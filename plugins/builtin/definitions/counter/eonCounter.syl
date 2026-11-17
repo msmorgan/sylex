@@ -1,4 +1,4 @@
 counter eonCounter {
-  lexical = {lemma = "eon counter"},
+  lexical = {lemma = "eon"},
   spelling = "eon counter"
 }

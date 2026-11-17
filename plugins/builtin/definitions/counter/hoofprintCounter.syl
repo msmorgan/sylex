@@ -1,4 +1,4 @@
 counter hoofprintCounter {
-  lexical = {lemma = "hoofprint counter"},
+  lexical = {lemma = "hoofprint"},
   spelling = "hoofprint counter"
 }

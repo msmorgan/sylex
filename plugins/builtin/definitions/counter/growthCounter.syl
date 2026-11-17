@@ -1,4 +1,4 @@
 counter growthCounter {
-  lexical = {lemma = "growth counter"},
+  lexical = {lemma = "growth"},
   spelling = "growth counter"
 }

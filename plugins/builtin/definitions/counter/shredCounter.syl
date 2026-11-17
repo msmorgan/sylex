@@ -1,4 +1,4 @@
 counter shredCounter {
-  lexical = {lemma = "shred counter"},
+  lexical = {lemma = "shred"},
   spelling = "shred counter"
 }

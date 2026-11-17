@@ -1,4 +1,4 @@
 counter glyphCounter {
-  lexical = {lemma = "glyph counter"},
+  lexical = {lemma = "glyph"},
   spelling = "glyph counter"
 }

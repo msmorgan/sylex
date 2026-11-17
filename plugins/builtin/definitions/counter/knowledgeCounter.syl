@@ -1,4 +1,4 @@
 counter knowledgeCounter {
-  lexical = {lemma = "knowledge counter"},
+  lexical = {lemma = "knowledge"},
   spelling = "knowledge counter"
 }

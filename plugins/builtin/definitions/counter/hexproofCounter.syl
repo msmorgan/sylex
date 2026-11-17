@@ -1,6 +1,6 @@
 # A hexproof counter causes its bearer to gain hexproof [CR#122.1b]; keyword counters apply in layer
 # 6 [CR#613.1f].
 counter hexproofCounter {
-  lexical = {lemma = "hexproof counter"},
+  lexical = {lemma = "hexproof"},
   spelling = "hexproof counter"
 }

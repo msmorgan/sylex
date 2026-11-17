@@ -1,4 +1,4 @@
 counter interventionCounter {
-  lexical = {lemma = "intervention counter"},
+  lexical = {lemma = "intervention"},
   spelling = "intervention counter"
 }

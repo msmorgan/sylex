@@ -1,6 +1,6 @@
 # A decayed counter causes its bearer to gain decayed [CR#122.1b]; keyword counters apply in layer 6
 # [CR#613.1f].
 counter decayedCounter {
-  lexical = {lemma = "decayed counter"},
+  lexical = {lemma = "decayed"},
   spelling = "decayed counter"
 }

@@ -1,4 +1,4 @@
 counter manifestationCounter {
-  lexical = {lemma = "manifestation counter"},
+  lexical = {lemma = "manifestation"},
   spelling = "manifestation counter"
 }

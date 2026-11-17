@@ -1,4 +1,4 @@
 counter windCounter {
-  lexical = {lemma = "wind counter"},
+  lexical = {lemma = "wind"},
   spelling = "wind counter"
 }

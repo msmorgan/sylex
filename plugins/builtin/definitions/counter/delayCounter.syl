@@ -1,4 +1,4 @@
 counter delayCounter {
-  lexical = {lemma = "delay counter"},
+  lexical = {lemma = "delay"},
   spelling = "delay counter"
 }

@@ -1,4 +1,4 @@
 counter cubeCounter {
-  lexical = {lemma = "cube counter"},
+  lexical = {lemma = "cube"},
   spelling = "cube counter"
 }

@@ -1,4 +1,4 @@
 counter netCounter {
-  lexical = {lemma = "net counter"},
+  lexical = {lemma = "net"},
   spelling = "net counter"
 }

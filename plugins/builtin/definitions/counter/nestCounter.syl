@@ -1,4 +1,4 @@
 counter nestCounter {
-  lexical = {lemma = "nest counter"},
+  lexical = {lemma = "nest"},
   spelling = "nest counter"
 }

@@ -1,4 +1,4 @@
 counter rustCounter {
-  lexical = {lemma = "rust counter"},
+  lexical = {lemma = "rust"},
   spelling = "rust counter"
 }

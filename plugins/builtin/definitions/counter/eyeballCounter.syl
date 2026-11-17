@@ -1,4 +1,4 @@
 counter eyeballCounter {
-  lexical = {lemma = "eyeball counter"},
+  lexical = {lemma = "eyeball"},
   spelling = "eyeball counter"
 }

@@ -1,6 +1,6 @@
 # A reach counter causes its bearer to gain reach [CR#122.1b]; keyword counters apply in layer 6
 # [CR#613.1f].
 counter reachCounter {
-  lexical = {lemma = "reach counter"},
+  lexical = {lemma = "reach"},
   spelling = "reach counter"
 }

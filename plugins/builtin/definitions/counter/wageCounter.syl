@@ -1,4 +1,4 @@
 counter wageCounter {
-  lexical = {lemma = "wage counter"},
+  lexical = {lemma = "wage"},
   spelling = "wage counter"
 }

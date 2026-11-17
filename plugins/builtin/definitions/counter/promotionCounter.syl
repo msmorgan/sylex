@@ -1,4 +1,4 @@
 counter promotionCounter {
-  lexical = {lemma = "promotion counter"},
+  lexical = {lemma = "promotion"},
   spelling = "promotion counter"
 }

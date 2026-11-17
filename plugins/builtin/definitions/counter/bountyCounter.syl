@@ -1,4 +1,4 @@
 counter bountyCounter {
-  lexical = {lemma = "bounty counter"},
+  lexical = {lemma = "bounty"},
   spelling = "bounty counter"
 }

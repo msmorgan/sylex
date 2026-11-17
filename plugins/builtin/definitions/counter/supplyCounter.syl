@@ -1,4 +1,4 @@
 counter supplyCounter {
-  lexical = {lemma = "supply counter"},
+  lexical = {lemma = "supply"},
   spelling = "supply counter"
 }

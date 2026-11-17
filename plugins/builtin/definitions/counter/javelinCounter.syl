@@ -1,4 +1,4 @@
 counter javelinCounter {
-  lexical = {lemma = "javelin counter"},
+  lexical = {lemma = "javelin"},
   spelling = "javelin counter"
 }

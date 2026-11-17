@@ -1,4 +1,4 @@
 counter phyresisCounter {
-  lexical = {lemma = "phyresis counter"},
+  lexical = {lemma = "phyresis"},
   spelling = "phyresis counter"
 }

@@ -1,4 +1,4 @@
 counter verseCounter {
-  lexical = {lemma = "verse counter"},
+  lexical = {lemma = "verse"},
   spelling = "verse counter"
 }

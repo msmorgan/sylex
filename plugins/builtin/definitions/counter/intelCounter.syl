@@ -1,4 +1,4 @@
 counter intelCounter {
-  lexical = {lemma = "intel counter"},
+  lexical = {lemma = "intel"},
   spelling = "intel counter"
 }

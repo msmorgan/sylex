@@ -1,4 +1,4 @@
 counter croakCounter {
-  lexical = {lemma = "croak counter"},
+  lexical = {lemma = "croak"},
   spelling = "croak counter"
 }

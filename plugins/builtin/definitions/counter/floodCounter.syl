@@ -1,4 +1,4 @@
 counter floodCounter {
-  lexical = {lemma = "flood counter"},
+  lexical = {lemma = "flood"},
   spelling = "flood counter"
 }

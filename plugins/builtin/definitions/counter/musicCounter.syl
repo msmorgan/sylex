@@ -1,4 +1,4 @@
 counter musicCounter {
-  lexical = {lemma = "music counter"},
+  lexical = {lemma = "music"},
   spelling = "music counter"
 }

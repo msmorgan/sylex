@@ -2,6 +2,6 @@
 # zero defense is put into its owner's graveyard if it is not the source of an ability that has
 # triggered but not yet left the stack; a non-Siege battle with zero defense always is [CR#122.1g].
 counter defenseCounter {
-  lexical = {lemma = "defense counter"},
+  lexical = {lemma = "defense"},
   spelling = "defense counter"
 }
