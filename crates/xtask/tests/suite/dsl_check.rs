@@ -2027,6 +2027,14 @@ fn spelling_rule_8_skeleton_must_be_unambiguous() {
            spelling = \"$a< $b> %VerbPhrase: <$c>\",\n\
            body = $a\n\
          }}\n\
+         template okTailPlacementsSeparate(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< %VerbPhrase: for $a>< %inner VerbPhrase: for $b>\",\n\
+           body = $a\n\
+         }}\n\
+         template twoOuterTails(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
+           spelling = \"pick< %VerbPhrase: for $a>< %VerbPhrase: for $b>\",\n\
+           body = $a\n\
+         }}\n\
          template twoBareOptionals(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
            spelling = \"pick< $a>< $b>\",\n\
            body = $a\n\
@@ -2043,6 +2051,10 @@ fn spelling_rule_8_skeleton_must_be_unambiguous() {
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [
+            (
+                RefusalKind::SpellingAmbiguousSkeleton,
+                s("\"pick< %VerbPhrase: for $a>< %VerbPhrase: for $b>\"")
+            ),
             (
                 RefusalKind::SpellingAmbiguousSkeleton,
                 s("\"pick< $a>< $b>\"")
