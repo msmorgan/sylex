@@ -61,7 +61,7 @@ const GRAMMAR: &str = r#"
     word The = "d:the"
     word These = "d:these"
     word This = "d:this"
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
     PredicateAdjunct: VerbPhrase -> VerbPhrase adjunct:PrepositionPhrase { cost: 2 }
     Determined: NounPhrase -> det:Word(The) Nominal
@@ -428,7 +428,7 @@ fn plural_complement_load_errors() {
     category VerbPhrase [VerbForm]
     word The = "d:the"
     slot NP = NounPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
     Determined: NounPhrase -> det:Word(The) Nominal
     Noun: Nominal -> Lex(Noun)

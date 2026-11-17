@@ -74,7 +74,7 @@ const GRAMMAR: &str = r#"
     slot Nominal = Nominal
     slot Amount = AmountPhrase
     slot Cost = CostPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain, clause.Voice = Active
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain, clause.Voice = Active
     Numeral: AmountPhrase -> Lex(Numeral)
     Symbol: CostPhrase -> Lex(Symbol)
     Bare: NounPhrase -> Nominal

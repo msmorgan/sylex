@@ -57,7 +57,7 @@ fn grammar(
             slot PP = PrepositionPhrase
             word Some = "d:some"
             word Or = "c:or"
-            Statement: Sentence -> NounPhrase '.'
+            Statement: Sentence -> NounPhrase '.' {{ capital: [head] }}
             Bare: NounPhrase -> Nominal {{ transparent: [head] }}
             Determined: NounPhrase -> determiner:Word(Some) Nominal {{ transparent: [head] }}
             valence Nominal {{ head: Noun }}
@@ -130,7 +130,7 @@ fn a_raising_delimiter_needs_right_node_raising() {
         category Sentence
         category NounPhrase
         word Or = "c:or"
-        Statement: Sentence -> NounPhrase '.'
+        Statement: Sentence -> NounPhrase '.' { capital: [head] }
         Name: NounPhrase -> Lex(Noun)
         coordination NounPhrase { coordinators: Or, raising_delimiter: ',' }
     "#;
@@ -207,7 +207,7 @@ fn an_adjectival_passive_passes_a_gap_through_its_by_phrase() {
                 slot Pred = Predicative
                 word By = "p:by"
                 word Or = "c:or"
-                Statement: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Finite
+                Statement: Sentence -> clause:VerbPhrase '.' {{ capital: [clause] }} where clause.VerbForm = Finite
                 AdjectivalPredicative: Predicative -> AdjectivePhrase {{ transparent: [head] }}
                 Bare: NounPhrase -> Lex(Noun)
                 valence VerbPhrase {{
@@ -296,7 +296,7 @@ fn a_gapped_adjunct_raises_its_gap_and_yields_to_a_selected_infinitival() {
         slot ToInf = ToInf
         slot HollowToInf = HollowInf
         word To = "s:to"
-        Statement: Sentence -> subject:NounPhrase clause:VerbPhrase '.' where clause.VerbForm = Finite
+        Statement: Sentence -> subject:NounPhrase clause:VerbPhrase '.' { capital: [subject] } where clause.VerbForm = Finite
         Bare: NounPhrase -> Nominal { transparent: [head] }
         Head: Nominal -> Lex(Noun)
         BareRelative: Nominal -> Nominal modifier:Clause

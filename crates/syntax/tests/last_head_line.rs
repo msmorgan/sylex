@@ -39,7 +39,7 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
         category Temporal
         word Or = "c:or"
         word This = "d:this"
-        Statement: Sentence -> Group '.'
+        Statement: Sentence -> Group '.' { capital: [head] }
         Plain: Group -> Lex(Noun)
         Long: Group -> Lex(Noun) modifier:Temporal
         This: Temporal -> determiner:Word(This) Lex(Noun)

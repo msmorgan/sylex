@@ -60,7 +60,7 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
         class Coordinator = ["c:and"]
         slot NP = NounPhrase
         slot PP = PrepositionPhrase
-        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Imperative: Sentence -> VerbPhrase '.' { capital: [head] } where head.VerbForm = Plain
         Noun: NounPhrase -> Lex(Noun)
         PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
         valence VerbPhrase {
@@ -236,7 +236,7 @@ fn remnant_count(text: &str) -> usize {
         class Coordinator = ["c:and"]
         slot NP = NounPhrase
         slot KeywordPhrase = KeywordPhrase
-        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Imperative: Sentence -> VerbPhrase '.' { capital: [head] } where head.VerbForm = Plain
         Noun: NounPhrase -> Lex(Noun)
         Keyword: KeywordPhrase -> KeywordParameters
         PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
@@ -317,7 +317,7 @@ fn a_joint_exclusion_on_a_slot_moves_into_the_cluster() {
         class Coordinator = ["c:and"]
         slot NP = NounPhrase where !(slot.Number = Plural & slot.Countability = Count)
         slot PP = PrepositionPhrase
-        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Imperative: Sentence -> VerbPhrase '.' { capital: [head] } where head.VerbForm = Plain
         Noun: NounPhrase -> Lex(Noun)
         PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
         valence VerbPhrase {

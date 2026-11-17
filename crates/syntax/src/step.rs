@@ -377,6 +377,8 @@ pub(crate) struct ChildSlot {
     /// It is a conjunct of its coordination other than the last: the only
     /// position a `Summary::nonfinal` phrase may fill.
     pub nonfinal_conjunct: bool,
+    /// It opens with a capital (`ProductionDecl::capital`).
+    pub capital: bool,
     /// A derived unlike Frame Slot: the mask of values outside which the
     /// coordination filling it has no conjunct's value of its `unlike`
     /// feature (`Grammar::unlike_slots`).
@@ -867,6 +869,7 @@ pub(crate) fn resolve(
             last_glues: false,
             first_edge: None,
             last_edge: None,
+            opening: Opening::Empty,
             vars,
             gap: None,
             // A Gap the Production introduces before a later child is not
@@ -955,6 +958,8 @@ pub(crate) struct Summary {
     pub first_edge: Option<sylex_lexicon::LeftEdge>,
     /// The right edge of its last word, which the word after it agrees with.
     pub last_edge: Option<sylex_lexicon::RightEdge>,
+    /// How it opens, which its position checks.
+    pub opening: Opening,
     /// Feature values in Category feature order; slots past the Category's
     /// features stay unset.
     pub values: [FeatureValue; MAX_CATEGORY_FEATURES],
@@ -1218,9 +1223,56 @@ pub(crate) struct LeafFacts {
 
 pub(crate) enum ChildView<'a> {
     Node(&'a Summary),
-    /// A lexical leaf, with its Adjacency Agreement edges.
-    Leaf(&'a LeafFacts, sylex_lexicon::Edges),
+    /// A lexical leaf, with its Adjacency Agreement edges and how it opens.
+    Leaf(&'a LeafFacts, sylex_lexicon::Edges, Opening),
     Punct,
+}
+
+/// How a Constituent opens, which the capital its position calls for
+/// checks (`ProductionDecl::capital`): a child that opens with a capital
+/// opens so, any other child but the first with an atom in lower case, and
+/// that first child as its mother does.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub(crate) enum Opening {
+    /// It has no atom.
+    Empty,
+    /// Its first atom is a word that takes an initial capital, written
+    /// without it.
+    Lower,
+    /// Its first atom is a word that takes an initial capital, written
+    /// with it.
+    Capital,
+    /// Nothing outside it decides how it opens: its first atom is a mark or
+    /// a word with one spelling, or the child it opens with opens with a
+    /// capital.
+    Fixed,
+}
+
+impl Opening {
+    /// How a word written in `case` opens (`LexicalMatch::case`).
+    pub(crate) fn of(case: Option<sylex_lexicon::LetterCase>) -> Self {
+        match case {
+            None => Self::Fixed,
+            Some(sylex_lexicon::LetterCase::Lower) => Self::Lower,
+            Some(sylex_lexicon::LetterCase::Capital) => Self::Capital,
+        }
+    }
+
+    /// How a mother opens with a child that opens with `child` after children
+    /// that open with `self`, at a position that opens with a capital or not;
+    /// `None` where the child's case is not the one its position calls for.
+    pub(crate) fn then(self, child: Self, capital: bool) -> Option<Self> {
+        match (self, capital) {
+            (Self::Empty, false) => Some(child),
+            (Self::Empty, true) => match child {
+                Self::Empty => Some(Self::Empty),
+                Self::Lower => None,
+                Self::Capital | Self::Fixed => Some(Self::Fixed),
+            },
+            (_, true) => (child != Self::Lower).then_some(self),
+            (_, false) => (child != Self::Capital).then_some(self),
+        }
+    }
 }
 
 /// The partial state of a Production whose first children have been found.
@@ -1233,6 +1285,8 @@ pub(crate) struct State {
     first_edge: Option<sylex_lexicon::LeftEdge>,
     /// The right edge of the last word so far (`Summary::last_edge`).
     last_edge: Option<sylex_lexicon::RightEdge>,
+    /// How the children so far open it (`Summary::opening`).
+    opening: Opening,
     vars: [FeatureValue; MAX_PRODUCTION_VARS],
     gap: Option<Gap>,
     gap_right_edge: bool,
@@ -1346,7 +1400,7 @@ impl Production {
         use crate::reading::glues_before;
         let (mut first, mut last) = match child {
             ChildView::Node(summary) => (summary.first_glues, summary.last_glues),
-            ChildView::Leaf(leaf, _) => (glues_before(leaf.binding), glues_after(leaf.binding)),
+            ChildView::Leaf(leaf, ..) => (glues_before(leaf.binding), glues_after(leaf.binding)),
             ChildView::Punct => match self.rhs[position] {
                 Symbol::Punct(_, binding, _) => (glues_before(binding), glues_after(binding)),
                 _ => (false, false),
@@ -1514,7 +1568,7 @@ impl Production {
     ) -> Option<()> {
         let head_forms = match child {
             ChildView::Node(summary) => summary.head_forms,
-            ChildView::Leaf(leaf, _) => leaf.forms,
+            ChildView::Leaf(leaf, ..) => leaf.forms,
             ChildView::Punct => 0,
         };
         if self.lexical_head == Some(position) {
@@ -1610,7 +1664,7 @@ impl Production {
                 summary.preposition.map(|(p, _)| p),
                 summary.cluster_preposition,
             ),
-            ChildView::Leaf(leaf, _) => (None, leaf.lexeme, None, None),
+            ChildView::Leaf(leaf, ..) => (None, leaf.lexeme, None, None),
             ChildView::Punct => return Some(()),
         };
         if self.remnant == RemnantRole::SharesHead && self.head == Some(position) {
@@ -2156,7 +2210,7 @@ impl Production {
     fn child_value(slot: &ChildSlot, child: &ChildView<'_>, feature: usize) -> Option<u16> {
         match child {
             ChildView::Node(summary) => slot.node_value(summary, feature),
-            ChildView::Leaf(leaf, _) => leaf.features[feature],
+            ChildView::Leaf(leaf, ..) => leaf.features[feature],
             ChildView::Punct => None,
         }
     }
@@ -2268,7 +2322,7 @@ impl Production {
         // mark have none.
         let (first_edge, last_edge) = match child {
             ChildView::Node(summary) => (summary.first_edge, summary.last_edge),
-            ChildView::Leaf(_, edges) => (Some(edges.left), Some(edges.right)),
+            ChildView::Leaf(_, edges, _) => (Some(edges.left), Some(edges.right)),
             ChildView::Punct => {
                 let Symbol::Punct(_, _, spoken) = self.rhs[position] else {
                     unreachable!("a punctuation child stands at a punctuation symbol");
@@ -2285,6 +2339,15 @@ impl Production {
         }
         next.first_edge = state.first_edge.or(first_edge);
         next.last_edge = last_edge.or(state.last_edge);
+        // The capitals of Oracle text are positional: a child opens with
+        // one where the Production says so, and in lower case after the
+        // mother's first atom.
+        let opening = match child {
+            ChildView::Node(summary) => summary.opening,
+            ChildView::Leaf(_, _, opening) => *opening,
+            ChildView::Punct => Opening::Fixed,
+        };
+        next.opening = state.opening.then(opening, slot.capital)?;
         next.unwritten_period =
             matches!(child, ChildView::Node(summary) if summary.unwritten_period);
         next.leaves = (next.leaves + Self::leaves(child)).min(2);
@@ -2359,10 +2422,42 @@ impl Production {
                 }
                 self.priority(grammar, &mut next, position, summary)?;
             }
-            ChildView::Leaf(leaf, _) => self.accept_leaf(grammar, &mut next, position, leaf),
+            ChildView::Leaf(leaf, ..) => self.accept_leaf(grammar, &mut next, position, leaf),
             ChildView::Punct => {}
         }
         Some(next)
+    }
+
+    /// The mother's feature values once every child has been accepted, and
+    /// the last conjunct's value of each resolved feature a serial tail
+    /// records.
+    fn mother_values(
+        &self,
+        state: &State,
+    ) -> (
+        [FeatureValue; MAX_CATEGORY_FEATURES],
+        [FeatureValue; MAX_RESOLUTIONS],
+    ) {
+        let mut values = [FeatureValue::UNSET; MAX_CATEGORY_FEATURES];
+        for (value, var) in values.iter_mut().zip(&self.mother_vars) {
+            *value = var.map_or(FeatureValue::UNSET, |v| state.vars[v]);
+        }
+        let mut last_resolved = [FeatureValue::UNSET; MAX_RESOLUTIONS];
+        for (i, &(_, differ, at)) in self.resolutions.iter().enumerate() {
+            match at {
+                // The whole takes the common value, or `differ`.
+                Some(at) => {
+                    values[at] = match (state.nonlast[i].get(), state.last[i].get()) {
+                        (Some(a), Some(b)) if a != b => FeatureValue::new(differ),
+                        (None, _) => state.last[i],
+                        _ => state.nonlast[i],
+                    };
+                }
+                // A serial tail records its last conjunct's value.
+                None => last_resolved[i] = state.last[i],
+            }
+        }
+        (values, last_resolved)
     }
 
     /// The mother's summary once every child has been accepted.
@@ -2393,25 +2488,7 @@ impl Production {
             return None;
         }
         let coordinated = self.coordinator.is_some();
-        let mut values = [FeatureValue::UNSET; MAX_CATEGORY_FEATURES];
-        for (value, var) in values.iter_mut().zip(&self.mother_vars) {
-            *value = var.map_or(FeatureValue::UNSET, |v| state.vars[v]);
-        }
-        let mut last_resolved = [FeatureValue::UNSET; MAX_RESOLUTIONS];
-        for (i, &(_, differ, at)) in self.resolutions.iter().enumerate() {
-            match at {
-                // The whole takes the common value, or `differ`.
-                Some(at) => {
-                    values[at] = match (state.nonlast[i].get(), state.last[i].get()) {
-                        (Some(a), Some(b)) if a != b => FeatureValue::new(differ),
-                        (None, _) => state.last[i],
-                        _ => state.nonlast[i],
-                    };
-                }
-                // A serial tail records its last conjunct's value.
-                None => last_resolved[i] = state.last[i],
-            }
-        }
+        let (values, last_resolved) = self.mother_values(state);
         let hosts = match state.preposition {
             Some((_, frame)) if !coordinated => grammar.preposition_frames[frame].hosts.mask(),
             _ => crate::frames::conjoined_hosts(
@@ -2426,6 +2503,7 @@ impl Production {
             last_glues: state.last_glues,
             first_edge: state.first_edge,
             last_edge: state.last_edge,
+            opening: state.opening,
             values,
             gap,
             gap_right_edge: state.gap_right_edge && state.shared_gap_right_edge,

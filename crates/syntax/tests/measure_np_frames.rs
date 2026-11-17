@@ -67,7 +67,7 @@ const GRAMMAR: &str = r#"
     slot NP = NounPhrase
     slot PP = PrepositionPhrase
     slot MeasureNP = MeasureNounPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain, clause.Voice = Active
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain, clause.Voice = Active
     Measure: MeasureNounPhrase -> Lex(Numeral)
     Bare: NounPhrase -> Lex(Noun)
     valence VerbPhrase {

@@ -7,10 +7,10 @@ use serde::Serialize;
 use crate::Binding;
 use crate::Capitalization;
 use crate::Category;
+use crate::LetterCase;
 use crate::Lexeme;
 use crate::LexicalReading;
 use crate::LexicalValue;
-use crate::SurfaceCase;
 use crate::SurfaceStructure;
 use crate::WordForm;
 use crate::morphology;
@@ -56,6 +56,10 @@ pub struct LexicalMatch {
     pub start: usize,
     pub end: usize,
     pub reading: LexicalReading,
+    /// The case its first letter is written in, where its reading takes an
+    /// initial capital that its declared spelling lacks; `None` where the
+    /// two spellings are one, as they are for a Lexeme spelled exactly.
+    pub case: Option<LetterCase>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -156,7 +160,7 @@ impl AnalyzedText {
 #[derive(Debug, Default)]
 struct TrieNode {
     children: Vec<(char, usize)>,
-    values: Vec<(LexicalValue, Binding)>,
+    values: Vec<(LexicalValue, Binding, Option<LetterCase>)>,
 }
 
 impl TrieNode {
@@ -172,7 +176,9 @@ impl TrieNode {
 pub struct Lexicon {
     lexemes: BTreeMap<crate::LexemeId, Lexeme>,
     surfaces: BTreeMap<LexicalValue, String>,
-    surface_features: BTreeMap<LexicalValue, crate::SurfaceFeatures>,
+    /// The capitalized spelling of each value whose Lexeme takes an initial
+    /// capital its declared spelling lacks.
+    capitals: BTreeMap<LexicalValue, String>,
     edges: BTreeMap<LexicalValue, crate::Edges>,
     trie: Vec<TrieNode>,
 }
@@ -187,7 +193,7 @@ impl Lexicon {
         let mut result = Self {
             lexemes: BTreeMap::new(),
             surfaces: BTreeMap::new(),
-            surface_features: BTreeMap::new(),
+            capitals: BTreeMap::new(),
             edges: BTreeMap::new(),
             trie: vec![TrieNode::default()],
         };
@@ -279,17 +285,11 @@ impl Lexicon {
                     lexeme: lexeme.id,
                     form: declaration.form,
                     features: declaration.features.clone(),
-                    capitalization: SurfaceCase::Declared,
-                };
-                let features = crate::SurfaceFeatures {
-                    onset: lexeme.onset.or(default_onset),
-                    initial: initial_surface(&surface) == surface,
-                    interior: true,
                 };
                 let edges = crate::Edges::new(
                     &declaration.features,
                     crate::AgreementProperties {
-                        onset: features.onset,
+                        onset: lexeme.onset.or(default_onset),
                         prefix_hyphenation,
                         genitive_host: genitive_host(declaration.form, &surface, &plurals),
                     },
@@ -297,25 +297,18 @@ impl Lexicon {
                 let initial = initial_surface(&surface);
                 let capitalized =
                     lexeme.capitalization == Capitalization::Initial && initial != surface;
-                result.surface_features.insert(value.clone(), features);
                 result.edges.insert(value.clone(), edges);
-                result.insert(value.clone(), surface, lexeme.binding);
+                result.insert(
+                    &value,
+                    &surface,
+                    lexeme.binding,
+                    capitalized.then_some(LetterCase::Lower),
+                );
                 if capitalized {
-                    let value = LexicalValue {
-                        capitalization: SurfaceCase::Initial,
-                        ..value
-                    };
-                    result.surface_features.insert(
-                        value.clone(),
-                        crate::SurfaceFeatures {
-                            initial: true,
-                            interior: false,
-                            ..features
-                        },
-                    );
-                    result.edges.insert(value.clone(), edges);
-                    result.insert(value, initial, lexeme.binding);
+                    result.insert(&value, &initial, lexeme.binding, Some(LetterCase::Capital));
+                    result.capitals.insert(value.clone(), initial);
                 }
+                result.surfaces.insert(value, surface);
             }
             if let Some(reason) = card_scope_defect(&lexeme).or_else(|| agreement_defect(&lexeme)) {
                 return Err(error(reason));
@@ -328,7 +321,13 @@ impl Lexicon {
         Ok(result)
     }
 
-    fn insert(&mut self, value: LexicalValue, surface: String, binding: Binding) {
+    fn insert(
+        &mut self,
+        value: &LexicalValue,
+        surface: &str,
+        binding: Binding,
+        case: Option<LetterCase>,
+    ) {
         let mut node = 0;
         for ch in surface.chars() {
             node = match self.trie[node]
@@ -344,8 +343,7 @@ impl Lexicon {
                 }
             };
         }
-        self.trie[node].values.push((value.clone(), binding));
-        self.surfaces.insert(value, surface);
+        self.trie[node].values.push((value.clone(), binding, case));
     }
 
     #[must_use]
@@ -356,44 +354,6 @@ impl Lexicon {
     /// Enumerates licensed values independently of any analyzed source.
     pub fn values(&self) -> impl Iterator<Item = &LexicalValue> {
         self.surfaces.keys()
-    }
-
-    /// Frozen pronunciation and positional capabilities of one licensed
-    /// realization.
-    ///
-    /// # Errors
-    /// Rejects undeclared word values and noncanonical numeral values.
-    pub fn surface_features(
-        &self,
-        reading: &LexicalReading,
-    ) -> Result<crate::SurfaceFeatures, LexicalError> {
-        match reading {
-            LexicalReading::FlavorWord { .. } => {
-                self.realize(reading)?;
-                Ok(crate::SurfaceFeatures {
-                    onset: None,
-                    initial: true,
-                    interior: false,
-                })
-            }
-            LexicalReading::Word(value) => self
-                .surface_features
-                .get(value)
-                .copied()
-                .ok_or(LexicalError::UnlicensedValue),
-            LexicalReading::Numeral {
-                value,
-                capitalization,
-                ..
-            } => {
-                let text = self.realize(reading)?;
-                Ok(crate::SurfaceFeatures {
-                    onset: crate::pronunciation::numeral_onset(*value),
-                    initial: initial_surface(&text) == text,
-                    interior: *capitalization == SurfaceCase::Declared,
-                })
-            }
-        }
     }
 
     /// What Adjacency Agreement reads at the edges of one licensed
@@ -415,10 +375,28 @@ impl Lexicon {
         }
     }
 
+    /// The spelling of a reading in its declared case: where a position
+    /// calls for no capital ([`LetterCase::Lower`]).
+    ///
     /// # Errors
     /// Rejects values not admitted by this lexicon, including lossy numeral
     /// values.
     pub fn realize(&self, reading: &LexicalReading) -> Result<String, LexicalError> {
+        self.realize_in(reading, LetterCase::Lower)
+    }
+
+    /// The spelling of a reading where a position calls for `case`: with an
+    /// initial capital only where `case` is [`LetterCase::Capital`] and the
+    /// reading takes one ([`Lexicon::takes_capital`]). A word spelled
+    /// exactly keeps its spelling in every position.
+    ///
+    /// # Errors
+    /// As [`Lexicon::realize`].
+    pub fn realize_in(
+        &self,
+        reading: &LexicalReading,
+        case: LetterCase,
+    ) -> Result<String, LexicalError> {
         match reading {
             LexicalReading::FlavorWord { label } => {
                 // A registered label is never a Flavor Word, so neither
@@ -435,32 +413,62 @@ impl Lexicon {
                 }
                 Ok(format!("{label} —"))
             }
-            LexicalReading::Word(value) => self
-                .surfaces
-                .get(value)
-                .cloned()
-                .ok_or(LexicalError::UnlicensedValue),
-            LexicalReading::Numeral {
-                value,
-                notation,
-                capitalization,
-            } => {
+            LexicalReading::Word(value) => {
+                let declared = self
+                    .surfaces
+                    .get(value)
+                    .ok_or(LexicalError::UnlicensedValue)?;
+                Ok(match (case, self.capitals.get(value)) {
+                    (LetterCase::Capital, Some(capital)) => capital.clone(),
+                    // A Lexeme spelled exactly, or whose declared spelling
+                    // already opens with a capital, has one spelling.
+                    (LetterCase::Capital, None) | (LetterCase::Lower, _) => declared.clone(),
+                })
+            }
+            LexicalReading::Numeral { value, notation } => {
                 if notation.canonical_notation(*value) != *notation {
                     return Err(LexicalError::UnlicensedValue);
                 }
                 let text = notation
                     .try_format(*value)
                     .map_err(|_| LexicalError::UnlicensedValue)?;
-                if *capitalization == SurfaceCase::Declared {
-                    return Ok(text);
-                }
-                let initial = initial_surface(&text);
-                if initial == text {
-                    return Err(LexicalError::UnlicensedValue);
-                }
-                Ok(initial)
+                Ok(match case {
+                    LetterCase::Lower => text,
+                    LetterCase::Capital => initial_surface(&text),
+                })
             }
         }
+    }
+
+    /// The spelling a lexical match records: `case` is the case its first
+    /// letter is written in, `None` for a reading with one spelling
+    /// ([`LexicalMatch::case`]).
+    ///
+    /// # Errors
+    /// As [`Lexicon::realize`], and a `case` that is `None` for a reading with
+    /// two spellings, or names a case for a reading with one.
+    pub fn realize_written(
+        &self,
+        reading: &LexicalReading,
+        case: Option<LetterCase>,
+    ) -> Result<String, LexicalError> {
+        match (case, self.takes_capital(reading)?) {
+            (Some(case), true) => self.realize_in(reading, case),
+            (None, false) => self.realize(reading),
+            (Some(_), false) | (None, true) => Err(LexicalError::UnlicensedValue),
+        }
+    }
+
+    /// Whether a licensed reading takes an initial capital that its declared
+    /// spelling lacks: a word whose Lexeme takes one
+    /// ([`Capitalization::Initial`]) and a numeral spelled in words. Only
+    /// such a reading's spelling depends on its position.
+    ///
+    /// # Errors
+    /// As [`Lexicon::realize`].
+    pub fn takes_capital(&self, reading: &LexicalReading) -> Result<bool, LexicalError> {
+        let declared = self.realize(reading)?;
+        Ok(self.realize_in(reading, LetterCase::Capital)? != declared)
     }
 
     /// Analyzes an italic run written at the head of an ability
@@ -512,7 +520,7 @@ impl Lexicon {
         let mut registered: Vec<&LexicalValue> = self.trie[node]
             .values
             .iter()
-            .map(|(value, _)| value)
+            .map(|(value, _, _)| value)
             .filter(|value| scope.is_none_or(|scope| self.word_stands_in(value, scope)))
             .filter(|value| self.lexemes[&value.lexeme].category == Category::Keyword)
             .collect();
@@ -544,7 +552,7 @@ impl Lexicon {
                 None => return false,
             }
         }
-        self.trie[node].values.iter().any(|(value, _)| {
+        self.trie[node].values.iter().any(|(value, _, _)| {
             matches!(
                 self.lexemes[&value.lexeme].category,
                 Category::Determinative
@@ -630,7 +638,7 @@ impl Lexicon {
                     break;
                 };
                 node = next;
-                for (value, binding) in &self.trie[node].values {
+                for (value, binding, case) in &self.trie[node].values {
                     if !self.word_stands_in(value, scope) {
                         continue;
                     }
@@ -639,6 +647,7 @@ impl Lexicon {
                             start,
                             end: end + 1,
                             reading: LexicalReading::Word(value.clone()),
+                            case: *case,
                         },
                         *binding,
                     ));
@@ -812,6 +821,7 @@ fn flavor_word_matches(tokens: &[char], matches: &mut Vec<LexicalMatch>) {
                     start,
                     end: dash + 1,
                     reading: LexicalReading::FlavorWord { label },
+                    case: None,
                 });
             }
             break;
@@ -904,8 +914,10 @@ fn numeral_matches(tokens: &[char], matches: &mut Vec<LexicalMatch>) {
                     Numeral::Arabic(true),
                     Numeral::Roman,
                 ] {
-                    for capitalization in [SurfaceCase::Declared, SurfaceCase::Initial] {
-                        let candidate = if capitalization == SurfaceCase::Initial {
+                    // The declared spelling is the formatted one, and a numeral
+                    // spelled in words also takes an initial capital.
+                    for case in [LetterCase::Lower, LetterCase::Capital] {
+                        let candidate = if case == LetterCase::Capital {
                             let mut chars = text.chars();
                             let Some(first) = chars.next() else {
                                 continue;
@@ -920,19 +932,17 @@ fn numeral_matches(tokens: &[char], matches: &mut Vec<LexicalMatch>) {
                         if notation.canonical_notation(value) != notation {
                             continue;
                         }
-                        if capitalization == SurfaceCase::Initial
-                            && (initial_surface(&candidate) != text || candidate == text)
+                        let capitalized = initial_surface(&candidate) != candidate;
+                        if case == LetterCase::Capital
+                            && (initial_surface(&candidate) != text || !capitalized)
                         {
                             continue;
                         }
                         matches.push(LexicalMatch {
                             start,
                             end,
-                            reading: LexicalReading::Numeral {
-                                value,
-                                notation,
-                                capitalization,
-                            },
+                            reading: LexicalReading::Numeral { value, notation },
+                            case: capitalized.then_some(case),
                         });
                     }
                 }

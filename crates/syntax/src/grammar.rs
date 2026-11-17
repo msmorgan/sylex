@@ -252,6 +252,15 @@ pub struct ProductionDecl {
     /// §4.3, p. 1122).
     #[serde(default)]
     pub unshared: Vec<Ident>,
+    /// Children that open with a capital: the first word of each is written
+    /// with an initial capital where its Lexeme takes one, as a sentence
+    /// opens with one. Every other child opens in lower case, but the first
+    /// child that has any atom, which opens as the mother does. The engine
+    /// supplies no position of its own: the grammar states each one, and a
+    /// Constituent parsed alone opens as one inside a sentence does
+    /// (`docs/design/english.md` §7, "A Reading stores no capitalization").
+    #[serde(default)]
+    pub capital: Vec<Ident>,
 }
 
 pub(crate) fn default_cost() -> u32 {
@@ -460,6 +469,11 @@ pub enum SchemaDecl {
         /// (`ClustersDecl::remnants`).
         #[serde(default)]
         remnant: Option<Ident>,
+        /// Marks after which a pattern's next part, whatever its kind, opens
+        /// with a capital (`ProductionDecl::capital`), as a parameter set off
+        /// by an em dash does (*Modular—Sunburst*).
+        #[serde(default)]
+        capital_after: Vec<char>,
     },
     /// Frame-driven phrases headed by every lexeme of a lexical Category.
     ///

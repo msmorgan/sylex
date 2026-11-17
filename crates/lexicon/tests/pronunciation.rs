@@ -6,7 +6,6 @@ use sylex_lexicon::Numeral;
 use sylex_lexicon::Onset;
 use sylex_lexicon::Source;
 use sylex_lexicon::SourceKind;
-use sylex_lexicon::SurfaceCase;
 
 fn row(id: &str, spelling: &str) -> Lexeme {
     Lexeme::invariant(
@@ -41,21 +40,13 @@ fn a_declared_onset_replaces_the_first_letter_s() {
     for value in lexicon.values() {
         let reading = LexicalReading::Word(value.clone());
         let surface = lexicon.realize(&reading).unwrap();
-        let properties = lexicon.surface_features(&reading).unwrap();
+        let edges = lexicon.edges(&reading).unwrap();
         let expected = if value.lexeme == "hour" || value.lexeme == "island" {
             Onset::Vowel
         } else {
             Onset::Consonant
         };
-        assert_eq!(properties.onset, Some(expected), "{value:?}");
-        assert_eq!(
-            properties.initial,
-            value.capitalization == SurfaceCase::Initial
-        );
-        assert_eq!(
-            properties.interior,
-            value.capitalization == SurfaceCase::Declared
-        );
+        assert_eq!(edges.left.onset, Some(expected), "{value:?}");
         assert!(
             lexicon
                 .analyze(&surface)
@@ -78,11 +69,8 @@ fn a_declared_onset_replaces_the_first_letter_s() {
         let reading = LexicalReading::Numeral {
             value,
             notation: Numeral::Arabic(false),
-            capitalization: SurfaceCase::Declared,
         };
-        let properties = lexicon.surface_features(&reading).unwrap();
-        assert_eq!(properties.onset, Some(expected));
-        assert!(properties.initial && properties.interior);
+        assert_eq!(lexicon.edges(&reading).unwrap().left.onset, Some(expected));
     }
 }
 
@@ -141,7 +129,7 @@ fn multiword_names_and_bound_forms_take_the_first_pronounced_onset() {
         for value in lexicon.values() {
             let reading = LexicalReading::Word(value.clone());
             assert_eq!(
-                lexicon.surface_features(&reading).unwrap().onset,
+                lexicon.edges(&reading).unwrap().left.onset,
                 expected,
                 "{spelling}"
             );

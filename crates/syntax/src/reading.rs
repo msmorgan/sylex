@@ -26,6 +26,7 @@ use crate::step::Anchor;
 use crate::step::ChildRole;
 use crate::step::ChildView;
 use crate::step::Gap;
+use crate::step::Opening;
 use crate::step::Summary;
 use crate::step::Symbol;
 use crate::walk::ForestMemo;
@@ -1157,7 +1158,15 @@ impl CompiledGrammar {
                     if !self.leaf_matches(test, &facts) {
                         return Err(reject("leaf does not satisfy its symbol"));
                     }
-                    production.accept(self, &state, position, &ChildView::Leaf(&facts, edges))
+                    // A Reading stores no case: Realization writes each word
+                    // in the case its position calls for, so no position
+                    // constrains a leaf here.
+                    production.accept(
+                        self,
+                        &state,
+                        position,
+                        &ChildView::Leaf(&facts, edges, Opening::Fixed),
+                    )
                 }
                 Symbol::Cat { category, .. } => {
                     let Some(child) = children.next() else {
@@ -1471,9 +1480,14 @@ impl CompiledGrammar {
     ) -> Result<(), AdmissionError> {
         let mut next = 0;
         let mut depth = 0;
-        self.atoms_from(reading, lexicon, out, located, &mut next, &mut depth)
+        // No Production puts the whole in a position that opens with a
+        // capital: it opens as a Constituent inside a sentence does.
+        self.atoms_from(reading, lexicon, out, located, &mut next, &mut depth, false)
     }
 
+    /// As [`CompiledGrammar::atoms`], for a Constituent at a position that
+    /// opens with a capital or not (`ProductionDecl::capital`).
+    #[expect(clippy::too_many_arguments, reason = "one recursive walk")]
     fn atoms_from(
         &self,
         reading: &Reading,
@@ -1482,10 +1496,18 @@ impl CompiledGrammar {
         located: &mut dyn FnMut(usize, (usize, usize)),
         next: &mut usize,
         depth: &mut usize,
+        capital: bool,
     ) -> Result<(), AdmissionError> {
         match reading {
             Reading::Leaf(value) => {
-                let text = lexicon.realize(value).map_err(|_| AdmissionError::Leaf)?;
+                let case = if capital {
+                    sylex_lexicon::LetterCase::Capital
+                } else {
+                    sylex_lexicon::LetterCase::Lower
+                };
+                let text = lexicon
+                    .realize_in(value, case)
+                    .map_err(|_| AdmissionError::Leaf)?;
                 let binding = match value {
                     LexicalReading::Word(v) => {
                         let lexeme = self.lexeme(&v.lexeme).ok_or(AdmissionError::Leaf)?;
@@ -1506,7 +1528,8 @@ impl CompiledGrammar {
                 let first = out.len();
                 located(me, (first, first));
                 let mut children = node.children.iter();
-                for symbol in &self.productions[index].rhs {
+                let production = &self.productions[index];
+                for (position, symbol) in production.rhs.iter().enumerate() {
                     if let Symbol::Punct(QUOTATION_MARK, binding, _) = symbol {
                         if glues_after(*binding) {
                             out.push((
@@ -1544,8 +1567,13 @@ impl CompiledGrammar {
                             production: node.production.to_string(),
                             reason: "missing child".to_owned(),
                         })?;
+                        // A child opens with a capital where its Production
+                        // says so; the first with an atom opens as its mother
+                        // does, and every other in lower case.
+                        let opens =
+                            production.slots[position].capital || (capital && out.len() == first);
                         let first = out.len();
-                        self.atoms_from(child, lexicon, out, located, next, depth)?;
+                        self.atoms_from(child, lexicon, out, located, next, depth, opens)?;
                         if let Symbol::Cat {
                             binding: Some(binding),
                             ..

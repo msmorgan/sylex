@@ -57,33 +57,11 @@ fn word(id: &str, form: WordForm, features: FeatureBundle) -> LexicalReading {
         lexeme: id.into(),
         form,
         features,
-        capitalization: SurfaceCase::Declared,
     })
 }
 
 fn numeral(value: i32, notation: Numeral) -> LexicalReading {
-    LexicalReading::Numeral {
-        value,
-        notation,
-        capitalization: SurfaceCase::Declared,
-    }
-}
-
-fn initial(reading: LexicalReading) -> LexicalReading {
-    match reading {
-        LexicalReading::Word(value) => LexicalReading::Word(LexicalValue {
-            capitalization: SurfaceCase::Initial,
-            ..value
-        }),
-        LexicalReading::FlavorWord { .. } => unreachable!(),
-        LexicalReading::Numeral {
-            value, notation, ..
-        } => LexicalReading::Numeral {
-            value,
-            notation,
-            capitalization: SurfaceCase::Initial,
-        },
-    }
+    LexicalReading::Numeral { value, notation }
 }
 
 fn at(text: &AnalyzedText, start: usize, end: usize) -> BTreeSet<LexicalReading> {
@@ -96,6 +74,18 @@ fn at(text: &AnalyzedText, start: usize, end: usize) -> BTreeSet<LexicalReading>
 
 fn complete(lexicon: &Lexicon, text: &str) -> BTreeSet<LexicalReading> {
     at(&lexicon.analyze(text), 0, text.chars().count())
+}
+
+/// Each match spanning all of `text`, with the case it is written in.
+fn complete_cased(lexicon: &Lexicon, text: &str) -> BTreeSet<(LexicalReading, Option<LetterCase>)> {
+    let end = text.chars().count();
+    lexicon
+        .analyze(text)
+        .matches
+        .into_iter()
+        .filter(|m| m.start == 0 && m.end == end)
+        .map(|m| (m.reading, m.case))
+        .collect()
 }
 
 fn override_form(lexeme: &mut Lexeme, form: WordForm, surface: &str) {
@@ -192,9 +182,12 @@ fn one_or_two_targets_retains_each_word_and_numeral_reading() {
     ]);
     assert_eq!(complete(&lexicon, "one"), plain_one);
     let text = lexicon.analyze("One or two target creatures");
-    assert_eq!(
-        at(&text, 0, 3),
-        plain_one.into_iter().map(initial).collect()
+    assert_eq!(at(&text, 0, 3), plain_one);
+    assert!(
+        text.matches
+            .iter()
+            .filter(|m| m.start == 0)
+            .all(|m| m.case == Some(LetterCase::Capital))
     );
     assert_eq!(
         at(&text, 7, 10),
@@ -248,21 +241,30 @@ fn initial_variants_do_not_case_fold_exact_catalog_entries() {
     };
     let lexicon = Lexicon::new([noun("n:counter", "counter"), catalog]).unwrap();
     assert_eq!(
-        complete(&lexicon, "Counters"),
-        BTreeSet::from([initial(word(
-            "n:counter",
-            WordForm::Plural,
-            nominal(Number::Plural)
-        )),])
+        complete_cased(&lexicon, "Counters"),
+        BTreeSet::from([(
+            word("n:counter", WordForm::Plural, nominal(Number::Plural)),
+            Some(LetterCase::Capital)
+        )])
+    );
+    assert_eq!(
+        complete_cased(&lexicon, "counters"),
+        BTreeSet::from([(
+            word("n:counter", WordForm::Plural, nominal(Number::Plural)),
+            Some(LetterCase::Lower)
+        )])
     );
     assert!(complete(&lexicon, "COUNTERS").is_empty());
     assert_eq!(
-        complete(&lexicon, "Three Dog"),
-        BTreeSet::from([word(
-            "name:ThreeDog",
-            WordForm::Invariant,
-            FeatureBundle::default()
-        ),])
+        complete_cased(&lexicon, "Three Dog"),
+        BTreeSet::from([(
+            word(
+                "name:ThreeDog",
+                WordForm::Invariant,
+                FeatureBundle::default()
+            ),
+            None
+        )])
     );
     assert!(complete(&lexicon, "three Dog").is_empty());
     assert!(complete(&lexicon, "Three dog").is_empty());
@@ -548,29 +550,63 @@ fn undeclared_words_and_parts_of_speech_are_not_guessed() {
 #[test]
 fn independently_constructed_readings_roundtrip_through_realization() {
     let lexicon = Lexicon::new([noun("n:counter", "counter")]).unwrap();
-    for (reading, expected_surface) in [
+    let lower = LetterCase::Lower;
+    let capital = LetterCase::Capital;
+    for (reading, case, expected_surface, written) in [
         (
             word("n:counter", WordForm::Plural, nominal(Number::Plural)),
+            lower,
             "counters",
+            Some(lower),
         ),
         (
-            initial(word(
-                "n:counter",
-                WordForm::Singular,
-                nominal(Number::Singular),
-            )),
+            word("n:counter", WordForm::Singular, nominal(Number::Singular)),
+            capital,
             "Counter",
+            Some(capital),
         ),
-        (numeral(100, Numeral::Cardinal), "one hundred"),
-        (initial(numeral(2, Numeral::Cardinal)), "Two"),
-        (numeral(1_001, Numeral::Cardinal), "one thousand, one"),
-        (numeral(-2, Numeral::Ordinal), "second to last"),
-        (numeral(-1_000, Numeral::Arabic(true)), "-1,000"),
-        (numeral(4, Numeral::Roman), "IV"),
+        (
+            numeral(100, Numeral::Cardinal),
+            lower,
+            "one hundred",
+            Some(lower),
+        ),
+        (numeral(2, Numeral::Cardinal), capital, "Two", Some(capital)),
+        (
+            numeral(1_001, Numeral::Cardinal),
+            lower,
+            "one thousand, one",
+            Some(lower),
+        ),
+        (
+            numeral(-2, Numeral::Ordinal),
+            lower,
+            "second to last",
+            Some(lower),
+        ),
+        (
+            numeral(-1_000, Numeral::Arabic(true)),
+            lower,
+            "-1,000",
+            None,
+        ),
+        (numeral(4, Numeral::Roman), lower, "IV", None),
+        // A numeral with one spelling keeps it where a capital is called for.
+        (numeral(4, Numeral::Roman), capital, "IV", None),
     ] {
-        assert_eq!(lexicon.realize(&reading).unwrap(), expected_surface);
+        assert_eq!(
+            lexicon.realize_in(&reading, case).unwrap(),
+            expected_surface
+        );
+        assert_eq!(lexicon.takes_capital(&reading).unwrap(), written.is_some());
+        // A match records a case exactly where the reading has two spellings.
+        let other = match written {
+            Some(_) => None,
+            None => Some(lower),
+        };
+        assert!(lexicon.realize_written(&reading, other).is_err());
         assert!(
-            complete(&lexicon, expected_surface).contains(&reading),
+            complete_cased(&lexicon, expected_surface).contains(&(reading.clone(), written)),
             "{reading:?} from {expected_surface}"
         );
     }
@@ -593,7 +629,7 @@ fn every_returned_reading_realizes_its_exact_source_occurrence() {
     for found in &text.matches {
         let range = text.byte_range(found.start, found.end).unwrap();
         assert_eq!(
-            lexicon.realize(&found.reading).unwrap(),
+            lexicon.realize_written(&found.reading, found.case).unwrap(),
             &text.text()[range]
         );
     }
@@ -607,7 +643,6 @@ fn invalid_constructed_values_are_rejected() {
         word("v:counter", WordForm::Plain, FeatureBundle::default()),
         numeral(4_000, Numeral::Roman),
         numeral(2, Numeral::Arabic(true)),
-        initial(numeral(4, Numeral::Roman)),
     ] {
         assert!(
             matches!(
@@ -752,7 +787,6 @@ fn an_italic_run_no_declaration_spells_is_a_flavor_word() {
             lexeme: "lexeme:ability_word/battalion".into(),
             form: WordForm::Invariant,
             features: FeatureBundle::default(),
-            capitalization: SurfaceCase::Declared,
         }),
         "a declared ability word is not a flavor word",
     );
@@ -957,10 +991,8 @@ fn flavor_heads_are_lossless_open_labels_at_line_starts() {
             BTreeSet::from([expected.clone()])
         );
         assert_eq!(lexicon.realize(&expected).unwrap(), format!("{label} —"));
-        let surface = lexicon.surface_features(&expected).unwrap();
-        assert!(surface.initial);
-        assert!(!surface.interior);
-        assert_eq!(surface.onset, None);
+        assert!(!lexicon.takes_capital(&expected).unwrap());
+        assert_eq!(lexicon.edges(&expected).unwrap().left.onset, None);
         let prefixed = format!("Trample\n{text}");
         assert_eq!(
             at(&lexicon.analyze(&prefixed), 8, 8 + end),
@@ -992,7 +1024,7 @@ fn flavor_heads_are_lossless_open_labels_at_line_starts() {
             label: label.into(),
         };
         assert!(lexicon.realize(&reading).is_err());
-        assert!(lexicon.surface_features(&reading).is_err());
+        assert!(lexicon.edges(&reading).is_err());
     }
 }
 
@@ -1086,7 +1118,7 @@ fn a_registered_label_is_never_also_a_flavor_word() {
             label: label.into(),
         };
         assert!(lexicon.realize(&reading).is_err(), "{label}");
-        assert!(lexicon.surface_features(&reading).is_err(), "{label}");
+        assert!(lexicon.edges(&reading).is_err(), "{label}");
     }
 }
 
@@ -1305,7 +1337,7 @@ fn mode_bullets_stay_outside_open_flavor_word_labels() {
         label: "• Cure Wounds".into(),
     };
     assert!(lexicon.realize(&invalid).is_err());
-    assert!(lexicon.surface_features(&invalid).is_err());
+    assert!(lexicon.edges(&invalid).is_err());
 }
 
 #[test]

@@ -96,7 +96,7 @@ fn grammar(lexicon: &Lexicon, rule: &str) -> Result<CompiledGrammar, sylex_synta
         slot NP = NounPhrase
         slot PP = PrepositionPhrase
         slot TemporalClause = TemporalClause
-        Declarative: Sentence -> clause:Clause '.'
+        Declarative: Sentence -> clause:Clause '.' {{ capital: [clause] }}
         Imperative: Clause -> VerbPhrase
             where head.VerbForm = Plain,
                   $.NonPastTime = NonPast,

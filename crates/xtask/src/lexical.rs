@@ -502,7 +502,7 @@ fn cover_matches(
     inventory.matched_readings += analyzed.matches.len();
     for found in &analyzed.matches {
         let span = occurrence(analyzed, found.start, found.end)?;
-        let realized = lexicon.realize(&found.reading)?;
+        let realized = lexicon.realize_written(&found.reading, found.case)?;
         ensure!(
             realized == span.text,
             "lexical analyze/render law failed at {}..{}: {:?} -> {realized:?}, expected {:?}",

@@ -72,11 +72,11 @@ fn grammar(
             slot NP = NounPhrase {np_slot_equations}
             slot PP = PrepositionPhrase
             {high_attachment}
-            Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
-            Passive: Sentence -> clause:VerbPhrase '!' where clause.Voice = Passive
-            Adjectival: Sentence -> AdjectivePhrase '?'
+            Imperative: Sentence -> clause:VerbPhrase '.' {{ capital: [clause] }} where clause.VerbForm = Plain
+            Passive: Sentence -> clause:VerbPhrase '!' {{ capital: [clause] }} where clause.Voice = Passive
+            Adjectival: Sentence -> AdjectivePhrase '?' {{ capital: [head] }}
             Bare: NounPhrase -> Nominal
-            Fragment: Sentence -> NounPhrase ';'
+            Fragment: Sentence -> NounPhrase ';' {{ capital: [head] }}
             {premodification}
             valence VerbPhrase {{ head: Verb, {valence} }}
             valence PrepositionPhrase {{ head: Preposition, complement_kind: ComplementKind }}

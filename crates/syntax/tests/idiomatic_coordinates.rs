@@ -49,7 +49,7 @@ fn count(text: &str) -> usize {
         class CoordinateAdverb = ["adv:so on"]
         class Coordinator = ["c:and", "c:or"]
         slot NP = NounPhrase
-        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Imperative: Sentence -> VerbPhrase '.' { capital: [head] } where head.VerbForm = Plain
         Noun: NounPhrase -> Lex(Noun)
         IdiomaticCoordinate: IdiomaticCoordinate -> Class(CoordinateAdverb)
         valence VerbPhrase { head: Verb }

@@ -69,7 +69,7 @@ const GRAMMAR: &str = r"
     category Sentence
     slot NP = NounPhrase
     Bare: NounPhrase -> Nominal
-    Fragment: Sentence -> NounPhrase ';'
+    Fragment: Sentence -> NounPhrase ';' { capital: [head] }
     premodification Participle {
         head: Verb,
         host: Nominal,

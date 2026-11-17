@@ -58,7 +58,7 @@ fn count(text: &str) -> usize {
         category VerbPhrase [VerbForm]
         class Coordinator = ["c:and"]
         slot NP = NounPhrase
-        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Imperative: Sentence -> VerbPhrase '.' { capital: [head] } where head.VerbForm = Plain
         Noun: NounPhrase -> Lex(Noun)
         PredicateAdjunct: Adjunct -> filler:Hosted(PrepositionPhrase, Predicate)
         valence VerbPhrase {

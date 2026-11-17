@@ -95,7 +95,7 @@ const GRAMMAR: &str = r#"
     class Coordinator = ["c:and", "c:or"]
     slot NP = NounPhrase
     slot PP = PrepositionPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Determined: NounPhrase -> determiner:Lex(Determinative) Nominal
         where $.Determination = Overt
     BarePlural: NounPhrase -> Nominal { uncoordinated: [head] }

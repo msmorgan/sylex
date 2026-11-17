@@ -59,7 +59,7 @@ const GRAMMAR: &str = r"
     slot NP = NounPhrase
     slot PP = PrepositionPhrase
     slot Mention = Mention
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Determined: NounPhrase -> determiner:Lex(Determinative) Nominal
     WordMention: Mention -> Lex(Noun)
     valence VerbPhrase { head: Verb }

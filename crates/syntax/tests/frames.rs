@@ -76,7 +76,7 @@ const GRAMMAR: &str = r"
     category VerbPhrase [VerbForm]
     slot NP = NounPhrase
     slot PP = PrepositionPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Determined: NounPhrase -> determiner:DeterminerPhrase Nominal
     FusedHead: NounPhrase -> DeterminerPhrase
     Postpositive: Nominal -> Nominal modifier:AdjectivePhrase

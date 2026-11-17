@@ -15,7 +15,6 @@ use sylex_lexicon::NameForm;
 use sylex_lexicon::Onset;
 use sylex_lexicon::Source;
 use sylex_lexicon::SourceKind;
-use sylex_lexicon::SurfaceCase;
 use sylex_lexicon::WordForm;
 
 fn source(id: &str) -> Source {
@@ -146,7 +145,6 @@ fn value(id: &str, form: WordForm, features: FeatureBundle) -> LexicalReading {
         lexeme: id.into(),
         form,
         features,
-        capitalization: SurfaceCase::Declared,
     })
 }
 

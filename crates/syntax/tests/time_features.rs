@@ -51,7 +51,7 @@ fn times(text: &str) -> (bool, bool) {
             feature PastTime = Past
             feature NonPastTime = NonPast
             category Sentence
-            Verb: Sentence -> Lex(Verb) '.' {equations}
+            Verb: Sentence -> Lex(Verb) '.' {{ capital: [head] }} {equations}
             "
         );
         let grammar = CompiledGrammar::bind(

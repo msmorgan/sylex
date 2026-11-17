@@ -105,7 +105,7 @@ slot PP = PrepositionPhrase
 slot AdjP = AdjectivePhrase
 slot KeywordPhrase = KeywordPhrase
 slot ToInf = ToInf
-Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+Imperative: Sentence -> clause:VerbPhrase '.' {{ capital: [clause] }} where clause.VerbForm = Plain
 SingularNP: NounPhrase -> det:Word(A) Nominal where $.Number = Singular
 PluralNP: NounPhrase -> det:Word(Two) Nominal where $.Number = Plural
 PronounNP: NounPhrase -> Lex(Pronoun) where $.Number = Singular, $.Postmodification = Closed
@@ -239,7 +239,7 @@ fn steals_no_non_object_gap_and_ignores_non_np_objects() {
     let lex = lexicon();
     let grammar = build(
         DEFAULT_VALENCE,
-        "PassiveClause: Sentence -> subject:NounPhrase clause:VerbPhrase '.' where clause.VerbForm = PastParticiple, clause.Voice = Passive",
+        "PassiveClause: Sentence -> subject:NounPhrase clause:VerbPhrase '.' { capital: [subject] } where clause.VerbForm = PastParticiple, clause.Voice = Passive",
     )
     .unwrap();
 

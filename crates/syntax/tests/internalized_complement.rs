@@ -80,7 +80,7 @@ fn grammar(
             slot PP = PrepositionPhrase
             slot Nominal = Nominal
             slot Amount = AmountPhrase
-            Participial: Sentence -> clause:VerbPhrase '.'
+            Participial: Sentence -> clause:VerbPhrase '.' {{ capital: [clause] }}
                 where clause.VerbForm = PastParticiple,
                       clause.Voice = Passive
             Numeral: AmountPhrase -> Lex(Numeral)

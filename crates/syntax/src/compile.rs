@@ -73,7 +73,6 @@ pub(crate) struct LexemeFacts {
 pub(crate) struct ValueFacts {
     form: sylex_lexicon::WordForm,
     features: sylex_lexicon::FeatureBundle,
-    capitalization: sylex_lexicon::SurfaceCase,
     /// Its Adjacency Agreement edges (`sylex_lexicon::Lexicon::edges`).
     pub edges: sylex_lexicon::Edges,
     /// The word forms of every Word spelled like it, ignoring case, as a
@@ -85,9 +84,7 @@ pub(crate) struct ValueFacts {
 
 impl ValueFacts {
     fn is(&self, value: &sylex_lexicon::LexicalValue) -> bool {
-        self.form == value.form
-            && self.capitalization == value.capitalization
-            && self.features == value.features
+        self.form == value.form && self.features == value.features
     }
 }
 
@@ -415,7 +412,6 @@ fn word_values(
         table[lexeme.index()].push(ValueFacts {
             form: value.form,
             features: value.features.clone(),
-            capitalization: value.capitalization,
             edges,
             forms: spelling.as_deref().map_or_else(
                 || crate::step::form_bit(value.form),
@@ -508,6 +504,8 @@ struct Draft {
     unshared: Vec<usize>,
     /// Children that are not, nor are headed by, a Linked Coordination.
     unlinked: Vec<usize>,
+    /// Children that open with a capital (`ProductionDecl::capital`).
+    capital: Vec<usize>,
     /// A binary coordination with a delimiter before its coordinator.
     delimits: bool,
     /// A serial tail of a coordination, whose `first` conjunct follows another.
@@ -652,6 +650,7 @@ impl Draft {
             paired_coordinator: None,
             uncoordinated: Vec::new(),
             unlinked: Vec::new(),
+            capital: Vec::new(),
             coordinated: Vec::new(),
             whole_coordination: Vec::new(),
             unshared: Vec::new(),
@@ -1600,6 +1599,14 @@ impl<'a> Binder<'a> {
                 .ok_or_else(|| context(invalid(format!("unknown unlinked child `{name}`"))))?;
             draft.unlinked.push(child);
         }
+        for name in &declaration.capital {
+            let child = draft
+                .children
+                .iter()
+                .position(|c| c.name == *name)
+                .ok_or_else(|| context(invalid(format!("unknown capital child `{name}`"))))?;
+            draft.capital.push(child);
+        }
         for name in &declaration.coordinated {
             let child = draft
                 .children
@@ -2500,12 +2507,14 @@ impl<'a> Binder<'a> {
                 binding,
                 coordinators,
                 remnant,
+                capital_after,
             } => self.parameters(
                 *head,
                 phrase,
                 *binding,
                 coordinators.as_deref(),
                 remnant.as_deref(),
+                capital_after,
             ),
             SchemaDecl::Valence {
                 head,
@@ -2939,6 +2948,7 @@ impl<'a> Binder<'a> {
         binding: Option<Binding>,
         coordinators: Option<&str>,
         remnant: Option<&str>,
+        capital_after: &[char],
     ) -> Result<Vec<Draft>, LoadError> {
         use crate::frames::ParameterPart;
         let coordinator = coordinators.map(|c| self.coordinator_test(c)).transpose()?;
@@ -3009,6 +3019,14 @@ impl<'a> Binder<'a> {
                         ),
                         ParameterPart::Mark(c, binding) => ("", Symbol::Punct(*c, *binding, None)),
                     };
+                    // Whatever part stands right after one of the marks, a
+                    // slot, a marker word or a mark, opens with a capital.
+                    let after_mark = draft.children.last().is_some_and(|c| {
+                        matches!(c.symbol, Symbol::Punct(mark, ..) if capital_after.contains(&mark))
+                    });
+                    if after_mark {
+                        draft.capital.push(draft.children.len());
+                    }
                     draft.child(name, symbol, GapRule::Closed);
                 }
                 let structural: Vec<&ParameterPart> = parts
@@ -3026,6 +3044,7 @@ impl<'a> Binder<'a> {
                     for child in &draft.children[1..] {
                         elided.child(child.name.as_ref(), child.symbol.clone(), GapRule::Closed);
                     }
+                    elided.capital = draft.capital.iter().map(|at| at - 1).collect();
                     elided.remnant =
                         crate::step::RemnantRole::Elides(crate::step::Elided::Lexeme(lexeme));
                     draft.remnant = crate::step::RemnantRole::SharesHead;
@@ -5526,6 +5545,9 @@ fn gate_slots(production: &mut Production, draft: &mut Draft) -> Result<(), Stri
     for at in std::mem::take(&mut draft.unlinked) {
         production.slots[at].unlinked = true;
     }
+    for at in std::mem::take(&mut draft.capital) {
+        production.slots[at].capital = true;
+    }
     for at in std::mem::take(&mut draft.coordinated) {
         production.slots[at].coordinated = true;
     }
@@ -6003,6 +6025,7 @@ fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
         whole_coordination,
         unshared: _,
         unlinked,
+        capital,
         delimits: _,
         tail: _,
         interleaved_prefix: _,
@@ -6056,6 +6079,7 @@ fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
         .chain(uncoordinated.iter_mut())
         .chain(coordinated.iter_mut())
         .chain(unlinked.iter_mut())
+        .chain(capital.iter_mut())
         .chain(nonfinal_conjuncts.iter_mut())
     {
         *i = map(*i);

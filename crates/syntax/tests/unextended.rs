@@ -45,7 +45,7 @@ category Sentence
 word In = "p:in"
 slot NP = NounPhrase
 slot PP = PrepositionPhrase
-Statement: Sentence -> Predicate '.'
+Statement: Sentence -> Predicate '.' {{ capital: [head] }}
 Noun: NounPhrase -> Lex(Noun)
 Bare: Predicate -> subject:NounPhrase {{ unextended: [subject] }}
 {extended}

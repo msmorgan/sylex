@@ -85,7 +85,7 @@ const GRAMMAR: &str = r#"
     class Coordinator = ["c:or"]
     slot NP = ComplementNounPhrase
     slot KeywordPhrase = KeywordPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Wrapped: ComplementNounPhrase -> NounPhrase
     Singular: NounPhrase -> determiner:Word(A) Nominal where $.Number = Singular
     BarePlural: NounPhrase -> Nominal where head.Number = Plural

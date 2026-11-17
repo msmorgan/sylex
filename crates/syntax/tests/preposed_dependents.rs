@@ -37,7 +37,7 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
         category Sentence
         category Temporal
         word This = "d:this"
-        Statement: Sentence -> Clause '.'
+        Statement: Sentence -> Clause '.' { capital: [head] }
         Plain: Clause -> Lex(Noun)
         Noun: Group -> Lex(Noun)
         Adjective: Group -> Lex(Adjective)

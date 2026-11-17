@@ -80,7 +80,7 @@ const GRAMMAR: &str = r#"
     slot Amount = AmountPhrase
     slot Nominal = Nominal
     slot Objects = ObjectCoordination { unlike: [NP, KeywordPhrase, Amount] }
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain, clause.Voice = Active
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain, clause.Voice = Active
     Numeral: AmountPhrase -> Lex(Numeral)
     Keyword: KeywordPhrase -> Lex(Keyword)
     Bare: NounPhrase -> Nominal
@@ -257,7 +257,7 @@ fn a_central_adjunct_shifts_an_unlike_slot() {
         slot KeywordPhrase = KeywordPhrase
         slot Amount = AmountPhrase
         slot Objects = ObjectCoordination { unlike: [NP, KeywordPhrase, Amount] }
-        Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+        Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
         Numeral: AmountPhrase -> Lex(Numeral)
         Keyword: KeywordPhrase -> Lex(Keyword)
         Adverb: AdverbPhrase -> Lex(Adverb)

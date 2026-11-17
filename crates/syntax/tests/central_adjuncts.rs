@@ -70,7 +70,7 @@ slot NP = NounPhrase
 slot PP = PrepositionPhrase
 slot Pred = Predicative
 slot BareInf = BareInf
-Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+Imperative: Sentence -> clause:VerbPhrase '.' {{ capital: [clause] }} where clause.VerbForm = Plain
 Noun: NounPhrase -> Lex(Noun)
 Adverb: AdverbPhrase -> Lex(Adverb)
 CentralAdverb: CentralAdjunct -> AdverbPhrase

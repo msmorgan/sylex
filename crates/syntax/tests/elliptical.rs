@@ -55,7 +55,7 @@ fn grammar(lexicon: &Lexicon, elliptical: &str) -> CompiledGrammar {
             word Draws = "w:draws"
             slot NP = NounPhrase
             slot PP = PrepositionPhrase
-            Statement: Sentence -> clause:Clause '.'
+            Statement: Sentence -> clause:Clause '.' {{ capital: [clause] }}
             SubjectPredicate: Clause -> subject:NounPhrase Predicate
             Noun: NounPhrase -> Lex(Noun)
             // A reduced relative: *card [that] can*.
@@ -151,7 +151,7 @@ fn an_ellipsis_site_names_its_omitted_complement_forms() {
         root Predicate
         category Predicate
         word Can = "w:can"
-        Stranded: Predicate -> Word(Can) { elliptical: [] }
+        Stranded: Predicate -> Word(Can) { capital: [head], elliptical: [] }
     "#;
     let error = CompiledGrammar::bind(
         &Grammar::from_fug_str(text).unwrap(),

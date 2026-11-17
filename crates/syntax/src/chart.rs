@@ -22,6 +22,7 @@ use crate::step::ChildView;
 use crate::step::CoordinatorId;
 use crate::step::LeafFacts;
 use crate::step::LinkedCoordination;
+use crate::step::Opening;
 use crate::step::State;
 use crate::step::Summary;
 use crate::step::Symbol;
@@ -56,6 +57,8 @@ pub(crate) struct Leaf {
     pub start: usize,
     pub end: usize,
     pub reading: LexicalReading,
+    /// The case its first letter is written in (`LexicalMatch::case`).
+    pub case: Option<sylex_lexicon::LetterCase>,
     pub facts: LeafFacts,
     pub edges: sylex_lexicon::Edges,
 }
@@ -685,6 +688,7 @@ impl CompiledGrammar {
                 start: found.start,
                 end: found.end,
                 reading: found.reading.clone(),
+                case: found.case,
                 facts,
                 edges,
             });
@@ -853,7 +857,11 @@ impl CompiledGrammar {
                             if !self.leaf_matches(leaf_test, facts) {
                                 continue;
                             }
-                            let view = ChildView::Leaf(facts, forest.leaves[leaf].edges);
+                            let view = ChildView::Leaf(
+                                facts,
+                                forest.leaves[leaf].edges,
+                                Opening::of(forest.leaves[leaf].case),
+                            );
                             if !production.spacing_matches(
                                 &forest.items[id].state,
                                 dot,
@@ -951,6 +959,10 @@ impl CompiledGrammar {
                     && node.start == 0
                     && skip(node.end) == n
                     && node.summary.gap == crate::Gap::None
+                    // No Production puts the input in a position that opens
+                    // with a capital, so it opens as a Constituent inside a
+                    // sentence does, where none states one.
+                    && node.summary.opening != Opening::Capital
             })
             .collect();
         Parse {

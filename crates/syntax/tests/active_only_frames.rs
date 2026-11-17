@@ -71,11 +71,11 @@ const GRAMMAR: &str = r#"
     word By = "p:by"
     slot NP = NounPhrase
     slot PP = PrepositionPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain, clause.Voice = Active
-    Passive: Sentence -> clause:VerbPhrase '!' where clause.Voice = Passive
-    Adjectival: Sentence -> AdjectivePhrase '?'
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain, clause.Voice = Active
+    Passive: Sentence -> clause:VerbPhrase '!' { capital: [clause] } where clause.Voice = Passive
+    Adjectival: Sentence -> AdjectivePhrase '?' { capital: [head] }
     Bare: NounPhrase -> Nominal
-    Fragment: Sentence -> NounPhrase ';'
+    Fragment: Sentence -> NounPhrase ';' { capital: [head] }
     premodification Participle { head: Verb, host: Nominal, forms: [PastParticiple] }
     valence VerbPhrase {
         head: Verb,

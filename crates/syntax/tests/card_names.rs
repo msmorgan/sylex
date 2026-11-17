@@ -38,8 +38,8 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
         category Sentence
         category Name
         NameLeaf: Name -> Lex(Catalog)
-        Plain: Sentence -> Name '.'
-        OptedIn: Sentence -> OtherCardName() '!'
+        Plain: Sentence -> Name '.' { capital: [head] }
+        OptedIn: Sentence -> OtherCardName() '!' { capital: [head] }
     ";
     CompiledGrammar::bind(
         &Grammar::from_fug_str(text).unwrap(),

@@ -41,7 +41,7 @@ const GRAMMAR: &str = r"
     category Sentence
     category VerbPhrase [VerbForm]
     slot PP = PrepositionPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     valence VerbPhrase { head: Verb }
     valence PrepositionPhrase { head: Preposition }
 ";
@@ -118,7 +118,7 @@ fn an_idiom_selects_its_particle_and_a_predicative() {
         category VerbPhrase [VerbForm]
         slot PP = PrepositionPhrase
         slot Pred = Predicative
-        Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+        Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
         NounPredicative: Predicative -> Lex(Noun)
         valence VerbPhrase { head: Verb }
         valence PrepositionPhrase { head: Preposition }

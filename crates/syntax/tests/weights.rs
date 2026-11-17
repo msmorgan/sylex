@@ -28,8 +28,8 @@ fn grammar(lexicon: &Lexicon, light: &str) -> Result<CompiledGrammar, sylex_synt
             category Words
             Word: Words -> Lex(Noun)
             MoreWords: Words -> Words next:Lex(Noun)
-            Light: Sentence -> words:Words '.' {{ light: [{light}] }}
-            Heavy: Sentence -> words:Words '!' {{ heavy: [words] }}
+            Light: Sentence -> words:Words '.' {{ capital: [words], light: [{light}] }}
+            Heavy: Sentence -> words:Words '!' {{ capital: [words], heavy: [words] }}
         "
     );
     CompiledGrammar::bind(

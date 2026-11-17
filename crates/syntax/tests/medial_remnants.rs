@@ -46,7 +46,7 @@ fn count(text: &str) -> usize {
         class Coordinator = ["c:and"]
         slot NP = NounPhrase
         slot Pred = Predicative
-        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Imperative: Sentence -> VerbPhrase '.' { capital: [head] } where head.VerbForm = Plain
         Noun: NounPhrase -> Lex(Noun)
         NominalPredicative: Predicative -> NounPhrase
         valence VerbPhrase { head: Verb, remnants: [Pred -> PredicativeRemnant] }
@@ -112,7 +112,7 @@ fn a_joint_exclusion_on_a_slot_moves_into_the_remnant() {
         class Coordinator = ["c:and"]
         slot NP = NounPhrase
         slot Pred = Predicative where !(slot.Number = Plural & slot.Countability = Count)
-        Imperative: Sentence -> VerbPhrase '.' where head.VerbForm = Plain
+        Imperative: Sentence -> VerbPhrase '.' { capital: [head] } where head.VerbForm = Plain
         Noun: NounPhrase -> Lex(Noun)
         NominalPredicative: Predicative -> NounPhrase
         valence VerbPhrase { head: Verb, remnants: [Pred -> PredicativeRemnant] }

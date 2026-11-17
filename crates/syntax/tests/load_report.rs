@@ -98,7 +98,7 @@ const GRAMMAR: &str = r#"
     word With = "prep:with"
     class FrontAdverb = ["adv:first", "adv:then"]
     slot NP = NounPhrase
-    Statement: Sentence -> subject:NounPhrase '.'
+    Statement: Sentence -> subject:NounPhrase '.' { capital: [subject] }
     Bare: NounPhrase -> Lex(Noun) where $.Form = Plain
     Definite: NounPhrase -> det:Word(The) Lex(Noun) where $.Form = Plain, $.Mark = Set
     Indefinite: NounPhrase -> det:Word(A) Lex(Noun) where $.Form = Marked, $.Lone = Only, $.Mark = Set

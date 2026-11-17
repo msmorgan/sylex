@@ -22,7 +22,6 @@ use sylex_lexicon::Number;
 use sylex_lexicon::Person;
 use sylex_lexicon::Source;
 use sylex_lexicon::SourceKind;
-use sylex_lexicon::SurfaceCase;
 use sylex_lexicon::SurfaceStructure;
 use sylex_lexicon::WordForm;
 use sylex_syntax::AdmissionError;
@@ -147,17 +146,11 @@ fn node(
     })
 }
 
-fn leaf(
-    lexeme: &str,
-    form: WordForm,
-    features: FeatureBundle,
-    capitalization: SurfaceCase,
-) -> Reading {
+fn leaf(lexeme: &str, form: WordForm, features: FeatureBundle) -> Reading {
     Reading::Leaf(LexicalReading::Word(LexicalValue {
         lexeme: lexeme.into(),
         form,
         features,
-        capitalization,
     }))
 }
 
@@ -185,17 +178,18 @@ fn lexemes(reading: &Reading) -> Vec<String> {
 }
 
 /// One word of a lexical Category, then a full stop.
-const WORD: &str = r"
+const WORD: &str = r#"
     root Sentence
     category Sentence
     category Word
-    Sentence: Sentence -> word:Word '.'
+    Sentence: Sentence -> word:Word '.' { capital: [word] }
+    Quoted: Sentence -> "Word" '.'
     Noun: Word -> word:Lex(Noun)
     Verb: Word -> word:Lex(Verb)
     Adjective: Word -> word:Lex(Adjective)
     Determinative: Word -> word:Lex(Determinative)
     Numeral: Word -> word:Lex(Numeral)
-";
+"#;
 
 /// The Reading of `Sentence` over one leaf.
 fn word_reading(production: &str, value: LexicalReading) -> Reading {
@@ -304,7 +298,7 @@ fn multiword_lexeme_is_atomic_and_needs_its_separator() {
         root Sentence
         category Nominal
         category Sentence
-        Sentence: Sentence -> Nominal '.'
+        Sentence: Sentence -> Nominal '.' { capital: [head] }
         Noun: Nominal -> Lex(Noun)
         Premodified: Nominal -> modifier:Lex(Adjective) Nominal
     ";
@@ -359,8 +353,8 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
         category Adjectives
         category Nominal
         category Sentence
-        Sentence: Sentence -> Nominal '.'
-        Split: Sentence -> modifier:Adjectives Nominal '.'
+        Sentence: Sentence -> Nominal '.' { capital: [head] }
+        Split: Sentence -> modifier:Adjectives Nominal '.' { capital: [modifier] }
         Adjectives: Adjectives -> first:Lex(Adjective) last:Lex(Adjective)
         Noun: Nominal -> Lex(Noun)
         Premodified: Nominal -> modifier:Lex(Adjective) Nominal
@@ -502,17 +496,20 @@ const LIST: &str = r"
     category Item [Number]
     category Sentence
     category Seq
-    Sentence: Sentence -> list:Seq '.'
+    Sentence: Sentence -> list:Seq '.' { capital: [list] }
     One: Seq -> item:Item
     More: Seq -> list:Seq item:Item
     Noun: Item -> Lex(Noun)
     Adjective: Item -> Lex(Adjective)
 ";
 
+/// `n` words, the first opening the sentence with its capital.
 fn repeated(word: &str, n: usize) -> String {
     let mut text = vec![word; n].join(" ");
     text.push('.');
-    text
+    let mut chars = text.chars();
+    let first = chars.next().unwrap();
+    first.to_uppercase().chain(chars).collect()
 }
 
 /// Obligations 5 and 6: Derivations with equal summaries pack, so the chart
@@ -520,13 +517,14 @@ fn repeated(word: &str, n: usize) -> String {
 /// linearly with the input.
 #[test]
 fn homograph_choices_do_not_multiply_the_chart() {
+    // *y*, which is no Roman numeral, as a sentence-initial *X* would be.
     let homographs = |k: usize| {
-        Lexicon::new((0..k).map(|i| word(&format!("a:x{i}"), "x", Category::Adjective))).unwrap()
+        Lexicon::new((0..k).map(|i| word(&format!("a:y{i}"), "y", Category::Adjective))).unwrap()
     };
     let lexicons = [homographs(1), homographs(3)];
     let mut items = Vec::new();
     for n in [4, 8, 16] {
-        let text = repeated("x", n);
+        let text = repeated("y", n);
         let [one, three] = [0, 1].map(|i| {
             let grammar = bind(LIST, &lexicons[i], NO_FRAMES).unwrap();
             let parse = grammar.parse(&lexicons[i], &text);
@@ -541,7 +539,7 @@ fn homograph_choices_do_not_multiply_the_chart() {
     }
     assert_eq!(items[2] - items[1], 2 * (items[1] - items[0]), "{items:?}");
     let grammar = bind(LIST, &lexicons[1], NO_FRAMES).unwrap();
-    assert_eq!(readings(&grammar, &lexicons[1], &repeated("x", 2)).len(), 9);
+    assert_eq!(readings(&grammar, &lexicons[1], &repeated("y", 2)).len(), 9);
 }
 
 /// Obligations 6 and 10: Constituents with distinct summaries stay distinct,
@@ -610,7 +608,7 @@ fn agreement_keeps_joint_alternatives_correlated() {
             category Sentence
             category Subject [Number, Person]
             category VerbPhrase [Number, Person, VerbForm]
-            Clause: Sentence -> subject:Subject VerbPhrase '.'
+            Clause: Sentence -> subject:Subject VerbPhrase '.' { capital: [subject] }
                 where subject.Number = head.Number,
                       subject.Person = head.Person,
                       head.VerbForm = Finite
@@ -679,23 +677,13 @@ fn agreement_keeps_joint_alternatives_correlated() {
                     "Pronoun",
                     "Subject",
                     &feature(&subject),
-                    vec![leaf(
-                        pronoun,
-                        WordForm::Invariant,
-                        subject,
-                        SurfaceCase::Initial,
-                    )],
+                    vec![leaf(pronoun, WordForm::Invariant, subject)],
                 ),
                 node(
                     "Verb",
                     "VerbPhrase",
                     &verb_features,
-                    vec![leaf(
-                        "v:see",
-                        WordForm::Present,
-                        verb,
-                        SurfaceCase::Declared,
-                    )],
+                    vec![leaf("v:see", WordForm::Present, verb)],
                 ),
             ],
         )
@@ -745,7 +733,8 @@ const RELATIVE: &str = r#"
     word The = "d:the"
     word You = "pr:you"
     slot NP = NounPhrase
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] }
+        where clause.VerbForm = Plain
     Declarative: Clause -> subject:Word(You) VerbPhrase { transparent: [head] }
         where head.VerbForm = Finite,
               subject.Number = head.Number,
@@ -785,7 +774,7 @@ fn a_projected_variant_the_grammar_omits_is_a_bind_error() {
         )
     };
     let bound = bind(&grammar("First | Second | Third"), &lexicon, NO_FRAMES).unwrap();
-    assert_eq!(readings(&bound, &lexicon, "X").len(), 1);
+    assert_eq!(readings(&bound, &lexicon, "x").len(), 1);
     match bind(&grammar("Second | Third"), &lexicon, NO_FRAMES) {
         Err(LoadError::Invalid(message)) => assert!(
             message.contains("`pr:x`") && message.contains("Person is First"),
@@ -943,8 +932,8 @@ fn unary_cycle_hides_no_finite_sibling() {
             category A
             category B
             category Sentence
-            SA: Sentence -> A '.'
-            SB: Sentence -> B '.'
+            SA: Sentence -> A '.' { capital: [head] }
+            SB: Sentence -> B '.' { capital: [head] }
             AB: A -> B
             BA: B -> A
             AWord: A -> Lex(Noun)
@@ -954,14 +943,7 @@ fn unary_cycle_hides_no_finite_sibling() {
         NO_FRAMES,
     )
     .unwrap();
-    let card = || {
-        leaf(
-            "n:card",
-            WordForm::Singular,
-            number(Number::Singular),
-            SurfaceCase::Initial,
-        )
-    };
+    let card = || leaf("n:card", WordForm::Singular, number(Number::Singular));
     let a_word = || node("AWord", "A", &[], vec![card()]);
     let b_word = || node("BWord", "B", &[], vec![card()]);
     let expected = BTreeSet::from([
@@ -1014,7 +996,7 @@ fn removing_an_alternative_removes_exactly_its_readings() {
             category NounPhrase [Number]
             category Sentence
             category VerbPhrase [VerbForm]
-            Imperative: Sentence -> clause:VerbPhrase '.'
+            Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] }
             Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
             Bare: NounPhrase -> Lex(Noun)
             Determined: NounPhrase -> det:Lex(Determinative) Lex(Noun)
@@ -1080,22 +1062,33 @@ fn every_declared_lexical_value_round_trips() {
     .unwrap();
     let grammar = bind(WORD, &lexicon, NO_FRAMES).unwrap();
     let values: Vec<LexicalValue> = lexicon.values().cloned().collect();
-    assert!(
-        values
-            .iter()
-            .any(|v| v.capitalization == SurfaceCase::Initial)
-    );
+    assert!(values.iter().any(|v| {
+        lexicon
+            .takes_capital(&LexicalReading::Word(v.clone()))
+            .unwrap()
+    }));
     let family = values
         .into_iter()
-        .map(|value| {
+        .flat_map(|value| {
             let category = lexicon.lexemes()[&value.lexeme].category;
-            word_reading(production_for(category), LexicalReading::Word(value))
+            let word = node(
+                production_for(category),
+                "Word",
+                &[],
+                vec![Reading::Leaf(LexicalReading::Word(value))],
+            );
+            // The same Reading opens with a capital where a sentence begins
+            // and in lower case inside quotation marks: no leaf states a case.
+            [
+                node("Sentence", "Sentence", &[], vec![word.clone()]),
+                node("Quoted", "Sentence", &[], vec![word]),
+            ]
         })
         .collect();
-    // Each value in both capitalizations: `burn` 15 (plain, gerund, six
-    // present, past participle and six preterite), `café` 2, `élan` 2,
-    // `naïve` 1, `each` 1; `Æther` has only its declared capitalization.
-    assert_eq!(assert_family(&grammar, &lexicon, "Sentence", family), 43);
+    // Each value in both positions: `burn` 15 (plain, gerund, six present,
+    // past participle and six preterite), `café` 2, `élan` 2, `naïve` 1,
+    // `each` 1 and `Æther` 1, which keeps its one spelling in both.
+    assert_eq!(assert_family(&grammar, &lexicon, "Sentence", family), 44);
 }
 
 /// Imperatives with nominal and predicate attachment of Preposition Phrases.
@@ -1111,7 +1104,8 @@ const PHRASES: &str = r#"
     word The = "d:the"
     word These = "d:these"
     word This = "d:this"
-    Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+    Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] }
+        where clause.VerbForm = Plain
     Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
     PredicateAdjunct: VerbPhrase -> VerbPhrase adjunct:PrepositionPhrase
     Determined: NounPhrase -> det:Word(The) Nominal
@@ -1176,9 +1170,7 @@ fn complete_phrase_families_round_trip() {
     ])
     .unwrap();
     let grammar = bind(PHRASES, &lexicon, NO_FRAMES).unwrap();
-    let invariant =
-        |id: &str, case: SurfaceCase| leaf(id, WordForm::Invariant, FeatureBundle::default(), case);
-    let declared = SurfaceCase::Declared;
+    let invariant = |id: &str| leaf(id, WordForm::Invariant, FeatureBundle::default());
 
     let mut nominals = Vec::new();
     for noun in ["n:card", "n:sheep"] {
@@ -1189,7 +1181,7 @@ fn complete_phrase_families_round_trip() {
                 "Noun",
                 "Nominal",
                 &features,
-                vec![leaf(noun, form, number(n), declared)],
+                vec![leaf(noun, form, number(n))],
             );
             nominals.push((n, bare.clone()));
             nominals.push((
@@ -1198,7 +1190,7 @@ fn complete_phrase_families_round_trip() {
                     "Premodified",
                     "Nominal",
                     &features,
-                    vec![invariant("a:red", declared), bare],
+                    vec![invariant("a:red"), bare],
                 ),
             ));
         }
@@ -1217,7 +1209,7 @@ fn complete_phrase_families_round_trip() {
                     production,
                     "NounPhrase",
                     &features,
-                    vec![invariant(det, declared), nominal.clone()],
+                    vec![invariant(det), nominal.clone()],
                 ),
             ));
         }
@@ -1239,7 +1231,7 @@ fn complete_phrase_families_round_trip() {
                 "PrepositionPhrase",
                 "PrepositionPhrase",
                 &[],
-                vec![invariant(preposition, declared), np.clone()],
+                vec![invariant(preposition), np.clone()],
             ));
         }
     }
@@ -1257,12 +1249,7 @@ fn complete_phrase_families_round_trip() {
     // attachment sites: the verb phrase and the object's nominal. (A
     // premodified object would add a third tree, the premodifier over the
     // postmodified nominal.)
-    let see = leaf(
-        "v:see",
-        WordForm::Plain,
-        FeatureBundle::default(),
-        SurfaceCase::Initial,
-    );
+    let see = leaf("v:see", WordForm::Plain, FeatureBundle::default());
     let plain = [("VerbForm", "Plain")];
     let mut imperatives = Vec::new();
     for (n, np) in noun_phrases.iter().filter(|(_, np)| lexemes(np).len() == 2) {
@@ -1337,7 +1324,6 @@ fn numeral_sign_survives_phrase_projection_and_controls_admission() {
                 vec![Reading::Leaf(LexicalReading::Numeral {
                     value,
                     notation: sylex_lexicon::Numeral::Arabic(false),
-                    capitalization: SurfaceCase::Declared,
                 })],
             )],
         );

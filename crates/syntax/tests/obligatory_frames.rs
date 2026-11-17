@@ -61,7 +61,7 @@ fn grammar(obligatory: bool) -> String {
             category VerbPhrase [VerbForm]
             slot NP = NounPhrase
             slot PP = PrepositionPhrase
-            Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
+            Imperative: Sentence -> clause:VerbPhrase '.' {{ capital: [clause] }} where clause.VerbForm = Plain
             Bare: NounPhrase -> Nominal
             valence VerbPhrase {{ head: Verb }}
             valence PrepositionPhrase {{ head: Preposition }}

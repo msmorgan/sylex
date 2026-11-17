@@ -37,7 +37,7 @@ fn grammar(lexicon: &Lexicon, equations: &str) -> Result<CompiledGrammar, String
             word The = "d:the"
             Bare: NounPhrase -> Lex(Noun) where $.Determination = Bare
             Determined: NounPhrase -> determiner:Word(The) Lex(Noun) where $.Determination = Overt
-            Pair: Phrase -> adjunct:NounPhrase adjunct:NounPhrase '.' where {equations}
+            Pair: Phrase -> adjunct:NounPhrase adjunct:NounPhrase '.' {{ capital: [adjunct] }} where {equations}
         "#
     );
     let grammar = Grammar::from_fug_str(&text).map_err(|e| format!("{e:?}"))?;

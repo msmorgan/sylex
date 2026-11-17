@@ -63,8 +63,10 @@ pub enum Capitalization {
     /// Only the declared spelling.
     Exact,
     /// The declared spelling, plus a variant with its first scalar uppercased
-    /// when that differs. The reading records which was written
-    /// ([`crate::SurfaceCase`]); no other case folding is licensed.
+    /// when that differs. Analysis finds either, and its match records which
+    /// was written ([`crate::LetterCase`]); the position a Reading puts the
+    /// word in decides which one realizes it. No other case folding is
+    /// licensed.
     Initial,
 }
 

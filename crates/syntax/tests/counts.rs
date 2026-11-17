@@ -52,7 +52,7 @@ const BRACKETS: &str = r"
     root Sentence
     category Sentence
     category Phrase
-    Sentence: Sentence -> Phrase '.'
+    Sentence: Sentence -> Phrase '.' { capital: [head] }
     Noun: Phrase -> Lex(Noun)
     Adjective: Phrase -> Lex(Adjective)
     Pair: Phrase -> first:Phrase second:Phrase
@@ -130,8 +130,8 @@ fn a_unary_cycle_is_an_error_naming_it() {
             category A
             category B
             category Sentence
-            SA: Sentence -> A '.'
-            SB: Sentence -> B '.'
+            SA: Sentence -> A '.' { capital: [head] }
+            SB: Sentence -> B '.' { capital: [head] }
             AB: A -> B
             BA: B -> A
             AWord: A -> Lex(Noun)

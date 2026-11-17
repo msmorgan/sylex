@@ -4,7 +4,6 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::FeatureBundle;
-use crate::Onset;
 
 /// Stable, interned identity of a declared lexeme.
 /// IDs are copied through lexical values and serialize as their original text.
@@ -98,19 +97,17 @@ pub enum Countability {
     Mass,
 }
 
-/// The selected capitalization of a grammatical lexical value.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
-pub enum SurfaceCase {
-    Declared,
-    Initial,
-}
-
-/// Positional distribution of one realization, independent of its host.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
-pub struct SurfaceFeatures {
-    pub onset: Option<Onset>,
-    pub initial: bool,
-    pub interior: bool,
+/// The case a word's first letter is written in, where its Lexeme takes an
+/// initial capital that its declared spelling lacks
+/// ([`crate::Capitalization::Initial`]). Which one a position calls for is
+/// the grammar's to say, so a lexical match records it and no lexical value
+/// does: a Reading derives it from its structure.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize)]
+pub enum LetterCase {
+    /// The declared spelling.
+    Lower,
+    /// The declared spelling with its first letter capitalized.
+    Capital,
 }
 
 /// An integer notation identity. Its parse and realization codecs belong to
@@ -130,19 +127,12 @@ pub struct LexicalValue {
     pub lexeme: LexemeId,
     pub form: WordForm,
     pub features: FeatureBundle,
-    pub capitalization: SurfaceCase,
 }
 
 /// A compact lexical alternative, independent of its source occurrence.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum LexicalReading {
     Word(LexicalValue),
-    FlavorWord {
-        label: String,
-    },
-    Numeral {
-        value: i32,
-        notation: Numeral,
-        capitalization: SurfaceCase,
-    },
+    FlavorWord { label: String },
+    Numeral { value: i32, notation: Numeral },
 }
