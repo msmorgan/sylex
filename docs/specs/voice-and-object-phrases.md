@@ -1,14 +1,31 @@
 # Voice, object phrases and shared phrases: a clause is a subject and a verb phrase
 
+## Status: DRAFT
+
+This spec gives direction, not a settled design. Three of the tickets that build it have landed
+(`syl-verb-phrase-sort-name`, `syl-definition-actor-parameter`, `syl-misnamed-declarations`); the
+rest of it has not been built or run through `cargo xtask dsl check`. Where building it shows a
+rule here to be wrong or incomplete, the finding stands and this text is revised; a builder
+reports the conflict and does not bend the code to fit the spec.
+
+Known to be unsettled, each a question on the ticket named:
+
+- **A participle is a sort of its own** (`docs/specs/kind-sorts-and-position-unions.md` §2).
+  `done` produces a `Participle`, as does `ing` for the active participle, `be` takes one, and
+  where this spec says a verb phrase stands in a nominal's `post` as a participle, a `Participle`
+  does. §3 still writes `shared` over an active verb phrase and a `done` phrase in `post` (*Abu
+  Ja'far*) and `be` over `shared` (*Cephalid Illusionist*), and says `be` over an active phrase
+  is the progressive: `syl-passive-participle-and-trigger-events`.
+- **A lookback after a head.** §8 puts `did(phrase, within)`, a verb phrase, in `post`, and writes
+  "creatures destroyed this way" as `did` over a `done` phrase; neither types once a verb phrase
+  is no member of `PostModifier`: `syl-lookback-operator-and-holds`.
+- **Negation over `be`** ("isn't blocked", "wasn't cast", about 85 lines), which §11 leaves
+  undesigned: `syl-passive-participle-and-trigger-events`.
+
 A clause's subject is the noun phrase the card prints as its subject, and everything else a
 clause says is its verb phrase: the verb with its complements, a passive, a modal. Damage,
 counters, life and tokens are noun phrases like any other. A phrase that coordinated verb phrases
 share is written once, after them.
-
-`docs/specs/kind-sorts-and-position-unions.md` §2 changes one thing here: a participle is a
-sort of its own. `done` produces a `Participle`, as does `ing` for the active participle, `be`
-takes one, and where this spec says a verb phrase stands in a nominal's `post` as a participle,
-a `Participle` does.
 
 The `.syl` below is the shape of the design. It has not been run through `cargo xtask dsl check`.
 A word is marked NEW where this spec adds it and SKETCH where another ticket owns its final form
