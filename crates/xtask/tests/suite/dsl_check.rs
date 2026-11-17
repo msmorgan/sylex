@@ -2725,7 +2725,7 @@ const AGREEMENT_PREAMBLE: &str = "\
     primitive superlative(op: AggregateOp, axis: ProjAxis, domain: Nominal): PostModifier = Superlative\n\
     primitive atLeast: Comparator = AtLeast\n\
     primitive compareOver(domain: Nominal, measure: Amount, comparator: Comparator, bound: Amount): Nominal = CompareOver\n\
-    primitive headed(subject: NounPhrase, head: Nominal): NounPhrase = Headed\n\
+    primitive this(head: Nominal): NounPhrase = This\n\
     primitive always: Condition = Always\n\
     primitive nothing: VerbPhrase = Nothing\n";
 
@@ -2803,7 +2803,7 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
            body = described($d, nominal(card, post = [withDifferentNames]))\n\
          }}\n\
          template badThroughParameter: NounPhrase {{ body = differentCards(each) }}\n\
-         template badHeaded(x: NounPhrase): NounPhrase {{ body = headed($x, nominal(card, post = [withDifferentNames])) }}\n\
+         template badThis: NounPhrase {{ body = this(nominal(card, post = [withDifferentNames])) }}\n\
          template differentUpTo(p: Nat): NounPhrase {{\n\
            body = counted(range(high = $p), nominal(card, post = [withDifferentNames]))\n\
          }}\n\

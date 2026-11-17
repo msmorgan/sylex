@@ -520,7 +520,7 @@ impl<'a> NominalChecker<'a, '_> {
                 }
             }
             // The rule, not a fallback: every other consumer of a `Nominal`
-            // (`headed`, `attachHost`, `run`, `addsTarget`, `everyCardIs`,
+            // (`this`, `attachHost`, `run`, `addsTarget`, `everyCardIs`,
             // `noCardIs`, the `Reach` words, a rules row's scope, …) tests each
             // member on its own or names a head noun, so it forms no group for
             // Agreement, whatever its constructor.

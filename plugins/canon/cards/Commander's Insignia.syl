@@ -6,8 +6,4 @@ card singleFaced({
       static(
         getsBoth(
           bare(nominal(creature, post = [youControl])),
-          up(
-            eventCount(
-              actor(you),
-              cast(headed(yourCommander, spell), from = commandZone),
-              thisGame))))]})
+          up(eventCount(actor(you), cast(yourCommander, from = commandZone), thisGame))))]})
