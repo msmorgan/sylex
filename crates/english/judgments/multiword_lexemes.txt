@@ -3,16 +3,10 @@
 +Nominal mana values => !Nominal "values"
 +Nominal mana cost => !Nominal "cost"
 +Nominal mana costs => !Nominal "costs"
-+Nominal Mana value => !Nominal "value"
-+Nominal Mana values => !Nominal "values"
-+Nominal Mana cost => !Nominal "cost"
-+Nominal Mana costs => !Nominal "costs"
 +NounPhrase mana values
 +NounPhrase mana costs
 +PrepositionPhrase face down
-+PrepositionPhrase Face down
 +PrepositionPhrase face up
-+PrepositionPhrase Face up
 +PrepositionPhrase face up or face down => PrepositionPhrase "face up"; PrepositionPhrase "face down"
 +VerbPhrase is face down => PrepositionPhrase "face down" as PredicativeComplement of be
 # from: Showstopping Surprise

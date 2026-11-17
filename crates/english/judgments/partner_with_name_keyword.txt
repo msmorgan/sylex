@@ -5,8 +5,8 @@
 + <card=Khorvath Brightflame> Partner with Sylvia Brightspear
 + <card=Rowan Kenrith> Partner with Will Kenrith
 # from: Rory Williams
-+KeywordPhrase Partner with Amy Pond
++KeywordPhrase partner with Amy Pond
 # from: Silvar, Devourer of the Free
-+KeywordPhrase Partner with Trynn, Champion of Freedom
++KeywordPhrase partner with Trynn, Champion of Freedom
 + Partner
 + Partner—Survivors

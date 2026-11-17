@@ -1,7 +1,7 @@
 # Coordination of phrases (binary and serial with the serial comma) and shared modifiers across coordinated phrases
 + Whenever you cast a spell that's white, blue, black, or red, put a +1/+1 counter on this creature.
 # from: Magistrate's Veto
-+Nominal White creatures and blue creatures
++Nominal white creatures and blue creatures
 # from: Magus of the Disk
 +Nominal artifacts, creatures, and enchantments
 # from: Body of Research

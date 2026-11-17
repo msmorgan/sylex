@@ -20,8 +20,8 @@
 # from: Gandalf, Westward Voyager
 + If any of those cards shares a card type, draw a card. => NounPhrase "any of those cards"; PrepositionPhrase "of those cards" as Complement of any
 +NounPhrase any of those cards => PrepositionPhrase "of those cards" as Complement of any
-+Clause Each of them gets +1/+1
-+Clause Any of that mana is spent on a creature spell
++Clause each of them gets +1/+1
++Clause any of that mana is spent on a creature spell
 *Clause All of them gets +1/+1
 *Clause Both of them gets +1/+1
 *Clause Many of them gets +1/+1

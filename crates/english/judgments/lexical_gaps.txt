@@ -2,7 +2,7 @@
 +Clause this ability resolves
 +Clause that ability triggers
 +Clause this creature remains on the battlefield => PrepositionPhrase "on the battlefield" as Complement of remain
-+VerbPhrase Distribute two +1/+1 counters => NounPhrase "two +1/+1 counters" as Object of distribute
++VerbPhrase distribute two +1/+1 counters => NounPhrase "two +1/+1 counters" as Object of distribute
 *Clause this ability resolve
 *Clause those abilities resolves
 *Clause that ability trigger

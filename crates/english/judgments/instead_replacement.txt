@@ -36,7 +36,7 @@
 # from: Abundance
 + You may instead choose land or nonland. => PrepositionPhrase "instead" as Adjunct of choose
 # from: Land Equilibrium
-+Clause That player instead puts that card onto the battlefield => PrepositionPhrase "instead" as Adjunct of put
++Clause that player instead puts that card onto the battlefield => PrepositionPhrase "instead" as Adjunct of put
 # the Complement of the *of* that *instead* selects: a gerund-participial, or a goal Preposition Phrase
 +PrepositionPhrase instead of drafting a card => VerbPhrase "drafting a card" as Complement of of
 +PrepositionPhrase instead of onto the battlefield => PrepositionPhrase "onto the battlefield" as Complement of of

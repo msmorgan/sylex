@@ -1,15 +1,15 @@
 # The verb "choose" taking a quantity (one or both, up to N, N or more) as a determiner-phrase complement, versus a quantified noun phrase object
-+Clause Choose one or both => NounPhrase "one or both" as Object of choose
-+Clause Choose one or more => NounPhrase "one or more" as Object of choose
-+Clause When this creature enters, choose up to one => NounPhrase "up to one" as Object of choose
++Clause choose one or both => NounPhrase "one or both" as Object of choose
++Clause choose one or more => NounPhrase "one or more" as Object of choose
++Clause when this creature enters, choose up to one => NounPhrase "up to one" as Object of choose
 # from: Wail of the Forgotten
-+Clause Choose two or more => NounPhrase "two or more" as Object of choose
-+Clause Choose up to one => NounPhrase "up to one" as Object of choose
-+Clause Choose up to two => NounPhrase "up to two" as Object of choose
-+Clause Choose up to three => NounPhrase "up to three" as Object of choose
-+Clause Choose one => NounPhrase "one" as Object of choose
-+Clause Choose two => NounPhrase "two" as Object of choose
-+Clause Choose three => NounPhrase "three" as Object of choose
++Clause choose two or more => NounPhrase "two or more" as Object of choose
++Clause choose up to one => NounPhrase "up to one" as Object of choose
++Clause choose up to two => NounPhrase "up to two" as Object of choose
++Clause choose up to three => NounPhrase "up to three" as Object of choose
++Clause choose one => NounPhrase "one" as Object of choose
++Clause choose two => NounPhrase "two" as Object of choose
++Clause choose three => NounPhrase "three" as Object of choose
 # from: Rankle, Master of Pranks
 + Choose any number — => NounPhrase "any number" as Object of choose
 + Choose up to one creature. => NounPhrase "up to one creature" as Object of choose; !PrepositionPhrase "up to one" as Complement of choose

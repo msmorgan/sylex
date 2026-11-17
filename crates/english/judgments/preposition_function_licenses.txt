@@ -9,5 +9,5 @@
 + Return target creature card from your graveyard to your hand. => PrepositionPhrase "from your graveyard" as Adjunct of return; !PrepositionPhrase "from your graveyard" as Complement of return
 +PrepositionPhrase of the chosen type
 +VerbPhrase aren't of the chosen type => PrepositionPhrase "of the chosen type" as PredicativeComplement of be
-+NounPhrase Spells you cast of the chosen type => RelativeClause "you cast" gap "Spells"
++NounPhrase spells you cast of the chosen type => RelativeClause "you cast" gap "spells"
 +NounPhrase one of them of their choice

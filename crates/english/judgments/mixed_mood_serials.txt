@@ -9,7 +9,7 @@
 + At the beginning of your upkeep, surveil 1. Then if there are seven or more cards in your graveyard, sacrifice this artifact, it deals 2 damage to each opponent, and you gain 2 life. => Clause "sacrifice this artifact, it deals 2 damage to each opponent, and you gain 2 life"
 # The same with a then-linked declarative last (a Linked Coordination).
 + <card=Kaboom!> For each of them, reveal cards from the top of your library until you reveal a nonland card, Kaboom! deals damage equal to that card's mana value to that player or planeswalker, then you put the revealed cards on the bottom of your library in any order. => Clause "reveal cards from the top of your library until you reveal a nonland card"; Clause "Kaboom! deals damage equal to that card's mana value to that player or planeswalker"; Clause "then you put the revealed cards on the bottom of your library"
-+Clause Scry 2, then you get {E}{E} => Clause "Scry 2"; Clause "then you get {E}{E}"; readings 1
++Clause scry 2, then you get {E}{E} => Clause "scry 2"; Clause "then you get {E}{E}"; readings 1
 # Like-mood Clauses coordinate in their own schema: one tree.
 +Clause another creature dies, or a creature card is put into a graveyard from anywhere other than the battlefield, or a creature card leaves your graveyard
 # A declarative and then an imperative opening with a fronted dependent, the

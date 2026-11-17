@@ -113,11 +113,10 @@
 + Other creatures you control have ward {2}.
 # from: Hollowhead Sliver
 + Sliver creatures you control have "{T}, Discard a card: Draw a card."
-+KeywordPhrase Ward
-+KeywordPhrase Frenzy
++KeywordPhrase ward
++KeywordPhrase frenzy
 # from: Shadow Puppeteers
 + Flying, ward {2}
-+KeywordPhrase ward
 * Target creatures attack.
 * Spells that targets creatures attack.
 + Instant
@@ -167,4 +166,4 @@
 * You draws cards, discard cards, and gain life.
 # from: Frozen Aether
 +NounPhrase artifacts, creatures, and lands => NounPhrase "artifacts"; NounPhrase "creatures"; NounPhrase "lands"; readings 1
-+Clause Draw cards
++Clause draw cards

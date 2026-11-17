@@ -46,7 +46,6 @@
 +NounPhrase unspent red mana => AdjectivePhrase "unspent"
 +NounPhrase the greatest number noted for it this turn => VerbPhrase "noted for it this turn"
 +NounPhrase all instances => Nominal "instances"
-+NounPhrase All instances => Nominal "instances"
 +NounPhrase the activation costs of this creature's abilities => Nominal "activation"
 +NounPhrase the activation costs of this artifact's abilities => Nominal "activation"
 +NounPhrase an additional combat phase followed by an additional main phase => VerbPhrase "followed by an additional main phase"

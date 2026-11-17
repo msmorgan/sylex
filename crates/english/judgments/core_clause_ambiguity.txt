@@ -34,5 +34,5 @@
 
 +Clause X is 1 => NounPhrase "X" as Subject of be; NounPhrase "1"; Predicative "1" as PredicativeComplement of be; readings 1
 # from: The End
-+Clause Your life total is 1 => NounPhrase "1"; Predicative "1" as PredicativeComplement of be; readings 1
++Clause your life total is 1 => NounPhrase "1"; Predicative "1" as PredicativeComplement of be; readings 1
 +Clause X is the number => NounPhrase "X" as Subject of be; readings 1

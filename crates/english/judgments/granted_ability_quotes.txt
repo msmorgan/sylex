@@ -6,8 +6,15 @@
 + Equipped creature gets +1/+1 and has reach and "Whenever this creature attacks, tap target creature an opponent controls."
 + All artifacts have "At the beginning of your upkeep, sacrifice this artifact unless you pay {2}."
 * It has "Sacrifice this token: {C} Add."
-+ Whenever this creature attacks, it gains "this creature can't be blocked" until end of turn unless defending player sacrifices a creature of their choice. => Clause "this creature can't be blocked"
+# from: Ogre Marauder, as its Editorial Correction reads it
++ Whenever this creature attacks, it gains "This creature can't be blocked" until end of turn unless defending player sacrifices a creature of their choice. => Clause "This creature can't be blocked"
+# from: Ogre Marauder: a quoted ability opens with a capital
+* Whenever this creature attacks, it gains "this creature can't be blocked" until end of turn unless defending player sacrifices a creature of their choice.
 + {3}: Until end of turn, this creature loses "Prevent all damage that would be dealt to this creature." => QuotedAbility "\"Prevent all damage that would be dealt to this creature.\"" as Object of lose
-+ When this Aura enters, if it's on the battlefield, it loses "enchant creature card in a graveyard" and gains "enchant creature put onto the battlefield with this Aura." => Ability "enchant creature card in a graveyard"; Ability "enchant creature put onto the battlefield with this Aura"
++ When this Aura enters, if it's on the battlefield, it loses "enchant creature card in a graveyard" and gains "enchant creature put onto the battlefield with this Aura." => QuotedKeywordPhrase "\"enchant creature card in a graveyard\""; QuotedKeywordPhrase "\"enchant creature put onto the battlefield with this Aura.\""; !QuotedAbility "\"enchant creature card in a graveyard\""
++ <card=Adventurers' Guildhouse> Green legendary creatures you control have "bands with other legendary creatures." => QuotedKeywordPhrase "\"bands with other legendary creatures.\""; !QuotedAbility "\"bands with other legendary creatures.\""
++ <card=Hexing Squelcher> Other creatures you control have "Ward—Pay 2 life." => QuotedAbility "\"Ward—Pay 2 life.\"" as Object of have; !QuotedKeywordPhrase "\"Ward—Pay 2 life.\""
++ <card=Necromancy> When this enchantment enters, if it's on the battlefield, it becomes an Aura with "enchant creature put onto the battlefield with Necromancy." => QuotedKeywordPhrase "\"enchant creature put onto the battlefield with Necromancy.\""
++ <card=Zhulodok, Void Gorger> Colorless spells you cast from your hand with mana value 7 or greater have "Cascade, cascade." => QuotedAbility "\"Cascade, cascade.\"" as Object of have
 + −5: You get an emblem with "Mountains you control have '{T}: This land deals 1 damage to any target.'" => QuotedAbility "\"Mountains you control have '{T}: This land deals 1 damage to any target.'\"" as Complement of with; QuotedAbility "'{T}: This land deals 1 damage to any target.'" as Object of have; Ability "{T}: This land deals 1 damage to any target"
 + II — This Saga gains "Landfall — Whenever a land you control enters, create a 1/1 green Elf creature token." => Ability "Landfall — Whenever a land you control enters, create a 1/1 green Elf creature token"

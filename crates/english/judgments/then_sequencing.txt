@@ -1,7 +1,7 @@
 # Sequencing with ", then" in chains of bare imperatives (one analysis: coordinated imperative clauses), under a shared subject and modal, and "Then" as a connective adverb
 # from: Impede Momentum
-+Clause Tap target creature and put three stun counters on it => Clause "Tap target creature"; Clause "put three stun counters on it"; readings 1
-+Clause Draw a card, then discard a card => Clause "Draw a card"; Clause "discard a card"; readings 1
++Clause tap target creature and put three stun counters on it => Clause "tap target creature"; Clause "put three stun counters on it"; readings 1
++Clause draw a card, then discard a card => Clause "draw a card"; Clause "discard a card"; readings 1
 # from: Impede Momentum
 + Tap target creature and put three stun counters on it.
 # from: Urza's Tome

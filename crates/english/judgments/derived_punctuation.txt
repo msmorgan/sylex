@@ -1,10 +1,10 @@
 # Coordinated verb phrases and adjectives, a quoted ability, and keyword phrases with a dash, space or cost parameter
-+Clause Draw a card, then discard a card
++Clause draw a card, then discard a card
 # from: The Locust God
 +AdjectivePhrase red and blue
 + Draw a card.
 + It has "Sacrifice this token: Add {C}."
-+KeywordPhrase Suspend 1—{R}
-+KeywordPhrase Splice onto Arcane {G}
-+KeywordPhrase Prototype {3}{G}{G} — 3/5
-+KeywordPhrase Boast — {1}{W}: Tap target creature.
++KeywordPhrase suspend 1—{R}
++KeywordPhrase splice onto Arcane {G}
++KeywordPhrase prototype {3}{G}{G} — 3/5
++KeywordPhrase boast — {1}{W}: Tap target creature.

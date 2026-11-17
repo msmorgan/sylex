@@ -46,7 +46,7 @@
 # from: Incremental Blight
 +NounPhrase a third target creature => DeterminerPhrase "a third target" as Determiner of creature; DeterminerPhrase "third target" head det:target; readings 1
 # from: Dwarven Song
-+NounPhrase One or more target creatures => DeterminerPhrase "One or more target" as Determiner of creature; DeterminerPhrase "One or more"; DeterminerPhrase "target" head det:target; readings 1
++NounPhrase one or more target creatures => DeterminerPhrase "one or more target" as Determiner of creature; DeterminerPhrase "one or more"; DeterminerPhrase "target" head det:target; readings 1
 # from: Gaze of Pain
 +NounPhrase a target creature => DeterminerPhrase "a target" as Determiner of creature; DeterminerPhrase "target" head det:target; readings 1
 # from: Guardian of Faith

@@ -9,7 +9,7 @@
 +NounPhrase your choice of double strike, protection from red, vigilance, or shadow => PrepositionPhrase "of double strike, protection from red, vigilance, or shadow" as Complement of choice; KeywordPhrase "double strike"; KeywordPhrase "protection from red"
 +NounPhrase your choice of banding, flying, first strike, or trample => PrepositionPhrase "of banding, flying, first strike, or trample" as Complement of choice; KeywordPhrase "first strike"
 + This creature enters with your choice of a reach counter or a vigilance counter on it.
-+ When The Third Doctor enters, create your choice of a Clue token, a Food token, or a Treasure token.
++ <card=The Third Doctor> When The Third Doctor enters, create your choice of a Clue token, a Food token, or a Treasure token.
 + Enchanted creature has flying, first strike, and vigilance.
 # from: Hidden Spider
 +NounPhrase a spell with flying => PrepositionPhrase "with flying" as Modifier of spell

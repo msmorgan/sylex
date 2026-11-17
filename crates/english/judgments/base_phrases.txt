@@ -12,5 +12,5 @@
 * Choose to attacks.
 +Clause it explores again
 +Clause this creature can't attack alone
-+Clause Otherwise, suspect it
-+Clause Then draw a card
++Clause otherwise, suspect it
++Clause then draw a card

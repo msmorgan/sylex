@@ -5,7 +5,7 @@
 *NounPhrase an artifacts
 *NounPhrase a mana
 *NounPhrase an mana
-+Clause Sacrifice an artifact
++Clause sacrifice an artifact
 +NounPhrase an Aura
 +NounPhrase an amount of {G}
 # from: Kiora Bests the Sea God
@@ -13,8 +13,8 @@
 +NounPhrase a 1/1 creature
 # from: Illusionary Mask
 +NounPhrase a +8/+8 creature
-+NounPhrase Two target creatures
-+PrepositionPhrase At the beginning
++NounPhrase two target creatures
++PrepositionPhrase at the beginning
 +PrepositionPhrase in a graveyard
 + Draw a card.
 + Flying, trample

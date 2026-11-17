@@ -1,10 +1,10 @@
 # Landwalk keywords (Swampwalk, Forestwalk, landwalk) as keyword phrases, and in running text
-+KeywordPhrase Swampwalk => readings 1
-+KeywordPhrase Forestwalk => readings 1
-+KeywordPhrase Islandwalk => readings 1
-+KeywordPhrase Mountainwalk => readings 1
-+KeywordPhrase Plainswalk => readings 1
-+KeywordPhrase Desertwalk => readings 1
++KeywordPhrase swampwalk => readings 1
++KeywordPhrase forestwalk => readings 1
++KeywordPhrase islandwalk => readings 1
++KeywordPhrase mountainwalk => readings 1
++KeywordPhrase plainswalk => readings 1
++KeywordPhrase desertwalk => readings 1
 +KeywordPhrase landwalk => readings 1
 +KeywordPhrase nonbasic landwalk => readings 1
 + <card=Traveler's Cloak> Enchanted creature has landwalk of the chosen type. => KeywordPhrase "landwalk of the chosen type" as Object of have; Quality "the chosen type" as Complement of landwalk; readings 1

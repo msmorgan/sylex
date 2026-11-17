@@ -13,11 +13,10 @@
 +KeywordPhrase flashback
 +KeywordPhrase toxic
 +KeywordPhrase suspend
-+KeywordPhrase Suspend
-+KeywordPhrase Flashback {2}{R}
-+KeywordPhrase Cycling {2}
-+KeywordPhrase Suspend 4—{1}{U}
-+KeywordPhrase Toxic 1
++KeywordPhrase flashback {2}{R}
++KeywordPhrase cycling {2}
++KeywordPhrase suspend 4—{1}{U}
++KeywordPhrase toxic 1
 # from: The Fugitive Doctor
 + Target instant or sorcery card in your graveyard gains flashback {2}{R}{G} until end of turn. => KeywordPhrase "flashback {2}{R}{G}" as Object of gain; !KeywordPhrase "flashback"
 + <card=Gavi, Nest Warden> You may pay {0} rather than pay the cycling cost of the first card you cycle each turn. => KeywordPhrase "cycling" as Modifier of cost; !VerbPhrase "cycling"

@@ -1,0 +1,8 @@
+# The capitals of Oracle text are positional: a word whose Lexeme takes an initial capital is written with it where the structure opens with one (the start of a line or sentence, after a cost's colon, an em dash, a bullet or a table bar, each item of a cost list, a quoted ability, every word of a Type Line) and in lower case everywhere else (`docs/design/english.md` §7)
++ <card=The Eighth Doctor> When The Eighth Doctor enters, mill three cards. => NounPhrase "The Eighth Doctor" as Subject of enter; !DeterminerPhrase "The"
++ <card=Flowstone Flood> Buyback—Pay 3 life, Discard a card at random. => VerbPhrase "Discard a card at random"
++ <card=Arcbound Wanderer> Modular—Sunburst
+# from: Necratog, as its Editorial Correction reads it
++ Exile the top creature card of your graveyard: This creature gets +2/+2 until end of turn.
+# from: Necratog: an activated ability's effect opens with a capital
+* Exile the top creature card of your graveyard: this creature gets +2/+2 until end of turn.

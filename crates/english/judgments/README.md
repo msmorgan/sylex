@@ -83,21 +83,28 @@ analysis is absent.
 
 The grammar parses Oracle text into Readings that keep the legitimate Ambiguity
 and no more; it does not validate templating. Text that Oracle would template
-differently (digits for a spelled number, a capital, a glyph, a missing comma,
+differently (digits for a spelled number, a glyph, a missing comma,
 *if possible* for *if able*) may parse incidentally, and that is fine. The
 grammar does not police strings that no card contains. A `*` entry is a minimal
 ungrammatical variant of a real or cited construction. It pins a formation rule
 that generation needs: agreement in Person, Number or Countability (*a
 creatures*, *You draws cards.*), Case (*Draw cards from they.*), verb form
-(*choose not untap this creature*). It never pins an unprinted word order or
-combination. Cite its source card where one exists. A constraint that keeps a
-spurious Reading off real Oracle text is witnessed by a `+` entry on that text,
-with a `!` assertion or a Reading count. A rule, feature or production that
+(*choose not untap this creature*), and the capital a position calls for
+(*Exile the top creature card of your graveyard: this creature gets …*,
+Necratog). It never pins an unprinted word order or combination. Cite its
+source card where one exists. A constraint that keeps a spurious Reading off
+real Oracle text is witnessed by a `+` entry on that text, with a `!`
+assertion or a Reading count. A rule, feature or production that
 would exist only to reject some text is never added, and no entry asks for one.
 
 An entry's text is real Oracle text (a corpus unit, or a contiguous span of one
 under a Category mark), or a simplification of a named card's text that keeps
-the construction under test. A simplification names its source with
+the construction under test. A Category-marked entry is written as the
+Constituent opens inside a sentence: in lower case, unless one of its own
+Productions states a capital (`docs/design/english.md` §7). So a span that
+opens its line is lower-cased (`+NounPhrase target creature`, not *Target
+creature*, which has no Reading), while `+Sentence Draw a card.` and a verbal
+cost keep their capital, which their Productions call for. A simplification names its source with
 `<card=NAME>` or a `# from: NAME` comment on the line above, and that card's
 text must contain the construction. An entry whose construction no card prints
 gets no entry, except a `*` entry (above).

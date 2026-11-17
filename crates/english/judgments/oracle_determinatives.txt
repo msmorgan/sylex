@@ -1,7 +1,6 @@
 # Explicit Oracle Determinative Lexemes; homographic participles remain verbal modifiers.
-+NounPhrase Equipped creature => DeterminerPhrase "Equipped" as Determiner of creature
++NounPhrase equipped creature => DeterminerPhrase "equipped" as Determiner of creature
 +NounPhrase enchanted land => DeterminerPhrase "enchanted" as Determiner of land
-+NounPhrase Enchanted land => DeterminerPhrase "Enchanted" as Determiner of land
 +NounPhrase target enchanted creature => DeterminerPhrase "target" as Determiner of creature; VerbPhrase "enchanted" as Modifier of creature
 +NounPhrase target creature => DeterminerPhrase "target" as Determiner of creature; readings 1
 + Equipped creature has haste. => DeterminerPhrase "Equipped" as Determiner of creature

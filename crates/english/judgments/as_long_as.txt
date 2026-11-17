@@ -6,6 +6,5 @@
 + This creature has indestructible as long as it has defender. => PrepositionPhrase "as long as it has defender" as Adjunct of have
 + When this creature enters, gain control of target artifact for as long as you control this creature. => PrepositionPhrase "for as long as you control this creature" as Adjunct of gain; readings 1
 +PrepositionPhrase as long as you control an artifact
-+PrepositionPhrase As long as you control an artifact
 +PrepositionPhrase for as long as you control this creature
 *PrepositionPhrase as long as controlling an artifact

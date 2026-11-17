@@ -4,7 +4,7 @@
 + <card=Press the Advantage> Up to two target creatures each get +2/+2 and gain trample until end of turn. => NounPhrase "Up to two target creatures"; VerbPhrase "get +2/+2 and gain trample until end of turn"
 + <card=Skull Rend> Those players each discard two cards at random. => NounPhrase "Those players" as Subject of discard
 + <card=Join Forces> They each get +2/+2 until end of turn. => NounPhrase "They" as Subject of get
-+Clause <card=Turtle Tracks> Any number of target players may each search their library for a basic land card => VerbPhrase "may each search their library for a basic land card"
++Clause <card=Turtle Tracks> any number of target players may each search their library for a basic land card => VerbPhrase "may each search their library for a basic land card"
 + <card=Angry Mob> Angry Mob's power and toughness are each 2. => VerbPhrase "are each 2"
 + Each player draws a card. => NounPhrase "Each player" as Subject of draw
 +NounPhrase each of those players

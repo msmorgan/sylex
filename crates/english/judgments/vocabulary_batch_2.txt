@@ -23,11 +23,11 @@
 + <card=Castle Doom> Create a 3/3 colorless Robot Villain artifact creature token named Doombot. => Name "Doombot"
 + <card=Doctor Doom> When Doctor Doom enters, create two 3/3 colorless Robot Villain artifact creature tokens named Doombot. => Name "Doombot"
 +Clause <card=Mole Man, Moloid Master> create a 1/1 green Minion creature token named Moloid => Name "Moloid"
-+Clause <card=Return of the Mole Man> Create X 1/1 green Minion creature tokens named Moloid => Name "Moloid"
++Clause <card=Return of the Mole Man> create X 1/1 green Minion creature tokens named Moloid => Name "Moloid"
 + <card=Search for Survivors> Reorder your graveyard at random. => NounPhrase "your graveyard" as Object of reorder
 +Clause <card=Fossil Find> reorder your graveyard as you choose => NounPhrase "your graveyard" as Object of reorder
 +Clause <card=U.S.Agent, John Walker> create a colorless Equipment artifact token named Sturdy Shield => Name "Sturdy Shield"
-+Clause <card=Origin of Captain America> Create a colorless Equipment artifact token named Sturdy Shield => Name "Sturdy Shield"
++Clause <card=Origin of Captain America> create a colorless Equipment artifact token named Sturdy Shield => Name "Sturdy Shield"
 +Clause <card=Goblin Game> all players reveal them simultaneously => AdverbPhrase "simultaneously"
 +Clause <card=Goblin Welder> that player simultaneously sacrifices the artifact => AdverbPhrase "simultaneously" as Adjunct of sacrifice
 + <card=Breaking Wave> Simultaneously untap all tapped creatures and tap all untapped creatures. => AdverbPhrase "Simultaneously"
@@ -40,7 +40,7 @@
 + <card=Mages' Contest> You and target spell's controller bid life. => VerbPhrase "bid life"
 +PrepositionPhrase <card=Pain's Reward> with a bid of any number => NounPhrase "a bid of any number"
 +PrepositionPhrase <card=Mages' Contest> with a bid => NounPhrase "a bid"
-+NounPhrase <card=Pain's Reward> The bidding => Nominal "bidding"
++NounPhrase <card=Pain's Reward> the bidding => Nominal "bidding"
 + <card=Mages' Contest> If you win the bidding, counter that spell. => NounPhrase "the bidding"
 +Nominal <card=Narci, Fable Singer> chapter ability of a Saga you control => Nominal "chapter"
 +NounPhrase <card=Mystic Barrier> the nearest opponent => AdjectivePhrase "nearest"
@@ -59,7 +59,7 @@
 +NounPhrase <card=Netherese Puzzle-Ward> a die's highest natural result => AdjectivePhrase "natural"
 + <card=Netherese Puzzle-Ward> Whenever you roll a die's highest natural result, draw a card. => AdjectivePhrase "natural"
 +PrepositionPhrase <card=Ogre Enforcer> by lethal damage => AdjectivePhrase "lethal"
-+NounPhrase <card=Zilortha, Strength Incarnate> Lethal damage dealt to creatures you control => AdjectivePhrase "Lethal"
++NounPhrase <card=Zilortha, Strength Incarnate> lethal damage dealt to creatures you control => AdjectivePhrase "lethal"
 +RelativeClause <card=Círdan the Shipwright> they received
 +RelativeClause <card=Mob Verdict> an opponent received
 + <card=Karakyk Guardian> This creature has hexproof as long as it hasn't dealt damage yet. => AdverbPhrase "yet"
@@ -72,7 +72,7 @@
 +NounPhrase <card=Koma, World-Eater> four 3/3 blue Serpent creature tokens named Koma's Coil => Name "Koma's Coil"
 +NounPhrase <card=Nurgle's Rot> a 1/3 black Demon creature token named Plaguebearer of Nurgle => Name "Plaguebearer of Nurgle"
 +Clause <card=Marit Lage's Slumber> create Marit Lage => NounPhrase "Marit Lage"
-+Clause <card=The Book of Vile Darkness> Create Vecna => NounPhrase "Vecna"
++Clause <card=The Book of Vile Darkness> create Vecna => NounPhrase "Vecna"
 +NounPhrase <card=Hand of Vecna> a creature you control named Vecna => Name "Vecna"
 + <card=Gor Muldrak, Amphinologist> At the beginning of your end step, each player who controls the fewest creatures creates a 4/3 blue Salamander Warrior creature token. => DeterminerPhrase "the fewest" as Determiner of creature
 +NounPhrase <card=Gor Muldrak, Amphinologist> each player who controls the fewest creatures => DeterminerPhrase "the fewest" as Determiner of creature
@@ -83,7 +83,7 @@
 +NounPhrase <card=Molten Sentry> heads => Nominal "heads"
 +NounPhrase <card=Molten Sentry> tails => Nominal "tails"
 +PrepositionPhrase <card=Quarry Colossus> beneath the top X cards of that library
-+Clause <card=Marina Vendrell> Lock or unlock a door of target Room you control => VerbPhrase "Lock or unlock a door of target Room you control"
++Clause <card=Marina Vendrell> lock or unlock a door of target Room you control => VerbPhrase "lock or unlock a door of target Room you control"
 +NounPhrase <card=Ghostly Dancers> a locked door of a Room you control => VerbPhrase "locked"
 +NounPhrase <card=Ghostly Keybearer> a locked door of up to one target Room you control => VerbPhrase "locked"
 +Clause <card=Ogre Enforcer> lethal damage dealt by a single source is marked on it
@@ -123,7 +123,7 @@
 +NounPhrase <card=Kwia Vigorbloom> Lotus
 +NounPhrase <card=Weapons Manufacturing> a colorless artifact token named Munitions => Name "Munitions"
 +NounPhrase <card=Weapons Manufacturing> Munitions
-+Clause <card=Tamiyo, Compleated Sage> Create Tamiyo's Notebook => NounPhrase "Tamiyo's Notebook"
++Clause <card=Tamiyo, Compleated Sage> create Tamiyo's Notebook => NounPhrase "Tamiyo's Notebook"
 +NounPhrase <card=Tamiyo, Compleated Sage> Tamiyo's Notebook
 +Clause <card=Ozox, the Clattering King> create Jumblebones => NounPhrase "Jumblebones"
 +NounPhrase <card=Ozox, the Clattering King> Jumblebones
@@ -131,13 +131,13 @@
 +NounPhrase <card=Svella, Ice Shaper> Icy Manalith
 +NounPhrase <card=Nahiri, the Lithomancer> a colorless Equipment artifact token named Stoneforged Blade => Name "Stoneforged Blade"
 +NounPhrase <card=Nahiri, the Lithomancer> Stoneforged Blade
-+NounPhrase <card=Rite of the Raging Storm> Creatures named Lightning Rager => Name "Lightning Rager"
++NounPhrase <card=Rite of the Raging Storm> creatures named Lightning Rager => Name "Lightning Rager"
 +NounPhrase <card=Rite of the Raging Storm> Lightning Rager
 +NounPhrase <card=Awakening of Vitu-Ghazi> a legendary 0/0 Elemental creature with haste named Vitu-Ghazi => Name "Vitu-Ghazi"
 +NounPhrase <card=Awakening of Vitu-Ghazi> Vitu-Ghazi
 +Clause <card=Mishra, Eminent One> its name is Mishra's Warform => NounPhrase "Mishra's Warform"
 +NounPhrase <card=Mishra, Eminent One> Mishra's Warform
-+Clause <card=Mechtitan Core> Create Mechtitan => NounPhrase "Mechtitan"
++Clause <card=Mechtitan Core> create Mechtitan => NounPhrase "Mechtitan"
 +NounPhrase <card=Mechtitan Core> Mechtitan
 +Clause <card=Ka-Zar of the Savage Land> create Zabu => NounPhrase "Zabu"
 +NounPhrase <card=Ka-Zar of the Savage Land> Zabu
@@ -148,7 +148,7 @@
 +Nominal <card=Rocket Launcher> recent turn => AdjectivePhrase "recent"
 +AdjectivePhrase <card=Rocket Launcher> recent
 + <card=Reverse the Sands> Redistribute any number of players' life totals. => VerbPhrase "Redistribute any number of players' life totals"
-+Clause <card=Reverse the Sands> Redistribute any number of players' life totals => VerbPhrase "Redistribute any number of players' life totals"
++Clause <card=Reverse the Sands> redistribute any number of players' life totals => VerbPhrase "redistribute any number of players' life totals"
 +Clause <card=The Deck of Many Things> subtract the number of cards in your hand => VerbPhrase "subtract the number of cards in your hand"
 + <card=The Deck of Many Things> Roll a d20 and subtract the number of cards in your hand. => VerbPhrase "subtract the number of cards in your hand"
 +RelativeClause <card=Opposition Agent> they find
@@ -167,7 +167,7 @@
 +NounPhrase <card=Lita, Mechanical Engineer> Zeppelin
 +VerbPhrase <card=Pia Nalaar, Chief Mechanic> named Nalaar Aetherjet => Name "Nalaar Aetherjet"
 +NounPhrase <card=Pia Nalaar, Chief Mechanic> Nalaar Aetherjet
-+Clause <card=Tomb of Urami> Create Urami => NounPhrase "Urami"
++Clause <card=Tomb of Urami> create Urami => NounPhrase "Urami"
 +NounPhrase <card=Tomb of Urami> Urami
 +VerbPhrase <card=Kibo, Uktabi Prince> named Banana => Name "Banana"
 +NounPhrase <card=Tuktuk the Explorer> Tuktuk the Returned

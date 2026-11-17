@@ -1,13 +1,13 @@
 # Keyword abilities used as verbs (crew, mutate, soulbond, exploit, escape, haunt, beam up) and keyword designations used as adjectives
 +Clause this creature crews a Vehicle => NounPhrase "a Vehicle" as Object of crew
-+Clause This creature crews Vehicles => NounPhrase "Vehicles" as Object of crew
++Clause this creature crews Vehicles => NounPhrase "Vehicles" as Object of crew
 +Clause this creature mutates
 +Clause this creature has mutated => VerbPhrase "mutated" as Complement of have
 +Clause this creature is paired with another creature => PrepositionPhrase "with another creature" as Complement of pair
 +Clause it's paired with a creature => PrepositionPhrase "with a creature" as Complement of pair
 +Clause this creature exploits a creature => NounPhrase "a creature" as Object of exploit
 +Clause it exploited that creature => NounPhrase "that creature" as Object of exploit
-+Clause This creature escapes with a +1/+1 counter on it => PrepositionPhrase "with a +1/+1 counter on it" as Complement of escape
++Clause this creature escapes with a +1/+1 counter on it => PrepositionPhrase "with a +1/+1 counter on it" as Complement of escape
 + This creature escapes with "Whenever this creature deals combat damage to a player, you may cast an artifact, instant, or sorcery spell from among cards exiled with this creature without paying its mana cost." => PrepositionPhrase "with \"Whenever this creature deals combat damage to a player, you may cast an artifact, instant, or sorcery spell from among cards exiled with this creature without paying its mana cost.\"" as Complement of escape
 +Clause it escaped
 +Clause the creature this card haunts dies => RelativeClause "this card haunts" gap "creature"

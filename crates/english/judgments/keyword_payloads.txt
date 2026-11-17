@@ -1,15 +1,15 @@
 # Keyword abilities with quality, amount, cost and ability payloads (Protection from red, Suspend 1—{R}, Devour Food 3, Boast)
-+KeywordPhrase Protection from red
-+KeywordPhrase Affinity for artifacts
-+KeywordPhrase Enchant land
-+KeywordPhrase Suspend 1—{R}
-+KeywordPhrase Prototype {3}{G}{G} — 3/5
-+KeywordPhrase Splice onto Arcane {G}
-+KeywordPhrase Devour Food 3
-+KeywordPhrase Devour land 3
-+KeywordPhrase Devour artifact 1
-+KeywordPhrase Suspend
-+KeywordPhrase Boast — {1}{W}: Tap target creature. => NounPhrase "target creature" as Object of tap
++KeywordPhrase protection from red
++KeywordPhrase affinity for artifacts
++KeywordPhrase enchant land
++KeywordPhrase suspend 1—{R}
++KeywordPhrase prototype {3}{G}{G} — 3/5
++KeywordPhrase splice onto Arcane {G}
++KeywordPhrase devour Food 3
++KeywordPhrase devour land 3
++KeywordPhrase devour artifact 1
++KeywordPhrase suspend
++KeywordPhrase boast — {1}{W}: Tap target creature. => NounPhrase "target creature" as Object of tap
 # An em-dash ability runs to the end of its line: it never stops after one of its sentences, and the line is never one Sentence
 + <card=Black Panther, Most Dangerous> Power-up — {5}{W}{W}: Put two +1/+1 counters on Black Panther. Other creatures you control get +2/+2 until end of turn. => KeywordParameters "Power-up — {5}{W}{W}: Put two +1/+1 counters on Black Panther. Other creatures you control get +2/+2 until end of turn."; !Sentence "Power-up — {5}{W}{W}: Put two +1/+1 counters on Black Panther. Other creatures you control get +2/+2 until end of turn."; readings 1
 + <card=Thanos, the Mad Titan> Power-up — {C}{W}{U}{B}{R}{G}: Put two +1/+1 counters on Thanos. Choose odd or even. Destroy each other creature with mana value of the chosen quality. => KeywordParameters "Power-up — {C}{W}{U}{B}{R}{G}: Put two +1/+1 counters on Thanos. Choose odd or even. Destroy each other creature with mana value of the chosen quality."; !KeywordParameters "Power-up — {C}{W}{U}{B}{R}{G}: Put two +1/+1 counters on Thanos."; !KeywordParameters "Power-up — {C}{W}{U}{B}{R}{G}: Put two +1/+1 counters on Thanos. Choose odd or even."
