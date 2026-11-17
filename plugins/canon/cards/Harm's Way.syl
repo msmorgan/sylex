@@ -8,6 +8,6 @@ card singleFaced({
           replace(
             would(
               actor(aYourChoice(source)),
-              dealDamage(recipient = andOr([you, allOf(nominal(permanent, post = [youControl]))]))),
+              dealDamage(recipient = andOr([you, bare(nominal(permanent, post = [youControl]))]))),
             instead(redirectDamage(theNext(2), target(anyTarget)))),
           thisTurn))]})

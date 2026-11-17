@@ -11,7 +11,7 @@ ability crew(amount: Amount) {
       perform(
         tap(
           withTotal(
-            allOf(nominal(pre = [other, untapped], creature, post = [youControl])),
+            bare(nominal(pre = [other, untapped], creature, post = [youControl])),
             stat(power),
             atLeast,
             $amount))),

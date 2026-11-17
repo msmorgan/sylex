@@ -11,5 +11,5 @@ card singleFaced({
               enchanted(creature),
               [
                 protection(
-                  eachKind(color, domain = allOf(nominal(permanent, post = [youControl]))))]),
+                  eachKind(color, domain = bare(nominal(permanent, post = [youControl]))))]),
             doesnt(actor(thisEffect), remove(thisAura))]))]})

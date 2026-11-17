@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         abilityGrant(
-          allOf(
+          bare(
             nominal(
               pre = [artifact],
               spell,

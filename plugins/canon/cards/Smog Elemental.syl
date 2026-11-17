@@ -7,7 +7,7 @@ card singleFaced({
       flying,
       static(
         getsPt(
-          allOf(nominal(creature, post = [hasKeyword(theKeyword(flying)), opponentsControl])),
+          bare(nominal(creature, post = [hasKeyword(theKeyword(flying)), opponentsControl])),
           down(1),
           down(1)))],
     power = 3,

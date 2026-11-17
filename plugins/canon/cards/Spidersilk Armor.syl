@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       static(
         conjunction([
-            getsPt(allOf(nominal(creature, post = [youControl])), up(0), up(1)),
+            getsPt(bare(nominal(creature, post = [youControl])), up(0), up(1)),
             abilityGrant(them, [reach])]))]})

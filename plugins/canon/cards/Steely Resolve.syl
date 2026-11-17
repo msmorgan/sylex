@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       static(entersChoosing(thisEnchantment, subtype(creature))),
       static(
-        abilityGrant(allOf(nominal(creature, post = [ofChosen(subtype(creature))])), [shroud]))]})
+        abilityGrant(bare(nominal(creature, post = [ofChosen(subtype(creature))])), [shroud]))]})

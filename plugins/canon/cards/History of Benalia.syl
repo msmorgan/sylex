@@ -18,8 +18,4 @@ card singleFaced({
                 toughness = 2}}))),
       when(
         chapterMark([3]),
-        get(
-          allOf(nominal(knight, post = [youControl])),
-          up(2),
-          up(1),
-          duration = untilEndOfTurn))]})
+        get(bare(nominal(knight, post = [youControl])), up(2), up(1), duration = untilEndOfTurn))]})

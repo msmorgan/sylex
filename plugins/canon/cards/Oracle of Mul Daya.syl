@@ -7,6 +7,6 @@ card singleFaced({
       static(
         can(actor(you), play(counted(additional(exactly(1)), land)), timing = onEachOfYourTurns)),
       static(visibility(reveal, you, topOfLibrary)),
-      static(can(actor(you), play(allOf(land), from = onTop)))],
+      static(can(actor(you), play(bare(land), from = onTop)))],
     power = 2,
     toughness = 2})

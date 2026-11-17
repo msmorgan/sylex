@@ -4,7 +4,7 @@ action collectEvidence(amount: Amount) {
   spelling = "collect evidence $amount",
   body = exile(
     withTotal(
-      allOf(nominal(card, post = [in(graveyardOf($actor))])),
+      bare(nominal(card, post = [in(graveyardOf($actor))])),
       stat(manaValue),
       atLeast,
       $amount))

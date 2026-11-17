@@ -3,5 +3,5 @@ card singleFaced({
     cost = [generic(3), pip(red)],
     types = [enchantment],
     text = [
-      static(cant(actor(you), play(allOf(land)))),
+      static(cant(actor(you), play(bare(land)))),
       activatedOnlyOnce(perform(sacrifice(a(land))), draw(2), oncePerTurn)]})

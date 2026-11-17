@@ -13,9 +13,9 @@ card singleFaced({
               cant(
                 actor(yourOpponents),
                 activate(
-                  allOf(
+                  bare(
                     nominal(
                       abilityHead(anyActivated),
-                      post = [ofSource(allOf(or([artifact, creature, enchantment])))]))))])))],
+                      post = [ofSource(bare(or([artifact, creature, enchantment])))]))))])))],
     power = 2,
     toughness = 2})

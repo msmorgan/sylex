@@ -9,6 +9,6 @@ card singleFaced({
             establishThroughout(
               conjunction([
                   cant(any, cast(bare(nominal(spell, post = [named(chosenName)])))),
-                  cant(any, play(allOf(nominal(land, post = [named(chosenName)]))))]),
+                  cant(any, play(bare(nominal(land, post = [named(chosenName)]))))]),
               untilYourNextTurn)])),
       spell(draw(1))]})

@@ -10,7 +10,7 @@ card adventurer({
         cant(
           actor(thisCreature),
           block(
-            attacker = allOf(nominal(creature, post = [not(hasKeyword(theKeyword(flying)))])))))],
+            attacker = bare(nominal(creature, post = [not(hasKeyword(theKeyword(flying)))])))))],
     power = 3,
     toughness = 1},
   {

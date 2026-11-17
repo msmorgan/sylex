@@ -9,7 +9,7 @@ card singleFaced({
         loyaltySymbol(up(2)),
         establishThroughout(
           must(
-            actor(allOf(nominal(creature, post = [controlledBy(target(opponent))]))),
+            actor(bare(nominal(creature, post = [controlledBy(target(opponent))]))),
             attack(defender = ownName)),
           duringNextTurnOf(that(player)))),
       activated(loyaltySymbol(down(2)), destroy(target(nominal(pre = [tapped], creature)))),

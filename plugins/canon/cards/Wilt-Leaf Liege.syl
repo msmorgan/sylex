@@ -5,9 +5,9 @@ card singleFaced({
     subtypes = [elf, knight],
     text = [
       static(
-        getsPt(allOf(nominal(pre = [other, green], creature, post = [youControl])), up(1), up(1))),
+        getsPt(bare(nominal(pre = [other, green], creature, post = [youControl])), up(1), up(1))),
       static(
-        getsPt(allOf(nominal(pre = [other, white], creature, post = [youControl])), up(1), up(1))),
+        getsPt(bare(nominal(pre = [other, white], creature, post = [youControl])), up(1), up(1))),
       static(
         replace(
           causedBy(

@@ -11,5 +11,5 @@ card singleFaced({
             gatedBy(actor(enchanted(creature)), block, mana([generic(3)]))])),
       static(
         costShift(
-          allOf(nominal(abilityHead(anyActivated), post = [ofSource(enchanted(creature))])),
+          bare(nominal(abilityHead(anyActivated), post = [ofSource(enchanted(creature))])),
           more(3)))]})

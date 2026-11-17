@@ -8,7 +8,7 @@ card singleFaced({
       flying,
       static(
         costShift(
-          allOf(
+          bare(
             nominal(
               pre = [sphinx],
               spell,

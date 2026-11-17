@@ -11,8 +11,4 @@ card singleFaced({
             instead(preventDamage(ofThatDamage(1)))))),
       activated(
         compound([mana([generic(2)]), tapSymbol]),
-        get(
-          allOf(nominal(pre = [attacking], creature)),
-          up(1),
-          up(0),
-          duration = untilEndOfTurn))]})
+        get(bare(nominal(pre = [attacking], creature)), up(1), up(0), duration = untilEndOfTurn))]})

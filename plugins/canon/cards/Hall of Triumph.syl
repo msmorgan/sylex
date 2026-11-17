@@ -5,5 +5,4 @@ card singleFaced({
     types = [artifact],
     text = [
       static(entersChoosing(ownName, color)),
-      static(
-        getsPt(allOf(nominal(creature, post = [youControl, ofChosen(color)])), up(1), up(1)))]})
+      static(getsPt(bare(nominal(creature, post = [youControl, ofChosen(color)])), up(1), up(1)))]})

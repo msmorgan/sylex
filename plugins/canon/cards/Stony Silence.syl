@@ -6,5 +6,4 @@ card singleFaced({
       static(
         cant(
           any,
-          activate(
-            allOf(nominal(abilityHead(anyActivated), post = [ofSource(allOf(artifact))])))))]})
+          activate(bare(nominal(abilityHead(anyActivated), post = [ofSource(bare(artifact))])))))]})

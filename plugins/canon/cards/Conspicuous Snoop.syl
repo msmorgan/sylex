@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [goblin, rogue],
     text = [
       static(visibility(reveal, you, topOfLibrary)),
-      static(can(actor(you), play(allOf(nominal(pre = [goblin], spell)), from = onTop))),
+      static(can(actor(you), play(bare(nominal(pre = [goblin], spell)), from = onTop))),
       static(
         asLongAs(
           is(topSlice(1), noun(a(nominal(pre = [goblin], card)))),

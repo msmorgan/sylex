@@ -4,6 +4,6 @@ card singleFaced({
     supertypes = [legendary],
     types = [creature],
     subtypes = [human, soldier],
-    text = [firstStrike, static(costShift(allOf(nominal(pre = [non(creature)], spell)), more(1)))],
+    text = [firstStrike, static(costShift(bare(nominal(pre = [non(creature)], spell)), more(1)))],
     power = 2,
     toughness = 1})

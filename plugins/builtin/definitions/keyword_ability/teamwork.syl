@@ -12,7 +12,7 @@ ability teamwork(amount: Amount) {
           perform(
             tap(
               withTotal(
-                allOf(nominal(creature, post = [youControl])),
+                bare(nominal(creature, post = [youControl])),
                 stat(power),
                 atLeast,
                 $amount))))))]

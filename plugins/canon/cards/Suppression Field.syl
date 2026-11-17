@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       static(
         onlyUnless(
-          costShift(allOf(abilityHead(anyActivated)), more(2)),
+          costShift(bare(abilityHead(anyActivated)), more(2)),
           is(them, noun(a(manaAbility)))))]})

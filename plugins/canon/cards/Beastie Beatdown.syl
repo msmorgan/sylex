@@ -19,7 +19,7 @@ card singleFaced({
         spell(
           doIf(
             compareAmt(
-              distinctCount(cardType, allOf(nominal(card, post = [in(yourGraveyard)]))),
+              distinctCount(cardType, bare(nominal(card, post = [in(yourGraveyard)]))),
               atLeast,
               4),
             putCounters(

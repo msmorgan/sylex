@@ -3,11 +3,11 @@ card singleFaced({
     cost = [generic(2), pip(black)],
     types = [enchantment],
     text = [
-      static(costShift(allOf(nominal(pre = [white], spell)), more(3))),
+      static(costShift(bare(nominal(pre = [white], spell)), more(3))),
       static(
         costShift(
-          allOf(
+          bare(
             nominal(
               abilityHead(anyActivated),
-              post = [ofSource(allOf(nominal(pre = [white], enchantment)))])),
+              post = [ofSource(bare(nominal(pre = [white], enchantment)))])),
           more(3)))]})

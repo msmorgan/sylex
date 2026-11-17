@@ -9,9 +9,9 @@ card singleFaced({
         cant(
           any,
           activate(
-            allOf(
+            bare(
               nominal(
                 abilityHead(anyActivated),
-                post = [ofSource(allOf(nominal(source, post = [named(chosenName)])))])))))],
+                post = [ofSource(bare(nominal(source, post = [named(chosenName)])))])))))],
     power = 2,
     toughness = 1})

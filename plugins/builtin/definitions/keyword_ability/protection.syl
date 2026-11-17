@@ -8,26 +8,26 @@ ability protection(quality: Predicate) {
     static(
       cant(
         by(
-          allOf(
+          bare(
             or([
                 nominal(pre = [hasQuality($quality)], spell),
                 abilityOf(allOf(nominal(pre = [hasQuality($quality)], source)))]))),
         target(this))),
-    static(cant(any, attachTo(allOf(nominal(pre = [hasQuality($quality)], aura)), this))),
+    static(cant(any, attachTo(bare(nominal(pre = [hasQuality($quality)], aura)), this))),
     static(
       cant(
         any,
         attachTo(
-          allOf(nominal(pre = [hasQuality($quality)], or([equipment, fortification]))),
+          bare(nominal(pre = [hasQuality($quality)], or([equipment, fortification]))),
           thisPermanent))),
     static(
       replace(
         would(
-          by(allOf(nominal(pre = [hasQuality($quality)], source))),
+          by(bare(nominal(pre = [hasQuality($quality)], source))),
           dealDamage(recipient = this)),
         instead(preventDamage(allDamage)))),
     static(
       cant(
-        by(allOf(nominal(pre = [hasQuality($quality)], creature))),
+        by(bare(nominal(pre = [hasQuality($quality)], creature))),
         block(attacker = thisCreature)))]
 }

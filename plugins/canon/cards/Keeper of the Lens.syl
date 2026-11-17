@@ -8,6 +8,6 @@ card singleFaced({
         visibility(
           lookAt,
           you,
-          objects(allOf(nominal(pre = [faceDown], creature, post = [youDontControl])))))],
+          objects(bare(nominal(pre = [faceDown], creature, post = [youDontControl])))))],
     power = 1,
     toughness = 2})

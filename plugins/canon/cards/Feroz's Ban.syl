@@ -2,4 +2,4 @@ card singleFaced({
     name = "Feroz's Ban",
     cost = [generic(6)],
     types = [artifact],
-    text = [static(costShift(allOf(nominal(pre = [creature], spell)), more(2)))]})
+    text = [static(costShift(bare(nominal(pre = [creature], spell)), more(2)))]})

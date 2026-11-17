@@ -9,9 +9,9 @@ card singleFaced({
         cant(
           any,
           activate(
-            allOf(
+            bare(
               nominal(
                 abilityHead(anyActivated),
-                post = [ofSource(allOf(or([artifact, creature, planeswalker])))])))))],
+                post = [ofSource(bare(or([artifact, creature, planeswalker])))])))))],
     power = 3,
     toughness = 3})

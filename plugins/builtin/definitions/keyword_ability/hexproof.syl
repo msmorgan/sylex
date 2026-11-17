@@ -7,6 +7,6 @@ ability hexproof {
   body = [
     static(
       cant(
-        by(allOf(nominal(or([spell, abilityHead(anyOnStack)]), post = [opponentsControl]))),
+        by(bare(nominal(or([spell, abilityHead(anyOnStack)]), post = [opponentsControl]))),
         target(this)))]
 }

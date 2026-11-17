@@ -7,8 +7,8 @@ card singleFaced({
         cant(
           any,
           activate(
-            allOf(
+            bare(
               nominal(
                 abilityHead(anyActivated),
-                post = [ofSource(allOf(or([artifact, creature])))]))),
+                post = [ofSource(bare(or([artifact, creature])))]))),
           unless = is(them, noun(a(manaAbility)))))]})

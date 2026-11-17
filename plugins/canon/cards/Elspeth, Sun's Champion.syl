@@ -14,6 +14,6 @@ card singleFaced({
         getEmblem([
             static(
               conjunction([
-                  getsPt(allOf(nominal(creature, post = [youControl])), up(2), up(2)),
+                  getsPt(bare(nominal(creature, post = [youControl])), up(2), up(2)),
                   abilityGrant(them, [flying])]))]))],
     loyalty = 4})

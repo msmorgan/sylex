@@ -8,7 +8,7 @@ card singleFaced({
           replace(
             would(
               any,
-              dealDamage(recipient = andOr([you, allOf(nominal(permanent, post = [youControl]))]))),
+              dealDamage(recipient = andOr([you, bare(nominal(permanent, post = [youControl]))]))),
             instead(
               preventDamage(
                 theNext(letter(x)),

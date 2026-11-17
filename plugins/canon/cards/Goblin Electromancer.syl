@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(
+          bare(
             nominal(
               pre = [or([instant, sorcery])],
               spell,

@@ -4,5 +4,5 @@ card singleFaced({
     types = [instant],
     text = [
       spell(
-        establishThroughout(cant(actor(allOf(creature)), attack), thisTurn),
+        establishThroughout(cant(actor(bare(creature)), attack), thisTurn),
         timing = duringPart(whose = anOpponent, upkeep))]})

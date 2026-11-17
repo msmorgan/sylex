@@ -11,4 +11,4 @@ card singleFaced({
           counted(
             1,
             ofAnyColorAmong(
-              allOf(nominal(pre = [legendary, creature], card, post = [in(yourGraveyard)]))))))]})
+              bare(nominal(pre = [legendary, creature], card, post = [in(yourGraveyard)]))))))]})

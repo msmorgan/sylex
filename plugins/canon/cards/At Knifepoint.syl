@@ -7,7 +7,7 @@ card singleFaced({
         partScope(
           you,
           turn,
-          abilityGrant(allOf(nominal(outlaw, post = [youControl])), [firstStrike]))),
+          abilityGrant(bare(nominal(outlaw, post = [youControl])), [firstStrike]))),
       whenever(
         does(actor(you), commitCrime),
         create(

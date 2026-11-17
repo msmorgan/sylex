@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [kor, artificer, ally],
     text = [
-      static(getsPt(allOf(nominal(pre = [equipped], creature, post = [youControl])), up(1), up(1))),
+      static(getsPt(bare(nominal(pre = [equipped], creature, post = [youControl])), up(1), up(1))),
       whenever(
         does(actor(a(nominal(pre = [equipped], creature, post = [youControl]))), die),
         draw(1))],

@@ -6,9 +6,9 @@ card singleFaced({
       static(
         qualityChange(
           and([
-              allOf(nominal(pre = [non(land)], permanent, post = [youControl])),
-              allOf(nominal(pre = [permanent], spell, post = [youControl])),
-              allOf(
+              bare(nominal(pre = [non(land)], permanent, post = [youControl])),
+              bare(nominal(pre = [permanent], spell, post = [youControl])),
+              bare(
                 nominal(
                   pre = [non(land), permanent],
                   card,

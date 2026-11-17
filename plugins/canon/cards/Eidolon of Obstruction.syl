@@ -7,10 +7,10 @@ card singleFaced({
       firstStrike,
       static(
         costShift(
-          allOf(
+          bare(
             nominal(
               abilityHead(loyalty),
-              post = [ofSource(allOf(nominal(planeswalker, post = [opponentsControl])))])),
+              post = [ofSource(bare(nominal(planeswalker, post = [opponentsControl])))])),
           more(1)))],
     power = 2,
     toughness = 1})

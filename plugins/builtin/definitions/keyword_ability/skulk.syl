@@ -5,6 +5,6 @@ ability skulk {
   body = [
     static(
       cant(
-        by(allOf(nominal(creature, post = [hasPower(greater, powerOf(thisCreature))]))),
+        by(bare(nominal(creature, post = [hasPower(greater, powerOf(thisCreature))]))),
         block(attacker = thisCreature)))]
 }

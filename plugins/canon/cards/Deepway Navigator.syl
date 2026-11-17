@@ -11,6 +11,6 @@ card singleFaced({
       static(
         asLongAs(
           did(actor(you), attackWith(counted(orMore(3), merfolk)), within(soFarThisTurn)),
-          getsPt(allOf(nominal(merfolk, post = [youControl])), up(1), up(0))))],
+          getsPt(bare(nominal(merfolk, post = [youControl])), up(1), up(0))))],
     power = 2,
     toughness = 2})

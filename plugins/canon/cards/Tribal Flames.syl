@@ -13,4 +13,4 @@ card singleFaced({
                 x,
                 distinctCount(
                   subtype(land, basicOnly),
-                  allOf(nominal(land, post = [youControl]))))])))]})
+                  bare(nominal(land, post = [youControl]))))])))]})

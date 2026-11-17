@@ -10,14 +10,14 @@ card singleFaced({
           turn,
           conjunction([
               costShift(
-                allOf(
+                bare(
                   nominal(
                     spell,
                     post = [did(actor(yourOpponents), cast(which), within = thisObject)])),
                 more(1)),
               onlyUnless(
                 costShift(
-                  allOf(
+                  bare(
                     nominal(
                       ability,
                       post = [did(actor(yourOpponents), activate(which), within = thisObject)])),

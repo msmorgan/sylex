@@ -8,4 +8,4 @@ card singleFaced({
             draw(letter(x)),
             define(
               x,
-              distinctCount(cardType, allOf(nominal(card, post = [in(yourGraveyard)]))))]))]})
+              distinctCount(cardType, bare(nominal(card, post = [in(yourGraveyard)]))))]))]})

@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [centaur],
     text = [
       static(visibility(reveal, you, topOfLibrary)),
-      static(can(actor(you), play(allOf(land), from = onTop))),
+      static(can(actor(you), play(bare(land), from = onTop))),
       whenever(does(actor(a(nominal(land, post = [youControl]))), enter), gainLife(1))],
     power = 2,
     toughness = 4})

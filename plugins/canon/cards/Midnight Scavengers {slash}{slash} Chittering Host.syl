@@ -23,7 +23,7 @@ card transforming({
       when(
         does(actor(thisCreature), enter),
         establishFor(
-          allOf(nominal(pre = [other], creature, post = [youControl])),
+          bare(nominal(pre = [other], creature, post = [youControl])),
           [getsPt(them, up(1), up(0)), abilityGrant(them, [menace])],
           duration = untilEndOfTurn))],
     power = 5,

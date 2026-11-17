@@ -10,7 +10,7 @@ card singleFaced({
       static(
         replace(
           would(
-            by(allOf(nominal(source, post = [ofTheLastChosen(color)]))),
+            by(bare(nominal(source, post = [ofTheLastChosen(color)]))),
             dealDamage(recipient = enchanted(creature))),
           instead(preventDamage(allDamage)))),
       activated(

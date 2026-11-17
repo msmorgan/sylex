@@ -5,6 +5,6 @@ card singleFaced({
     text = [
       spell(
         establishFor(
-          allOf(nominal(creature, post = [youControl])),
+          bare(nominal(creature, post = [youControl])),
           [getsPt(them, up(2), up(0)), qualityChange(them, adds, everyTypeOf(creature))],
           duration = untilEndOfTurn))]})

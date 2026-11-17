@@ -12,6 +12,6 @@ ability splitSecond {
             cant(
               actor(bare(player)),
               activate(
-                allOf(
+                bare(
                   nominal(pre = [non(hasQuality(isManaAbility))], abilityHead(anyActivated)))))])))]
 }

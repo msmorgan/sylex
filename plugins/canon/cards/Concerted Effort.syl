@@ -9,7 +9,7 @@ card singleFaced({
           doOnlyIf(
             establishThroughout(
               keywordGrant(
-                allOf(nominal(creature, post = [youControl])),
+                bare(nominal(creature, post = [youControl])),
                 thatKeyword,
                 and([hasType(creature), youControl, hasKeyword(thatKeyword)])),
               untilEndOfTurn),

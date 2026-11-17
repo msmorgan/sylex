@@ -15,7 +15,7 @@ card singleFaced({
       activated(
         loyaltySymbol(down(7)),
         establishFor(
-          allOf(nominal(creature, post = [youControl])),
+          bare(nominal(creature, post = [youControl])),
           [
             getsBoth(them, up(forEach(1, nominal(forest, post = [youControl])))),
             abilityGrant(them, [trample])],

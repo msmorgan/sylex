@@ -8,7 +8,7 @@ card singleFaced({
         asLongAs(
           is(thisCreature, untapped),
           replace(
-            would(by(allOf(artifact)), dealDamage(recipient = you)),
+            would(by(bare(artifact)), dealDamage(recipient = you)),
             instead(redirectDamage(allDamage, thisCreature)))))],
     power = 1,
     toughness = 6})

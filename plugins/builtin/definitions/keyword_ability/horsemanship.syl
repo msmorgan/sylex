@@ -5,6 +5,6 @@ ability horsemanship {
   body = [
     static(
       cant(
-        by(allOf(nominal(creature, post = [not(hasKeyword(theKeyword(horsemanship)))]))),
+        by(bare(nominal(creature, post = [not(hasKeyword(theKeyword(horsemanship)))]))),
         block(attacker = thisCreature)))]
 }

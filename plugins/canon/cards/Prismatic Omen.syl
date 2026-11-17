@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(
-        qualityChange(allOf(nominal(land, post = [youControl])), adds, everyTypeOf(basicLand)))]})
+        qualityChange(bare(nominal(land, post = [youControl])), adds, everyTypeOf(basicLand)))]})

@@ -10,7 +10,7 @@ card singleFaced({
           counted(
             1,
             ofAnyColorAmong(
-              allOf(
+              bare(
                 nominal(
                   pre = [legendary],
                   and([creature, planeswalker]),

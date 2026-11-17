@@ -9,11 +9,11 @@ ability hexproofFrom(quality: Predicate) {
     static(
       cant(
         by(
-          allOf(
+          bare(
             nominal(
               or([
                   nominal(pre = [hasQuality($quality)], spell),
-                  abilityOf(allOf(nominal(pre = [hasQuality($quality)], source)))]),
+                  abilityOf(bare(nominal(pre = [hasQuality($quality)], source)))]),
               post = [opponentsControl]))),
         target(thisPermanent)))]
 }

@@ -7,5 +7,5 @@ card singleFaced({
       static(
         definesPowerAndToughness(
           ownName,
-          distinctCount(cardType, allOf(nominal(card, post = [in(graveyard)]))),
-          plus(distinctCount(cardType, allOf(nominal(card, post = [in(graveyard)]))), 1)))]})
+          distinctCount(cardType, bare(nominal(card, post = [in(graveyard)]))),
+          plus(distinctCount(cardType, bare(nominal(card, post = [in(graveyard)]))), 1)))]})

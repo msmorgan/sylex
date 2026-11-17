@@ -5,8 +5,8 @@ card singleFaced({
     text = [
       static(
         costShift(
-          allOf(
+          bare(
             nominal(
               abilityHead(anyActivated),
-              post = [ofSource(allOf(nominal(creature, post = [youControl])))])),
+              post = [ofSource(bare(nominal(creature, post = [youControl])))])),
           less(2, floor = 1)))]})

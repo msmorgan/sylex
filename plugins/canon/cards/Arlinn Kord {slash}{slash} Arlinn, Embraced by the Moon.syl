@@ -25,7 +25,7 @@ card transforming({
       activated(
         loyaltySymbol(up(1)),
         establishFor(
-          allOf(nominal(creature, post = [youControl])),
+          bare(nominal(creature, post = [youControl])),
           [getsPt(them, up(1), up(1)), abilityGrant(them, [trample])],
           duration = untilEndOfTurn)),
       activated(
@@ -38,7 +38,7 @@ card transforming({
         getEmblem([
             static(
               abilityGrant(
-                allOf(nominal(creature, post = [youControl])),
+                bare(nominal(creature, post = [youControl])),
                 [
                   haste,
                   activated(tapSymbol, dealDamageOwnPower(thisCreature, target(anyTarget)))]))]))]})

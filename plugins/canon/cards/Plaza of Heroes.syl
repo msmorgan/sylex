@@ -13,7 +13,7 @@ card singleFaced({
         addMana(
           counted(
             1,
-            ofAnyColorAmong(allOf(nominal(pre = [legendary], permanent, post = [youControl])))))),
+            ofAnyColorAmong(bare(nominal(pre = [legendary], permanent, post = [youControl])))))),
       activated(
         compound([mana([generic(3)]), tapSymbol, perform(exile(thisLand))]),
         gain(

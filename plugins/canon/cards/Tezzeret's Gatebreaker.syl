@@ -15,5 +15,5 @@ card singleFaced({
       activated(
         compound([mana([generic(5), pip(blue)]), tapSymbol, perform(sacrifice(thisArtifact))]),
         establishThroughout(
-          cant(any, block(attacker = allOf(nominal(creature, post = [youControl])))),
+          cant(any, block(attacker = bare(nominal(creature, post = [youControl])))),
           thisTurn))]})

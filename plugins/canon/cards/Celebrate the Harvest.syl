@@ -8,6 +8,6 @@ card singleFaced({
             search(
               yourLibrary,
               for = counted(upToOf(letter(x)), nominal(pre = [basic, land], card))),
-            define(x, distinctCount(value(power), allOf(nominal(creature, post = [youControl])))),
+            define(x, distinctCount(value(power), bare(nominal(creature, post = [youControl])))),
             putOntoBattlefieldTapped(those(card)),
             shuffle]))]})

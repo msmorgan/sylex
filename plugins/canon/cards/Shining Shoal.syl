@@ -20,6 +20,6 @@ card singleFaced({
           replace(
             would(
               actor(aYourChoice(source)),
-              dealDamage(recipient = andOr([you, allOf(nominal(creature, post = [youControl]))]))),
+              dealDamage(recipient = andOr([you, bare(nominal(creature, post = [youControl]))]))),
             instead(redirectDamage(theNext(letter(x)), target(anyTarget)))),
           thisTurn))]})

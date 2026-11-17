@@ -8,6 +8,6 @@ card singleFaced({
       static(
         replace(
           would(
-            by(allOf(nominal(source, post = [named(chosenName)]))),
-            dealDamage(recipient = and([you, allOf(nominal(permanent, post = [youControl]))]))),
+            by(bare(nominal(source, post = [named(chosenName)]))),
+            dealDamage(recipient = and([you, bare(nominal(permanent, post = [youControl]))]))),
           instead(preventDamage(allDamage))))]})

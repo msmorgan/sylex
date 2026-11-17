@@ -8,7 +8,7 @@ card singleFaced({
       static(
         conjunction([
             getsBase(
-              allOf(
+              bare(
                 nominal(
                   pre = [non(legendary)],
                   creature,

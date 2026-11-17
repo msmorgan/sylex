@@ -11,7 +11,7 @@ card singleFaced({
       when(
         chapterMark([3]),
         get(
-          allOf(nominal(creature, post = [youControl])),
+          bare(nominal(creature, post = [youControl])),
           up(1),
           up(0),
           duration = untilEndOfTurn))]})

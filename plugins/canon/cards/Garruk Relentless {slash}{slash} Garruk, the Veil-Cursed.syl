@@ -46,7 +46,7 @@ card transforming({
         loyaltySymbol(down(3)),
         sequentially([
             establishFor(
-              allOf(nominal(creature, post = [youControl])),
+              bare(nominal(creature, post = [youControl])),
               [abilityGrant(them, [trample]), getsPt(them, up(letter(x)), up(letter(x)))],
               duration = untilEndOfTurn),
             define(x, countOf(nominal(pre = [creature], card, post = [in(yourGraveyard)])))]))]})

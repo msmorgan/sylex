@@ -14,7 +14,7 @@ card singleFaced({
               instruct(
                 you,
                 gain(
-                  allOf(
+                  bare(
                     nominal(
                       creature,
                       post = [youControl, inCombat(blockerOf, counterpart = that(creature))])),

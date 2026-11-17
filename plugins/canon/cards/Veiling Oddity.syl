@@ -9,6 +9,6 @@ card singleFaced({
         timed(
           does(any, removeCounters(theLast, printedKind(timeCounter), this)),
           whileTrue(is(it, in(exileZone)))),
-        establishThroughout(cant(any, block(attacker = allOf(creature))), thisTurn))],
+        establishThroughout(cant(any, block(attacker = bare(creature))), thisTurn))],
     power = 2,
     toughness = 3})

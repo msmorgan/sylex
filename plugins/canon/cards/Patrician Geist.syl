@@ -5,10 +5,10 @@ card singleFaced({
     subtypes = [spirit, knight],
     text = [
       flying,
-      static(getsPt(allOf(nominal(pre = [other], spirit, post = [youControl])), up(1), up(1))),
+      static(getsPt(bare(nominal(pre = [other], spirit, post = [youControl])), up(1), up(1))),
       static(
         costShift(
-          allOf(
+          bare(
             nominal(
               spell,
               post = [did(actor(you), cast(which, from = yourGraveyard), within = thisObject)])),

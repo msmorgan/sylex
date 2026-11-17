@@ -6,12 +6,12 @@ card singleFaced({
       cumulativeUpkeep(mana([pip(red)])),
       static(
         cant(
-          actor(allOf(nominal(pre = [blue], creature))),
-          block(attacker = allOf(nominal(creature, post = [youControl]))))),
+          actor(bare(nominal(pre = [blue], creature))),
+          block(attacker = bare(nominal(creature, post = [youControl]))))),
       static(
         gatedBy(
-          actor(allOf(nominal(pre = [non(blue)], creature))),
-          block(attacker = allOf(nominal(creature, post = [youControl]))),
+          actor(bare(nominal(pre = [non(blue)], creature))),
+          block(attacker = bare(nominal(creature, post = [youControl]))),
           perform(
             payLife(
               amount = forEach(

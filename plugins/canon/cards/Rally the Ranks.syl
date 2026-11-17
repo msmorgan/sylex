@@ -6,6 +6,6 @@ card singleFaced({
       static(entersChoosing(thisEnchantment, subtype(creature))),
       static(
         getsPt(
-          allOf(nominal(creature, post = [youControl, ofChosen(subtype(creature))])),
+          bare(nominal(creature, post = [youControl, ofChosen(subtype(creature))])),
           up(1),
           up(1)))]})

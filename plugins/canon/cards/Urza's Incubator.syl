@@ -6,5 +6,5 @@ card singleFaced({
       static(entersChoosing(thisArtifact, subtype(creature))),
       static(
         costShift(
-          allOf(nominal(pre = [creature], spell, post = [ofChosen(subtype(creature))])),
+          bare(nominal(pre = [creature], spell, post = [ofChosen(subtype(creature))])),
           less(2)))]})

@@ -12,7 +12,7 @@ card singleFaced({
       static(definesQuality(thisCreature, adds, chosenQuality(ofChosen(subtype(creature))))),
       static(
         getsPt(
-          allOf(nominal(pre = [other], creature, post = [youControl, ofChosen(subtype(creature))])),
+          bare(nominal(pre = [other], creature, post = [youControl, ofChosen(subtype(creature))])),
           up(1),
           up(1)))],
     power = 2,

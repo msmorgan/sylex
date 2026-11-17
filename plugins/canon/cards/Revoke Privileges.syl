@@ -9,4 +9,4 @@ card singleFaced({
         conjunction([
             cant(actor(enchanted(creature)), attack),
             cant(actor(enchanted(creature)), block),
-            cant(actor(enchanted(creature)), crew(allOf(vehicle)))]))]})
+            cant(actor(enchanted(creature)), crew(bare(vehicle)))]))]})

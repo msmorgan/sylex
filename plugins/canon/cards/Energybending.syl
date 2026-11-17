@@ -7,9 +7,6 @@ card singleFaced({
       spell(
         sequentially([
             establishThroughout(
-              qualityChange(
-                allOf(nominal(land, post = [youControl])),
-                adds,
-                everyTypeOf(basicLand)),
+              qualityChange(bare(nominal(land, post = [youControl])), adds, everyTypeOf(basicLand)),
               untilEndOfTurn),
             draw(1)]))]})

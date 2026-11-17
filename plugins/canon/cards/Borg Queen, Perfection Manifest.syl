@@ -5,7 +5,7 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [borg, noble],
     text = [
-      static(getsPt(allOf(nominal(pre = [artifact], creature, post = [youControl])), up(2), up(0))),
+      static(getsPt(bare(nominal(pre = [artifact], creature, post = [youControl])), up(2), up(0))),
       when(
         does(actor(shortenedName), enter),
         assimilate(target(nominal(pre = [creature], card, post = [in(graveyardOf(anOpponent))]))))],

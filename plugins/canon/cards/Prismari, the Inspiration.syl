@@ -9,7 +9,7 @@ card singleFaced({
       ward(perform(payLife(amount = 5))),
       static(
         abilityGrant(
-          allOf(
+          bare(
             nominal(
               pre = [or([instant, sorcery])],
               spell,

@@ -5,5 +5,5 @@ card singleFaced({
     text = [
       spell(
         preventAll(
-          to = and([you, allOf(nominal(permanent, post = [youControl]))]),
+          to = and([you, bare(nominal(permanent, post = [youControl]))]),
           duration = thisTurn))]})

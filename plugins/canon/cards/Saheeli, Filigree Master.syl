@@ -29,13 +29,10 @@ card singleFaced({
         loyaltySymbol(down(4)),
         getEmblem([
             static(
-              getsPt(
-                allOf(nominal(pre = [artifact], creature, post = [youControl])),
-                up(1),
-                up(1))),
+              getsPt(bare(nominal(pre = [artifact], creature, post = [youControl])), up(1), up(1))),
             static(
               costShift(
-                allOf(
+                bare(
                   nominal(
                     pre = [artifact],
                     spell,

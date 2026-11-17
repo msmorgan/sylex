@@ -10,9 +10,9 @@ card singleFaced({
         cant(
           any,
           activate(
-            allOf(
+            bare(
               nominal(
                 abilityHead(anyActivated),
-                post = [ofSource(allOf(nominal(creature, post = [opponentsControl])))])))))],
+                post = [ofSource(bare(nominal(creature, post = [opponentsControl])))])))))],
     power = 3,
     toughness = 4})

@@ -7,7 +7,7 @@ card singleFaced({
         sequentially([
             doForEachKind(
               value(power),
-              domain = allOf(nominal(creature, post = [in(battlefield)])),
+              domain = bare(nominal(creature, post = [in(battlefield)])),
               number,
               choose(a(nominal(creature, post = [hasPower(equal, chosenNumber)])))),
             destroy(each(nominal(creature, post = [notChosen])))]))]})
