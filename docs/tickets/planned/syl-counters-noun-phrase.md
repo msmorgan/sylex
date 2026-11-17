@@ -34,7 +34,9 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
     prints its capital;
   - a +X/+Y kind is `boost(power, toughness)`, a parameterized kind: "+1/+1 counters" is
     `counter(boost(…))` [CR#122.1a];
-  - a keyword counter's kind is its keyword [CR#122.1b].
+  - a keyword counter's kind is a parameterized kind over its keyword, as `boost` is over its
+    numbers [CR#122.1b]. The keyword is not itself a kind word: echo, fuse, plot and training are
+    kind names and also keywords that no keyword counter can be.
 - A coordination of kinds is written inside the argument: *Denry Klin, Editor in Chief*'s "a
   +1/+1, first strike, or vigilance counter".
 - What a counter confers is stated once per rule: a keyword counter gives its keyword and a
@@ -53,22 +55,20 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
   `exileWithCounters` and `returnToBattlefieldWithCounters` over it. `countersOn` stays a measure
   over a kind.
 
-## Open questions
-
-- **How a keyword stands at `CounterKind`.** Options: a parameterized kind over the keyword, as
-  `boost` is over its numbers; or the fifteen keywords [CR#122.1b] lists declared as kind words.
-  Recommendation: the parameterized kind, since four kind names are also keywords that are not
-  keyword counters (echo, fuse, plot, training).
-
 ## Done when
 
-- The open questions are answered, and each answer is in the doc comment of the declaration it
-  shapes.
 - `putCounters(counters: NounPhrase, on)` and `removeCounters(counters: NounPhrase, from)` are
   the declarations, the others the Design lists take the phrase the same way, and no call writes
   an amount or a kind beside the phrase.
 - `counter` is the head at `Nominal` with its kind as the Design says, and no `counter`
   declaration's lemma or spelling ends in "counter".
+- Counter kinds have one source. Today `crates/vocabulary/catalogs/counters.ron` lists 241 kinds
+  for the lexicon and `plugins/builtin/definitions/counter/` declares 220 for `.syl`, and they
+  disagree: eleven named kinds printed on in-scope cards have no declaration (blight, coin, death,
+  devotion, echo, everything, healing, necrodermis, plot, training, unlock), and eleven +X/+Y
+  kinds none (+0/+1, +0/+2, +1/+0, +1/+2, +2/+0, +2/+2, -0/-1, -0/-2, -1/-0, -2/-1, -2/-2), which
+  `boost` covers. Every named kind is a `CounterKind` word, and either the catalog is derived
+  from the declarations or a load check refuses a difference.
 - The eight cards `english-counter-kind-premodifies-counter` names are written or authored with
   their coordination of kinds.
 - *Hardened Scales*, *Solemnity* and *Winding Constrictor* write the phrases in the table above
