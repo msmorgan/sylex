@@ -116,9 +116,9 @@ spell or ability is put on the stack ([CR#601.2c,115.1]).
    output, such as a token it creates, continue to later text, while its condition's referents
    close. With an else branch, branch-local non-targets are closed. An existential
    ("there is …", `exists`) publishes its indefinite subject to the consequent. A conditional
-   Static Spec's consequent exports the plural domain of a bare plural or "all" it introduces
-   (`described(all, …)`) to the text after the conditional in its ability, as a negated or modal
-   box keeps its universal domains (item 3): *Guardian Beast*'s "This effect doesn't remove Auras
+   Static Spec's consequent exports the plural domain of an "all" or a universal bare plural it
+   introduces (§2.4) to the text after the conditional in its ability, as a negated or modal box
+   keeps its universal domains (item 3): *Guardian Beast*'s "This effect doesn't remove Auras
    already attached to those artifacts" reads the "noncreature artifacts you control" of its "As
    long as" sentence.
 3. **Negated or modal** (`cant`/`must`/`can`/`gatedBy`, `not`, an else branch). Hypothetical
@@ -202,8 +202,21 @@ constrains the enclosing plural determiner's group rather than each member alone
 after the head (`thatIs`, "a spell that's both red and white") holds of a member exactly when its
 `Predicative` would under the copula. A possessive determiner (`possessive(owner)`, "its activated
 abilities") takes every member that belongs to its owner, an ability belonging to its source
-([CR#113.7]); the plural indefinite (`plural`, `a` with `plur = many`) is to `a` what `thePlural` is
-to `the`, and is not universal as `bare` is.
+([CR#113.7]).
+
+A **bare plural** (`bare`, `described(bare, …)`) is the determinerless plural the card prints, and
+its term states no quantificational force. Where it stands decides how it is read; semantics reads
+that position, and the term never writes it.
+
+- As a participant a rule or effect generalizes over, it is read as the universal over its
+  description and exports the same plural domain "all" does (§2.2 item 2): *Glorious Anthem*'s
+  "Creatures you control get +1/+1", *Leyline of Punishment*'s "Players can't gain life".
+- As the copula's complement (`noun(bare(…))`) it tests each member of its subject, as `a` tests
+  one, and introduces no referent: *Pithing Needle*'s "unless they're mana abilities" (§3.3).
+- As an indefinite participant of an action it is a plural indefinite: *Aggressive Mining*'s "You
+  can't play lands", *Grand Abolisher*'s "can't cast spells or activate abilities of artifacts,
+  creatures, or enchantments". Under `cant` it has a hypothetical indefinite's universal force and
+  closes with the rule's box (§2.2 item 3).
 
 A **characteristic read** ("its power") may select a departed object by its last known information
 ([CR#608.2h]). Such a read never makes the object the patient of a battlefield action. Oracle text
@@ -340,9 +353,8 @@ since a "can't" outranks anything that allows the thing ([CR#101.2]).
   is cast or activated ([CR#601.2f,602.2b]), so the shift changes the cost of each member the
   condition does not hold of. *Suppression Field*'s "Activated abilities cost {2} more to activate
   unless they're mana abilities" leaves alone the cost of each ability that is a mana ability, as
-  [CR#605.1a] defines one. A plural
-  noun phrase as the copula's complement ("they're mana abilities") is `plural`, which tests each
-  member as `a` tests one.
+  [CR#605.1a] defines one. A bare plural as the copula's complement ("they're mana abilities",
+  `noun(bare(manaAbility))`) tests each member as `a` tests one (§2.4).
 - **Host legality is one relation.** An Aura, Equipment or Fortification may be attached to a host
   when a `mayBeAttachedTo` permission allows it (enchant [CR#702.5a], [CR#301.5,301.6]) and no
   `cantBeAttached` limit excludes it ("can't be enchanted", "can't be equipped by …"): "Other

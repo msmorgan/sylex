@@ -51,9 +51,9 @@ nothing explains.
   correlative `both`; `ofChosen` and `attachedTo` stand at `Predicative` too.
 - `costShift` takes `unless: Option(Condition)`, read inside the shift once per member of its
   subject, as a deontic rule's Unless Condition is (`semantics.md` §3.3).
-- The plural indefinite is `plural(p)` over `a(unmarked, plur = many)`: `a` takes the `plur` that
-  `the` takes, and `plural` is to `a` what `thePlural` is to `the`, distinct from the universal
-  `bare`.
+- A bare plural as the copula's complement ("they're mana abilities") is `bare(p)`, over the
+  `bare` determiner, which states no quantificational force; under the copula it tests each member
+  of its subject as `a` tests one (`semantics.md` §2.4).
 - "Can't be enchanted / equipped / fortified [by …]" is `cantBeAttached(host, word, by)`, a
   standing limit on what the host can be enchanted by [CR#303.4], or equipped or fortified by
   [CR#702.16d]. Host legality is one relation: a `mayBeAttachedTo` permission less any
@@ -88,8 +88,8 @@ nothing explains.
   Blade*, `detain`, `haste` and `creature` write `possessive`; every remaining `ofSource` caller
   prints "of"; *Saga* and read ahead write `abilityHead(chapter)`, and `chapterAbilityOf` is
   gone.
-- *Tithe Taker* and *Suppression Field* write `costShift(…, unless = is(them, noun(plural(…))))`;
-  *Pithing Needle* and *Damping Matrix* write `plural`; *Guardian Beast* and `protection` write
+- *Tithe Taker* and *Suppression Field* write `costShift(…, unless = is(them, noun(bare(…))))`;
+  *Pithing Needle* and *Damping Matrix* write `noun(bare(manaAbility))`; *Guardian Beast* and `protection` write
   `cantBeAttached`; the Aura, Equipment and Fortification state-based actions test
   `legallyAttached`.
 - `nominal.rs` classifies every determiner, plurality, slice-count, quantity and coordinator form
@@ -125,7 +125,7 @@ nothing explains.
 
 - `plugins/builtin/primitives/postModifier/thatIs.syl`, `plugins/builtin/templates/predicative/`,
   `plugins/builtin/primitives/static/{costShift,cantBeAttached}.syl`,
-  `plugins/builtin/templates/determiner/{plural,possessive}.syl`
+  `plugins/builtin/templates/determiner/{bare,possessive}.syl`
 - `crates/xtask/src/dsl_check/nominal.rs`; `crates/xtask/tests/suite/dsl_check.rs`
 - `docs/design/spelling.md` §2, `docs/design/semantics.md` §2.4, §3.3
 - `docs/evidence/syl-nominal-descriptions/`, `docs/evidence/syl-nominal-modifier-sorts-and-checks/`
