@@ -4,6 +4,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(
-        onlyUnless(
-          costShift(bare(abilityHead(anyActivated)), more(2)),
-          is(them, noun(a(manaAbility)))))]})
+        costShift(
+          bare(abilityHead(anyActivated)),
+          more(2),
+          unless = is(them, noun(plural(manaAbility)))))]})

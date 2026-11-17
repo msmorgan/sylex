@@ -1,0 +1,8 @@
+# The determinerless plural that is not universal ("they're mana abilities"): the plural of `a`, as
+# a copula's complement testing each member of a plural subject as `a` tests one. Its tree is the
+# indefinite plural "one or more <p>" (`counted(orMore(1), p)`), whose number is many; `bare`, the
+# same words as a participant, is the universal `allOf`.
+template plural(p: Nominal): NounPhrase {
+  spelling = "$p",
+  body = described(count(range(low = 1), none), $p)
+}

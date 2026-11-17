@@ -1,1 +1,9 @@
-primitive costShift(subject: NounPhrase, shift: CostShift): StaticSpec = CostShift
+# "<subject> cost(s) <shift>[ unless <unless>]": a change to the total cost of each spell or ability
+# `subject` describes as it is cast or activated [CR#601.2f,602.2b]. `unless` is the printed
+# exemption, read once per member of `subject` inside the shift (`semantics.md` §3.3): a member it
+# holds of is not changed ("Activated abilities cost {2} more to activate unless they're mana
+# abilities", *Suppression Field*).
+primitive costShift(
+  subject: NounPhrase,
+  shift: CostShift,
+  unless: Option(Condition) = none): StaticSpec = CostShift

@@ -174,10 +174,10 @@ endophora. Whatever the technique, a referent is accessible to an anaphor only i
    indefinites introduced inside it are exported as plural (*Consume the Meek*'s "Destroy each
    creature with mana value 3 or less. They can't be regenerated."; *Promise of Loyalty*'s "Each
    player puts a vow counter on a creature they control … Each of those creatures …"). Inside a
-   deontic rule's Unless Condition (§3.3), a universal participant is read one member at a time: a
-   plural anaphor reads the whole domain, a predicate on it holding of each member and a count of
-   it counting every member (*Archon of Absolution*'s "pays {1} for each of those creatures"), and
-   a singular one reads the member at hand.
+   deontic rule's or a cost shift's Unless Condition (§3.3), a universal participant is read one
+   member at a time: a plural anaphor reads the whole domain, a predicate on it holding of each
+   member and a count of it counting every member (*Archon of Absolution*'s "pays {1} for each of
+   those creatures"), and a singular one reads the member at hand.
 3. Its sort, zone and Head Noun fit the anaphor's carrier word ([CR#109.2]).
 4. The consuming verb can apply to it in its zone ([CR#109.2,701.21a]). A creature that died
    cannot be sacrificed or have counters put on it as a permanent.
@@ -330,6 +330,13 @@ since a "can't" outranks anything that allows the thing ([CR#101.2]).
   The rule applies to each participant it ranges over exactly when the condition, read of that
   participant, does not hold, so a singular anaphor may read that participant (§2.4 item 2): read
   ahead's "Chapter abilities of this Saga can't trigger … unless … that ability" ([CR#702.155a]).
+  A cost shift's Unless Condition (`costShift(…, unless = …)`) is read the same way, inside the
+  shift and once per member of its subject: each spell or ability's total cost is determined as it
+  is cast or activated ([CR#601.2f,602.2b]), so the shift changes the cost of each member the
+  condition does not hold of. *Suppression Field*'s "Activated abilities cost {2} more to activate
+  unless they're mana abilities" leaves each mana ability's cost alone ([CR#605.1a]). A plural
+  noun phrase as the copula's complement ("they're mana abilities") is `plural`, which tests each
+  member as `a` tests one.
 - **A cast or play permission widens only what it states**: the zone its `from` names, its Timing or
   as-though, the additional land plays it counts ([CR#305.2]), and the zone a moved referent was put
   into or its subject names ("you may cast that card" after an exile, §2.1; *Tibalt, Cosmic

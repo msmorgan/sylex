@@ -15,14 +15,13 @@ card singleFaced({
                     spell,
                     post = [did(actor(yourOpponents), cast(which), within = thisObject)])),
                 more(1)),
-              onlyUnless(
-                costShift(
-                  bare(
-                    nominal(
-                      ability,
-                      post = [did(actor(yourOpponents), activate(which), within = thisObject)])),
-                  more(1)),
-                is(them, noun(a(manaAbility))))]))),
+              costShift(
+                bare(
+                  nominal(
+                    ability,
+                    post = [did(actor(yourOpponents), activate(which), within = thisObject)])),
+                more(1),
+                unless = is(them, noun(plural(manaAbility))))]))),
       afterlife(1)],
     power = 2,
     toughness = 1})
