@@ -10,10 +10,8 @@
 +NounPhrase a -1/-0 counter
 +NounPhrase a +1/+1 or -1/-1 counter => Kind "+1/+1 or -1/-1" as Modifier of counter; readings 1
 +NounPhrase a +2/+0, +1/+1, or +0/+2 counter => Kind "+2/+0, +1/+1, or +0/+2" as Modifier of counter; readings 1
-# A slash measure is no fused nominal head on its own.
-*NounPhrase a 2/2
-*NounPhrase a 2/2 or 3/3
-* Destroy a 2/2.
+# An unsigned slash measure is a premodifier of the token's nominal, never a determined nominal head on its own.
++ <card=Germinate Recruits> Create X 2/2 colorless Wizard Soldier creature tokens named Cadet, where X is the amount of life you gained this turn. => !NounPhrase "X 2/2"
 # A kind name premodifies *counter* as its kind; where *time* ends a Nominal and *counters* begins a clause, they are no kind and counter.
 + Sacrifice a Thrull: Put three time counters on this Aura. => Nominal "time counters" head counter; Kind "time" as Modifier of counter; readings 1
 + Whenever one or more counters are put on a creature you control, if it's the first time counters have been put on that creature this turn, put a +1/+1 counter on that creature. => PrepositionPhrase "if it's the first time counters have been put on that creature this turn" as Adjunct of put; Clause "counters have been put on that creature this turn"; RelativeClause "counters have been put on that creature this turn" as Modifier of time gap "first time"; !Nominal "time counters"
