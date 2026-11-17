@@ -1,5 +1,5 @@
-# [CR#301.5,704.5n] An Equipment may be attached to a creature, and one attached to no legal
-# host becomes unattached.
+# [CR#301.5,704.5n] An Equipment may be attached to a creature, and one attached to an illegal
+# permanent or to a player becomes unattached.
 subtype equipment {
   lexical = {lemma = "Equipment", plural = "Equipment"},
   spelling = "Equipment",
@@ -7,5 +7,7 @@ subtype equipment {
   name = "Equipment",
   confers = [
     property(mayBeAttachedTo(thisEquipment, allOf(creature))),
-    stateBased(not(isAttached(thisEquipment)), attachment(unattached, thisEquipment))]
+    stateBased(
+      and([isAttached(thisEquipment), not(legallyAttached(thisEquipment))]),
+      attachment(unattached, thisEquipment))]
 }

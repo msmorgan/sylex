@@ -1,0 +1,7 @@
+# "<subject> is attached to a legal object or player": attached to a host that host legality
+# admits for it (`semantics.md` §3.3), the condition the attachment state-based actions test
+# [CR#704.5m,704.5n].
+template legallyAttached(subject: NounPhrase): Condition {
+  spelling = "$subject be attached to a legal object or player",
+  body = is($subject, attachedTo(a(legalAttachment(host, $subject))))
+}

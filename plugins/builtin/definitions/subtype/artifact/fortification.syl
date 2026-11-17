@@ -6,5 +6,7 @@ subtype fortification {
   name = "Fortification",
   confers = [
     property(mayBeAttachedTo(thisFortification, allOf(land))),
-    stateBased(not(isAttached(thisFortification)), attachment(unattached, thisFortification))]
+    stateBased(
+      and([isAttached(thisFortification), not(legallyAttached(thisFortification))]),
+      attachment(unattached, thisFortification))]
 }

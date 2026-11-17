@@ -1,8 +1,9 @@
-# [CR#704.5m] An Aura that is not attached is put into its owner's graveyard.
+# [CR#704.5m] An Aura attached to an illegal object or player, or attached to nothing, is put into
+# its owner's graveyard.
 subtype aura {
   lexical = {lemma = "Aura"},
   spelling = "Aura",
   types = [enchantment],
   name = "Aura",
-  confers = [stateBased(not(isAttached(thisAura)), putInto(thisAura, graveyard))]
+  confers = [stateBased(not(legallyAttached(thisAura)), putInto(thisAura, graveyard))]
 }

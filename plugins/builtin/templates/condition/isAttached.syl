@@ -1,5 +1,5 @@
-# "This Aura/Equipment/Fortification is attached": the attachment relation the engine's
-# attach-permission model keeps [CR#704.5m,704.5n].
+# "<subject> is attached": an Aura, Equipment or Fortification attached to some object or player,
+# legally or not [CR#701.3a].
 template isAttached(subject: NounPhrase): Condition {
   spelling = "$subject be attached",
   body = is($subject, attachment(attachment))
