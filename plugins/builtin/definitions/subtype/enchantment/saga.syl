@@ -25,11 +25,6 @@ subtype saga {
           compareAmt(countersOn(loreCounter, thisSaga), atLeast, finalChapterNumber(thisSaga)),
           not(
             exists(
-              nominal(
-                ability,
-                post = [
-                  ofSource(thisSaga),
-                  compare(atLeast, 1, [chapter]),
-                  triggeredNotLeftStack])))]),
+              nominal(abilityHead(chapter), post = [ofSource(thisSaga), triggeredNotLeftStack])))]),
       sacrifice(thisSaga))]
 }

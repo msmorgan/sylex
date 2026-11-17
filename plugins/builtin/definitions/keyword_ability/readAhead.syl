@@ -8,7 +8,7 @@ ability readAhead {
     static(
       onlyWhile(
         cant(
-          actor(bare(chapterAbilityOf(thisSaga))),
+          actor(bare(nominal(abilityHead(chapter), post = [ofSource(thisSaga)]))),
           trigger,
           unless = is(that(ability), compare(equal, countersOn(loreCounter, thisSaga), [chapter]))),
         did(actor(thisSaga), enter, within(soFarThisTurn))))]

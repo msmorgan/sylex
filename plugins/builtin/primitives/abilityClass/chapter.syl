@@ -1,0 +1,4 @@
+# A chapter ability: the triggered ability a chapter symbol represents [CR#715.2].
+primitive chapter: AbilityClass = Chapter {
+  spelling = "chapter"
+}
