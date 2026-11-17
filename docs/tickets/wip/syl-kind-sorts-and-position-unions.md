@@ -84,7 +84,6 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
   tickets it changes say so: `syl-zone-words`, `syl-passive-participle-and-trigger-events`,
   `syl-lookback-operator-and-holds`, `syl-clause-and-imperative`, and each ticket that asks for a
   new word at `Predicate` or consumes `Predicative`.
-- The owner has read the spec before any ticket that builds it is claimed.
 
 ## Not in scope
 
