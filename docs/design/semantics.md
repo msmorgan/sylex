@@ -204,30 +204,37 @@ description with no zone or "card" reads the permanent as it is.
 
 **Participial Descriptions** ("the exiled card") require the unique referent the deed stamped.
 They are the only references that reach objects a linked ability published ([CR#607.2a]).
-"This way" reads only the current ability's stamps, since it is no linking phrase ([CR#607.1]).
-Only a Participial Description written without "this way" reaches a linked ability's objects.
+"This way" reads the current ability's stamps, since it is no linking phrase ([CR#607.1]). The one
+exception is a cost paid to cast the spell whose text holds it, or a cost the same ability imposes:
+"this way" also reads that payment's stamps. *Burn at the Stake*'s "the number of creatures tapped
+this way" counts the creatures tapped for the additional cost its other ability states, which is
+paid as the spell is cast ([CR#601.2h,604.5]), and a *Defiler*'s "if you paid life this way" reads
+the additional cost the same ability imposes. Otherwise only a Participial Description written
+without "this way" reaches a linked ability's objects.
 
 **Numeric anaphors** read back a number within the current ability ([CR#607.1,608.2c]).
 `thatMuch(sort)` covers both scalar outcomes and the size of an event's or action's group — whether
 a `would` clause's prospective group or amount ([CR#701.10g,702.150a]) or a completed one
-([CR#120.3a,120.3c,701.24f]) — because English selects "that much" (`thatMuch`) against "that
-many" (`thatMany`) by the noun quantified rather than by whether the antecedent was a scalar or a
-group (*Ingenious Artillerist*, *Ageless Entity*, *Doubling Season*). Unqualified (`sort = none`), it excludes clause-mate subjects, ranks accessible
-numeric antecedents by clause prominence (*Neheb, Dreadhorde Champion*, *Memory Vampire*), and is
-refused when two tie; a sort-qualified read (`preventedThisWay`, `removedThisWay`, or `infect`'s
+([CR#120.3a,120.3c,701.24f]) — because English selects "that much" (`thatMuch`) against "that many"
+(`thatMany`) by the noun quantified rather than by whether the antecedent was a scalar or a group
+(*Ingenious Artillerist*, *Ageless Entity*, *Doubling Season*). Unqualified (`sort = none`), it
+reads a numeric antecedent in scope, excluding clause-mate subjects; how it chooses among several is
+open (§6 item 18). A sort-qualified read (`preventedThisWay`, `removedThisWay`, or `infect`'s
 `damageDealt` [CR#702.90b]) filters by `OutcomeSort`. `theDifference` is separate: it reads the
-positive difference a strict inequality establishes, and that difference is never eligible for
-bare `thatMuch`. A `compareAmt` that is a conditional's condition (a `doIf`, a trigger's
-intervening "if") introduces its difference into the conditional's antecedent, not into the
-comparison's own box that closes on exit (§2.2 item 5), so the difference is accessible in the
-consequent and closed after it (§2.2 item 2): *Sandstone Oracle*'s "If that player has more cards
-in hand than you, draw cards equal to the difference". It is not accessible in an `else` branch,
-under `not`, or from one arm of an `or`. A `compareOver` introduces a difference for each member
-its description admits (*Tales of the Ancestors*' "Each player with fewer cards in hand than the
-player with the most cards in hand draws cards equal to the difference"); where that difference
-is accessible is open (§6). `chosenNumber` is no numeric anaphor: it belongs to the `ChoiceRef`
-family (`theChoice`, `theLatestChoice`) and crosses ability boundaries on linked choice abilities
-([CR#607.2d]).
+positive difference a strict inequality establishes, and that difference is never eligible for bare
+`thatMuch`. A `compareAmt` that is a conditional's condition (a `doIf`, a trigger's intervening
+"if") introduces its difference into the conditional's antecedent, not into the comparison's own box
+that closes on exit (§2.2 item 5), so the difference is accessible in the consequent and closed
+after it (§2.2 item 2): *Sandstone Oracle*'s "If that player has more cards in hand than you, draw
+cards equal to the difference". It is not accessible in an `else` branch, under `not`, or from one
+arm of an `or`. A `compareOver` introduces a difference for each member its description admits, and
+that difference is read with the member wherever the member is read: in a distributive's nuclear
+scope (*Tales of the Ancestors*' "Each player with fewer cards in hand than the player with the most
+cards in hand draws cards equal to the difference") and after an indefinite chosen from the
+description (*Boreas Charger*'s "choose an opponent who controls more lands than you. Search your
+library for a number of Plains cards equal to the difference"). `chosenNumber` is no numeric
+anaphor: it belongs to the `ChoiceRef` family (`theChoice`, `theLatestChoice`) and crosses ability
+boundaries on linked choice abilities ([CR#607.2d]).
 
 `ownName` (to which `shortenedName` expands, [CR#201.5c]) names the object whose characteristics
 hold the ability: a card face's object ([CR#201.5,201.5b]) or a named token whose creating effect
@@ -250,7 +257,7 @@ What a term is built from, and how an event, a static statement and a lookback a
 A replacement must see the world the replaced event would change, so `would` reads its Action
 **before** the event. Its patients are still in their old zone, and
 prospective amounts such as "that many" exist, but products such as a drawn card do not
-([CR#614.6]). Every other context reads its Action **after** the event, except for the two reads
+([CR#614.6]). Every other context reads its Action **after** the event, except for the reads
 below: patients have moved, are stamped with the deed, and become new objects where [CR#400.7]
 applies.
 
@@ -264,6 +271,13 @@ origin (§2.1). An entering permanent's replacement effects read it as it would 
 battlefield ([CR#614.12]), and playing a land ("play an additional land", "play lands from your
 graveyard") names the land permanent the special action puts onto the battlefield from a land card
 ([CR#116.2a,305.1]), so a card-type head at `Nominal` keeps its permanent reading in each place.
+
+A cost reduction applies when the spell's total cost is determined, before that cost is paid
+([CR#601.2f,601.2h]), so its read of a cost paid "this way" (§2.4) reads the payment the player
+announced ([CR#601.2b]): *Explosive Singularity*'s "for each creature tapped this way" counts the
+creatures announced for its additional cost. The CR does not say when the number of objects an
+"any number" additional cost uses is fixed. Fixing it with the announcement, as a variable
+additional cost's value is ([CR#601.2b,607.2j]), is an engine choice.
 
 ### 3.2 The Event Gate
 
@@ -520,8 +534,7 @@ are found over enumerated candidates or over a packed form is open (§6).
    manifest dread puts onto the battlefield is chosen from the cards looked at, and §2.3 drops
    partitive Referents.
 10. **An anaphor with more than one accessible Referent.** §2.4 says which Referents an anaphor
-    may read (and that an unqualified numeric anaphor ranks by clause prominence and refuses a
-    tie), not the exact salience rule when several Referents qualify. Two meanings that differ
+    may read, not the exact salience rule when several Referents qualify. Two meanings that differ
     only in an antecedent are one surface term, so the stored term cannot carry the choice: it is
     made by a fixed rule in the reference step each time a term is read, and that rule is not
     designed.
@@ -559,10 +572,16 @@ are found over enumerated candidates or over a packed form is open (§6).
     (§5 step 2). Refusing what is not understood instead would drop real constructions.
 17. **Boxes for modes.** §2.2 has no box for `chooseModes`: a mode is neither a branch that
     closes nor top-level text.
-18. **Where a description's difference is read.** A `compareOver` admits each member by a strict
-    inequality, and the corpus reads that member's difference in the nuclear scope of a
-    distributive over the description (*Tales of the Ancestors*, *Spiteful Repossession*,
-    *Sovereign Okinec Ahau*) and in a later sentence after an indefinite chosen from it (*Boreas
-    Charger*'s "choose an opponent who controls more lands than you. Search your library for a
-    number of Plains cards equal to the difference"). §2.2 item 5 closes the description on exit,
-    and no rule says how the difference outlives it.
+18. **Choosing among numeric antecedents.** How an unqualified `thatMuch` chooses among several
+    accessible numeric antecedents (§2.4) is open. A rule must give these readings: *Neheb,
+    Dreadhorde Champion*'s "add that much {R}" reads the cards discarded, not the combat damage
+    or the cards drawn (its ruling); *Last Stand*'s "discard that many cards" reads the cards
+    drawn, the last of five amounts; *Bottle-Cap Blast*'s "create that many" reads the excess
+    damage of its if-clause, not the 5 damage; *Tellah, Great Sage*'s "deals that much damage"
+    reads the mana spent in its if-clause; *Galvanic Discharge*'s reads the {E} paid, not the
+    {E}{E}{E} gotten; *Refraction Trap*'s reads the damage prevented, not the 3 (its ruling);
+    *Memory Vampire*'s "any number of target players each mill that many cards" reads the combat
+    damage, not the clause-mate subject. An amount written as an anaphor introduces no new
+    antecedent: *Sekki, Seasons' Guide* creates as many tokens as the damage though it may remove
+    fewer counters, and *Hordewing Skaab*'s discard is the number of opponents even when another
+    effect changed the draw (their rulings).

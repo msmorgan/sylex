@@ -1,9 +1,10 @@
 # "the difference": the positive difference a strict inequality establishes. A `compareAmt` that is
 # a conditional's condition introduces it into the conditional's antecedent, so the consequent reads
-# it and nothing after the conditional, an `else` branch, a negation or another arm of an `or` does;
-# a `compareOver` introduces one for each member its description admits (`docs/design/semantics.md`
-# §2.4). It is not `thatMuch`: a comparator introduces it rather than an action or event, and it is
-# never eligible for bare "that much" or "that many".
+# it and nothing after the conditional, an `else` branch, a negation or another arm of an `or` does.
+# A `compareOver` introduces one for each member its description admits, read with that member
+# wherever the member is read (*Boreas Charger*; `docs/design/semantics.md` §2.4). It is not
+# `thatMuch`: a comparator introduces it rather than an action or event, and it is never eligible
+# for bare "that much" or "that many".
 primitive theDifference: Amount = Difference {
   spelling = "the difference"
 }
