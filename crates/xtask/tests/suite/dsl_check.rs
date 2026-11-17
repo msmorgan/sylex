@@ -2609,7 +2609,11 @@ fn stacked_requires_two_elements_inside_a_premodifier_coordination() {
            body = nominal(pre = [coord(or, [white, stacked([tapped, black, white])])], card)\n\
          }}\n\
          template whiteBlack: PreModifier {{ body = stacked([white, black]) }}\n\
-         template namedArm: Nominal {{ body = nominal(pre = [or([tapped, whiteBlack])], card) }}"
+         template namedArm: Nominal {{ body = nominal(pre = [or([tapped, whiteBlack])], card) }}\n\
+         primitive andOr: Coordinator = AndOr\n\
+         template inAndOrCoord: Nominal {{\n\
+           body = nominal(pre = [coord(andOr, [white, stacked([tapped, black])])], card)\n\
+         }}"
     );
     assert_eq!(kinds(&valid), []);
 
@@ -2776,6 +2780,16 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
            body = described($d, nominal(card, post = [withDifferentNames]))\n\
          }}\n\
          template badThroughParameter: NounPhrase {{ body = differentCards(each) }}\n\
+         template differentUpTo(p: Nat): NounPhrase {{\n\
+           body = counted(range(high = $p), nominal(card, post = [withDifferentNames]))\n\
+         }}\n\
+         template okUpToThree: NounPhrase {{ body = differentUpTo(3) }}\n\
+         template badUpToOneThroughParameter: NounPhrase {{ body = differentUpTo(1) }}\n\
+         template differentWorth(p: Nat): NounPhrase {{\n\
+           body = counted(worth($p), nominal(card, post = [withDifferentNames]))\n\
+         }}\n\
+         template okWorthThree: NounPhrase {{ body = differentWorth(3) }}\n\
+         template badWorthOneThroughParameter: NounPhrase {{ body = differentWorth(1) }}\n\
          sba badRule {{\n\
            body = {{ scope = nominal(creature, post = [withDifferentNames]), when = always, then = nothing }}\n\
          }}"
@@ -2788,6 +2802,14 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
             vec![(
                 RefusalKind::AgreementWithoutGroup,
                 s("differentCards(each)")
+            )],
+            vec![(
+                RefusalKind::AgreementWithoutGroup,
+                s("differentUpTo(1)")
+            )],
+            vec![(
+                RefusalKind::AgreementWithoutGroup,
+                s("differentWorth(1)")
             )],
             vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames"))],
         ]
@@ -2834,7 +2856,13 @@ fn agreement_refuses_a_number_form_it_does_not_classify() {
          primitive fewest: DetPhrase = Fewest\n\
          template cards: NounPhrase {{ body = described(fewest, nominal(card, post = [withDifferentNames])) }}\n\
          primitive most: Quantity = Most\n\
-         template most: NounPhrase {{ body = counted(most, nominal(card, post = [withDifferentNames])) }}"
+         template most: NounPhrase {{ body = counted(most, nominal(card, post = [withDifferentNames])) }}\n\
+         primitive half: SliceCount = Half\n\
+         template halfOf(g: NounPhrase): NounPhrase {{\n\
+           body = someOf(half, description = nominal(card, post = [withDifferentNames]), $g)\n\
+         }}\n\
+         primitive several: Plurality = Several\n\
+         template theSeveral: NounPhrase {{ body = described(the(plur = several), nominal(card, post = [withDifferentNames])) }}"
     );
     assert_eq!(
         refusals(&[("a.syl", &source)]),
@@ -2852,6 +2880,20 @@ fn agreement_refuses_a_number_form_it_does_not_classify() {
                     sort: s("Quantity"),
                 },
                 s("most")
+            ),
+            (
+                RefusalKind::UnclassifiedNumber {
+                    word: s("half"),
+                    sort: s("SliceCount"),
+                },
+                s("half")
+            ),
+            (
+                RefusalKind::UnclassifiedNumber {
+                    word: s("several"),
+                    sort: s("Plurality"),
+                },
+                s("several")
             ),
         ]
     );
