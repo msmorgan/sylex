@@ -1,10 +1,10 @@
 # "<host> can't be <word>[ by <by>]" ("noncreature artifacts you control can't be enchanted",
 # *Guardian Beast*; protection's "can't be enchanted by Auras that have the stated quality"
 # [CR#702.16c] and "can't be equipped by Equipment … or fortified by Fortifications …"
-# [CR#702.16d]): a standing limit on what `host` can be enchanted, equipped or fortified by
-# [CR#303.4]. No Aura, Equipment or Fortification, as `word` names, matching `by` when it is
+# [CR#702.16d]): a standing limit on what `host` can be enchanted by [CR#303.4], or, as protection
+# states it, equipped or fortified by [CR#702.16d]. No Aura, Equipment or Fortification, as `word` names, matching `by` when it is
 # written, is a legal attachment to `host`; this is the counterpart of `mayBeAttachedTo`, and the
-# two make up the host legality `legalHostOf`, `legalAttachment` and `isAttached` read
+# two make up the host legality `legalHostOf`, `legalAttachment` and `legallyAttached` read
 # (`semantics.md` §3.3).
 primitive cantBeAttached(
   host: NounPhrase,

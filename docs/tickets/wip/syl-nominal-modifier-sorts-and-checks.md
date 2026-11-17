@@ -19,9 +19,12 @@ does not give it, or spell words no caller prints:
 - `predicative/youControl` and `predicative/controlledBy` spell "you control" and "$who control",
   so `is(thisArtifact, youControl)` (*Helm of Possession*, `echo`, `suspend`, `soulbond`) spells
   "this artifact be you control".
-- `nominal/abilityOf` spells "ability of $source", where *Gaea's Revenge*, `protection` and
-  `hexproofFrom` print "abilities from … sources" [CR#702.16b,702.11d]; *Arrest*, *Demotion*,
-  *Viper's Kiss*, `haste` and `creature` print "its activated abilities" through `ofSource`.
+- `nominal/abilityOf` spells "ability of $source", where *Gaea's Revenge* prints "abilities from
+  nongreen sources", protection's rule "abilities from a source with the stated quality"
+  [CR#702.16b] and hexproof from's "abilities your opponents control from [quality] sources"
+  [CR#702.11d]. *Arrest*, *Demotion*, *Viper's Kiss*, *Power Artifact*, *Stupefying Touch*,
+  *Ghostfire Blade*, `detain`, `haste` and `creature` print a possessive ("its activated
+  abilities", "This Equipment's equip ability") through `ofSource`.
 - *Tithe Taker* and *Suppression Field* write "unless they're mana abilities" as `onlyUnless(…,
   is(them, noun(a(manaAbility))))`: `them` has no binder in a cost shift, and the term prints "a
   mana ability"; *Pithing Needle* and *Damping Matrix* print that too. *Guardian Beast* writes
