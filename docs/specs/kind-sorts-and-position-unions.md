@@ -312,9 +312,8 @@ what is left of `Predicate`'s tests to `Test`.
 | after a head | a temporal noun phrase ("the first time each turn") | 131 |
 | after a copula | a measure ("except the token is 1/1", *Endless Evil*) | 23 |
 
-A counter's kind before "counter" is `syl-counters-noun-phrase`'s; twelve kind names are also
-subtype words ("blood", "treasure", "egg"), so a kind word cannot simply join `PreModifier`
-beside `Nominal`. The rest are `syl-unplaced-describing-kinds` (NEW).
+A counter's kind before "counter" is no member of `PreModifier`: it is the argument of the head
+`counter` (`syl-counters-noun-phrase`). The rest are `syl-unplaced-describing-kinds` (NEW).
 
 ## 6. Tickets
 
@@ -336,8 +335,8 @@ composed from a clause with a gap, at `RelativeClause`), `syl-zone-words` (a loc
 `PrepositionPhrase`), `syl-damage-and-life-noun-phrases` (its modifiers are declared at kinds),
 `syl-become-replaces-types` (it consumes `Predicative`, and `becomeStatus` goes with it) and
 `syl-token-records-to-templates`,
-`syl-canon-wording-defects` (`copied`, `choseExtreme`), `syl-continuous-effect-subject` and
-`syl-counters-noun-phrase` (a membership where each plans a coercion), and
+`syl-canon-wording-defects` (`copied`, `choseExtreme`), `syl-continuous-effect-subject` (a
+membership where it plans a coercion), and
 `syl-name-originally-printed-in`,
 `syl-daybound-reconfigure-bodies` and `syl-clone-any-on-the-battlefield` (each asks for a new word
 at `Predicate`, which is declared at its kind instead). `syl-verb-phrase-dependents` builds a
