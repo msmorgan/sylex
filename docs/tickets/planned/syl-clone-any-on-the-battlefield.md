@@ -1,5 +1,6 @@
 ---
 needs: [cleanup-step6-surface]
+specs: [kind-sorts-and-position-unions]
 ---
 
 # "any creature on the battlefield" in a copy choice
@@ -32,7 +33,7 @@ it), 4 "any creature card in a graveyard" and 1 "any land card in a graveyard".
 ## Open questions
 
 - Which word carries the wording. (a) A determiner Template "any <p>" (a choice that is not a
-  target, as `a(p)` is today), with the location as a Predicate "on the battlefield" inside
+  target, as `a(p)` is today), with the location as a preposition phrase "on the battlefield" inside
   `p`, so the graveyard forms reuse the same "any"; `in(loc)` spells "in <loc>", so "on the
   battlefield" needs its own spelling. (b) One Template "any <p> on the battlefield".
   Recommendation: (a), since "any creature card in a graveyard" needs the same determiner with

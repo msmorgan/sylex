@@ -1,8 +1,9 @@
 ---
 needs: [cleanup-step6-surface]
+specs: [kind-sorts-and-position-unions]
 ---
 
-# A Predicate for "with a name originally printed in" an expansion
+# A word for "with a name originally printed in" an expansion
 
 ## Why
 
@@ -20,7 +21,7 @@ Three Vintage-legal cards test an object's name against the expansion that first
 The test reads the object's name, not the card's own printing [CR#206.3]: the CR lists the names
 each expansion covers [CR#206.3a..206.3c], and a reprint with another expansion symbol still
 matches. A copy of *Mishra's Factory* matches through its copied name [CR#707.2], and an object
-with no name, such as a face-down permanent [CR#708.2a], never matches. No word at `Predicate`
+with no name, such as a face-down permanent [CR#708.2a], never matches. No word
 says this, so the three cards are unwritable. A card-level printing record would give the wrong
 answer for copies.
 
@@ -28,7 +29,7 @@ answer for copies.
 
 - An `Expansion` sort with one primitive per expansion the CR lists in [CR#206.3a..206.3c]:
   `arabianNights`, `antiquities`, `homelands`.
-- A primitive at `Predicate`, `nameOriginallyPrintedIn(expansion: Expansion)`, spelled
+- A primitive at `PrepositionPhrase`, `nameOriginallyPrintedIn(expansion: Expansion)`, spelled
   "with a name originally printed in the <expansion> expansion". It applies to any object with a
   name, so it covers the spells and lands in *City in a Bottle*'s second ability as well as
   permanents.

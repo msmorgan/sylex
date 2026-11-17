@@ -1,6 +1,6 @@
 ---
-needs: [cleanup-step6-spine, syl-clause-and-imperative, syl-kind-sorts-and-position-unions]
-specs: [voice-and-object-phrases]
+needs: [cleanup-step6-spine, syl-clause-and-imperative, syl-union-membership]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # The passive is `done` and `be`, and a trigger event is a subject and a verb phrase

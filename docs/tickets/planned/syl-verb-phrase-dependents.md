@@ -1,6 +1,6 @@
 ---
-needs: [syl-kind-sorts-and-position-unions]
-specs: [voice-and-object-phrases]
+needs: [syl-union-membership]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # Depictives and adverbials are the verb phrase's dependents, not `MoveRider`

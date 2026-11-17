@@ -1,6 +1,6 @@
 ---
-needs: [cleanup-step6-spine, syl-passive-participle-and-trigger-events, syl-kind-sorts-and-position-unions]
-specs: [voice-and-object-phrases]
+needs: [cleanup-step6-spine, syl-passive-participle-and-trigger-events, syl-union-membership]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # A lookback is the operator `did`, and a condition stated as a clause is `holds`

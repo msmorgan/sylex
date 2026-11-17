@@ -1,6 +1,6 @@
 ---
-needs: [cleanup-step6-spine, syl-nominal-descriptions, syl-kind-sorts-and-position-unions]
-specs: [voice-and-object-phrases]
+needs: [cleanup-step6-spine, syl-nominal-descriptions, syl-union-membership]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # Damage and life are noun phrases

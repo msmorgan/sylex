@@ -1,6 +1,6 @@
 ---
 needs: [cleanup-step6-surface, syl-nominal-descriptions, english-names-read-from-text]
-specs: [voice-and-object-phrases]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # Created tokens are written as printed, not as raw records

@@ -1,6 +1,6 @@
 ---
 needs: [cleanup-step6-spine, syl-verb-phrase-sort-name, syl-definition-actor-parameter, syl-damage-and-life-noun-phrases, syl-counters-noun-phrase]
-specs: [voice-and-object-phrases]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # A sentence is a `Clause`: a subject with its verb phrase, or an imperative

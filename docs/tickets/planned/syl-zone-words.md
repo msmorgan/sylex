@@ -1,5 +1,6 @@
 ---
-needs: [syl-single-face-card-call, cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions, syl-spelling-conventions, syl-kind-sorts-and-position-unions]
+needs: [syl-single-face-card-call, cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions, syl-spelling-conventions, syl-union-membership]
+specs: [kind-sorts-and-position-unions]
 ---
 
 # Zone words mean what they say, and prepositions stay out of `Location`
@@ -55,13 +56,14 @@ Scourge*'s "but not from anywhere else") has no written form either.
   argument's, not the verb's.
 - **"In $zone" and "exiled with $source" after a head.** With `syl-nominal-descriptions`, these
   are postmodifiers of a nominal ("a card in your graveyard", "cards exiled with this artifact").
-  Recommendation: they are `PostModifier` declarations over a bare `Location`, and `exiledWith`
-  leaves `Location`.
+  Recommendation: they are `PrepositionPhrase` and `VerbPhrase` declarations over a bare
+  `Location` (`docs/specs/kind-sorts-and-position-unions.md` §1), and `exiledWith` leaves
+  `Location`.
 - **Position riders.** "Second from the top" follows the zone as a depictive of the move.
   Options: a rider on the move; or a destination form that prints the zone and the Position
   Phrase in that order. Recommendation: a rider, matching the Reading.
 - **Outside the game as an origin.** Options: an origin form "from outside the game" beside the
-  zone origins, leaving `outsideTheGame` a `Predicate` for "cards you own outside the game"; or a
+  zone origins, leaving `outsideTheGame` a `PrepositionPhrase` for "cards you own outside the game"; or a
   value at `Location`, which its doc comment and [CR#400.11] argue against. Recommendation: the
   origin form; how the engine holds such a card is `core-location-outside-the-game`'s.
 - **Names.** `Destination` is already a type in `crates/core/src/action.rs` (a zone, or a library

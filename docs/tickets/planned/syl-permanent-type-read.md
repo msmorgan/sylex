@@ -1,5 +1,6 @@
 ---
 needs: [cleanup-step6-surface]
+specs: [kind-sorts-and-position-unions]
 ---
 
 # "Has a permanent type" reads `permanentType`
@@ -15,7 +16,8 @@ primitive quantifies over `card_type` declarations.
 
 ## Design
 
-- A nullary Predicate primitive means "has a card type whose `permanentType` is true". It takes
+- A nullary primitive means "has a card type whose `permanentType` is true", at the kind sort
+  its wording has (`docs/specs/kind-sorts-and-position-unions.md` §5). It takes
   over `isPermanentType`'s name, its `TODO(spelling)` and its one caller, `isPermanentCard`
   ([CR#110.4a]), and the Template goes.
 

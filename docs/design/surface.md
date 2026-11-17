@@ -18,8 +18,9 @@ reads the expanded term and gives the primitives and the places a clause stands 
   [`semantics.md`](./semantics.md), how a surface term is read into its meaning.
 
 The words a surface term is built from are designed in `docs/specs/voice-and-object-phrases.md`
-(the clause, the verb phrase and its operators, the object phrases) and in the planned tickets
-that build them. §6 and §7 say what Definitions, Templates and the action-clause spine are in
+(the clause, the verb phrase and its operators, the object phrases), in
+`docs/specs/kind-sorts-and-position-unions.md` (the sorts a describing phrase is declared at and
+the positions that admit them) and in the planned tickets that build them. §6 and §7 say what Definitions, Templates and the action-clause spine are in
 today's term language, where the sorts that say what a clause means are still in it (§2). They
 were written when the term classified its own clauses, so they still say what some statements
 mean beside how they are written, and the tickets that build the clause and voice words

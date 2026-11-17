@@ -1,0 +1,42 @@
+---
+needs: [syl-union-membership, syl-clause-and-imperative]
+specs: [kind-sorts-and-position-unions, voice-and-object-phrases]
+---
+
+# "Has …" is a verb phrase headed by "have"
+
+## Why
+
+`hasCounter`, `hasKeyword`, `compare`, `shares`, `hasDesignation` and `named` stand at
+`Predicative`, the complement of "be", for wordings whose verb is "have": "has no ice counters on
+it" (*Dark Depths*), "has two or fewer loyalty counters on him" (*Garruk Relentless*), "as though
+it didn't have defender" (*Bristlepack Sentry*), "has the same name as" (*Candles of Leng*), "has
+the city's blessing" (ascend), "has the chosen name". Each is unspelled or spelled as a different
+phrase (the with-phrase of the same name), so the term does not say what the card prints.
+
+## Open questions
+
+- **What "have" takes.** The object is a noun phrase in every wording above ("no ice counters on
+  it", "defender", "the same name as …"). Options: one verb `have(object: NounPhrase)`, the
+  keyword, counters phrase and name each a noun phrase under it; or a verb per kind of object.
+  Recommendation: one verb, since the wording is one.
+
+## Done when
+
+- The open question is answered in the declaration's doc comment.
+- Each wording above is written as its card or rule prints it, and no declaration at
+  `Predicative` stands for a "has …" wording. `hasDesignation`'s three wordings ("you're the
+  monarch", "while saddled", "has the city's blessing") are each written at the kind they print.
+- The landing runs the `syl-number-snapshot` diff and explains every flagged line.
+- `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
+
+## Not in scope
+
+- "Have" with a participle ("can't have counters put on it"):
+  `docs/specs/voice-and-object-phrases.md` §11.
+- A continuous effect's "has flying": `syl-continuous-effect-subject`.
+
+## Pointers
+
+`docs/specs/kind-sorts-and-position-unions.md` §5; `docs/specs/voice-and-object-phrases.md`;
+`plugins/builtin/primitives/predicative/{hasCounter,hasKeyword,compare,shares,hasDesignation,named}.syl`.
