@@ -80,8 +80,9 @@ feature ObliqueKind =
 feature NounDistribution = Ordinary | Quantity | DirectMeasure | HeadOnly | Serial
 // `Quantity`: a fused-head quantity (*choose one*). `Manner`: only *way*,
 // the one noun that is a Manner Adjunct without a preposition (*do it this
-// way*; CGEL 8§2.1:671).
-feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity
+// way*; CGEL 8§2.1:671). `Resource`: a measured mass quantity or symbol
+// sequence (*X damage*, *1 life*, *{R}*).
+feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource
 // Only *type*, for Artificial Evolution's *the new creature type can't be
 // Wall* (SpecifyingClause). It is a word flag, not a class CGEL has: CGEL
 // puts no lexical condition on a specifying clause's variable. Without it
@@ -89,7 +90,7 @@ feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity
 // (Conversion) and *Urza's Power-Plant* (Urza's Tower).
 feature Variable = Cited
 // The NounKind of a head's *of* oblique.
-feature ObliqueNounKind = Ordinary | Temporal | Manner | Numeric | Quantity
+feature ObliqueNounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource
 feature Determination = Bare | Mixed | Overt
 // The Determination of a determinative's Complement (*than one*).
 feature ObliqueDetermination = Bare | Mixed | Overt
@@ -1747,10 +1748,13 @@ MaximumDetermination: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) N
           $.Case = Plain,
           $.Person = Third
 // *Up to five {P} worth of modes* [CR#700.2i].
-MaximumMeasuredMass: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) Nominal
+MaximumMeasuredMass: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) Nominal {
+    unshared: [NounKind],
+}
     where determiner.Countability != Count,
           head.Countability = Mass,
           head.Number = Singular,
+          $.NounKind = Resource,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -2089,7 +2093,7 @@ DegreeArithmetic: DeterminerPhrase ->
     where head.ComplementKind = Intransitive,
           head.TargetMarked != Marked,
           modifier.DeterminativeDistribution != Distributive,
-          modifier.NounKind != Ordinary | Temporal | Manner
+          modifier.NounKind != Ordinary | Temporal | Manner | Resource
 // *Half their life*, *double that damage*. A head determined by a number or
 // degree determinative is excluded: *half X damage* (Banshee) is
 // MultipliedNumber's *[half X] damage*, and *half that many +1/+1 counters*
@@ -2393,18 +2397,19 @@ FloatedAll: Clause -> subject:NounPhrase adjunct:Word(All) VerbPhrase { transpar
 NumericalDetermination: DeterminerPhrase -> NumericalDeterminer
     where $.DeterminativeDistribution = Numerical,
           $.ComplementKind = Intransitive
-MeasuredMass: NounPhrase -> determiner:DeterminerPhrase Nominal
+MeasuredMass: NounPhrase -> determiner:DeterminerPhrase Nominal { unshared: [NounKind] }
     where determiner.DeterminativeDistribution = Numerical,
           determiner.TargetMarked != Marked,
           $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           head.NounDistribution = DirectMeasure,
           head.Countability = Mass,
           head.Number = Singular,
+          $.NounKind = Resource,
           $.Case = Plain,
           $.Determination = Overt,
           $.Person = Third
 // *For each mana spent*.
-DistributiveMeasure: NounPhrase -> determiner:DeterminerPhrase Nominal
+DistributiveMeasure: NounPhrase -> determiner:DeterminerPhrase Nominal { unshared: [NounKind] }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.DeterminativeDistribution = Distributive,
           determiner.TargetMarked != Marked,
@@ -2412,6 +2417,7 @@ DistributiveMeasure: NounPhrase -> determiner:DeterminerPhrase Nominal
           head.Countability = Mass,
           head.Number = Singular,
           determiner.NounKind = head.NounKind,
+          $.NounKind = Resource,
           $.Case = Plain,
           $.Person = Third,
           $.Determination = Overt
@@ -2545,7 +2551,7 @@ BareMass: NounPhrase -> Nominal { transparent: [head], uncoordinated: [head] }
           $.Person = Third
 SymbolFusedHead: FusedNounPhrase -> SymbolHead
 SymbolNominalPhrase: SymbolHead -> Symbols
-    where $.NounKind = Ordinary,
+    where $.NounKind = Resource,
           $.Determination = Bare,
           $.Case = Plain,
           $.Number = Singular,
@@ -2676,13 +2682,16 @@ ComparativeQuantityCountDetermined: NounPhrase -> determiner:DeterminerPhrase No
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-ComparativeQuantityMassDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal
+ComparativeQuantityMassDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
+    unshared: [NounKind],
+}
     where determiner.ComplementKind = PP,
           determiner.ObliqueKind != FiniteClause,
           determiner.ObliqueDetermination = Bare,
           head.Countability := Mass,
           head.Number = Singular,
           determiner.Countability = head.Countability,
+          $.NounKind = Resource,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -3688,7 +3697,7 @@ coordination Clause {
 coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Case, NounKind, Countability, NounDistribution],
+    proximate: [Case, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
     where $.Number = Plural,
@@ -3699,7 +3708,7 @@ coordination NounPhrase {
 coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, FirstConjunctNumber],
-    proximate: [Case, NounKind, Countability, NounDistribution],
+    proximate: [Case, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
     where $.Number = Singular,
@@ -3713,7 +3722,7 @@ coordination NounPhrase {
 coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Person, Case, NounKind, Countability, NounDistribution],
+    proximate: [Person, Case, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
     where last.Number := Plural,
@@ -3721,7 +3730,7 @@ coordination NounPhrase {
 coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Person, Case, NounKind, Countability, NounDistribution],
+    proximate: [Person, Case, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
     where last.Number = Singular
@@ -3734,7 +3743,7 @@ coordination NounPhrase {
     coordinators: Alternative,
     raising_delimiter: ',',
     unshared: [DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Number, Person, Case, NounKind, Countability, NounDistribution],
+    proximate: [Number, Person, Case, Countability, NounDistribution],
     resolve: [Determination -> Mixed],
 }
     where first.NounKind != Numeric | Quantity,

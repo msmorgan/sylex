@@ -54,4 +54,10 @@
 # a mass determinative is no determiner of a count noun through the Marker (CGEL 5§3.1:339, ∗*so much priest*)
 # from: Dead Ringers
 * <card=Dead Ringers> Destroy much target nonblack creature.
-+ <card=Eternal Flame> Eternal Flame deals X damage to target opponent or planeswalker and half X damage, rounded up, to you, where X is the number of Mountains you control. => !Nominal "opponent or planeswalker and half X damage"; ComplementCluster "half X damage, rounded up, to you"
++ <card=Eternal Flame> Eternal Flame deals X damage to target opponent or planeswalker and half X damage, rounded up, to you, where X is the number of Mountains you control. => !Nominal "opponent or planeswalker and half X damage"; !NounPhrase "target opponent or planeswalker and half X damage"; ComplementCluster "half X damage, rounded up, to you"
++NounPhrase {R} or one mana
++NounPhrase {1} and 1 life
++ <card=Mox Amber> {T}: Add one mana of any color among legendary creatures and planeswalkers you control. => !NounPhrase "one mana of any color among legendary creatures"
++ <card=Fury> When this creature enters, it deals 4 damage divided as you choose among any number of target creatures and/or planeswalkers. => !NounPhrase "4 damage divided as you choose among any number of target creatures"
++ <card=Fire and Brimstone> Fire and Brimstone deals 4 damage to target player who attacked this turn and 4 damage to you. => !NounPhrase "this turn and 4 damage"
++ <card=Open the Omenpaths> • Add two mana of any one color and two mana of any other color. Spend this mana only to cast creature or enchantment spells. => !NounPhrase "any one color and two mana of any other color"
