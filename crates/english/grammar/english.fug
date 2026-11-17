@@ -1335,10 +1335,13 @@ InterleavedDepictive: Interleaved -> AdjectivePhrase { cost: 0 }
           head.AdjectivePosition != Attributive,
           head.Grade != Equative | Comparative | NonScalarInequality | Mixed
 // *Onto the battlefield tapped and attacking and the rest on the bottom*.
+// Intransitive only (*tapped*): excludes complemented adjectives such as
+// *attached to it* from Depictive and PredicateAdjunct (*gets +2/+2 for
+// each Aura and Equipment attached to it*, Strong Back).
 InterleavedCoordinatedDepictive: Interleaved -> DepictiveCoordination { cost: 0 }
 AdjectivalDepictive: Depictive -> filler:AdjectivePhrase
     where filler.Voice != Passive,
-          filler.ComplementKind != Amount,
+          filler.ComplementKind = Intransitive,
           filler.AdjectivePosition != Attributive,
           filler.Grade != Equative | Comparative | NonScalarInequality | Mixed,
           $.ComplementKind = AdjP
@@ -1354,7 +1357,7 @@ PrepositionalAdjunct: PredicateAdjunct -> filler:Hosted(PrepositionPhrase, Predi
     where $.ComplementKind = PP
 DepictiveAdjunct: PredicateAdjunct -> filler:AdjectivePhrase
     where filler.Voice != Passive,
-          filler.ComplementKind != Amount,
+          filler.ComplementKind = Intransitive,
           filler.AdjectivePosition != Attributive,
           filler.Grade != Equative | Comparative | NonScalarInequality | Mixed,
           $.ComplementKind = AdjP
