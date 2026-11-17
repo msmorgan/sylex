@@ -1,7 +1,6 @@
 use crate::Numeral;
 use crate::NumeralCodec;
 use crate::Onset;
-use crate::SurfaceStructure;
 
 /// The Onset of a declared spelling, from its first word, where its Lexeme
 /// declares none ([`crate::Lexeme::onset`]):
@@ -10,20 +9,9 @@ use crate::SurfaceStructure;
 ///   *u*, else `Consonant`. Every word whose first sound is not its first
 ///   letter's (*hour*, *unity*, *X*) declares its Onset.
 /// - a numeral: the Onset of its spoken cardinal ([`numeral_onset`]: *2ˣ*).
-/// - a measured compound: the Onset of its measure's first component, a signed
-///   one spoken with its sign, *plus* or *minus* (*a +1/+1 counter*), and an
-///   unsigned one as its cardinal.
 ///
 /// Any other spelling has no Onset, which no article agrees with.
-pub(crate) fn default_onset(surface: &str, structure: SurfaceStructure) -> Option<Onset> {
-    if structure == SurfaceStructure::MeasuredCompound
-        && let Some(word) = SIGN_WORDS
-            .iter()
-            .find(|(sign, _)| surface.starts_with(*sign))
-            .map(|(_, word)| word)
-    {
-        return letter_onset(word);
-    }
+pub(crate) fn default_onset(surface: &str) -> Option<Onset> {
     let digits: String = surface
         .chars()
         .take_while(|c| c.is_ascii_digit() || *c == ',')

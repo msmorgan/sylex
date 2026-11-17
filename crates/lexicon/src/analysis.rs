@@ -217,13 +217,6 @@ impl Lexicon {
                     "opaque spelling requires a catalog or notation category",
                 ));
             }
-            if lexeme.surface_structure == SurfaceStructure::MeasuredCompound
-                && (lexeme.category != Category::Noun || lexeme.binding != Binding::Free)
-            {
-                return Err(error(
-                    "a measured compound requires a free noun declaration",
-                ));
-            }
             if !valid_surface(&lexeme.lemma, lexeme.surface_structure, lexeme.binding) {
                 return Err(error("lemma violates its declared word boundaries"));
             }
@@ -278,8 +271,7 @@ impl Lexicon {
                 if !valid_surface(&surface, lexeme.surface_structure, lexeme.binding) {
                     return Err(error("spelling violates its declared word boundaries"));
                 }
-                let default_onset =
-                    crate::pronunciation::default_onset(&surface, lexeme.surface_structure);
+                let default_onset = crate::pronunciation::default_onset(&surface);
                 redundant_onset &= lexeme
                     .onset
                     .is_none_or(|onset| default_onset == Some(onset));
@@ -685,18 +677,7 @@ impl Lexicon {
                 let right = edges_match(&tokens, found.start, found.end, Binding::Suffix)
                     || matches!(binding, Binding::Prefix | Binding::Bound)
                     || suffix_starts[found.end];
-                let measured_left = match &found.reading {
-                    LexicalReading::Word(value)
-                        if self.lexemes[&value.lexeme].surface_structure
-                            == SurfaceStructure::MeasuredCompound =>
-                    {
-                        found.start == 0
-                            || !word_character(tokens[found.start - 1])
-                                && !matches!(tokens[found.start - 1], '+' | '-' | '/')
-                    }
-                    _ => true,
-                };
-                (left && right && measured_left).then_some(found)
+                (left && right).then_some(found)
             })
             .collect::<Vec<_>>();
         numeral_matches(&tokens, &mut matches);
@@ -848,32 +829,7 @@ fn valid_surface(surface: &str, structure: SurfaceStructure, binding: Binding) -
         SurfaceStructure::Multiword => surface
             .split(' ')
             .all(|word| valid_word(word, Binding::Free)),
-        SurfaceStructure::MeasuredCompound => {
-            let Some((measure, head)) = surface.split_once(' ') else {
-                return false;
-            };
-            let Some((left, right)) = measure.split_once('/') else {
-                return false;
-            };
-            canonical_measure_component(left)
-                && canonical_measure_component(right)
-                && valid_word(head, Binding::Free)
-        }
         SurfaceStructure::Word => valid_word(surface, binding),
-    }
-}
-
-fn canonical_measure_component(component: &str) -> bool {
-    if let Some(unsigned) = component
-        .strip_prefix('+')
-        .or_else(|| component.strip_prefix('-'))
-    {
-        Numeral::Arabic(false)
-            .parse(unsigned)
-            .is_ok_and(|value| value >= 0)
-            || (component.starts_with('-') && Numeral::Arabic(false).parse(component).is_ok())
-    } else {
-        Numeral::Arabic(false).parse(component).is_ok()
     }
 }
 

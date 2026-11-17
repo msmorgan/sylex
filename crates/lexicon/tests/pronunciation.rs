@@ -148,35 +148,3 @@ fn multiword_names_and_bound_forms_take_the_first_pronounced_onset() {
         }
     }
 }
-
-/// A measure's sign is spoken, *plus* or *minus*: *a +1/+1 counter*, *a
-/// -1/-1 counter*.
-#[test]
-fn a_measured_compound_takes_the_onset_of_its_measure() {
-    for (spelling, expected) in [
-        ("+1/+1 counter", Onset::Consonant),
-        ("-1/-1 counter", Onset::Consonant),
-        ("8/8 counter", Onset::Vowel),
-    ] {
-        let mut entry = Lexeme::noun(
-            "counter",
-            spelling,
-            vec![sylex_lexicon::Countability::Count],
-            Source {
-                kind: SourceKind::Catalog,
-                path: "pronunciation-fixture".into(),
-                owner: "counter".into(),
-            },
-        );
-        entry.surface_structure = sylex_lexicon::SurfaceStructure::MeasuredCompound;
-        let lexicon = Lexicon::new([entry]).unwrap();
-        for value in lexicon.values() {
-            let reading = LexicalReading::Word(value.clone());
-            assert_eq!(
-                lexicon.surface_features(&reading).unwrap().onset,
-                Some(expected),
-                "{spelling}"
-            );
-        }
-    }
-}
