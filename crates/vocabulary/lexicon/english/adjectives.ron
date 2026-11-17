@@ -19,9 +19,12 @@
     (lemma: "bottom", position: Some(Attributive)),
     "colored",
     "common",
-    // A non-scalar comparative governor of inequality, with a *than*
-    // Complement (CGEL, Ch. 13 §5.4, p. 1144).
-    (lemma: "different", grade: Some(NonScalarInequality)),
+    // A non-scalar comparative governor of inequality (CGEL, Ch. 13 §5.4,
+    // pp. 1143–1144). Its Complement is usually a *from* phrase (*different
+    // from its base power*). After a head noun Oracle prints only *than* (*a
+    // different name than that spell*), which the grammar's
+    // `NonScalarIndirectComplement` attaches.
+    (lemma: "different", grade: Some(NonScalarInequality), frames: [Complement(PP(["from"]))]),
     "double-faced",
     // An equality adjective, graded like *same* (*equal toughness*).
     (lemma: "equal", grade: Some(Equative), frames: [Complement(PP(["to"]))]),
