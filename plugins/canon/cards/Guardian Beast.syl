@@ -11,7 +11,7 @@ card singleFaced({
             asLongAs(
               is(thisCreature, untapped),
               conjunction([
-                  cant(any, attachTo(a(aura), them)),
+                  cantBeAttached(them, enchanted),
                   abilityGrant(them, [indestructible]),
                   cant(actor(bare(nominal(pre = [other], player))), gainControlOf(them))],
                 subject = bare(nominal(pre = [non(creature)], artifact, post = [youControl])))),

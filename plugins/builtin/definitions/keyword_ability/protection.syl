@@ -15,13 +15,17 @@ ability protection(quality: Predicate) {
                   ability,
                   post = [fromSource(bare(nominal(pre = [hasQuality($quality)], source)))])]))),
         target(this))),
-    static(cant(any, attachTo(bare(nominal(pre = [hasQuality($quality)], aura)), this))),
+    static(cantBeAttached(this, enchanted, by = bare(nominal(pre = [hasQuality($quality)], aura)))),
     static(
-      cant(
-        any,
-        attachTo(
-          bare(nominal(pre = [hasQuality($quality)], or([equipment, fortification]))),
-          thisPermanent))),
+      cantBeAttached(
+        thisPermanent,
+        equipped,
+        by = bare(nominal(pre = [hasQuality($quality)], equipment)))),
+    static(
+      cantBeAttached(
+        thisPermanent,
+        fortified,
+        by = bare(nominal(pre = [hasQuality($quality)], fortification)))),
     static(
       replace(
         would(

@@ -6,7 +6,8 @@
 # enchant, enters attached to a legal host its controller chooses as it enters [CR#303.4f]. An
 # effect that names the host (`attachedTo`) puts it onto that host, and if it can't
 # legally enchant that host or the host is undefined, the Aura doesn't enter, as with no legal host
-# at all [CR#303.4i]. Which hosts are legal is the engine's to evaluate (`legalHostOf`).
+# at all [CR#303.4i]. The legal hosts (`legalHostOf`) are those host legality admits
+# (`semantics.md` §3.3): this permission, less any `cantBeAttached` limit.
 ability enchant(subject: Predicate) {
   lexical = {
     lemma = "enchant",

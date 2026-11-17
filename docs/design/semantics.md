@@ -337,6 +337,23 @@ since a "can't" outranks anything that allows the thing ([CR#101.2]).
   unless they're mana abilities" leaves each mana ability's cost alone ([CR#605.1a]). A plural
   noun phrase as the copula's complement ("they're mana abilities") is `plural`, which tests each
   member as `a` tests one.
+- **Host legality is one relation.** An Aura, Equipment or Fortification may be attached to a host
+  when a `mayBeAttachedTo` permission allows it (enchant [CR#702.5a], [CR#301.5,301.6]) and no
+  `cantBeAttached` limit excludes it ("can't be enchanted", "can't be equipped by …"): "Other
+  effects can limit what a permanent can be enchanted by" ([CR#303.4]), and protection's
+  "can't be enchanted by" and "can't be equipped … or fortified by" are such limits
+  ([CR#702.16c,702.16d]). A limit is read of the attachment as it would exist attached, so it
+  covers an Aura entering attached as well as one on the battlefield. `legalHostOf`,
+  `legalAttachment` and `isAttached` read this relation, and every rule that asks for a legal host
+  reads it: an Aura entering attached chooses or is put onto a legal host or doesn't enter
+  ([CR#303.4f,303.4g,303.4i]), an attachment isn't moved onto an illegal one
+  ([CR#303.4j,701.3a,701.3b]), and one attached to an illegal host is put into its owner's
+  graveyard or becomes unattached as a state-based action ([CR#303.4c,704.5m,704.5n]). An Aura
+  spell's target is defined by its enchant ability alone ([CR#303.4a,115.1b]); a limit does not
+  make that target illegal, and the resolving Aura spell that can't legally enchant its target is
+  put into its owner's graveyard instead of entering ([CR#608.3c,303.4i]). Because a limit makes
+  an attached Aura illegal, an effect that "doesn't remove" Auras already attached exempts them
+  from that state-based action ([CR#702.16n,702.16p]; *Guardian Beast*, *Benevolent Blessing*).
 - **A cast or play permission widens only what it states**: the zone its `from` names, its Timing or
   as-though, the additional land plays it counts ([CR#305.2]), and the zone a moved referent was put
   into or its subject names ("you may cast that card" after an exile, §2.1; *Tibalt, Cosmic

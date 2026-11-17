@@ -1,1 +1,3 @@
-primitive equipped: AttachWord = Equipped
+primitive equipped: AttachWord = Equipped {
+  spelling = "equipped"
+}

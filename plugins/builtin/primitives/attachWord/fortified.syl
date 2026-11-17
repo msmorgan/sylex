@@ -1,1 +1,3 @@
-primitive fortified: AttachWord = Fortified
+primitive fortified: AttachWord = Fortified {
+  spelling = "fortified"
+}
