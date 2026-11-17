@@ -6,15 +6,15 @@
 //! surround it. Their product is the number of the unit's Derivations that
 //! use it, because no node, item or edge occurs twice in one Derivation:
 //!
-//! - No Constituent spans nothing. A period may be unwritten and match with
-//!   zero width; the compiler refuses a Production whose first child is one
-//!   (`Binder::no_zero_width_start`), and the chart asserts that every lexical
-//!   alternative spans at least one char. So two occurrences of one node would
-//!   have the same nonempty span and could not be disjoint.
-//! - No partial Production past its first child spans nothing, by the same
-//!   refusal: its first child spans at least one char. So two occurrences of
-//!   one such item would have the same nonempty span too, and an edge occurs
-//!   once per occurrence of its item.
+//! - No Constituent spans nothing. The chart asserts that every lexical
+//!   alternative spans at least one char, and the compiler refuses a Production
+//!   with no child (`Binder::every_production_has_a_child`): a mark is no
+//!   child, and a period may be unwritten and match with zero width. So two
+//!   occurrences of one node would have the same nonempty span and could not be
+//!   disjoint.
+//! - No partial Production that has found a child spans nothing, since its
+//!   child does not. So two occurrences of one such item would have the same
+//!   nonempty span too, and an edge occurs once per occurrence of its item.
 //! - The forest has no unary cycle, so nested occurrences of a node or item
 //!   cannot happen either. A grammar may contain a cycle of span-preserving
 //!   Productions, closed or kept open only by features, so [`Parse::counts`]
@@ -270,7 +270,7 @@ impl Parse<'_> {
                 let &(previous, child) = self.forest.items[item].families.get(index)?;
                 let child = match child {
                     ChildRef::Node(n) => Some(Vertex::Node(n)),
-                    ChildRef::Leaf(_) | ChildRef::Punct => None,
+                    ChildRef::Leaf(_) => None,
                 };
                 Some((previous.map(Vertex::Item), child))
             }),
@@ -368,7 +368,7 @@ impl Counts<'_> {
 fn child_inside(node_inside: &[u128], child: ChildRef) -> u128 {
     match child {
         ChildRef::Node(n) => node_inside[n],
-        ChildRef::Leaf(_) | ChildRef::Punct => 1,
+        ChildRef::Leaf(_) => 1,
     }
 }
 

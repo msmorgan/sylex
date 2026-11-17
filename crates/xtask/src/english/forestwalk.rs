@@ -433,7 +433,7 @@ fn is_closed(node: &SettledNode) -> bool {
         SettledRest::Alternatives(_) | SettledRest::Splits { .. } => false,
         SettledRest::Children { children, .. } => children.iter().all(|(_, child)| match child {
             SettledChild::Node(child) => is_closed(child),
-            SettledChild::Leaf { .. } | SettledChild::Punct => true,
+            SettledChild::Leaf { .. } => true,
         }),
     }
 }
@@ -502,11 +502,9 @@ fn stop_lines(
                             stop_lines(s, r, child_label, tokens, output)?;
                         }
                     }
-                    (SettledChild::Leaf { .. }, SettledChild::Leaf { .. })
-                    | (SettledChild::Punct, SettledChild::Punct) => {}
-                    (SettledChild::Node(_), SettledChild::Leaf { .. } | SettledChild::Punct)
-                    | (SettledChild::Leaf { .. }, SettledChild::Node(_) | SettledChild::Punct)
-                    | (SettledChild::Punct, SettledChild::Node(_) | SettledChild::Leaf { .. }) => {
+                    (SettledChild::Leaf { .. }, SettledChild::Leaf { .. }) => {}
+                    (SettledChild::Node(_), SettledChild::Leaf { .. })
+                    | (SettledChild::Leaf { .. }, SettledChild::Node(_)) => {
                         panic!(
                             "child {index} of {} [{spine_prod}] at {:?} differs in kind between \
                          the settled spine and a Reading",
@@ -586,7 +584,7 @@ fn spine_lines(
                                         output,
                                     )?;
                                 }
-                                SettledChild::Leaf { .. } | SettledChild::Punct => {
+                                SettledChild::Leaf { .. } => {
                                     writeln!(output, "{line}{}", child_text(child, tokens))?;
                                 }
                             }
@@ -611,7 +609,7 @@ fn span_text(span: &std::ops::Range<usize>, tokens: &[char]) -> String {
 }
 
 /// A leaf as its word and lexical reading, with its own surface when it
-/// reaches past its word's; punctuation as such.
+/// reaches past its word's.
 fn child_text(child: &SettledChild, tokens: &[char]) -> String {
     match child {
         SettledChild::Leaf {
@@ -626,7 +624,6 @@ fn child_text(child: &SettledChild, tokens: &[char]) -> String {
                 format!("{} {surface:?} {}", word_name(word), lexical(reading))
             }
         }
-        SettledChild::Punct => "punctuation".to_owned(),
         SettledChild::Node(node) => panic!(
             "a node child ({} at {:?}) has lines of its own",
             node.category, node.span

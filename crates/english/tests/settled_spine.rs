@@ -91,7 +91,7 @@ fn counted_node(parse: &Parse<'_>, counts: &Counts<'_>, node: usize) -> SettledN
                     break;
                 };
                 let name =
-                    grammar.production_functions(forest.item_production(i))[forest.item_dot(i) - 1];
+                    grammar.production_functions(forest.item_production(i))[parse.item_child(i)];
                 children.push((name, child));
                 at = previous;
             }
@@ -115,7 +115,6 @@ fn counted_node(parse: &Parse<'_>, counts: &Counts<'_>, node: usize) -> SettledN
                                     span: forest.leaf_span(l),
                                     reading: forest.leaf_reading(l).clone(),
                                 },
-                                ChildRef::Punct => SettledChild::Punct,
                             };
                             (name, child)
                         })
@@ -162,7 +161,6 @@ fn by_start(spine: &SettledSpine) -> SettledSpine {
                                 span: span.clone(),
                                 reading: reading.clone(),
                             },
-                            SettledChild::Punct => SettledChild::Punct,
                         };
                         (*name, child)
                     })
@@ -207,12 +205,7 @@ fn agrees(node: &SettledNode, readings: &[&Reading]) -> Result<(), String> {
                     node.category
                 ));
             }
-            let built: Vec<&SettledChild> = children
-                .iter()
-                .map(|(_, child)| child)
-                .filter(|child| !matches!(child, SettledChild::Punct))
-                .collect();
-            for (index, child) in built.iter().enumerate() {
+            for (index, (_, child)) in children.iter().enumerate() {
                 let below: Vec<&Reading> = nodes
                     .iter()
                     .map(|n| n.children.get(index).ok_or("a Reading lacks a child"))
@@ -224,10 +217,9 @@ fn agrees(node: &SettledNode, readings: &[&Reading]) -> Result<(), String> {
                             return Err(format!("a Reading's leaf differs from {reading:?}"));
                         }
                     }
-                    SettledChild::Punct => unreachable!("punctuation is filtered out"),
                 }
             }
-            if nodes.iter().any(|n| n.children.len() != built.len()) {
+            if nodes.iter().any(|n| n.children.len() != children.len()) {
                 return Err(format!("a Reading's {} has other children", node.category));
             }
             Ok(())

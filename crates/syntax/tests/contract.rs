@@ -25,6 +25,7 @@ use sylex_lexicon::SourceKind;
 use sylex_lexicon::SurfaceStructure;
 use sylex_lexicon::WordForm;
 use sylex_syntax::AdmissionError;
+use sylex_syntax::ChildRef;
 use sylex_syntax::CompiledGrammar;
 use sylex_syntax::FrameCatalog;
 use sylex_syntax::Gap;
@@ -446,10 +447,11 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
 /// A Production with an empty right-hand side is a load error, the engine
 /// has no literal symbol, and every lexical alternative spans at least one
 /// character. A written mark is one character, but a period may be unwritten
-/// and match with zero width, so a Production whose first child is a period
-/// is a load error too: no Constituent, nor any partial Production past its
-/// first child, spans nothing. So there is no empty-span Derivation to
-/// complete, predict, duplicate or keep as a leaf.
+/// and match with zero width, so a Production whose first symbol is a period
+/// is a load error too, and so is one with no child, only marks: no
+/// Constituent, nor any partial Production past its first symbol, spans
+/// nothing. So there is no empty-span Derivation to complete, predict,
+/// duplicate or keep as a leaf.
 #[test]
 fn no_category_is_nullable() {
     let lexicon =
@@ -466,11 +468,22 @@ fn no_category_is_nullable() {
         );
         match bind(&periods, &lexicon, NO_FRAMES) {
             Err(LoadError::Invalid(message)) => assert!(
-                message.contains("`Numeral`: its first child is a period"),
+                message.contains("`Numeral`: its first symbol is a period"),
                 "{message}"
             ),
             other => panic!("{rhs}: {other:?}"),
         }
+    }
+    let marks = WORD.replace(
+        "Numeral: Word -> word:Lex(Numeral)",
+        "Numeral: Word -> ',' '.'",
+    );
+    match bind(&marks, &lexicon, NO_FRAMES) {
+        Err(LoadError::Invalid(message)) => assert!(
+            message.contains("`Numeral`: it has no child, only marks"),
+            "{message}"
+        ),
+        other => panic!("{other:?}"),
     }
     let grammar = bind(WORD, &lexicon, NO_FRAMES).unwrap();
     let parse = grammar.parse(&lexicon, "");
@@ -486,6 +499,58 @@ fn no_category_is_nullable() {
             "{text}"
         );
     }
+}
+
+/// The Packed Forest stores no punctuation (`docs/design/english.md` §7).
+/// The marks a Production has before, between and after its children leave
+/// it those children alone: the first has no previous item, each partial
+/// Production is past the marks that follow its last child, and the
+/// round-trip laws read every mark from the Production.
+#[test]
+fn a_mark_is_no_child_of_the_forest() {
+    let lexicon = Lexicon::new([noun("one")]).unwrap();
+    let grammar = bind(
+        r"
+        root Pair
+        category Pair
+        category Item
+        Bracketed: Pair -> '[':Prefix first:Item ',' second:Item ']' '.'
+        Noun: Item -> word:Lex(Noun)
+        ",
+        &lexicon,
+        NO_FRAMES,
+    )
+    .unwrap();
+    let analyzed = lexicon.analyze("[one, ones].");
+    assert_eq!(checked(&grammar, &lexicon, &analyzed).len(), 1);
+    let parse = grammar.parse_analyzed(&analyzed);
+    let forest = parse.forest();
+    let &[root] = forest.roots() else { panic!("{:?}", forest.roots()) };
+    let &[whole] = &forest.node_items(root).collect::<Vec<_>>()[..] else {
+        panic!("one alternative")
+    };
+    assert_eq!(
+        (forest.item_dot(whole), forest.item_span(whole)),
+        (6, 0..12)
+    );
+    assert_eq!(parse.item_child(whole), 3);
+    let &[(Some(before), ChildRef::Node(second))] =
+        &forest.item_families(whole).collect::<Vec<_>>()[..]
+    else {
+        panic!("one family, of a previous item and a node")
+    };
+    // A Constituent begins where the one before it ends, before its space.
+    assert_eq!(forest.node_span(second), 5..10);
+    assert_eq!(
+        (forest.item_dot(before), forest.item_span(before)),
+        (3, 0..5)
+    );
+    assert_eq!(parse.item_child(before), 1);
+    let &[(None, ChildRef::Node(first))] = &forest.item_families(before).collect::<Vec<_>>()[..]
+    else {
+        panic!("one family, of the first child")
+    };
+    assert_eq!(forest.node_span(first), 1..4);
 }
 
 /// A list of words: `Seq -> Item | Seq Item`, where `Item` carries Number

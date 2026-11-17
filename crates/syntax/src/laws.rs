@@ -1,17 +1,24 @@
 //! Both round-trip laws, checked over the Packed Forest without building its
 //! trees.
 
+use std::ops::Range;
+
 use sylex_lexicon::Binding;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
 
 use crate::chart::ChildRef;
 use crate::chart::Parse;
+use crate::chart::QUOTATION_MARK;
+use crate::chart::is_quotation_mark;
+use crate::chart::skip;
 use crate::reading::AdmissionError;
 use crate::reading::Reading;
 use crate::reading::glues_after;
 use crate::reading::glues_before;
 use crate::step::Opening;
+use crate::step::Production;
+use crate::step::Symbol;
 use crate::walk::ForestMemo;
 use crate::walk::Visit;
 
@@ -128,6 +135,64 @@ struct Bounds {
     openings: Openings,
 }
 
+/// One atom of a chain, or a child Constituent's atoms: its edge behaviors,
+/// how it opens and its extent in chars.
+struct Atom {
+    edges: EdgeMask,
+    openings: Openings,
+    start: usize,
+    end: usize,
+}
+
+/// The atoms of a partial Production so far: their bounds, `None` before
+/// the first, and where they end.
+struct Chain {
+    bounds: Option<Bounds>,
+    end: usize,
+}
+
+impl Chain {
+    /// The chain with `atom` after it, at a position that opens with a
+    /// capital or not, `space` being the spacing the text has between them
+    /// ([`Parse::space_after`]).
+    fn then(
+        self,
+        atom: &Atom,
+        capital: bool,
+        space: Option<bool>,
+    ) -> Result<Self, RealizationFault> {
+        let mut bounds = Bounds::default();
+        let before = self
+            .bounds
+            .map_or(Openings::one(Opening::Empty), |bounds| bounds.openings);
+        for so_far in before.iter() {
+            for child in atom.openings.iter() {
+                let Some(opened) = so_far.then(child, capital) else {
+                    return Err(RealizationFault::Case { at: atom.start });
+                };
+                bounds.openings.insert(opened);
+            }
+        }
+        match self.bounds {
+            None => bounds.edges = atom.edges,
+            Some(before) => {
+                for (first, glued) in before.edges.iter() {
+                    for (attaches, after) in atom.edges.iter() {
+                        if space != Some(!(glued || attaches)) {
+                            return Err(RealizationFault::Spacing { at: self.end });
+                        }
+                        bounds.edges.insert((first, after));
+                    }
+                }
+            }
+        }
+        Ok(Self {
+            bounds: Some(bounds),
+            end: atom.end,
+        })
+    }
+}
+
 /// Memoized bounds of forest nodes and items.
 type EdgeMemo = ForestMemo<Bounds, Bounds>;
 
@@ -204,21 +269,43 @@ impl Parse<'_> {
         let mut bounds = Bounds::default();
         let state = &self.forest.items[item];
         let production = &self.grammar.productions[state.production];
-        let capital = production.slots[state.dot - 1].capital;
-        for &(previous, child) in &self.forest.items[item].families {
-            let (last, opening, at): (EdgeMask, Openings, usize) = match child {
+        let at = self.item_child(item);
+        for &(previous, child) in &state.families {
+            // The atoms before the child: the previous item's, or the marks
+            // the Production opens with.
+            let before = match previous {
+                Some(previous) => Chain {
+                    bounds: Some(self.item_edges(previous, lexicon, memo, leaves)?),
+                    end: self.forest.items[previous].end,
+                },
+                None => self.past_marks(
+                    production,
+                    0..at,
+                    Chain {
+                        bounds: None,
+                        end: state.start,
+                    },
+                )?,
+            };
+            let atom = match child {
                 ChildRef::Node(n) => {
                     let child = self.node_edges(n, lexicon, memo, leaves)?;
-                    let edges = if let crate::step::Symbol::Cat {
+                    let edges = if let Symbol::Cat {
                         binding: Some(binding),
                         ..
-                    } = &production.rhs[state.dot - 1]
+                    } = &production.rhs[at]
                     {
                         child.edges.bind(*binding)
                     } else {
                         child.edges
                     };
-                    (edges, child.openings, self.forest.nodes[n].start)
+                    let node = &self.forest.nodes[n];
+                    Atom {
+                        edges,
+                        openings: child.openings,
+                        start: node.start,
+                        end: node.end,
+                    }
                 }
                 ChildRef::Leaf(l) => {
                     let binding = if let Some(binding) = leaves[l] {
@@ -229,66 +316,76 @@ impl Parse<'_> {
                         binding
                     };
                     let leaf = &self.forest.leaves[l];
-                    (
-                        EdgeMask::one((glues_before(binding), glues_after(binding))),
-                        Openings::one(Opening::of(leaf.case)),
-                        leaf.start,
-                    )
-                }
-                ChildRef::Punct => {
-                    let crate::step::Symbol::Punct(_, binding, _) = &production.rhs[state.dot - 1]
-                    else {
-                        unreachable!()
-                    };
-                    (
-                        EdgeMask::one((glues_before(*binding), glues_after(*binding))),
-                        Openings::one(Opening::Fixed),
-                        state.end,
-                    )
-                }
-            };
-            let before = match previous {
-                Some(previous) => self.item_edges(previous, lexicon, memo, leaves)?,
-                None => Bounds {
-                    edges: EdgeMask::default(),
-                    openings: Openings::one(Opening::Empty),
-                },
-            };
-            for so_far in before.openings.iter() {
-                for child in opening.iter() {
-                    let Some(opened) = so_far.then(child, capital) else {
-                        return Err(RealizationFault::Case { at });
-                    };
-                    bounds.openings.insert(opened);
-                }
-            }
-            let Some(previous) = previous else {
-                bounds.edges.extend(last);
-                continue;
-            };
-            let at = self.forest.items[previous].end;
-            let symbol = &self.grammar.productions[self.forest.items[item].production].rhs
-                [self.forest.items[item].dot - 1];
-            let space = if matches!(symbol, crate::step::Symbol::Punct(c, ..) if c.is_whitespace())
-            {
-                Some(false)
-            } else {
-                self.space_after(at)
-            };
-            for (first, glued) in before.edges.iter() {
-                for (attaches, after) in last.iter() {
-                    let glue = glued || attaches;
-                    if space != Some(!glue) {
-                        return Err(RealizationFault::Spacing { at });
+                    Atom {
+                        edges: EdgeMask::one((glues_before(binding), glues_after(binding))),
+                        openings: Openings::one(Opening::of(leaf.case)),
+                        start: leaf.start,
+                        end: leaf.end,
                     }
-                    bounds.edges.insert((first, after));
                 }
-            }
+            };
+            let space = self.space_after(before.end);
+            let with_child = before.then(&atom, production.slots[at].capital, space)?;
+            let after = self.past_marks(production, at + 1..state.dot, with_child)?;
+            assert_eq!(
+                after.end, state.end,
+                "the marks of `{}` end where its item does",
+                production.id
+            );
+            let found = after.bounds.expect("a chain with a child has bounds");
+            bounds.edges.extend(found.edges);
+            bounds.openings.extend(found.openings);
         }
         if memo.nodes.settle(mark) {
             memo.items.insert(item, bounds);
         }
         Ok(bounds)
+    }
+
+    /// A chain of atoms once it has the marks its Production has at
+    /// `symbols`: a mark is no child of the forest, so it is read from the
+    /// Production, and found in the text where the chain ends.
+    fn past_marks(
+        &self,
+        production: &Production,
+        symbols: Range<usize>,
+        mut chain: Chain,
+    ) -> Result<Chain, RealizationFault> {
+        for symbol in symbols {
+            let Symbol::Punct(c, binding, _) = production.rhs[symbol] else {
+                unreachable!("only marks stand between the children of a Production")
+            };
+            let space = if c.is_whitespace() { Some(false) } else { self.space_after(chain.end) };
+            let mark = Atom {
+                edges: EdgeMask::one((glues_before(binding), glues_after(binding))),
+                openings: Openings::one(Opening::Fixed),
+                start: chain.end,
+                end: self.mark_end(c, chain.end),
+            };
+            chain = chain.then(&mark, production.slots[symbol].capital, space)?;
+        }
+        Ok(chain)
+    }
+
+    /// Where the mark `c` that a Production has after an atom ending at
+    /// `from` ends. A written mark is one char, after the space before it
+    /// unless it is whitespace itself; a period the text does not write
+    /// there (a quotation's own final period, or one after a word ending in
+    /// terminal punctuation) ends where it starts.
+    fn mark_end(&self, c: char, from: usize) -> usize {
+        if c.is_whitespace() {
+            return from + 1;
+        }
+        let at = skip(&self.tokens, from);
+        let written = self.tokens.get(at).is_some_and(|&token| {
+            if c == QUOTATION_MARK { is_quotation_mark(token) } else { token == c }
+        });
+        if written {
+            at + 1
+        } else {
+            assert_eq!(c, '.', "only a period may be unwritten");
+            from
+        }
     }
 
     /// Whether one space (`Some(true)`) or nothing (`Some(false)`) follows
@@ -367,7 +464,6 @@ impl Parse<'_> {
             .iter()
             .any(|&(previous, child)| {
                 let rest = match child {
-                    ChildRef::Punct => children,
                     ChildRef::Leaf(l) => match children.split_last() {
                         Some((Reading::Leaf(value), rest))
                             if *value == self.forest.leaves[l].reading =>

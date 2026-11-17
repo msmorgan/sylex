@@ -49,7 +49,6 @@ Settled spine:
     modifier: "Snow"#1 supertype:snow Invariant
     head: TypeLine [TypesWithSubtypes]
       head: CardTypes [SingleCardType] > "Creature"#1 type:creature Singular {number=Singular}
-      punctuation
       subtypes: Subtypes [MultipleSubtypes]
         first: "Zombie"#1 subtype:Zombie Singular {number=Singular}
         rest: Subtypes [SingleSubtype] > "Cleric"#1 subtype:Cleric Singular {number=Singular}
@@ -72,7 +71,6 @@ Derivations: 2
 Settled spine:
   Document [TextAbility] > Ability [ActivatedAbility]
     cost: ActivationCost "{1}, {T}"
-    punctuation
     effect: Effect [SentenceEffect] > Sentences [SingleSentence] > Sentence [Declarative] "Exile target card from a graveyard.": its children differ between Derivations
 Forks: 1
   dependency "from"#1
@@ -444,11 +442,11 @@ fn a_limit_prints_each_remaining_reading_at_the_spines_stops() {
     let readings = output.split("\nReadings: 2\n").nth(1).expect(&output);
     let (first, second) = readings.split_once("\nReading 2:\n").unwrap();
     assert!(
-        first.starts_with("Reading 1:\n  effect: Sentence [Declarative]\n"),
+        first.starts_with("Reading 1:\n  effect: Sentence [Declarative] > "),
         "{output}"
     );
     assert!(
-        second.starts_with("  effect: Sentence [Declarative]\n"),
+        second.starts_with("  effect: Sentence [Declarative] > "),
         "{output}"
     );
     assert!(!first.contains("ActivationCost"), "{output}");
@@ -499,10 +497,10 @@ fn a_limit_prints_each_remaining_reading_at_the_spines_stops() {
             .expect(two_stop_readings);
         let section = body.split("\nReading ").next().unwrap();
         let first_at = section
-            .find("  first: Sentence [Declarative]\n")
+            .find("  first: Sentence [Declarative] > ")
             .expect(section);
         let rest_at = section
-            .find("  rest: Sentence [Declarative]\n")
+            .find("  rest: Sentence [Declarative] > ")
             .expect(section);
         assert!(first_at < rest_at, "{section}");
     }

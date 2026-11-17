@@ -69,7 +69,6 @@ pub enum SettledChild {
         span: Range<usize>,
         reading: LexicalReading,
     },
-    Punct,
 }
 
 impl ForkForest<'_> {
@@ -127,7 +126,6 @@ impl ForkForest<'_> {
             let child = match &*sequence.last {
                 tree @ Tree::Node { .. } => SettledChild::Node(self.settled_tree(tree)),
                 Tree::Leaf(leaf) => self.leaf(*leaf),
-                Tree::Punct => SettledChild::Punct,
             };
             named.push((sequence.name, child));
             at = sequence.prefix.as_deref();
@@ -205,7 +203,8 @@ impl ForkForest<'_> {
             let [(previous, child)] = live[..] else {
                 return None;
             };
-            let name = self.parse.grammar.productions[partial.production].names[partial.dot - 1];
+            let name =
+                self.parse.grammar.productions[partial.production].names[self.parse.item_child(i)];
             children.push((name, child));
             at = previous;
         }
@@ -217,7 +216,6 @@ impl ForkForest<'_> {
         match child {
             ChildRef::Node(c) => SettledChild::Node(self.settled(c, packed, total)),
             ChildRef::Leaf(l) => self.leaf(l),
-            ChildRef::Punct => SettledChild::Punct,
         }
     }
 

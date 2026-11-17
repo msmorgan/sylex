@@ -4,8 +4,9 @@
 /// unit's Derivations that use the row's node, alternative, item, family,
 /// head or Embedding (`sylex_syntax::Counts`).
 pub(crate) const SCHEMA: &str = r"
--- The grammar's Categories and Productions. `functions` is a JSON array of
--- each child's name, punctuation included (an empty name); `frame` and
+-- The grammar's Categories and Productions. `functions` is a JSON array with
+-- a name for each of a Production's symbols, in order: a child's function,
+-- and an empty name for a mark, which is no child; `frame` and
 -- `variant` are a frame-headed Production's Selected Frame and what its id
 -- adds after the frame's name: its Valence Alternation and derived shape,
 -- `/`-separated (`passive`, `passive+by`, `adjectival`, `gap0`,
@@ -81,7 +82,8 @@ CREATE TABLE alternatives (
     derivations INTEGER NOT NULL,
     PRIMARY KEY (unit, node, alternative)
 ) WITHOUT ROWID;
--- Partial Productions: `dot` children found, spanning `start`..`end`.
+-- Partial Productions, spanning `start`..`end`: past `dot` of the
+-- Production's symbols, the children found and the marks crossed with them.
 CREATE TABLE items (
     unit INTEGER NOT NULL,
     item INTEGER NOT NULL,
@@ -93,7 +95,8 @@ CREATE TABLE items (
     PRIMARY KEY (unit, item)
 ) WITHOUT ROWID;
 -- An item's families: its previous item (NULL for its first child) and its
--- last child, a node, a leaf, or punctuation (both NULL).
+-- last child, a node or a leaf. A mark is no child and has no row: a
+-- Production's marks are read from `productions.functions`.
 CREATE TABLE families (
     unit INTEGER NOT NULL,
     item INTEGER NOT NULL,
@@ -102,7 +105,8 @@ CREATE TABLE families (
     child_node INTEGER,
     child_leaf INTEGER,
     derivations INTEGER NOT NULL,
-    PRIMARY KEY (unit, item, family)
+    PRIMARY KEY (unit, item, family),
+    CHECK ((child_node IS NOT NULL) + (child_leaf IS NOT NULL) = 1)
 ) WITHOUT ROWID;
 -- The lexical alternatives some family takes. `kind` is `word` (with its
 -- lexeme and Word Form), `flavor word` or `numeral` (with `value`).
@@ -119,8 +123,8 @@ CREATE TABLE leaves (
     PRIMARY KEY (unit, leaf)
 ) WITHOUT ROWID;
 -- Each alternative's head leaves: the leaf reached through `head` children,
--- with its lexeme and Word Form when it is a word (`leaf` NULL where a
--- `head` child is punctuation, or there is none). One alternative's items
+-- with its lexeme and Word Form when it is a word (`leaf` NULL where there
+-- is no `head` child). One alternative's items
 -- may reach several (*cast* as Present or Preterite). `inside` is the
 -- alternative's own Derivations with that head; `derivations` the unit's.
 CREATE TABLE heads (
@@ -204,7 +208,7 @@ CREATE TABLE words (
 ) WITHOUT ROWID;
 -- Each node some Derivation uses, once per word whose Head Line runs through
 -- it (`sylex_syntax::ForkForest::head_lines`): the word its head line ends
--- in, `word` NULL where that line ends in punctuation or in no child. One
+-- in, `word` NULL where that line ends in no child. One
 -- node can be on several words' Head Lines across Derivations (a
 -- coordination node whose alternatives take different coordinators).
 -- `derivations` is the unit's Derivations that use the node with that word;
@@ -263,8 +267,8 @@ CREATE TABLE fork_options (
 -- `dependency` = `root`, or `dependent`: the `function` the maximal projection
 -- bears in its governor, the governor's Category (`governor_category`, a
 -- private Category named as the one it copies) and the governor's head-line
--- word (`governor`; NULL where that head line ends in punctuation or no
--- child). A frame answer is `frames`, a JSON array of the head line's frame
+-- word (`governor`; NULL where that head line ends in no child). A frame
+-- answer is `frames`, a JSON array of the head line's frame
 -- Production names, from the leaf up.
 CREATE TABLE fork_answers (
     unit INTEGER NOT NULL,

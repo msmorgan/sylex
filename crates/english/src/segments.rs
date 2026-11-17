@@ -249,7 +249,6 @@ impl Walk<'_, '_> {
                     let span = forest.leaf_span(l);
                     Segmentations::from([vec![(span.start, span.end)]])
                 }
-                ChildRef::Punct => Segmentations::from([Vec::new()]),
             };
             for b in &before {
                 for h in &here {

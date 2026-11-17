@@ -1395,6 +1395,14 @@ pub(crate) struct State {
 }
 
 impl Production {
+    /// The position, among its symbols, of the last child before `dot`: a
+    /// mark is no child.
+    pub(crate) fn child_before(&self, dot: usize) -> Option<usize> {
+        self.rhs[..dot]
+            .iter()
+            .rposition(|symbol| !matches!(symbol, Symbol::Punct(..)))
+    }
+
     pub(crate) fn boundaries(&self, position: usize, child: &ChildView<'_>) -> (bool, bool) {
         use crate::reading::glues_after;
         use crate::reading::glues_before;
@@ -2091,6 +2099,11 @@ impl Production {
                 })
                 .or_else(|| children.first().copied())
         };
+        assert!(
+            head_line_child.is_none_or(|at| !punct(at)),
+            "production `{}`: its head line runs through a mark, which is no child",
+            self.id
+        );
         let post_head_of_lhs = self.head == Some(0)
             && self.coordinator.is_none()
             && count > 1

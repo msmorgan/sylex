@@ -41,13 +41,13 @@ struct Tree {
     node: usize,
     alternative: usize,
     production: usize,
-    children: Vec<Child>,
+    /// Each child with its position among the Production's symbols.
+    children: Vec<(usize, Child)>,
 }
 
 enum Child {
     Tree(Rc<Tree>),
     Leaf(usize),
-    Punct,
 }
 
 /// Every Derivation of a node, as trees.
@@ -80,20 +80,23 @@ fn sequences(
     parse: &Parse<'_>,
     item: usize,
     memo: &mut BTreeMap<usize, Vec<Rc<Tree>>>,
-) -> Vec<Vec<Child>> {
+) -> Vec<Vec<(usize, Child)>> {
     let mut out = Vec::new();
     let families: Vec<_> = parse.forest().item_families(item).collect();
+    let at = parse.item_child(item);
     for (previous, child) in families {
         let befores = previous.map_or_else(|| vec![Vec::new()], |p| sequences(parse, p, memo));
         let heres: Vec<Child> = match child {
             ChildRef::Node(n) => trees(parse, n, memo).into_iter().map(Child::Tree).collect(),
             ChildRef::Leaf(l) => vec![Child::Leaf(l)],
-            ChildRef::Punct => vec![Child::Punct],
         };
         for before in &befores {
             for here in &heres {
-                let mut sequence: Vec<Child> = before.iter().map(copy).collect();
-                sequence.push(copy(here));
+                let mut sequence: Vec<(usize, Child)> = before
+                    .iter()
+                    .map(|(at, child)| (*at, copy(child)))
+                    .collect();
+                sequence.push((at, copy(here)));
                 out.push(sequence);
             }
         }
@@ -105,7 +108,6 @@ fn copy(child: &Child) -> Child {
     match child {
         Child::Tree(t) => Child::Tree(Rc::clone(t)),
         Child::Leaf(l) => Child::Leaf(*l),
-        Child::Punct => Child::Punct,
     }
 }
 
@@ -130,11 +132,11 @@ impl Walk<'_, '_> {
     /// The leaf reached through `head` children.
     fn head(&self, tree: &Tree) -> HeadLeaf {
         let functions = self.parse.grammar().production_functions(tree.production);
-        let at = functions.iter().position(|f| *f == "head")?;
-        match &tree.children[at] {
+        let head = functions.iter().position(|f| *f == "head")?;
+        let (_, child) = tree.children.iter().find(|(at, _)| *at == head)?;
+        match child {
             Child::Tree(t) => self.head(t),
             Child::Leaf(l) => Some(*l),
-            Child::Punct => None,
         }
     }
 
@@ -178,9 +180,8 @@ impl Walk<'_, '_> {
     fn conjuncts(&self, tree: &Tree) -> usize {
         tree.children
             .iter()
-            .enumerate()
             .map(
-                |(at, child)| match (self.function(tree.production, at), child) {
+                |(at, child)| match (self.function(tree.production, *at), child) {
                     ("first" | "last" | "coordinate", _) => 1,
                     ("rest", Child::Tree(t)) => self.conjuncts(t),
                     _ => 0,
@@ -228,7 +229,7 @@ impl Walk<'_, '_> {
             .or_default() += 1;
         let head = self.word(self.head(tree));
         let functions = self.parse.grammar().production_functions(tree.production);
-        for (at, child) in tree.children.iter().enumerate() {
+        for &(at, ref child) in &tree.children {
             let Child::Tree(t) = child else { continue };
             if functions[at] == "head" {
                 self.visit(t, &chain, None);

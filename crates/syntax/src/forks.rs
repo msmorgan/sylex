@@ -77,7 +77,7 @@ pub enum Dependency {
     /// It is a child of a Constituent of another word's head line.
     Dependent {
         /// The governor's head-line word: `None` where the governor's head
-        /// line ends in punctuation or in no child.
+        /// line ends in no child.
         governor: Option<ForkWord>,
         /// Its name in the governor's Production.
         function: Ident,
@@ -154,8 +154,7 @@ pub struct HeadLineNode {
     /// The node of the Packed Forest ([`crate::PackedForest`]).
     pub node: usize,
     /// The word whose Head Line runs through it, an index into
-    /// [`ForkForest::words`]: `None` where the line ends in punctuation or
-    /// in no child.
+    /// [`ForkForest::words`]: `None` where the line ends in no child.
     pub word: Option<usize>,
     /// The Derivations that use the node with that word.
     pub derivations: u128,

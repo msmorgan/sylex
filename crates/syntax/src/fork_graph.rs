@@ -83,8 +83,7 @@ pub(crate) struct Unit {
 #[derive(Debug, Clone)]
 struct GNode {
     original: usize,
-    /// The word its head line ends in: `None` where it ends in punctuation
-    /// or in no child.
+    /// The word its head line ends in: `None` where it ends in no child.
     word: Option<u32>,
     items: Vec<usize>,
 }
@@ -99,7 +98,6 @@ struct GItem {
 pub(crate) enum GChild {
     Node(usize),
     Leaf(usize),
-    Punct,
 }
 
 #[derive(Debug, Clone)]
@@ -301,7 +299,7 @@ pub(crate) fn split(parse: &Parse<'_>) -> Result<(Unit, Graph), ForestCycle> {
         match vertex {
             Vertex::Item(i) => {
                 let item = &forest.items[i];
-                let at = item.dot - 1;
+                let at = parse.item_child(i);
                 let mut heads = BTreeSet::new();
                 match line(item.production) {
                     None => {
@@ -313,9 +311,6 @@ pub(crate) fn split(parse: &Parse<'_>) -> Result<(Unit, Graph), ForestCycle> {
                                 ChildRef::Node(c) => heads.extend(node_heads[c].iter().copied()),
                                 ChildRef::Leaf(l) => {
                                     heads.insert(leaf_head(&mut intern, l));
-                                }
-                                ChildRef::Punct => {
-                                    heads.insert(headless);
                                 }
                             }
                         }
@@ -347,7 +342,6 @@ pub(crate) fn split(parse: &Parse<'_>) -> Result<(Unit, Graph), ForestCycle> {
     let mut down = Down {
         parse,
         intern,
-        headless,
         leaf_word: &leaf_word,
         node_heads: &node_heads,
         item_heads: &item_heads,
@@ -393,7 +387,6 @@ pub(crate) fn split(parse: &Parse<'_>) -> Result<(Unit, Graph), ForestCycle> {
 struct Down<'a, 'p> {
     parse: &'a Parse<'p>,
     intern: Interner,
-    headless: u32,
     leaf_word: &'a [Option<u32>],
     node_heads: &'a [Vec<u32>],
     item_heads: &'a [Vec<u32>],
@@ -459,7 +452,7 @@ impl Down<'_, '_> {
         let grammar = parse.grammar;
         let item = &parse.forest.items[original];
         let production = item.production;
-        let at = item.dot - 1;
+        let at = parse.item_child(original);
         let line = grammar.head_line_child(production);
         let governor = self.intern.heads[head as usize].word;
         for &(previous, child) in &item.families {
@@ -469,7 +462,6 @@ impl Down<'_, '_> {
             let heads: Vec<u32> = match child {
                 ChildRef::Node(c) => self.node_heads[c].clone(),
                 ChildRef::Leaf(l) => vec![self.leaf_head(l)],
-                ChildRef::Punct => vec![self.headless],
             };
             let heads: Vec<u32> = heads
                 .into_iter()
@@ -496,7 +488,6 @@ impl Down<'_, '_> {
                     let copy = match child {
                         ChildRef::Node(c) => GChild::Node(self.node(c, child_head)),
                         ChildRef::Leaf(l) => GChild::Leaf(l),
-                        ChildRef::Punct => GChild::Punct,
                     };
                     (copy, child_head)
                 })
@@ -507,9 +498,9 @@ impl Down<'_, '_> {
                         self.leaf_word[l].expect("a used leaf has a word"),
                         u32_of(l),
                     )),
-                    GChild::Node(_) | GChild::Punct => None,
+                    GChild::Node(_) => None,
                 };
-                let attachment = if line == Some(at) || matches!(child, GChild::Punct) {
+                let attachment = if line == Some(at) {
                     None
                 } else {
                     let h = self.intern.heads[child_head as usize];
@@ -579,7 +570,7 @@ impl Graph {
                 let family = &self.families[*self.items[i].families.get(index)?];
                 let child = match family.child {
                     GChild::Node(c) => Some(V::Node(c)),
-                    GChild::Leaf(_) | GChild::Punct => None,
+                    GChild::Leaf(_) => None,
                 };
                 Some((family.previous.map(V::Item), child))
             }),
@@ -612,7 +603,7 @@ impl Graph {
     fn child_inside(node_inside: &[u128], child: GChild) -> u128 {
         match child {
             GChild::Node(c) => node_inside[c],
-            GChild::Leaf(_) | GChild::Punct => 1,
+            GChild::Leaf(_) => 1,
         }
     }
 
@@ -690,7 +681,7 @@ impl Graph {
     }
 
     /// Each original node some Derivation uses, by the word its head line
-    /// ends in (`None`: punctuation or no child), with the Derivations that
+    /// ends in (`None`: no child), with the Derivations that
     /// use it so. A Derivation uses an original node at most once (the
     /// forest has no unary cycle), so a node's copies partition its
     /// Derivations.
@@ -754,7 +745,6 @@ impl Graph {
             let child = match family.child {
                 GChild::Node(c) => ChildRef::Node(self.nodes[c].original),
                 GChild::Leaf(l) => ChildRef::Leaf(l),
-                GChild::Punct => ChildRef::Punct,
             };
             let key = (
                 self.items[family.item].original,
@@ -783,7 +773,7 @@ impl Graph {
                 && family.previous.is_none_or(|p| item_live[p])
                 && match family.child {
                     GChild::Node(c) => node_live[c],
-                    GChild::Leaf(_) | GChild::Punct => true,
+                    GChild::Leaf(_) => true,
                 }
         };
         for &vertex in &order {
@@ -830,7 +820,7 @@ impl Graph {
                         let previous = family.previous.map(|p| out.item((p, false)));
                         let child = match family.child {
                             GChild::Node(c) => GChild::Node(out.node((c, false))),
-                            other => other,
+                            leaf @ GChild::Leaf(_) => leaf,
                         };
                         out.family(i, previous, child, family.facts);
                     }
@@ -853,7 +843,7 @@ impl Graph {
         let mut item_inside = vec![[0u128; 2]; self.items.len()];
         let child_inside = |node_inside: &[[u128; 2]], child: GChild| match child {
             GChild::Node(c) => node_inside[c],
-            GChild::Leaf(_) | GChild::Punct => [1, 0],
+            GChild::Leaf(_) => [1, 0],
         };
         for &vertex in &order {
             match vertex {
@@ -943,7 +933,7 @@ impl Graph {
                             let previous = family.previous.map(|p| out.item((p, p_used)));
                             let child = match family.child {
                                 GChild::Node(c) => GChild::Node(out.node((c, c_used))),
-                                other => other,
+                                leaf @ GChild::Leaf(_) => leaf,
                             };
                             out.family(i, previous, child, family.facts);
                         }
@@ -984,9 +974,9 @@ impl Graph {
                     nodes[n] = out;
                 }
                 V::Item(i) => {
-                    let original = &parse.forest.items[self.items[i].original];
-                    let name =
-                        parse.grammar.productions[original.production].names[original.dot - 1];
+                    let original = self.items[i].original;
+                    let name = parse.grammar.productions[parse.forest.items[original].production]
+                        .names[parse.item_child(original)];
                     let mut out = Vec::new();
                     for &f in &self.items[i].families {
                         let family = &self.families[f];
@@ -997,7 +987,6 @@ impl Graph {
                         let lasts: Vec<Rc<Tree>> = match family.child {
                             GChild::Node(c) => nodes[c].clone(),
                             GChild::Leaf(l) => vec![Rc::new(Tree::Leaf(l))],
-                            GChild::Punct => vec![Rc::new(Tree::Punct)],
                         };
                         for prefix in prefixes {
                             for last in &lasts {
@@ -1030,8 +1019,6 @@ pub(crate) enum Tree {
     },
     /// A leaf of the Packed Forest.
     Leaf(usize),
-    /// Punctuation, which a Reading does not store.
-    Punct,
 }
 
 /// A sequence of children, last first, each with its name in the Production.
@@ -1049,7 +1036,6 @@ impl Tree {
     ) -> crate::Reading {
         match self {
             Tree::Leaf(l) => crate::Reading::Leaf(parse.forest.leaves[*l].reading.clone()),
-            Tree::Punct => panic!("punctuation is no Reading"),
             Tree::Node {
                 node,
                 production,
@@ -1058,9 +1044,7 @@ impl Tree {
                 let mut readings = Vec::new();
                 let mut at = children.as_deref();
                 while let Some(sequence) = at {
-                    if !matches!(*sequence.last, Tree::Punct) {
-                        readings.push(sequence.last.reading(parse, features));
-                    }
+                    readings.push(sequence.last.reading(parse, features));
                     at = sequence.prefix.as_deref();
                 }
                 readings.reverse();

@@ -70,7 +70,7 @@ on are the contract documented on `grammar::ProductionDecl`.
 - `PackedForest`'s accessors (`roots`, `node_span`, `node_items`,
   `node_alternatives`, `item_families`, `item_production`, `leaf_span`,
   `leaf_reading`, ...), `Parse`'s (`node_features`, `node_gap`,
-  `node_coordinator`), `Parse::count_node` and the `walk` module read the
+  `node_coordinator`, `item_child`), `Parse::count_node` and the `walk` module read the
   forest from outside; `sylex_english`'s census is built on them.
 - `Parse::counts()` gives every node's, item's and edge's exact Derivation
   count (`counts.rs`); `alternative_heads`, `alternative_conjuncts` and

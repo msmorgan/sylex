@@ -175,7 +175,7 @@ impl Parse<'_> {
             let before = previous.map_or(1, |p| self.count_item(p, memo));
             let here = match child {
                 ChildRef::Node(n) => self.count_node(n, memo),
-                ChildRef::Leaf(_) | ChildRef::Punct => 1,
+                ChildRef::Leaf(_) => 1,
             };
             total = total.saturating_add(before.saturating_mul(here));
         }
@@ -262,7 +262,7 @@ impl Parse<'_> {
             };
             let here = match child {
                 ChildRef::Node(n) => self.tier_node(n, memo),
-                ChildRef::Leaf(_) | ChildRef::Punct => Some((RankingKey::default(), 1)),
+                ChildRef::Leaf(_) => Some((RankingKey::default(), 1)),
             };
             for (anchors, before) in befores {
                 let edge = self.edge_key(item, anchors, previous, child);
@@ -291,7 +291,7 @@ impl Parse<'_> {
     ) -> RankingKey {
         let high = match child {
             ChildRef::Node(n) => self.high_attachment(n),
-            _ => false,
+            ChildRef::Leaf(_) => false,
         };
         self.edge_key_with_high(item, anchors, previous, child, high)
     }
@@ -324,10 +324,14 @@ impl Parse<'_> {
             let head_final = self.forest.items[previous?].state.head_final;
             Some((self.words(start, end), head_final))
         };
-        self.grammar
-            .attachment_key(it.production, it.dot - 1, child, head, first, || {
-                self.words(it.start, node.start)
-            })
+        self.grammar.attachment_key(
+            it.production,
+            self.item_child(item),
+            child,
+            head,
+            first,
+            || self.words(it.start, node.start),
+        )
     }
 
     /// Whether a forest node attaches high by its Attachment Class, by the
@@ -342,14 +346,13 @@ impl Parse<'_> {
     /// the first conjunct, whose words a later child's key reads.
     fn anchors(&self, item: usize, mut anchors: Anchors, child: ChildRef) -> Anchors {
         let it = &self.forest.items[item];
-        let extent = || match child {
-            ChildRef::Node(n) => Some((self.forest.nodes[n].start, self.forest.nodes[n].end)),
-            ChildRef::Leaf(l) => Some((self.forest.leaves[l].start, self.forest.leaves[l].end)),
-            ChildRef::Punct => None,
+        let extent = match child {
+            ChildRef::Node(n) => (self.forest.nodes[n].start, self.forest.nodes[n].end),
+            ChildRef::Leaf(l) => (self.forest.leaves[l].start, self.forest.leaves[l].end),
         };
-        match self.grammar.productions[it.production].slots[it.dot - 1].anchor {
-            Some(Anchor::Head) => anchors.head = extent(),
-            Some(Anchor::First) => anchors.first = extent(),
+        match self.grammar.productions[it.production].slots[self.item_child(item)].anchor {
+            Some(Anchor::Head) => anchors.head = Some(extent),
+            Some(Anchor::First) => anchors.first = Some(extent),
             None => {}
         }
         anchors
@@ -528,12 +531,11 @@ impl<'a, 'g> Enumeration<'a, 'g> {
                 vec![(Anchors::default(), empty)]
             };
             let last = match child {
-                ChildRef::Node(n) => Some(self.node_stream(n, memo)),
+                ChildRef::Node(n) => self.node_stream(n, memo),
                 ChildRef::Leaf(l) => {
                     let tree = self.tree(TreeEntry::Leaf(l));
-                    Some(self.singleton(RankingKey::default(), Value::Tree(tree)))
+                    self.singleton(RankingKey::default(), Value::Tree(tree))
                 }
-                ChildRef::Punct => None,
             };
             let high = if let ChildRef::Node(n) = child {
                 let packed = &self.parse.forest.nodes[n];
@@ -551,7 +553,7 @@ impl<'a, 'g> Enumeration<'a, 'g> {
                     .entry(self.parse.anchors(item, anchors, child))
                     .or_default()
                     .push(Edge {
-                        tails: [Some(prefix), last],
+                        tails: [Some(prefix), Some(last)],
                         operation: Operation::Append,
                         key,
                     });
@@ -649,11 +651,8 @@ impl<'a, 'g> Enumeration<'a, 'g> {
             }
             Operation::Append => {
                 let Value::Seq(prefix) = first else { unreachable!() };
-                match last {
-                    Some(Value::Tree(tree)) => Value::Seq(self.sequence(prefix, tree)),
-                    None => first,
-                    _ => unreachable!(),
-                }
+                let Some(Value::Tree(tree)) = last else { unreachable!() };
+                Value::Seq(self.sequence(prefix, tree))
             }
             Operation::Pass => first,
         };
@@ -1457,7 +1456,7 @@ impl CompiledGrammar {
 
     /// The child of a Reading node its head line runs through
     /// ([`Self::head_line_child`]), by its index among the node's children;
-    /// `None` when it is punctuation, which a Reading does not store.
+    /// `None` when the Production has none.
     ///
     /// # Panics
     /// When no Production has the node's id.
@@ -1465,8 +1464,7 @@ impl CompiledGrammar {
     pub fn reading_head_line_child(&self, node: &ReadingNode) -> Option<usize> {
         let production = self.by_id[&node.production];
         let at = self.head_line_child(production)?;
-        (!matches!(self.productions[production].rhs[at], Symbol::Punct(..)))
-            .then(|| self.reading_child(production, at))
+        Some(self.reading_child(production, at))
     }
 
     /// Pushes a Reading's atoms (text, binding, punctuation) in order, and

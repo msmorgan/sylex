@@ -546,8 +546,8 @@ fn descendants(
             continue;
         }
         let function = grammar.production_functions(forest.item_production(item))
-            [forest.item_dot(item) - 1]
-            .as_str();
+            [parse.item_child(item)]
+        .as_str();
         for (previous, child) in forest.item_families(item) {
             items.extend(previous);
             if let ChildRef::Node(child) = child
@@ -836,7 +836,6 @@ fn write_items(inserts: &mut Inserts<'_>, u_id: i64, items: &[ItemRow]) -> Resul
             let (node, leaf) = match child {
                 ChildRef::Node(n) => (Val::Int(index(*n)), Val::Null),
                 ChildRef::Leaf(l) => (Val::Null, Val::Int(index(*l))),
-                ChildRef::Punct => (Val::Null, Val::Null),
             };
             inserts.family.push([
                 Val::Int(u_id),

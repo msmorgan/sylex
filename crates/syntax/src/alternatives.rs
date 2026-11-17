@@ -35,8 +35,7 @@ use crate::step::ChildRole;
 pub type HeadWord = (LexemeId, WordForm);
 
 /// A head leaf: the leaf reached by following `head` children down, by its
-/// index in the forest; `None` where a `head` child is punctuation or there
-/// is no `head` child.
+/// index in the forest; `None` where there is no `head` child.
 pub type HeadLeaf = Option<usize>;
 
 /// One dependent function a Constituent stands under: going up from it
@@ -155,12 +154,12 @@ impl Parse<'_> {
         let item_inside = |item: Option<usize>| item.map_or(1, |i| total(&heads.items[i]));
         let child_inside = |child: ChildRef| match child {
             ChildRef::Node(n) => total(&heads.nodes[n]),
-            ChildRef::Leaf(_) | ChildRef::Punct => 1,
+            ChildRef::Leaf(_) => 1,
         };
         let child_heads = |child: ChildRef| -> Map<HeadLeaf> {
             match child {
                 ChildRef::Node(n) => heads.nodes[n].clone(),
-                leaf => BTreeMap::from([(head_leaf(leaf), 1)]),
+                ChildRef::Leaf(leaf) => BTreeMap::from([(Some(leaf), 1)]),
             }
         };
         let mut result: AlternativeDistribution<Embedding> = forest
@@ -199,7 +198,7 @@ impl Parse<'_> {
                     let it = &forest.items[item];
                     let production = it.production;
                     let head = grammar.head_index(production);
-                    let at = it.dot - 1;
+                    let at = self.item_child(item);
                     let function = grammar.productions[production].names[at];
                     let surrounding = std::mem::take(&mut item_above[item]);
                     for &(previous, child) in &it.families {
@@ -259,7 +258,7 @@ impl Parse<'_> {
         let order = self.children_first()?;
         let grammar = self.grammar;
         Ok(self.head_inside.get_or_init(|| {
-            self.inside(order, None, head_leaf, |production, at, before, child| {
+            self.inside(order, None, Some, |production, at, before, child| {
                 if grammar.head_index(production) == Some(at) { *child } else { *before }
             })
         }))
@@ -275,13 +274,13 @@ impl Parse<'_> {
 
     /// The inside distribution of a value each item settles from its
     /// previous item's value and its last child's: `start` before the first
-    /// child, `leaf` for a leaf or punctuation child, and `step(production,
+    /// child, `leaf` for a leaf child (by its index), and `step(production,
     /// child index, previous value, child value)` for each family.
     fn inside<K: Ord + Clone>(
         &self,
         order: &[Vertex],
         start: K,
-        leaf: impl Fn(ChildRef) -> K,
+        leaf: impl Fn(usize) -> K,
         step: impl Fn(usize, usize, &K, &K) -> K,
     ) -> Inside<K> {
         let forest = &self.forest;
@@ -303,15 +302,15 @@ impl Parse<'_> {
                 }
                 Vertex::Item(item) => {
                     let it = &forest.items[item];
-                    let at = it.dot - 1;
+                    let at = self.item_child(item);
                     let mut map = Map::new();
                     for &(previous, child) in &it.families {
                         let before = previous.map_or(&origin, |p| &inside.items[p]);
                         let leaf_map;
                         let here = match child {
                             ChildRef::Node(n) => &inside.nodes[n],
-                            other => {
-                                leaf_map = BTreeMap::from([(leaf(other), 1)]);
+                            ChildRef::Leaf(l) => {
+                                leaf_map = BTreeMap::from([(leaf(l), 1)]);
                                 &leaf_map
                             }
                         };
@@ -341,15 +340,6 @@ impl Parse<'_> {
                     .collect()
             })
             .collect()
-    }
-}
-
-/// The head leaf a leaf or punctuation child is.
-fn head_leaf(child: ChildRef) -> HeadLeaf {
-    match child {
-        ChildRef::Leaf(leaf) => Some(leaf),
-        ChildRef::Punct => None,
-        ChildRef::Node(_) => unreachable!("a node child is no leaf"),
     }
 }
 

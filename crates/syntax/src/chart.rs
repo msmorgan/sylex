@@ -23,6 +23,7 @@ use crate::step::CoordinatorId;
 use crate::step::LeafFacts;
 use crate::step::LinkedCoordination;
 use crate::step::Opening;
+use crate::step::Production;
 use crate::step::State;
 use crate::step::Summary;
 use crate::step::Symbol;
@@ -74,19 +75,21 @@ pub enum Coordinator {
 }
 
 /// A child of a partial Production in a Packed Forest: a completed
-/// Constituent or a lexical alternative (by index), or structural
-/// punctuation.
+/// Constituent or a lexical alternative (by index). A mark is no child: a
+/// Production's marks are read from the Production.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ChildRef {
     Node(usize),
     Leaf(usize),
-    Punct,
 }
 
 /// A partial Production: its found children are a chain of families.
 #[derive(Debug)]
 pub(crate) struct Item {
     pub production: usize,
+    /// The symbols of its Production it is past: its found children and the
+    /// marks crossed with them. It rests on a child or at the end, never on
+    /// a mark.
     pub dot: usize,
     pub start: usize,
     pub end: usize,
@@ -94,7 +97,8 @@ pub(crate) struct Item {
     /// For each multiword noun whose words `end` falls between, whether this
     /// item's children have a boundary at its start: see [`Seams`].
     pub seam: u64,
-    /// (previous item, last child) alternatives.
+    /// (previous item, last child) alternatives; the previous item holds
+    /// the children before the last, and is `None` where there are none.
     pub families: Vec<(Option<usize>, ChildRef)>,
 }
 
@@ -178,7 +182,8 @@ impl PackedForest {
         self.items[item].production
     }
 
-    /// The number of children a partial Production has found.
+    /// The number of its Production's symbols a partial Production is past:
+    /// the children it has found and the marks crossed with them.
     #[must_use]
     pub fn item_dot(&self, item: usize) -> usize {
         self.items[item].dot
@@ -196,7 +201,8 @@ impl PackedForest {
         &self.leaves[leaf].reading
     }
 
-    /// The (previous item, last child) alternatives of a partial Production.
+    /// The (previous item, last child) alternatives of a partial Production
+    /// that has found a child; the previous item is `None` for its first.
     pub fn item_families(
         &self,
         item: usize,
@@ -280,6 +286,20 @@ impl<'g> Parse<'g> {
         self.grammar.feature_map(node.category, &node.summary)
     }
 
+    /// The position, among its Production's symbols
+    /// ([`CompiledGrammar::production_functions`]), of the last child a
+    /// partial Production has found.
+    ///
+    /// # Panics
+    /// When it has found none.
+    #[must_use]
+    pub fn item_child(&self, item: usize) -> usize {
+        let item = &self.forest.items[item];
+        self.grammar.productions[item.production]
+            .child_before(item.dot)
+            .expect("a partial Production in a Derivation has found a child")
+    }
+
     /// The unfilled Gap a completed Constituent contains.
     #[must_use]
     pub fn node_gap(&self, node: usize) -> crate::Gap {
@@ -310,6 +330,20 @@ impl<'g> Parse<'g> {
     pub fn reparse(&self, analyzed: &AnalyzedText) -> Parse<'g> {
         self.grammar.run(analyzed, self.root)
     }
+}
+
+/// The position of the atom at or after `p`: past the interword spaces
+/// there. A structural line break consumes its own boundary, so no line
+/// break is skipped, and nothing is skipped after one: indentation is not
+/// an interword space and has no atom to realize it.
+pub(crate) fn skip(tokens: &[char], mut p: usize) -> usize {
+    if p > 0 && matches!(tokens[p - 1], '\n' | '\r') {
+        return p;
+    }
+    while p < tokens.len() && tokens[p].is_whitespace() && !matches!(tokens[p], '\n' | '\r') {
+        p += 1;
+    }
+    p
 }
 
 /// The quotation mark a `Quoted` child is compiled with
@@ -646,23 +680,13 @@ impl CompiledGrammar {
         }
         let (logical, marks) = quotations(&analyzed.tokens, &covered);
         let tokens = &logical;
-        let skip = |mut p: usize| {
-            // A structural line break consumes its own boundary. Indentation
-            // is not an interword space and has no atom to realize it.
-            if p > 0 && matches!(tokens[p - 1], '\n' | '\r') {
-                return p;
-            }
-            while p < n && tokens[p].is_whitespace() && tokens[p] != '\n' && tokens[p] != '\r' {
-                p += 1;
-            }
-            p
-        };
+        let skip = |p: usize| skip(tokens, p);
         let mut forest = PackedForest::default();
         let mut by_start: Vec<Vec<usize>> = vec![Vec::new(); n + 1];
         let atomic = self.atomic_spans(analyzed);
         for found in &analyzed.matches {
-            // No Constituent spans nothing: see
-            // `Binder::no_zero_width_start` for the other half.
+            // No Constituent spans nothing: it has a child
+            // (`Binder::every_production_has_a_child`), and no leaf does.
             assert!(
                 found.start < found.end,
                 "lexical analysis matched an empty span at char {}",
@@ -710,6 +734,59 @@ impl CompiledGrammar {
                 .collect(),
             n,
         );
+        // A Production's marks are crossed with the step that reaches them,
+        // so an item rests on a child or at its end and no item or family
+        // stands for a mark. From `production` at `dot`, begun at `start` and
+        // ending at `position`: the dot, end, state and seam bits past the
+        // marks there, or `None` where the text does not write them.
+        let cross = |production: &Production,
+                     mut dot: usize,
+                     start: usize,
+                     mut position: usize,
+                     mut state: State,
+                     mut seam: u64| {
+            while let Some(Symbol::Punct(c, binding, _)) = production.rhs.get(dot) {
+                let mut at = if c.is_whitespace() { position } else { skip(position) };
+                let mut end = at + 1;
+                let found = if *c == QUOTATION_MARK {
+                    let role = if glues_after(*binding) { Quote::Open } else { Quote::Close };
+                    marks.get(at) == Some(&Some(role))
+                } else if at < n && tokens[at] == *c {
+                    // Written punctuation is no quotation's, and never
+                    // precedes a closing mark.
+                    marks[at].is_none()
+                        && !(matches!(c, '.' | ',')
+                            && marks.get(at + 1) == Some(&Some(Quote::Close)))
+                        && !(*c == '.' && at == position && terminal[at])
+                } else if *c == '.'
+                    && (marks.get(position) == Some(&Some(Quote::Close)) || terminal[position])
+                    && !state.unwritten_period
+                {
+                    // A quotation's own final period is not written, nor is
+                    // one after a word ending in terminal punctuation, and it
+                    // is the one period there.
+                    (at, end) = (position, position);
+                    true
+                } else {
+                    false
+                };
+                if !found
+                    || !production.spacing_matches(
+                        &state,
+                        dot,
+                        &ChildView::Punct,
+                        &tokens[position..at],
+                    )
+                {
+                    return None;
+                }
+                let mut next = production.accept(self, &state, dot, &ChildView::Punct)?;
+                seam = seams.after(skip(start), (dot > 0).then_some((position, seam)), at, end)?;
+                next.unwritten_period = at == end;
+                (dot, position, state) = (dot + 1, end, next);
+            }
+            Some((dot, position, state, seam))
+        };
         let mut boundaries = Boundaries::new(n);
         boundaries.boundary(0);
         // Indices into `forest.nodes`, by [`NodeKey`].
@@ -741,13 +818,12 @@ impl CompiledGrammar {
             if position == 0 {
                 predicted_at[root] = position;
                 for &p in &self.by_lhs[root] {
-                    if self.prediction.production(p, &active) {
-                        boundaries.add(
-                            &mut forest,
-                            0,
-                            (p, 0, 0, self.productions[p].start(), 0),
-                            None,
-                        );
+                    let production = &self.productions[p];
+                    if self.prediction.production(p, &active)
+                        && let Some((dot, end, state, seam)) =
+                            cross(production, 0, 0, 0, production.start(), 0)
+                    {
+                        boundaries.add(&mut forest, end, (p, dot, 0, state, seam), None);
                     }
                 }
             }
@@ -760,7 +836,6 @@ impl CompiledGrammar {
                     (item.production, item.dot, item.start)
                 };
                 let production = &self.productions[production_id];
-                let previous = (dot > 0).then_some(id);
                 if dot == production.rhs.len() {
                     let Some(summary) = production.finish(self, &forest.items[id].state) else {
                         continue;
@@ -810,20 +885,25 @@ impl CompiledGrammar {
                             parent_production.accept(self, &item.state, item.dot, &view)
                         {
                             let (p, d, s) = (item.production, item.dot, item.start);
-                            let prev = (d > 0).then_some(parent);
                             let Some(seam) = seams.after(
                                 skip(s),
-                                prev.map(|_| (item.end, item.seam)),
+                                (d > 0).then_some((item.end, item.seam)),
                                 skip(start),
                                 position,
                             ) else {
                                 continue;
                             };
+                            let Some((dot, end, state, seam)) =
+                                cross(parent_production, d + 1, s, position, state, seam)
+                            else {
+                                continue;
+                            };
+                            let previous = parent_production.child_before(d).map(|_| parent);
                             boundaries.add(
                                 &mut forest,
-                                position,
-                                (p, d + 1, s, state, seam),
-                                Some((prev, ChildRef::Node(node))),
+                                end,
+                                (p, dot, s, state, seam),
+                                Some((previous, ChildRef::Node(node))),
                             );
                         }
                     }
@@ -840,11 +920,15 @@ impl CompiledGrammar {
                             continue;
                         }
                         for &p in &self.by_lhs[*category] {
-                            if self.prediction.production(p, &active) {
+                            let predicted = &self.productions[p];
+                            if self.prediction.production(p, &active)
+                                && let Some((dot, end, state, seam)) =
+                                    cross(predicted, 0, position, position, predicted.start(), 0)
+                            {
                                 boundaries.add(
                                     &mut forest,
-                                    position,
-                                    (p, 0, position, self.productions[p].start(), 0),
+                                    end,
+                                    (p, dot, position, state, seam),
                                     None,
                                 );
                             }
@@ -877,76 +961,29 @@ impl CompiledGrammar {
                                 let item = &forest.items[id];
                                 let Some(seam) = seams.after(
                                     skip(start),
-                                    previous.map(|_| (item.end, item.seam)),
+                                    (dot > 0).then_some((item.end, item.seam)),
                                     at,
                                     end,
                                 ) else {
                                     continue;
                                 };
+                                let Some((dot_after, end, state, seam)) =
+                                    cross(production, dot + 1, start, end, state, seam)
+                                else {
+                                    continue;
+                                };
+                                let previous = production.child_before(dot).map(|_| id);
                                 boundaries.add(
                                     &mut forest,
                                     end,
-                                    (production_id, dot + 1, start, state, seam),
+                                    (production_id, dot_after, start, state, seam),
                                     Some((previous, ChildRef::Leaf(leaf))),
                                 );
                             }
                         }
                     }
-                    Symbol::Punct(c, binding, _) => {
-                        let mut at = if c.is_whitespace() { position } else { skip(position) };
-                        let mut end = at + 1;
-                        let found = if *c == QUOTATION_MARK {
-                            let role =
-                                if glues_after(*binding) { Quote::Open } else { Quote::Close };
-                            marks.get(at) == Some(&Some(role))
-                        } else if at < n && tokens[at] == *c {
-                            // Written punctuation is no quotation's, and
-                            // never precedes a closing mark.
-                            marks[at].is_none()
-                                && !(matches!(c, '.' | ',')
-                                    && marks.get(at + 1) == Some(&Some(Quote::Close)))
-                                && !(*c == '.' && at == position && terminal[at])
-                        } else if *c == '.'
-                            && (marks.get(position) == Some(&Some(Quote::Close))
-                                || terminal[position])
-                            && !forest.items[id].state.unwritten_period
-                        {
-                            // A quotation's own final period is not written,
-                            // nor is one after a word ending in terminal
-                            // punctuation, and it is the one period there.
-                            (at, end) = (position, position);
-                            true
-                        } else {
-                            false
-                        };
-                        if found
-                            && production.spacing_matches(
-                                &forest.items[id].state,
-                                dot,
-                                &ChildView::Punct,
-                                &tokens[position..at],
-                            )
-                            && let Some(mut state) = production.accept(
-                                self,
-                                &forest.items[id].state,
-                                dot,
-                                &ChildView::Punct,
-                            )
-                            && let Some(seam) = seams.after(
-                                skip(start),
-                                previous.map(|_| (forest.items[id].end, forest.items[id].seam)),
-                                at,
-                                end,
-                            )
-                        {
-                            state.unwritten_period = at == end;
-                            boundaries.add(
-                                &mut forest,
-                                end,
-                                (production_id, dot + 1, start, state, seam),
-                                Some((previous, ChildRef::Punct)),
-                            );
-                        }
+                    Symbol::Punct(..) => {
+                        unreachable!("an item rests past the marks of its Production")
                     }
                 }
             }

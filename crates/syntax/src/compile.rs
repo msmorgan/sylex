@@ -241,9 +241,9 @@ impl CompiledGrammar {
         self.productions[production].lhs
     }
 
-    /// The name of each child of a Production, in order, punctuation
-    /// included: the grammatical function each bears in the mother (empty
-    /// for punctuation).
+    /// A name for each symbol of a Production, in order: the grammatical
+    /// function a child bears in the mother, and an empty name for a mark,
+    /// which is no child.
     #[must_use]
     pub fn production_functions(&self, production: usize) -> &[Ident] {
         &self.productions[production].names
@@ -286,8 +286,8 @@ impl CompiledGrammar {
         self.productions[production].head
     }
 
-    /// The child a Production's head line runs through, by its index among
-    /// the Production's children, punctuation included. In order:
+    /// The child a Production's head line runs through, by its position among
+    /// the Production's symbols. In order:
     ///
     /// 1. In a Linked Conjunct (a Category that is a coordination schema's
     ///    `link`), its linking connective: its first child besides punctuation
@@ -310,8 +310,8 @@ impl CompiledGrammar {
     ///
     /// The `head` itself ([`Self::head_index`]) is unchanged. Each Production
     /// names at most one head-line child, so a word's maximal projection is
-    /// the only one whose head line ends in that word. `None` for a
-    /// Production of punctuation alone.
+    /// the only one whose head line ends in that word. `None` for a Linked
+    /// Conjunct with no child but its `head`.
     #[must_use]
     pub fn head_line_child(&self, production: usize) -> Option<usize> {
         self.productions[production].shape.head_line_child
@@ -332,7 +332,7 @@ impl CompiledGrammar {
     }
 
     /// The index among a Reading node's children (punctuation is not stored)
-    /// of a Production's child at `index` among all its children.
+    /// of a Production's child at position `index` among its symbols.
     pub(crate) fn reading_child(&self, production: usize, index: usize) -> usize {
         self.productions[production].rhs[..index]
             .iter()
@@ -1305,6 +1305,7 @@ impl<'a> Binder<'a> {
         self.edge_lines()?;
         self.report_holders();
         self.no_zero_width_start()?;
+        self.every_production_has_a_child()?;
         for (name, declaration) in &self.grammar.categories {
             if let Some(category) = &declaration.category {
                 self.category(category)?;
@@ -1351,18 +1352,33 @@ impl<'a> Binder<'a> {
         Ok(())
     }
 
-    /// Refuses a Production whose first child is a period. A lexical
+    /// Refuses a Production whose first symbol is a period. A lexical
     /// alternative spans at least one char and a written mark is one char,
     /// but a period may be unwritten and match with zero width (a quotation's
     /// own final period, or one after a word ending in terminal punctuation;
-    /// `run`). With every other first child, each partial Production past its
-    /// first child spans at least one char, and so does every Constituent.
+    /// `run`). With every other first symbol, each partial Production past
+    /// its first symbol spans at least one char.
     fn no_zero_width_start(&self) -> Result<(), LoadError> {
         for production in &self.out.productions {
             if let Some(Symbol::Punct('.', ..)) = production.rhs.first() {
                 return Err(invalid(format!(
-                    "production `{}`: its first child is a period, which may be unwritten, so \
+                    "production `{}`: its first symbol is a period, which may be unwritten, so \
                      it can start with nothing",
+                    production.id
+                )));
+            }
+        }
+        Ok(())
+    }
+
+    /// Refuses a Production with no child: a mark is no child, so the Packed
+    /// Forest would hold nothing for its Constituent, which an unwritten
+    /// period could leave spanning nothing.
+    fn every_production_has_a_child(&self) -> Result<(), LoadError> {
+        for production in &self.out.productions {
+            if production.child_before(production.rhs.len()).is_none() {
+                return Err(invalid(format!(
+                    "production `{}`: it has no child, only marks",
                     production.id
                 )));
             }

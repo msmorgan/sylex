@@ -106,7 +106,7 @@ pub fn recount_without(parse: &Parse<'_>, removed: Use) -> u128 {
                 let before = previous.map_or(1, |p| self.item(p));
                 let here = match child {
                     ChildRef::Node(c) => self.node(c),
-                    ChildRef::Leaf(_) | ChildRef::Punct => 1,
+                    ChildRef::Leaf(_) => 1,
                 };
                 total += before * here;
             }
@@ -156,7 +156,7 @@ pub fn derivations(parse: &Parse<'_>) -> Vec<Vec<Use>> {
             let befores = previous.map_or_else(|| vec![Vec::new()], |p| item(parse, p, memo));
             let heres = match child {
                 ChildRef::Node(c) => node(parse, c, memo),
-                ChildRef::Leaf(_) | ChildRef::Punct => vec![Vec::new()],
+                ChildRef::Leaf(_) => vec![Vec::new()],
             };
             for before in &befores {
                 for here in &heres {

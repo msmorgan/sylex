@@ -123,14 +123,19 @@ fn pp_chain_packs_catalan_many_trees_in_a_small_forest() {
 }
 
 /// A Production beginning with a word or a mark is predicted only where that
-/// terminal can begin: declaring one that nothing here starts adds no chart
-/// item and loses no Reading, and one the text does start still parses.
+/// terminal can begin: declaring one of each that nothing here starts adds no
+/// chart item and loses no Reading, and one the text does start still parses.
+/// Prediction alone keeps the word-initial one out; the mark-initial one
+/// would also fail to cross its mark.
 #[test]
 fn terminal_initial_productions_are_predicted_only_where_they_scan() {
     let lexicon = lexicon();
     let grammar = bind(GRAMMAR, &lexicon).unwrap();
     let bracketed = bind(
-        &format!("{GRAMMAR}    Bracketed: NounPhrase -> '(':Prefix NounPhrase ')'\n"),
+        &format!(
+            "{GRAMMAR}    Bracketed: NounPhrase -> '(':Prefix NounPhrase ')'\n    Linked: \
+             NounPhrase -> Lex(Coordinator) NounPhrase\n"
+        ),
         &lexicon,
     )
     .unwrap();
@@ -741,7 +746,7 @@ fn left_corner_masks_preserve_more_than_64_distinct_terminals() {
         .map(|i| char::from_u32(0x2500 + i).unwrap())
         .collect();
     for (i, mark) in marks.iter().enumerate() {
-        writeln!(productions, "Mark{i}: Mark -> '{mark}'").unwrap();
+        writeln!(productions, "Mark{i}: Mark -> '{mark}':Prefix Lex(Noun)").unwrap();
     }
     let grammar = bind(
         &format!("root Root\ncategory Mark\ncategory Root\n{productions}"),
@@ -749,7 +754,7 @@ fn left_corner_masks_preserve_more_than_64_distinct_terminals() {
     )
     .unwrap();
     for mark in marks {
-        let text = mark.to_string();
+        let text = format!("{mark}man");
         // Each distinct mark selects its own sole declared Production.
         assert_eq!(readings(&grammar, &lexicon, &text).len(), 1);
         assert_eq!(
@@ -757,7 +762,7 @@ fn left_corner_masks_preserve_more_than_64_distinct_terminals() {
             Ok(())
         );
     }
-    assert_eq!(readings(&grammar, &lexicon, "?"), [] as [Reading; 0]);
+    assert_eq!(readings(&grammar, &lexicon, "?man"), [] as [Reading; 0]);
 }
 
 #[test]

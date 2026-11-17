@@ -23,7 +23,7 @@ fn a_spoken_mark_needs_a_sign_word() {
             "
             root Sentence
             category Sentence
-            Signed: Sentence -> '{mark}':Prefix:Spoken '.'
+            Signed: Sentence -> '{mark}':Prefix:Spoken Lex(Numeral) '.'
             "
         )
     };
