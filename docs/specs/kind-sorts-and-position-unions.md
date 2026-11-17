@@ -131,9 +131,11 @@ The `CardType`, `Subtype`, `Supertype` and `Color` coercions into `PreModifier`,
 - **`Status` stays a sort**, as `Color` does. Its values are `tapped`, `untapped`, `flipped`,
   `faceDown`, `faceUp`, `phasedIn` and `phasedOut`. A status printed as an adjective is spelled:
   "tapped", "untapped", "flipped", "face-down", "face-up", "phased-out". `phasedIn` has no
-  spelling. Unhyphenated "face down" and "face up" (prepositions in the pool: 111 and 175 leaves)
-  and the phasing wordings are Templates in their idioms over the status value ("turn … face
-  down", "exile … face down", "phases out"). `becomeStatus` and `entersAs` take a `Status`. The
+  spelling. Unhyphenated "face down" and "face up" are prepositions in the pool (111 and 175
+  leaves; "face down" 65 after a head, 21 after a copula): the `PrepositionPhrase` Templates
+  `isFaceDown` and `isFaceUp` over the status value, named apart from the `Status` words because
+  both reach `Predicative`. The verbs that print them and the phasing wordings are Templates in
+  their idioms ("turn … face down", "exile … face down", "phases out"). `becomeStatus` and `entersAs` take a `Status`. The
   `PreModifier` Templates `tapped`, `untapped`, `faceDown` and `phasedOut` go.
 
 ## 5. What each declaration becomes
