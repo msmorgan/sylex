@@ -2710,6 +2710,13 @@ const AGREEMENT_PREAMBLE: &str = "\
     template countOf(n: Nominal): Amount { body = numberOf(described(all, $n)) }\n\
     template forEach(per: Amount, n: Nominal): Amount { body = countOf($n) }\n\
     primitive didDiscard(group: NounPhrase): PostModifier = DidDiscard\n\
+    primitive max: AggregateOp = Max\n\
+    primitive manaValue: ProjAxis = ManaValue\n\
+    primitive aggregateOver(op: AggregateOp, domain: Nominal, body: Amount): Amount = AggregateOver\n\
+    primitive superlative(op: AggregateOp, axis: ProjAxis, domain: Nominal): PostModifier = Superlative\n\
+    primitive atLeast: Comparator = AtLeast\n\
+    primitive compareOver(domain: Nominal, measure: Amount, comparator: Comparator, bound: Amount): Nominal = CompareOver\n\
+    primitive headed(subject: NounPhrase, head: Nominal): NounPhrase = Headed\n\
     primitive always: Condition = Always\n\
     primitive nothing: VerbPhrase = Nothing\n";
 
@@ -2755,7 +2762,14 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          template okPossessive(owner: NounPhrase): NounPhrase {{\n\
            body = described(possessive($owner), nominal(card, post = [withDifferentNames]))\n\
          }}\n\
-         template okForEach: Amount {{ body = forEach(1, nominal(card, post = [withDifferentNames])) }}"
+         template okForEach: Amount {{ body = forEach(1, nominal(card, post = [withDifferentNames])) }}\n\
+         template okAggregate: Amount {{ body = aggregateOver(max, nominal(card, post = [withDifferentNames]), 1) }}\n\
+         template okSuperlative: Nominal {{\n\
+           body = nominal(creature, post = [superlative(max, manaValue, nominal(card, post = [withDifferentNames]))])\n\
+         }}\n\
+         template okCompareOver: Nominal {{\n\
+           body = compareOver(nominal(card, post = [withDifferentNames]), 1, atLeast, 2)\n\
+         }}"
     );
     assert_eq!(kinds(&valid), []);
 
@@ -2780,6 +2794,7 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
            body = described($d, nominal(card, post = [withDifferentNames]))\n\
          }}\n\
          template badThroughParameter: NounPhrase {{ body = differentCards(each) }}\n\
+         template badHeaded(x: NounPhrase): NounPhrase {{ body = headed($x, nominal(card, post = [withDifferentNames])) }}\n\
          template differentUpTo(p: Nat): NounPhrase {{\n\
            body = counted(range(high = $p), nominal(card, post = [withDifferentNames]))\n\
          }}\n\
@@ -2803,14 +2818,9 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
                 RefusalKind::AgreementWithoutGroup,
                 s("differentCards(each)")
             )],
-            vec![(
-                RefusalKind::AgreementWithoutGroup,
-                s("differentUpTo(1)")
-            )],
-            vec![(
-                RefusalKind::AgreementWithoutGroup,
-                s("differentWorth(1)")
-            )],
+            vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames"))],
+            vec![(RefusalKind::AgreementWithoutGroup, s("differentUpTo(1)"))],
+            vec![(RefusalKind::AgreementWithoutGroup, s("differentWorth(1)"))],
             vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames"))],
         ]
         .concat()

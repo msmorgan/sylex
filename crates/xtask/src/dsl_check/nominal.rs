@@ -453,11 +453,6 @@ impl<'a> NominalChecker<'a, '_> {
                     self.walk(aterm, Place::Elsewhere, refusals);
                 }
             }
-            Some(("Nominal", "Coordination")) => {
-                for (_, _, aterm) in args {
-                    self.walk(aterm, Place::Elsewhere, refusals);
-                }
-            }
             Some(("PreModifier", "Coordination")) => {
                 let item_place = match arg("coordinator") {
                     Term::Param => Place::Deferred,
@@ -511,9 +506,23 @@ impl<'a> NominalChecker<'a, '_> {
                     self.walk(aterm, Place::Elsewhere, refusals);
                 }
             }
-            // The rule, not a fallback: every consumer of a `Nominal` other than
-            // a determiner (`Described`) or a slice (`SomeOf`) tests individual
-            // members or names a single head noun, so it forms no group for
+            // A coordination of nominals hands Agreement to its enclosing
+            // consumer. An aggregate, a superlative or a comparison ranges over
+            // its whole domain at once, as "all" does (`countOf` is `numberOf`
+            // over `all`), so an Agreement in the domain constrains that group.
+            Some(
+                ("Nominal", "Coordination" | "CompareOver")
+                | ("Amount", "AggregateOver")
+                | ("PostModifier", "Superlative"),
+            ) => {
+                for (_, _, aterm) in args {
+                    self.walk(aterm, Place::Elsewhere, refusals);
+                }
+            }
+            // The rule, not a fallback: every other consumer of a `Nominal`
+            // (`headed`, `attachHost`, `run`, `addsTarget`, `everyCardIs`,
+            // `noCardIs`, the `Reach` words, a rules row's scope, …) tests each
+            // member on its own or names a head noun, so it forms no group for
             // Agreement, whatever its constructor.
             _ => {
                 for (_, psort, aterm) in args {
