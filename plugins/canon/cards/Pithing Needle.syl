@@ -11,5 +11,5 @@ card singleFaced({
             bare(
               nominal(
                 abilityHead(anyActivated),
-                post = [ofSource(bare(nominal(source, post = [named(chosenName)])))]))),
+                post = [of(bare(nominal(source, post = [named(chosenName)])))]))),
           unless = is(them, noun(bare(manaAbility)))))]})

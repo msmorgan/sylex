@@ -1,0 +1,4 @@
+# "split": the card has two card faces, its halves, on a single card [CR#709.1,709.2].
+primitive split: PreModifier = SplitCard {
+  spelling = "split"
+}

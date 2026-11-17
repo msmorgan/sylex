@@ -16,6 +16,6 @@ subtype siege {
     stateBased(
       and([
           compareAmt(countersOn(defenseCounter, this(battle)), equal, 0),
-          not(exists(nominal(ability, post = [ofSource(it), triggeredNotLeftStack])))]),
+          not(exists(nominal(ability, post = [of(it), triggeredNotLeftStack])))]),
       putInto(it, graveyard))]
 }

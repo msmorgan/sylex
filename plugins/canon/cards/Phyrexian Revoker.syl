@@ -12,6 +12,6 @@ card singleFaced({
             bare(
               nominal(
                 abilityHead(anyActivated),
-                post = [ofSource(bare(nominal(source, post = [named(chosenName)])))])))))],
+                post = [of(bare(nominal(source, post = [named(chosenName)])))])))))],
     power = 2,
     toughness = 1})

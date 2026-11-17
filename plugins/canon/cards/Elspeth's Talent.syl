@@ -15,7 +15,7 @@ card singleFaced({
       whenever(
         does(
           actor(you),
-          activate(a(nominal(abilityHead(loyalty), post = [ofSource(enchanted(planeswalker))])))),
+          activate(a(nominal(abilityHead(loyalty), post = [of(enchanted(planeswalker))])))),
         establishFor(
           bare(nominal(creature, post = [youControl])),
           [getsPt(them, up(2), up(2)), abilityGrant(them, [vigilance])],

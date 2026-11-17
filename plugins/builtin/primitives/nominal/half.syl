@@ -1,0 +1,4 @@
+# One of a split card's two halves, each castable by itself [CR#709.2,709.3].
+primitive half: Nominal = Half {
+  spelling = "half"
+}

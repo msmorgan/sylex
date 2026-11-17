@@ -8,5 +8,5 @@ card singleFaced({
           bare(
             nominal(
               abilityHead(anyActivated),
-              post = [ofSource(bare(nominal(creature, post = [youControl])))])),
+              post = [of(bare(nominal(creature, post = [youControl])))])),
           less(2, floor = 1)))]})

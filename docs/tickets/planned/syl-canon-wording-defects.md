@@ -50,6 +50,9 @@ Each of these terms writes words its card does not print, or cannot print what i
   "this creature is controlled by you", where [CR#702.95a] prints "if you control both this
   creature and another creature and both are unpaired". No plural anaphor spells "both", and no
   rule lets an anaphor in one conjunct of a condition read an indefinite of the conjunct before it.
+- *Denry Klin, Editor in Chief* writes `this(creature)` twice in "put the same number of each
+  kind of counter on that creature", a clause that prints no mention of Denry Klin: the counters
+  are those of the condition before it, "if Denry Klin has counters on it".
 
 ## Open questions
 
@@ -81,6 +84,7 @@ Each of these terms writes words its card does not print, or cannot print what i
 - No `discard` in canon writes a location its card does not print.
 - `soulbond`'s conditions print [CR#702.95a]'s words, with the declarations and the accessibility
   rule that needs.
+- *Denry Klin, Editor in Chief*'s second ability writes no `this(…)` its text does not print.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

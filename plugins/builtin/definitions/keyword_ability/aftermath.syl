@@ -8,8 +8,18 @@ ability aftermath {
   lexical = {lemma = "aftermath"},
   spelling = "aftermath",
   body = [
-    static(can(actor(actor), cast(this, from = yourGraveyard))),
-    static(cant(actor(actor), cast(this, from = not(graveyard)))),
+    static(
+      can(
+        actor(actor),
+        cast(
+          this(nominal(half, post = [of(this(nominal(pre = [split], card)))])),
+          from = yourGraveyard))),
+    static(
+      cant(
+        actor(actor),
+        cast(
+          this(nominal(half, post = [of(this(nominal(pre = [split], card)))])),
+          from = not(graveyard)))),
     static(
       replace(
         would(actor(this(spell)), leave(from = stack)),

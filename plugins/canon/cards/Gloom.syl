@@ -9,5 +9,5 @@ card singleFaced({
           bare(
             nominal(
               abilityHead(anyActivated),
-              post = [ofSource(bare(nominal(pre = [white], enchantment)))])),
+              post = [of(bare(nominal(pre = [white], enchantment)))])),
           more(3)))]})

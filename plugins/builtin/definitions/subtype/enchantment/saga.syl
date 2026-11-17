@@ -23,7 +23,6 @@ subtype saga {
       and([
           compareAmt(finalChapterNumber(this(saga)), atLeast, 1),
           compareAmt(countersOn(loreCounter, this(saga)), atLeast, finalChapterNumber(it)),
-          not(
-            exists(nominal(abilityHead(chapter), post = [ofSource(it), triggeredNotLeftStack])))]),
+          not(exists(nominal(abilityHead(chapter), post = [of(it), triggeredNotLeftStack])))]),
       sacrifice(it))]
 }

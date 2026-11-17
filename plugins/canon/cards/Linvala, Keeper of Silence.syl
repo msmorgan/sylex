@@ -13,6 +13,6 @@ card singleFaced({
             bare(
               nominal(
                 abilityHead(anyActivated),
-                post = [ofSource(bare(nominal(creature, post = [opponentsControl])))])))))],
+                post = [of(bare(nominal(creature, post = [opponentsControl])))])))))],
     power = 3,
     toughness = 4})

@@ -11,7 +11,7 @@ card singleFaced({
             a(
               nominal(
                 abilityHead(anyTriggered),
-                post = [ofSource(a(nominal(ally, post = [youControl])))]))),
+                post = [of(a(nominal(ally, post = [youControl])))]))),
           exactly(1)))],
     power = 3,
     toughness = 3})
