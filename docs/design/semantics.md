@@ -204,19 +204,28 @@ after the head (`thatIs`, "a spell that's both red and white") holds of a member
 abilities") takes every member that belongs to its owner, an ability belonging to its source
 ([CR#113.7]).
 
-A **bare plural** (`bare`, `described(bare, …)`) is the determinerless plural the card prints, and
-its term states no quantificational force. Where it stands decides how it is read; semantics reads
-that position, and the term never writes it.
+A **bare noun phrase** (`bare`, `described(bare, …)`) is a plural or mass noun the card prints
+with no determiner. Its term states no quantificational force: one wording has one written form
+(`spelling.md`), and nothing printed tells one force from another. Semantics reads the force from
+where the phrase stands, and the term never writes it. The readings the corpus shows:
 
-- As a participant a rule or effect generalizes over, it is read as the universal over its
-  description and exports the same plural domain "all" does (§2.2 item 2): *Glorious Anthem*'s
-  "Creatures you control get +1/+1", *Leyline of Punishment*'s "Players can't gain life".
-- As the copula's complement (`noun(bare(…))`) it tests each member of its subject, as `a` tests
-  one, and introduces no referent: *Pithing Needle*'s "unless they're mana abilities" (§3.3).
-- As an indefinite participant of an action it is a plural indefinite: *Aggressive Mining*'s "You
-  can't play lands", *Grand Abolisher*'s "can't cast spells or activate abilities of artifacts,
-  creatures, or enchantments". Under `cant` it has a hypothetical indefinite's universal force and
-  closes with the rule's box (§2.2 item 3).
+- The subject a rule or effect is said of is the universal over its description, and exports the
+  plural domain "all" does (§2.2 item 2): *Glorious Anthem*'s "Creatures you control get +1/+1",
+  *Everlasting Torment*'s "Players can't gain life".
+- The copula's complement (`noun(bare(…))`) tests each member of its subject, as `a` tests one,
+  and introduces no referent: *Pithing Needle*'s "unless they're mana abilities" (§3.3).
+- The object of an action is a plural indefinite: *Aggressive Mining*'s "You can't play lands",
+  *Grand Abolisher*'s "can't cast spells". Under `cant` it has a hypothetical indefinite's
+  universal force and closes with the rule's box (§2.2 item 3).
+- The domain a measure or a kind enumeration ranges over is that whole domain, closed after it
+  (§2.2 item 5): "the number of creatures you control" (`countOf`), *Tarmogoyf*'s "among cards in
+  all graveyards", *Pledge of Loyalty*'s "each color among permanents you control".
+- Inside a modifier it restricts the member the modifier is said of and introduces no referent of
+  its own: *Cursed Totem*'s "Activated abilities of creatures", *Gaea's Revenge*'s "abilities from
+  nongreen sources".
+
+How semantics tells these positions apart in a term, and the force of a bare object under `can`,
+are open (§6).
 
 A **characteristic read** ("its power") may select a departed object by its last known information
 ([CR#608.2h]). Such a read never makes the object the patient of a battlefield action. Oracle text
@@ -632,3 +641,9 @@ are found over enumerated candidates or over a packed form is open (§6).
     antecedent: *Sekki, Seasons' Guide* creates as many tokens as the damage though it may remove
     fewer counters, and *Hordewing Skaab*'s discard is the number of opponents even when another
     effect changed the draw (their rulings).
+19. **Reading a bare noun phrase's position.** §2.4 lists the readings of a bare noun phrase by
+    where it stands, but a term does not yet show every position: canon writes many English
+    subjects as an argument of the verb (*Tidal Flats*' `gain(bare(…), …)`, each `getsPt(bare(…),
+    …)`), where the universal and the indefinite reading cannot be told apart by the argument's
+    place. The force of a bare object under `can` (*Future Sight*'s "You may play lands and cast spells
+    from the top of your library") is also unstated.

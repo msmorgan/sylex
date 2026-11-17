@@ -1,5 +1,6 @@
-# "the greatest power among …s": the domain ranged over is all of them, closed after it.
+# "the greatest power among …s": the domain ranged over is the bare plural the card prints, closed
+# after it (`docs/design/semantics.md` §2.2 item 5).
 template aggregateAll(op: AggregateOp, axis: ProjAxis, p: Nominal): Amount {
   spelling = "the $op $axis among $p",
-  body = aggregate($op, $axis, described(all, $p))
+  body = aggregate($op, $axis, described(bare, $p))
 }

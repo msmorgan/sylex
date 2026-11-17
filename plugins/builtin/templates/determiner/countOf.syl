@@ -1,5 +1,6 @@
-# "the number of …s": the domain counted is all of them, closed after the count.
+# "the number of …s": the counted domain is the bare plural the card prints, closed after the count
+# (`docs/design/semantics.md` §2.2 item 5).
 template countOf(p: Nominal): Amount {
   spelling = "the number of $p",
-  body = numberOf(described(all, $p))
+  body = numberOf(described(bare, $p))
 }

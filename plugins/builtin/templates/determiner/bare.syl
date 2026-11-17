@@ -1,11 +1,10 @@
-# The bare plural, "<p>s" with no determiner. Its term says only what is printed; where it stands
-# decides its reading (`docs/design/semantics.md` §2.4). A participant a rule or effect generalizes
-# over is the universal over its description, as "all" is (*Glorious Anthem*'s "Creatures you
-# control get +1/+1", *Leyline of Punishment*'s "Players can't gain life"). The copula's complement
-# tests each member of its subject, as `a` tests one (*Pithing Needle*'s "unless they're mana
-# abilities", `noun(bare(manaAbility))`). A participant of an action is a plural indefinite
-# (*Aggressive Mining*'s "You can't play lands", *Grand Abolisher*'s "can't cast spells or activate
-# abilities of artifacts, creatures, or enchantments").
+# The bare noun phrase: a plural, or a mass noun, printed with no determiner ("creatures you
+# control", "mana abilities", "lands", "damage"). Its term says only what is printed and states no
+# quantificational force; semantics reads the force from where the phrase stands
+# (`docs/design/semantics.md` §2.4): the universal in *Glorious Anthem*'s "Creatures you control get
+# +1/+1", a test of each member in *Pithing Needle*'s "unless they're mana abilities"
+# (`noun(bare(manaAbility))`), an indefinite in *Aggressive Mining*'s "You can't play lands", a
+# measured domain in "the number of creatures you control" (`countOf`).
 template bare(p: Nominal): NounPhrase {
   spelling = "$p",
   body = described(bare, $p)

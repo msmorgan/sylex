@@ -2708,7 +2708,7 @@ const AGREEMENT_PREAMBLE: &str = "\
     primitive totaling(bound: Amount): SliceCount = Totaling\n\
     primitive someOf(count: SliceCount, description: Option(Nominal) = none, group: NounPhrase): NounPhrase = SomeOf\n\
     primitive numberOf(group: NounPhrase): Amount = CountOf\n\
-    template countOf(n: Nominal): Amount { body = numberOf(described(all, $n)) }\n\
+    template countOf(n: Nominal): Amount { body = numberOf(described(bare, $n)) }\n\
     template forEach(per: Amount, n: Nominal): Amount { body = countOf($n) }\n\
     primitive didDiscard(group: NounPhrase): PostModifier = DidDiscard\n\
     primitive max: AggregateOp = Max\n\

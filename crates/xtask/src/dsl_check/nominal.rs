@@ -509,7 +509,7 @@ impl<'a> NominalChecker<'a, '_> {
             // A coordination of nominals hands Agreement to its enclosing
             // consumer. An aggregate, a superlative or a comparison ranges over
             // its whole domain at once, as "all" does (`countOf` is `numberOf`
-            // over `all`), so an Agreement in the domain constrains that group.
+            // over a bare plural), so an Agreement in the domain constrains that group.
             Some(
                 ("Nominal", "Coordination" | "CompareOver")
                 | ("Amount", "AggregateOver")
