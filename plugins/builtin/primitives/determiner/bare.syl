@@ -1,0 +1,3 @@
+# The determinerless plural, which prints no word and states no quantificational force: where the
+# phrase stands decides how it is read (`bare`, `docs/design/semantics.md` §2.4).
+primitive bare: DetPhrase = Bare

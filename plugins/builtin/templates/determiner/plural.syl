@@ -1,8 +1,0 @@
-# "<p>s" as the plural indefinite, the plural of `a`: "they're mana abilities" (*Pithing Needle*'s
-# "can't be activated unless they're mana abilities"), the copula's complement testing each member
-# of a plural subject as `a` tests one. The same words as a participant are `bare` when they are
-# universal ("Creatures get -1/-1", `described(all, …)`); `plural` is not universal.
-template plural(p: Nominal): NounPhrase {
-  spelling = "$p",
-  body = described(a(unmarked, plur = many), $p)
-}

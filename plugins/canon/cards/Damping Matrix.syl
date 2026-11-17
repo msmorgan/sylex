@@ -11,4 +11,4 @@ card singleFaced({
               nominal(
                 abilityHead(anyActivated),
                 post = [ofSource(bare(or([artifact, creature])))]))),
-          unless = is(them, noun(plural(manaAbility)))))]})
+          unless = is(them, noun(bare(manaAbility)))))]})

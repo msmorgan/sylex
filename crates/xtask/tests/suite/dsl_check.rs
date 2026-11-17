@@ -2686,8 +2686,9 @@ const AGREEMENT_PREAMBLE: &str = "\
     primitive theLast: Quantity = Last\n\
     primitive worth(n: Nat): Quantity = Worth\n\
     primitive all: DetPhrase = All\n\
+    primitive bare: DetPhrase = Bare\n\
     primitive each: DetPhrase = Each\n\
-    primitive a(mode: ChoiceMode, plur: Plurality = one): DetPhrase = A\n\
+    primitive a(mode: ChoiceMode): DetPhrase = A\n\
     primitive the(plur: Plurality = one): DetPhrase = The\n\
     primitive count(quantity: Quantity, mode: Option(ChoiceMode)): DetPhrase = Count\n\
     primitive target(quantity: Quantity): DetPhrase = Target\n\
@@ -2697,8 +2698,8 @@ const AGREEMENT_PREAMBLE: &str = "\
     template each(n: Nominal): NounPhrase { body = described(each, $n) }\n\
     template the(n: Nominal): NounPhrase { body = described(the, $n) }\n\
     template thePlural(n: Nominal): NounPhrase { body = described(the(plur = many), $n) }\n\
-    template plural(n: Nominal): NounPhrase { body = described(a(unmarked, plur = many), $n) }\n\
     template allOf(n: Nominal): NounPhrase { body = described(all, $n) }\n\
+    template bare(n: Nominal): NounPhrase { body = described(bare, $n) }\n\
     template counted(q: Quantity, n: Nominal): NounPhrase { body = described(count($q, none), $n) }\n\
     template target(n: Nominal): NounPhrase { body = described(target(range(low = 1, high = 1)), $n) }\n\
     template targets(q: Quantity, n: Nominal): NounPhrase { body = described(target($q), $n) }\n\
@@ -2740,7 +2741,7 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          template okWorthThree: NounPhrase {{ body = counted(worth(3), nominal(card, post = [withDifferentNames])) }}\n\
          template okAll: NounPhrase {{ body = allOf(nominal(card, post = [withDifferentNames])) }}\n\
          template okPluralThe: NounPhrase {{ body = thePlural(nominal(card, post = [withDifferentNames])) }}\n\
-         template okPluralIndefinite: NounPhrase {{ body = plural(nominal(card, post = [withDifferentNames])) }}\n\
+         template okBare: NounPhrase {{ body = bare(nominal(card, post = [withDifferentNames])) }}\n\
          template okWholeSlice(g: NounPhrase): NounPhrase {{\n\
            body = someOf(whole, description = nominal(card, post = [withDifferentNames]), $g)\n\
          }}\n\

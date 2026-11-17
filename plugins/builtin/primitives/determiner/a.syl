@@ -1,3 +1,2 @@
-# "a …", the indefinite; with `plur = many` the plural indefinite, which English writes with no
-# determiner (`plural`).
-primitive a(mode: ChoiceMode, plur: Plurality = one): DetPhrase = A
+# "a …", the indefinite.
+primitive a(mode: ChoiceMode): DetPhrase = A

@@ -21,7 +21,7 @@ card singleFaced({
                     ability,
                     post = [did(actor(yourOpponents), activate(which), within = thisObject)])),
                 more(1),
-                unless = is(them, noun(plural(manaAbility))))]))),
+                unless = is(them, noun(bare(manaAbility))))]))),
       afterlife(1)],
     power = 2,
     toughness = 1})
