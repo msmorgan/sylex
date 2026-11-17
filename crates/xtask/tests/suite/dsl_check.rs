@@ -2809,6 +2809,25 @@ fn stacked_refuses_a_coordinator_it_does_not_classify() {
 }
 
 #[test]
+fn a_definition_body_is_checked_with_each_calls_arguments() {
+    // An `action` whose body leaves the count open: only the call that
+    // passes 1 puts Agreement under a singular count.
+    let source = format!(
+        "{NOMINAL_PREAMBLE}{AGREEMENT_PREAMBLE}\
+         primitive discard(group: NounPhrase): VerbPhrase = Discard\n\
+         action discardDifferent(n: Amount) {{\n\
+           body = discard(counted(exactlyOf($n), nominal(card, post = [withDifferentNames])))\n\
+         }}\n\
+         template discardTwo: VerbPhrase {{ body = discardDifferent(2) }}\n\
+         template discardOne: VerbPhrase {{ body = discardDifferent(1) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(RefusalKind::AgreementWithoutGroup, s("discardDifferent(1)"))]
+    );
+}
+
+#[test]
 fn agreement_refuses_a_number_form_it_does_not_classify() {
     let source = format!(
         "{NOMINAL_PREAMBLE}{AGREEMENT_PREAMBLE}\

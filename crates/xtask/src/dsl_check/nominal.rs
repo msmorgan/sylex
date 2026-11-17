@@ -16,7 +16,10 @@
 //!   `Nominal` consumed by a determiner or slice that forms a plural group.
 //!
 //! The last three read each declaration's values with every Template call
-//! replaced by its body, its parameters bound to the call's arguments.
+//! replaced by its body, its parameters bound to the call's arguments, and
+//! with each call of a Definition that has parameters checking that
+//! Definition's body with the call's arguments. A defect a body has whatever
+//! its arguments is refused at the declaration and again at each call.
 
 use std::collections::BTreeMap;
 
@@ -67,8 +70,8 @@ enum Place {
     /// A direct item of a `PreModifier` `or` or `and/or` coordination.
     DisjunctionItem,
     /// The root of a Template's own `body`, or an item of a coordination whose
-    /// coordinator is a Template parameter: checked where the Template is
-    /// called.
+    /// coordinator is a declaration's parameter: checked where the declaration
+    /// is called.
     Deferred,
     /// Anywhere else.
     Elsewhere,
@@ -80,8 +83,8 @@ enum Place {
 enum Number {
     AtMostOne,
     Group,
-    /// A Template parameter: the term is checked again with the argument at
-    /// each call of the Template.
+    /// A declaration's parameter: the term is checked again with the argument
+    /// at each call of the declaration, a Template's or a Definition's.
     Parameter,
 }
 
@@ -349,13 +352,39 @@ impl<'a> NominalChecker<'a, '_> {
 
         if decl.kind.word == schema::TEMPLATE {
             let body = decl.field("body").expect("a Template has a body");
-            self.elaborate(body, &decl.sort, &callee_env, Some(call_span), refusals)
-        } else {
-            Term::Call {
-                decl: sig.decl,
-                span: call_span,
-                args: bound_args,
+            return self.elaborate(body, &decl.sort, &callee_env, Some(call_span), refusals);
+        }
+        // A Definition (`action`, `ability`, …) stays one call, but its body is
+        // checked here too with this call's arguments, as a Template's is: a
+        // parameter its body leaves open is settled only at the call.
+        let body = match (decl.params.is_empty(), decl.field("body")) {
+            (false, Some(body)) => {
+                let mut body_env = callee_env.clone();
+                for (implicit, _) in decl.kind.implicit {
+                    body_env.insert((*implicit).to_owned(), Term::Param);
+                }
+                let sort = decl
+                    .kind
+                    .fields
+                    .iter()
+                    .find(|spec| spec.name == "body")
+                    .and_then(|spec| spec.sort)
+                    .map_or_else(|| decl.sort.clone(), SortKey::table);
+                Some(Box::new(self.elaborate(
+                    body,
+                    &sort,
+                    &body_env,
+                    Some(call_span),
+                    refusals,
+                )))
             }
+            (true, _) | (false, None) => None,
+        };
+        Term::Call {
+            decl: sig.decl,
+            span: call_span,
+            args: bound_args,
+            body,
         }
     }
 
@@ -384,8 +413,16 @@ impl<'a> NominalChecker<'a, '_> {
                 }
             }
             Term::Call {
-                decl, span, args, ..
-            } => self.walk_call(*decl, *span, args, place, refusals),
+                decl,
+                span,
+                args,
+                body,
+            } => {
+                self.walk_call(*decl, *span, args, place, refusals);
+                if let Some(body) = body {
+                    self.walk(body, place, refusals);
+                }
+            }
             Term::Int(_) | Term::Param | Term::None | Term::Other => {}
         }
     }
@@ -534,7 +571,9 @@ impl<'a> NominalChecker<'a, '_> {
             Term::List(items) => items
                 .iter()
                 .find_map(|it| self.post_modifier_agree_span(it)),
-            Term::Call { decl, span, args } => {
+            Term::Call {
+                decl, span, args, ..
+            } => {
                 if self.builds(*decl, "PostModifier", "Agree") {
                     Some(*span)
                 } else if self.builds(*decl, "PostModifier", "Coordination")
@@ -682,7 +721,9 @@ fn named<'t, 'a>(args: &'t Args<'a>, name: &str) -> &'t Term<'a> {
 /// for a Template parameter.
 fn call_of<'t, 'a>(term: &'t Term<'a>, sort: &str) -> Option<(usize, Span, &'t Args<'a>)> {
     match term {
-        Term::Call { decl, span, args } => Some((*decl, *span, args)),
+        Term::Call {
+            decl, span, args, ..
+        } => Some((*decl, *span, args)),
         Term::Param => None,
         other => panic!("a {sort} is a call or a parameter, not {other:?}"),
     }
@@ -744,6 +785,9 @@ enum Term<'a> {
         decl: usize,
         span: Span,
         args: Vec<(String, SortKey, Term<'a>)>,
+        /// A Definition's body with this call's arguments; `None` for a
+        /// primitive and for a declaration with no parameters.
+        body: Option<Box<Term<'a>>>,
     },
     List(Vec<Term<'a>>),
     Record {

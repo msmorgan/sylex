@@ -132,7 +132,9 @@ fn card_without_a_line_lists_its_units() {
     );
     let both = survey(&["--card", "Delver of Secrets // Insectile Aberration"]).unwrap();
     assert!(
-        both.starts_with("Delver of Secrets type line: \"Creature — Human Wizard\"\nDelver of Secrets line 1: "),
+        both.starts_with(
+            "Delver of Secrets type line: \"Creature — Human Wizard\"\nDelver of Secrets line 1: "
+        ),
         "{both}"
     );
     assert!(
@@ -154,11 +156,17 @@ fn each_bad_unit_choice_names_the_way_out() {
         )
     );
     assert!(
-        fail(&["--card", "Lightning Bolt", "--assertions"]).contains("pass `--line N` or `--type-line`")
+        fail(&["--card", "Lightning Bolt", "--assertions"])
+            .contains("pass `--line N` or `--type-line`")
     );
     assert!(
-        fail(&["--card", "Lightning Bolt", "--pick", "dependency \"deals\"#1 root"])
-            .contains("pass `--line N` or `--type-line`")
+        fail(&[
+            "--card",
+            "Lightning Bolt",
+            "--pick",
+            "dependency \"deals\"#1 root"
+        ])
+        .contains("pass `--line N` or `--type-line`")
     );
     assert_eq!(
         fail(&["--card", "Lightning Bolt", "--line", "2"]),
