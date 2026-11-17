@@ -437,20 +437,21 @@ evidence.
 ## Surveying a unit's forest
 
 ```sh
+cargo xtask english forestwalk --card 'Draugr Necromancer'
 cargo xtask english forestwalk --card 'Draugr Necromancer' --line 2
 cargo xtask english forestwalk --card 'Draugr Necromancer' --type-line
 cargo xtask english forestwalk --as-card 'Jace, Cunning Castaway' 'Jace draws two cards.'
 ```
 
 `forestwalk` shows one unit's ambiguity without enumerating its Readings, so a
-unit of thousands of Readings fits on a screen. The unit is given as `parse`
-gives it: text (one entry, without assertions; `--as-card` or `<card=NAME>`
-for its card), or `--card NAME` with exactly one of `--line N` and
-`--type-line`, which pick a unit as `parse` labels it (`FACE line N`,
-`FACE type line`). `NAME` is a face's name, or the whole card's when the card
-has one face. Faces of two cards that share a name (*Lightning Bolt*) give one
-unit when the picked units have the same text. A wrong choice is an error
-that lists the face's units or names.
+unit of thousands of Readings fits on a screen. `--card NAME` alone lists the
+units of every matching face (`FACE type line`, `FACE line N`). To survey one
+unit, give text (one entry, without assertions; `--as-card` or `<card=NAME>`
+for its card), or `--card NAME` with `--line N` or `--type-line`, where `NAME`
+is a face's name (or the whole card's when the card has one face). Faces of two
+cards that share a name (*Lightning Bolt*) give one unit when the picked units
+have the same text. A wrong choice is an error that lists the face's units or
+names.
 
 It prints the Derivation count, then the settled spine
 (`ForkForest::settled_spine`): expanded branching nodes print as `function:

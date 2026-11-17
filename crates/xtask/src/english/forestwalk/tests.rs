@@ -120,21 +120,45 @@ fn a_face_name_two_cards_share_picks_their_one_text() {
     );
 }
 
+/// `--card` with neither `--line` nor `--type-line` lists the units of every
+/// matching face, deduplicating identical units across cards that share a face
+/// name (*Lightning Bolt*).
+#[test]
+fn card_without_a_line_lists_its_units() {
+    assert_eq!(
+        survey(&["--card", "Lightning Bolt"]).unwrap(),
+        "Lightning Bolt type line: \"Instant\"\n\
+         Lightning Bolt line 1: \"Lightning Bolt deals 3 damage to any target.\"\n"
+    );
+    let both = survey(&["--card", "Delver of Secrets // Insectile Aberration"]).unwrap();
+    assert!(
+        both.starts_with("Delver of Secrets type line: \"Creature — Human Wizard\"\nDelver of Secrets line 1: "),
+        "{both}"
+    );
+    assert!(
+        both.ends_with("Insectile Aberration type line: \"Creature — Human Insect\"\nInsectile Aberration line 1: \"Flying\"\n"),
+        "{both}"
+    );
+}
+
 #[test]
 fn each_bad_unit_choice_names_the_way_out() {
     let fail = |inputs: &[&str]| survey(inputs).unwrap_err();
     let units = "  Lightning Bolt type line: \"Instant\"\n  \
                  Lightning Bolt line 1: \"Lightning Bolt deals 3 damage to any target.\"";
     assert_eq!(
-        fail(&["--card", "Lightning Bolt"]),
+        fail(&["--card", "Lightning Bolt", "--line", "1", "--type-line"]),
         format!(
-            "give exactly one of `--line N` and `--type-line` to pick a unit of \
+            "give `--line N` or `--type-line`, not both, to pick a unit of \
              Lightning Bolt:\n{units}"
         )
     );
-    assert_eq!(
-        fail(&["--card", "Lightning Bolt", "--line", "1", "--type-line"]),
-        fail(&["--card", "Lightning Bolt"])
+    assert!(
+        fail(&["--card", "Lightning Bolt", "--assertions"]).contains("pass `--line N` or `--type-line`")
+    );
+    assert!(
+        fail(&["--card", "Lightning Bolt", "--pick", "dependency \"deals\"#1 root"])
+            .contains("pass `--line N` or `--type-line`")
     );
     assert_eq!(
         fail(&["--card", "Lightning Bolt", "--line", "2"]),

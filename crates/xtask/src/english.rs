@@ -28,13 +28,16 @@ enum EnglishCommand {
     /// Profile every Corpus Unit into its Complexity Stratum and run the
     /// census: read, known-wrong-only and unread per Stratum.
     Strata(StrataArgs),
-    /// Inspect judgments and their cheapest Readings.
+    /// Evaluate judgment entries and dump raw constituent tables (token bomb:
+    /// prints full multi-column node tables for up to `--limit` Readings per
+    /// unit; use `forestwalk` to inspect parses or list a card's units).
     Parse(ParseArgs),
     /// Write every Corpus Unit's Packed Forest, with exact Derivation
     /// counts, to one SQLite database. Questions are SQL over it.
     Forests(forests::ForestsArgs),
-    /// Survey one unit's forest without enumerating it: its settled spine,
-    /// then its forks, each option with its exact Derivation count.
+    /// Survey one unit's forest without enumerating it (its settled spine,
+    /// then its forks, each option with its exact Derivation count), or list a
+    /// card's units.
     Forestwalk(forestwalk::ForestwalkArgs),
 }
 
@@ -161,7 +164,9 @@ struct ParseArgs {
     /// lines. Takes no text.
     #[arg(long, value_name = "NAME")]
     card: Option<String>,
-    /// Maximum number of cheapest Readings to display per input.
+    /// Maximum number of cheapest Readings to dump per input (token bomb: each
+    /// Reading is a full constituent table; pass `--limit 0` when only
+    /// outcomes, strata or counts are wanted, or use `forestwalk`).
     #[arg(long, default_value_t = 8)]
     limit: usize,
 }

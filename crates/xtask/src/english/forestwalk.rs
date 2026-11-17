@@ -1,6 +1,7 @@
 //! `cargo xtask english forestwalk`: one unit's forest surveyed without
 //! enumerating it: its settled spine (`ForkForest::settled_spine`), then its
-//! forks (`ForkForest::forks`), each option with its exact Derivation count.
+//! forks (`ForkForest::forks`), each option with its exact Derivation count;
+//! `--card NAME` alone lists the matching faces' units.
 //!
 //! `--pick` and `--exclude` narrow the forest by fork options first
 //! (`ForkForest::pick`, `ForkForest::exclude`; [`selector`]) and survey what
@@ -53,16 +54,16 @@ pub(super) struct ForestwalkArgs {
     /// fetched: the name is an input like the text.
     #[arg(long, value_name = "NAME", conflicts_with = "card")]
     as_card: Option<String>,
-    /// Fetch the face so named (a face's name, or its whole card's when the
-    /// card has one face) from the supported corpus and survey one of its
-    /// units, picked by `--line` or `--type-line`. Takes no text.
+    /// Fetch the faces so named (a face's name, or its whole card's) from the
+    /// supported corpus: alone, list their units; with `--line` or
+    /// `--type-line`, survey that unit (then `NAME` must name one face). Takes
+    /// no text.
     #[arg(long, value_name = "NAME")]
     card: Option<String>,
-    /// With `--card`: the face's Nth rules-text line (1-based), as `parse`
-    /// labels it.
+    /// With `--card`: survey the face's Nth rules-text line (1-based).
     #[arg(long, value_name = "N")]
     line: Option<usize>,
-    /// With `--card`: the face's type line.
+    /// With `--card`: survey the face's type line.
     #[arg(long)]
     type_line: bool,
     #[command(flatten)]
@@ -84,7 +85,13 @@ pub(super) struct ForestwalkArgs {
 
 pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
     let selectors = args.steps.selectors()?;
-    let item = unit(args)?;
+    let item = match target(args, &selectors)? {
+        Target::List(listing) => {
+            writeln!(output, "{listing}")?;
+            return Ok(());
+        }
+        Target::Survey(item) => *item,
+    };
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
     if let Some(name) = &args.as_card {
         anyhow::ensure!(
@@ -295,15 +302,33 @@ fn isolation_lines(
     Ok(())
 }
 
-/// The one unit the arguments name, as a judgment entry.
-fn unit(args: &ForestwalkArgs) -> Result<ParseItem> {
+enum Target {
+    List(String),
+    Survey(Box<ParseItem>),
+}
+
+/// What the arguments ask for: a card's unit listing, or one unit to survey.
+fn target(args: &ForestwalkArgs, selectors: &[Selector]) -> Result<Target> {
     let picks = args.line.is_some() || args.type_line;
     match (&args.card, &args.text) {
         (Some(name), Some(_)) => anyhow::bail!(
             "`--card {name}` fetches that card and surveys its own text, so it takes no text; \
              to survey text as if it were on a card so named, use `--as-card`"
         ),
-        (Some(name), None) => fetched_unit(name, args.line, args.type_line),
+        (Some(name), None) if !picks => {
+            anyhow::ensure!(
+                selectors.is_empty() && !args.assertions,
+                "`--pick`, `--exclude` and `--assertions` survey one unit; pass `--line N` or \
+                 `--type-line`"
+            );
+            let units = super::fetched_units(name)?;
+            Ok(Target::List(format_units(&units, "")))
+        }
+        (Some(name), None) => Ok(Target::Survey(Box::new(fetched_unit(
+            name,
+            args.line,
+            args.type_line,
+        )?))),
         (None, Some(text)) => {
             anyhow::ensure!(
                 !picks,
@@ -318,7 +343,7 @@ fn unit(args: &ForestwalkArgs) -> Result<ParseItem> {
                 entry.groups.is_empty() && entry.negated.is_empty() && entry.readings.is_none(),
                 "the survey checks no assertions; give the entry without them, or use `parse`"
             );
-            Ok(item)
+            Ok(Target::Survey(Box::new(item)))
         }
         (None, None) => match &args.as_card {
             Some(name) => anyhow::bail!(
@@ -326,11 +351,32 @@ fn unit(args: &ForestwalkArgs) -> Result<ParseItem> {
                  and none was given; to fetch that card and survey its own text, use `--card`"
             ),
             None => anyhow::bail!(
-                "nothing to survey: give text, or `--card NAME` with `--line N` or \
-                 `--type-line` for a unit of a card's own text"
+                "nothing to survey: give text, or `--card NAME` (alone to list its units, or \
+                 with `--line N` or `--type-line` to survey one)"
             ),
         },
     }
+}
+
+/// Faces of two cards that share a name list a unit of one text once, and
+/// name their card when two homonymous units differ.
+fn format_units(units: &[FetchedUnit], indent: &str) -> String {
+    let mut seen = std::collections::HashSet::new();
+    units
+        .iter()
+        .map(|u| {
+            let differs = units.iter().any(|o| {
+                o.face == u.face && o.kind == u.kind && o.index == u.index && o.text != u.text
+            });
+            if differs {
+                format!("{indent}{} (card: {}): {:?}", u.label(), u.card, u.text)
+            } else {
+                format!("{indent}{}: {:?}", u.label(), u.text)
+            }
+        })
+        .filter(|line| seen.insert(line.clone()))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 /// The unit of the face named `name` that `line` or `type_line` picks.
@@ -344,16 +390,6 @@ fn fetched_unit(name: &str, line: Option<usize>, type_line: bool) -> Result<Pars
         "`--card {name}` names faces of more than one name ({}); give one face's name",
         faces.join("; ")
     );
-    // Faces of two cards that share a name list a unit of one text once.
-    let listing = || {
-        let mut seen = std::collections::HashSet::new();
-        units
-            .iter()
-            .map(|u| format!("  {}: {:?}", u.label(), u.text))
-            .filter(|line| seen.insert(line.clone()))
-            .collect::<Vec<_>>()
-            .join("\n")
-    };
     let picked: Vec<&FetchedUnit> = match (line, type_line) {
         (Some(n), false) => units
             .iter()
@@ -364,14 +400,18 @@ fn fetched_unit(name: &str, line: Option<usize>, type_line: bool) -> Result<Pars
             .filter(|u| u.kind == UnitKind::TypeLine)
             .collect(),
         (Some(_), true) | (None, false) => anyhow::bail!(
-            "give exactly one of `--line N` and `--type-line` to pick a unit of {}:\n{}",
+            "give `--line N` or `--type-line`, not both, to pick a unit of {}:\n{}",
             faces[0],
-            listing()
+            format_units(&units, "  ")
         ),
     };
     let Some(first) = picked.first() else {
         let missing = line.map_or_else(|| "type line".to_owned(), |n| format!("line {n}"));
-        anyhow::bail!("{} has no {missing}; its units:\n{}", faces[0], listing());
+        anyhow::bail!(
+            "{} has no {missing}; its units:\n{}",
+            faces[0],
+            format_units(&units, "  ")
+        );
     };
     if picked.iter().any(|u| u.text != first.text) {
         let texts: Vec<String> = picked
