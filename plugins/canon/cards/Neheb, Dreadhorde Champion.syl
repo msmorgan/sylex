@@ -1,0 +1,20 @@
+card singleFaced({
+    name = "Neheb, Dreadhorde Champion",
+    cost = [generic(2), pip(red), pip(red)],
+    supertypes = [legendary],
+    types = [creature],
+    subtypes = [zombie, minotaur, warrior],
+    text = [
+      trample,
+      whenever(
+        does(
+          actor(shortenedName),
+          dealDamage(kind = combat, recipient = a(or([player, planeswalker])))),
+        sequentially([
+            may(
+              discard(counted(anyNumber, card)),
+              ifDid = sequentially(
+                [draw(thatMany), addMana(counted(thatMuch, symbols([pip(red)])))])),
+            establishThroughout(manaRetention(you, thisMana), untilEndOfTurn)]))],
+    power = 5,
+    toughness = 4})
