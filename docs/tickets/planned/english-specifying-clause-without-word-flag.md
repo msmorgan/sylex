@@ -7,7 +7,7 @@ needs: []
 ## Why
 
 `docs/design/english.md` §3 forbids word flags: no feature or flag names a single open-class
-word to license an attachment or construction. `NounEntry::variable` in `nouns.ron` is set on
+word to license an attachment or construction, except a Catalog's license feature. `NounEntry::variable` in `nouns.ron` is set on
 `"type"` alone, projecting `feature Variable = Cited` onto `Nominal` and `NounPhrase` across the
 chart solely to license `SpecifyingClause` and `SpecifyingModalClause` for *Artificial Evolution*
 (*the new creature type can't be Wall*). Both Productions also bypass `VerbPhrase` as flat

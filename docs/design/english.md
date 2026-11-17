@@ -136,16 +136,35 @@ Phrase's.
 **No policing.** No feature or equation exists only to refuse a form no card
 prints. A negative Judgment pins a formation rule that generation needs, such as
 agreement, Case or verb form, on a real or cited construction, never an
-unprinted word order or combination. Nor does any feature or flag name a word:
-an attachment is decided by Category, function and grammatical feature, the
-lexicon has no flag that limits which open-class heads may host a general
-adjunct, and binding refuses the feature names such flags take. This follows
-from the charter (§4). Why: an unprinted form never reaches the parser, so
-refusing it only grows the grammar, and in a lexicalist grammar such constraints
-have no natural home. A word flag is fitted to the cards seen so far, says
-nothing about English, and breaks on the next card. Where an attachment seems to
-need one, some declaration is too broad, such as a preposition's Host
-Categories, and the fix is to correct that declaration.
+unprinted word order or combination. Nor does any feature or flag name a word,
+except a license feature (below): an attachment is decided by Category,
+function and grammatical feature, and the lexicon has no flag that limits which
+open-class heads may host a general adjunct. This follows from the charter
+(§4). Why: an unprinted form never reaches the parser, so refusing it only
+grows the grammar, and in a lexicalist grammar such constraints have no natural
+home. A word flag is fitted to the cards seen so far, says nothing about
+English, and breaks on the next card. Where an attachment seems to need one,
+some declaration is too broad, such as a preposition's Host Categories, and the
+fix is to correct that declaration.
+
+**License features.** A license feature is a lexical feature by which a Catalog
+licenses its own words in one position: it marks each of the Catalog's words,
+which stand nowhere else, and the head that admits them there, which admits
+no other word of their kind there. It is declared by the Catalog, on its words
+and on that head, never by the grammar on a word it names. One is allowed where
+the Catalog's words, read as words of an ordinary Category, would take that
+Category's whole distribution, and the census shows the distribution
+multiplying Readings on real card text. Its feature comment in the grammar
+names the Catalog and the position. `KindLicense` is the one: the
+counter Catalog marks each counter's kind name (*charge*, *time*), which stands
+only as the kind premodifying the noun *counter*, and *counter*, which takes no
+noun premodifier but its kind, a slash measure or a keyword [CR#122.1]. As
+ordinary nouns, the kind names would head nominals and premodify any noun,
+and many are homographs of other words (*Treasure*, *time*). Why: the counter
+kinds are open, as every Catalog is, and *counter* is the one head they
+modify. A license states that as a lexical fact of the Catalog, where a
+Production per kind would name Catalog items (§2), and it leaves the
+attachment of general adjuncts to Category, function and grammatical feature.
 
 ## 4. Admission and ambiguity
 

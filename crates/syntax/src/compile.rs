@@ -45,9 +45,6 @@ use crate::step::Test;
 use crate::step::Unlike;
 use crate::step::Weight;
 
-/// Feature names that would police attachment rather than describe grammar.
-const FORBIDDEN_SUFFIXES: [&str; 5] = ["Use", "Licence", "License", "Present", "Restriction"];
-
 /// The lexical facts a bound grammar keeps about one lexeme.
 #[derive(Debug, Clone)]
 pub(crate) struct LexemeFacts {
@@ -169,9 +166,8 @@ impl CompiledGrammar {
     /// Binds `grammar` to the lexicon and frame catalog.
     ///
     /// # Errors
-    /// Any unknown name, ill-typed equation, forbidden feature name, grammar
-    /// reference to a non-core or open-class lexeme, or frame that cannot be
-    /// compiled.
+    /// Any unknown name, ill-typed equation, grammar reference to a non-core
+    /// or open-class lexeme, or frame that cannot be compiled.
     pub fn bind(
         grammar: &Grammar,
         lexicon: &Lexicon,
@@ -725,13 +721,6 @@ impl<'a> Binder<'a> {
     ) -> Result<Self, LoadError> {
         let mut report = LoadReport::default();
         let features: Vec<Ident> = grammar.features.keys().copied().collect();
-        for name in &features {
-            if FORBIDDEN_SUFFIXES.iter().any(|s| name.ends_with(s)) {
-                return Err(invalid(format!(
-                    "feature `{name}` is a policing flag, which the grammar may not declare"
-                )));
-            }
-        }
         if features.len() > crate::step::MAX_FEATURES {
             return Err(invalid(format!(
                 "the grammar declares {} features, more than {}",

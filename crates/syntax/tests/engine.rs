@@ -330,13 +330,6 @@ fn load_errors() {
             .contains("unknown lexeme")
     );
     assert!(load_error(&swap("Noun: Nominal -> Lex(Noun)", "Noun: Nominal ->")).contains("empty"));
-    for suffix in ["Use", "Licence", "License", "Present", "Restriction"] {
-        let policing = swap(
-            "feature Number = ",
-            &format!("feature Attachment{suffix} = Yes\n    feature Number = "),
-        );
-        assert!(load_error(&policing).contains("policing"), "{suffix}");
-    }
     // Values agree by index, so two features agree only over one domain.
     let agreeing = swap(
         "feature VerbForm = ",
