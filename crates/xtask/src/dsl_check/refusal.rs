@@ -226,6 +226,11 @@ pub enum RefusalKind {
          `dsl_check/nominal.rs`"
     )]
     UnclassifiedNumber { word: String, sort: String },
+    #[error(
+        "coordinator `{0}` is not classified for the `stacked` rule; classify it in \
+         `dsl_check/nominal.rs`"
+    )]
+    UnclassifiedCoordinator(String),
     #[error("`{0}` stands only in a card face, never in builtin")]
     OwnNameInBuiltin(String),
     #[error("`{word}` requires a card face with a Shortened Name; `{face}` has none")]

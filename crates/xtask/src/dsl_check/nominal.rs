@@ -347,26 +347,6 @@ impl<'a> NominalChecker<'a, '_> {
             bound_args.push((slot.name.clone(), slot.sort.clone(), arg_term));
         }
 
-        // `forEach` is distributive singular ("for each card"), even though
-        // its body expands through `countOf` (`described(all, ...)`).
-        if decl.kind.word == schema::TEMPLATE && decl.name.as_deref() == Some("forEach") {
-            let mut refused_here = false;
-            for (_, psort, aterm) in &bound_args {
-                if is_nominal_sort(psort)
-                    && let Some(bad_span) = self.nominal_agree_span(aterm)
-                {
-                    refusals.push(Refusal {
-                        span: bad_span,
-                        kind: RefusalKind::AgreementWithoutGroup,
-                    });
-                    refused_here = true;
-                }
-            }
-            if refused_here {
-                return Term::Other;
-            }
-        }
-
         if decl.kind.word == schema::TEMPLATE {
             let body = decl.field("body").expect("a Template has a body");
             self.elaborate(body, &decl.sort, &callee_env, Some(call_span), refusals)
@@ -444,16 +424,30 @@ impl<'a> NominalChecker<'a, '_> {
             Some(("PreModifier", "Coordination")) => {
                 let item_place = match arg("coordinator") {
                     Term::Param => Place::Deferred,
-                    coordinator if self.is_and(coordinator) => {
-                        if place == Place::Elsewhere {
-                            refusals.push(Refusal {
-                                span,
-                                kind: RefusalKind::UnplacedStacked,
-                            });
+                    Term::Call {
+                        decl: coordinator,
+                        span: coordinator_span,
+                        ..
+                    } => match self.constructor(*coordinator) {
+                        Some(("Coordinator", "And")) => {
+                            if place == Place::Elsewhere {
+                                refusals.push(Refusal {
+                                    span,
+                                    kind: RefusalKind::UnplacedStacked,
+                                });
+                            }
+                            Place::Elsewhere
                         }
-                        Place::Elsewhere
-                    }
-                    _ => Place::DisjunctionItem,
+                        Some(("Coordinator", "Or" | "AndOr")) => Place::DisjunctionItem,
+                        _ => {
+                            refusals.push(Refusal {
+                                span: *coordinator_span,
+                                kind: RefusalKind::UnclassifiedCoordinator(self.word(*coordinator)),
+                            });
+                            Place::Elsewhere
+                        }
+                    },
+                    other => panic!("a Coordinator is a call or a parameter, not {other:?}"),
                 };
                 self.walk(arg("items"), item_place, refusals);
             }
@@ -480,9 +474,11 @@ impl<'a> NominalChecker<'a, '_> {
                     self.walk(aterm, Place::Elsewhere, refusals);
                 }
             }
+            // The rule, not a fallback: every consumer of a `Nominal` other than
+            // a determiner (`Described`) or a slice (`SomeOf`) tests individual
+            // members or names a single head noun, so it forms no group for
+            // Agreement, whatever its constructor.
             _ => {
-                // Every other consumer of a `Nominal` tests individual members
-                // or names a single head noun, forming no group for Agreement.
                 for (_, psort, aterm) in args {
                     if is_nominal_sort(psort) {
                         self.refuse_agreement_in(aterm, refusals);
@@ -491,11 +487,6 @@ impl<'a> NominalChecker<'a, '_> {
                 }
             }
         }
-    }
-
-    /// Whether `term` is the coordinator `and`.
-    fn is_and(&self, term: &Term<'a>) -> bool {
-        matches!(term, Term::Call { decl, .. } if self.builds(*decl, "Coordinator", "And"))
     }
 
     fn refuse_agreement_in(&self, term: &Term<'a>, refusals: &mut Vec<Refusal>) {
@@ -517,14 +508,20 @@ impl<'a> NominalChecker<'a, '_> {
                 if self.builds(*decl, "Nominal", "Nominal") {
                     args.iter()
                         .find_map(|(pname, _, aterm)| match pname.as_str() {
+                            // An Agreement phrase is a postmodifier, never a
+                            // premodifier.
+                            "pre" => None,
                             "head" => self.nominal_agree_span(aterm),
                             "post" => self.post_modifier_agree_span(aterm),
-                            _ => None,
+                            other => panic!("`nominal` has no parameter `{other}`"),
                         })
                 } else if self.builds(*decl, "Nominal", "Coordination") {
                     args.iter()
                         .find_map(|(_, _, aterm)| self.nominal_agree_span(aterm))
                 } else {
+                    // A head word, or a Nominal built over a domain of its own
+                    // (`compareOver`): any Agreement inside belongs to that
+                    // domain's own consumer, which the walk checks there.
                     None
                 }
             }
@@ -546,6 +543,9 @@ impl<'a> NominalChecker<'a, '_> {
                     args.iter()
                         .find_map(|(_, _, aterm)| self.post_modifier_agree_span(aterm))
                 } else {
+                    // Any other postmodifier is no Agreement and holds the
+                    // nominal's postmodifiers in no argument; a nominal inside
+                    // one is checked at its own consumer.
                     None
                 }
             }
@@ -555,14 +555,14 @@ impl<'a> NominalChecker<'a, '_> {
 
     // ---- Number: each form of each sort, by constructor ----
 
-    /// A `DetPhrase`'s number: "all" and plural "the" form a group, "a" and
+    /// A `DetPhrase`'s number: "all", a possessive and plural "the" form a group, "a" and
     /// distributive "each" do not, and a count or a target is its quantity's.
     fn determiner_number(&self, det: &Term<'a>, refusals: &mut Vec<Refusal>) -> Number {
         let Some((decl, span, args)) = call_of(det, "DetPhrase") else {
             return Number::Parameter;
         };
         match self.constructor(decl) {
-            Some(("DetPhrase", "All")) => Number::Group,
+            Some(("DetPhrase", "All" | "Possessive")) => Number::Group,
             Some(("DetPhrase", "A" | "Each")) => Number::AtMostOne,
             Some(("DetPhrase", "The")) => self.plurality_number(named(args, "plur"), refusals),
             Some(("DetPhrase", "Count" | "Target")) => {
@@ -651,15 +651,20 @@ impl<'a> NominalChecker<'a, '_> {
     }
 
     fn unclassified(&self, decl: usize, span: Span, refusals: &mut Vec<Refusal>) -> Number {
-        let decl = &self.decls[decl];
         refusals.push(Refusal {
             span,
             kind: RefusalKind::UnclassifiedNumber {
-                word: decl.name.clone().unwrap_or_else(|| decl.label()),
-                sort: decl.sort.to_string(),
+                word: self.word(decl),
+                sort: self.decls[decl].sort.to_string(),
             },
         });
         Number::Group
+    }
+
+    /// The word a declaration declares, or its label when it declares none.
+    fn word(&self, decl: usize) -> String {
+        let decl = &self.decls[decl];
+        decl.name.clone().unwrap_or_else(|| decl.label())
     }
 }
 

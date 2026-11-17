@@ -2687,6 +2687,7 @@ const AGREEMENT_PREAMBLE: &str = "\
     primitive the(plur: Plurality = one): DetPhrase = The\n\
     primitive count(quantity: Quantity, mode: Option(ChoiceMode)): DetPhrase = Count\n\
     primitive target(quantity: Quantity): DetPhrase = Target\n\
+    primitive possessive(owner: NounPhrase): DetPhrase = Possessive\n\
     primitive described(determiner: DetPhrase, nominal: Nominal): NounPhrase = Described\n\
     template a(n: Nominal): NounPhrase { body = described(a(unmarked), $n) }\n\
     template each(n: Nominal): NounPhrase { body = described(each, $n) }\n\
@@ -2744,7 +2745,11 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          }}\n\
          template okQuantityParameter(q: Quantity): NounPhrase {{\n\
            body = counted($q, nominal(card, post = [withDifferentNames]))\n\
-         }}"
+         }}\n\
+         template okPossessive(owner: NounPhrase): NounPhrase {{\n\
+           body = described(possessive($owner), nominal(card, post = [withDifferentNames]))\n\
+         }}\n\
+         template okForEach: Amount {{ body = forEach(1, nominal(card, post = [withDifferentNames])) }}"
     );
     assert_eq!(kinds(&valid), []);
 
@@ -2765,7 +2770,6 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          template badSliceOne(g: NounPhrase): NounPhrase {{\n\
            body = someOf(sliceCounted(exactlyOf(1)), description = nominal(card, post = [withDifferentNames]), $g)\n\
          }}\n\
-         template badForEach: Amount {{ body = forEach(1, nominal(card, post = [withDifferentNames])) }}\n\
          template differentCards(d: DetPhrase): NounPhrase {{\n\
            body = described($d, nominal(card, post = [withDifferentNames]))\n\
          }}\n\
@@ -2777,7 +2781,7 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
     assert_eq!(
         refusals(&[("a.syl", &invalid)]),
         [
-            vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames")); 12],
+            vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames")); 11],
             // Inside a Template's body, at the call that supplies the determiner.
             vec![(
                 RefusalKind::AgreementWithoutGroup,
@@ -2786,6 +2790,19 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
             vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames"))],
         ]
         .concat()
+    );
+}
+
+#[test]
+fn stacked_refuses_a_coordinator_it_does_not_classify() {
+    let source = format!(
+        "{NOMINAL_PREAMBLE}\
+         primitive nor: Coordinator = Nor\n\
+         template neither: Nominal {{ body = nominal(pre = [coord(nor, [white, black])], card) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(RefusalKind::UnclassifiedCoordinator(s("nor")), s("nor"))]
     );
 }
 
