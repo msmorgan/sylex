@@ -192,8 +192,9 @@ struct Alt<'e> {
     /// Its declared Complement frames, for a preposition.
     preposition_frames: &'e [PrepositionFrame],
     /// A verb whose lemma the lexicon also declares as an auxiliary
-    /// (`VerbKind: Auxiliary`): the auxiliaries themselves, and main-verb
-    /// *do*, which this stratum reads with the auxiliary *do* of *don't*.
+    /// (`VerbKind: Auxiliary | Modal`): the auxiliaries themselves, and
+    /// main-verb *do*, which this stratum reads with the auxiliary *do* of
+    /// *don't*.
     auxiliary: bool,
 }
 
@@ -347,13 +348,17 @@ impl<'e> Profiler<'e> {
     pub fn new(env: &'e LexicalEnvironment) -> Self {
         let verb_kind = Ident::new("VerbKind");
         let auxiliary = Ident::new("Auxiliary");
+        let modal = Ident::new("Modal");
         let auxiliaries = env
             .lexicon
             .lexemes()
             .values()
             .filter(|l| {
                 l.category == Category::Verb
-                    && l.properties.features.get(&verb_kind) == Some(&auxiliary)
+                    && matches!(
+                        l.properties.features.get(&verb_kind),
+                        Some(k) if *k == auxiliary || *k == modal
+                    )
             })
             .map(|l| l.lemma.as_str())
             .collect();

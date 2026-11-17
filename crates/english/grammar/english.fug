@@ -41,8 +41,10 @@ feature Voice = Active | Passive
 // from the verb's participle again, and the participle, not the Adjective,
 // postmodifies with a Complement (*Aura attached to a creature*).
 feature AdjectivalPassive = Lexical
-// Privative: auxiliary verbs (CGEL's NICE verbs).
-feature VerbKind = Auxiliary
+// `Modal`: modal auxiliaries (*can*, *may*, *must*, *will*); `Auxiliary`:
+// non-modal NICE verbs (*be*, *have*, *don't*); `Lexical`: all other verbs;
+// `Mixed`: a coordination of unlike VerbKinds.
+feature VerbKind = Lexical | Auxiliary | Modal | Mixed
 // A Clause's or Verb Phrase's time, two privative features, each carried or
 // not; the lexicon's tense gives them: a preterite carries `Past`, a present
 // `NonPast`. A modal's preterite is ambiguous between past time and modal
@@ -426,7 +428,7 @@ category PrepositionRemnant
 // A medial Verb Phrase conjunct's Predicative Complement, the copula elided
 // (*is enchanted, [equipped], and has a counter on it*; CGEL
 // 15§3.6:1335–1336).
-category PredicativeRemnant
+category PredicativeRemnant [VerbKind]
 // A medial Clause conjunct's finite Verb Phrase, the Subject elided (*you
 // gain 4 life, [draw four cards], and he deals 4 damage*; CGEL
 // 15§3.6:1335–1336).
@@ -1379,7 +1381,7 @@ CoordinatedDepictive: VerbPhrase -> VerbPhrase adjunct:DepictiveCoordination {
     cost: 2,
     transparent: [head],
 }
-    where head.VerbKind != Auxiliary
+    where head.VerbKind != Auxiliary | Modal
 PrepositionalAdjunct: PredicateAdjunct -> filler:Hosted(PrepositionPhrase, Predicate)
     where $.ComplementKind = PP
 DepictiveAdjunct: PredicateAdjunct -> filler:AdjectivePhrase
@@ -3498,7 +3500,7 @@ adjunct Gerund { host: Clause, side: Before, host_kind: Predicate, delimiter: ',
 // only: after an auxiliary it is the progressive's (*the player it is
 // attacking*).
 adjunct Gerund { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
-    where head.VerbKind != Auxiliary
+    where head.VerbKind != Auxiliary | Modal
 // A purpose *to*-infinitival, unless the head's frame selects a
 // *to*-infinitival Complement (*costs {2} less to activate*, Arm-Mounted
 // Anchor).
@@ -3509,16 +3511,33 @@ adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
 // abilities you activate ... cost {3} less to activate*, Strong Back).
 adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
     where adjunct.Gap = NP
-// Conjuncts share Voice and VerbKind, so a selecting auxiliary sees a value
-// (*it has attacked or blocked* is no passive perfect). Only a medial
-// conjunct may be a PredicativeRemnant, so Predicatives under one copula
-// keep one tree (*is a creature, an artifact, and an enchantment*).
+// Conjuncts share Voice and resolve VerbKind (*it has attacked or blocked* is
+// no passive perfect). Disjunctive coordination excludes a modal catenative
+// paired with a plain lexical finite VP (*can't attack or block* coordinates
+// bare infinitives under the modal; CGEL 15§2.1(b):1290), while *and*/*but*
+// (*has first strike and must be blocked*), *be* + modal (*is snow or could
+// produce {C}*), and lexical + *be* (*controls the most creatures or is tied*)
+// remain admitted. Only a medial conjunct may be a PredicativeRemnant, so
+// Predicatives under one copula keep one tree (*is a creature, an artifact,
+// and an enchantment*).
 coordination VerbPhrase {
-    coordinators: Coordinator,
+    coordinators: And,
     unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    proximate: [VerbKind],
     remnant: PredicativeRemnant,
 }
     where $.CentralPosition = first.CentralPosition
+coordination VerbPhrase {
+    coordinators: Disjunctive,
+    unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    resolve: [VerbKind -> Mixed],
+    remnant: PredicativeRemnant,
+}
+    where $.CentralPosition = first.CentralPosition,
+          !(first.VerbKind = Modal & last.VerbKind = Lexical),
+          !(first.VerbKind = Lexical & last.VerbKind = Modal),
+          !(first.VerbKind = Mixed & last.VerbKind = Lexical),
+          !(first.VerbKind = Modal & last.VerbKind = Mixed)
 // Active with passive (*enters or is put into a graveyard*), Voice and
 // VerbKind unvalued. Never past participles, whose Voice selects them
 // (*attacked or blocked by this creature*).
@@ -3544,6 +3563,7 @@ coordination VerbPhrase {
 coordination VerbPhrase {
     coordinators: But,
     unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    proximate: [VerbKind],
 }
     where $.CentralPosition = first.CentralPosition
 // A Linked Coordination (*may search ..., put ..., then shuffle*), set off
@@ -3553,6 +3573,7 @@ coordination VerbPhrase {
 coordination VerbPhrase {
     link: LinkedVerbPhrase,
     unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    proximate: [VerbKind],
     delimiter: ',',
 }
     where $.CentralPosition = first.CentralPosition

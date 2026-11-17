@@ -258,12 +258,17 @@ impl Builder {
             }
         }
         lexeme.merge_number_neutral_forms();
-        if auxiliary {
-            lexeme
-                .properties
-                .features
-                .insert("VerbKind".into(), "Auxiliary".into());
-        }
+        lexeme.properties.features.insert(
+            "VerbKind".into(),
+            if entry.modal {
+                "Modal"
+            } else if auxiliary {
+                "Auxiliary"
+            } else {
+                "Lexical"
+            }
+            .into(),
+        );
         if let Some(base) = &entry.form_of {
             if !auxiliary {
                 return Err(invalid("only an auxiliary is a form of another verb"));

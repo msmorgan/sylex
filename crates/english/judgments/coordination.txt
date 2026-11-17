@@ -81,3 +81,6 @@
 + Destroy target permanent you own and an opponent controls. => RelativeClause "you own and an opponent controls" as Modifier of permanent
 + Destroy target permanent you own or an opponent controls. => RelativeClause "you own or an opponent controls" as Modifier of permanent
 + Destroy target permanent you own and/or an opponent controls. => RelativeClause "you own and/or an opponent controls" as Modifier of permanent
++ <card=Rhonas the Indomitable> Rhonas can't attack or block unless you control another creature with power 4 or greater. => VerbPhrase "attack or block" as Complement of can; !VerbPhrase "can't attack"
++ <card=Break the Ice> Destroy target land that is snow or could produce {C}. => VerbPhrase "is snow"; VerbPhrase "could produce {C}"
++ <card=Hooded Horror> This creature can't be blocked as long as defending player controls the most creatures or is tied for the most. => VerbPhrase "controls the most creatures"; VerbPhrase "is tied for the most"
