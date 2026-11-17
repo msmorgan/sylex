@@ -555,16 +555,19 @@ impl<'a> NominalChecker<'a, '_> {
 
     // ---- Number: each form of each sort, by constructor ----
 
-    /// A `DetPhrase`'s number: "all", a possessive and plural "the" form a group, "a" and
-    /// distributive "each" do not, and a count or a target is its quantity's.
+    /// A `DetPhrase`'s number: "all" and a possessive form a group, distributive
+    /// "each" does not, "a" and "the" are their plurality's, and a count or a
+    /// target is its quantity's.
     fn determiner_number(&self, det: &Term<'a>, refusals: &mut Vec<Refusal>) -> Number {
         let Some((decl, span, args)) = call_of(det, "DetPhrase") else {
             return Number::Parameter;
         };
         match self.constructor(decl) {
             Some(("DetPhrase", "All" | "Possessive")) => Number::Group,
-            Some(("DetPhrase", "A" | "Each")) => Number::AtMostOne,
-            Some(("DetPhrase", "The")) => self.plurality_number(named(args, "plur"), refusals),
+            Some(("DetPhrase", "Each")) => Number::AtMostOne,
+            Some(("DetPhrase", "A" | "The")) => {
+                self.plurality_number(named(args, "plur"), refusals)
+            }
             Some(("DetPhrase", "Count" | "Target")) => {
                 self.quantity_number(named(args, "quantity"), refusals)
             }
