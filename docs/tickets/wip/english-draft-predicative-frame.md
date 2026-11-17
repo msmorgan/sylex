@@ -21,6 +21,11 @@ gains a spurious `predicative_complement` Reading.
 
 - Remove `ComplexTransitive(Pred)` from `draft` in `crates/vocabulary/lexicon/english/verbs.ron`,
   leaving `frames: [Monotransitive]`.
+- Mark `round` as `kind: Temporal` in `crates/vocabulary/lexicon/english/nouns.ron` (matching
+  `turn`, `phase`, `step`, `combat` and `game`), so `"how many cards you've drafted this draft
+  round"` (*Lurking Automaton*, *Pyretic Hunter*, *Garbage Fire*, *Custodi Peacekeeper*) reads
+  `"this draft round"` as a temporal `Adjunct` rather than an accidental `NominalPredicative`
+  `PredicativeComplement`.
 
 ## Done when
 

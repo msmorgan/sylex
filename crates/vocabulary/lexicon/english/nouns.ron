@@ -136,7 +136,7 @@
     // The result of rolling a die: *ignore the lower roll* (OSG §12,
     // Randomness, dice, coins, and voting).
     "roll",
-    "round",
+    (lemma: "round", kind: Temporal),
     "rule",
     "size",
     "source",

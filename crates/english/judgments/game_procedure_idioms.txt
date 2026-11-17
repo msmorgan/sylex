@@ -30,8 +30,11 @@
 # A gerund-participial Supplement (CGEL, Ch. 14 §9) with a heavy-shifted Object.
 + <card=Karn Liberated> −14: Restart the game, leaving in exile all non-Aura permanent cards exiled with Karn. Then put those cards onto the battlefield under your control. => VerbPhrase "leaving in exile all non-Aura permanent cards exiled with Karn"; NounPhrase "all non-Aura permanent cards exiled with Karn" as Object of leave
 + <card=Time and Tide> Simultaneously, all phased-out creatures phase in and all creatures with phasing phase out. => AdverbPhrase "Simultaneously"; AdjectivePhrase "phased-out" as Modifier of creature
-# *One at a time*, an exceptional Preposition Phrase (CGEL, Ch. 7 §4.3).
+# *One at a time*, an exceptional Preposition Phrase (CGEL, Ch. 7 §4.3); *face up* on *draft* is a depictive Adjunct, never a PredicativeComplement.
++ <card=Agent of Acquisitions> Draft this card face up. => PrepositionPhrase "face up" as Adjunct of draft; !Predicative "face up" as PredicativeComplement of draft; !PrepositionPhrase "face up" as PredicativeComplement of draft
 + <card=Agent of Acquisitions> Instead of drafting a card from a booster pack, you may draft each card in that booster pack, one at a time. If you do, turn this card face down and you can't draft cards for the rest of this draft round. => PrepositionPhrase "one at a time"
++ <card=Cogwork Librarian> As you draft a card, you may draft an additional card from that booster pack. If you do, put this card into that booster pack. => !Predicative "from that booster pack" as PredicativeComplement of draft; !PrepositionPhrase "from that booster pack" as PredicativeComplement of draft
++ <card=Lurking Automaton> Reveal this card as you draft it and note how many cards you've drafted this draft round, including this card. => NounPhrase "this draft round" as Adjunct of draft
 # Discourse-deictic fused *the above* (CGEL, Ch. 17 §9.4, p. 1556).
 + <card=Multiple Choice> If X is 4 or more, do all of the above. => NounPhrase "all of the above" as Object of do; NounPhrase "the above" head above
 # A noun prefixed by *non-* as a head (CGEL, Ch. 19 §5.5.1).

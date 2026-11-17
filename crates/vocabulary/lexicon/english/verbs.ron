@@ -68,8 +68,7 @@
     (lemma: "die", frames: [Intransitive]),
     (lemma: "distribute", frames: [Monotransitive, TransitiveWithPP(["among"])]),
     (lemma: "divide", frames: [Monotransitive, TransitiveWithPP(["among", "into"])]),
-    // *Draft this card face up.*
-    (lemma: "draft", frames: [Monotransitive, ComplexTransitive(Pred)]),
+    (lemma: "draft", frames: [Monotransitive]),
     (lemma: "draw", preterite: "drew", past_participle: "drawn", frames: [Monotransitive]),
     (lemma: "end", frames: [Intransitive, Monotransitive]),
     (lemma: "ensue", frames: [Intransitive]),
