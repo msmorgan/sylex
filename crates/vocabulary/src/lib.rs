@@ -411,7 +411,7 @@ impl Sources {
         for decl in &self.nouns {
             let entry = decl.entry();
             let id = format!("noun:{}", entry.lemma);
-            builder.noun(&id, &entry, core(NOUNS, &id));
+            builder.noun(&id, &entry, core(NOUNS, &id))?;
         }
         for decl in &self.adjectives {
             let entry = decl.entry();
@@ -423,7 +423,7 @@ impl Sources {
         Ok(())
     }
 
-    fn statuses_and_turn_parts(&self, builder: &mut Builder) {
+    fn statuses_and_turn_parts(&self, builder: &mut Builder) -> Result<(), SourceError> {
         let catalog = |path: &str, owner: &str| source(SourceKind::Catalog, path, owner);
         for status in &self.statuses {
             let source = catalog(STATUSES, status.rule.number());
@@ -438,8 +438,9 @@ impl Sources {
             let mut entry = part.noun.entry();
             entry.kind = schema::NounKind::Temporal;
             let id = format!("turn_part:{}", entry.lemma);
-            builder.noun(&id, &entry, catalog(TURN_PARTS, part.rule.number()));
+            builder.noun(&id, &entry, catalog(TURN_PARTS, part.rule.number()))?;
         }
+        Ok(())
     }
 
     fn catalogs(&self, builder: &mut Builder) -> Result<(), SourceError> {
@@ -447,7 +448,7 @@ impl Sources {
         for decl in &self.types.card_types {
             let entry = decl.entry();
             let id = format!("type:{}", entry.lemma);
-            builder.noun(&id, &entry, catalog(TYPES, &id));
+            builder.noun(&id, &entry, catalog(TYPES, &id))?;
             builder
                 .lexemes
                 .last_mut()
@@ -506,7 +507,7 @@ impl Sources {
                 )));
             }
             entry.prefix_hyphenation = Some(sylex_lexicon::Hyphenation::Hyphenated);
-            builder.noun(&id, &entry, catalog(SUBTYPES, &id));
+            builder.noun(&id, &entry, catalog(SUBTYPES, &id))?;
             let lexeme = builder.lexemes.last_mut().expect("just pushed");
             lexeme.properties.classes = families
                 .iter()
@@ -524,7 +525,7 @@ impl Sources {
                     &id,
                     &entry,
                     catalog(DESIGNATIONS, designation.rule.number()),
-                );
+                )?;
             }
             for lemma in &designation.adjectives {
                 let id = format!("designation:{lemma}");
@@ -536,7 +537,7 @@ impl Sources {
                 ));
             }
         }
-        self.statuses_and_turn_parts(builder);
+        self.statuses_and_turn_parts(builder)?;
         for token in &self.tokens {
             if !subtypes.contains_key(&token.subtype) {
                 return Err(SourceError::Invalid(format!(
@@ -736,7 +737,7 @@ impl Sources {
             for decl in &action.nouns {
                 let entry = decl.entry();
                 let id = format!("action:{}", entry.lemma);
-                builder.noun(&id, &entry, catalog(KEYWORD_ACTIONS, owner));
+                builder.noun(&id, &entry, catalog(KEYWORD_ACTIONS, owner))?;
             }
         }
         let mut stems = std::collections::BTreeSet::new();
@@ -794,7 +795,7 @@ impl Sources {
             for decl in &ability.nouns {
                 let entry = decl.entry();
                 let id = format!("keyword_noun:{}", entry.lemma);
-                builder.noun(&id, &entry, catalog(KEYWORD_ABILITIES, owner));
+                builder.noun(&id, &entry, catalog(KEYWORD_ABILITIES, owner))?;
             }
             if let Some(surface) = &ability.bound {
                 builder.push(bound(

@@ -304,7 +304,21 @@ impl Builder {
         Ok(())
     }
 
-    pub(crate) fn noun(&mut self, id: &str, entry: &NounEntry, source: Source) {
+    pub(crate) fn noun(
+        &mut self,
+        id: &str,
+        entry: &NounEntry,
+        source: Source,
+    ) -> Result<(), SourceError> {
+        if entry.bare_mass_modified
+            && !entry
+                .countability
+                .contains(&sylex_lexicon::Countability::Mass)
+        {
+            return Err(SourceError::Invalid(format!(
+                "noun `{id}`: `bare_mass_modified` requires `Mass` countability"
+            )));
+        }
         let mut lexeme = Lexeme::noun(id, &entry.lemma, entry.countability.clone(), source);
         lexeme.properties.features.insert(
             "NounDistribution".into(),
@@ -314,6 +328,12 @@ impl Builder {
             .properties
             .features
             .insert("NounKind".into(), Ident::new(&format!("{:?}", entry.kind)));
+        if entry.bare_mass_modified {
+            lexeme
+                .properties
+                .features
+                .insert("BareMass".into(), Ident::new("Modified"));
+        }
         if let Some(plural) = &entry.plural {
             replace(&mut lexeme, WordForm::Plural, None, None, plural);
         }
@@ -325,6 +345,7 @@ impl Builder {
         if !entry.parameters.is_empty() {
             self.parameters.insert(id, entry.parameters.clone());
         }
+        Ok(())
     }
 
     pub(crate) fn adjective(&mut self, prefix: &str, entry: &AdjectiveEntry, source: &Source) {

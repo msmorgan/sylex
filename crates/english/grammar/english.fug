@@ -80,6 +80,16 @@ feature ObliqueKind =
 // of target creatures*; CGEL 5§3.3:349–351). `Serial`: only *time*, a
 // frequency or multiplier head (*three times*; CGEL 8§9:715).
 feature NounDistribution = Ordinary | Quantity | DirectMeasure | HeadOnly | Serial
+// Privative: a non-count noun whose bare nominal stands as a Noun Phrase only
+// with a Complement, Modifier or shared coordination (*power 3*, *mana value
+// less than X*, *control of target creature*, *turn order*, *power and
+// toughness*), never as an unmodified single word.
+feature BareMass = Modified
+// Whether a `BareMass = Modified` Nominal is still a bare single-word head
+// (`Unmodified`) or has a Complement or Modifier (`Expanded`), so
+// `CoordinatedBareMass` admits a coordinated Nominal only when at least one
+// conjunct could not stand as a `ModifiedBareMass` Noun Phrase on its own.
+feature BareMassHead = Unmodified | Expanded
 // `Quantity`: a fused-head quantity (*choose one*). `Manner`: only *way*,
 // the one noun that is a Manner Adjunct without a preposition (*do it this
 // way*; CGEL 8§2.1:671). `Resource`: a measured mass quantity or symbol
@@ -292,7 +302,7 @@ category ComplementNounPhrase : NounPhrase [
 // Complement's.
 category Nominal [
     Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense,
+    ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, BareMass, BareMassHead,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, Determination, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
@@ -310,7 +320,7 @@ category RelativeTemporalNominal : Nominal [
 ]
 category BareNominal : Nominal [
     Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense,
+    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, BareMass,
 ] { gap }
 // The singular count nominals that share a determiner before the
 // final, determined conjunct of a SharedDeterminerCoordination.
@@ -1892,7 +1902,19 @@ DegreePartitive: PartitiveHead -> DeterminerPhrase complement:Selected(Prepositi
 // Verb Phrase is (ParticipialPostmodifier), which keeps *all other Auras
 // attached to permanents you control* (Remove Enchantments) from a second,
 // identical Reading through the Adjective *attached*.
-PostpositiveAdjective: Nominal -> Nominal modifier:AdjectivePhrase { heavy: [modifier] }
+PostpositiveAdjective: Nominal -> Nominal modifier:AdjectivePhrase {
+    heavy: [modifier],
+    uncoordinated: [head],
+    unshared: [BareMassHead],
+}
+    where modifier.ComplementKind = PP,
+          modifier.Voice != Passive,
+          modifier.AdjectivalPassive != Lexical,
+          $.BareMassHead = Expanded
+PostpositiveCoordinationAdjective: Nominal -> Nominal modifier:AdjectivePhrase {
+    coordinated: [head],
+    heavy: [modifier],
+}
     where modifier.ComplementKind = PP,
           modifier.Voice != Passive,
           modifier.AdjectivalPassive != Lexical
@@ -2552,9 +2574,7 @@ NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transp
           head.KindLicense != Head
 QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier QuantifiedNominal
 // A bare count singular nominal that a preposition's frame selects (*until
-// end of turn*). The head carries Count itself: a noun that is also
-// non-count is the bare non-count Noun Phrase's alone (BareMass; *in Time*,
-// Turtles in Time), one tree per analysis.
+// end of turn*).
 BarePrepositionalNominal: BareNominalComplement -> PrepositionalNominal
     where head.Number = Singular,
           head.Countability := Count
@@ -2586,13 +2606,42 @@ SuperlativeFusedHead: BareNominalComplement -> AdjectivePhrase
           head.ComplementKind = Intransitive,
           head.AdjectivePosition != Predicative
 // A bare Noun Phrase is never a coordination of Nominals (BarePlural too):
-// the Noun Phrases coordinate (*creatures and lands*), Nominals only under
-// something shared (*all [creatures and lands]*; english.md §8).
+// the Noun Phrases coordinate (*creatures and lands*, *chaos and silence*),
+// Nominals only under something shared (*all [creatures and lands]*, *[power
+// and toughness] 0/2*, *[mana value, power, or toughness] equal to ...*;
+// english.md §8). A `BareMass = Modified` noun (*mana value*, *power*,
+// *toughness*, *control*, *loyalty*) takes `BareMass` only when a Complement,
+// Modifier or coordinated Nominal expands it (`ModifiedBareMass`,
+// `CoordinatedBareMass`), an admission gate (english.md §6) keeping *[a spell
+// with mana value] [less than or equal to ...]* off Maralen, Fae Ascendant and
+// Sphere of Annihilation, and *under [its owner's] [control tapped ...]* off
+// Tawnos's Coffin.
 BareMass: NounPhrase -> Nominal { transparent: [head], uncoordinated: [head] }
-    where $.Determination = Bare,
+    where head.BareMass != Modified,
+          $.Determination = Bare,
           $.Case = Plain,
           head.Countability = Mass,
           head.Number = Singular,
+          $.Person = Third
+ModifiedBareMass: NounPhrase -> Nominal { heavy: [head], transparent: [head], uncoordinated: [head] }
+    where head.BareMass := Modified,
+          $.Determination = Bare,
+          $.Case = Plain,
+          head.Countability = Mass,
+          head.Number = Singular,
+          $.Person = Third
+// Coordinated `BareMass = Modified` nominals where at least one conjunct is
+// itself unmodified (`BareMassHead = Unmodified`), so the conjuncts cannot
+// coordinate as bare Noun Phrases (*power and toughness*, *mana value, power,
+// or toughness equal to ...*, Talion, the Kindly Lord) without building a
+// second tree where every conjunct is already modified (*base power 1 or base
+// toughness 1*, Vhati il-Dal).
+CoordinatedBareMass: NounPhrase -> Nominal { transparent: [head], coordinated: [head] }
+    where head.BareMass := Modified,
+          head.BareMassHead = Unmodified,
+          $.Determination = Bare,
+          $.Case = Plain,
+          head.Countability = Mass,
           $.Person = Third
 SymbolFusedHead: FusedNounPhrase -> SymbolHead
 SymbolNominalPhrase: SymbolHead -> Symbols
@@ -2833,14 +2882,15 @@ DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase No
 // A plural count head, not just the plural of a coordination of singular
 // count nominals: a shared determiner belongs outside that coordination and
 // cannot be left behind when its tail becomes a Supplement (CGEL
-// 5§8.5:409–410; OSG §7, Plurals and agreement). Mass-noun coordinations
-// remain bare.
+// 5§8.5:409–410; OSG §7, Plurals and agreement; english.md §8). A mass
+// nominal projects through `BareMass` / `CoordinatedBareMass` instead.
 BarePlural: NounPhrase -> Nominal { uncoordinated: [head] }
     where $.Determination = Bare,
           $.Case = Plain,
           head.Number = Plural,
           $.Person = Third,
-          !(head.Countability = Count & head.ConjunctNumber = Singular)
+          !(head.Countability = Count & head.ConjunctNumber = Singular),
+          !(head.Countability = Mass & head.BareMassHead = Expanded)
 Pronoun: NounPhrase -> Lex(Pronoun)
     where $.NounKind = Ordinary,
           $.Determination = Bare,
@@ -2903,7 +2953,19 @@ GenitiveModifiedQuantity: NounPhrase -> determiner:NounPhrase ModifiedQuantified
 // comparative adjective's (*mana value less than X*), never its
 // Amount Complement.
 Unmodified: Nominal -> BareNominal { transparent: [head] }
-    where $.ConjunctNumber = $.Number,
+    where head.BareMass != Modified,
+          $.BareMassHead = Expanded,
+          $.ConjunctNumber = $.Number,
+          !(head.ComplementKind = Amount & head.ObliqueKind = PP)
+ExpandedBareMass: Nominal -> BareNominal { heavy: [head], transparent: [head] }
+    where head.BareMass := Modified,
+          $.BareMassHead = Expanded,
+          $.ConjunctNumber = $.Number,
+          !(head.ComplementKind = Amount & head.ObliqueKind = PP)
+UnmodifiedBareMass: Nominal -> BareNominal { light: [head], transparent: [head] }
+    where head.BareMass := Modified,
+          $.BareMassHead = Unmodified,
+          $.ConjunctNumber = $.Number,
           !(head.ComplementKind = Amount & head.ObliqueKind = PP)
 // The Targeting Marker word alone is its determinative's own
 // DeterminerPhrase (*target creature*). BareTargetingMarker builds the word,
@@ -3071,6 +3133,7 @@ SingleParticipialPostmodifier: Nominal -> BareNominal modifier:VerbPhrase {
     light: [modifier],
 }
     where $.ConjunctNumber = $.Number,
+          $.BareMassHead = Expanded,
           modifier.VerbForm = PastParticiple,
           modifier.Voice = Passive,
           modifier.AdjectivalPassive != Lexical,
@@ -3080,6 +3143,7 @@ SingleGerundParticipialPostmodifier: Nominal -> BareNominal modifier:VerbPhrase 
     light: [modifier],
 }
     where $.ConjunctNumber = $.Number,
+          $.BareMassHead = Expanded,
           modifier.VerbForm = GerundParticiple
 // A bare relative: a finite clause with an object Gap. A marked one may
 // also have a subject Gap, which agrees with the antecedent.
@@ -3822,14 +3886,16 @@ coordination NounPhrase {
 coordination Nominal {
     coordinators: And,
     unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber],
-    proximate: [NounDistribution, KindLicense],
+    proximate: [NounDistribution, KindLicense, BareMass],
+    resolve: [BareMassHead -> Unmodified],
 }
     where $.Number = Plural,
           $.ConjunctNumber = first.Number
 coordination Nominal {
     coordinators: Disjunctive,
     unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber],
-    proximate: [NounDistribution, KindLicense],
+    proximate: [NounDistribution, KindLicense, BareMass],
+    resolve: [BareMassHead -> Unmodified],
 }
     where $.ConjunctNumber = $.Number
 coordination GenitiveNominals {

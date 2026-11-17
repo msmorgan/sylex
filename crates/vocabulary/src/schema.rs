@@ -260,6 +260,13 @@ pub struct NounEntry {
     pub lemma: String,
     #[serde(default = "count")]
     pub countability: Vec<Countability>,
+    /// The non-count nominal stands bare as a Noun Phrase only with a
+    /// Complement or Modifier (*power 3*, *mana value less than X*, *control
+    /// of target creature*, *turn order*), never as an unmodified single word
+    /// (*bidding*, *devotion*, *rest*, *text*, *loyalty*, *power*,
+    /// *toughness*, *mana value*, *mana cost*, *control*, *order*, *worth*).
+    #[serde(default)]
+    pub bare_mass_modified: bool,
     #[serde(default)]
     pub plural: Option<String>,
     #[serde(default)]
@@ -297,6 +304,7 @@ impl NounDecl {
                 parameters: Vec::new(),
                 lemma: lemma.clone(),
                 countability: count(),
+                bare_mass_modified: false,
                 plural: None,
                 frames: Vec::new(),
                 prefix_hyphenation: None,

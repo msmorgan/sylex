@@ -4,7 +4,7 @@
 // a relational noun (CGEL, Ch. 5, §14.1, pp. 439–441); an of-phrase that only
 // describes ("a creature of your choice") is a modifier and gets no frame.
 [
-    (lemma: "bidding", countability: [Mass]),
+    (lemma: "bidding", countability: [Mass], bare_mass_modified: true),
     // Game nouns.
     (lemma: "ability", frames: [Complement(PP(["of"]))]),
     "activation",
@@ -36,7 +36,7 @@
     // *each combat*
     (lemma: "combat", kind: Temporal, countability: [Count, Mass]),
     (lemma: "combination", frames: [Complement(PP(["of"]))]),
-    (lemma: "control", countability: [Mass], frames: [Complement(PP(["of"]))]),
+    (lemma: "control", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))]),
     (lemma: "controller", frames: [Complement(PP(["of"]))]),
     (lemma: "copy", frames: [Complement(PP(["of"]))]),
     // "an additional cost to cast this spell"; "the mana cost for Rune spells".
@@ -53,7 +53,7 @@
     (lemma: "d20", plural: "d20"),
     (lemma: "damage", distribution: DirectMeasure, countability: [Mass]),
     "deck",
-    (lemma: "devotion", countability: [Mass], frames: [Complement(PP(["to"]))]),
+    (lemma: "devotion", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["to"]))]),
     (lemma: "die", plural: "dice"),
     (lemma: "difference", frames: [Complement(PP(["between"]))]),
     // What a player faces by choosing modes for a spell or ability [CR#700.17]: *Whenever you
@@ -96,8 +96,8 @@
     "legend",
     "library",
     (lemma: "life", distribution: DirectMeasure, countability: [Mass]),
-    // *has starting loyalty X*, as *power 3*.
-    (lemma: "loyalty", distribution: DirectMeasure, countability: [Mass], frames: [Complement(Amount)]),
+    // *has starting loyalty X*, as *power 3*; *having 0 loyalty*.
+    (lemma: "loyalty", distribution: DirectMeasure, countability: [Mass], bare_mass_modified: true, frames: [Complement(Amount)]),
     (lemma: "mana", distribution: DirectMeasure, countability: [Mass]),
     // *to a maximum of 10*; the attributive *maximum* is the adjective's.
     (lemma: "maximum", distribution: HeadOnly, frames: [Complement(PP(["of"]))]),
@@ -108,7 +108,7 @@
     "offer",
     // *the opponent to your left*
     (lemma: "opponent", frames: [Complement(PP(["to"]))]),
-    (lemma: "order", countability: [Count, Mass]),
+    (lemma: "order", countability: [Count, Mass], bare_mass_modified: true),
     // A prefix joins it with a hyphen, as a subtype (*non-outlaw*).
     (lemma: "outlaw", prefix_hyphenation: Hyphenated),
     (lemma: "owner", frames: [Complement(PP(["of"]))]),
@@ -126,12 +126,12 @@
     "pool",
     // Count across creatures (*different powers*) and mass as an unquantified
     // characteristic (*power and toughness*, *power 3 or less*, *power equal to …*).
-    (lemma: "power", countability: [Count, Mass], frames: [Complement(PP(["of"])), Complement(Amount)]),
+    (lemma: "power", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PP(["of"])), Complement(Amount)]),
     "process",
     "quality",
     (lemma: "radiation", countability: [Mass]),
     // Quantificational "the rest (of …)" has no plural.
-    (lemma: "rest", countability: [Mass], frames: [Complement(PP(["of"]))]),
+    (lemma: "rest", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))]),
     (lemma: "result", frames: [Complement(PP(["of"]))]),
     "right",
     // The result of rolling a die: *ignore the lower roll* (OSG §12,
@@ -153,15 +153,15 @@
     "teammate",
     // A quoted ability follows *text* as its apposition (*has the text
     // "{2}: Discard a card."*; CGEL, Ch. 5 §14.3, p. 447).
-    (lemma: "text", countability: [Mass], frames: [Complement(PP(["of"])), Complement(QuotedAbility)]),
+    (lemma: "text", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"])), Complement(QuotedAbility)]),
     "tie",
-    (lemma: "time", kind: Temporal, distribution: Serial, countability: [Count, Mass]),
+    (lemma: "time", kind: Temporal, distribution: Serial),
     "token",
     // *on top of*; prenominal *top* is the adjective. Bare after a
     // preposition it may omit *of X*, as *in front* does (*put that card on
     // top*; CGEL, Ch. 7 §3.1, p. 620), unlike *end* or *excess*.
     (lemma: "top", distribution: HeadOnly, frames: [Complement(PP(["of"])), Intransitive]),
-    (lemma: "toughness", countability: [Count, Mass], frames: [Complement(PP(["of"])), Complement(Amount)]),
+    (lemma: "toughness", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PP(["of"])), Complement(Amount)]),
     (lemma: "turn", kind: Temporal),
     "type",
     // "for the same value", "double the value of X".
@@ -195,8 +195,8 @@
     // outside the game*). Elsewhere *outside* is the preposition (*from
     // outside the game*, *cards you own outside the game*).
     "outside the game",
-    (lemma: "mana cost", countability: [Count, Mass], frames: [Complement(PP(["for", "of"])), Complement(Cost)]),
-    (lemma: "mana value", countability: [Count, Mass], frames: [Complement(Amount)]),
+    (lemma: "mana cost", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PP(["for", "of"])), Complement(Cost)]),
+    (lemma: "mana value", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(Amount)]),
     // [CR#103.6]; `opening` occurs in no other sense.
     "opening hand",
     // The mana cost of a locked half, paid to unlock it [CR#709.5e].
@@ -216,5 +216,5 @@
     "snitch",
     (lemma: "war", countability: [Count, Mass]),
     // A measure noun: *five {P} worth of modes* (CGEL Ch. 5, p. 470).
-    (lemma: "worth", distribution: DirectMeasure, countability: [Mass], frames: [Complement(PP(["of"]))]),
+    (lemma: "worth", distribution: DirectMeasure, countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))]),
 ]

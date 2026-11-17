@@ -137,6 +137,7 @@ fn a_frame_belongs_to_its_head_category() {
             parameters: Vec::new(),
             lemma: "frobnication".to_owned(),
             countability: vec![sylex_lexicon::Countability::Count],
+            bare_mass_modified: false,
             plural: None,
             frames: vec![FrameSpec::Monotransitive],
             prefix_hyphenation: None,
@@ -309,4 +310,24 @@ fn an_adjectival_passive_marks_its_adjective_and_its_verb() {
     assert!(!marked("adj:tied"));
     assert!(!marked("adj:left"));
     assert!(!marked("verb:leave"));
+}
+
+#[test]
+fn bare_mass_modified_requires_mass_countability() {
+    let mut sources = Sources::load().unwrap();
+    sources
+        .nouns
+        .push(NounDecl::Entry(sylex_vocabulary::schema::NounEntry {
+            distribution: sylex_vocabulary::schema::NounDistribution::Ordinary,
+            kind: sylex_vocabulary::schema::NounKind::Ordinary,
+            parameters: Vec::new(),
+            lemma: "frobnication".to_owned(),
+            countability: vec![sylex_lexicon::Countability::Count],
+            bare_mass_modified: true,
+            plural: None,
+            frames: Vec::new(),
+            prefix_hyphenation: None,
+            onset: None,
+        }));
+    rejects(&sources, "requires `Mass` countability");
 }
