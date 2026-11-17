@@ -42,9 +42,11 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
 - What a counter confers is stated once per rule, in the `confers` of the parameterized kind,
   enabled once per counter (`docs/specs/confers-and-rules.md` §1): `boost` gives its numbers
   [CR#122.1a] and the keyword kind its keyword [CR#122.1b]. The per-kind `counter` declarations
-  that only repeat their keyword or measure (`flyingCounter`, `p1p1Counter` and the others
-  `english-counter-kind-premodifies-counter` lists) and the uncalled `grants` Template are
-  deleted. The counters whose rules are their own (shield, stun, finality, rad, hone, poison)
+  that only repeat their measure or keyword are deleted, with the uncalled `grants` Template:
+  `p1p1Counter` and `m1m1Counter`, and `deathtouchCounter`, `decayedCounter`,
+  `doubleStrikeCounter`, `exaltedCounter`, `firstStrikeCounter`, `flyingCounter`, `hasteCounter`,
+  `hexproofCounter`, `indestructibleCounter`, `lifelinkCounter`, `menaceCounter`, `reachCounter`,
+  `shadowCounter`, `trampleCounter` and `vigilanceCounter`. The counters whose rules are their own (shield, stun, finality, rad, hone, poison)
   are `syl-counter-conferrals`'s.
 - `printedKind` and `anyKind` are deleted, and `thoseCounters`, `chosenKind`,
   `distinctChosenKinds` and `sameKindAs` are each replaced by the noun phrase their line prints
