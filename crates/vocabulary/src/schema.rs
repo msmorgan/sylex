@@ -264,12 +264,6 @@ pub struct NounEntry {
     pub plural: Option<String>,
     #[serde(default)]
     pub frames: Vec<FrameSpec>,
-    /// The noun may head the Subject of the grammar's specifying clauses,
-    /// which exist for Artificial Evolution (*the new creature type can't be
-    /// Wall*). `type` has it. It is a word flag: CGEL puts no lexical
-    /// condition on a specifying clause's variable.
-    #[serde(default)]
-    pub variable: bool,
     /// How a prefix joins the noun, where it is not solid, the default
     /// (*nonland*): hyphenated (*non-outlaw*). A subtype takes it hyphenated
     /// without declaring it (*non-Vampire*).
@@ -305,7 +299,6 @@ impl NounDecl {
                 countability: count(),
                 plural: None,
                 frames: Vec::new(),
-                variable: false,
                 prefix_hyphenation: None,
                 onset: None,
             },

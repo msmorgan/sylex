@@ -85,12 +85,6 @@ feature NounDistribution = Ordinary | Quantity | DirectMeasure | HeadOnly | Seri
 // way*; CGEL 8§2.1:671). `Resource`: a measured mass quantity or symbol
 // sequence (*X damage*, *1 life*, *{R}*).
 feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource
-// Only *type*, for Artificial Evolution's *the new creature type can't be
-// Wall* (SpecifyingClause). It is a word flag, not a class CGEL has: CGEL
-// puts no lexical condition on a specifying clause's variable. Without it
-// the specifying Productions also read *All Mountains are Plains*
-// (Conversion) and *Urza's Power-Plant* (Urza's Tower).
-feature Variable = Cited
 // The NounKind of a head's *of* oblique.
 feature ObliqueNounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource
 feature Determination = Bare | Mixed | Overt
@@ -278,7 +272,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 // toughness 4/4*). NounDistribution is the head noun's, a coordination's
 // its last conjunct's (NominalPredicative).
 category NounPhrase [
-    Variable, Number, Person, Case, Determination, NounKind, Countability,
+    Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution, Postmodification,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
@@ -293,7 +287,7 @@ category ComplementNounPhrase : NounPhrase [
 // A nominal's ComplementKind and ObliqueNumber are its head noun's
 // Complement's.
 category Nominal [
-    Variable, Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
+    Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead, KindLicense,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, Determination, NounDistribution]
@@ -311,7 +305,7 @@ category RelativeTemporalNominal : Nominal [
     Number, Countability, NounKind, Determination, NounDistribution,
 ]
 category BareNominal : Nominal [
-    Variable, Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
+    Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueNounKind, MeasureHead, KindLicense,
 ] { gap }
 // The singular count nominals that share a determiner before the
@@ -565,6 +559,13 @@ category QuotedAbility
 // Phrase's.
 category Mention
 category MentionModifier
+// A singular subtype name or coordination of them as the value of a
+// specifying copular *be* (*the new creature type can't be Wall*, Artificial
+// Evolution; CGEL 4§5.5:266–269). Distinct from Predicative so coordination
+// does not mix bare subtype names with determined nominals (*that's a Demon,
+// Horror, or Nightmare*, Ancient Cellarspawn), and distinct from Mention so
+// bare color nouns, *day* or *night* after *be* get no cited-word twin.
+category SpecifyingValue { function }
 category QuotedCost
 // A quoted cost and its premodifiers, kept out of Nominal coordination.
 category QuotedCostNominal : Nominal [Number, Countability, NounKind, NounDistribution]
@@ -1036,32 +1037,17 @@ SubjectPredicate: Clause -> subject:NounPhrase Free(VerbPhrase) { transparent: [
           head.VerbForm = Finite,
           subject.Case != Accusative | Genitive,
           $.ClauseMarking = Unmarked
-// A specifying copular clause, whose value is a subtype name (CGEL
-// 4§5.5:266-269), for Artificial Evolution's *the new creature type can't
-// be Wall*; a `Variable` Subject keeps them off other cards. Both are flat
-// clauses, not built on the Verb Phrase, so no adjunct, coordination of
-// values or other auxiliary reaches them. The value is not a `Mention`
-// Predicative of the copula: that gives every bare color word, *day* or
-// *night*, and plural-syncretic subtype after a copula a cited-word twin
-// (*All Mountains are Plains*, Conversion).
-SpecifyingClause: Clause -> subject:NounPhrase Class(BeVerb) value:Class(Subtype)
-    where subject.Variable := Cited,
-          value.Number = Singular,
-          subject.Number = head.Number,
-          subject.Person = head.Person,
-          head.VerbForm = Finite,
-          subject.Case != Accusative | Genitive,
-          $.ClauseMarking = Unmarked
-SpecifyingModalClause: Clause ->
-    subject:NounPhrase Class(StrandableModal) be:Class(BeVerb) value:Class(Subtype)
-    where subject.Variable := Cited,
-          value.Number = Singular,
-          head.VerbForm = Finite,
-          be.VerbForm = Plain,
-          subject.Number = head.Number,
-          subject.Person = head.Person,
-          subject.Case != Accusative | Genitive,
-          $.ClauseMarking = Unmarked
+// A specifying copular Verb Phrase, whose value is a singular subtype name
+// or coordination of them (CGEL 4§5.5:266–269), for Artificial Evolution's
+// *the new creature type can't be Wall*. `head.Number != Plural` is an
+// admission gate (english.md §6) against plural-syncretic subtypes after a
+// plural copula (*All Mountains are Plains*, Conversion), while
+// CliticSubjectPredicate's `subject.Case = Nominative` keeps clitic *'s* off
+// genitives (*an Urza's Power-Plant*, Urza's Tower).
+SpecifyingBe: VerbPhrase -> Class(BeVerb) predicative_complement:SpecifyingValue
+    where head.Number != Plural,
+          $.Voice = Active
+SubtypeSpecifyingValue: SpecifyingValue -> Class(Subtype) where head.Number = Singular
 // A bound auxiliary clitic has a nominative pronoun host (*it's*, *you're*,
 // *they've*).
 // Twin: RelativeCliticSubjectPredicate.
@@ -3589,6 +3575,7 @@ coordination KeywordPhrase { coordinators: Coordinator, unshared: [KeywordForm, 
 coordination QuotedAbility { coordinators: Coordinator }
 // *left or right*; *artifact, creature, or land*.
 coordination Mention { coordinators: Coordinator }
+coordination SpecifyingValue { coordinators: Coordinator }
 // *named Crown of Empires and Scepter of Empires*; *from among Disenchant,
 // Braingeyser, ..., and Black Lotus*.
 coordination NameComplement { coordinators: Coordinator }

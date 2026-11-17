@@ -163,10 +163,7 @@
     (lemma: "top", distribution: HeadOnly, frames: [Complement(PP(["of"])), Intransitive]),
     (lemma: "toughness", countability: [Count, Mass], frames: [Complement(PP(["of"])), Complement(Amount)]),
     (lemma: "turn", kind: Temporal),
-    // For Artificial Evolution's *the new creature type can't be Wall*
-    // (`SpecifyingClause`); CGEL puts no lexical condition on a specifying
-    // clause's variable.
-    (lemma: "type", variable: true),
+    "type",
     // "for the same value", "double the value of X".
     (lemma: "value", frames: [Complement(PP(["of"]))]),
     // *the total of those results*; the attributive word is the adjective.

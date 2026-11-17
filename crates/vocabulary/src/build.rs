@@ -314,12 +314,6 @@ impl Builder {
             .properties
             .features
             .insert("NounKind".into(), Ident::new(&format!("{:?}", entry.kind)));
-        if entry.variable {
-            lexeme
-                .properties
-                .features
-                .insert("Variable".into(), Ident::new("Cited"));
-        }
         if let Some(plural) = &entry.plural {
             replace(&mut lexeme, WordForm::Plural, None, None, plural);
         }

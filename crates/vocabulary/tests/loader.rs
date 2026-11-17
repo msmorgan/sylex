@@ -139,7 +139,6 @@ fn a_frame_belongs_to_its_head_category() {
             countability: vec![sylex_lexicon::Countability::Count],
             plural: None,
             frames: vec![FrameSpec::Monotransitive],
-            variable: false,
             prefix_hyphenation: None,
             onset: None,
         }));
