@@ -9,5 +9,5 @@ subtype equipment {
     property(mayBeAttachedTo(this(equipment), allOf(creature))),
     stateBased(
       and([isAttached(this(equipment)), not(legallyAttached(this(equipment)))]),
-      attachment(unattached, this(equipment)))]
+      attachment(unattached, it))]
 }

@@ -6,7 +6,7 @@ template devourEntry(quality: Predicate, amount: Amount, head: Nominal): Ability
   spelling = "As this object enters, you may sacrifice any number of $quality permanents. This permanent enters with $amount +1/+1 counters on it for each $head sacrificed this way.",
   body = static(
     replace(
-      would(actor(this(permanent)), enter),
+      would(actor(this(object)), enter),
       before(
         may(devour(counted(anyNumber, nominal(pre = [hasQuality($quality)], permanent)))),
         body = withRiders([

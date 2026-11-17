@@ -12,8 +12,8 @@ ability cumulativeUpkeep(cost: Cost) {
       sequentially([
           putCounters(1, printedKind(ageCounter), this(permanent)),
           doUnlessKeywordCost(
-            sacrifice(this(permanent)),
+            sacrifice(it),
             this(permanent),
             cumulativeUpkeep,
-            scaled($cost, times(1, countersOn(ageCounter, this(permanent)))))]))]
+            scaled($cost, times(1, countersOn(ageCounter, it))))]))]
 }

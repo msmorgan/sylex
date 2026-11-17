@@ -22,18 +22,18 @@ ability enchant(subject: Predicate) {
       replace(
         would(actor(this(aura)), enter),
         doIf(
-          not(exists(legalHostOf(this(aura)))),
-          instead(doIf(is(this(aura), in(stack)), putInto(this(aura), graveyard)))))),
+          not(exists(legalHostOf(it))),
+          instead(doIf(is(it, in(stack)), putInto(this(aura), graveyard)))))),
     static(
       replace(
         would(any, move(this(aura), not(stack), battlefield, [not(attachedTo(any))])),
         doIf(
           exists(legalHostOf(this(aura))),
-          before(choose(a(legalHostOf(this(aura)))), body = alongside(attachTo(this(aura), it)))))),
+          before(choose(a(legalHostOf(it))), body = alongside(attachTo(this(aura), it)))))),
     static(
       replace(
         would(
           actor(this(aura)),
-          enter(riders = [attachedTo(any), not(attachedTo(a(legalHostOf(this(aura)))))])),
-        instead(doIf(is(this(aura), in(stack)), putInto(this(aura), graveyard)))))]
+          enter(riders = [attachedTo(any), not(attachedTo(a(legalHostOf(it))))])),
+        instead(doIf(is(it, in(stack)), putInto(this(aura), graveyard)))))]
 }

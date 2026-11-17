@@ -12,5 +12,5 @@ ability intimidate {
           bare(
             andOr([
                 nominal(pre = [artifact], creature),
-                nominal(creature, post = [shares(color, share, this(creature))])])))))]
+                nominal(creature, post = [shares(color, share, it)])])))))]
 }

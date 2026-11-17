@@ -7,5 +7,5 @@ ability overload(cost: Cost) {
   spelling = "overload $cost",
   body = [
     static(altCost(payingInstead($cost), this(spell))),
-    static(if(keywordCostPaid(this(spell), overload), textChange(this(spell), targetToEach)))]
+    static(if(keywordCostPaid(this(spell), overload), textChange(it, targetToEach)))]
 }

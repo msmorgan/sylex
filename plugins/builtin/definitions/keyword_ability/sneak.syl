@@ -19,7 +19,7 @@ ability sneak(cost: Cost) {
         timing = and([asInstant, duringPart(whose = you, declareBlockers)]))),
     static(
       replace(
-        would(actor(this(permanent)), enter),
+        would(actor(this(nominal(pre = [permanent], spell))), enter),
         doIf(
           keywordCostPaid(this(permanent), sneak),
           # It enters tapped and attacking what the returned creature was attacking [CR#702.190b].

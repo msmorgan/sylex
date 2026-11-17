@@ -9,7 +9,7 @@ ability storm {
       does(actor(you), cast(this(spell))),
       sequentially([
           copyOnStack(
-            this(spell),
+            it,
             times = eventCount(
               actor(a(player)),
               cast(a(nominal(pre = [other], spell))),

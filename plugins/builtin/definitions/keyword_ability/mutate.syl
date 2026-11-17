@@ -14,7 +14,7 @@ ability mutate(cost: Cost) {
       if(
         choiceWasTaken(this(spell), byKeyword(mutate)),
         addsTarget(
-          this(spell),
+          it,
           nominal(pre = [non(human)], creature, post = [ownedBy(ownerOf(this(spell)))])))),
     static(
       replace(
@@ -23,6 +23,6 @@ ability mutate(cost: Cost) {
           choiceWasTaken(this(spell), byKeyword(mutate)),
           instead(
             chooseOne(
-              merge(this(spell), the(nominal(pre = [was(target(which))], creature)), top),
-              merge(this(spell), the(nominal(pre = [was(target(which))], creature)), bottom))))))]
+              merge(it, the(nominal(pre = [was(target(which))], creature)), top),
+              merge(it, the(nominal(pre = [was(target(which))], creature)), bottom))))))]
 }

@@ -5,8 +5,5 @@ ability unleash {
   spelling = "unleash",
   body = [
     static(mayHaveEnter(this(permanent), [withCounters(1, printedKind(p1p1Counter), additional)])),
-    static(
-      onlyWhile(
-        cant(actor(this(permanent)), block),
-        is(this(permanent), hasCounter(kind = p1p1Counter))))]
+    static(onlyWhile(cant(actor(this(permanent)), block), is(it, hasCounter(kind = p1p1Counter))))]
 }

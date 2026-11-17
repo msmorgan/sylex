@@ -6,8 +6,7 @@ ability renown(count: Amount) {
   body = [
     when(
       does(actor(this(creature)), dealDamage(kind = combat, recipient = a(player))),
-      if = not(is(this(creature), hasDesignation(renowned))),
-      sequentially([
-          putCounters($count, printedKind(p1p1Counter), this(creature)),
-          gainDesignation(this(creature), renowned)]))]
+      if = not(is(it, hasDesignation(renowned))),
+      sequentially(
+        [putCounters($count, printedKind(p1p1Counter), it), gainDesignation(it, renowned)]))]
 }

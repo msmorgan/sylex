@@ -9,12 +9,12 @@ ability madness(cost: Cost) {
     static(
       replace(
         would(actor(a(player)), discard(this(card))),
-        instead(discard(this(card), destination = exile)))),
+        instead(discard(it, destination = exile)))),
     when(
       causes(byEvent(does(any, discard(this(card)))), does(any, exileFrom(this(card), hand))),
       instruct(
-        ownerOf(this(card)),
+        ownerOf(it),
         may(
-          cast(this(card), from = exileZone, altCost = payingInstead($cost)),
+          cast(it, from = exileZone, altCost = payingInstead($cost)),
           ifNot = putInto(this(card), graveyard))))]
 }

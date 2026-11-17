@@ -13,7 +13,5 @@ ability megamorph(cost: Cost) {
     static(
       replace(
         would(any, turnFaceUp(this(permanent))),
-        doIf(
-          keywordCostPaid(this(permanent), morph),
-          alongside(putCounters(1, printedKind(p1p1Counter), this(permanent))))))]
+        doIf(keywordCostPaid(it, morph), alongside(putCounters(1, printedKind(p1p1Counter), it)))))]
 }

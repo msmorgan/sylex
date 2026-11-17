@@ -15,5 +15,5 @@ ability aftermath {
         would(actor(this(spell)), leave(from = stack)),
         doIf(
           is(this(spell), was(cast(which, from = graveyard), within = thisObject)),
-          instead(exile(this(spell))))))]
+          instead(exile(it)))))]
 }

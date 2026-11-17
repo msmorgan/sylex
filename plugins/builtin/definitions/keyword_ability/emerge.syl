@@ -15,6 +15,6 @@ ability emerge(cost: Cost) {
       if(
         keywordCostPaid(this(spell), emerge),
         costShift(
-          this(spell),
+          it,
           less(statOf(stat(manaValue), the(nominal(pre = [was(sacrifice(which))], creature)))))))]
 }

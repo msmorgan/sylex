@@ -17,7 +17,7 @@ ability champion(subject: Predicate) {
               exile(
                 a(nominal(pre = [other, hasQuality($subject)], permanent, post = [youControl]))))),
           once),
-        ifNot = sacrifice(this(permanent)))),
+        ifNot = sacrifice(it))),
     when(
       does(actor(this(permanent)), leave),
       returnToBattlefield(

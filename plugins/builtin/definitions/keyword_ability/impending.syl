@@ -16,14 +16,11 @@ ability impending(amount: Amount, cost: Cost) {
           withRiders([withCounters($amount, printedKind(timeCounter), fresh)])))),
     static(
       asLongAs(
-        and([
-            keywordCostPaid(this(permanent), impending),
-            is(this(permanent), hasCounter(kind = timeCounter))]),
-        characteristicChange(this(permanent), [typeLine(loses, {types = [creature]})]))),
+        and([keywordCostPaid(this(permanent), impending), is(it, hasCounter(kind = timeCounter))]),
+        characteristicChange(it, [typeLine(loses, {types = [creature]})]))),
     at(
       beginningOfYour(endStep),
-      if = and([
-          keywordCostPaid(this(permanent), impending),
-          is(this(permanent), hasCounter(kind = timeCounter))]),
-      removeCounters(exactly(1), printedKind(timeCounter), this(permanent)))]
+      if = and(
+        [keywordCostPaid(this(permanent), impending), is(it, hasCounter(kind = timeCounter))]),
+      removeCounters(exactly(1), printedKind(timeCounter), it))]
 }

@@ -8,14 +8,12 @@ ability amplify(amount: Amount) {
   body = [
     static(
       replace(
-        would(actor(this(permanent)), enter),
+        would(actor(this(object)), enter),
         before(
           reveal(
             counted(
               anyNumber,
-              nominal(
-                card,
-                post = [in(yourHand), shares(subtype(creature), share, this(permanent))]))),
+              nominal(card, post = [in(yourHand), shares(subtype(creature), share, it)]))),
           body = withRiders([
               withCounters(
                 forEach($amount, nominal(card, post = [was(reveal(which), within = thisWay)])),

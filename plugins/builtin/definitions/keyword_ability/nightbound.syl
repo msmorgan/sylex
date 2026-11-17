@@ -4,9 +4,6 @@ ability nightbound {
   lexical = {lemma = "nightbound"},
   spelling = "nightbound",
   body = [
-    static(
-      asEvent(
-        gameBecomes(day),
-        doIf(is(this(permanent), transformed), transform(this(permanent))))),
+    static(asEvent(gameBecomes(day), doIf(is(this(permanent), transformed), transform(it)))),
     static(cant(any, transform(this(permanent)), except = byKeyword(nightbound)))]
 }

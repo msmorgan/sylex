@@ -5,5 +5,5 @@ action adapt(amount: Amount) {
   spelling = "adapt $amount",
   body = doIf(
     not(is(this(permanent), hasCounter(kind = p1p1Counter))),
-    putCounters($amount, printedKind(p1p1Counter), this(permanent)))
+    putCounters($amount, printedKind(p1p1Counter), it))
 }

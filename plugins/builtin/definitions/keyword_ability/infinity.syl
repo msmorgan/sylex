@@ -3,8 +3,5 @@ ability infinity(ability: Ability) {
   lexical = {lemma = "∞", parameters = [[DashAbility]]},
   spelling = "∞ — $ability",
   body = [
-    static(
-      asLongAs(
-        is(this(permanent), hasDesignation(harnessed)),
-        abilityGrant(this(permanent), [$ability])))]
+    static(asLongAs(is(this(permanent), hasDesignation(harnessed)), abilityGrant(it, [$ability])))]
 }

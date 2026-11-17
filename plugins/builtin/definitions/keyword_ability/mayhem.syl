@@ -7,5 +7,5 @@ ability mayhem(cost: Cost) {
     static(
       asLongAs(
         did(actor(you), discard(this(card)), within(soFarThisTurn)),
-        can(actor(you), cast(this(card), from = yourGraveyard, altCost = payingInstead($cost)))))]
+        can(actor(you), cast(it, from = yourGraveyard, altCost = payingInstead($cost)))))]
 }

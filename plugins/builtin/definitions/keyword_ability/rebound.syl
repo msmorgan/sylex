@@ -15,7 +15,7 @@ ability rebound {
           is(this(spell), was(cast(which, from = yourHand), within = thisObject)),
           instead(
             sequentially([
-                exile(this(spell)),
+                exile(it),
                 atNext(
                   beginningOf(upkeep, you, nextTime),
                   may(cast(this(card), altCost = withoutPaying)))])))))]

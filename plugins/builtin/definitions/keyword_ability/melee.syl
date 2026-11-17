@@ -8,7 +8,7 @@ ability melee {
     whenever(
       does(actor(this(creature)), attack),
       getsBoth(
-        this(creature),
+        it,
         up(
           forEach(
             1,

@@ -8,5 +8,5 @@ subtype fortification {
     property(mayBeAttachedTo(this(fortification), allOf(land))),
     stateBased(
       and([isAttached(this(fortification)), not(legallyAttached(this(fortification)))]),
-      attachment(unattached, this(fortification)))]
+      attachment(unattached, it))]
 }

@@ -9,8 +9,8 @@ ability vanishing(amount: Amount) {
     at(
       beginningOfYour(upkeep),
       if = is(this(permanent), hasCounter(kind = timeCounter)),
-      removeCounters(exactly(1), printedKind(timeCounter), this(permanent))),
+      removeCounters(exactly(1), printedKind(timeCounter), it)),
     when(
       does(any, removeCounters(theLast, printedKind(timeCounter), this(permanent))),
-      sacrifice(this(permanent)))]
+      sacrifice(it))]
 }

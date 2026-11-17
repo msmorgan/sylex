@@ -8,5 +8,5 @@ ability riot {
       mayHaveEnter(
         this(permanent),
         [withCounters(1, printedKind(p1p1Counter), additional)],
-        otherwise = alongside(gain(this(permanent), [haste]))))]
+        otherwise = alongside(gain(it, [haste]))))]
 }

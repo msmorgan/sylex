@@ -16,6 +16,6 @@ token youngHeroRoleToken {
             [
               whenever(
                 does(actor(this(creature)), attack),
-                if = compareAmt(toughnessOf(this(creature)), atMost, 3),
-                putCounters(1, printedKind(p1p1Counter), this(creature)))]))]}}
+                if = compareAmt(toughnessOf(it), atMost, 3),
+                putCounters(1, printedKind(p1p1Counter), it))]))]}}
 }

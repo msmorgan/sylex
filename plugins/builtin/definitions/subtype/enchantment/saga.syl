@@ -22,11 +22,8 @@ subtype saga {
     stateBased(
       and([
           compareAmt(finalChapterNumber(this(saga)), atLeast, 1),
-          compareAmt(countersOn(loreCounter, this(saga)), atLeast, finalChapterNumber(this(saga))),
+          compareAmt(countersOn(loreCounter, this(saga)), atLeast, finalChapterNumber(it)),
           not(
-            exists(
-              nominal(
-                abilityHead(chapter),
-                post = [ofSource(this(saga)), triggeredNotLeftStack])))]),
-      sacrifice(this(saga)))]
+            exists(nominal(abilityHead(chapter), post = [ofSource(it), triggeredNotLeftStack])))]),
+      sacrifice(it))]
 }

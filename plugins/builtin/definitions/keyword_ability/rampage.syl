@@ -7,13 +7,10 @@ ability rampage(amount: Amount) {
     whenever(
       does(any, becomeBlocked(this(creature))),
       getsBoth(
-        this(creature),
+        it,
         up(
           times(
             $amount,
-            minus(
-              countOf(
-                nominal(creature, post = [inCombat(blockerOf, counterpart = this(creature))])),
-              1))),
+            minus(countOf(nominal(creature, post = [inCombat(blockerOf, counterpart = it)])), 1))),
         duration = untilEndOfTurn))]
 }

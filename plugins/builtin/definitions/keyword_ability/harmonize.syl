@@ -25,7 +25,7 @@ ability harmonize(cost: Cost) {
       if(
         keywordCostPaid(this(spell), harmonize),
         costShift(
-          this(spell),
+          it,
           generic(down(powerOf(the(nominal(pre = [was(tap(which))], creature)))), none)))),
     static(
       replace(

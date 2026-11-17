@@ -11,14 +11,10 @@ ability sunburst {
       replace(
         would(actor(this(object)), enter(from = stack)),
         doIf(
-          coloredManaSpentToCast(this(spell)),
+          coloredManaSpentToCast(it),
           doIf(
             is(this(object), hasTypeIgnoringTypeChanges(creature)),
-            withRiders([
-                withCounters(colorsSpentToCast(this(spell)), printedKind(p1p1Counter), fresh)]),
+            withRiders([withCounters(colorsSpentToCast(it), printedKind(p1p1Counter), fresh)]),
             otherwise = withRiders([
-                withCounters(
-                  colorsSpentToCast(this(spell)),
-                  printedKind(chargeCounter),
-                  fresh)])))))]
+                withCounters(colorsSpentToCast(it), printedKind(chargeCounter), fresh)])))))]
 }
