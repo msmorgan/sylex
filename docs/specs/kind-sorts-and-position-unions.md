@@ -131,12 +131,16 @@ The `CardType`, `Subtype`, `Supertype` and `Color` coercions into `PreModifier`,
 - **`Status` stays a sort**, as `Color` does. Its values are `tapped`, `untapped`, `flipped`,
   `faceDown`, `faceUp`, `phasedIn` and `phasedOut`. A status printed as an adjective is spelled:
   "tapped", "untapped", "flipped", "face-down", "face-up", "phased-out". `phasedIn` has no
-  spelling. Unhyphenated "face down" and "face up" are prepositions in the pool (111 and 175
-  leaves; "face down" 65 after a head, 21 after a copula): the `PrepositionPhrase` Templates
-  `isFaceDown` and `isFaceUp` over the status value, named apart from the `Status` words because
-  both reach `Predicative`. The verbs that print them and the phasing wordings are Templates in
-  their idioms ("turn … face down", "exile … face down", "phases out"). `becomeStatus` and `entersAs` take a `Status`. The
-  `PreModifier` Templates `tapped`, `untapped`, `faceDown` and `phasedOut` go.
+  spelling. Unhyphenated "face down" and "face up" are depictives: Oracle text prints them after
+  a verb and its object ("exile it face down", "turn target creature face down", "put … onto the
+  battlefield face down"), not as a modifier after a head, so no word for them stands in `post`,
+  and the verbs that print them write them as their riders do today until
+  `syl-verb-phrase-dependents` gives the depictive its place. Two in-scope cards print one after a
+  copula, *Unable to Scream* ("as long as enchanted creature is face down") and *Showstopping
+  Surprise* ("if it's face down"): the position-bound `Predicative` Template `isFaceDown` over
+  the status value. The phasing wordings ("phases out") are verbs. `becomeStatus` and `entersAs`
+  take a `Status`. The `PreModifier` Templates `tapped`, `untapped`, `faceDown` and `phasedOut`
+  go.
 
 ## 5. What each declaration becomes
 
@@ -173,8 +177,8 @@ membership (*Fry*, *Battlegate Mimic*, *Animate Dead*, *Crippling Fear*).
   wording, a relative clause over the predicative `not` ("that aren't legendary"), or `not` inside
   the participle (*Escaped Shapeshifter*'s "not named …").
 - `Predicative`: `and`, `or`, `andOr`, `both`, `coord`, `not`.
-- Position-bound Templates: `withMostVotes` at `PostModifier` (*Council's Judgment*) and
-  `hasTypeIgnoringTypeChanges` at `Predicative` (sunburst's rule).
+- Position-bound Templates: `withMostVotes` at `PostModifier` (*Council's Judgment*), and
+  `hasTypeIgnoringTypeChanges` (sunburst's rule) and `isFaceDown` (§4) at `Predicative`.
 
 ### Identity wrappers deleted
 

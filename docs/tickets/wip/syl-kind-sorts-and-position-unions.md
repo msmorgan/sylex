@@ -59,10 +59,11 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 - `post` holds every dependent printed after the head in printed order, a complement the head
   selects ("half of this split card") and a modifier alike; the term does not mark which.
 - `Status` stays a sort, as `Color` does, and one coercion `Status → AdjectivePhrase` carries a
-  spelled status into every position. "Tapped", "untapped", "flipped", "face-down" and "face-up"
-  are spelled; `phasedIn` and `phasedOut` are not. Unhyphenated "face down" and "face up" and the
-  phasing wordings are Templates in their idioms over the status value. `becomeStatus` and
-  `entersAs` take a `Status`; `hasStatus` and the `Status → Predicative` coercion go.
+  spelled status into every position. A status printed as an adjective is spelled ("tapped",
+  "untapped", "flipped", "face-down", "face-up", "phased-out"). Unhyphenated "face down" and "face
+  up" are depictives, written by the verbs that print them; `isFaceDown` is a position-bound
+  `Predicative` Template for the two cards that print "face down" after a copula. `becomeStatus`
+  and `entersAs` take a `Status`; `hasStatus` and the `Status → Predicative` coercion go.
 - `not` at `PostModifier` goes. Each caller writes what it prints: a `without` preposition phrase,
   "with no …" as its own wording, or a relative clause over the predicative `not`. `non-` stays at
   `PreModifier` and `not` at `Predicative`.
