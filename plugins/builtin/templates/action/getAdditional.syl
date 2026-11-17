@@ -1,0 +1,10 @@
+# "<subject> gets an additional +P/+T [until …]": a further change on top of one an earlier
+# instruction made (*Glistening Deluge*); the changes add up [CR#613.4c].
+template getAdditional(
+  subject: NounPhrase,
+  powerValue: Delta(Amount),
+  toughnessValue: Delta(Amount),
+  duration: Option(Duration) = none): VerbPhrase {
+  spelling = "$subject get an additional $powerValue/$toughnessValue< $duration>",
+  body = get($subject, $powerValue, $toughnessValue, duration = $duration)
+}

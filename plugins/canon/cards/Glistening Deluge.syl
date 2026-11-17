@@ -1,0 +1,13 @@
+card singleFaced({
+    name = "Glistening Deluge",
+    cost = [generic(1), pip(black), pip(black)],
+    types = [sorcery],
+    text = [
+      spell(
+        sequentially([
+            get(allOf(creature), down(1), down(1), duration = untilEndOfTurn),
+            getAdditional(
+              bare(nominal(creature, post = [thatIs(andOr([green, white]))])),
+              down(2),
+              down(2),
+              duration = untilEndOfTurn)]))]})
