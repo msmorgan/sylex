@@ -1,0 +1,17 @@
+card singleFaced({
+    name = "Ral's Staticaster",
+    cost = [generic(2), pip(blue), pip(red)],
+    types = [creature],
+    subtypes = [lizard, wizard],
+    text = [
+      trample,
+      whenever(
+        does(actor(thisCreature), attack),
+        if = exists(nominal(pre = [ral], planeswalker, post = [youControl])),
+        get(
+          thisCreature,
+          up(forEachInner(1, nominal(card, post = [in(yourHand)]))),
+          up(0),
+          duration = untilEndOfTurn))],
+    power = 3,
+    toughness = 3})

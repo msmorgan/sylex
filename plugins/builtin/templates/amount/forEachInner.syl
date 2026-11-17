@@ -1,0 +1,7 @@
+# "N for each <p>" with "for each <p>" printed at the edge of its host verb phrase, before the
+# host's other trailing dependents: *Ral's Staticaster*'s "gets +1/+0 for each card in your hand
+# until end of turn". Printed after them, it is `forEach`.
+template forEachInner(per: Amount, p: Nominal): Amount {
+  spelling = "$per %inner VerbPhrase: for each $p",
+  body = times($per, countOf($p))
+}

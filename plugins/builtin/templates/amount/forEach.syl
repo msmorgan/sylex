@@ -1,5 +1,8 @@
-# "N for each <p>"
+# "N for each <p>": the amount N, scaled by the count of <p>. "for each <p>" is a Tail of the verb
+# phrase that hosts the amount, printed after the host's other trailing dependents, as *Hit // Run*'s
+# "get +1/+0 until end of turn for each other attacking creature". Printed before them, it is
+# `forEachInner`.
 template forEach(per: Amount, p: Nominal): Amount {
-  spelling = "$per for each $p",
+  spelling = "$per %VerbPhrase: for each $p",
   body = times($per, countOf($p))
 }

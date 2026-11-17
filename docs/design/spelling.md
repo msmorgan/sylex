@@ -339,8 +339,11 @@ Three properties make the extension closed:
   for each other attacking Aurochs" and Ral's Staticaster "gets +1/+0 for each card in your
   hand until end of turn". Both Tails attach to one verb phrase, so the Category alone does not
   tell them apart, and the two placements are two Templates (§4). The notation writes the
-  inside placement `%inner Category: …` (§7); which Templates need it is the
-  `syl-tail-placement` ticket's to find.
+  inside placement `%inner Category: …` (§7): `forEach` prints "for each" outside, and
+  `forEachInner` inside, before a duration (Ral's Staticaster) or a trailing conditional
+  adjunct (Batwing Brume's "loses 1 life for each attacking creature they control if {B} was
+  spent to cast this spell"). "Equal to" printed away from its amount has one placement: it is a
+  postposed modifier inside the verb's own phrase (Dogpile), before every adjunct of it.
 - **A Tail is read where it is printed.** Gaze of Adamaro "deals damage to target player equal
   to the number of cards in that player's hand": the amount is the declaration's first
   parameter, and its Tail mentions "that player" after the recipient introduced them. Read
@@ -843,6 +846,11 @@ The notation of §7 has no form yet for the placeholder a coordination's arms ho
 "the nearest phrase above the Hole" names nothing, and a rule by position, such as the smallest
 phrase that ends where the Hole stands, does not fit a Reading, which is a tree. How such
 a Tail's host is found is not settled.
+
+**A Tail whose host has no other trailing dependent.** Its two placements then print one
+Reading: Coat of Arms's "Each creature gets +1/+1 for each other creature on the battlefield that
+shares at least one creature type with it" is `forEach` and `forEachInner` alike, so recovery yields two
+terms for one wording. Which of them is written is not settled.
 
 **A list element that prints only a Tail.** Such an element takes no part in its list's join
 (§7), so `[A, B, T]`, `[A, T, B]` and `[T, A, B]` print one Reading, and recovery cannot recover
