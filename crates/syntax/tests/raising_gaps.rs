@@ -316,27 +316,37 @@ fn a_gapped_adjunct_raises_its_gap_and_yields_to_a_selected_infinitival() {
     let grammar =
         CompiledGrammar::bind(&Grammar::from_fug_str(source).unwrap(), &lexicon, &frames).unwrap();
 
-    // Non-selecting *spend* keeps its gapped purpose adjunct inside a relative clause.
+    // Non-selecting *spend* keeps its gapped purpose adjunct inside a relative
+    // clause.
     let spend_readings = grammar
         .parse(&lexicon, "Spell mana spends mana to cast casts.")
         .readings()
         .collect::<Vec<_>>();
     assert_eq!(spend_readings.len(), 1, "{spend_readings:#?}");
     assert_eq!(
-        grammar.admit(&spend_readings[0], &lexicon, &sylex_lexicon::CardScope::default()),
+        grammar.admit(
+            &spend_readings[0],
+            &lexicon,
+            &sylex_lexicon::CardScope::default()
+        ),
         Ok(())
     );
 
-    // Selecting *cost* (`HollowToInf`) suppresses both ungapped and gapped `adjunct ToInf`:
-    // main-clause `costs mana to cast` takes `HollowInfinitival` alone, and relative-clause
-    // `mana costs mana to cast` cannot license a relative Gap through gapped `adjunct ToInf`.
+    // Selecting *cost* (`HollowToInf`) suppresses both ungapped and gapped
+    // `adjunct ToInf`: main-clause `costs mana to cast` takes
+    // `HollowInfinitival` alone, and relative-clause `mana costs mana to cast`
+    // cannot license a relative Gap through gapped `adjunct ToInf`.
     let cost_readings = grammar
         .parse(&lexicon, "Spell costs mana to cast.")
         .readings()
         .collect::<Vec<_>>();
     assert_eq!(cost_readings.len(), 1, "{cost_readings:#?}");
     assert_eq!(
-        grammar.admit(&cost_readings[0], &lexicon, &sylex_lexicon::CardScope::default()),
+        grammar.admit(
+            &cost_readings[0],
+            &lexicon,
+            &sylex_lexicon::CardScope::default()
+        ),
         Ok(())
     );
     assert_eq!(
@@ -347,7 +357,8 @@ fn a_gapped_adjunct_raises_its_gap_and_yields_to_a_selected_infinitival() {
         0
     );
 
-    // A `.Gap` requirement on `head` or a comma-delimited adjunct is rejected at bind time.
+    // A `.Gap` requirement on `head` or a comma-delimited adjunct is rejected
+    // at bind time.
     for bad in [
         "adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate } where head.Gap = NP",
         "adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, delimiter: ',' } where adjunct.Gap = NP",

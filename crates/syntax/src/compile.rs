@@ -5450,7 +5450,9 @@ fn adjunct_production_id(schema: &SchemaDecl) -> String {
     let gap = equations
         .iter()
         .find_map(|e| match e {
-            Equation::Require(path, value) if path.ends_with(".Gap") => Some(format!("/gap-{value}")),
+            Equation::Require(path, value) if path.ends_with(".Gap") => {
+                Some(format!("/gap-{value}"))
+            }
             _ => None,
         })
         .unwrap_or_default();

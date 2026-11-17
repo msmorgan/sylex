@@ -787,7 +787,7 @@ fn decl_values<'a>(decl: &Decl<'a>) -> Vec<(&'a Value, ValueSlot)> {
     out
 }
 
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 enum Term<'a> {
     Call {
         decl: usize,
