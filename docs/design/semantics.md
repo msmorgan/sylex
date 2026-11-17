@@ -210,10 +210,9 @@ Only a Participial Description written without "this way" reaches a linked abili
 a `would` clause's prospective group or amount ([CR#614.6]) or a completed one — because English
 selects "that much" (`thatMuch`) against "that many" (`thatMany`) by the noun quantified rather
 than by whether the antecedent was a scalar or a group (*Ingenious Artillerist*, *Ageless Entity*,
-*Doubling Season*). Unqualified (`sort = none`), it excludes clause-mate subjects and outcomes that
-name what was declined (`ceilingShortfall`), ranks accessible numeric antecedents by clause
-prominence (*Neheb, Dreadhorde Champion*, *Memory Vampire*), and is refused when two tie; a
-sort-qualified read (`preventedThisWay`, `removedThisWay`, `shortOfCeiling`, or `infect`'s
+*Doubling Season*). Unqualified (`sort = none`), it excludes clause-mate subjects, ranks accessible
+numeric antecedents by clause prominence (*Neheb, Dreadhorde Champion*, *Memory Vampire*), and is
+refused when two tie; a sort-qualified read (`preventedThisWay`, `removedThisWay`, or `infect`'s
 `damageDealt` [CR#702.90b]) filters by `OutcomeSort`. `theDifference` is separate: a strict
 inequality (`compareAmt`, `compareOver`) introduces its positive difference into that comparison's
 branch alone, closed across negation (`not`, an `else` branch) and disjunction (`or`) and never
