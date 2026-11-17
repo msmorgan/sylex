@@ -1,5 +1,5 @@
 ---
-needs: [syl-kind-sorts-and-position-unions]
+needs: [syl-kind-sorts-and-position-unions, syl-round-trip-stratum-0]
 specs: [kind-sorts-and-position-unions]
 ---
 
