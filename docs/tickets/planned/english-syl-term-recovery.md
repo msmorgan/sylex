@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-surface, syl-shared-phrase-written-once, syl-replacement-stated-as-clause, syl-token-records-to-templates, syl-round-trip-stratum-0]
+needs: [cleanup-step6-surface, syl-shared-phrase-written-once, syl-replacement-stated-as-clause, syl-token-records-to-templates]
 ---
 
 # Recover `.syl` terms from `sylex_english` Readings
