@@ -148,9 +148,13 @@ feature QualityHead = Fused
 // A degree determinative (*that many*, *as much*) and what it determines,
 // which a multiplier joins as a quantity, never as a Noun Phrase.
 feature QuantityKind = Degree
-// In a Word-Part Coordination, a Compound Noun's first base alone, or the
-// last Conjunct's `Whole` noun (CGEL 15§3.1(g):1325).
-feature CompoundPart = Base | Whole
+// A slash measure as the fused head of its nominal (*a 3/3*).
+feature MeasureHead = Fused
+// A license feature (english.md §3), which the counter catalog declares: a
+// counter's kind name (*charge*, *time*), which stands only as the kind of
+// the noun *counter*, and *counter*, the one noun a kind premodifies
+// [CR#122.1].
+feature KindLicense = Kind | Head
 feature Inflection =
     | Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis
     | GerundParticiple | PastParticiple
@@ -287,7 +291,7 @@ category ComplementNounPhrase : NounPhrase [
 // Complement's.
 category Nominal [
     Variable, Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueNounKind, ConjunctNumber, CompoundPart,
+    ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, Determination, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
@@ -305,16 +309,15 @@ category RelativeTemporalNominal : Nominal [
 ]
 category BareNominal : Nominal [
     Variable, Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueNounKind, CompoundPart,
+    ObliqueNumber, ObliqueKind, ObliqueNounKind, MeasureHead, KindLicense,
 ] { gap }
 // The singular count nominals that share a determiner before the
 // final, determined conjunct of a SharedDeterminerCoordination.
 category SharedNominals [Number, Countability]
 category NounPremodifier : Nominal [Polarity]
-// A Word-Part Coordination of Compound Nouns sharing a head word (*a +1/+1,
-// first strike, or vigilance counter*), and each Conjunct.
-category CompoundCoordination : Nominal [Number, Countability, NounKind, NounDistribution]
-category CompoundConjunct : Nominal [Number, Countability, NounKind, NounDistribution, CompoundPart]
+// A counter's kind, or a coordination of kinds (*a +1/+1, first strike, or
+// vigilance counter*).
+category Kind
 // A noun premodifier conjunct with an adjective or negative noun
 // premodifier of its own (*artifact or [non-Aura enchantment] card*).
 category NounPremodifierConjunct : Nominal
@@ -686,8 +689,6 @@ class Variable { typed }
 class RangeMarker { typed }
 // Only `{P}` [CR#107.18].
 class Pawprint { typed }
-// The Compound Nouns whose first base names their kind: the counters.
-class SharedHeadCompound { typed }
 
 slot TypeModifier = TypeModifier
 slot NonManaCost = NonManaCost
@@ -764,9 +765,11 @@ IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal where head.Number = Si
 // A keyword premodifies only without its Keyword Parameters (*a disturb
 // cost*), never with them (*[protection from each of the exiled card's]
 // card types*, Mirror Golem). `=`, so a keyword coordination, which leaves
-// KeywordForm unvalued, passes (*an eternalize or embalm ability*).
+// KeywordForm unvalued, passes (*an eternalize or embalm ability*). Before
+// *counter*, a keyword is the counter's kind (KindPremodifier).
 KeywordPremodifier: BareNominal -> modifier:KeywordPhrase BareNominal
-    where modifier.KeywordForm = Bare
+    where modifier.KeywordForm = Bare,
+          head.KindLicense != Head
 // Quoted wording mentioned as a term: a keyword or cited-word premodifier
 // (*all "bands with other" abilities*, *a "left" pile*), a cited word
 // (*choose "left" or "right."*) or a singular nominal (*the "legend rule"*,
@@ -975,7 +978,7 @@ NominalPhraseQuality: Quality -> NounPhrase
 // *protection from snow*, [CR#205.4a]). Never a color word, whose noun
 // conversion is the Quality (*protection from red*; one tree, english.md §8).
 AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
-NamedParameter: Name -> Lex(Catalog)
+NamedParameter: Name -> Lex(Catalog) where head.KindLicense != Kind
 NameAsComplement: NameComplement -> Name { cost: 0 }
 OtherCardNameComplement: NameComplement -> OtherCardName()
 SlashMeasure: Measure -> first:SignedAmount '/':Bound second:SignedAmount
@@ -1264,34 +1267,37 @@ HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
 // suspected*.
 CentralAdverbAdjunct: CentralAdjunct -> AdverbPhrase { cost: 0 } where head.AdjunctPosition = Central
 
+// Before *counter*, a measure is the counter's kind (KindPremodifier).
 MeasurePremodifier: BareNominal -> modifier:Measure BareNominal
+    where head.KindLicense != Head
+// A counter's kind premodifies the noun *counter* [CR#122.1]: a slash
+// measure for a +X/+Y counter [CR#122.1a], a keyword for a keyword counter
+// [CR#122.1b], or a kind name. A keyword kind is bare, as a
+// KeywordPremodifier is, and one keyword (`:=`): keywords coordinate as
+// kinds, so a list of kinds is one coordination whatever its kinds are.
+KindPremodifier: BareNominal -> modifier:Kind BareNominal
+    where head.KindLicense := Head
+MeasureKind: Kind -> Measure
+KeywordKind: Kind -> KeywordPhrase where head.KeywordForm := Bare
+KindName: Kind -> Lex(Catalog) where head.KindLicense := Kind
 // *five {P} worth of modes*.
 PawprintPremodifier: BareNominal -> modifier:Pawprints BareNominal
 // *its {1}{G} kicker*.
 SymbolPremodifier: BareNominal -> modifier:Symbols BareNominal
 // A slash measure is a noun only under a determiner (*an additional
-// +2/+2*); bare, it is a MeasureNounPhrase. A fused first base (*a 3/3*
-// [creature]), so never a non-final Conjunct of a Nominal Coordination:
-// there it is a Word-Part Coordination's base (*a +2/+0, +1/+1, or +0/+2
-// counter*; english.md §8).
+// +2/+2*); bare, it is a MeasureNounPhrase. A fused head (*a 3/3*
+// [creature]), so never a non-final Conjunct of a Nominal Coordination, an
+// admission gate (english.md §6): it keeps *[a +2/+0], [+1/+1], or [+0/+2
+// counter]* from beside the coordination of the counter's kinds *a [+2/+0,
+// +1/+1, or +0/+2] counter* (Frankenstein's Monster).
 MeasureNominal: BareNominal -> Measure
-    where $.CompoundPart = Base,
+    where $.MeasureHead = Fused,
           $.Determination = Overt,
           $.Number = Singular,
           $.Countability = Count,
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
 MeasureNounPhrase: MeasureNounPhrase -> Measure
-WordPartCoordination: BareNominal -> CompoundCoordination
-// A counter's first base is its name [CR#122.1]: a keyword, or a slash
-// measure for a +X/+Y counter [CR#122.1a,122.1b]. It is `modifier`: it
-// modifies the head noun the conjuncts share, which it never heads. A
-// keyword base is bare, as a KeywordPremodifier is.
-KeywordBase: CompoundConjunct -> modifier:KeywordPhrase
-    where $.CompoundPart = Base,
-          modifier.KeywordForm = Bare
-MeasureBase: CompoundConjunct -> modifier:Measure where $.CompoundPart = Base
-WholeCompound: CompoundConjunct -> Class(SharedHeadCompound) where $.CompoundPart = Whole
 // *Gets twice -X/-X*.
 AdverbModifiedMeasure: MeasureNounPhrase -> modifier:AdverbPhrase MeasureNounPhrase
     where modifier.AdjunctPosition = Phrasal
@@ -2443,8 +2449,10 @@ AttributeSequence: AttributeChain -> first:Attribute ',' rest:AttributeChain
     where first.Polarity := Negative
 FinalAttribute: AttributeChain -> last:Attribute where last.Polarity := Negative
 AttributedNominal: BareNominal -> modifier:Attributes BareNominal
+// *Counter* takes no noun premodifier but its kind (KindLicense).
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
-    where head.Determination != Overt
+    where head.Determination != Overt,
+          head.KindLicense != Head
 QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier QuantifiedNominal
 // A bare count singular nominal that a preposition's frame selects (*until
 // end of turn*). The head carries Count itself: a noun that is also
@@ -3698,18 +3706,18 @@ coordination NounPhrase {
           last.NounKind != Quantity
 coordination Nominal {
     coordinators: And,
-    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, CompoundPart],
+    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead],
     proximate: [NounDistribution],
 }
-    where first.CompoundPart != Base,
+    where first.MeasureHead != Fused,
           $.Number = Plural,
           $.ConjunctNumber = first.Number
 coordination Nominal {
     coordinators: Disjunctive,
-    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, CompoundPart],
+    unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead],
     proximate: [NounDistribution],
 }
-    where first.CompoundPart != Base,
+    where first.MeasureHead != Fused,
           $.ConjunctNumber = $.Number
 coordination GenitiveNominals {
     coordinators: Coordinator,
@@ -3740,14 +3748,6 @@ coordination NounPremodifier {
     unshared: [Polarity],
     conjunct: NounPremodifierConjunct,
 }
-coordination CompoundCoordination {
-    coordinators: Coordinator,
-    unshared: [CompoundPart],
-    proximate: [Number, Countability, NounKind, NounDistribution],
-    conjunct: CompoundConjunct,
-}
-    where first.CompoundPart = Base,
-          last.CompoundPart = Whole
 // Conjuncts of one Inflection share it (*attacking or blocking creature*,
 // Aethertow).
 coordination Participle { coordinators: Coordinator, unshared: [Polarity] }
@@ -3876,6 +3876,9 @@ coordination AmountOrNounPhrase {
     unlike: ComplementKind,
 }
 coordination MeasureNounPhrase { coordinators: Coordinator }
+// A counter's kinds, whatever each is (*a flying, lifelink, or +1/+1
+// counter*, Reluctant Role Model).
+coordination Kind { coordinators: Coordinator }
 coordination Amount { coordinators: Coordinator, proximate: [QuantityNumber, Sign] }
 coordination SymbolCosts { coordinators: Coordinator }
 // It determines as its last conjunct does (*one or more cards*). No

@@ -406,10 +406,9 @@ pub(crate) fn quotations(tokens: &[char], covered: &[bool]) -> (Vec<char>, Vec<O
 /// The separate words stand apart only where they straddle a constituent
 /// boundary: in the smallest Constituent spanning the term, the child holding
 /// its first word begins before the term and the child holding its last word
-/// ends after it (*the [first time] [counters have been put ...]*). Where
-/// either child begins or ends with the term, its words rebuild the term's
-/// own analysis, alone (*[first] [strike]*) or with a dependent of one part
-/// (*mana [cost for ...]*, *[red or haste] counter*), beside the term itself.
+/// ends after it. Where either child begins or ends with the term, its words
+/// rebuild the term's own analysis, alone (*[first] [strike]*) or with a
+/// dependent of one part (*mana [cost for ...]*), beside the term itself.
 ///
 /// The rule is checked where a Production that began at or before the term
 /// takes the child that reaches the term's end from inside it: an item

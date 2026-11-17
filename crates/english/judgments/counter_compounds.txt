@@ -1,4 +1,4 @@
-# Counter-kind compound nouns ("charge counter", "+1/+1 counter") as nominals, with article form following pronunciation
+# A counter's kind ("charge", "+1/+1") premodifying *counter*, with the article's form following the kind's pronunciation
 +NounPhrase a charge counter => Nominal "charge counter"
 +NounPhrase charge counters => Nominal "charge counters"
 +NounPhrase a reach counter or a vigilance counter => NounPhrase "a reach counter"; NounPhrase "a vigilance counter"
@@ -8,3 +8,6 @@
 +NounPhrase a -0/-1 counter
 +NounPhrase a -0/-2 counter
 +NounPhrase a -1/-0 counter
+# A kind name premodifies *counter* as its kind; where *time* ends a Nominal and *counters* begins a clause, they are no kind and counter.
++ Sacrifice a Thrull: Put three time counters on this Aura. => Nominal "time counters" head counter; Kind "time" as Modifier of counter; readings 1
++ Whenever one or more counters are put on a creature you control, if it's the first time counters have been put on that creature this turn, put a +1/+1 counter on that creature. => PrepositionPhrase "if it's the first time counters have been put on that creature this turn" as Adjunct of put; Clause "counters have been put on that creature this turn"; RelativeClause "counters have been put on that creature this turn" as Modifier of time gap "first time"; !Nominal "time counters"

@@ -9,5 +9,5 @@
 +NounPhrase an additional +2/+2
 # from: Quenchable Fire
 + It deals an additional 2 damage. => NounPhrase "an additional 2 damage" as Object of deal
-+ It enters with an additional +1/+1 counter on it. => AdjectivePhrase "additional" as Modifier of "+1/+1 counter"
++ It enters with an additional +1/+1 counter on it. => AdjectivePhrase "additional" as Modifier of counter
 + Draw an additional card. => NounPhrase "an additional card" as Object of draw; AdjectivePhrase "additional" as Modifier of card

@@ -12,14 +12,16 @@ use sylex_syntax::grammar::SchemaDecl;
 use sylex_syntax::grammar::SymbolDecl;
 use sylex_vocabulary::Sources;
 
-/// Grammatical terms that happen to spell a catalog item, each the standard
-/// name of a grammatical concept rather than a use of the catalog word.
+/// Terms that happen to spell a catalog item, each the standard name of a
+/// grammatical or notational concept rather than a use of the catalog word.
 // *Case* is the grammatical feature of nominative, accusative and genitive.
 // *Free* (free-choice *any*, CGEL, Ch. 5 §7.5, p. 381), *past* (the past
 // participle), *present* (the present tense) and *time* (a relative of time)
 // name grammatical concepts; the catalog words they spell are vote options
-// [CR#701.38b].
-const GRAMMATICAL_TERMS: [&str; 5] = ["case", "free", "past", "present", "time"];
+// [CR#701.38b]. *Loyalty* names the loyalty cost of a loyalty ability's
+// symbol (*[+1]*, [CR#606.4]); the catalog word it spells is the loyalty
+// counter's kind name [CR#122.1e].
+const GRAMMATICAL_TERMS: [&str; 6] = ["case", "free", "past", "present", "time", "loyalty"];
 
 #[test]
 fn the_grammar_names_only_core_closed_class_lexemes() {

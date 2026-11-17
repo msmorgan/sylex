@@ -128,15 +128,13 @@ look, but it is no defect when the construction really has one holder.
 ## 5. Multiword terms
 
 A multiword term declared outside the core lexicon is one leaf, but its words
-keep their own analyses where they straddle a constituent boundary: in *if it's
-the first time counters have been put on that creature*, *time* ends the
-Nominal *first time* and *counters* begins the clause, so the Catalog term *time
-counter* does not hold them. The words straddle a boundary only when, in the
+keep their own analyses where they straddle a constituent boundary: where the
+first word ends one constituent and the last begins the next, the Catalog term
+does not hold them. The words straddle a boundary only when, in the
 smallest Constituent spanning the term, the child holding its first word begins
 before the term and the child holding its last word ends after it; otherwise
 they would rebuild the term, alone or with a dependent of one word. A core
-multiword term (*mana value*) never splits, nor does a term with a part that is
-not an ordinary word (the measure of *+1/+1 counter*). A multiword noun whose
+multiword term (*mana value*) never splits. A multiword noun whose
 first word is also a preposition is no barrier: its words form a Preposition
 Phrase, never the noun's own analysis. Why: words that meet by accident are a
 different analysis from the term coined from them, while words that rebuild the

@@ -60,6 +60,20 @@ use crate::schema::VerbEntry;
 pub use crate::shortening::AttestedShortenings;
 pub use crate::shortening::short_name;
 
+/// The license feature of a counter's kind name and of the noun *counter*
+/// (`Sources::counter_kinds`).
+const KIND_LICENSE: &str = "KindLicense";
+
+/// Whether `lexeme` is a counter's kind name, which stands only before the
+/// noun *counter*.
+pub(crate) fn is_counter_kind_name(lexeme: &Lexeme) -> bool {
+    lexeme
+        .properties
+        .features
+        .get(KIND_LICENSE)
+        .is_some_and(|value| value.as_str() == "Kind")
+}
+
 /// Why the lexicon or a catalog cannot be loaded.
 #[derive(Debug, thiserror::Error)]
 pub enum SourceError {
@@ -502,42 +516,6 @@ impl Sources {
         }
         self.keywords(builder)?;
         self.ability_labels(builder);
-        for counter in &self.counters {
-            let id = format!("counter:{}", counter.kind);
-            let entry = schema::NounEntry {
-                distribution: schema::NounDistribution::Ordinary,
-                kind: schema::NounKind::Ordinary,
-                parameters: Vec::new(),
-                lemma: format!("{} counter", counter.kind),
-                countability: vec![sylex_lexicon::Countability::Count],
-                plural: None,
-                frames: Vec::new(),
-                variable: false,
-                prefix_hyphenation: None,
-                onset: counter.onset,
-            };
-            builder.noun(&id, &entry, catalog(COUNTERS, &id));
-            // A counter's name is its kind, the first base of its Compound
-            // Noun [CR#122.1]; a Word-Part Coordination shares the head word
-            // with earlier bases (*a +1/+1, first strike, or vigilance
-            // counter*; CGEL, Ch. 15 §3.1(g), p. 1325).
-            builder
-                .lexemes
-                .last_mut()
-                .expect("just pushed")
-                .properties
-                .classes
-                .insert("SharedHeadCompound".into());
-            if counter.kind.starts_with(['+', '-'])
-                || counter.kind.starts_with(|c: char| c.is_ascii_digit())
-            {
-                builder
-                    .lexemes
-                    .last_mut()
-                    .expect("just pushed")
-                    .surface_structure = SurfaceStructure::MeasuredCompound;
-            }
-        }
         for designation in &self.designations {
             for decl in &designation.nouns {
                 let entry = decl.entry();
@@ -587,6 +565,64 @@ impl Sources {
             builder.push(card_scoped(lexeme, &introduced.cards));
         }
         self.scoped_name_catalogs(builder);
+        self.counter_kinds(builder)
+    }
+
+    /// The kind names of counters, and the license of the noun *counter*. A
+    /// counter's kind premodifies *counter* [CR#122.1]: a slash measure for
+    /// a +X/+Y counter [CR#122.1a], a keyword for a keyword counter
+    /// [CR#122.1b], and any other kind its kind name, a word of its own (*a
+    /// charge counter*). A kind name stands only there: it is a catalog word,
+    /// never a noun, and it and *counter*, the one noun that takes it, carry
+    /// the license feature `KindLicense` (`docs/design/english.md`
+    /// §3).
+    fn counter_kinds(&self, builder: &mut Builder) -> Result<(), SourceError> {
+        let keywords: std::collections::BTreeSet<&str> = self
+            .keyword_abilities
+            .iter()
+            .map(|ability| ability.lemma.as_str())
+            .collect();
+        let keyword_counters = schema::Rule::try_from("[CR#122.1b]".to_owned())
+            .expect("a bracketed CR citation is a rule");
+        for counter in &self.counters {
+            let kind = counter.kind.as_str();
+            if kind.starts_with(['+', '-']) || kind.starts_with(|c: char| c.is_ascii_digit()) {
+                continue;
+            }
+            if counter.rule.as_ref() == Some(&keyword_counters) {
+                if !keywords.contains(kind) {
+                    return Err(SourceError::Invalid(format!(
+                        "keyword counter `{kind}` names no declared keyword ability"
+                    )));
+                }
+                continue;
+            }
+            let id = format!("counter:{kind}");
+            let mut lexeme = Lexeme::invariant(
+                &id,
+                kind,
+                Category::Catalog,
+                source(SourceKind::Catalog, COUNTERS, &id),
+            );
+            lexeme.onset = counter.onset;
+            lexeme
+                .properties
+                .features
+                .insert(KIND_LICENSE.into(), Ident::new("Kind"));
+            builder.push(lexeme);
+        }
+        let head = builder
+            .lexemes
+            .iter_mut()
+            .find(|lexeme| lexeme.id.as_str() == "noun:counter")
+            .ok_or_else(|| {
+                SourceError::Invalid(format!(
+                    "{COUNTERS} licenses the noun `counter`, which the core lexicon does not declare"
+                ))
+            })?;
+        head.properties
+            .features
+            .insert(KIND_LICENSE.into(), Ident::new("Head"));
         Ok(())
     }
 

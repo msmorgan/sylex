@@ -277,7 +277,6 @@ impl Tok<'_> {
                     Class::CardType
                         | Class::Subtype
                         | Class::Token
-                        | Class::CounterKind
                         | Class::CardName
                         | Class::Designation
                         | Class::TurnPart

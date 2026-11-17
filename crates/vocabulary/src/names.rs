@@ -20,10 +20,11 @@ use crate::build::source;
 ///
 /// The spelling is dropped where the rest of the vocabulary in scope on that
 /// card already spells it (*Sliver* in *Sliver Queen*): a Catalog item such
-/// as a token name or an Introduced Name always, any other word unless the
-/// spelling is the explicit name before a comma or a planeswalker type,
-/// which is the name of the character the card is (*Jace* in *Jace, the Mind
-/// Sculptor*).
+/// as a token name or an Introduced Name always, any other word, a counter's
+/// kind name among them, unless the spelling is the explicit name before a
+/// comma or a planeswalker type, which is the name of the character the card
+/// is (*Jace* in *Jace, the Mind Sculptor*; *Loot* in *Loot, the
+/// Pathfinder*).
 #[must_use]
 pub fn shortened_name(name: &str, attested: Option<&str>, vocabulary: &Lexicon) -> Option<String> {
     let candidate = attested?.trim();
@@ -53,7 +54,7 @@ fn spelled_by_other_vocabulary(
         let lexeme = &vocabulary.lexemes()[&value.lexeme];
         found.start == 0
             && found.end == whole
-            && (lexeme.category == Category::Catalog
+            && (lexeme.category == Category::Catalog && !crate::is_counter_kind_name(lexeme)
                 || !explicit
                     && lexeme.binding == Binding::Free
                     && !lexeme.properties.classes.contains("PlaneswalkerType"))

@@ -24,8 +24,10 @@ word parts.
   ("flying", "first strike") or a kind name ("charge", "loyalty", "time"). A kind name is a word
   of its own, declared by its `counter` declaration, whose lemma is the name without "counter".
 - A coordination of kinds is an ordinary coordination of premodifiers under one head.
-- That a kind word modifies only "counter" is not the grammar's to enforce ("charge creature"
-  parses); semantics rejects it.
+- A license feature (`docs/design/english.md` §3) restricts the kinds: "counter" is the one noun
+  a kind premodifies, and it takes a measure, a keyword or a declared kind name there and no other
+  noun premodifier; a kind name stands only there, so no other noun takes it ("charge creature"
+  has no Reading) and it never heads a nominal.
 
 ## Done when
 

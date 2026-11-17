@@ -1,6 +1,8 @@
 // Counter kinds: every kind printed on Vintage-legal cards, plus every kind named by
-// [CR#122.1a..122.1j]. `rule` is set where the CR names the kind. Each kind becomes the
-// compound noun `<kind> counter`. The remaining kinds are named only by cards.
+// [CR#122.1a..122.1j]. `rule` is set where the CR names the kind. A kind premodifies the noun
+// *counter*: a slash measure [CR#122.1a] and a keyword [CR#122.1b] are words the language has
+// anyway, and every other kind is its kind name, a word that stands only before *counter*. The
+// remaining kinds are named only by cards.
 [
     // Power/toughness counters [CR#122.1a].
     (kind: "+0/+1", rule: "[CR#122.1a]"),

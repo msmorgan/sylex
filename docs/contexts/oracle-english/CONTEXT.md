@@ -214,6 +214,11 @@ A core closed-class Lexeme that the grammar names individually.
 **Lexical Class**:
 A declared group of Lexemes eligible for the same grammatical slot.
 
+**License Feature**:
+A lexical feature by which a Catalog licenses its own words in one position
+and marks the head that admits them there: `KindLicense`, on each
+counter's kind name and the noun *counter* (english.md §3).
+
 **Lexical Environment**:
 The declared vocabulary and frames available for analyzing an expression.
 
@@ -416,10 +421,6 @@ with no Complement.
 **Nominal Cluster**:
 Parallel sequences of a Determiner and one or more premodifying Modifiers,
 coordinated before a shared Nominal (*all black and all red creature cards*).
-
-**Word-Part Coordination**:
-A Coordination of Compound Nouns' first bases sharing the last Conjunct's head
-word, as in *a +1/+1, first strike, or vigilance counter*.
 
 **Medial Remnant**:
 A medial Conjunct whose initial element is elided and recovered from the first
