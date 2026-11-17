@@ -192,8 +192,10 @@ zone comes from its postmodifiers or its verb ([CR#109.2a]). `spell` means a spe
 ([CR#109.2b,112.1]), `source` a source in any zone ([CR#109.2c,113.7]), `token` the token test
 alone ([CR#111.1,111.7]), and `player` and `opponent` a player ([CR#102.1..102.3]). Under the
 copula `is(subject, predicative)`, `Predicative`'s noun-phrase form `noun(phrase)` tests its
-subject in that subject's own zone without [CR#109.2]'s battlefield restriction ("If it's a land",
-of a card in a library; "if it's a creature card" adds the card class through `card`). A
+subject in that subject's own zone ("If it's a land", of a card in a library; "if it's a creature
+card" adds the card class through `card`). [CR#109.2] gives a type word in a description of an
+object the battlefield reading and says nothing of a predicative noun phrase; reading one as a test
+of the subject, with no battlefield restriction, is this design's choice. A
 coordination at `Nominal` is a union of the domains its arms describe ("artifacts and creatures"),
 whereas modifiers in `pre` and `post` intersect with the head; an Agreement `PostModifier` (`agree`)
 constrains the enclosing plural determiner's group rather than each member alone.

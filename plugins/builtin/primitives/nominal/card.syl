@@ -1,4 +1,5 @@
-# A Magic card or an object represented by one; a token is not a card [CR#108.2,108.2b,109.2a].
+# A Magic card or an object represented by one; a token is not a card [CR#108.2,108.2b]. It names
+# no zone: a zone its description states is where the card is [CR#109.2a].
 primitive card: Nominal = Card {
   spelling = "card"
 }
