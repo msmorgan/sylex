@@ -63,8 +63,8 @@ calls. It lands first, so each call is rewritten against its final shape.
 ## Not in scope
 
 - A counter kind printed as a power/toughness pair ("enters with a +2/+0, +1/+1, or +0/+2 counter
-  on it", *Frankenstein's Monster*): a Word-Part Coordination of counter names
-  (`docs/contexts/oracle-english/CONTEXT.md`), not this sort.
+  on it", *Frankenstein's Monster*): a coordination of a counter's kinds premodifying *counter*
+  (`Kind` in `crates/english/grammar/english.fug`), not this sort.
 - Where the "for each" Tail stands relative to a duration: `syl-tail-placement`.
 
 ## Pointers
