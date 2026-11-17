@@ -85,6 +85,9 @@ pub enum FillSpec {
     /// situation at its own time
     /// (`sylex_syntax::frames::ClauseKind::Temporal`).
     TemporalClause,
+    /// A comparative clause, the Complement of *than* or equative *as*
+    /// (`sylex_syntax::frames::ClauseKind::Comparative`).
+    ComparativeClause,
     /// An expandable declarative content clause (CGEL, Ch. 11 §4.8, p. 971).
     ExpandableClause,
     /// A Clause set off by a dash, the content of the Object before it.

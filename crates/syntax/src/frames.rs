@@ -57,6 +57,11 @@ pub enum ClauseKind {
     /// temporal preposition's Complement (*when*, *whenever*, *until*,
     /// *before*, *after*, *while*, *as*; CGEL, Ch. 8 §6, p. 700).
     Temporal,
+    /// A comparative clause, the Complement of *than* or equative *as*: a
+    /// finite Clause reduced at the position its comparative governor
+    /// corresponds to (*as many cards as they discarded this way*, *more
+    /// cards than you do*; CGEL, Ch. 13 §2.1, p. 1108).
+    Comparative,
     Verbless,
     /// A non-finite or verbless clause with its Subject, the Complement of
     /// *with* and *without* (*with your hand revealed*; CGEL, Ch. 14 §8.3,
@@ -164,6 +169,7 @@ pub enum SlotKind {
     MeasureNP,
     FiniteClause,
     TemporalClause,
+    ComparativeClause,
     ExpandableClause,
     SetOffClause,
     VerblessClause,
@@ -202,6 +208,7 @@ impl SlotFill {
             Self::MeasureNP => SlotKind::MeasureNP,
             Self::Clause(ClauseKind::Finite) => SlotKind::FiniteClause,
             Self::Clause(ClauseKind::Temporal) => SlotKind::TemporalClause,
+            Self::Clause(ClauseKind::Comparative) => SlotKind::ComparativeClause,
             Self::ExpandableClause => SlotKind::ExpandableClause,
             Self::SetOffClause => SlotKind::SetOffClause,
             Self::Clause(ClauseKind::Verbless) => SlotKind::VerblessClause,

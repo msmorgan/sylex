@@ -209,6 +209,11 @@ pub fn lexicon() -> Lexicon {
     set(&mut be, Preterite, Some(Third), Some(Singular), "was");
     set(&mut be, GerundParticiple, None, None, "being");
     set(&mut be, PastParticiple, None, None, "been");
+    // Supportive *do*, which the grammar strands (*if you do*).
+    let mut do_verb = verb("do", Core);
+    set(&mut do_verb, Present, Some(Third), Some(Singular), "does");
+    set(&mut do_verb, Preterite, None, None, "did");
+    set(&mut do_verb, PastParticiple, None, None, "done");
     let mut genitive = invariant("clitic", "genitive", Category::Clitic, Core);
     genitive.forms[0].surface = Some("'s".to_owned());
     genitive.binding = Binding::Suffix;
@@ -221,6 +226,7 @@ pub fn lexicon() -> Lexicon {
         get,
         have,
         be,
+        do_verb,
         genitive,
         verb("attack", Core),
         verb("enter", Core),
@@ -320,6 +326,7 @@ fn auxiliaries(lexemes: &mut Vec<Lexeme>) {
         ("may", "may", Some("might")),
         ("must", "must", None),
         ("will", "will", Some("would")),
+        ("don't", "doesn't", Some("didn't")),
     ] {
         let mut auxiliary = verb(word, Core);
         auxiliary
@@ -339,7 +346,7 @@ fn auxiliaries(lexemes: &mut Vec<Lexeme>) {
         if lexeme.category == Category::Verb
             && [
                 "be", "have", "'ve", "haven't", "'re", "aren't", "can", "can't", "may", "must",
-                "will",
+                "will", "don't",
             ]
             .contains(&lexeme.lemma.as_str())
         {

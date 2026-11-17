@@ -28,7 +28,8 @@
     "double-faced",
     // An equality adjective, graded like *same* (*equal toughness*).
     (lemma: "equal", grade: Some(Equative), frames: [Complement(PP(["to"]))]),
-    "even",
+    // *Choose odd or even*: each names a Quality (*the chosen quality*).
+    (lemma: "even", fused_quality: true),
     // Attributive only: *excess damage*; *in excess of* and *the excess* are the noun.
     (lemma: "excess", position: Some(Attributive)),
     (lemma: "extra", position: Some(Attributive)),
@@ -69,7 +70,7 @@
     "negative",
     (lemma: "new", comparative: "newer", superlative: "newest"),
     "next",
-    "odd",
+    (lemma: "odd", fused_quality: true),
     // Attributive-only "the only creature card" (CGEL, Ch. 6, §4.1, p. 553).
     (lemma: "only", position: Some(Attributive), determination: Some(Overt)),
     "original",

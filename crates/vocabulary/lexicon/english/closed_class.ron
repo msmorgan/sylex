@@ -180,7 +180,7 @@
         (lemma: "can't", modal: true, form_of: Some("can"), third_singular: "can't", preterite: "couldn't", finite_only: true, negative: true,
             frames: [Catenative(BareInf)]),
         (lemma: "don't", form_of: Some("do"), third_singular: "doesn't", preterite: "didn't", finite_only: true,
-            negative: true, frames: [Catenative(BareInf), Intransitive]),
+            negative: true, frames: [Catenative(BareInf)]),
         // Lexical and catenative *have*: an Object Noun Phrase, a granted
         // Keyword Phrase or Quoted Ability ([CR#113.1a]), a *to*-infinitival
         // Complement (*doesn't have to attack*), or an Object Noun Phrase with

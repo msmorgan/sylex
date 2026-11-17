@@ -64,7 +64,7 @@
         (complement: Nominal, hosts: Predicate),
         // A comparative clause after equative *as*: *as many times as you
         // choose* (CGEL Ch. 13 §2.1, p. 1108).
-        (complement: FiniteClause, hosts: ComplementOnly),
+        (complement: ComparativeClause, hosts: ComplementOnly),
     ]),
     // Prepositional idiom licensing a content clause (CGEL p. 971).
     (lemma: "as long as", frames: [(complement: FiniteClause, hosts: Predicate)]),
@@ -264,7 +264,7 @@
         (complement: AdvP, hosts: ComplementOnly),
         // A comparative clause: *more creatures than you do* (CGEL Ch. 13
         // §2.1, p. 1108).
-        (complement: FiniteClause, hosts: ComplementOnly),
+        (complement: ComparativeClause, hosts: ComplementOnly),
         // A cited word: *a creature type other than Wall*, *a card type
         // other than creature or land*.
         (complement: Mention, hosts: ComplementOnly),

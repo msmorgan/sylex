@@ -66,16 +66,16 @@ feature Polarity = Affirmative | Negative
 // *meld*, *into* (*meld them into Brisela, Voice of Nightmares*).
 feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | TemporalClause
-    | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf
-    | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP | UnlikeObject
-    | Name
+    | ComparativeClause | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf
+    | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
+    | UnlikeObject | Name
 // The Slot Kind of a determinative's Preposition Phrase's Complement: the
 // values of ComplementKind, which it agrees with.
 feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | TemporalClause
-    | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf | Gerund | BareInf
-    | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP | UnlikeObject
-    | Name
+    | ComparativeClause | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf
+    | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
+    | UnlikeObject | Name
 // `Quantity`: only *number*, the number-transparent noun (*any number
 // of target creatures*; CGEL 5§3.3:349–351). `Serial`: only *time*, a
 // frequency or multiplier head (*three times*; CGEL 8§9:715).
@@ -152,6 +152,12 @@ feature FrontPosition = Occupied
 // Before a bare imperative the adverb is the Clause's front Adjunct, never
 // also this (english.md §8). A coordination begins where its first conjunct does.
 feature CentralPosition = Occupied
+// Privative: a Verb Phrase that is an auxiliary stranded before its
+// Complement's ellipsis site (*than you do*, *if you can't*; the Code of the
+// NICE properties, CGEL 3§2.1.4:99), and the Clause it heads. A coordination
+// carries none: one stranded conjunct does not make *than [you lost life or
+// did]* an elliptical clause.
+feature Ellipsis = Code
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
@@ -223,6 +229,7 @@ category Sentences
 // SubjectRemnant recovers.
 category Clause [
     Number, Person, VerbForm, ClauseMarking, Inflection, FrontPosition, PastTime, NonPastTime,
+    Ellipsis,
 ] { gap }
 // Number: a subject relative agrees with its antecedent. NounKind: an
 // adverbial relative modifies a temporal nominal.
@@ -241,7 +248,7 @@ category SubjectInitialClause : Clause [VerbForm, Inflection] { gap }
 category Participle : VerbPhrase [Inflection, Polarity]
 category VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
-    PastTime, NonPastTime,
+    PastTime, NonPastTime, Ellipsis,
 ] { gap }
 // A Linked Conjunct: a Clause or Verb Phrase opened by its linking
 // connective (*Each player discards a card, [then draws a card]*), as *so*
@@ -380,7 +387,7 @@ category NominalClusters : NominalCluster [
 // A determinative's Complement has a Number of its own (*all but one*).
 category DeterminerPhrase [
     Number, Countability, DeterminativeDistribution, NounKind, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution, TargetMarked,
+    ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution, TargetMarked, Grade,
 ]
 category Multiplier
 // The Targeting Marker as an outer determiner's head or the determiner of
@@ -536,6 +543,8 @@ category FiniteClause : Clause
 // (*when*, *whenever*, *until*, *before*, *after*, *while*, *as*; CGEL
 // 8§6:700).
 category TemporalClause : Clause [PastTime, NonPastTime]
+// The Complement of *than* or equative *as* (CGEL 13§2.1:1108).
+category ComparativeClause : Clause
 category ExpandableClause : Clause
 // A dash-set Supplement giving a head's Complement its content
 // (SetOffComplementClause).
@@ -657,6 +666,7 @@ class HaveVerb = ["verb:have", "verb:'ve", "verb:haven't"]
 class StrandableModal = ["verb:can", "verb:can't", "verb:may", "verb:must", "verb:will"]
 class StrandableHave = ["verb:have", "verb:haven't"]
 class StrandableBe = ["verb:be", "verb:aren't"]
+class StrandableDo = ["verb:do", "verb:don't"]
 // They select a *than* Complement (*more than one*; CGEL 13§2.1:1104), and
 // a measure phrase modifies them.
 class ComparativeQuantifier = ["det:more.count", "det:more.mass", "det:less", "det:fewer"]
@@ -757,6 +767,7 @@ slot UnlikeObject = ObjectCoordination { unlike: [NP, KeywordPhrase, QuotedAbili
 slot Cost = SymbolCosts
 slot FiniteClause = FiniteClause
 slot TemporalClause = TemporalClause
+slot ComparativeClause = ComparativeClause
 slot ExpandableClause = ExpandableClause
 slot SetOffClause = SetOffClause
 slot VerblessClause = VerblessClause
@@ -1237,13 +1248,24 @@ PerfectParticiple: PerfectComplement -> VerbPhrase { transparent: [head] }
 // [discards a card]* keeps its ellipsis.
 StrandedModal: VerbPhrase -> Class(StrandableModal) { elliptical: [Plain] }
     where head.VerbForm = Finite,
-          $.Voice = Active
+          $.Voice = Active,
+          $.Ellipsis = Code
 StrandedPerfect: VerbPhrase -> Class(StrandableHave) { elliptical: [PastParticiple] }
     where head.VerbForm = Finite,
-          $.Voice = Active
+          $.Voice = Active,
+          $.Ellipsis = Code
 StrandedBe: VerbPhrase -> Class(StrandableBe) { elliptical: [GerundParticiple, PastParticiple] }
     where head.VerbForm = Finite,
-          $.Voice = Active
+          $.Voice = Active,
+          $.Ellipsis = Code
+// Supportive *do* stranded (*If you do, ...*; CGEL 17§7.2:1524) as in a
+// comparative clause (*more life than they do*; 13§2.1:1110). The grammar
+// reads bare *do* there as this alone, never also as an intransitive
+// lexical verb: one tree (english.md §8).
+StrandedDo: VerbPhrase -> Class(StrandableDo) { elliptical: [Plain] }
+    where head.VerbForm = Finite,
+          $.Voice = Active,
+          $.Ellipsis = Code
 Progressive: VerbPhrase -> Class(BeVerb) complement:AuxiliaryComplement {
     transparent: [complement],
 }
@@ -1456,10 +1478,18 @@ DegreeDeterminer: DeterminerPhrase -> modifier:Word(That) Class(DegreeQuantifier
 // *As much*, *as many* (CGEL 13§4.3:1130). Degree *as* modifies the
 // determinative, never a Noun Phrase.
 EquativeDeterminer: DeterminerPhrase -> modifier:Word(DegreeAs) Class(DegreeQuantifier) {
-    unshared: [DeterminativeDistribution],
+    unshared: [DeterminativeDistribution, Grade],
 }
     where $.ComplementKind = Intransitive,
-          $.DeterminativeDistribution = Degree
+          $.DeterminativeDistribution = Degree,
+          $.Grade = Equative
+// *At least as many* (*at least as many lands as you do*, Land
+// Equilibrium): the bound is the equative determinative's, as it is a
+// numerical one's in AdverbModifiedDeterminerPhrase, never also the Noun
+// Phrase's (BoundingNounPhrase; english.md §8).
+BoundedEquativeDeterminer: DeterminerPhrase -> modifier:AdverbPhrase DeterminerPhrase
+    where modifier.AdjunctPosition = Bounding,
+          head.Grade := Equative
 // A modified degree determinative as a fused head (*that many*, *tied for
 // the most*); a coordination fuses only as a FusedQuantity. Count only:
 // never *that much*.
@@ -1494,10 +1524,12 @@ FusedQuantityCoordination: FusedNounPhrase -> FusedQuantity
 // target*, *twice its power*); a bounding one, its quantity (*at least one
 // creature*). A focusing modifier precedes a determined Noun Phrase
 // (*exactly those colors*; CGEL 6§7.3.1:587); numerical determination is
-// AdverbModifiedDeterminerPhrase's.
+// AdverbModifiedDeterminerPhrase's, and an equative determinative's bound
+// BoundedEquativeDeterminer's.
 BoundingNounPhrase: NounPhrase -> modifier:AdverbPhrase determiner:DeterminerPhrase Nominal
     where modifier.AdjunctPosition = Bounding,
           determiner.DeterminativeDistribution != Numerical | Independent | FreeChoice,
+          determiner.Grade != Equative,
           determiner.ComplementKind != PP,
           $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.Countability = head.Countability,
@@ -1603,9 +1635,9 @@ ModifiedComparativeFrequency: TemporalNounPhrase ->
           $.Person = Third
 // *As many times as you choose*.
 EquativeFrequency: TemporalNounPhrase ->
-    modifier:Word(DegreeAs) determiner:Class(DegreeQuantifier) Nominal
-    complement:Selected(PrepositionPhrase, As)
-    where complement.ComplementKind = FiniteClause,
+    determiner:DeterminerPhrase Nominal complement:Selected(PrepositionPhrase, As)
+    where determiner.Grade := Equative,
+          complement.ComplementKind = ComparativeClause,
           head.NounDistribution = Serial,
           head.Number = Plural,
           determiner.Number = head.Number,
@@ -2018,9 +2050,9 @@ ComparativeMassDetermined: NounPhrase ->
 // they discarded this way*, Forget; CGEL 13§2.1:1108). Twin:
 // EquativeFrequency.
 EquativeCountDetermined: NounPhrase ->
-    modifier:Word(DegreeAs) determiner:Class(DegreeQuantifier) Nominal
-    complement:Selected(PrepositionPhrase, As)
-    where complement.ComplementKind = FiniteClause,
+    determiner:DeterminerPhrase Nominal complement:Selected(PrepositionPhrase, As)
+    where determiner.Grade := Equative,
+          complement.ComplementKind = ComparativeClause,
           head.NounDistribution != Serial,
           head.Number = Plural,
           head.Countability = Count,
@@ -2209,7 +2241,7 @@ ComparativeFusedHead: NounPhrase -> DeterminerPhrase {
     unshared: [Number, DeterminativeDistribution],
 }
     where head.ComplementKind = PP,
-          head.ObliqueKind != AdvP | FiniteClause,
+          head.ObliqueKind != AdvP | ComparativeClause,
           head.ObliqueDetermination = Bare,
           head.Countability != Mass,
           $.Number = head.ObliqueNumber,
@@ -2502,6 +2534,11 @@ FusedLocative: LocativeHead -> Word(Anywhere)
 // names the word.
 WordMention: Mention -> FreeLex(Noun) where head.Inflection = Singular
 NegativeMention: Mention -> prefix:Lex(Affix) Mention { light: [head], uncoordinated: [head] }
+// A cited adjective that names a Quality (*choose odd or even*, Extinction
+// Event), as AdjectivalQuality's does after *protection from*.
+QualityMention: Mention -> AdjectivePhrase { uncoordinated: [head] }
+    where head.QualityHead := Fused,
+          head.ComplementKind = Intransitive
 // A cited noun under an attributive adjective or a cited *non-* word
 // (*non-Aura enchantment*), never under a cited noun (*choose target
 // creature* is an ordinary Noun Phrase). The head is one word, so a longer
@@ -2705,7 +2742,7 @@ ComparativeCountCluster: NominalCluster ->
 ComparativeMassCluster: NominalCluster ->
     determiner:DeterminerPhrase modifier:NominalModifier
     where determiner.ComplementKind = PP,
-          determiner.ObliqueKind != FiniteClause,
+          determiner.ObliqueKind != ComparativeClause,
           determiner.ObliqueDetermination = Bare,
           determiner.Countability := Mass,
           $.Countability = Mass,
@@ -2782,7 +2819,7 @@ ComparativeQuantityMassDetermined: NounPhrase -> determiner:DeterminerPhrase Nom
     unshared: [NounKind],
 }
     where determiner.ComplementKind = PP,
-          determiner.ObliqueKind != FiniteClause,
+          determiner.ObliqueKind != ComparativeClause,
           determiner.ObliqueDetermination = Bare,
           head.Countability := Mass,
           head.Number = Singular,
@@ -3295,6 +3332,20 @@ FiniteComplementClause: FiniteClause -> Clause { unlinked: [head] } where head.V
 // Twin: FiniteComplementClause.
 TemporalComplementClause: TemporalClause -> Clause { unlinked: [head] }
     where head.VerbForm = Finite
+// A comparative clause has a gap where its comparative governor
+// corresponds (CGEL 13§2.1:1108): a Gap (*as many cards as they discarded
+// __ this way*, Forget), or, where an auxiliary or *do* is stranded, one
+// in what is ellipted (*more cards in hand than you do*, Keeper of the
+// Mind; 13§2.1:1109–1110). An admission gate (english.md §6): a complete
+// Clause is no comparative clause, which keeps *than [you lost life this
+// turn]* from *a player other than you lost life this turn* (Ludevic,
+// Necro-Alchemist).
+GappedComparativeClause: ComparativeClause -> Clause { unlinked: [head] }
+    where head.VerbForm = Finite,
+          head.Gap = NP
+EllipticalComparativeClause: ComparativeClause -> Clause { unlinked: [head] }
+    where head.VerbForm = Finite,
+          head.Ellipsis := Code
 // Content clauses that permit *that*; their governors select this Category
 // (CGEL 11§4.8:971).
 UnmarkedExpandableClause: ExpandableClause -> FiniteClause
@@ -3641,14 +3692,14 @@ adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
 // and an enchantment*).
 coordination VerbPhrase {
     coordinators: And,
-    unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    unshared: [Inflection, AdjectivalPassive, CentralPosition, Ellipsis],
     proximate: [VerbKind],
     remnant: PredicativeRemnant,
 }
     where $.CentralPosition = first.CentralPosition
 coordination VerbPhrase {
     coordinators: Disjunctive,
-    unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    unshared: [Inflection, AdjectivalPassive, CentralPosition, Ellipsis],
     resolve: [VerbKind -> Mixed],
     remnant: PredicativeRemnant,
 }
@@ -3662,7 +3713,7 @@ coordination VerbPhrase {
 // (*attacked or blocked by this creature*).
 coordination VerbPhrase {
     coordinators: Coordinator,
-    unshared: [VerbKind, Voice, Inflection, AdjectivalPassive, CentralPosition],
+    unshared: [VerbKind, Voice, Inflection, AdjectivalPassive, CentralPosition, Ellipsis],
     serial: true,
     unlike: Voice,
 }
@@ -3671,7 +3722,7 @@ coordination VerbPhrase {
 // *Blocking or blocked by this creature*.
 coordination VerbPhrase {
     coordinators: Coordinator,
-    unshared: [Inflection, AdjectivalPassive, VerbForm, CentralPosition],
+    unshared: [Inflection, AdjectivalPassive, VerbForm, CentralPosition, Ellipsis],
     proximate: [VerbKind, Voice],
 }
     where $.CentralPosition = first.CentralPosition,
@@ -3681,7 +3732,7 @@ coordination VerbPhrase {
 // *You control but don't own*.
 coordination VerbPhrase {
     coordinators: But,
-    unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    unshared: [Inflection, AdjectivalPassive, CentralPosition, Ellipsis],
     proximate: [VerbKind],
 }
     where $.CentralPosition = first.CentralPosition
@@ -3691,7 +3742,7 @@ coordination VerbPhrase {
 // discards ..., then sacrifices ...*).
 coordination VerbPhrase {
     link: LinkedVerbPhrase,
-    unshared: [Inflection, AdjectivalPassive, CentralPosition],
+    unshared: [Inflection, AdjectivalPassive, CentralPosition, Ellipsis],
     proximate: [VerbKind],
     delimiter: ',',
 }
@@ -3711,7 +3762,7 @@ coordination NameComplement { coordinators: Coordinator }
 // 15§3.6:1335–1336).
 coordination Clause {
     coordinators: Coordinator,
-    unshared: [Inflection, FrontPosition],
+    unshared: [Inflection, FrontPosition, Ellipsis],
     delimiter: ',',
     remnant: SubjectRemnant,
     recovered: [Number, Person],
@@ -3723,7 +3774,7 @@ coordination Clause {
 // imperative.
 coordination Clause {
     coordinators: Coordinator,
-    unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
+    unshared: [Number, Person, Inflection, VerbForm, FrontPosition, Ellipsis],
     delimiter: ',',
     serial: true,
     unlike: VerbForm,
@@ -3736,7 +3787,7 @@ coordination Clause {
 // at the beginning of each of your draw steps, put ...*).
 coordination Clause {
     coordinators: Coordinator,
-    unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
+    unshared: [Number, Person, Inflection, VerbForm, FrontPosition, Ellipsis],
     delimiter: ',',
     delimited,
     serial: false,
@@ -3751,7 +3802,7 @@ coordination Clause {
 // turn, exile it instead*).
 coordination Clause {
     coordinators: Coordinator,
-    unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
+    unshared: [Number, Person, Inflection, VerbForm, FrontPosition, Ellipsis],
     serial: false,
 }
     where $.FrontPosition = first.FrontPosition,
@@ -3763,14 +3814,14 @@ coordination Clause {
 // top of your library*).
 coordination Clause {
     coordinators: But,
-    unshared: [Number, Person, Inflection, FrontPosition],
+    unshared: [Number, Person, Inflection, FrontPosition, Ellipsis],
     delimiter: ',',
     serial: false,
 }
     where $.FrontPosition = first.FrontPosition
 coordination Clause {
     coordinators: But,
-    unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
+    unshared: [Number, Person, Inflection, VerbForm, FrontPosition, Ellipsis],
     delimiter: ',',
     serial: false,
     unlike: VerbForm,
@@ -3781,7 +3832,7 @@ coordination Clause {
           $.VerbForm = Plain
 coordination Clause {
     coordinators: But,
-    unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
+    unshared: [Number, Person, Inflection, VerbForm, FrontPosition, Ellipsis],
     delimiter: ',',
     serial: false,
     unlike: VerbForm,
@@ -3795,7 +3846,7 @@ coordination Clause {
 // link whose verb could be its Complement (StrandedModal).
 coordination Clause {
     link: LinkedClause,
-    unshared: [Number, Person, Inflection, FrontPosition],
+    unshared: [Number, Person, Inflection, FrontPosition, Ellipsis],
     delimiter: ',',
 }
     where $.FrontPosition = first.FrontPosition
@@ -3803,7 +3854,7 @@ coordination Clause {
 // revealed cards ...*.
 coordination Clause {
     link: LinkedClause,
-    unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
+    unshared: [Number, Person, Inflection, VerbForm, FrontPosition, Ellipsis],
     delimiter: ',',
     serial: true,
     unlike: VerbForm,
@@ -3814,7 +3865,7 @@ coordination Clause {
           $.VerbForm = Plain
 coordination Clause {
     link: LinkedClause,
-    unshared: [Number, Person, Inflection, VerbForm, FrontPosition],
+    unshared: [Number, Person, Inflection, VerbForm, FrontPosition, Ellipsis],
     delimiter: ',',
     delimited,
     serial: false,
