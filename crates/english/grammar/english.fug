@@ -1489,11 +1489,10 @@ FloatedObjectBoth: ComplementNounPhrase -> NounPhrase adjunct:Word(Both) { uncoo
     where head.Number = Plural,
           head.NounKind != Numeric,
           head.Case != Nominative | Genitive
-// *All* after an accusative personal pronoun (*remove them all*; CGEL
-// 5§10.1.1:427–428), never a full Noun Phrase.
+// *All* after an accusative personal pronoun (*remove them all*, *remove it
+// all*; CGEL 5§10.1.1:427–428), never a full Noun Phrase.
 FloatedObjectAll: ComplementNounPhrase -> NounPhrase adjunct:Word(All) { uncoordinated: [head] }
-    where head.Number = Plural,
-          head.Case = Accusative
+    where head.Case = Accusative
 AdverbModifiedPrepositionPhrase: PrepositionPhrase -> modifier:AdverbPhrase PrepositionPhrase
     where modifier.AdjunctPosition = Phrasal
 AdverbModifiedDeterminerPhrase: DeterminerPhrase -> modifier:AdverbPhrase DeterminerPhrase

@@ -12,6 +12,5 @@
 + Flying, vigilance
 # from: Amazing Acrobatics
 +NounPhrase one or two target creatures
-*NounPhrase two or one creatures
 +NounPhrase one, two, or three creatures
 *NounPhrase one or two creature
