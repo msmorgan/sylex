@@ -1,3 +1,5 @@
+# "<word> by <by>" ("enchanted by an Aura you control"): the subject is the host `by` is attached
+# to, `word` naming how ("enchanted", "equipped", "fortified") [CR#303.4b,301.5,301.6].
 template attachedBy(word: AttachWord, by: NounPhrase): Predicative {
   spelling = "$word by $by",
   body = attachment(host, counterpart = $by, word = $word)

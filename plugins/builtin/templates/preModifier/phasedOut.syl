@@ -1,3 +1,4 @@
+# "phased-out": a permanent with the phased-out status [CR#110.5,702.26a].
 template phasedOut: PreModifier {
   spelling = "phased-out",
   body = hasStatus(phasedOut)

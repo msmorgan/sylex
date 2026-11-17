@@ -1,3 +1,4 @@
+# "transformed": a double-faced permanent with its back face up [CR#712.6d,701.27a].
 template transformed: Predicative {
   spelling = "transformed",
   body = currentFace(back)

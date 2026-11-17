@@ -1,3 +1,5 @@
+# "non<p>": an object that does not match the premodifier `p` ("nonland", "nongreen"), its
+# complement within the head's domain.
 template non(p: PreModifier): PreModifier {
   spelling = "non~$p",
   body = not($p)

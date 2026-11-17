@@ -1,3 +1,5 @@
+# "<p> or <q>": an object matching any arm ("white or blue"); intersected with the head like any
+# premodifier.
 template or(disjuncts: List(PreModifier)): PreModifier {
   spelling = "$disjuncts#<or>",
   body = coord(or, $disjuncts)

@@ -1,3 +1,5 @@
+# "that <subj> <action>[ <within>]" after a copula: the subject is one `subj` did `action` to,
+# looked back over `within`.
 template did(subj: Subject, action: VerbPhrase, within: Option(LookbackSpan) = none): Predicative {
   # TODO(spelling): Bare or participial lookbacks wait on `syl-lookback-operator-and-holds`.
   spelling = "that $subj $action< $within>",

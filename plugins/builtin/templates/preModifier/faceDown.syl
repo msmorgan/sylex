@@ -1,3 +1,5 @@
+# "face-down": an object with the face-down status, as a face-down permanent, spell or card in
+# exile [CR#110.5,708.2].
 template faceDown: PreModifier {
   spelling = "face-down",
   body = hasStatus(faceDown)
