@@ -1,0 +1,3 @@
+# The possessive determiner "<owner>'s" ("its activated abilities"): every member of the nominal
+# that belongs to `owner`. An ability belongs to its source [CR#113.7].
+primitive possessive(owner: NounPhrase): DetPhrase = Possessive

@@ -15,7 +15,6 @@ ability haste {
     static(
       can(
         actor(controllerOf(thisCreature)),
-        activate(
-          allOf(nominal(abilityHead(anyActivated), post = [ofSource(it), tapOrUntapInCost]))),
+        activate(possessive(it, nominal(abilityHead(anyActivated), post = [tapOrUntapInCost]))),
         asThough = holds(controlledSinceTheirTurnBegan(thisCreature))))]
 }

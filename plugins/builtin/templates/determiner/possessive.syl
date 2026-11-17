@@ -1,0 +1,5 @@
+# "<owner>'s <p>" ("its activated abilities", *Arrest*): every `p` that belongs to `owner`.
+template possessive(owner: NounPhrase, p: Nominal): NounPhrase {
+  spelling = "$owner's $p",
+  body = described(possessive($owner), $p)
+}

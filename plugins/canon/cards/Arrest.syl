@@ -9,6 +9,4 @@ card singleFaced({
         conjunction([
             cant(actor(enchanted(creature)), attack),
             cant(actor(enchanted(creature)), block),
-            cant(
-              any,
-              activate(allOf(nominal(abilityHead(anyActivated), post = [ofSource(it)]))))]))]})
+            cant(any, activate(possessive(it, abilityHead(anyActivated))))]))]})
