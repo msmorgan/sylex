@@ -16,8 +16,8 @@ primitive quantifies over `card_type` declarations.
 
 ## Design
 
-- A nullary primitive means "has a card type whose `permanentType` is true", at the kind sort
-  its wording has (`docs/specs/kind-sorts-and-position-unions.md` §5). It takes
+- A nullary primitive means "has a card type whose `permanentType` is true", at the sort its
+  wording is declared at (`docs/specs/kind-sorts-and-position-unions.md` §4). It takes
   over `isPermanentType`'s name, its `TODO(spelling)` and its one caller, `isPermanentCard`
   ([CR#110.4a]), and the Template goes.
 

@@ -26,53 +26,41 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 ## Design
 
 - The kinds of phrase are sorts: `AdjectivePhrase` ("red", "legendary", "tapped", "other than
-  X"), `PrepositionPhrase` ("in your graveyard", "with flying", "from nongreen sources", "face
-  down"), `RelativeClause` ("you control", "that's white or blue"), and the existing
-  `VerbPhrase` (as a participle: "exiled", "attacking", "controlled by you"), `NounPhrase` and
-  `Nominal`. Each phrase is declared once, at its kind.
-- `PreModifier`, `PostModifier` and `Predicative` stay as sorts and are **unions** of kinds: a
-  relation between sorts beside coercion, with free membership and no body. `PreModifier` is an
-  adjective phrase, a nominal or a verb phrase; `PostModifier` a preposition phrase, a relative
-  clause, a verb phrase or an adjective phrase; `Predicative` an adjective phrase, a preposition
-  phrase or a noun phrase. A value takes at most one coercion and at most one membership step, so
-  a coercion stays one hop (`syl.md` §3).
-- Membership is by kind. It admits a wording English does not print in that position ("is
-  face-down"); no finer sort refuses it.
-- A nominal is a member of `PreModifier`, so a type or subtype word is one word wherever it
-  stands, "creature" in "creature card" and "Goblin" in "Goblin card" alike, and `token` and
-  `permanent` are one declaration as head and as modifier. The `CardType → PreModifier` and
-  `Subtype → PreModifier` coercions and `stacked` go. That a description with a type word and no
-  "card", "spell" or "source" means a permanent on the battlefield [CR#109.2] is read by semantics
-  from where the word stands, not written by the term.
-- A union declares only words from the union to itself (coordination, negation, a prefix), and
-  its own declaration is the one a name resolves to there.
-- An unspelled test whose wordings are of several kinds (`hasPossessor`: "you control", a relative
-  clause, and "controlled by you", a participle) stands at `Predicate`, which every kind admits as
-  a Template's body, until the clause and voice tickets compose each wording from its verb.
-  `Predicate` retires when the last of them and its other consumers leave.
-- A depictive ("enters tapped", "put onto the battlefield face down") is built from the same
-  kinds, so no word is declared again for standing after a verb; `MoveRider` stays as it is until
-  `syl-verb-phrase-dependents` replaces it.
-- A keyword's quality parameter ("protection from red", "enchant creature", "from everything") is
-  typed by one more union, `Quality`: an adjective phrase, a nominal or a noun phrase. Keywords
-  declare their parameters as they do now; a later ticket retypes the ones at `Predicate`.
+  X"), `PrepositionPhrase` ("in your graveyard", "with flying", "face down"), `RelativeClause`
+  ("you control", "that's white or blue"), and the existing `VerbPhrase` (as a participle:
+  "exiled", "attacking"), `NounPhrase` and `Nominal`. Each phrase is declared once, at its kind.
+- A sort may have member sorts: a member's values are the sort's values, written as themselves,
+  with no body. Membership is transitive and replaces coercion: `Color` and `Supertype` are
+  members of `AdjectivePhrase`, `CardType` and `Subtype` of `Nominal`, `Int` of `Amount`, and the
+  wrapping primitives go.
+- `PreModifier`, `PostModifier` and `Predicative` are position sorts, whose members are the kinds
+  that stand there: an adjective phrase, a nominal or a verb phrase before a head; a preposition
+  phrase, a relative clause, a verb phrase or an adjective phrase after it; an adjective phrase,
+  a preposition phrase or a noun phrase after a copula. A verb phrase's membership states that it
+  is a participle there.
+- Membership is by kind. It admits a wording English does not print in that position; no finer
+  sort refuses it.
+- A type or subtype word is one word wherever it stands, and `token` and `permanent` are one
+  declaration as head and as modifier. That a description with a type word and no "card", "spell"
+  or "source" means a permanent on the battlefield [CR#109.2] is read by semantics from where the
+  word stands, not written by the term.
+- A position sort declares only words from the sort to itself (coordination, negation, a prefix)
+  and Templates for wordings bound to that position, and its own declaration is the one a name
+  resolves to there. A declaration another ticket has yet to compose stays at the position sort
+  it is at until that ticket lands.
 - `post` holds every dependent printed after the head in printed order, a complement the head
   selects ("half of this split card") and a modifier alike; the term does not mark which.
-- `Status` stays a sort, as `Color` does, and one coercion `Status → AdjectivePhrase` carries a
-  spelled status into every position. A status printed as an adjective is spelled ("tapped",
-  "untapped", "flipped", "face-down", "face-up", "phased-out"). Unhyphenated "face down" and "face
-  up" are depictives, written by the verbs that print them; `isFaceDown` is a position-bound
-  `Predicative` Template for the two cards that print "face down" after a copula. `becomeStatus`
-  and `entersAs` take a `Status`; `hasStatus` and the `Status → Predicative` coercion go.
+- `Status` is not a sort of the surface term: "tapped", "untapped" and "flipped" are adjective
+  phrases, "face down", "face up", "phased in" and "phased out" preposition phrases, and
+  "face-down" and "phased-out" Templates bound to the place before a head.
 - `not` at `PostModifier` goes. Each caller writes what it prints: a `without` preposition phrase,
   "with no …" as its own wording, or a relative clause over the predicative `not`. `non-` stays at
   `PreModifier` and `not` at `Predicative`.
-- The ticket that builds union membership declares `RelativeClause` and moves today's fixed
-  relatives onto it; `syl-clause-and-imperative` composes a relative from a clause with a gap.
-- A union's membership declaration states the form a verb phrase takes there
-  (`VerbPhrase@GerundParticiple` in `PreModifier` and `PostModifier`), with the form labels of
-  `spelling.md` §7: an active verb phrase prints its gerund-participle ("attacking"), and a `done`
-  phrase its past participle with no "be".
+- The ticket that builds membership declares `RelativeClause` and moves today's fixed relatives
+  onto it; `syl-clause-and-imperative` composes a relative from a clause with a gap.
+- Keyword parameters stay at `Predicate`; `syl-keyword-quality-union` decides their sort.
+- A depictive ("enters tapped", "put onto the battlefield face down") is built from the same
+  kinds; `MoveRider` stays as it is until `syl-verb-phrase-dependents` replaces it.
 
 ## Done when
 

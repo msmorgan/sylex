@@ -38,5 +38,5 @@ phrase (the with-phrase of the same name), so the term does not say what the car
 
 ## Pointers
 
-`docs/specs/kind-sorts-and-position-unions.md` §5; `docs/specs/voice-and-object-phrases.md`;
+`docs/specs/kind-sorts-and-position-unions.md` §4; `docs/specs/voice-and-object-phrases.md`;
 `plugins/builtin/primitives/predicative/{hasCounter,hasKeyword,compare,shares,hasDesignation,named}.syl`.

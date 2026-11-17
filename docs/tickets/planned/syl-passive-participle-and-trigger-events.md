@@ -80,6 +80,12 @@ and the tickets after it the other words that take a `Subject`.
   passive, and nothing describes passive subject promotion or a `Subject` that carries voice. `surface.md` §7.1's table has the
   trigger row of the spec's §1 table. The glossary entries **Subject**, **Actor** and **Patient**
   (`docs/contexts/game-model/CONTEXT.md`) are rewritten as the spec's §10 says.
+- The fixed participles at `VerbPhrase` (`attacking`, `blocking`, `blocked`, `chosen`,
+  `equipped`, `foretold`, `plotted`, `attachedTo`, `named`) are each the verb phrase standing in
+  `pre` or `post`, and the passives and the progressive at `Predicative` (`attachedTo`,
+  `attachedBy`, `controlledBy`, `was`, `named`, `inCombat`) and `notChosen` are composed from
+  their verbs (`docs/specs/kind-sorts-and-position-unions.md` §4). *Balance* is authored: "lands
+  controlled by the player who controls the fewest".
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope

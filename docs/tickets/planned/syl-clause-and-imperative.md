@@ -99,6 +99,9 @@ to say who does what (spec §1, §4).
   **Handoff** is retired, **Clause** is new, and
   **Actor** no longer says "unless a Handoff names another".
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
+- A relative clause composed from a clause with a gap stands at `RelativeClause`
+  (`docs/specs/kind-sorts-and-position-unions.md` §4), and the landing lists the fixed relative
+  Templates it replaces and those it leaves.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 
 ## Not in scope
