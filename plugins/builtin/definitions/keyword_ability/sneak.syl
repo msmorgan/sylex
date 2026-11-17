@@ -21,7 +21,7 @@ ability sneak(cost: Cost) {
       replace(
         would(actor(this(nominal(pre = [permanent], spell))), enter),
         doIf(
-          keywordCostPaid(this(permanent), sneak),
+          keywordCostPaid(it, sneak),
           # It enters tapped and attacking what the returned creature was attacking [CR#702.190b].
           withRiders([
               entersAs(tapped),

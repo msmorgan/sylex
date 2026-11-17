@@ -5,8 +5,8 @@
 # controller's control continuously since their most recent turn began. "Even if" is an "as
 # though" permission whose condition is that rule's: the prohibition stays, and the creature is
 # treated as meeting its exception [CR#609.4]. The rule's "that creature" names the creature with
-# haste, which the Definition writes `this(creature)`: the source is read by self-name (`this`),
-# never by an anaphoric noun word.
+# haste, which the Definition writes `this(creature)`: the source is named by `this`, never by an
+# anaphoric noun word.
 ability haste {
   lexical = {lemma = "haste"},
   spelling = "haste",

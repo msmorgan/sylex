@@ -1,5 +1,7 @@
 # "this <head>": the object the text is on, named by the head noun its text prints ("this
-# creature", "this card", "this spell", "this object"), the source of its abilities [CR#113.7].
+# creature", "this card", "this spell", "this object"), the source of its abilities [CR#113.7];
+# or the player who has the ability, where a keyword's rule names one ("This permanent or player",
+# shroud [CR#702.18a]).
 primitive this(head: Nominal): NounPhrase = This {
   spelling = "this $head"
 }

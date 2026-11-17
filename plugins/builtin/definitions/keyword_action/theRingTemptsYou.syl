@@ -45,7 +45,7 @@ action theRingTemptsYou {
                   atLeast,
                   2),
                 abilityGrant(
-                  it,
+                  this(emblem),
                   [
                     whenever(
                       does(
@@ -67,7 +67,7 @@ action theRingTemptsYou {
                   atLeast,
                   3),
                 abilityGrant(
-                  it,
+                  this(emblem),
                   [
                     whenever(
                       does(
@@ -90,7 +90,7 @@ action theRingTemptsYou {
                   atLeast,
                   4),
                 abilityGrant(
-                  it,
+                  this(emblem),
                   [
                     whenever(
                       does(

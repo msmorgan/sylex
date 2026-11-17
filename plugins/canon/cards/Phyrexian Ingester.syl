@@ -12,6 +12,6 @@ card singleFaced({
         conjunction([
             getsPt(this(creature), up(letter(x)), up(letter(y))),
             letterDefinition(x, powerOf(the(nominal(pre = [was(exile(which)), creature], card)))),
-            letterDefinition(y, toughnessOf(that(card)))]))],
+            letterDefinition(y, toughnessOf(it))]))],
     power = 3,
     toughness = 3})

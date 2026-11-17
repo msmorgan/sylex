@@ -18,8 +18,7 @@ Other tickets decide the fate of declarations this sweep would otherwise delete 
 land first: `syl-result-reads` (the coin and die reads with no user),
 `syl-one-declaration-per-keyword` (it folds the unused `partner` variants, kept for deck
 construction, into `partner`),
-`syl-ability-words-once` (the unused `abilityWord` Template), `syl-this-head-template`
-(`this(class)`, `this(emblem)` and `this(spacecraft)`, unused), `syl-spelling-optional-segments` (the
+`syl-ability-words-once` (the unused `abilityWord` Template), `syl-spelling-optional-segments` (the
 `enters…`, `activatedOnly…`, `prevent…` and `defines…` Templates it merges, several unused or used
 once) and `syl-one-deed-per-keyword-action` (the unused `exchange` variants, and `exileFaceDownFrom`
 and `exileWithCounters`, used once each).

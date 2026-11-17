@@ -1,6 +1,7 @@
 # "Hexproof": "This permanent can't be the target of spells or abilities your opponents
-# control," and on a player "You can't be the target of …" [CR#702.11b,702.11c], so the body is
-# written over its holder as the permanent rule prints it (`this(permanent)`).
+# control," and on a player "You can't be the target of …" [CR#702.11b,702.11c]. The rules print
+# one sentence per holder; the body writes both holders in one, as shroud's rule does
+# [CR#702.18a] (`this(or([permanent, player]))`).
 ability hexproof {
   lexical = {lemma = "hexproof", parameters = [[], [Quality(Some("from"))]]},
   spelling = "hexproof",
@@ -8,5 +9,5 @@ ability hexproof {
     static(
       cant(
         by(bare(nominal(or([spell, abilityHead(anyOnStack)]), post = [opponentsControl]))),
-        target(this(permanent))))]
+        target(this(or([permanent, player])))))]
 }
