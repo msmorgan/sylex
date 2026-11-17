@@ -1,5 +1,6 @@
 ---
-needs: [cleanup-step6-surface]
+needs: [cleanup-step6-surface, syl-union-membership]
+specs: [kind-sorts-and-position-unions]
 ---
 
 # Canon terms that do not say what their cards print

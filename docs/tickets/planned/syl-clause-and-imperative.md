@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-verb-phrase-sort-name, syl-definition-actor-parameter, syl-damage-and-life-noun-phrases, syl-counters-noun-phrase]
+needs: [cleanup-step6-spine, syl-verb-phrase-sort-name, syl-definition-actor-parameter, syl-damage-and-life-noun-phrases, syl-counters-noun-phrase, syl-union-membership]
 specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 

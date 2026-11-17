@@ -736,7 +736,8 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
   grammar: its in-place part at a Category its result sort is spelled as, and each Tail as a
   trailing dependent of a host of its named Category, each Hole standing for a phrase of any
   Category that its own sort's Constructions spell, with the features agreement will fix left
-  unmarked. A sort is not one Category: a `PreModifier` is a noun in "creature card" and an
+  unmarked. A sort is not one Category (`docs/specs/kind-sorts-and-position-unions.md` makes
+  each kind of phrase a sort and these positions sorts over them): a `PreModifier` is a noun in "creature card" and an
   adjective in "tapped creature", and a `PostModifier` is a preposition phrase in "with flying" and
   a relative clause in "you control". A `spelling` whose in-place part parses in several ways names
   no one fragment, and which of them spelling prints is open (§10).

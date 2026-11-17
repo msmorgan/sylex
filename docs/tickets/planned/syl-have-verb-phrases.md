@@ -25,8 +25,8 @@ phrase (the with-phrase of the same name), so the term does not say what the car
 
 - The open question is answered in the declaration's doc comment.
 - Each wording above is written as its card or rule prints it, and no test or `Predicative`
-  declaration stands for a "has …" wording. `hasDesignation`'s three wordings ("you're the
-  monarch", "while saddled", "has the city's blessing") are each written at the kind they print.
+  declaration stands for a "has …" wording. `hasDesignation`'s "has the city's blessing" is among them; "you're the monarch" and
+  "while saddled" are `syl-spelled-test-phrases`'s.
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

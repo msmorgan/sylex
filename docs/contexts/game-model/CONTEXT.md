@@ -28,6 +28,7 @@ A nameless `.syl` declaration through which a value of one sort stands at anothe
 existing Primitive: a Card Type or Subtype as a Nominal, a Card Type, Subtype, Supertype or Color
 as a PreModifier, a Status or Color as a Predicative, an integer as an Amount. It applies only where the
 value does not stand at the expected sort itself, and never twice in a row.
+`docs/specs/kind-sorts-and-position-unions.md` replaces it with membership between sorts.
 
 **Defined Token**:
 A token whose characteristics the rules define in full: a predefined token ([CR#111.10]) or one

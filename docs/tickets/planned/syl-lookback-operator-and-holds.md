@@ -45,7 +45,8 @@ same `Subject` and verb phrase.
 - As a description, `did` stands in a nominal's postmodifier list, said of the thing described,
   the way `syl-nominal-descriptions` settles for a verb phrase there; a relativized object keeps
   `which` (*Alabaster Leech*'s "White spells you cast").
-- `was` is gone at `Condition` and at `Predicate`, and no lookback holds `actor(…)`, `any` or
+- `did` is gone at `Predicative`
+  (`docs/specs/kind-sorts-and-position-unions.md` §4). `was` is gone at `Condition` and at `Predicate`, and no lookback holds `actor(…)`, `any` or
   `by(…)`. Each former `was(…)`, `did(any, …)` and `did(by(…), …)` site, and each `did(actor(…),
   …)` whose card prints a participle, is read from its Oracle line: *Sengir Vampire*'s
   description is a `did` over `done(dealIndirect(subject, …), by = this(creature))`, *Phyrexian

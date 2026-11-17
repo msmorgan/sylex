@@ -36,8 +36,8 @@ creature face down", about 180 units).
 **A sort may have member sorts.** Every value of a member is a value of the sort, written as
 itself: membership has no body and builds nothing. It is transitive, and it replaces coercion.
 
-A membership is a declaration with no name, in `plugins/builtin/members/`, written as a coercion
-is today with no body:
+A membership is a declaration with no name and no body, in `plugins/builtin/members/`. Its
+subject is a sort, which `sylex_syl`'s parser learns to read in that place:
 
     member(Color): AdjectivePhrase
     member(AdjectivePhrase): PreModifier
@@ -71,7 +71,9 @@ Templates that carry the wordings are written over them ("you control" is `hasPo
 cards also call them bare. A test is no kind of phrase, so it is declared once, at `Test`:
 
 - A declaration at `Test` has no `spelling`; one that has is refused at load. So recovery never
-  yields a test, and a test is never a second written form of a phrase.
+  yields a test. A rule body may still write a test where a spelled phrase over it exists
+  (`hasKeyword(…)` beside `withKeyword(…)`); a card's term may not, once
+  `syl-spelled-test-phrases` lands.
 - `Test` is a member of the three position sorts directly, beside the kinds, so a bare test still
   stands wherever it is called today.
 - **A Template at a kind may have its body at `Test`**, declared per kind:
@@ -83,8 +85,11 @@ cards also call them bare. A test is no kind of phrase, so it is declared once, 
 
   The body resolves at the Template's own sort when its root word stands in that sort's Reaches,
   and otherwise at `Test`. The choice is never open: the kind and `Test` reach one position sort,
-  so §3 already refuses a word declared at both. A parameter typed by a kind must also admit a
-  `Test`, since expansion puts one there; none is typed so today, and load refuses one that is.
+  so §3 refuses a word declared at both, and none of the four kinds declares a coordinator or a
+  negation, the words §3 lets a position sort share. A parameter typed by one of the four must
+  also admit a `Test`, since expansion puts one there; none is typed so today, and load refuses
+  one that is. When `VerbPhrase` takes `Participle`'s place its Templates are verbs with no test
+  under them, and `expands(Participle)` goes with the sort.
 - `Test` has `coord` and `not` of its own, and unspelled `hasType`, `hasSubtype`, `hasSupertype`
   and `hasColor`, for bodies that combine tests: `historic` is `coord(or, [hasType(artifact),
   hasSupertype(legendary), hasSubtype(saga)])`, an adjective phrase that stands before a head and
@@ -99,17 +104,19 @@ refuses a test in a card's term.
 **`Participle` (NEW) holds a participle that modifies a head.** "Attacking", "blocked",
 "enchanted", "named X", "attached to it" and "controlled by X" are verb phrases in their
 participle form (*Smite*'s "target blocked creature" parses so). Until the passive is built each
-is a fixed Template over a test, and those Templates stand at `Participle`, a member of
+is a fixed Template over a test, or a primitive of its own (`named`, `notChosen`), and they stand
+at `Participle`, a member of
 `PreModifier` and `PostModifier` and not of `Predicative`, where "be" with a participle is the
 passive. One `attacking(defender = none)` then serves "attacking creature" and "creature
 attacking you". `syl-passive-participle-and-trigger-events` replaces each fixed participle with
 its verb and `Participle` with `VerbPhrase` in the two memberships, stating the form on the
 membership (`lexical = {form = Participle}`: the gerund-participle of an active phrase, the past
 participle of a `done` phrase with no "be"), so a Hole typed by the position sort takes no form
-label (`spelling.md` §7). It also renames one of each pair `VerbPhrase` then collides with, `copy`
-(a `Nominal` and a verb) and `attachment` (a verb and a test). Where a status adjective and a
-passive participle print one word ("tapped" and the participle of `tap`), the written form is
-the adjective, which is how the grammar reads the bare word.
+label (`spelling.md` §7). It also renames one of each pair `VerbPhrase` then collides with: `copy`
+(a `Nominal` and a verb), `attachment` (a verb and a test), and `counter` (a verb, and a
+`Nominal` once `syl-counters-noun-phrase` lands). "Tapped" before a head is two Readings, the
+status adjective and the participle of `tap` (harmonize's "the tapped creature" is `was(tap(which))`,
+the creature tapped for the cost), and each has its term, as today.
 
 What a position sort does not hold: the passive and the progressive ("is attached to it", "isn't
 being declared as an attacker", "that's attacking you") are verb phrases under "be"
@@ -128,16 +135,19 @@ the only written form.
   word stands, as is the rule that a description with a type word, no zone and no "card", "spell"
   or "source" means a permanent on the battlefield [CR#109.2]; the term does not write it. The
   `Nominal` primitives `type` and `subtype` go.
-- `Color` and `Supertype` are members of `AdjectivePhrase`. "Isn't legendary" (74 units, *Yenna,
-  Redtooth Regent*) has a term, `is(…, not(legendary))`, which no coercion gave it.
+- `Color` and `Supertype` are members of `AdjectivePhrase`, so a supertype word stands after a
+  copula as a color does: `is(…, not(legendary))` for "isn't legendary" (48 units), which today
+  only the ability Template `isntLegendary` writes.
 - `Int` is a member of `Amount`, and `lit` goes.
 - `Status` is a member of nothing. It stays the sort of the game's statuses, which `setStatus`,
   `becomeStatus`, `entersAs` and the test `hasStatus` take. Its words are not one kind of phrase,
-  so each wording is a Template at its kind over `hasStatus`: `tapped`, `untapped` and `flipped`
-  at `AdjectivePhrase`; `faceDown`, `faceUp`, `phasedIn` and `phasedOut` at `PrepositionPhrase`,
+  so each wording is a Template at its kind over `hasStatus`: `tapped` and `untapped` at
+  `AdjectivePhrase`; `faceDown`, `faceUp`, `phasedIn` and `phasedOut` at `PrepositionPhrase`,
   spelled "face down", "face up", "phased in" and "phased out". The hyphenated "face-down" and
   "phased-out" stand only before a head (60 units and 1) and stay the `PreModifier` Templates of
-  those names. A status word and the Template of its name share no Reaches set.
+  those names. A status word and the Template of its name share no Reaches set. When
+  `syl-become-replaces-types` gives "become" a `Predicative` complement, `becomeStatus` goes, so
+  "becomes tapped" keeps one written form.
 - The words of the wrappers' names at `Predicate` (`hasType`, `hasColor` and the rest) and
   `subtype` at the sorts a text change and a choice read are not wrappers and stay.
 
@@ -157,8 +167,10 @@ The load rules of `syl.md` §3 hold over Reaches unchanged, with the exception b
 declared at two sorts of Reaches(`T`) is refused, and so is a literal that stands at two (an
 integer when `Int` and `Nat` both reach `T`). So step 4 finds at most one sort, with no
 backtracking. The side table that records the sort each call resolved at already says where the
-value stands. No word collides under §2's memberships once §4 is done
-(`docs/evidence/syl-kind-sorts/test-sort-check.md` has the computation).
+value stands. `docs/evidence/syl-kind-sorts/test-sort-check.md` computes the placement for a
+declaration set that differs from §4's in five rows (`tapOrUntapInCost`, `outsideTheGame`,
+`copied`, `plotted`, `notNamed`) and finds no collision; `syl-union-membership` reruns it for
+§4's.
 
 **A position sort's own declarations.** A declaration at `PreModifier`, `PostModifier` or
 `Predicative` is one of two things:
@@ -176,18 +188,20 @@ has an `or` too, and `coord` stands at `PreModifier`, `Nominal` and `Test`. That
 written form of a coordination at a position, whether its arms are of one kind or several. The
 grammar parses a coordination of like kinds at the kind ("white or blue" is one coordination of
 adjective phrases) and only unlike kinds at the function, so recovery maps both to the position
-sort's coordinator, and a coordinated `Nominal` is refused in `pre` as a nested one is. A
-coordinator is still declared once per sort it coordinates.
+sort's coordinator, and a coordinated `Nominal` is refused in `pre` as a nested one is. No kind
+sort with an `expands` declaration has a coordinator of its own; declaring a coordinator once
+for the sorts it coordinates is not decided here (§7).
 
-Anything else at a position sort is refused at load, once the declarations §4 lists as staying
-there have left; the ticket that removes the last of them adds the refusal.
+Anything else at a position sort is refused at load. The declarations §4 lists as staying are
+named in the check as its exceptions, each with its ticket, and each ticket removes its own.
 
 **A nominal in `pre`** is a bare head word (`creature`, `goblin`, `token`). `nominal(…)` with a
 `pre` or `post` of its own is refused there, since `nominal(pre = [nominal(pre = [legendary],
 creature)], card)` and `nominal(pre = [legendary, creature], card)` would be two written forms of
 "legendary creature card". The one place it stands is as an arm of a coordination in `pre`:
 *Acclaimed Contender*'s "Knight, Aura, Equipment, or legendary artifact card" has
-`nominal(pre = [legendary], artifact)` as its last arm, and `stacked` goes. The checker's rules
+`nominal(pre = [legendary], artifact)` as its last arm. `stacked` goes, and so does the
+`coord(and, […])` arm `nominal.rs` admits in its place today. The checker's rules
 on a nominal's lists that are keyed on a position sort's test (`("PostModifier", "Agree")`,
 `("PostModifier", "Superlative")` and the others in `crates/xtask/src/dsl_check/nominal.rs`)
 follow the test to `Test`.
@@ -201,19 +215,19 @@ there, written as the position sort's.
 ## 4. What each declaration becomes
 
 Every declaration at `PreModifier`, `PostModifier` and `Predicative` in `plugins/builtin/`: 135.
-Fifty move to a kind, 19 are the tests declared once at `Test`, 39 are deleted, 18 are the
-position sort's own and 9 stay until another ticket composes them. The placement is computed from
-the checker's own resolutions (`docs/evidence/syl-kind-sorts/test-sort-check.md`): every caller
-still resolves, and every moved Template's body resolves at its kind or at `Test`.
+Forty-eight move to a kind, 19 are the tests declared once at `Test`, 39 are deleted, 18 are the
+position sort's own and 11 stay until another ticket composes them. The placement follows the
+checker's own resolutions (`docs/evidence/syl-kind-sorts/test-sort-check.md`). Where a row names
+no card, the declaration is called only from rule bodies and no Reading was checked.
 
 ### Moves to its kind
 
 | Kind | Declarations | Decided by |
 |---|---|---|
-| `AdjectivePhrase` | `other`, `otherThan`, `split`, `colorless`, `multicolored`, `historic`, `unblocked`, `transformed`, `tiedFor`; the new `tapped`, `untapped`, `flipped`; the color and supertype words by membership | "red" 496 before a head, 21 after a copula (*Fry*); "legendary" 334 / 74; "colorless" 539 / 15; "multicolored" 64 / 1; "historic" 60 / 2; "unblocked" 13 / 4; "other" 1,567 before a head; "other than" 167 after a head; "tied" 34 after a copula; "tapped" 353 / 230 |
-| `PrepositionPhrase` | `in`, `inPile`, `of`, `fromSource`, `ofChosen`, `ofYourChoice`, `ofTheLastChosen`, `hasPower`, `hasManaValue`, `hasLesserManaValueThan`, `activationCostHas`, `manaCostHas`, `tapOrUntapInCost`, `withDifferentNames`, `withTheSameName`; `withCounter` and `withKeyword` (below); the new `faceDown`, `faceUp`, `phasedIn`, `phasedOut` | "in" 1,624 after a head, 313 after a copula (*Animate Dead*); *Aerial Volley* "with flying"; *Abrupt Decay* "with mana value 3 or less"; *Cursed Totem* "of creatures"; *Gaea's Revenge* "from nongreen sources"; *Adaptive Automaton* and *Crippling Fear* "of the chosen type"; *Unable to Scream* "is face down" |
+| `AdjectivePhrase` | `other`, `otherThan`, `split`, `colorless`, `multicolored`, `historic`, `unblocked`, `transformed`, `tiedFor`, `plotted`; the new `tapped` and `untapped`; the color and supertype words by membership | "red" 496 before a head, 21 after a copula (*Fry*); "legendary" 334 / 74; "colorless" 539 / 15; "multicolored" 64 / 1; "historic" 60 / 2; "unblocked" 13 / 4; "other" 1,567 before a head; "other than" 167 after a head; "tied" 34 after a copula; "tapped" 353 / 230; "plotted" only after "becomes" (7 units, *Aven Interrupter*) |
+| `PrepositionPhrase` | `in`, `inPile`, `of`, `fromSource`, `ofChosen`, `ofYourChoice`, `ofTheLastChosen`, `hasPower`, `hasManaValue`, `hasLesserManaValueThan`, `activationCostHas`, `manaCostHas`, `withDifferentNames`, `withTheSameName`; `withCounter` and `withKeyword` (below); the new `faceDown`, `faceUp`, `phasedIn`, `phasedOut` | "in" 1,624 after a head, 313 after a copula; *Aerial Volley* "with flying"; *Abrupt Decay* "with mana value 3 or less"; *Cursed Totem* "of creatures"; *Gaea's Revenge* "from nongreen sources"; *Adaptive Automaton* and *Crippling Fear* "of the chosen type"; *Unable to Scream* "is face down" |
 | `RelativeClause` | `youControl`, `youDontControl`, `youOwn`, `opponentsControl`, `anOpponentControls`, `controls` (below), `ownedBy`, `actorControls`; `thatIs`, `couldEnchant`, `triggeredNotLeftStack`; `did` | *Glorious Anthem* "you control"; *Academy Journeymage* "an opponent controls"; *Fry* "that's white or blue"; *Bruna, Light of Alabaster* "that could enchant it" |
-| `Participle` | `attacking`, `blocking`, `blocked`, `chosen`, `equipped`, `foretold`, `plotted`, `copied`, `attachedTo`, `named`, `notChosen`; `was`, one Template for its `PreModifier` and `PostModifier` copies; the new `controlledBy` ("controlled by $who") | *Smite* "blocked", *Stone Haven Outfitter* "Equipped", *Bioplasm* "exiled"; "attach" passive 178 after a head; "name" passive 333; *Burn at the Stake* "tapped this way"; *Balance* "lands controlled by the player who controls the fewest" |
+| `Participle` | `attacking`, `blocking`, `blocked`, `chosen`, `equipped`, `foretold`, `attachedTo`, `named`, `notChosen`; `was`, one Template for its `PreModifier` and `PostModifier` copies; the new `controlledBy` ("controlled by $who") and `notNamed` ("not named $source") | *Smite* "blocked", *Stone Haven Outfitter* "Equipped", *Bioplasm* "exiled"; "attach" passive 178 after a head; "name" passive 333; *Burn at the Stake* "tapped this way"; "controlled" 32 after a head (*Balance*); *Escaped Shapeshifter* "not named …" |
 
 - **Three renames, each one name for two wordings today.** `controlledBy` at `PostModifier`
   spells "$who control" and at `Predicative` "controlled by $who": the relative is `controls`,
@@ -221,18 +235,18 @@ still resolves, and every moved Template's body resolves at its kind or at `Test
   "with a counter on it" and "with $keyword" and at `Predicative` are the unspelled tests: the
   with-phrases are `withCounter` and `withKeyword`, Templates over the tests of the old names.
 - **Bodies rewritten.** `historic` (§2); `youDontControl` is `not(hasPossessor(controller, you))`;
-  `was` is written over `predicateDid`, the test `did` is over; `tapOrUntapInCost` is an `or` of
-  two `activationCostHas` phrases, with `or` declared at `PrepositionPhrase`.
-- **Cards that take the spelled phrase.** *Blessed Reversal*, *Tidal Flats* and the other cards
-  that print "attacking X" or "blocking X" after a head write `attacking(…)` and `blocking(…)`
-  where they call `inCombat` today. *Propaganda*, *Ghostly Prison* and *Awesome Presence* print a
+  `was` is written over `predicateDid`, the test `did` is over.
+- **Cards that take the spelled phrase.** *Blessed Reversal*, *Tidal Flats*, *Beckoning
+  Will-o'-Wisp* and *Triarch Stalker* print "attacking X" or "blocking X" after a head and write
+  `attacking(…)` and `blocking(…)`, each with an optional counterpart, where they call `inCombat`
+  today. *Propaganda*, *Ghostly Prison* and *Awesome Presence* print a
   relative, "that's attacking you", and keep the test until the passive ticket.
 
 ### Declared once at `Test`
 
 `agree`, `attachment`, `choseExtreme`, `chosenRef`, `colorCount`, `compare`, `currentFace`,
 `hasCounter`, `hasDesignation`, `hasKeyword`, `hasPossessor`, `hasStatus`, `inCombat`,
-`legalAttachment` (renamed, since a `Nominal` has the name), `predicateDid`, `related`, `shares`,
+`legalAttachment` (as `isLegalAttachment`, since a `Nominal` has the name), `predicateDid`, `related`, `shares`,
 `superlative`, `targeting`, with the new `coord`, `not`, `hasType`, `hasSubtype`, `hasSupertype`
 and `hasColor`. Each replaces its copies at the position sorts. Every copy of a test builds one
 constructor, and where signatures differ the longer one has the shorter's parameters with the
@@ -243,7 +257,7 @@ every call resolves unchanged.
 
 - The nine coercions, and the wrappers `hasColor`, `hasSupertype`, `hasType` and `hasSubtype` at
   `PreModifier`, `hasColor` and `hasStatus` at `Predicative`, `type`, `subtype` and `lit`.
-- The copies of each test at a second and third position sort (fifteen).
+- The copies of each test at a second and third position sort (fourteen).
 - `in`, `ofChosen`, `otherThan` and `transformed` at `Predicative`: the declaration that moves,
   now reached by membership (*Animate Dead*, *Crippling Fear*).
 - `token`, `permanent` and `outlaw` at `PreModifier`: the `Nominal` word (§2). `tapped` and
@@ -253,7 +267,7 @@ every call resolves unchanged.
 - `stacked` (§3), and the `PreModifier` copy of `was`.
 - `not` at `PostModifier`. Each of its callers writes what it prints: a `without` preposition
   phrase ("without flying"), "with no …" as its own wording, a relative clause over the
-  predicative `not` ("that aren't legendary"), or `not` inside the participle (*Escaped
+  predicative `not` ("that aren't legendary"), or the participle `notNamed` (*Escaped
   Shapeshifter*'s "not named …"). Two calls in `soulbond` negate a test and take `Test`'s `not`.
 
 ### The position sort's own
@@ -270,10 +284,10 @@ every call resolves unchanged.
 |---|---|---|
 | `attachedTo`, `attachedBy`, `controlledBy`, `named`, `was` at `Predicative` | "are already attached to it" (*Benevolent Blessing*), "was cast from your hand" (*Approach of the Second Sun*): the passive, `be(done(…))` | `syl-passive-participle-and-trigger-events` |
 | `did` at `Predicative` | "if you cast it" (*Arcane Proxy*): `did(phrase, within)` under `holds` | `syl-lookback-operator-and-holds` |
-| `outsideTheGame` at `PostModifier` and `Predicative` | "from outside the game" (19 of 22 units): a place | `syl-zone-words` |
+| `outsideTheGame` at `PostModifier` and `Predicative` | "from outside the game" (19 of 22 units): a place. Its `PostModifier` body becomes `thatIs(outsideTheGame)`, since `not` there is gone | `syl-zone-words` |
+| `tapOrUntapInCost` at `PostModifier` | "with the tap symbol or the untap symbol in its activation cost": an `or` of two with-phrases, which a kind has no coordinator for | `syl-spelled-test-phrases` (NEW) |
+| `copied` at `PreModifier` | its callers print "the copy" (*Rings of Brighthearth*) | `syl-canon-wording-defects` |
 | `hasQuality` at `PreModifier` | 23 rule bodies put a keyword's quality in `pre` through it | `syl-keyword-quality-union` (NEW) |
-
-The refusal of §3 waits for the last of them.
 
 ### `Predicate`
 
@@ -294,10 +308,11 @@ what is left of `Predicate`'s tests to `Test`.
 | before a head | a name ("Wicked Role token") | 69 |
 | before a head | mana symbols ("{2}{U} kicker") | 30 |
 | after a head | a temporal noun phrase ("the first time each turn") | 131 |
-| after a copula | a measure ("except it's 1/1", *Endless Evil*) | 23 |
+| after a copula | a measure ("except the token is 1/1", *Endless Evil*) | 23 |
 
-A counter's kind before "counter" is `syl-counters-noun-phrase`'s. The rest are
-`syl-unplaced-describing-kinds` (NEW).
+A counter's kind before "counter" is `syl-counters-noun-phrase`'s; twelve kind names are also
+subtype words ("blood", "treasure", "egg"), so a kind word cannot simply join `PreModifier`
+beside `Nominal`. The rest are `syl-unplaced-describing-kinds` (NEW).
 
 ## 6. Tickets
 
@@ -318,8 +333,9 @@ their verbs, `VerbPhrase` replaces `Participle`, and the two renames of §2),
 composed from a clause with a gap, at `RelativeClause`), `syl-zone-words` (a location phrase is a
 `PrepositionPhrase`), `syl-damage-and-life-noun-phrases` (its modifiers are declared at kinds),
 `syl-become-replaces-types` and `syl-token-records-to-templates` (they consume `Predicative`),
-`syl-canon-wording-defects` (`copied`, `choseExtreme`), `dsl-fmt-bundle-normalization` (no
-coercion is left to normalize), and `syl-name-originally-printed-in`,
+`syl-canon-wording-defects` (`copied`, `choseExtreme`), `syl-continuous-effect-subject` and
+`syl-counters-noun-phrase` (a membership where each plans a coercion), and
+`syl-name-originally-printed-in`,
 `syl-daybound-reconfigure-bodies` and `syl-clone-any-on-the-battlefield` (each asks for a new word
 at `Predicate`, which is declared at its kind instead). `syl-verb-phrase-dependents` builds a
 depictive ("enters tapped", "exile it face down") from the same kinds; `MoveRider` stays until it

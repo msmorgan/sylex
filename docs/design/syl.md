@@ -68,7 +68,9 @@ location is not stated by the declaration, and it can disagree with what the dec
   "gets +1/+1 for each Forest you control" is `getsBoth`'s one delta, not `getsPt`'s two copies.
   A value the text prints twice is written twice. Why: without local bindings, a copy the text
   does not print is a second source for one value, and the two can drift apart.
-- **No conversions besides `Option` and the declared coercions.** A value stands at its own sort
+- **No conversions besides `Option` and the declared coercions.**
+  (`docs/specs/kind-sorts-and-position-unions.md` replaces coercion with membership between
+  sorts; until it is built, this section and §3 describe the code.) A value stands at its own sort
   (§3), and every other wrap into another sort is a primitive or a Template written at the call
   site, `actor(…)` included. A coercion is a declaration with no name,
   `coercion(type: CardType): Nominal { body = type($type) }`: its one parameter's sort reaches its

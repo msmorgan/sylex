@@ -56,7 +56,7 @@ Scourge*'s "but not from anywhere else") has no written form either.
   argument's, not the verb's.
 - **"In $zone" and "exiled with $source" after a head.** With `syl-nominal-descriptions`, these
   are postmodifiers of a nominal ("a card in your graveyard", "cards exiled with this artifact").
-  Recommendation: they are `PrepositionPhrase` and `VerbPhrase` declarations over a bare
+  Recommendation: they are `PrepositionPhrase` and `Participle` declarations over a bare
   `Location` (`docs/specs/kind-sorts-and-position-unions.md` §1), and `exiledWith` leaves
   `Location`.
 - **Position riders.** "Second from the top" follows the zone as a depictive of the move.
@@ -74,6 +74,8 @@ Scourge*'s "but not from anywhere else") has no written form either.
 
 ## Done when
 
+- `outsideTheGame` is gone at `PostModifier` and `Predicative`
+  (`docs/specs/kind-sorts-and-position-unions.md` §4).
 - Each zone Template's spelling says what its body means, and no two share a spelling with
   different bodies; every caller in `plugins/` uses the one its printed words mean.
 - An unscoped destination's doc comment cites [CR#400.3], and `zone`'s doc comment says what

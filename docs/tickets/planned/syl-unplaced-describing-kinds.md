@@ -7,7 +7,7 @@ specs: [kind-sorts-and-position-unions]
 
 ## Why
 
-The pool prints five kinds of phrase around a head or after a copula that are members of no
+The pool prints six phrases around a head or after a copula that are members of no
 position sort (units are Corpus Units with some Derivation that has the phrase in that function):
 
 | Position | Phrase | Units |

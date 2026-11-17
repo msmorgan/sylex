@@ -81,13 +81,15 @@ and the tickets after it the other words that take a `Subject`.
   trigger row of the spec's §1 table. The glossary entries **Subject**, **Actor** and **Patient**
   (`docs/contexts/game-model/CONTEXT.md`) are rewritten as the spec's §10 says.
 - Each fixed participle at `Participle` (`attacking`, `blocking`, `blocked`, `chosen`,
-  `equipped`, `foretold`, `plotted`, `copied`, `attachedTo`, `named`, `notChosen`, `was`,
+  `equipped`, `foretold`, `attachedTo`, `named`, `notChosen`, `notNamed`, `was`,
   `controlledBy`) is its verb phrase standing in `pre` or `post`; `VerbPhrase` replaces
   `Participle` as the member of `PreModifier` and `PostModifier`, with the form stated on the
-  membership, and `Participle` is gone; the noun and the verb `copy`, and the verb and the test
-  `attachment`, have different names; and the passives at `Predicative` (`attachedTo`,
+  membership, and `Participle` is gone; the noun and the verb `copy`, the verb and the test
+  `attachment`, and the verb and the noun `counter` have different names; and the passives at `Predicative` (`attachedTo`,
   `attachedBy`, `controlledBy`, `named`, `was`) and the relatives over a progressive
-  (*Propaganda*'s "that's attacking you") are composed from their verbs
+  (*Propaganda*'s "that's attacking you", *Verity Circle*'s "isn't being declared as an
+  attacker") are composed from their verbs, each leaving the spec's list of declarations that
+  stay at a position sort
   (`docs/specs/kind-sorts-and-position-unions.md` §2, §4).
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
 

@@ -1,6 +1,6 @@
 ---
-needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter]
-specs: [voice-and-object-phrases]
+needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter, syl-union-membership]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # The counters a verb puts or removes are a noun phrase
@@ -50,6 +50,13 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
 - **The word for a measure before "counter".** "+1/+1" there is the measure a power/toughness
   change prints, which `syl-pt-change-sort` makes one value, `pt(power, toughness)`.
   Recommendation: that value is the premodifier, and this ticket needs `syl-pt-change-sort`.
+- **How a kind word reaches the place before "counter".** `PreModifier`'s members are kinds of
+  phrase (`docs/specs/kind-sorts-and-position-unions.md` §2). Twelve kind names are also subtype
+  words (blood, book, egg, fungus, gold, incarnation, mine, omen, plan, tower, trap, treasure),
+  and a subtype reaches `PreModifier` through `Nominal`, so `CounterKind` as one more member
+  collides on each. Options: the kind is an argument of the head, `counter(kind)`, with a
+  coordination of kinds inside it; or kind words take names of their own. Recommendation: the
+  argument, since no other head takes a kind.
 - **What a counter confers.** A keyword counter confers its keyword and a +X/+Y counter its
   measure by rule [CR#122.1a,122.1b], so their `counter` declarations (`flyingCounter`,
   `p1p1Counter`) and the uncalled `grants` Template say nothing the rule does not.
@@ -69,9 +76,7 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
   the declarations, the others the Design lists take the phrase the same way, and no call writes
   an amount or a kind beside the phrase.
 - `counter` is the head at `Nominal`, each kind stands in `pre` as the Design says, and no
-  `counter` declaration's lemma or spelling ends in "counter". `docs/design/syl.md` §2 and the
-  glossary entry **Coercion** (`docs/contexts/game-model/CONTEXT.md`) list the coercions that
-  exist.
+  `counter` declaration's lemma or spelling ends in "counter". `docs/design/syl.md` §2 lists the memberships that exist.
 - The eight cards `english-counter-kind-premodifies-counter` names are written or authored with
   their coordination in `pre`.
 - *Hardened Scales*, *Solemnity* and *Winding Constrictor* write the phrases in the table above
@@ -102,5 +107,4 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
   `plugins/builtin/templates/action/{removeAllCounters,loseCounters,distributeCounters}.syl`,
   `plugins/builtin/primitives/zone/withCounters.syl`,
   `plugins/builtin/primitives/noun/{printedKind,anyKind,thoseCounters,chosenKind,distinctChosenKinds,sameKindAs}.syl`,
-  `plugins/builtin/definitions/counter/`, `plugins/builtin/coercions/`
-- `crates/xtask/src/dsl_check/coercion.rs`
+  `plugins/builtin/definitions/counter/`, `plugins/builtin/members/`

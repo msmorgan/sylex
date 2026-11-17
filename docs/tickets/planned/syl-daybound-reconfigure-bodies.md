@@ -1,5 +1,5 @@
 ---
-needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface]
+needs: [plugins-v3-builtin-primitives-and-templates, lean-generated-canon-modules, lean-retirement, cleanup-step6-surface, syl-union-membership]
 specs: [kind-sorts-and-position-unions]
 ---
 # Daybound and reconfigure say all of what their CR text means
@@ -22,7 +22,7 @@ Written against the surface (`cleanup-step6-surface`).
   by the reconfigure ability, because [CR#702.151b] applies however the Equipment became
   attached, and an Equipment that's a creature can equip only if it has reconfigure
   [CR#301.5c].
-- Daybound's "represented by a double-faced card" is a nullary `VerbPhrase` primitive, the participle it prints,
+- Daybound's "represented by a double-faced card" is a nullary `Participle` primitive, the participle it prints,
   `isDoubleFacedCard` [CR#712.1,702.145b], beside `isCopyOfACard`. It stays card-only: a token
   copy of a double-faced card is a double-faced token, not a card [CR#707.8a].
 

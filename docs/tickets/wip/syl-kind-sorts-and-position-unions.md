@@ -15,8 +15,9 @@ bundle declares one phrase once per position: 24 names stand at both `PostModifi
 `Predicative` (`in`, `named`, `otherThan`, …), `hasColor` at three sorts, `not` at four, and
 `thatIs` and the `Color → Predicative` coercion exist only to carry a phrase from one position to
 another. The copies drift (`attachment`, `inCombat` and `hasDesignation` have a different
-signature per sort) and leave gaps: "isn't legendary" (*Yenna, Redtooth Regent*) has no term, and
-*Balance*'s "lands controlled by the player who controls the fewest" cannot be written.
+signature per sort) and leave gaps: a supertype word reaches `PreModifier` only, so "isn't
+legendary" is written by an ability Template of its own, and "controlled by $who" stands only at
+`Predicative`, so it cannot follow a head.
 
 `crates/english/grammar/english.fug` already keeps the two apart: `Predicative`, `Postmodifier`
 and `Attributes` are `{ function }` Categories filled by unary productions over the kinds of
@@ -50,8 +51,8 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
   it is at until that ticket lands.
 - `post` holds every dependent printed after the head in printed order, a complement the head
   selects ("half of this split card") and a modifier alike; the term does not mark which.
-- `Status` stays the sort of the game's statuses and is a member of nothing: "tapped", "untapped"
-  and "flipped" are adjective phrases over the status, "face down", "face up", "phased in" and
+- `Status` stays the sort of the game's statuses and is a member of nothing: "tapped" and "untapped"
+  are adjective phrases over the status, "face down", "face up", "phased in" and
   "phased out" preposition phrases, and "face-down" and "phased-out" Templates bound to the place
   before a head.
 - `not` at `PostModifier` goes. Each caller writes what it prints: a `without` preposition phrase,

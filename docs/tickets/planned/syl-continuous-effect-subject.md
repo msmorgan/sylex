@@ -108,11 +108,10 @@ Corpse-Born* prints "Grimgrin enters tapped and doesn't untap during your untap 
 
 - The open questions are answered and written in `docs/design/surface.md` §7.6 and the
   declarations' doc comments.
-- One coercion goes from `Clause` to `StaticSpec`, so a static ability's statement is
-  `static(clause(…))`. The declarations that wrap a `StaticSpec` (`asLongAs`, `if`,
+- `Clause` stands at `StaticSpec` (a coercion, or a membership once `syl-union-membership` has
+  replaced coercion), so a static ability's statement is `static(clause(…))`. The declarations that wrap a `StaticSpec` (`asLongAs`, `if`,
   `conditionally`, `conjunction`, `onlyWhile` and the others) keep their sort and wrap a clause
-  through it. `docs/design/syl.md` §2 and the glossary entry **Coercion**
-  (`docs/contexts/game-model/CONTEXT.md`) list the coercions that exist.
+  through it. `docs/design/syl.md` §2 and the glossary list it.
 - No declaration whose wording prints its subject takes it as a parameter; each is a
   `VerbPhrase` under `clause`: the declarations in the table, the "enters" family (`enters`,
   `entersTapped`, `entersTappedUnless`, `entersUnless`, `entersWithCounters`,
