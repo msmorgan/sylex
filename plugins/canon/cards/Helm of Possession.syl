@@ -8,4 +8,4 @@ card singleFaced({
         compound([mana([generic(2)]), tapSymbol, perform(sacrifice(a(creature)))]),
         gainControl(
           target(creature),
-          duration = forAsLongAs(and([is(thisArtifact, youControl), is(thisArtifact, tapped)]))))]})
+          duration = forAsLongAs(and([controls(you, thisArtifact), is(thisArtifact, tapped)]))))]})

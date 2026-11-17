@@ -37,5 +37,5 @@ ability suspend(amount: Amount, cost: Cost) {
               that(spell),
               [haste],
               duration = forAsLongAs(
-                or([is(that(spell), youControl), is(becomes(that(spell)), youControl)]))))]))]
+                or([controls(you, that(spell)), controls(you, becomes(that(spell)))]))))]))]
 }

@@ -1,4 +1,6 @@
+# "controlled by <who>" ("if it's controlled by the chosen player"): `who` controls the subject
+# [CR#110.2,112.2].
 template controlledBy(who: NounPhrase): Predicative {
-  spelling = "$who control",
+  spelling = "controlled by $who",
   body = hasPossessor(controller, $who)
 }
