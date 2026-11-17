@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-nominal-descriptions]
+needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter]
 specs: [voice-and-object-phrases]
 ---
 
@@ -22,41 +22,53 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
 `putCounters` is called 93 times in `plugins/canon/` and 45 in `plugins/builtin/`,
 `removeCounters` 16 and 8 (`grep`; re-count when claimed).
 
+## Design
+
+- A counters phrase is a nominal whose head is `counter` and whose kind is a premodifier:
+  "+1/+1 counters" is `nominal(pre = [<the +1/+1 measure>], counter)`, "a flying counter"
+  `nominal(pre = [flying], counter)` and "a charge counter" `nominal(pre = [charge], counter)`.
+  A named kind is a `CounterKind` word spelled by its name alone (`charge` is "charge"); a
+  keyword counter's kind is the keyword [CR#122.1b] and a +X/+Y counter's its measure
+  [CR#122.1a], so neither has a kind word of its own. Where no kind is printed the head stands
+  alone.
+- A coordination of kinds is a coordination in `pre`: *Denry Klin, Editor in Chief*'s "a +1/+1,
+  first strike, or vigilance counter".
+- `printedKind` and `anyKind` are deleted, and `thoseCounters`, `chosenKind`,
+  `distinctChosenKinds` and `sameKindAs` are each replaced by the noun phrase their line prints
+  (*Winding Constrictor*'s "of each of those kinds of counters", *Helica Glider*'s "your choice
+  of a flying counter or a first strike counter").
+- Every declaration that fixes "counters" in its wording beside a scalar and a kind takes the
+  phrase: `putCounters`, `removeCounters`, `moveCounters`, `distributeCounters`,
+  `removeAllCounters`, `loseCounters`, and the move rider `withCounters` with
+  `entersWithCounters`, `entersWithAdditionalCounters`, `entersWithFewerCounters`,
+  `exileWithCounters` and `returnToBattlefieldWithCounters` over it. `countersOn` stays a measure
+  over a kind.
+- The term does not refuse a kind word before another head ("charge creature"); semantics does.
+
 ## Open questions
 
-- **Which sort the counter-kind coercion starts from.** The spec proposes a coercion to `Nominal`
-  "from the counter-kind sort" (§6), and there are two. `CounterKind` is the sort the `counter`
-  declarations stand at, each spelled as its compound noun (`p1p1Counter` is "+1/+1 counter").
-  `CounterKindSource` is what `putCounters` takes today: `printedKind(kind)` (97 canon uses, 67
-  builtin), `anyKind` (7 canon), `thoseCounters` (5 canon), `chosenKind(menu)` (2 canon),
-  `distinctChosenKinds(menu)` (1 canon) and `sameKindAs(source)` (1 builtin). Recommendation: the
-  coercion starts from `CounterKind`, so a bare `p1p1Counter` is the head; `printedKind` and
-  `anyKind` go, the head `counter` standing where no kind is printed; and each of the other four
-  is read from the line that prints it (*Winding Constrictor*'s "of each of those kinds of
-  counters", *Helica Glider*'s "your choice of a flying counter or a first strike counter") and
-  written as the noun phrase that line prints.
-- **The other declarations that spread a counters phrase.** The spec's table (§6) retypes
-  `putCounters` and `removeCounters`. These fix "counters" in their wording beside a scalar and a
-  kind as well: `moveCounters(amount, source, destination, kind)`, `distributeCounters(amount,
-  kind, among)`, `removeAllCounters(kind, from)`, `loseCounters(kind, amount, agent)`, the move
-  rider `withCounters(amount, kind, …)` with `entersWithCounters`,
-  `entersWithAdditionalCounters`, `entersWithFewerCounters`, `exileWithCounters` and
-  `returnToBattlefieldWithCounters` over it, and the measure `countersOn(kind, holder)`. Cards
-  print the same phrase in each: 565 Vintage-legal cards print "enters with … counter(s) on
-  it/them", 47 "distribute … counters among" and 53 "remove all … counters from" (regular
-  expressions over Oracle text, reminder text removed). Recommendation: each takes the phrase, in
-  this ticket, since "puts" and "removes" in §6's opening sentence cover them; `countersOn` stays
-  a measure over a kind.
+- **The word for a measure before "counter".** "+1/+1" there is the measure a power/toughness
+  change prints, which `syl-pt-change-sort` makes one value, `pt(power, toughness)`.
+  Recommendation: that value is the premodifier, and this ticket needs `syl-pt-change-sort`.
+- **What a counter confers.** A keyword counter confers its keyword and a +X/+Y counter its
+  measure by rule [CR#122.1a,122.1b], so their `counter` declarations (`flyingCounter`,
+  `p1p1Counter`) and the uncalled `grants` Template say nothing the rule does not.
+  Recommendation: the two rules are each one conferral over the kind, and those declarations and
+  `grants` are deleted.
 
 ## Done when
 
 - The open questions are answered, and each answer is in the doc comment of the declaration it
   shapes.
 - `putCounters(counters: NounPhrase, on)` and `removeCounters(counters: NounPhrase, from)` are
-  the declarations, and no call writes an amount or a kind beside the phrase.
-- A counter kind stands at `Nominal` as its compound noun through one coercion, and `counter` is
-  the head at `Nominal` where no kind is printed. `docs/design/syl.md` §2 and the glossary entry
-  **Coercion** (`docs/contexts/game-model/CONTEXT.md`) list the coercions that exist.
+  the declarations, the others the Design lists take the phrase the same way, and no call writes
+  an amount or a kind beside the phrase.
+- `counter` is the head at `Nominal`, each kind stands in `pre` as the Design says, and no
+  `counter` declaration's lemma or spelling ends in "counter". `docs/design/syl.md` §2 and the
+  glossary entry **Coercion** (`docs/contexts/game-model/CONTEXT.md`) list the coercions that
+  exist.
+- The eight cards `english-counter-kind-premodifies-counter` names are written or authored with
+  their coordination in `pre`.
 - *Hardened Scales*, *Solemnity* and *Winding Constrictor* write the phrases in the table above
   as noun phrases, each checked against its Oracle text; where a line prints the phrase as a
   passive clause's subject, this ticket writes the phrase and
@@ -74,8 +86,6 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
 
 - The passive of `putCounters` and the Template `getCounters`:
   `syl-passive-participle-and-trigger-events` and the tickets after it.
-- A counter kind printed as a power/toughness pair ("a +2/+0, +1/+1, or +0/+2 counter",
-  *Frankenstein's Monster*): a Word-Part Coordination of counter names.
 - Whether a counters phrase introduces a Referent that "those counters" and "that many" read:
   not decided (spec §6), and `syl-numeric-anaphors` owns the readbacks.
 - Damage, life and tokens: `syl-damage-and-life-noun-phrases`, `syl-token-records-to-templates`.
