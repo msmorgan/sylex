@@ -198,7 +198,12 @@ object the battlefield reading and says nothing of a predicative noun phrase; re
 of the subject, with no battlefield restriction, is this design's choice. A
 coordination at `Nominal` is a union of the domains its arms describe ("artifacts and creatures"),
 whereas modifiers in `pre` and `post` intersect with the head; an Agreement `PostModifier` (`agree`)
-constrains the enclosing plural determiner's group rather than each member alone.
+constrains the enclosing plural determiner's group rather than each member alone. A copular relative
+after the head (`thatIs`, "a spell that's both red and white") holds of a member exactly when its
+`Predicative` would under the copula. A possessive determiner (`possessive(owner)`, "its activated
+abilities") takes every member that belongs to its owner, an ability belonging to its source
+([CR#113.7]); the plural indefinite (`plural`, `a` with `plur = many`) is to `a` what `thePlural` is
+to `the`, and is not universal as `bare` is.
 
 A **characteristic read** ("its power") may select a departed object by its last known information
 ([CR#608.2h]). Such a read never makes the object the patient of a battlefield action. Oracle text
