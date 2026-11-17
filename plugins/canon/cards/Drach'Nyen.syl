@@ -10,7 +10,5 @@ card singleFaced({
         conjunction([
             abilityGrant(equipped(creature), [menace]),
             getsPt(equipped(creature), up(letter(x)), up(0)),
-            letterDefinition(
-              x,
-              powerOf(the(nominal(card, post = [in(exiledWith(this(equipment)))]))))])),
+            letterDefinition(x, powerOf(the(nominal(pre = [was(exile(which))], card))))])),
       equip(mana([generic(2)]))]})

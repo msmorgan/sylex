@@ -9,5 +9,5 @@ card singleFaced({
       when(
         does(actor(this(enchantment)), leave),
         returnToBattlefield(
-          the(nominal(card, post = [in(exiledWith(this(enchantment)))])),
+          the(nominal(pre = [was(exile(which))], card)),
           riders = [underControlOf(ownerOf(it))]))]})
