@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-passive-participle-and-trigger-events]
+needs: [cleanup-step6-spine, syl-passive-participle-and-trigger-events, syl-kind-sorts-and-position-unions]
 specs: [voice-and-object-phrases]
 ---
 

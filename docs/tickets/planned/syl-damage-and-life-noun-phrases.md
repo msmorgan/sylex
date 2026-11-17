@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-nominal-descriptions]
+needs: [cleanup-step6-spine, syl-nominal-descriptions, syl-kind-sorts-and-position-unions]
 specs: [voice-and-object-phrases]
 ---
 

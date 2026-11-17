@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-clause-and-imperative]
+needs: [cleanup-step6-spine, syl-clause-and-imperative, syl-kind-sorts-and-position-unions]
 specs: [voice-and-object-phrases]
 ---
 

@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions, syl-continuous-effect-subject]
+needs: [cleanup-step6-spine, syl-spelling-optional-segments, syl-nominal-descriptions, syl-continuous-effect-subject, syl-kind-sorts-and-position-unions]
 ---
 
 # Characteristic-setting is written as printed, and plain `become` replaces types
