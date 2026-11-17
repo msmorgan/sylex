@@ -2027,10 +2027,6 @@ fn spelling_rule_8_skeleton_must_be_unambiguous() {
            spelling = \"$a< $b> %VerbPhrase: <$c>\",\n\
            body = $a\n\
          }}\n\
-         template okTailPlacementsSeparate(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
-           spelling = \"pick< %VerbPhrase: for $a>< %inner VerbPhrase: for $b>\",\n\
-           body = $a\n\
-         }}\n\
          template twoOuterTails(a: Option(Color), b: Option(Color)): Option(Color) {{\n\
            spelling = \"pick< %VerbPhrase: for $a>< %VerbPhrase: for $b>\",\n\
            body = $a\n\

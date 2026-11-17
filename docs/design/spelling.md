@@ -340,10 +340,14 @@ Three properties make the extension closed:
   hand until end of turn". Both Tails attach to one verb phrase, so the Category alone does not
   tell them apart, and the two placements are two Templates (§4). The notation writes the
   inside placement `%inner Category: …` (§7): `forEach` prints "for each" outside, and
-  `forEachInner` inside, before a duration (Ral's Staticaster) or a trailing conditional
-  adjunct (Batwing Brume's "loses 1 life for each attacking creature they control if {B} was
-  spent to cast this spell"). "Equal to" printed away from its amount has one placement: it is a
-  postposed modifier inside the verb's own phrase (Dogpile), before every adjunct of it.
+  `forEachInner` inside, before a duration (Ral's Staticaster), a trailing conditional adjunct
+  (Batwing Brume's "loses 1 life for each attacking creature they control if {B} was spent to
+  cast this spell", Nantuko Blightcutter's "as long as …") or a time adjunct (Scars of the
+  Veteran's "put a +0/+1 counter on it for each 1 damage prevented this way at the beginning of
+  the next end step"). Where the host has no other trailing dependent the two placements print
+  alike, and the written form is the unmarked Template (§4). "Equal to" printed away from its
+  amount has one placement: it is a postposed modifier inside the verb's own phrase (Dogpile),
+  before every adjunct of it.
 - **A Tail is read where it is printed.** Gaze of Adamaro "deals damage to target player equal
   to the number of cards in that player's hand": the amount is the declaration's first
   parameter, and its Tail mentions "that player" after the recipient introduced them. Read
@@ -471,7 +475,11 @@ bare word a coercion wraps and the written call of the primitive it wraps throug
 yields the bare form, which is the corpus's ([`.syl`](syl.md) §2). Likewise, when a Template's
 expansion is a call that could also be written directly, the written form is the Template: a
 one-condition trigger is the Ability `when`, `whenever` or `at`, and `triggered` is written only
-over a disjunction of trigger conditions. Why: two candidates that differ only in how an author
+over a disjunction of trigger conditions. And when a Tail's host has no other trailing dependent,
+its two placements (§3.2) print one Reading, and the written form is the unmarked Template:
+Coat of Arms's "Each creature gets +1/+1 for each other creature on the battlefield that shares
+at least one creature type with it" is `forEach`, and `forEachInner` is written only where a
+dependent of the host follows the Tail. Why: two candidates that differ only in how an author
 wrote the same term differ in nothing the text chose.
 
 Why: a derivation kept apart from the term would be something one direction of translation
@@ -763,7 +771,10 @@ things are known limits:
   restrictions with a `#<and>` join says it; separate optional parameters do not.
 - **A word for an absent value.** Angelic Aberration's "4/4 colorless Eldrazi Angel creature
   tokens" prints a word for an empty list of colors.
-- **A Tail between two of its host's adjuncts.** Only the two placements exist.
+- **A Tail between two of its host's adjuncts.** Only the two placements exist. Ulasht, the
+  Hate Seed prints one inside each conjunct of a coordination, "enters with a +1/+1 counter on it
+  for each other red creature you control and a +1/+1 counter on it for each other green
+  creature you control", which neither placement prints.
 
 Only `fromTop` and `fromBottom` write a form label (`$n@Ordinal`), and no declaration writes
 another form label, a `*` or a `#<.>` join yet; the `syl-spelling-forms-and-runs` ticket writes
@@ -846,11 +857,6 @@ The notation of §7 has no form yet for the placeholder a coordination's arms ho
 "the nearest phrase above the Hole" names nothing, and a rule by position, such as the smallest
 phrase that ends where the Hole stands, does not fit a Reading, which is a tree. How such
 a Tail's host is found is not settled.
-
-**A Tail whose host has no other trailing dependent.** Its two placements then print one
-Reading: Coat of Arms's "Each creature gets +1/+1 for each other creature on the battlefield that
-shares at least one creature type with it" is `forEach` and `forEachInner` alike, so recovery yields two
-terms for one wording. Which of them is written is not settled.
 
 **A list element that prints only a Tail.** Such an element takes no part in its list's join
 (§7), so `[A, B, T]`, `[A, T, B]` and `[T, A, B]` print one Reading, and recovery cannot recover
