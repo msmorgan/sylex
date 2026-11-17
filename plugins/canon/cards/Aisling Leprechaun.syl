@@ -6,8 +6,8 @@ card singleFaced({
     text = [
       whenever(
         or([
-            does(actor(thisCreature), block(attacker = a(creature))),
-            does(by(a(creature)), block(attacker = thisCreature))]),
+            does(actor(this(creature)), block(attacker = a(creature))),
+            does(by(a(creature)), block(attacker = this(creature)))]),
         becomeColor(that(creature), colors([green])))],
     power = 1,
     toughness = 1})

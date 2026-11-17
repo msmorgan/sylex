@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       whenever(
-        does(any, attachment(attached, a(aura), host = thisCreature)),
+        does(any, attachment(attached, a(aura), host = this(creature))),
         create(2, written(creatureToken(1, 1, [green], [saproling]))))],
     power = 4,
     toughness = 4})

@@ -6,7 +6,7 @@ ability transfigure(cost: Cost) {
   spelling = "transfigure $cost",
   body = [
     activatedOnlyDuring(
-      compound([$cost, perform(sacrifice(thisPermanent))]),
+      compound([$cost, perform(sacrifice(this(permanent)))]),
       sequentially([
           search(
             yourLibrary,
@@ -14,7 +14,7 @@ ability transfigure(cost: Cost) {
               nominal(
                 pre = [creature],
                 card,
-                post = [hasManaValue(equal, statOf(stat(manaValue), thisPermanent))]))),
+                post = [hasManaValue(equal, statOf(stat(manaValue), this(permanent)))]))),
           putOntoBattlefield(that(card)),
           shuffle]),
       asSorcery)]

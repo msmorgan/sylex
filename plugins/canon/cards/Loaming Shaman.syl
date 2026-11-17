@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [centaur, shaman],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         instruct(
           target(player),
           shuffleInto(targets(anyNumber, nominal(card, post = [in(graveyardOf(they))])))))],

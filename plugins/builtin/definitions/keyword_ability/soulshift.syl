@@ -6,7 +6,7 @@ ability soulshift(amount: Amount) {
   spelling = "soulshift $amount",
   body = [
     when(
-      does(actor(thisPermanent), die),
+      does(actor(this(permanent)), die),
       may(
         returnToHand(
           target(

@@ -7,7 +7,7 @@ card sharedLineSplit(
       when(
         does(actor(you), unlock(thisDoor)),
         instruct(
-          thisRoom,
+          this(room),
           dealDamage(
             amount = 4,
             recipient = target(nominal(creature, post = [anOpponentControls])))))]},
@@ -17,4 +17,4 @@ card sharedLineSplit(
     text = [
       at(
         beginningOfYour(endStep),
-        instruct(thisRoom, dealDamage(amount = 1, recipient = eachOpponent)))]})
+        instruct(this(room), dealDamage(amount = 1, recipient = eachOpponent)))]})

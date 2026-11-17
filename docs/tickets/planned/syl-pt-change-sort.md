@@ -9,7 +9,7 @@ needs: [cleanup-step6-spine, syl-continuous-effect-subject]
 "Gets +P/+T" takes two separate `Delta(Amount)` arguments, so nothing stands for the change as
 a whole. *Johtull Wurm* prints "gets -2/-1 until end of turn for each creature blocking it
 beyond the first": one "for each" scaling both numbers, which an `Amount`-level `forEach` can
-only write twice. *Mutagen Connoisseur*'s `getsPt(thisCreature, up(forEach(1, …)), up(0))` for
+only write twice. *Mutagen Connoisseur*'s `getsPt(this(creature), up(forEach(1, …)), up(0))` for
 "+1/+0 for each" recovers a second way, as a flat 1 beside a scaled 0. `getsBoth` goes the
 other way and writes one delta for the two numbers of "+N/+N", which the text prints as two.
 

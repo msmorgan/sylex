@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       lifelink,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         if = or([
             did(actor(it), enter(from = yourGraveyard), triggering),
             is(it, did(actor(you), cast(which, from = yourGraveyard), within = thisObject))]),

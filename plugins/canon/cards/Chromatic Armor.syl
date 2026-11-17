@@ -5,8 +5,8 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(hasType(creature)),
-      static(entersChoosing(thisAura, color)),
-      static(entersWithCounters(thisAura, 1, sleightCounter)),
+      static(entersChoosing(this(aura), color)),
+      static(entersWithCounters(this(aura), 1, sleightCounter)),
       static(
         replace(
           would(
@@ -16,6 +16,6 @@ card singleFaced({
       activated(
         mana([variable]),
         sequentially([
-            putCounters(1, printedKind(sleightCounter), thisAura),
+            putCounters(1, printedKind(sleightCounter), this(aura)),
             choose(a(quality(color))),
-            define(x, countersOn(sleightCounter, thisAura))]))]})
+            define(x, countersOn(sleightCounter, this(aura)))]))]})

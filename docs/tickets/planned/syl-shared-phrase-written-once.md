@@ -13,7 +13,7 @@ again, and an anaphor the card does not print is a word the text does not have. 
 card still cannot be written that way:
 
 - **One subject over coordinated verb phrases.** *Chub Toad* ("Whenever this creature blocks or
-  becomes blocked") and `bushido` write `thisCreature` into both arms of an event `or`. *Powerstone
+  becomes blocked") and `bushido` write `this(creature)` into both arms of an event `or`. *Powerstone
   Minefield* ("Whenever a creature attacks or blocks, this enchantment deals 2 damage to it.")
   would get a creature per arm, and *Predator's Strike* ("Target creature gets +3/+3 and gains
   trample until end of turn.") two targets. Each is one subject over an `and` or `or` of verb

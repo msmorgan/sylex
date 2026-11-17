@@ -9,11 +9,11 @@ card singleFaced({
     text = [
       flying,
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         gainControl(target(nominal(permanent, post = [youOwn, youDontControl])))),
       disguise(mana([generic(1), pip(blue)])),
       when(
-        does(any, turnFaceUp(thisCreature)),
+        does(any, turnFaceUp(this(creature))),
         sequentially([
             instruct(
               target(opponent),

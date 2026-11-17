@@ -1,4 +1,0 @@
-template thisSpell: NounPhrase {
-  spelling = "this spell",
-  body = headed(this, spell)
-}

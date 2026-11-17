@@ -11,6 +11,6 @@ card singleFaced({
             reveal(aAtRandom(nominal(card, post = [in(yourHand)]))),
             doIf(
               is(that(card), named(chosenName)),
-              instruct(thisCreature, dealDamage(amount = 2, recipient = target(anyTarget))))]))],
+              instruct(this(creature), dealDamage(amount = 2, recipient = target(anyTarget))))]))],
     power = 1,
     toughness = 1})

@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       flying,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         sequentially([
             searchLibraryOrGraveyard(
               a(nominal(pre = [artifact], card, post = [hasManaValue(atMost, 2)]))),

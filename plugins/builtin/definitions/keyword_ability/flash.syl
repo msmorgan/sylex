@@ -2,5 +2,5 @@
 ability flash {
   lexical = {lemma = "flash"},
   spelling = "flash",
-  body = [static(can(actor(you), play(thisCard), timing = asInstant))]
+  body = [static(can(actor(you), play(this(card)), timing = asInstant))]
 }

@@ -12,8 +12,8 @@ ability aftermath {
     static(cant(actor(actor), cast(this, from = not(graveyard)))),
     static(
       replace(
-        would(actor(thisSpell), leave(from = stack)),
+        would(actor(this(spell)), leave(from = stack)),
         doIf(
-          is(thisSpell, was(cast(which, from = graveyard), within = thisObject)),
-          instead(exile(thisSpell)))))]
+          is(this(spell), was(cast(which, from = graveyard), within = thisObject)),
+          instead(exile(this(spell))))))]
 }

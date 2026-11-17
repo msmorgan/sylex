@@ -8,4 +8,4 @@ card singleFaced({
       static(
         conjunction([
             abilityGrant(enchanted(creature), [protection(hasColor(white))]),
-            doesnt(actor(thisEffect), remove(thisAura))]))]})
+            doesnt(actor(thisEffect), remove(this(aura)))]))]})

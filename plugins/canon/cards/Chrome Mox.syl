@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       imprint(
         when(
-          does(actor(thisArtifact), enter),
+          does(actor(this(artifact)), enter),
           may(exile(a(nominal(pre = [non(artifact), non(land)], card, post = [in(yourHand)])))))),
       activated(
         tapSymbol,

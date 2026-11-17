@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(3), pip(green)],
     types = [creature],
     subtypes = [plant, elemental],
-    text = [when(does(actor(thisCreature), enter), proliferate)],
+    text = [when(does(actor(this(creature)), enter), proliferate)],
     power = 4,
     toughness = 4})

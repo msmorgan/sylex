@@ -7,7 +7,7 @@ card singleFaced({
       reach,
       deathtouch,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         sequentially([
             searchLibraryOrGraveyard(
               a(nominal(card, post = [named(printedName("Command Tower"))]))),

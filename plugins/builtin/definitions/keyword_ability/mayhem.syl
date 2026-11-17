@@ -6,6 +6,6 @@ ability mayhem(cost: Cost) {
   body = [
     static(
       asLongAs(
-        did(actor(you), discard(thisCard), within(soFarThisTurn)),
-        can(actor(you), cast(thisCard, from = yourGraveyard, altCost = payingInstead($cost)))))]
+        did(actor(you), discard(this(card)), within(soFarThisTurn)),
+        can(actor(you), cast(this(card), from = yourGraveyard, altCost = payingInstead($cost)))))]
 }

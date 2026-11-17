@@ -7,6 +7,6 @@ ability delve {
   body = [
     static(
       paySubstitute(
-        thisSpell,
+        this(spell),
         {action = exile(a(nominal(card, post = [in(yourGraveyard)]))), pays = [generic]}))]
 }

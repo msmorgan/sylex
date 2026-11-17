@@ -5,6 +5,8 @@ ability nightbound {
   spelling = "nightbound",
   body = [
     static(
-      asEvent(gameBecomes(day), doIf(is(thisPermanent, transformed), transform(thisPermanent)))),
-    static(cant(any, transform(thisPermanent), except = byKeyword(nightbound)))]
+      asEvent(
+        gameBecomes(day),
+        doIf(is(this(permanent), transformed), transform(this(permanent))))),
+    static(cant(any, transform(this(permanent)), except = byKeyword(nightbound)))]
 }

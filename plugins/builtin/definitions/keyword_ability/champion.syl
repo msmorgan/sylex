@@ -9,7 +9,7 @@ ability champion(subject: Predicate) {
   spelling = "champion $subject",
   body = [
     when(
-      does(actor(thisPermanent), enter),
+      does(actor(this(permanent)), enter),
       may(
         pay(
           payment(
@@ -17,9 +17,9 @@ ability champion(subject: Predicate) {
               exile(
                 a(nominal(pre = [other, hasQuality($subject)], permanent, post = [youControl]))))),
           once),
-        ifNot = sacrifice(thisPermanent))),
+        ifNot = sacrifice(this(permanent)))),
     when(
-      does(actor(thisPermanent), leave),
+      does(actor(this(permanent)), leave),
       returnToBattlefield(
         the(nominal(pre = [was(exile(which))], card)),
         riders = [underControlOf(ownerOf(it))]))]

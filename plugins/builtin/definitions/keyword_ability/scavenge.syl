@@ -6,7 +6,7 @@ ability scavenge(cost: Cost) {
   spelling = "scavenge $cost",
   body = [
     activatedOnlyDuring(
-      compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
+      compound([$cost, perform(exileFrom(this(card), yourGraveyard))]),
       putCounters(
         powerOf(the(nominal(card, post = [did(actor(you), exile(which))]))),
         printedKind(p1p1Counter),

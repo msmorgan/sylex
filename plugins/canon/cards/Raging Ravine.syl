@@ -2,13 +2,13 @@ card singleFaced({
     name = "Raging Ravine",
     types = [land],
     text = [
-      static(entersTapped(thisLand)),
+      static(entersTapped(this(land))),
       activated(tapSymbol, addMana(or([symbols([pip(red)]), symbols([pip(green)])]))),
       activated(
         mana([generic(2), pip(red), pip(green)]),
         establishThroughout(
           qualityChange(
-            thisLand,
+            this(land),
             sets,
             bundle({
                 characteristics = {
@@ -17,7 +17,7 @@ card singleFaced({
                   subtypes = [elemental],
                   text = [
                     whenever(
-                      does(actor(thisCreature), attack),
+                      does(actor(this(creature)), attack),
                       putCounters(1, printedKind(p1p1Counter), it))],
                   power = 3,
                   toughness = 3}},

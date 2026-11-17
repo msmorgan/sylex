@@ -7,7 +7,7 @@ card singleFaced({
       activated(
         mana([generic(1)]),
         triggerThisWay(
-          regenerate(thisCreature),
+          regenerate(this(creature)),
           does(any, regeneration(it)),
           putCounters(1, printedKind(m1m1Counter), it)))],
     power = 3,

@@ -7,7 +7,7 @@ card singleFaced({
       surge(mana([generic(3), pip(red), pip(red)])),
       flying,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         if = keywordCostPaid(it, surge),
         instruct(it, dealDamage(amount = 3, recipient = target(anyTarget))))],
     power = 5,

@@ -4,7 +4,7 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [juggernaut],
     text = [
-      static(must(actor(thisCreature), attack)),
-      static(cant(actor(bare(wall)), block(attacker = thisCreature)))],
+      static(must(actor(this(creature)), attack)),
+      static(cant(actor(bare(wall)), block(attacker = this(creature))))],
     power = 5,
     toughness = 3})

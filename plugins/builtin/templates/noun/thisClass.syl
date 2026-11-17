@@ -1,4 +1,0 @@
-template thisClass: NounPhrase {
-  spelling = "this Class",
-  body = headed(this, class)
-}

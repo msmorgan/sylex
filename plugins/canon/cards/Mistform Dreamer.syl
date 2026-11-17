@@ -8,7 +8,7 @@ card singleFaced({
       activated(
         mana([generic(1)]),
         establishThroughout(
-          qualityChange(thisCreature, sets, chosenQuality(ofYourChoice(subtype(creature)))),
+          qualityChange(this(creature), sets, chosenQuality(ofYourChoice(subtype(creature)))),
           untilEndOfTurn))],
     power = 2,
     toughness = 1})

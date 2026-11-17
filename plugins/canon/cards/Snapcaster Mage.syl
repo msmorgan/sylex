@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       flash,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         gain(
           target(nominal(pre = [or([instant, sorcery])], card, post = [in(yourGraveyard)])),
           [flashback(itsManaCost)],

@@ -49,7 +49,7 @@ surrounding construction takes the clause:
 
 | Card | Text | As `voice-and-object-phrases.md` builds it | In the direction |
 |---|---|---|---|
-| *Grollub* | "Whenever this creature is dealt damage, …" | `whenever(does(thisCreature, be(done(…))), …)` | `whenever(clause(thisCreature, be(done(…))), …)` |
+| *Grollub* | "Whenever this creature is dealt damage, …" | `whenever(does(this(creature), be(done(…))), …)` | `whenever(clause(this(creature), be(done(…))), …)` |
 | *Mardu Hordechief* | "if you attacked this turn" | `holds(you, did(attack, within = thisTurn))` | `clause(you, did(attack, within = thisTurn))` |
 | *Glorious Anthem* | "Creatures you control get +1/+1." | `static(clause(…, getsPt(…)))`, through a coercion from `Clause` to `StaticSpec` | `static(clause(…, getsPt(…)))`, `static` taking a `Clause` |
 
@@ -283,7 +283,7 @@ effect are [`semantics.md`](./semantics.md) §3.3.
   - `withRiders`: the entering happens with Entry Riders.
 - **A negative declarative** `doesnt(subj, action)` says what its Subject does not do. It is no
   deontic rule and takes no modifiers. "This effect doesn't remove this Aura" is
-  `doesnt(actor(thisEffect), remove(thisAura))`, written as the card prints it: its own Static Spec
+  `doesnt(actor(thisEffect), remove(this(aura)))`, written as the card prints it: its own Static Spec
   beside the spec it talks about, the two joined by `conjunction` in one static ability. Which
   consequence of the effect it exempts, an Aura put into its owner's graveyard or Equipment
   unattached ([CR#704.5m,704.5n]), is the engine's ([CR#702.16n]). `remove` is written only here:

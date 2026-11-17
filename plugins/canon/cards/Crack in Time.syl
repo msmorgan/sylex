@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       vanishing(3),
       triggered(
-        and([when(does(actor(thisEnchantment), enter)), at(beginningOfYour(firstMain))]),
+        and([when(does(actor(this(enchantment)), enter)), at(beginningOfYour(firstMain))]),
         exileUntil(
           target(nominal(creature, post = [anOpponentControls])),
-          does(actor(thisEnchantment), leave)))]})
+          does(actor(this(enchantment)), leave)))]})

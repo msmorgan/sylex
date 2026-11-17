@@ -10,8 +10,8 @@ ability miracle(cost: Cost) {
       asEvent(
         nthOccurrence(nth(1), does(actor(you), draw(1)), per = turn),
         doIf(
-          is(that(card), not(otherThan(thisCard))),
+          is(that(card), not(otherThan(this(card)))),
           triggerReflexively(
-            may(reveal(thisCard)),
-            may(cast(thisCard, altCost = payingInstead($cost)))))))]
+            may(reveal(this(card))),
+            may(cast(this(card), altCost = payingInstead($cost)))))))]
 }

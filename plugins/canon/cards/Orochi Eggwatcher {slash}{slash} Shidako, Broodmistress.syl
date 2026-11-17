@@ -10,7 +10,7 @@ card flip({
             create(1, written(creatureToken(1, 1, [green], [snake]))),
             doIf(
               compareAmt(countOf(nominal(creature, post = [youControl])), atLeast, 10),
-              flip(thisCreature))]))],
+              flip(this(creature)))]))],
     power = 1,
     toughness = 1},
   {

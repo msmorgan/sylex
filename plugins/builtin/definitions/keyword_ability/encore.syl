@@ -6,7 +6,7 @@ ability encore(cost: Cost) {
   spelling = "encore $cost",
   body = [
     activatedOnlyDuring(
-      compound([$cost, perform(exileFrom(thisCard, yourGraveyard))]),
+      compound([$cost, perform(exileFrom(this(card), yourGraveyard))]),
       sequentially([
           doForEach(
             eachOpponent,

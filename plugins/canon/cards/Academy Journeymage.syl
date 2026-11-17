@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(onlyIf(costShift(this, less(1)), exists(nominal(wizard, post = [youControl])))),
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         returnToHand(target(nominal(creature, post = [anOpponentControls]))))],
     power = 3,
     toughness = 2})

@@ -12,5 +12,5 @@ card singleFaced({
               post = [did(actor(yourOpponents), cast(which), within = thisObject)])),
           more(2))),
       activated(
-        perform(sacrifice(thisEnchantment)),
+        perform(sacrifice(this(enchantment))),
         destroy(target(or([artifact, enchantment]))))]})

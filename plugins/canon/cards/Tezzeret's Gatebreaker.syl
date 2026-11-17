@@ -4,7 +4,7 @@ card singleFaced({
     types = [artifact],
     text = [
       when(
-        does(actor(thisArtifact), enter),
+        does(actor(this(artifact)), enter),
         sequentially([
             lookAt(topSlice(5)),
             may(
@@ -13,7 +13,7 @@ card singleFaced({
                   putInto(that(card), hand)])),
             putInto(theRest, onBottom, riders = [inOrder(randomOrder)])])),
       activated(
-        compound([mana([generic(5), pip(blue)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound([mana([generic(5), pip(blue)]), tapSymbol, perform(sacrifice(this(artifact)))]),
         establishThroughout(
           cant(any, block(attacker = bare(nominal(creature, post = [youControl])))),
           thisTurn))]})

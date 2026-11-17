@@ -4,9 +4,9 @@ ability unleash {
   lexical = {lemma = "unleash"},
   spelling = "unleash",
   body = [
-    static(mayHaveEnter(thisPermanent, [withCounters(1, printedKind(p1p1Counter), additional)])),
+    static(mayHaveEnter(this(permanent), [withCounters(1, printedKind(p1p1Counter), additional)])),
     static(
       onlyWhile(
-        cant(actor(thisPermanent), block),
-        is(thisPermanent, hasCounter(kind = p1p1Counter))))]
+        cant(actor(this(permanent)), block),
+        is(this(permanent), hasCounter(kind = p1p1Counter))))]
 }

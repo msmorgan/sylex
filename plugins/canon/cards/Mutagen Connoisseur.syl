@@ -8,7 +8,7 @@ card singleFaced({
       vigilance,
       static(
         getsPt(
-          thisCreature,
+          this(creature),
           up(forEach(1, nominal(pre = [transformed], permanent, post = [youControl]))),
           up(0)))],
     power = 0,

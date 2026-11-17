@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         replace(
-          would(any, dealDamage(recipient = thisCreature)),
+          would(any, dealDamage(recipient = this(creature))),
           instead(putCounters(thatMany, printedKind(p1p1Counter), it))))],
     power = 1,
     toughness = 1})

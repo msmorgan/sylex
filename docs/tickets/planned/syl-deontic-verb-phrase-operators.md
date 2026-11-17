@@ -50,7 +50,7 @@ These are the last words that take a `Subject`, so the sort and its three words 
   standing at `StaticSpec`.
 - No call of them holds `actor(…)`, `any` or `by(…)`. Each former `any` and `by(…)` site is read
   from its card's Oracle line or its rule's text, and the landing lists each with its line:
-  *Abrupt Decay* is `static(clause(thisSpell, cant(be(done(counter(subject))))))`, and
+  *Abrupt Decay* is `static(clause(this(spell), cant(be(done(counter(subject))))))`, and
   *Solemnity*'s two lines are a clause over `cant(getCounters(…))` and a clause whose subject is
   the counters phrase over `cant(be(done(putCounters(subject, …))))`. A rule body's pattern that
   no card prints writes `any`, the wildcard word at `NounPhrase`, as its subject (spec §8).

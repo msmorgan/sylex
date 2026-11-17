@@ -5,7 +5,7 @@ ability afterlife(amount: Amount) {
   spelling = "afterlife $amount",
   body = [
     when(
-      does(actor(thisPermanent), die),
+      does(actor(this(permanent)), die),
       create(
         $amount,
         written(creatureToken(1, 1, [white, black], [spirit], abilities = [flying]))))]

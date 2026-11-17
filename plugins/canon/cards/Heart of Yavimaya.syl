@@ -4,11 +4,11 @@ card singleFaced({
     text = [
       static(
         replace(
-          would(actor(thisLand), enter),
+          would(actor(this(land)), enter),
           instead(
             doIfDone(
               sacrifice(a(forest)),
-              ifDid = putOntoBattlefield(thisLand),
+              ifDid = putOntoBattlefield(this(land)),
               ifNot = putInto(it, graveyard))))),
       activated(tapSymbol, addMana(symbols([pip(green)]))),
       activated(tapSymbol, get(target(creature), up(1), up(1), duration = untilEndOfTurn))]})

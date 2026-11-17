@@ -17,5 +17,5 @@ ability hexproofFrom(quality: Predicate) {
                     ability,
                     post = [fromSource(bare(nominal(pre = [hasQuality($quality)], source)))])]),
               post = [opponentsControl]))),
-        target(thisPermanent)))]
+        target(this(permanent))))]
 }

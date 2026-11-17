@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       when(
-        does(actor(thisEnchantment), enter),
+        does(actor(this(enchantment)), enter),
         exileUntil(
           target(nominal(pre = [non(land)], permanent, post = [anOpponentControls])),
-          does(actor(thisEnchantment), leave)))]})
+          does(actor(this(enchantment)), leave)))]})

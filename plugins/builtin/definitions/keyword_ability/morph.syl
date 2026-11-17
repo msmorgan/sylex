@@ -9,6 +9,6 @@ ability morph(cost: Cost) {
   spelling = "morph $cost",
   body = [
     static(
-      can(actor(you), cast(thisCard, payment = faceDown(faceDownCreature, mana([generic(3)]))))),
+      can(actor(you), cast(this(card), payment = faceDown(faceDownCreature, mana([generic(3)]))))),
     static(specialAction(none, $cost, turnFaceUp(this)))]
 }

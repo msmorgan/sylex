@@ -16,12 +16,12 @@ ability paradigm {
                 nominal(
                   pre = [other],
                   spell,
-                  post = [youControl, shares(cardName, share, thisSpell)]))),
+                  post = [youControl, shares(cardName, share, this(spell))]))),
             within(thisGame))),
         delayWithin(
           reached(beginningOfYour(firstMain)),
           restOfGame,
           sequentially(
             [copy(inZone(exile), this, 1, []), may(cast(that(copy), altCost = withoutPaying))])))),
-    spell(exile(thisSpell))]
+    spell(exile(this(spell)))]
 }

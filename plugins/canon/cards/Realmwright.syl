@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [vedalken, wizard],
     text = [
-      static(entersChoosingFrom(thisCreature, subtype(land), basicTypesOnly)),
+      static(entersChoosingFrom(this(creature), subtype(land), basicTypesOnly)),
       static(
         qualityChange(
           bare(nominal(land, post = [youControl])),

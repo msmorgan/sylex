@@ -10,7 +10,7 @@ ability sneak(cost: Cost) {
       can(
         actor(you),
         cast(
-          thisSpell,
+          this(spell),
           altCost = payingInstead(
             compound([
                 $cost,
@@ -19,9 +19,9 @@ ability sneak(cost: Cost) {
         timing = and([asInstant, duringPart(whose = you, declareBlockers)]))),
     static(
       replace(
-        would(actor(thisPermanent), enter),
+        would(actor(this(permanent)), enter),
         doIf(
-          keywordCostPaid(thisPermanent, sneak),
+          keywordCostPaid(this(permanent), sneak),
           # It enters tapped and attacking what the returned creature was attacking [CR#702.190b].
           withRiders([
               entersAs(tapped),

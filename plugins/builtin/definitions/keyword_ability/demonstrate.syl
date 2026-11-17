@@ -6,11 +6,11 @@ ability demonstrate {
   spelling = "demonstrate",
   body = [
     when(
-      does(actor(you), cast(thisSpell)),
+      does(actor(you), cast(this(spell))),
       may(
-        sequentially([copyOnStack(thisSpell), may(chooseNewTargets(that(copy)))]),
+        sequentially([copyOnStack(this(spell)), may(chooseNewTargets(that(copy)))]),
         ifDid = sequentially([
             choose(anOpponent),
-            instruct(the(nominal(pre = [chosen], player)), copyOnStack(thisSpell)),
+            instruct(the(nominal(pre = [chosen], player)), copyOnStack(this(spell))),
             instruct(the(nominal(pre = [chosen], player)), may(chooseNewTargets(that(copy))))])))]
 }

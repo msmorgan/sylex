@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [elf, druid],
     text = [
       when(
-        does(actor(thisCreature), die),
+        does(actor(this(creature)), die),
         if = was(becomeBlocked(it), within(soFarThisTurn)),
         gainLife(4))],
     power = 2,

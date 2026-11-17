@@ -8,5 +8,5 @@ card singleFaced({
           and([
               exists(nominal(plains, post = [anOpponentControls])),
               exists(nominal(swamp, post = [youControl]))]),
-          can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
+          can(actor(you), cast(this(spell), altCost = withoutPaying)))),
       spell(get(allOf(creature), down(2), down(2), duration = untilEndOfTurn))]})

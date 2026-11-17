@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       partnerWith(named(printedName("Blaring Recruiter"))),
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         get(bare(nominal(pre = [attacking], warrior)), up(1), up(1), duration = untilEndOfTurn))],
     power = 2,
     toughness = 2})

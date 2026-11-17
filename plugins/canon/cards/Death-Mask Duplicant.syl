@@ -11,11 +11,11 @@ card singleFaced({
       alsoForKeywords(
         static(
           asLongAs(
-            exists(nominal(card, post = [in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])),
+            exists(nominal(card, post = [in(exiledWith(this(creature))), hasKeyword(thatKeyword)])),
             keywordGrant(
-              thisCreature,
+              this(creature),
               thatKeyword,
-              and([in(exiledWith(thisCreature)), hasKeyword(thatKeyword)])))),
+              and([in(exiledWith(this(creature))), hasKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(fear),

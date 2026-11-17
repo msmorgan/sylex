@@ -13,13 +13,13 @@ card singleFaced({
                   creature,
                   post = [
                     did(
-                      actor(thisCreature),
+                      actor(this(creature)),
                       dealDamage(recipient = which),
                       within = within(soFarThisTurn))]))),
             die),
           instead(exile(it)))),
       activated(
         tapSymbol,
-        instruct(thisCreature, dealDamage(amount = 1, recipient = target(anyTarget))))],
+        instruct(this(creature), dealDamage(amount = 1, recipient = target(anyTarget))))],
     power = 1,
     toughness = 2})

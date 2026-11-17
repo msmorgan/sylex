@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [human, cleric],
     text = [
-      static(entersChoosing(thisCreature, number)),
+      static(entersChoosing(this(creature), number)),
       static(
         cant(
           any,

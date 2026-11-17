@@ -5,10 +5,10 @@ card singleFaced({
     subtypes = [tiefling, warlock],
     text = [
       lifelink,
-      when(does(actor(thisCreature), enter), gainDesignation(you, initiative)),
+      when(does(actor(this(creature)), enter), gainDesignation(you, initiative)),
       at(
         beginningOfYour(endStep),
         if = is(you, hasDesignation(initiative)),
-        putCounters(1, printedKind(p1p1Counter), thisCreature))],
+        putCounters(1, printedKind(p1p1Counter), this(creature)))],
     power = 2,
     toughness = 2})

@@ -6,7 +6,7 @@ ability affinity(quality: Predicate) {
   body = [
     static(
       costShift(
-        thisSpell,
+        this(spell),
         generic(
           down(forEach(1, nominal(pre = [hasQuality($quality)], permanent, post = [youControl]))),
           none)))]

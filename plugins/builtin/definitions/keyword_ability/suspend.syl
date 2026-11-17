@@ -17,20 +17,20 @@ ability suspend(amount: Amount, cost: Cost) {
   body = [
     static(
       specialAction(
-        whileTrue(couldBeginToCast(you, thisCard, yourHand)),
+        whileTrue(couldBeginToCast(you, this(card), yourHand)),
         $cost,
-        exileWithCounters(thisCard, $amount, timeCounter))),
+        exileWithCounters(this(card), $amount, timeCounter))),
     at(
       beginningOfYour(upkeep),
       if = is(
-        thisCard,
+        this(card),
         and([in(exileZone), hasKeyword(theKeyword(suspend)), hasCounter(kind = timeCounter)])),
-      removeCounters(exactly(1), printedKind(timeCounter), thisCard)),
+      removeCounters(exactly(1), printedKind(timeCounter), this(card))),
     when(
-      does(any, removeCounters(theLast, printedKind(timeCounter), thisCard)),
-      if = is(thisCard, in(exileZone)),
+      does(any, removeCounters(theLast, printedKind(timeCounter), this(card))),
+      if = is(this(card), in(exileZone)),
       sequentially([
-          may(play(thisCard, altCost = withoutPaying)),
+          may(play(this(card), altCost = withoutPaying)),
           doIf(
             did(actor(you), cast(a(nominal(pre = [creature], spell))), thisWay),
             gain(

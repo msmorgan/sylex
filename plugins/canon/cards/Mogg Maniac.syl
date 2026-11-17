@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [goblin],
     text = [
       whenever(
-        does(any, dealDamage(recipient = thisCreature)),
+        does(any, dealDamage(recipient = this(creature))),
         instruct(
           it,
           dealDamage(amount = thatMuch, recipient = target(or([planeswalker, opponent])))))],

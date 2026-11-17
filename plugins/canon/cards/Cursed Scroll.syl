@@ -12,4 +12,4 @@ card singleFaced({
             reveal(aAtRandom(nominal(card, post = [in(yourHand)]))),
             doIf(
               is(that(card), named(chosenName)),
-              instruct(thisArtifact, dealDamage(amount = 2, recipient = target(anyTarget))))]))]})
+              instruct(this(artifact), dealDamage(amount = 2, recipient = target(anyTarget))))]))]})

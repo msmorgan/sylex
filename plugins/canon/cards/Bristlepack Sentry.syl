@@ -9,7 +9,7 @@ card singleFaced({
         asLongAs(
           exists(nominal(creature, post = [youControl, hasPower(atLeast, 4)])),
           can(
-            actor(thisCreature),
+            actor(this(creature)),
             attack,
             asThough = holds(is(it, not(hasKeyword(theKeyword(defender))))))))],
     power = 3,

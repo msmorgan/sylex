@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(3)],
     types = [artifact],
     text = [
-      static(entersChoosing(thisArtifact, subtype(creature))),
+      static(entersChoosing(this(artifact), subtype(creature))),
       static(
         costShift(
           bare(nominal(pre = [creature], spell, post = [ofChosen(subtype(creature))])),

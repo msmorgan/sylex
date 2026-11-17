@@ -5,12 +5,12 @@ ability vanishing(amount: Amount) {
   lexical = {lemma = "vanishing", parameters = [[], [Amount]]},
   spelling = "vanishing $amount",
   body = [
-    static(entersWithCounters(thisPermanent, $amount, timeCounter)),
+    static(entersWithCounters(this(permanent), $amount, timeCounter)),
     at(
       beginningOfYour(upkeep),
-      if = is(thisPermanent, hasCounter(kind = timeCounter)),
-      removeCounters(exactly(1), printedKind(timeCounter), thisPermanent)),
+      if = is(this(permanent), hasCounter(kind = timeCounter)),
+      removeCounters(exactly(1), printedKind(timeCounter), this(permanent))),
     when(
-      does(any, removeCounters(theLast, printedKind(timeCounter), thisPermanent)),
-      sacrifice(thisPermanent))]
+      does(any, removeCounters(theLast, printedKind(timeCounter), this(permanent))),
+      sacrifice(this(permanent)))]
 }

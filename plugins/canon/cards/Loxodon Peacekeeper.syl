@@ -13,7 +13,7 @@ card singleFaced({
             gainControl(
               controller = the(
                 nominal(player, post = [superlative(min, playerStat(lifeTotal), player)])),
-              thisCreature),
+              this(creature)),
             doIf(
               thereAre(
                 counted(
@@ -21,6 +21,6 @@ card singleFaced({
                   nominal(player, post = [tiedFor(min, playerStat(lifeTotal), player)]))),
               sequentially([
                   choose(partOf(exactly(1), themPlayers)),
-                  gainControl(controller = that(player), thisCreature)]))]))],
+                  gainControl(controller = that(player), this(creature))]))]))],
     power = 4,
     toughness = 4})

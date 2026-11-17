@@ -9,6 +9,6 @@ ability station {
       putCounters(
         powerOf(the(nominal(pre = [was(tap(which))], creature))),
         printedKind(chargeCounter),
-        thisPermanent),
+        this(permanent)),
       asSorcery)]
 }

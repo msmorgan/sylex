@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [dryad],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         instruct(
           eachOpponent,
           may(

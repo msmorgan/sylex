@@ -3,9 +3,9 @@ card singleFaced({
     cost = [generic(1)],
     types = [artifact],
     text = [
-      static(entryChoice(thisArtifact, anOpponent)),
+      static(entryChoice(this(artifact), anOpponent)),
       at(
         beginningOfPossessed(the(nominal(pre = [chosen], player)), upkeep),
         sequentially([
-            instruct(thisArtifact, dealDamage(amount = letter(x), recipient = that(player))),
+            instruct(this(artifact), dealDamage(amount = letter(x), recipient = that(player))),
             define(x, minus(countOf(nominal(card, post = [in(handOf(they))])), 4))]))]})

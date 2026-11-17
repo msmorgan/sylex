@@ -11,5 +11,5 @@ card singleFaced({
                 getsPt(enchanted(creature), up(1), up(1)),
                 abilityGrant(enchanted(creature), [protection(hasType(enchantment))])],
               subject = enchanted(creature)),
-            doesnt(actor(thisEffect), remove(thisAura))])),
-      activated(perform(sacrifice(thisAura)), destroy(target(enchantment)))]})
+            doesnt(actor(thisEffect), remove(this(aura)))])),
+      activated(perform(sacrifice(this(aura))), destroy(target(enchantment)))]})

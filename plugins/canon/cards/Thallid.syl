@@ -4,9 +4,9 @@ card singleFaced({
     types = [creature],
     subtypes = [fungus],
     text = [
-      at(beginningOfYour(upkeep), putCounters(1, printedKind(sporeCounter), thisCreature)),
+      at(beginningOfYour(upkeep), putCounters(1, printedKind(sporeCounter), this(creature))),
       activated(
-        perform(removeCounters(exactly(3), printedKind(sporeCounter), thisCreature)),
+        perform(removeCounters(exactly(3), printedKind(sporeCounter), this(creature))),
         create(1, written(creatureToken(1, 1, [green], [saproling]))))],
     power = 1,
     toughness = 1})

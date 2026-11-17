@@ -12,7 +12,7 @@ card singleFaced({
                 nominal(
                   opponent,
                   post = [compare(greater, lifeTotalOf(you), [playerStat(lifeTotal)])])),
-              when = whileDoing(does(actor(you), activate(thisAbility)))),
-            instruct(thisCreature, dealDamage(amount = 2, recipient = that(player)))]))],
+              when = whileDoing(does(actor(you), activate(this(ability))))),
+            instruct(this(creature), dealDamage(amount = 2, recipient = that(player)))]))],
     power = 1,
     toughness = 2})

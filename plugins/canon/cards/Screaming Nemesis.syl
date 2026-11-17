@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       haste,
       whenever(
-        does(any, dealDamage(recipient = thisCreature)),
+        does(any, dealDamage(recipient = this(creature))),
         sequentially([
             instruct(
               it,

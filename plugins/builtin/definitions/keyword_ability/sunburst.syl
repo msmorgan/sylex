@@ -9,13 +9,16 @@ ability sunburst {
   body = [
     static(
       replace(
-        would(actor(thisPermanent), enter(from = stack)),
+        would(actor(this(permanent)), enter(from = stack)),
         doIf(
-          coloredManaSpentToCast(thisSpell),
+          coloredManaSpentToCast(this(spell)),
           doIf(
-            is(thisPermanent, hasTypeIgnoringTypeChanges(creature)),
+            is(this(permanent), hasTypeIgnoringTypeChanges(creature)),
             withRiders([
-                withCounters(colorsSpentToCast(thisSpell), printedKind(p1p1Counter), fresh)]),
+                withCounters(colorsSpentToCast(this(spell)), printedKind(p1p1Counter), fresh)]),
             otherwise = withRiders([
-                withCounters(colorsSpentToCast(thisSpell), printedKind(chargeCounter), fresh)])))))]
+                withCounters(
+                  colorsSpentToCast(this(spell)),
+                  printedKind(chargeCounter),
+                  fresh)])))))]
 }

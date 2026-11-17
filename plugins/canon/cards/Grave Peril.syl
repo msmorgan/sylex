@@ -5,4 +5,4 @@ card singleFaced({
     text = [
       when(
         does(actor(a(nominal(pre = [non(black)], creature))), enter),
-        doIfDone(sacrifice(thisEnchantment), ifDid = destroy(that(creature))))]})
+        doIfDone(sacrifice(this(enchantment)), ifDid = destroy(that(creature))))]})

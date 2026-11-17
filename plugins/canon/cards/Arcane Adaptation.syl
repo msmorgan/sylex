@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(2), pip(blue)],
     types = [enchantment],
     text = [
-      static(entersChoosing(thisEnchantment, subtype(creature))),
+      static(entersChoosing(this(enchantment), subtype(creature))),
       static(
         qualityChange(
           and([

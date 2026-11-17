@@ -5,10 +5,10 @@ ability mentor {
   spelling = "mentor",
   body = [
     whenever(
-      does(actor(thisCreature), attack),
+      does(actor(this(creature)), attack),
       putCounters(
         1,
         printedKind(p1p1Counter),
         target(
-          nominal(pre = [attacking], creature, post = [hasPower(less, powerOf(thisCreature))]))))]
+          nominal(pre = [attacking], creature, post = [hasPower(less, powerOf(this(creature)))]))))]
 }

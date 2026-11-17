@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(2), pip(black)],
     types = [enchantment],
     text = [
-      static(entersChoosing(thisEnchantment, subtype(creature))),
+      static(entersChoosing(this(enchantment), subtype(creature))),
       static(
         getsPt(allOf(nominal(creature, post = [ofChosen(subtype(creature))])), down(1), down(1)))]})

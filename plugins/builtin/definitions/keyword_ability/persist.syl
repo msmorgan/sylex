@@ -6,7 +6,7 @@ ability persist {
   spelling = "persist",
   body = [
     when(
-      does(actor(thisPermanent), die),
-      if = not(is(thisPermanent, hasCounter(kind = m1m1Counter))),
-      returnToBattlefieldWithCounters(thisPermanent, ownerOf(thisPermanent), 1, m1m1Counter))]
+      does(actor(this(permanent)), die),
+      if = not(is(this(permanent), hasCounter(kind = m1m1Counter))),
+      returnToBattlefieldWithCounters(this(permanent), ownerOf(this(permanent)), 1, m1m1Counter))]
 }

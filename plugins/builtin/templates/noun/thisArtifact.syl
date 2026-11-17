@@ -1,4 +1,0 @@
-template thisArtifact: NounPhrase {
-  spelling = "this artifact",
-  body = headed(this, artifact)
-}

@@ -8,7 +8,7 @@ card singleFaced({
         sequentially([
             gainLife(1),
             doIf(
-              not(is(thisEnchantment, noun(a(creature)))),
+              not(is(this(enchantment), noun(a(creature)))),
               become(
                 it,
                 {

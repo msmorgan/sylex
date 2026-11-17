@@ -9,7 +9,7 @@ ability tribute(amount: Amount) {
   body = [
     static(
       replace(
-        would(actor(thisCreature), enter),
+        would(actor(this(creature)), enter),
         before(
           choose(anOpponent),
           body = optionally(

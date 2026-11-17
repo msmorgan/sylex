@@ -9,6 +9,6 @@ card singleFaced({
       at(
         beginningOfEach(combat),
         if = compareAmt(lifeTotalOf(you), greater, lifeTotalOf(anOpponent)),
-        gain(thisCreature, [doubleStrike], duration = untilEndOfTurn))],
+        gain(this(creature), [doubleStrike], duration = untilEndOfTurn))],
     power = 5,
     toughness = 5})

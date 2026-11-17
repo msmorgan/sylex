@@ -13,8 +13,8 @@ cards print it as a noun phrase like any other:
 
 | Card | Oracle | Today |
 |---|---|---|
-| *Phytohydra* | "If damage would be dealt to this creature, …" | `would(any, dealDamage(recipient = thisCreature))` |
-| *Stormwild Capridor* | "If noncombat damage would be dealt to this creature, prevent that damage." | `dealDamage(recipient = thisCreature, kind = noncombat)` |
+| *Phytohydra* | "If damage would be dealt to this creature, …" | `would(any, dealDamage(recipient = this(creature)))` |
+| *Stormwild Capridor* | "If noncombat damage would be dealt to this creature, prevent that damage." | `dealDamage(recipient = this(creature), kind = noncombat)` |
 | *Grollub* | "each opponent gains that much life" | `gainLife(thatMuch)` |
 | *Aggressive Instinct* | "Target creature you control deals damage equal to its power to target creature you don't control." | `dealDamageOwnPower(target(…), target(…))` |
 

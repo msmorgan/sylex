@@ -7,7 +7,7 @@ token incubatorToken {
     characteristics = {
       types = [artifact],
       subtypes = [incubator],
-      text = [activated(mana([generic(2)]), transform(thisToken))]},
+      text = [activated(mana([generic(2)]), transform(this(token)))]},
     back = {
       name = "Phyrexian Token",
       types = [artifact, creature],

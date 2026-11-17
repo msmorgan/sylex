@@ -3,7 +3,7 @@ card transforming({
     cost = [generic(3)],
     types = [artifact, creature],
     subtypes = [scarecrow],
-    text = [when(does(actor(thisCreature), die), returnToBattlefieldTransformed(it, you))],
+    text = [when(does(actor(this(creature)), die), returnToBattlefieldTransformed(it, you))],
     power = 2,
     toughness = 2},
   {

@@ -4,12 +4,12 @@ card singleFaced({
     cost = [variable],
     types = [artifact],
     text = [
-      static(entersWithCounters(thisArtifact, colorsSpentToCast(it), chargeCounter)),
+      static(entersWithCounters(this(artifact), colorsSpentToCast(it), chargeCounter)),
       activated(
-        compound([mana([generic(2)]), perform(sacrifice(thisArtifact))]),
+        compound([mana([generic(2)]), perform(sacrifice(this(artifact)))]),
         destroy(
           each(
             nominal(
               pre = [non(land)],
               permanent,
-              post = [hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]})
+              post = [hasManaValue(equal, countersOn(chargeCounter, this(artifact)))]))))]})

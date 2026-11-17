@@ -7,8 +7,8 @@ card singleFaced({
         and([
             at(beginningOfYour(upkeep)),
             whenever(does(actor(you), cast(a(nominal(pre = [green], spell)))))]),
-        putCounters(1, printedKind(chargeCounter), thisArtifact)),
+        putCounters(1, printedKind(chargeCounter), this(artifact))),
       activated(
-        compound([tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound([tapSymbol, perform(sacrifice(this(artifact)))]),
         addMana(
-          counted(times(1, countersOn(chargeCounter, thisArtifact)), symbols([colorlessPip]))))]})
+          counted(times(1, countersOn(chargeCounter, this(artifact))), symbols([colorlessPip]))))]})

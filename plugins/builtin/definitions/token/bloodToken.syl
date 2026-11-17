@@ -12,6 +12,6 @@ token bloodToken {
               mana([generic(1)]),
               tapSymbol,
               perform(discard(a(nominal(card, post = [in(yourHand)])))),
-              perform(sacrifice(thisToken))]),
+              perform(sacrifice(this(token)))]),
           draw(1))]}}
 }

@@ -9,7 +9,7 @@ card singleFaced({
         sequentially([
             establish(
               qualityChange(
-                thisCreature,
+                this(creature),
                 sets,
                 bundle({characteristics = {subtypes = [werewolf]}}))),
             putCounters(2, printedKind(p1p1Counter), it),

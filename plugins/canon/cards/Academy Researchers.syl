@@ -8,10 +8,10 @@ card singleFaced({
     subtypes = [human, wizard],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         may(
           putOntoBattlefieldAttachedTo(
             a(nominal(pre = [aura], card, post = [in(yourHand)])),
-            thisCreature)))],
+            this(creature))))],
     power = 2,
     toughness = 2})

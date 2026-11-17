@@ -9,7 +9,7 @@ card singleFaced({
       static(
         costShift(
           possessive(
-            thisEquipment,
+            this(equipment),
             nominal(
               abilityHead(keyword(equip)),
               post = [targeting(a(nominal(pre = [colorless], creature)), someTarget)])),

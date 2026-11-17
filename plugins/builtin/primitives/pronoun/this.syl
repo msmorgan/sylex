@@ -1,4 +1,5 @@
-# "this": the source, by self-name [CR#113.7].
-primitive this: NounPhrase = This {
-  spelling = "this"
+# "this <head>": the object the text is on, named by the head noun its text prints ("this
+# creature", "this card", "this spell", "this object"), the source of its abilities [CR#113.7].
+primitive this(head: Nominal): NounPhrase = This {
+  spelling = "this $head"
 }

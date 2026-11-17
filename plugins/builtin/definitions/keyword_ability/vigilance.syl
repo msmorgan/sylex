@@ -6,5 +6,5 @@ ability vigilance {
   lexical = {lemma = "vigilance"},
   spelling = "vigilance",
   body = [
-    static(cant(any, tap(thisCreature), causedBy = byEvent(does(actor(thisCreature), attack))))]
+    static(cant(any, tap(this(creature)), causedBy = byEvent(does(actor(this(creature)), attack))))]
 }

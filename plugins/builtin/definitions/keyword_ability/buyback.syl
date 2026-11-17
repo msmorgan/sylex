@@ -9,7 +9,9 @@ ability buyback(cost: Cost) {
     static(
       replace(
         causedBy(
-          byEvent(does(any, resolve(thisSpell))),
-          would(any, putInto(thisSpell, graveyard, from = stack))),
-        doIf(keywordCostPaid(thisSpell, buyback), instead(move(thisSpell, anywhere, hand, [])))))]
+          byEvent(does(any, resolve(this(spell)))),
+          would(any, putInto(this(spell), graveyard, from = stack))),
+        doIf(
+          keywordCostPaid(this(spell), buyback),
+          instead(move(this(spell), anywhere, hand, [])))))]
 }

@@ -1,4 +1,0 @@
-template thisLand: NounPhrase {
-  spelling = "this land",
-  body = headed(this, land)
-}

@@ -8,6 +8,6 @@ card singleFaced({
       static(
         asLongAs(
           is(topSlice(1), noun(a(nominal(pre = [or([artifact, creature])], card)))),
-          abilityGrantFrom(thisCreature, [anyActivated], topSlice(1))))],
+          abilityGrantFrom(this(creature), [anyActivated], topSlice(1))))],
     power = 1,
     toughness = 3})

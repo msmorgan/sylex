@@ -6,10 +6,10 @@ ability storm {
   spelling = "storm",
   body = [
     when(
-      does(actor(you), cast(thisSpell)),
+      does(actor(you), cast(this(spell))),
       sequentially([
           copyOnStack(
-            thisSpell,
+            this(spell),
             times = eventCount(
               actor(a(player)),
               cast(a(nominal(pre = [other], spell))),

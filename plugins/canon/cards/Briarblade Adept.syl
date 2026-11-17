@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [elf, assassin],
     text = [
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         get(
           target(nominal(creature, post = [opponentsControl])),
           down(1),

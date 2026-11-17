@@ -8,7 +8,7 @@ card singleFaced({
       whenever(
         nthOccurrence(
           nth(1),
-          does(actor(a(or([spell, abilityHead(anyOnStack)]))), target(thisCreature)),
+          does(actor(a(or([spell, abilityHead(anyOnStack)]))), target(this(creature))),
           per = turn),
         counter(that(stackObject)))],
     power = 2,

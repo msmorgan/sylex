@@ -9,4 +9,4 @@ card singleFaced({
         conjunction([
             getsPt(enchanted(creature), up(2), up(0)),
             abilityGrant(enchanted(creature), [trample])])),
-      when(does(any, putInto(thisAura, graveyard, from = battlefield)), returnToHand(it))]})
+      when(does(any, putInto(this(aura), graveyard, from = battlefield)), returnToHand(it))]})

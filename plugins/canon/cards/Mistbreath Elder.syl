@@ -8,7 +8,7 @@ card singleFaced({
         beginningOfYour(upkeep),
         doIfDone(
           returnToHand(a(nominal(pre = [other], creature, post = [youControl]))),
-          ifDid = putCounters(1, printedKind(p1p1Counter), thisCreature),
-          ifNot = may(returnToHand(thisCreature))))],
+          ifDid = putCounters(1, printedKind(p1p1Counter), this(creature)),
+          ifNot = may(returnToHand(this(creature)))))],
     power = 2,
     toughness = 2})

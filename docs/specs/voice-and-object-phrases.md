@@ -181,7 +181,7 @@ Inside `done`, the complement the passive promotes holds `subject`. The printed 
 
 | Card | Oracle | Term |
 |---|---|---|
-| *Abrupt Decay* | "This spell can't be countered." | `static(clause(thisSpell, cant(be(done(counter(subject))))))` |
+| *Abrupt Decay* | "This spell can't be countered." | `static(clause(this(spell), cant(be(done(counter(subject))))))` |
 | *Kaya's Ghostform* | "When enchanted permanent dies or is put into exile, …" | `does(enchanted(permanent), or([die, be(done(putInto(subject, exileZone)))]))` |
 | *Tide of War* | "each blocking creature is sacrificed by its controller" | `clause(…, be(done(sacrifice(subject), by = controllerOf(it))))` |
 
@@ -218,8 +218,8 @@ Three cases need the two words apart, and need the agent on `done`:
         body = deal($damage, to = $recipient)
       }
 
-      would(be(done(deal(subject, to = thisCreature))))          # Phytohydra
-      does(thisCreature, be(done(dealIndirect(subject, bare(damage)))))   # Grollub
+      would(be(done(deal(subject, to = this(creature)))))          # Phytohydra
+      does(this(creature), be(done(dealIndirect(subject, bare(damage)))))   # Grollub
 
   A Template adds no constructor, so both are the one `deal` event, and expansion carries
   `subject` into `to`. No line in the corpus prints the ditransitive in the active ("deals it 3
@@ -546,7 +546,7 @@ the deontic words, and `replace`'s event is a `Clause` whose verb phrase is `wou
     # Phytohydra: "If damage would be dealt to this creature, put that many +1/+1 counters on
     # it instead."
     replace(
-      clause(bare(damage), would(be(done(deal(subject, to = thisCreature))))),
+      clause(bare(damage), would(be(done(deal(subject, to = this(creature)))))),
       instead(imperative(putCounters(counted(thatMany, p1p1Counter), it))))
 
 `would` is an operator because cards print it inside a relative on a damage phrase (333 lines)

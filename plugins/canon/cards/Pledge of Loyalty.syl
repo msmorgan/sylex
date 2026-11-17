@@ -12,4 +12,4 @@ card singleFaced({
               [
                 protection(
                   eachKind(color, domain = bare(nominal(permanent, post = [youControl]))))]),
-            doesnt(actor(thisEffect), remove(thisAura))]))]})
+            doesnt(actor(thisEffect), remove(this(aura)))]))]})

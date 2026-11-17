@@ -7,7 +7,7 @@ ability ward(cost: Cost) {
     whenever(
       does(
         by(a(nominal(or([spell, abilityHead(anyOnStack)]), post = [opponentsControl]))),
-        target(thisPermanent)),
+        target(this(permanent))),
       instruct(
         controllerOf(that(stackObject)),
         may(pay(payment($cost), once), ifNot = instruct(you, counter(that(stackObject))))))]

@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       enchant(and([hasType(creature), isCard, in(graveyard)])),
       when(
-        does(actor(thisAura), enter),
+        does(actor(this(aura)), enter),
         if = is(it, in(battlefield)),
         sequentially([
             establish(
@@ -18,13 +18,14 @@ card singleFaced({
                     it,
                     [
                       enchant(
-                        and([hasType(creature), did(by(thisAura), putOntoBattlefield(which))]))])],
+                        and(
+                          [hasType(creature), did(by(this(aura)), putOntoBattlefield(which))]))])],
                 subject = it)),
             returnToBattlefield(
               enchanted(nominal(pre = [creature], card)),
               riders = [underControlOf(you)]),
-            attachTo(thisAura, it),
+            attachTo(this(aura), it),
             delay(
-              does(actor(thisAura), leave),
+              does(actor(this(aura)), leave),
               instruct(controllerOf(that(creature)), sacrifice(it)))])),
       static(getsPt(enchanted(creature), down(1), up(0)))]})

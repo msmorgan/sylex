@@ -17,7 +17,7 @@ ability partnerWith(quality: Predicate) {
   spelling = "partner with $quality",
   body = [
     when(
-      does(actor(thisPermanent), enter),
+      does(actor(this(permanent)), enter),
       instruct(
         target(player),
         may(

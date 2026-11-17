@@ -8,6 +8,6 @@ token treasureToken {
       subtypes = [treasure],
       text = [
         activated(
-          compound([tapSymbol, perform(sacrifice(thisToken))]),
+          compound([tapSymbol, perform(sacrifice(this(token)))]),
           addMana(counted(1, ofAnyColor(sameColor))))]}}
 }

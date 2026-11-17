@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(2)],
     types = [artifact],
     text = [
-      static(entersChoosing(thisArtifact, subtype(creature))),
+      static(entersChoosing(this(artifact), subtype(creature))),
       static(
         qualityChange(
           each(nominal(pre = [creature], card, post = [in(yourGraveyard)])),

@@ -19,5 +19,5 @@ card singleFaced({
           die),
         sequentially([
             returnToBattlefield(that(card), riders = [underControlOf(you)]),
-            attachTo(thisEquipment, that(creature))])),
+            attachTo(this(equipment), that(creature))])),
       equip(mana([generic(4)]))]})

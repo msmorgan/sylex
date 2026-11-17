@@ -13,7 +13,7 @@ Each of these terms writes words its card does not print, or cannot print what i
   "When".
 - *Helm of Possession* prints "Gain control of target creature for as long as you control this
   artifact and this artifact remains tapped." and writes
-  `forAsLongAs(and([controls(you, thisArtifact), is(thisArtifact, tapped)]))`, which prints "is"
+  `forAsLongAs(and([controls(you, this(artifact)), is(this(artifact), tapped)]))`, which prints "is"
   where the card prints "remains".
 - *Juxtapose* prints "You and target player exchange control of the creature you each control
   with the greatest mana value." and writes `controlledBy(target(player))` twice in its first
@@ -46,7 +46,7 @@ Each of these terms writes words its card does not print, or cannot print what i
 - Thirteen canon cards write the discarded card with an unprinted "in your hand":
   `discard(a(nominal(…, card, post = [in(yourHand)])))` in *Crypt Lurker*, *Abolish*, *Charnel
   Troll* and others, where the cards print "discard a creature card" and the like.
-- `soulbond` writes its intervening condition as `is(thisCreature, and([controlledBy(you), …]))`,
+- `soulbond` writes its intervening condition as `is(this(creature), and([controlledBy(you), …]))`,
   "this creature is controlled by you", where [CR#702.95a] prints "if you control both this
   creature and another creature and both are unpaired". No plural anaphor spells "both", and no
   rule lets an anaphor in one conjunct of a condition read an indefinite of the conjunct before it.

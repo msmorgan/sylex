@@ -3,7 +3,7 @@ card singleFaced({
     types = [land],
     text = [
       activated(
-        compound([tapSymbol, perform(payLife(amount = 1)), perform(sacrifice(thisLand))]),
+        compound([tapSymbol, perform(payLife(amount = 1)), perform(sacrifice(this(land)))]),
         sequentially([
             search(yourLibrary, for = a(nominal(pre = [or([plains, island])], card))),
             putOntoBattlefield(it),

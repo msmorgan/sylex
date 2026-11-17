@@ -5,5 +5,5 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(hasType(creature)),
-      when(does(actor(thisAura), enter), draw(1)),
+      when(does(actor(this(aura)), enter), draw(1)),
       static(abilityGrant(enchanted(creature), [flying]))]})

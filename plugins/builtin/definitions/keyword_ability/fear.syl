@@ -7,7 +7,7 @@ ability fear {
     static(
       cant(
         any,
-        block(attacker = thisCreature),
+        block(attacker = this(creature)),
         except = byObjects(
           bare(andOr([nominal(pre = [artifact], creature), nominal(pre = [black], creature)])))))]
 }

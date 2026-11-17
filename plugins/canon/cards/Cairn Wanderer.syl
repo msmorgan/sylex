@@ -11,7 +11,7 @@ card singleFaced({
             exists(
               nominal(pre = [creature], card, post = [in(graveyard), hasKeyword(thatKeyword)])),
             keywordGrant(
-              thisCreature,
+              this(creature),
               thatKeyword,
               and([hasType(creature), in(graveyard), hasKeyword(thatKeyword)])))),
         [

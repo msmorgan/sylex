@@ -4,7 +4,7 @@ card singleFaced({
     types = [enchantment],
     text = [
       when(
-        does(actor(thisEnchantment), enter),
+        does(actor(this(enchantment)), enter),
         instruct(
           it,
           dealDamage(
@@ -14,7 +14,7 @@ card singleFaced({
         does(actor(counted(orMore(1), creature)), die),
         sequentially([
             mill(1),
-            putCounters(1, printedKind(bloodstainCounter), thisEnchantment),
+            putCounters(1, printedKind(bloodstainCounter), this(enchantment)),
             triggerReflexively(
               doOnlyIf(sacrifice(it), compareAmt(countersOn(bloodstainCounter, it), atLeast, 5)),
               returnToHand(

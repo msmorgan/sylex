@@ -7,11 +7,11 @@ ability offspring(cost: Cost) {
   body = [
     static(addedCost(this, optional, plusAdditional($cost))),
     when(
-      does(actor(thisPermanent), enter),
-      if = keywordCostPaid(thisPermanent, offspring),
+      does(actor(this(permanent)), enter),
+      if = keywordCostPaid(this(permanent), offspring),
       create(
         1,
         copyOf(
-          thisPermanent,
+          this(permanent),
           exceptions = [characteristicEdits([stat(power, set(1)), stat(toughness, set(1))])])))]
 }

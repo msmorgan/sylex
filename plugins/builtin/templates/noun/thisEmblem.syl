@@ -1,4 +1,0 @@
-template thisEmblem: NounPhrase {
-  spelling = "this emblem",
-  body = headed(this, emblem)
-}

@@ -16,6 +16,6 @@ ability saddle(amount: Amount) {
             stat(power),
             atLeast,
             $amount))),
-      gainDesignation(thisPermanent, saddled, duration = untilEndOfTurn),
+      gainDesignation(this(permanent), saddled, duration = untilEndOfTurn),
       asSorcery)]
 }

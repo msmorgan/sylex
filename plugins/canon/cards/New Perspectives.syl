@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(5), pip(blue)],
     types = [enchantment],
     text = [
-      when(does(actor(thisEnchantment), enter), draw(3)),
+      when(does(actor(this(enchantment)), enter), draw(3)),
       static(
         asLongAs(
           compareAmt(countOf(nominal(card, post = [in(yourHand)])), atLeast, 7),

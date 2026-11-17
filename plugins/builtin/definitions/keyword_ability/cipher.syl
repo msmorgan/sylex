@@ -11,19 +11,19 @@ ability cipher {
         is(this, noun(a(card))),
         may(
           sequentially([
-              exile(thisSpell),
+              exile(this(spell)),
               relate(this, encodedOn, a(nominal(creature, post = [youControl])))])))),
     static(
       abilityGrant(
         counterpart(encodedOn, this),
         [
           whenever(
-            does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
+            does(actor(this(creature)), dealDamage(kind = combat, recipient = a(player))),
             may(
               sequentially([
                   copy(
                     fromCardZone,
-                    the(nominal(card, post = [related(encodedOn, counterpart = thisCreature)])),
+                    the(nominal(card, post = [related(encodedOn, counterpart = this(creature))])),
                     1,
                     []),
                   may(cast(that(copy), altCost = withoutPaying))])))]))]

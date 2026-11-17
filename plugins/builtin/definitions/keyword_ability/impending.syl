@@ -10,20 +10,20 @@ ability impending(amount: Amount, cost: Cost) {
     static(altCost(payingInstead($cost), this)),
     static(
       replace(
-        would(actor(thisPermanent), enter),
+        would(actor(this(permanent)), enter),
         doIf(
-          keywordCostPaid(thisPermanent, impending),
+          keywordCostPaid(this(permanent), impending),
           withRiders([withCounters($amount, printedKind(timeCounter), fresh)])))),
     static(
       asLongAs(
         and([
-            keywordCostPaid(thisPermanent, impending),
-            is(thisPermanent, hasCounter(kind = timeCounter))]),
-        characteristicChange(thisPermanent, [typeLine(loses, {types = [creature]})]))),
+            keywordCostPaid(this(permanent), impending),
+            is(this(permanent), hasCounter(kind = timeCounter))]),
+        characteristicChange(this(permanent), [typeLine(loses, {types = [creature]})]))),
     at(
       beginningOfYour(endStep),
       if = and([
-          keywordCostPaid(thisPermanent, impending),
-          is(thisPermanent, hasCounter(kind = timeCounter))]),
-      removeCounters(exactly(1), printedKind(timeCounter), thisPermanent))]
+          keywordCostPaid(this(permanent), impending),
+          is(this(permanent), hasCounter(kind = timeCounter))]),
+      removeCounters(exactly(1), printedKind(timeCounter), this(permanent)))]
 }

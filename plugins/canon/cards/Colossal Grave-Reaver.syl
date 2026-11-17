@@ -5,7 +5,9 @@ card singleFaced({
     subtypes = [dragon],
     text = [
       flying,
-      whenever(or([does(actor(thisCreature), enter), does(actor(thisCreature), attack)]), mill(3)),
+      whenever(
+        or([does(actor(this(creature)), enter), does(actor(this(creature)), attack)]),
+        mill(3)),
       whenever(
         does(
           any,

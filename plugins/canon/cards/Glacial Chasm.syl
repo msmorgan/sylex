@@ -3,6 +3,6 @@ card singleFaced({
     types = [land],
     text = [
       cumulativeUpkeep(perform(payLife(amount = 2))),
-      when(does(actor(thisLand), enter), sacrifice(a(land))),
+      when(does(actor(this(land)), enter), sacrifice(a(land))),
       static(cant(actor(bare(nominal(creature, post = [youControl]))), attack)),
       static(replace(would(any, dealDamage(recipient = you)), instead(preventDamage(allDamage))))]})

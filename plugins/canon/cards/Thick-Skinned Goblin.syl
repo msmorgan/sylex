@@ -16,6 +16,6 @@ card singleFaced({
           instead(may(pay(payment(mana([generic(0)])), once))))),
       activated(
         mana([pip(red)]),
-        gain(thisCreature, [protection(hasColor(red))], duration = untilEndOfTurn))],
+        gain(this(creature), [protection(hasColor(red))], duration = untilEndOfTurn))],
     power = 2,
     toughness = 1})

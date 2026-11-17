@@ -41,4 +41,6 @@ card transforming({
                 bare(nominal(creature, post = [youControl])),
                 [
                   haste,
-                  activated(tapSymbol, dealDamageOwnPower(thisCreature, target(anyTarget)))]))]))]})
+                  activated(
+                    tapSymbol,
+                    dealDamageOwnPower(this(creature), target(anyTarget)))]))]))]})

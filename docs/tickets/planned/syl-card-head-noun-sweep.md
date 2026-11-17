@@ -22,7 +22,7 @@ keyword bodies.
 ## Not in scope
 
 - A card not yet in `plugins/canon/cards/` is spelled with its head nouns when it is written.
-- Printed "it" written as a self-reference (`thisCreature` for "it"):
+- Printed "it" written as a self-reference (`this(creature)` for "it"):
   `syl-printed-it-self-references`.
 - Type words before a dropped "card", and unprinted card types beside a subtype:
   `syl-nominal-descriptions`.

@@ -14,7 +14,7 @@ voice in a `Subject` word, so the printed subject and voice are not the term's:
 
 - *Sengir Vampire* prints a passive participle with its agent, "a creature dealt damage by this
   creature this turn", and writes an active clause,
-  `did(actor(thisCreature), dealDamage(recipient = which), …)`.
+  `did(actor(this(creature)), dealDamage(recipient = which), …)`.
 - *Phyrexian Rebirth*'s "the number of creatures destroyed this way" is `was(destroy(which),
   within = thisWay)`, a second word for the past because the first has no passive.
 - *Tuktuk Scrapper*'s "If that artifact is put into a graveyard this way" needs the participant
@@ -48,7 +48,7 @@ same `Subject` and verb phrase.
 - `was` is gone at `Condition` and at `Predicate`, and no lookback holds `actor(…)`, `any` or
   `by(…)`. Each former `was(…)`, `did(any, …)` and `did(by(…), …)` site, and each `did(actor(…),
   …)` whose card prints a participle, is read from its Oracle line: *Sengir Vampire*'s
-  description is a `did` over `done(dealIndirect(subject, …), by = thisCreature)`, *Phyrexian
+  description is a `did` over `done(dealIndirect(subject, …), by = this(creature))`, *Phyrexian
   Rebirth*'s a `did` over a `done` phrase, *Tuktuk Scrapper*'s condition a `holds` over the
   passive of `putInto`. A rule body's pattern that no card or rule prints writes `any`, the
   wildcard word at `NounPhrase`, as its subject (spec §8). The landing lists each site with its

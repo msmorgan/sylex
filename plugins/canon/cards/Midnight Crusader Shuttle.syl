@@ -10,7 +10,7 @@ card singleFaced({
       flavorWord(
         "Midnight Entity",
         whenever(
-          does(actor(thisVehicle), attack),
+          does(actor(this(vehicle)), attack),
           sequentially([
               faceAVillainousChoice(
                 instruct(defendingPlayer, sacrifice(a(creature))),

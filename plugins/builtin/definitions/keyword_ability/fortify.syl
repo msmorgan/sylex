@@ -10,6 +10,6 @@ ability fortify(cost: Cost) {
   body = [
     activatedOnlyDuring(
       $cost,
-      attachTo(thisPermanent, target(nominal(land, post = [youControl]))),
+      attachTo(this(permanent), target(nominal(land, post = [youControl]))),
       asSorcery)]
 }

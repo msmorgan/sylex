@@ -6,11 +6,11 @@ card singleFaced({
     text = [
       static(
         entersWithCounters(
-          thisCreature,
+          this(creature),
           forEach(1, nominal(pre = [creature], card, post = [in(yourGraveyard)])),
           p1p1Counter)),
       whenever(
         does(any, putInto(counted(orMore(1), nominal(pre = [creature], card)), yourGraveyard)),
-        putCounters(thatMany, printedKind(p1p1Counter), thisCreature))],
+        putCounters(thatMany, printedKind(p1p1Counter), this(creature)))],
     power = 1,
     toughness = 1})

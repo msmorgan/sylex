@@ -12,17 +12,17 @@ ability mutate(cost: Cost) {
     static(altCost(payingInstead($cost), this)),
     static(
       if(
-        choiceWasTaken(thisSpell, byKeyword(mutate)),
+        choiceWasTaken(this(spell), byKeyword(mutate)),
         addsTarget(
-          thisSpell,
-          nominal(pre = [non(human)], creature, post = [ownedBy(ownerOf(thisSpell))])))),
+          this(spell),
+          nominal(pre = [non(human)], creature, post = [ownedBy(ownerOf(this(spell)))])))),
     static(
       replace(
-        would(actor(thisSpell), enter),
+        would(actor(this(spell)), enter),
         doIf(
-          choiceWasTaken(thisSpell, byKeyword(mutate)),
+          choiceWasTaken(this(spell), byKeyword(mutate)),
           instead(
             chooseOne(
-              merge(thisSpell, the(nominal(pre = [was(target(which))], creature)), top),
-              merge(thisSpell, the(nominal(pre = [was(target(which))], creature)), bottom))))))]
+              merge(this(spell), the(nominal(pre = [was(target(which))], creature)), top),
+              merge(this(spell), the(nominal(pre = [was(target(which))], creature)), bottom))))))]
 }

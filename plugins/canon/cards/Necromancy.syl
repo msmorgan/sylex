@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       asThoughFlashSacrificedAtCleanup,
       when(
-        does(actor(thisEnchantment), enter),
+        does(actor(this(enchantment)), enter),
         if = is(it, in(battlefield)),
         sequentially([
             establish(
@@ -19,7 +19,7 @@ card singleFaced({
                 subject = it)),
             putOntoBattlefieldUnderYourControl(
               target(nominal(pre = [creature], card, post = [in(graveyard)]))),
-            attachTo(thisEnchantment, it),
+            attachTo(this(enchantment), it),
             delay(
-              does(actor(thisEnchantment), leave),
+              does(actor(this(enchantment)), leave),
               instruct(controllerOf(that(creature)), sacrifice(it)))]))]})

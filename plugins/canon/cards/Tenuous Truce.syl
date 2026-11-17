@@ -21,4 +21,4 @@ card singleFaced({
               does(
                 actor(they),
                 attack(defender = or([you, a(nominal(planeswalker, post = [youControl]))]))))]),
-        sacrifice(thisAura))]})
+        sacrifice(this(aura)))]})

@@ -11,6 +11,6 @@ card singleFaced({
               doIf(
                 getsMoreVotes("carnage"),
                 sequentially([
-                    sacrifice(thisArtifact),
+                    sacrifice(this(artifact)),
                     destroy(allOf(nominal(pre = [non(land)], permanent)))])),
               doIf(getsMoreVotesOrTied("homage"), draw(1))])))]})

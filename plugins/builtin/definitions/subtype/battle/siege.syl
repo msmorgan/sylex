@@ -7,10 +7,10 @@ subtype siege {
   types = [battle],
   name = "Siege",
   confers = [
-    property(entryChoice(thisSiege, anOpponent)),
+    property(entryChoice(this(siege), anOpponent)),
     ability(
       when(
-        does(any, removeCounters(theLast, printedKind(defenseCounter), thisPermanent)),
+        does(any, removeCounters(theLast, printedKind(defenseCounter), this(permanent))),
         sequentially(
           [exile(it), may(cast(it, resulting = isTransformed, altCost = withoutPaying))]))),
     stateBased(

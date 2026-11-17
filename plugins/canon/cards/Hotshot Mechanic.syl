@@ -5,6 +5,6 @@ card singleFaced({
     cost = [pip(white)],
     types = [artifact, creature],
     subtypes = [fox, pilot],
-    text = [static(asThough(actor(thisCreature), crew(bare(vehicle)), greaterBy(power, 2)))],
+    text = [static(asThough(actor(this(creature)), crew(bare(vehicle)), greaterBy(power, 2)))],
     power = 2,
     toughness = 1})

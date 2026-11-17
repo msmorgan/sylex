@@ -7,7 +7,7 @@ needs: [cleanup-step6-surface]
 ## Why
 
 *Clone* prints "You may have this creature enter as a copy of any creature on the battlefield."
-and is written `mayHaveEnter(thisCreature, [asCopyOf(a(isCreature), [])])`. `a(isCreature)` spells
+and is written `mayHaveEnter(this(creature), [asCopyOf(a(isCreature), [])])`. `a(isCreature)` spells
 "a creature": it drops "any" and "on the battlefield", so the term recovers a different wording,
 and `isCreature` holds of a creature card in any zone, so nothing in the term keeps the copied
 object on the battlefield. No Template carries "any … on the battlefield".

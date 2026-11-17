@@ -11,15 +11,15 @@ ability warp(cost: Cost) {
     verbs = [{lemma = "warp", frames = [Monotransitive]}]},
   spelling = "warp $cost",
   body = [
-    static(can(actor(you), cast(thisCard, from = yourHand, altCost = payingInstead($cost)))),
+    static(can(actor(you), cast(this(card), from = yourHand, altCost = payingInstead($cost)))),
     static(
       resolutionDelayedTrigger(
         doIf(
-          keywordCostPaid(thisSpell, warp),
+          keywordCostPaid(this(spell), warp),
           atNext(
             beginningOfNext(endStep),
             sequentially([
-                exile(becomes(thisSpell)),
+                exile(becomes(this(spell))),
                 establishThroughout(
                   can(actor(ownerOf(it)), cast(it, from = exileZone)),
                   onALaterTurn)])))))]

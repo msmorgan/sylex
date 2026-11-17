@@ -8,7 +8,7 @@ ability webSlinging(cost: Cost) {
       can(
         actor(you),
         cast(
-          thisSpell,
+          this(spell),
           altCost = payingInstead(
             compound([
                 $cost,

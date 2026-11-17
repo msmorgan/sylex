@@ -1,0 +1,5 @@
+# An object: an ability on the stack, a card, a copy of a card, a token, a spell, a permanent or
+# an emblem [CR#109.1].
+primitive object: Nominal = Object {
+  spelling = "object"
+}

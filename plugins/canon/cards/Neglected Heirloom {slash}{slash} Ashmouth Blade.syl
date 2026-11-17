@@ -5,7 +5,7 @@ card transforming({
     subtypes = [equipment],
     text = [
       static(getsPt(equipped(creature), up(1), up(1))),
-      when(does(any, turnOver(equipped(creature))), transform(thisEquipment)),
+      when(does(any, turnOver(equipped(creature))), transform(this(equipment))),
       equip(mana([generic(1)]))]},
   {
     name = "Ashmouth Blade",

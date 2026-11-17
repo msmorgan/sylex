@@ -5,7 +5,7 @@ card flip({
     subtypes = [goblin, warrior],
     text = [
       haste,
-      whenever(does(actor(thisCreature), dealDamage(recipient = anOpponent)), flip(it))],
+      whenever(does(actor(this(creature)), dealDamage(recipient = anOpponent)), flip(it))],
     power = 1,
     toughness = 1},
   {

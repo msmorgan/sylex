@@ -16,8 +16,8 @@ card singleFaced({
       haste,
       when(
         does(actor(shortenedName), enter),
-        instruct(thisCreature, fight(targets(upTo(1), nominal(pre = [other], creature))))),
+        instruct(this(creature), fight(targets(upTo(1), nominal(pre = [other], creature))))),
       static(
-        replace(would(any, dealDamage(recipient = shortenedName)), before(heal(thisCreature))))],
+        replace(would(any, dealDamage(recipient = shortenedName)), before(heal(this(creature)))))],
     power = 3,
     toughness = 5})

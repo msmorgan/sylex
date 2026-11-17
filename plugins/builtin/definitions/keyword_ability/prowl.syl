@@ -9,7 +9,7 @@ ability prowl(cost: Cost) {
         altCost(payingInstead($cost), this),
         did(
           actor(
-            a(nominal(source, post = [youControl, shares(subtype(creature), share, thisSpell)]))),
+            a(nominal(source, post = [youControl, shares(subtype(creature), share, this(spell))]))),
           dealDamage(kind = combat, recipient = a(player)),
           within(soFarThisTurn))))]
 }

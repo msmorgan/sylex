@@ -4,10 +4,10 @@ card singleFaced({
     types = [enchantment],
     text = [
       when(
-        does(actor(thisEnchantment), enter),
+        does(actor(this(enchantment)), enter),
         exile(target(nominal(pre = [other, non(land)], permanent)))),
       when(
-        does(actor(thisEnchantment), leave),
+        does(actor(this(enchantment)), leave),
         returnToBattlefield(
-          the(nominal(card, post = [in(exiledWith(thisEnchantment))])),
+          the(nominal(card, post = [in(exiledWith(this(enchantment)))])),
           riders = [underControlOf(ownerOf(it))]))]})

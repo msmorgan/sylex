@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(1), pip(black)],
     types = [creature],
     subtypes = [skeleton],
-    text = [activated(mana([pip(black)]), regenerate(thisCreature))],
+    text = [activated(mana([pip(black)]), regenerate(this(creature)))],
     power = 1,
     toughness = 1})

@@ -4,10 +4,10 @@ card singleFaced({
     types = [creature],
     subtypes = [elemental],
     text = [
-      static(entryChoice(thisCreature, anOpponent)),
+      static(entryChoice(this(creature), anOpponent)),
       static(
         getsBoth(
-          thisCreature,
+          this(creature),
           down(
             countOf(nominal(card, post = [in(handOf(the(nominal(pre = [chosen], player))))])))))],
     power = 7,

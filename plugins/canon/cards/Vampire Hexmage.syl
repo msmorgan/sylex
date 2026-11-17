@@ -5,6 +5,6 @@ card singleFaced({
     subtypes = [vampire, shaman],
     text = [
       firstStrike,
-      activated(perform(sacrifice(thisCreature)), removeAllCounters(none, target(permanent)))],
+      activated(perform(sacrifice(this(creature))), removeAllCounters(none, target(permanent)))],
     power = 2,
     toughness = 1})

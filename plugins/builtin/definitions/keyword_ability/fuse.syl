@@ -4,5 +4,5 @@
 ability fuse {
   lexical = {lemma = "fuse"},
   spelling = "fuse",
-  body = [static(can(actor(you), cast(thisCard, from = yourHand, payment = fused)))]
+  body = [static(can(actor(you), cast(this(card), from = yourHand, payment = fused)))]
 }

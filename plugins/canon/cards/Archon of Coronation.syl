@@ -10,7 +10,7 @@ card singleFaced({
     subtypes = [archon],
     text = [
       flying,
-      when(does(actor(thisCreature), enter), gainDesignation(you, monarch)),
+      when(does(actor(this(creature)), enter), gainDesignation(you, monarch)),
       static(
         asLongAs(
           is(you, hasDesignation(monarch)),

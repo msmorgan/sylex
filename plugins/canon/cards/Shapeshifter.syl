@@ -6,7 +6,7 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [shapeshifter],
     text = [
-      static(entersChoosingFrom(thisCreature, number, number(fromTo(0, 7)))),
+      static(entersChoosingFrom(this(creature), number, number(fromTo(0, 7)))),
       at(beginningOfYour(upkeep), may(choose(a(qualityFrom(number, number(fromTo(0, 7))))))),
       static(
         definesPowerAndToughness(ownName, theLastChosenNumber, minus(7, theLastChosenNumber)))]})

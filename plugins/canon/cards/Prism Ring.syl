@@ -3,5 +3,5 @@ card singleFaced({
     cost = [generic(1)],
     types = [artifact],
     text = [
-      static(entersChoosing(thisArtifact, color)),
+      static(entersChoosing(this(artifact), color)),
       whenever(does(actor(you), cast(a(nominal(spell, post = [ofChosen(color)])))), gainLife(1))]})

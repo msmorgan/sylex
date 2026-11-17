@@ -3,12 +3,12 @@ card singleFaced({
     cost = [generic(2)],
     types = [artifact],
     text = [
-      activated(tapSymbol, putCounters(1, printedKind(chargeCounter), thisArtifact)),
+      activated(tapSymbol, putCounters(1, printedKind(chargeCounter), this(artifact))),
       activated(
-        compound([tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound([tapSymbol, perform(sacrifice(this(artifact)))]),
         destroy(
           each(
             nominal(
               pre = [non(land)],
               permanent,
-              post = [hasManaValue(equal, countersOn(chargeCounter, thisArtifact))]))))]})
+              post = [hasManaValue(equal, countersOn(chargeCounter, this(artifact)))]))))]})

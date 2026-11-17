@@ -9,11 +9,12 @@ ability dash(cost: Cost) {
   lexical = {lemma = "dash", parameters = [[Cost]]},
   spelling = "dash $cost",
   body = [
-    static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
+    static(can(actor(you), cast(this(card), altCost = payingInstead($cost)))),
     static(
       resolutionDelayedTrigger(
         doIf(
-          keywordCostPaid(thisSpell, dash),
-          atNext(beginningOfNext(endStep), returnToHand(becomes(thisSpell)))))),
-    static(asLongAs(keywordCostPaid(thisPermanent, dash), abilityGrant(thisPermanent, [haste])))]
+          keywordCostPaid(this(spell), dash),
+          atNext(beginningOfNext(endStep), returnToHand(becomes(this(spell))))))),
+    static(
+      asLongAs(keywordCostPaid(this(permanent), dash), abilityGrant(this(permanent), [haste])))]
 }

@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       spectacle(mana([generic(3), pip(black), pip(red)])),
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         if = keywordCostPaid(it, spectacle),
         instruct(eachOpponent, discard(a(nominal(card, post = [in(hand)])))))],
     power = 4,

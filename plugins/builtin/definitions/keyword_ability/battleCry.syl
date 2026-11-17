@@ -5,7 +5,7 @@ ability battleCry {
   spelling = "battle cry",
   body = [
     whenever(
-      does(actor(thisCreature), attack),
+      does(actor(this(creature)), attack),
       establishThroughout(
         getsPt(each(nominal(pre = [other, attacking], creature)), up(1), up(0)),
         untilEndOfTurn))]

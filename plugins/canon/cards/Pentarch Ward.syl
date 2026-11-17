@@ -5,9 +5,9 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(hasType(creature)),
-      static(entersChoosing(thisAura, color)),
-      when(does(actor(thisAura), enter), draw(1)),
+      static(entersChoosing(this(aura), color)),
+      when(does(actor(this(aura)), enter), draw(1)),
       static(
         conjunction([
             abilityGrant(enchanted(creature), [protection(ofChosen(color))]),
-            doesnt(actor(thisEffect), remove(thisAura))]))]})
+            doesnt(actor(thisEffect), remove(this(aura)))]))]})

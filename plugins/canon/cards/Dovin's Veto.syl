@@ -3,5 +3,5 @@ card singleFaced({
     cost = [pip(white), pip(blue)],
     types = [instant],
     text = [
-      static(cant(any, counter(thisSpell))),
+      static(cant(any, counter(this(spell)))),
       spell(counter(target(nominal(pre = [non(creature)], spell))))]})

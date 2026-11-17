@@ -9,8 +9,8 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [shapeshifter],
     text = [
-      static(entersChoosing(thisCreature, subtype(creature))),
-      static(definesQuality(thisCreature, adds, chosenQuality(ofChosen(subtype(creature))))),
+      static(entersChoosing(this(creature), subtype(creature))),
+      static(definesQuality(this(creature), adds, chosenQuality(ofChosen(subtype(creature))))),
       static(
         entersWithAdditionalCounters(
           each(nominal(pre = [other], creature, post = [youControl, ofChosen(subtype(creature))])),

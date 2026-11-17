@@ -1,6 +1,6 @@
 # "<subj> doesn't <action>": a plain negative declarative, what the subject does not do. It is no
 # deontic rule and takes no deontic modifiers. "This effect doesn't remove this Aura" is
-# `doesnt(actor(thisEffect), remove(thisAura))`, its own sentence beside the effect it talks about
+# `doesnt(actor(thisEffect), remove(this(aura)))`, its own sentence beside the effect it talks about
 # [CR#702.16n].
 primitive doesnt(subj: Subject, action: VerbPhrase): StaticSpec = Doesnt {
   spelling = "$subj don't $action"

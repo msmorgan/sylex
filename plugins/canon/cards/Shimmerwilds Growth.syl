@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(hasType(land)),
-      static(entersChoosing(thisAura, color)),
+      static(entersChoosing(this(aura), color)),
       static(qualityChange(enchanted(land), sets, chosenQuality(ofChosen(color)))),
       whenever(
         does(any, tapForMana(enchanted(land))),

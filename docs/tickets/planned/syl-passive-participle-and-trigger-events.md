@@ -13,10 +13,10 @@ Voice is carried outside the verb phrase, by a `Subject` word that is not the pr
 So:
 
 - The printed subject of a passive is buried in the verb phrase: *Grollub*'s "Whenever this
-  creature is dealt damage" is `does(any, dealDamage(recipient = thisCreature))`.
+  creature is dealt damage" is `does(any, dealDamage(recipient = this(creature)))`.
 - A verb with two passives has one term for both. *Grollub* promotes the recipient and
   *Phytohydra*'s "If damage would be dealt to this creature" promotes the damage, and both hold
-  the same `dealDamage(recipient = thisCreature)` under `any`.
+  the same `dealDamage(recipient = this(creature))` under `any`.
 - A passive cannot coordinate with an active under one subject (*Kaya's Ghostform*'s "When
   enchanted permanent dies or is put into exile"), or stand as a participle (*Abu Ja'far*'s "all
   creatures blocking or blocked by it").
@@ -24,8 +24,8 @@ So:
   you put one or more counters on another creature" and *Divine Intervention*'s "When you remove
   the last intervention counter from this enchantment" are each `does(by(you), …)`.
 - `becomeBlocked` and `resolve` print their own subject and leave the event's `any`:
-  `does(any, becomeBlocked(thisCreature))` (*Chub Toad*, `bushido`, `afflict`, `rampage`),
-  `does(any, resolve(thisSpell))` (`buyback`, `haunt`, `rebound`; `paradigm` calls `resolve` the
+  `does(any, becomeBlocked(this(creature)))` (*Chub Toad*, `bushido`, `afflict`, `rampage`),
+  `does(any, resolve(this(spell)))` (`buyback`, `haunt`, `rebound`; `paradigm` calls `resolve` the
   same way).
 
 The spec's §2 to §4 replace this; this ticket builds the passive words and the trigger event,
@@ -51,19 +51,19 @@ and the tickets after it the other words that take a `Subject`.
   one-off script, kept in `docs/evidence/`, which checks that each is the term before it without
   the wrapper; the landing reports the counts it compared.
 - `deal`'s second passive has its Template `dealIndirect(recipient, damage)`, written only under
-  `done`: *Grollub*'s event is `does(thisCreature, be(done(dealIndirect(subject, bare(damage)))))`.
+  `done`: *Grollub*'s event is `does(this(creature), be(done(dealIndirect(subject, bare(damage)))))`.
 - `becomeBlocked(by: Option(NounPhrase) = none)`, worded "become blocked< by $by>", and `resolve`
   take no subject, and neither do `becomeBlocking`, `stopBlocking` and `phaseOutUntil`, which
   nothing calls. *Chub Toad*, `bushido`, `afflict`, `rampage`, `buyback`, `haunt`, `paradigm` and
   `rebound` are rewritten, and *Aisling Leprechaun*'s and *Inferno Elemental*'s
-  `does(by(a(isCreature)), block(attacker = thisCreature))`, for "becomes blocked by a creature",
+  `does(by(a(isCreature)), block(attacker = this(creature)))`, for "becomes blocked by a creature",
   is `becomeBlocked(by = …)` said of this creature [CR#509.3d].
 - `transformSelf` exists, a Template over the Definition `transform` with `subject` as its
   argument, and *Cult of the Waxing Moon*'s "Whenever a permanent you control transforms into a
   non-Human creature" calls it.
 - `regeneration` takes no subject parameter and reads `subject`, and *Matopi Golem*'s "When it
   regenerates this way" is `regeneration` said of the creature, where the card writes
-  `does(any, regeneration(thisCreature))` today. Which declaration carries the Deed stays
+  `does(any, regeneration(this(creature)))` today. Which declaration carries the Deed stays
   `syl-explicit-deeds`'s.
 - *Tide of War* is in `plugins/canon/cards/`, its "each blocking creature is sacrificed by its
   controller" a clause over `be(done(sacrifice(subject), by = …))`, checked against its Oracle

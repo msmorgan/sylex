@@ -12,7 +12,7 @@ ability epic {
         restOfGame,
         sequentially([
             copyOnStack(
-              thisSpell,
+              this(spell),
               exceptions = [
                 characteristicEdits([removedAbilities(specified([abilities(theKeyword(epic))]))])]),
             may(chooseNewTargets(that(copy)))])))]

@@ -12,6 +12,6 @@ token wickedRoleToken {
         enchant(hasType(creature)),
         static(getsPt(enchanted(creature), up(1), up(1))),
         when(
-          does(any, putInto(thisToken, graveyard, from = battlefield)),
+          does(any, putInto(this(token), graveyard, from = battlefield)),
           instruct(eachOpponent, loseLife(1)))]}}
 }

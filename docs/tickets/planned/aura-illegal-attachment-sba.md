@@ -8,7 +8,7 @@ needs: []
 
 [CR#704.5m] puts an Aura into its owner's graveyard if it is attached to an illegal object or
 player, or is not attached. `aura.syl` declares only the "not attached" half
-(`not(isAttached(thisAura))`), so in `.syl` an illegally attached Aura is never graveyarded by
+(`not(isAttached(this(aura)))`), so in `.syl` an illegally attached Aura is never graveyarded by
 its own row. The engine still runs on the v1 Aura row, whose condition is
 `Not(LegallyAttached(This))` and covers both halves, so pass 1 of `attachment_sbas` graveyards
 it and pass 2 (the [CR#704.5n,704.5p] unattach cleanup) skips it. No engine test covers the

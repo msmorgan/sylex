@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         mayHaveEnter(
-          thisCreature,
+          this(creature),
           [asCopyOf(a(nominal(creature, post = [in(battlefield)])), [])]))],
     power = 0,
     toughness = 0})

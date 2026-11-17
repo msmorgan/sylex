@@ -8,7 +8,7 @@ card singleFaced({
         timed(
           does(any, putInto(counted(orMore(1), card), exileZone)),
           duringPart(whose = you, turn)),
-        putCounters(1, printedKind(p1p1Counter), thisCreature),
+        putCounters(1, printedKind(p1p1Counter), this(creature)),
         limit = oncePerTurn)],
     power = 1,
     toughness = 1})

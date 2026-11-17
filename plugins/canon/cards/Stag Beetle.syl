@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         conjunction([
-            entersWithCounters(thisCreature, letter(x), p1p1Counter),
+            entersWithCounters(this(creature), letter(x), p1p1Counter),
             letterDefinition(
               x,
               countOf(nominal(pre = [other], creature, post = [in(battlefield)])))]))],

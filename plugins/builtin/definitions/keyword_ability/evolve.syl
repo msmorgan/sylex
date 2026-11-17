@@ -8,7 +8,7 @@ ability evolve {
     whenever(
       does(actor(a(nominal(creature, post = [youControl]))), enter),
       if = or([
-          compareAmt(powerOf(that(creature)), greater, powerOf(thisCreature)),
-          compareAmt(toughnessOf(that(creature)), greater, toughnessOf(thisCreature))]),
-      putCounters(1, printedKind(p1p1Counter), thisCreature))]
+          compareAmt(powerOf(that(creature)), greater, powerOf(this(creature))),
+          compareAmt(toughnessOf(that(creature)), greater, toughnessOf(this(creature)))]),
+      putCounters(1, printedKind(p1p1Counter), this(creature)))]
 }

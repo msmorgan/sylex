@@ -6,7 +6,7 @@ ability riot {
   body = [
     static(
       mayHaveEnter(
-        thisPermanent,
+        this(permanent),
         [withCounters(1, printedKind(p1p1Counter), additional)],
-        otherwise = alongside(gain(thisPermanent, [haste]))))]
+        otherwise = alongside(gain(this(permanent), [haste]))))]
 }

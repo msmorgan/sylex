@@ -14,7 +14,7 @@ ability equipQuality(quality: Predicate, cost: Cost) {
     activatedOnlyDuring(
       $cost,
       attachTo(
-        thisPermanent,
+        this(permanent),
         target(nominal(pre = [hasQuality($quality)], creature, post = [youControl]))),
       asSorcery)]
 }

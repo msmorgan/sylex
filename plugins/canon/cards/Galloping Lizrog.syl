@@ -6,12 +6,12 @@ card singleFaced({
     text = [
       trample,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         may(
           removeCounters(
             anyNumber,
             printedKind(p1p1Counter),
             among(bare(nominal(creature, post = [youControl])))),
-          ifDid = putCounters(times(2, thatMany), printedKind(p1p1Counter), thisCreature)))],
+          ifDid = putCounters(times(2, thatMany), printedKind(p1p1Counter), this(creature))))],
     power = 3,
     toughness = 3})

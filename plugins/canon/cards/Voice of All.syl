@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [angel],
     text = [
       flying,
-      static(entersChoosing(thisCreature, color)),
-      static(abilityGrant(thisCreature, [protection(ofChosen(color))]))],
+      static(entersChoosing(this(creature), color)),
+      static(abilityGrant(this(creature), [protection(ofChosen(color))]))],
     power = 2,
     toughness = 2})

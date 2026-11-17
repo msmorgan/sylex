@@ -7,7 +7,7 @@ needs: [plugins-v3-data-language, lean-retirement, syl-single-face-card-call, cl
 ## Why
 
 Cleave's second ability changes a spell's text by removing everything in square brackets
-[CR#702.148a,702.148b]. `cleave.syl` writes it as `textChange(thisSpell, removeBracketed)`, but a
+[CR#702.148a,702.148b]. `cleave.syl` writes it as `textChange(this(spell), removeBracketed)`, but a
 card's `.syl` term has no way to mark which of its parts are bracketed, so the text change
 removes nothing and none of the 12 Vintage-legal cleave cards can be written. The English side
 already reads a cleave line twice, as its Uncleaved and Cleaved Text, with the bracketed spans

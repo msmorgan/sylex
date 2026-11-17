@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(1), pip(white)],
     types = [creature],
     subtypes = [wall],
-    text = [defender, when(does(actor(thisCreature), enter), draw(1))],
+    text = [defender, when(does(actor(this(creature)), enter), draw(1))],
     power = 0,
     toughness = 4})

@@ -5,7 +5,7 @@ card transforming({
     subtypes = [human, rogue],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         may(
           returnToHand(
             target(
@@ -21,7 +21,7 @@ card transforming({
       haste,
       menace,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         establishFor(
           bare(nominal(pre = [other], creature, post = [youControl])),
           [getsPt(them, up(1), up(0)), abilityGrant(them, [menace])],

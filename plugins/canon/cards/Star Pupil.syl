@@ -4,9 +4,9 @@ card singleFaced({
     types = [creature],
     subtypes = [human, wizard],
     text = [
-      static(entersWithCounters(thisCreature, 1, p1p1Counter)),
+      static(entersWithCounters(this(creature), 1, p1p1Counter)),
       when(
-        does(actor(thisCreature), die),
+        does(actor(this(creature)), die),
         doForEachKind(
           counterKind,
           domain = it,

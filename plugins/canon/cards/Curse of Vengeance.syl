@@ -7,8 +7,10 @@ card singleFaced({
       enchant(isPlayer),
       whenever(
         does(actor(enchanted(player)), cast(a(spell))),
-        putCounters(1, printedKind(spiteCounter), thisAura)),
+        putCounters(1, printedKind(spiteCounter), this(aura))),
       when(
         does(actor(enchanted(player)), loseGame),
-        sequentially(
-          [gainLife(letter(x)), draw(letter(x)), define(x, countersOn(spiteCounter, thisAura))]))]})
+        sequentially([
+            gainLife(letter(x)),
+            draw(letter(x)),
+            define(x, countersOn(spiteCounter, this(aura)))]))]})

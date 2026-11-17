@@ -9,8 +9,8 @@ needs: [cleanup-step6-surface]
 Five canon cards print third-person personal pronouns (`"he"`, `"him"`, `"his"`) for the card
 itself, and `.syl` represents them inconsistently: *Deadpool, Trading Card* ("exchange his text
 box"), *Garruk Relentless // Garruk, the Veil-Cursed* ("on him, transform him", "to him"), and
-*Wolverine, Fierce Fighter* ("he fights", "dealt to him") write a self-reference (`thisCreature` or
-`thisPlaneswalker`), while *Gideon Jura* and *Gideon, Ally of Zendikar* ("dealt to him") write `it`
+*Wolverine, Fierce Fighter* ("he fights", "dealt to him") write a self-reference (`this(creature)` or
+`this(planeswalker)`), while *Gideon Jura* and *Gideon, Ally of Zendikar* ("dealt to him") write `it`
 (`pro(bare, one)`). `plugins/builtin/templates/pronoun/` has no `he`/`him`/`his` or `she`/`her`
 template, so neither matches the printed wording (`docs/design/semantics.md` §1 item 1).
 

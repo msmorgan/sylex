@@ -8,7 +8,7 @@ ability hideaway(amount: Amount) {
   spelling = "hideaway $amount",
   body = [
     when(
-      does(actor(thisPermanent), enter),
+      does(actor(this(permanent)), enter),
       sequentially([
           lookAt(topSlice($amount)),
           exileFaceDown(partOf(exactly(1), them)),
@@ -18,7 +18,7 @@ ability hideaway(amount: Amount) {
                 visibility(lookAt, you, objects(the(nominal(pre = [was(exile(which))], card)))),
                 visibility(
                   lookAt,
-                  controllerOf(thisPermanent),
+                  controllerOf(this(permanent)),
                   objects(the(nominal(pre = [was(exile(which))], card))))]),
             forAsLongAs(is(the(nominal(pre = [was(exile(which))], card)), in(exileZone))))]))]
 }

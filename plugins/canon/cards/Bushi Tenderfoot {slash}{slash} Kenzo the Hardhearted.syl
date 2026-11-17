@@ -12,11 +12,11 @@ card flip({
                 creature,
                 post = [
                   did(
-                    actor(thisCreature),
+                    actor(this(creature)),
                     dealDamage(recipient = which),
                     within = within(soFarThisTurn))]))),
           die),
-        flip(thisCreature))],
+        flip(this(creature)))],
     power = 1,
     toughness = 1},
   {

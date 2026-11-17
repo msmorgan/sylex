@@ -15,7 +15,7 @@ card singleFaced({
                   hasKeyword(thatKeyword),
                   not(named(printedName("Escaped Shapeshifter")))])),
             keywordGrant(
-              thisCreature,
+              this(creature),
               thatKeyword,
               and([
                   hasType(creature),

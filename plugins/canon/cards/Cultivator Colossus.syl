@@ -7,7 +7,7 @@ card singleFaced({
       trample,
       static(definesPt(ownName, countOf(nominal(land, post = [youControl])))),
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         may(
           putOntoBattlefieldTapped(a(nominal(pre = [land], card, post = [in(yourHand)]))),
           ifDid = sequentially([draw(1), repeat(again)])))]})

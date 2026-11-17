@@ -6,8 +6,8 @@ card singleFaced({
     text = [
       whenever(
         or([
-            does(actor(thisCreature), block(attacker = a(creature))),
-            does(by(a(creature)), block(attacker = thisCreature))]),
-        instruct(thisCreature, dealDamage(amount = 3, recipient = that(creature))))],
+            does(actor(this(creature)), block(attacker = a(creature))),
+            does(by(a(creature)), block(attacker = this(creature)))]),
+        instruct(this(creature), dealDamage(amount = 3, recipient = that(creature))))],
     power = 4,
     toughness = 4})

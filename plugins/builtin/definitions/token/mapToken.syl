@@ -8,7 +8,7 @@ token mapToken {
       subtypes = [map],
       text = [
         activatedOnlyDuring(
-          compound([mana([generic(1)]), tapSymbol, perform(sacrifice(thisToken))]),
+          compound([mana([generic(1)]), tapSymbol, perform(sacrifice(this(token)))]),
           instruct(target(nominal(creature, post = [youControl])), explore),
           asSorcery)]}}
 }

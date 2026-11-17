@@ -5,13 +5,13 @@ card singleFaced({
     subtypes = [ooze],
     text = [
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         sequentially([
             exile(topSlice(1)),
             doIf(
               is(it, noun(a(nominal(pre = [creature], card)))),
               get(
-                thisCreature,
+                this(creature),
                 up(powerOf(the(nominal(pre = [was(exile(which)), creature], card)))),
                 up(toughnessOf(it)),
                 duration = thisTurn))]))],

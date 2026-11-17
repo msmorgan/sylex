@@ -6,5 +6,5 @@ card singleFaced({
       when(
         does(actor(a(nominal(creature, post = [youControl]))), die),
         doIfDone(
-          sacrifice(thisEnchantment),
+          sacrifice(this(enchantment)),
           ifDid = create(4, written(creatureToken(1, 1, [], [spirit])))))]})

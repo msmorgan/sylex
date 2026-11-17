@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(5)],
     types = [artifact],
     text = [
-      static(entryChoice(thisArtifact, and([a(quality(color)), a(quality(subtype(creature)))]))),
+      static(entryChoice(this(artifact), and([a(quality(color)), a(quality(subtype(creature)))]))),
       activated(
         compound([mana([generic(5)]), tapSymbol]),
         create(

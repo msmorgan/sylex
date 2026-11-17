@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(2), pip(white)],
     types = [creature],
     subtypes = [human, soldier],
-    text = [static(untapDuring(thisCreature, each(nominal(pre = [other], player))))],
+    text = [static(untapDuring(this(creature), each(nominal(pre = [other], player))))],
     power = 2,
     toughness = 4})

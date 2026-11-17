@@ -7,13 +7,13 @@ card singleFaced({
       trample,
       haste,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         sequentially([
             instruct(eachPlayer, choose(disclosure = secretly, a(quality(number)))),
             revealChoices(numbers),
             instruct(each(nominal(player, post = [choseExtreme(max)])), loseLife(thatMuch)),
             doIf(
               is(you, choseExtreme(max)),
-              putCounters(2, printedKind(p1p1Counter), thisCreature))]))],
+              putCounters(2, printedKind(p1p1Counter), this(creature)))]))],
     power = 3,
     toughness = 3})

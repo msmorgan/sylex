@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [beast],
     text = [
       whenever(
-        does(any, dealDamage(recipient = thisCreature)),
+        does(any, dealDamage(recipient = this(creature))),
         instruct(eachOpponent, gainLife(thatMuch)))],
     power = 3,
     toughness = 3})

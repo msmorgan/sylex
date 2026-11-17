@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(you), rollDice(count = anyAmount, sides = anyDie)),
-        instruct(thisCreature, dealDamage(amount = 1, recipient = eachOpponent)))],
+        instruct(this(creature), dealDamage(amount = 1, recipient = eachOpponent)))],
     power = 1,
     toughness = 3})

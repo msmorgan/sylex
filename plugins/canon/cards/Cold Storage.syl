@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       activated(mana([generic(3)]), exile(target(nominal(creature, post = [youControl])))),
       activated(
-        perform(sacrifice(thisArtifact)),
+        perform(sacrifice(this(artifact))),
         returnToBattlefield(
-          each(nominal(pre = [creature], card, post = [in(exiledWith(thisArtifact))])),
+          each(nominal(pre = [creature], card, post = [in(exiledWith(this(artifact)))])),
           riders = [underControlOf(you)]))]})

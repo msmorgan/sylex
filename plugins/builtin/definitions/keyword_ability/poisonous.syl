@@ -5,6 +5,6 @@ ability poisonous(amount: Amount) {
   spelling = "poisonous $amount",
   body = [
     whenever(
-      does(actor(thisCreature), dealDamage(kind = combat, recipient = a(player))),
+      does(actor(this(creature)), dealDamage(kind = combat, recipient = a(player))),
       putCounters($amount, printedKind(poison), they))]
 }

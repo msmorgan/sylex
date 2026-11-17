@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       enchant(or([hasType(artifact), hasType(creature)])),
       when(
-        does(actor(thisAura), enter),
+        does(actor(this(aura)), enter),
         may(pay(payment(mana([generic(3)])), once), ifDid = tap(enchanted(permanent)))),
       static(
         conjunction(

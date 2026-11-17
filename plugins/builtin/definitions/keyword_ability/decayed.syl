@@ -4,6 +4,6 @@ ability decayed {
   lexical = {lemma = "decayed"},
   spelling = "decayed",
   body = [
-    static(cant(actor(thisCreature), block)),
-    when(does(actor(thisCreature), attack), atNext(endOfCombat, sacrifice(thisPermanent)))]
+    static(cant(actor(this(creature)), block)),
+    when(does(actor(this(creature)), attack), atNext(endOfCombat, sacrifice(this(permanent))))]
 }

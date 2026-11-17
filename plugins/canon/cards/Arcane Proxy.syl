@@ -6,7 +6,7 @@ card prototype({
     text = [
       prototype,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         if = is(it, did(actor(you), cast(which), within = thisObject)),
         sequentially([
             exile(
@@ -14,7 +14,7 @@ card prototype({
                 nominal(
                   pre = [or([instant, sorcery])],
                   card,
-                  post = [hasManaValue(atMost, powerOf(thisCreature)), in(yourGraveyard)]))),
+                  post = [hasManaValue(atMost, powerOf(this(creature))), in(yourGraveyard)]))),
             copy(fromCardZone, that(card), 1, []),
             may(cast(that(copy), altCost = withoutPaying))]))],
     power = 4,

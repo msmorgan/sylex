@@ -3,6 +3,6 @@ card singleFaced({
     cost = [generic(4), pip(green), pip(green)],
     types = [creature],
     subtypes = [elemental],
-    text = [cumulativeUpkeep(perform(putCounters(1, printedKind(m1m1Counter), thisCreature)))],
+    text = [cumulativeUpkeep(perform(putCounters(1, printedKind(m1m1Counter), this(creature))))],
     power = 9,
     toughness = 9})

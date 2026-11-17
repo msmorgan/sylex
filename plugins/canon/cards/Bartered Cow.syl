@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [ox],
     text = [
       triggered(
-        and([when(does(actor(thisCreature), die)), when(does(actor(you), discard(thisCard)))]),
+        and([when(does(actor(this(creature)), die)), when(does(actor(you), discard(this(card))))]),
         create(1, defined(foodToken)))],
     power = 3,
     toughness = 3})

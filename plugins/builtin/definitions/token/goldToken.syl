@@ -7,5 +7,5 @@ token goldToken {
       types = [artifact],
       subtypes = [gold],
       text = [
-        activated(perform(sacrifice(thisToken)), addMana(counted(1, ofAnyColor(sameColor))))]}}
+        activated(perform(sacrifice(this(token))), addMana(counted(1, ofAnyColor(sameColor))))]}}
 }

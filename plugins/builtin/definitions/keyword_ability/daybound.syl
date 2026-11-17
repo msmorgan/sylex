@@ -7,11 +7,11 @@ ability daybound {
   body = [
     static(
       replace(
-        would(actor(thisPermanent), enter),
+        would(actor(this(permanent)), enter),
         doIf(gameIs(night), withRiders([entersTransformed])))),
     static(
       asEvent(
         gameBecomes(night),
-        doIf(is(thisPermanent, currentFace(front)), transform(thisPermanent)))),
-    static(cant(any, transform(thisPermanent), except = byKeyword(daybound)))]
+        doIf(is(this(permanent), currentFace(front)), transform(this(permanent))))),
+    static(cant(any, transform(this(permanent)), except = byKeyword(daybound)))]
 }

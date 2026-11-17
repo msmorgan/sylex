@@ -2,5 +2,5 @@
 ability indestructible {
   lexical = {lemma = "indestructible"},
   spelling = "indestructible",
-  body = [static(cant(any, destroy(thisPermanent)))]
+  body = [static(cant(any, destroy(this(permanent))))]
 }

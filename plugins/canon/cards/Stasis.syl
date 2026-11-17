@@ -4,4 +4,4 @@ card singleFaced({
     types = [enchantment],
     text = [
       static(partSkip(bare(player), untapStep)),
-      at(beginningOfYour(upkeep), doUnless(mana([pip(blue)]), sacrifice(thisEnchantment)))]})
+      at(beginningOfYour(upkeep), doUnless(mana([pip(blue)]), sacrifice(this(enchantment))))]})

@@ -9,7 +9,7 @@ card singleFaced({
           actor(a(player)),
           pay(
             outcome = unpaid,
-            whose = thisEnchantment,
+            whose = this(enchantment),
             keyword = cumulativeUpkeep,
             payment(anyCost),
             once)),
@@ -21,4 +21,4 @@ card singleFaced({
                 recipient = and([
                     target(or([player, planeswalker])),
                     each(nominal(creature, post = [controlledBy(splitOverPlaneswalker)]))]))),
-            define(x, minus(times(2, countersOn(ageCounter, thisEnchantment)), 2))]))]})
+            define(x, minus(times(2, countersOn(ageCounter, this(enchantment))), 2))]))]})

@@ -13,10 +13,10 @@ card singleFaced({
                 creature,
                 post = [
                   did(
-                    actor(thisCreature),
+                    actor(this(creature)),
                     dealDamage(recipient = which),
                     within = within(soFarThisTurn))]))),
           die),
-        putCounters(1, printedKind(p1p1Counter), thisCreature))],
+        putCounters(1, printedKind(p1p1Counter), this(creature)))],
     power = 4,
     toughness = 4})

@@ -16,24 +16,24 @@ ability enchant(subject: Predicate) {
     verbs = [{lemma = "enchant", frames = [Monotransitive]}]},
   spelling = "enchant $subject",
   body = [
-    static(addsTarget(thisAura, matching($subject))),
-    static(mayBeAttachedTo(thisAura, allOf(matching($subject)))),
+    static(addsTarget(this(aura), matching($subject))),
+    static(mayBeAttachedTo(this(aura), allOf(matching($subject)))),
     static(
       replace(
-        would(actor(thisAura), enter),
+        would(actor(this(aura)), enter),
         doIf(
-          not(exists(legalHostOf(thisAura))),
-          instead(doIf(is(thisAura, in(stack)), putInto(thisAura, graveyard)))))),
+          not(exists(legalHostOf(this(aura)))),
+          instead(doIf(is(this(aura), in(stack)), putInto(this(aura), graveyard)))))),
     static(
       replace(
-        would(any, move(thisAura, not(stack), battlefield, [not(attachedTo(any))])),
+        would(any, move(this(aura), not(stack), battlefield, [not(attachedTo(any))])),
         doIf(
-          exists(legalHostOf(thisAura)),
-          before(choose(a(legalHostOf(thisAura))), body = alongside(attachTo(thisAura, it)))))),
+          exists(legalHostOf(this(aura))),
+          before(choose(a(legalHostOf(this(aura)))), body = alongside(attachTo(this(aura), it)))))),
     static(
       replace(
         would(
-          actor(thisAura),
-          enter(riders = [attachedTo(any), not(attachedTo(a(legalHostOf(thisAura))))])),
-        instead(doIf(is(thisAura, in(stack)), putInto(thisAura, graveyard)))))]
+          actor(this(aura)),
+          enter(riders = [attachedTo(any), not(attachedTo(a(legalHostOf(this(aura)))))])),
+        instead(doIf(is(this(aura), in(stack)), putInto(this(aura), graveyard)))))]
 }

@@ -6,6 +6,6 @@ card singleFaced({
     subtypes = [insect],
     text = [
       activated(mana([generic(4), snow, snow]), monstrosity(2)),
-      static(asLongAs(is(thisCreature, hasDesignation(monstrous)), abilityGrant(it, [flying])))],
+      static(asLongAs(is(this(creature), hasDesignation(monstrous)), abilityGrant(it, [flying])))],
     power = 3,
     toughness = 3})

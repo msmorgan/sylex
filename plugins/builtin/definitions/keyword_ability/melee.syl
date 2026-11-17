@@ -6,9 +6,9 @@ ability melee {
   spelling = "melee",
   body = [
     whenever(
-      does(actor(thisCreature), attack),
+      does(actor(this(creature)), attack),
       getsBoth(
-        thisCreature,
+        this(creature),
         up(
           forEach(
             1,

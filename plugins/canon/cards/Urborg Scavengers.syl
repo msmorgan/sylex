@@ -5,15 +5,15 @@ card singleFaced({
     subtypes = [spirit],
     text = [
       whenever(
-        or([does(actor(thisCreature), enter), does(actor(thisCreature), attack)]),
+        or([does(actor(this(creature)), enter), does(actor(this(creature)), attack)]),
         sequentially([
             exile(target(nominal(card, post = [in(graveyard)]))),
-            putCounters(1, printedKind(p1p1Counter), thisCreature)])),
+            putCounters(1, printedKind(p1p1Counter), this(creature))])),
       alsoForKeywords(
         static(
           onlyWhile(
             keywordGrant(
-              thisCreature,
+              this(creature),
               thatKeyword,
               and([in(exiledWith(it)), hasKeyword(thatKeyword)])),
             exists(nominal(card, post = [in(exiledWith(it)), hasKeyword(thatKeyword)])))),

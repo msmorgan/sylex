@@ -249,8 +249,8 @@ fn named_arguments_may_stand_anywhere_among_positional_ones() {
     // Binding positional arguments to parameters is resolution's job; the
     // parser only keeps each argument, named or not, where it was written.
     check(
-        "template t: X { body = when(does(actor(thisAura), enter), if = is(it, in(battlefield)), sequentially([a])) }",
-        "template t: X {body = when(does(actor(thisAura); enter); if = is(it; in(battlefield)); sequentially([a]))}",
+        "template t: X { body = when(does(actor(this(aura)), enter), if = is(it, in(battlefield)), sequentially([a])) }",
+        "template t: X {body = when(does(actor(this(aura)); enter); if = is(it; in(battlefield)); sequentially([a]))}",
     );
     check(
         "template t: X { body = f(to = b, a, from = c, d) }",

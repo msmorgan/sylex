@@ -6,7 +6,7 @@ ability bloodthirst(amount: Amount) {
   body = [
     static(
       replace(
-        would(actor(thisPermanent), enter),
+        would(actor(this(permanent)), enter),
         doIf(
           was(dealDamage(recipient = anOpponent), within(soFarThisTurn)),
           withRiders([withCounters($amount, printedKind(p1p1Counter), fresh)]))))]

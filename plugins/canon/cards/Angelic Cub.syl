@@ -1,7 +1,7 @@
 # "Whenever this creature becomes the target of a spell or ability for the first time each turn,
 # put a +1/+1 counter on it": "for the first time each turn" watches only the first matching trigger
-# event each turn, and "it" in the effect resolves to `thisCreature` rather than the targeting spell
-# or ability.
+# event each turn, and "it" in the effect resolves to `this(creature)` rather than the targeting
+# spell or ability.
 card singleFaced({
     name = "Angelic Cub",
     cost = [generic(1), pip(white)],
@@ -11,12 +11,12 @@ card singleFaced({
       whenever(
         nthOccurrence(
           nth(1),
-          does(actor(a(or([spell, abilityHead(anyOnStack)]))), target(thisCreature)),
+          does(actor(a(or([spell, abilityHead(anyOnStack)]))), target(this(creature))),
           per = turn),
         putCounters(1, printedKind(p1p1Counter), it)),
       static(
         asLongAs(
-          compareAmt(countersOn(p1p1Counter, thisCreature), atLeast, 3),
+          compareAmt(countersOn(p1p1Counter, this(creature)), atLeast, 3),
           abilityGrant(it, [flying])))],
     power = 1,
     toughness = 1})

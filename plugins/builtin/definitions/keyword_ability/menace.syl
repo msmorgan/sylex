@@ -4,5 +4,8 @@ ability menace {
   spelling = "menace",
   body = [
     static(
-      cant(any, block(attacker = thisCreature), except = byObjects(counted(orMore(2), creature))))]
+      cant(
+        any,
+        block(attacker = this(creature)),
+        except = byObjects(counted(orMore(2), creature))))]
 }

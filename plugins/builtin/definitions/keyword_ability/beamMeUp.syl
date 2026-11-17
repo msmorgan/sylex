@@ -18,6 +18,6 @@ ability beamMeUp(cost: Cost) {
             compound([$cost, perform(beamUp(a(nominal(creature, post = [youControl]))))]))))),
     static(
       replace(
-        would(actor(thisSpell), leave(from = stack)),
-        doIf(keywordCostPaid(thisSpell, beamMeUp), instead(exile(thisSpell)))))]
+        would(actor(this(spell)), leave(from = stack)),
+        doIf(keywordCostPaid(this(spell), beamMeUp), instead(exile(this(spell))))))]
 }

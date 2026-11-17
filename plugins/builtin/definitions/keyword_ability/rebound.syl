@@ -9,13 +9,13 @@ ability rebound {
     static(
       replace(
         causedBy(
-          byEvent(does(any, resolve(thisSpell))),
-          would(any, putInto(thisSpell, graveyard, from = stack))),
+          byEvent(does(any, resolve(this(spell)))),
+          would(any, putInto(this(spell), graveyard, from = stack))),
         doIf(
-          is(thisSpell, was(cast(which, from = yourHand), within = thisObject)),
+          is(this(spell), was(cast(which, from = yourHand), within = thisObject)),
           instead(
             sequentially([
-                exile(thisSpell),
+                exile(this(spell)),
                 atNext(
                   beginningOf(upkeep, you, nextTime),
                   may(cast(this, altCost = withoutPaying)))])))))]

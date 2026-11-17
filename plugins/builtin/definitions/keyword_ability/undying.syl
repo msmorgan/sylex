@@ -6,7 +6,7 @@ ability undying {
   spelling = "undying",
   body = [
     when(
-      does(actor(thisPermanent), die),
-      if = not(is(thisPermanent, hasCounter(kind = p1p1Counter))),
-      returnToBattlefieldWithCounters(thisPermanent, ownerOf(thisPermanent), 1, p1p1Counter))]
+      does(actor(this(permanent)), die),
+      if = not(is(this(permanent), hasCounter(kind = p1p1Counter))),
+      returnToBattlefieldWithCounters(this(permanent), ownerOf(this(permanent)), 1, p1p1Counter))]
 }

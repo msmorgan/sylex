@@ -11,14 +11,14 @@ every word it uses exists at the sort it is used at unless it is marked NEW.
 
 - **`confers`** is what one holding gives: one counter, one ability instance, or, for a card type,
   subtype, supertype or designation, the one time its holder has it. A `confers` entry is enabled
-  once per holding, and `this` in it is the holder. Two +1/+1 counters give +1/+1 twice
+  once per holding, and `this(<head>)` in it names the holder. Two +1/+1 counters give +1/+1 twice
   [CR#122.1a]; a creature with two exalted counters has two instances of exalted [CR#122.1b] (the
   *Emissary of Soulfire* ruling: "A creature with multiple exalted counters will have that many
   instances of exalted"). A type is held once, so for a type "per holding" is "per holder".
 - **`rules`** (NEW field) is a list of `{scope, confer}` records, the fields of a `conferral`
   row (`ConferralRule`). Each record is enabled once per entity that matches its `scope`, however
-  many holdings that entity has, and `this` in it is that entity. It goes on `card_type`,
-  `subtype`, `supertype`, `counter`, `designation` and `ability`.
+  many holdings that entity has, and `this(<head>)` in it names that entity. It goes on
+  `card_type`, `subtype`, `supertype`, `counter`, `designation` and `ability`.
 - A top-level rules row (`sba`, `conferral`) is already enabled once per `scope` match; a `rules`
   record is the same thing written on the declaration whose rule it is.
 

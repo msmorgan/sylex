@@ -3,13 +3,13 @@ card singleFaced({
     cost = [generic(2), pip(white), pip(white)],
     types = [enchantment],
     text = [
-      static(entersWithCounters(thisEnchantment, 7, omenCounter)),
+      static(entersWithCounters(this(enchantment), 7, omenCounter)),
       at(
         beginningOfYour(upkeep),
         sequentially([
-            removeCounters(exactly(1), printedKind(omenCounter), thisEnchantment),
+            removeCounters(exactly(1), printedKind(omenCounter), this(enchantment)),
             doIf(
-              compareAmt(countersOn(omenCounter, thisEnchantment), atMost, 0),
+              compareAmt(countersOn(omenCounter, this(enchantment)), atMost, 0),
               doIf(
                 thereAre(
                   counted(

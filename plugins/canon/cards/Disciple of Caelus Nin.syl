@@ -7,7 +7,7 @@ card singleFaced({
     subtypes = [human, wizard],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         sequentially([
             instruct(
               eachPlayer,
@@ -15,7 +15,7 @@ card singleFaced({
                 you,
                 counted(upTo(5), nominal(permanent, post = [controlledBy(they)])))),
             instruct(
-              allOf(nominal(permanent, post = [otherThan(thisCreature), notChosen])),
+              allOf(nominal(permanent, post = [otherThan(this(creature)), notChosen])),
               phaseOut)])),
       static(cant(actor(bare(permanent)), phaseIn))],
     power = 3,

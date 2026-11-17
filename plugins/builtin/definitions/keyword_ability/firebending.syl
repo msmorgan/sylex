@@ -8,7 +8,7 @@ ability firebending(amount: Amount) {
   spelling = "firebending $amount",
   body = [
     whenever(
-      does(actor(thisCreature), attack),
+      does(actor(this(creature)), attack),
       sequentially([
           addMana(counted($amount, symbols([pip(red)]))),
           establishThroughout(manaRetention(you, thisMana), untilEndOfCombat)]))]

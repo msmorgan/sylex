@@ -23,7 +23,7 @@ battlefield").
   `replace(would(actor($subject), enter), optionally(withRiders($riders)))`: an optional
   replacement of the entering [CR#614.1c]. With the "enters" phrases standing at `VerbPhrase`
   (`syl-continuous-effect-subject`), the printed sentence is
-  `clause(you, may(have(thisCreature, …)))` over one, standing at `StaticSpec`. The spec says an
+  `clause(you, may(have(this(creature), …)))` over one, standing at `StaticSpec`. The spec says an
   "enters" phrase states a replacement effect with no "would" (§1) and does not say that it still
   does under `may(have(…))`. Options: the three cards write the clause, and lowering reads the
   optional replacement off it; or `mayHaveEnter` stays, a Template whose body is that clause.

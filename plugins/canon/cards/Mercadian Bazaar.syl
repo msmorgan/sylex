@@ -2,9 +2,9 @@ card singleFaced({
     name = "Mercadian Bazaar",
     types = [land],
     text = [
-      static(entersTapped(thisLand)),
-      activated(tapSymbol, putCounters(1, printedKind(storageCounter), thisLand)),
+      static(entersTapped(this(land))),
+      activated(tapSymbol, putCounters(1, printedKind(storageCounter), this(land))),
       activated(
         compound(
-          [tapSymbol, perform(removeCounters(anyNumber, printedKind(storageCounter), thisLand))]),
+          [tapSymbol, perform(removeCounters(anyNumber, printedKind(storageCounter), this(land)))]),
         addMana(counted(removedThisWay, symbols([pip(red)]))))]})

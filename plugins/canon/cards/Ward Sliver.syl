@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [sliver],
     text = [
-      static(entersChoosing(thisCreature, color)),
+      static(entersChoosing(this(creature), color)),
       static(abilityGrant(allOf(sliver), [protection(ofChosen(color))]))],
     power = 2,
     toughness = 2})

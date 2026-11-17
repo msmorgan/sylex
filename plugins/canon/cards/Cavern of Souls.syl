@@ -2,7 +2,7 @@ card singleFaced({
     name = "Cavern of Souls",
     types = [land],
     text = [
-      static(entersChoosing(thisLand, subtype(creature))),
+      static(entersChoosing(this(land), subtype(creature))),
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
         tapSymbol,

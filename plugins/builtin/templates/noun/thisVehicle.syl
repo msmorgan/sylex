@@ -1,4 +1,0 @@
-template thisVehicle: NounPhrase {
-  spelling = "this Vehicle",
-  body = headed(this, vehicle)
-}

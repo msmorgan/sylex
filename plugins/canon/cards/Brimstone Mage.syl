@@ -14,7 +14,7 @@ card leveler({
       text = [
         activated(
           tapSymbol,
-          instruct(thisCreature, dealDamage(amount = 1, recipient = target(anyTarget))))]},
+          instruct(this(creature), dealDamage(amount = 1, recipient = target(anyTarget))))]},
     {
       range = plus(3),
       power = 2,
@@ -22,4 +22,4 @@ card leveler({
       text = [
         activated(
           tapSymbol,
-          instruct(thisCreature, dealDamage(amount = 3, recipient = target(anyTarget))))]}])
+          instruct(this(creature), dealDamage(amount = 3, recipient = target(anyTarget))))]}])

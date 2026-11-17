@@ -6,8 +6,8 @@ card singleFaced({
     text = [
       whenever(
         timed(
-          does(actor(thisCreature), attack),
+          does(actor(this(creature)), attack),
           whileTrue(exists(nominal(token, post = [youControl])))),
-        get(thisCreature, up(2), up(0), duration = untilEndOfTurn))],
+        get(this(creature), up(2), up(0), duration = untilEndOfTurn))],
     power = 1,
     toughness = 2})

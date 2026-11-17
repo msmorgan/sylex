@@ -6,6 +6,6 @@ card singleFaced({
     text = [
       whenever(
         does(actor(a(nominal(pre = [other], creature))), enter),
-        establish(copyChange(thisCreature, that(creature), exceptions = [exceptThisAbility])))],
+        establish(copyChange(this(creature), that(creature), exceptions = [exceptThisAbility])))],
     power = 0,
     toughness = 1})

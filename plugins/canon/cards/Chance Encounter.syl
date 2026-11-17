@@ -7,8 +7,8 @@ card singleFaced({
     text = [
       whenever(
         does(actor(you), flipCountedCoins(call = wins)),
-        putCounters(1, printedKind(luckCounter), thisEnchantment)),
+        putCounters(1, printedKind(luckCounter), this(enchantment))),
       at(
         beginningOfYour(upkeep),
-        if = compareAmt(countersOn(luckCounter, thisEnchantment), atLeast, 10),
+        if = compareAmt(countersOn(luckCounter, this(enchantment)), atLeast, 10),
         winGame)]})

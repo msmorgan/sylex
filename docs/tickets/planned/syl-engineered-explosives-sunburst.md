@@ -8,7 +8,7 @@ needs: [cleanup-step6-surface]
 
 *Engineered Explosives* prints the keyword "Sunburst", but
 `plugins/canon/cards/Engineered Explosives.syl` writes a charge-counter entry in its place:
-`static(entersWithCounters(thisArtifact, colorsSpentToCast(thisArtifact), chargeCounter))`, one
+`static(entersWithCounters(this(artifact), colorsSpentToCast(this(artifact)), chargeCounter))`, one
 branch of what sunburst means [CR#702.44a]. The keyword is declared
 (`plugins/builtin/definitions/keyword_ability/sunburst.syl`), so the card can name it, and the
 written-out copy carries none of the keyword's identity: nothing that asks whether a permanent has

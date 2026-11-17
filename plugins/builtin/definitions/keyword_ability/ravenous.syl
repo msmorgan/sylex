@@ -4,6 +4,6 @@ ability ravenous {
   lexical = {lemma = "ravenous"},
   spelling = "ravenous",
   body = [
-    static(entersWithCounters(thisPermanent, letter(x), p1p1Counter)),
-    when(does(actor(thisPermanent), enter), if = compareAmt(letter(x), atLeast, 5), draw(1))]
+    static(entersWithCounters(this(permanent), letter(x), p1p1Counter)),
+    when(does(actor(this(permanent)), enter), if = compareAmt(letter(x), atLeast, 5), draw(1))]
 }

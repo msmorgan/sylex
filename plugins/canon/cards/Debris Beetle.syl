@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       trample,
       when(
-        does(actor(thisVehicle), enter),
+        does(actor(this(vehicle)), enter),
         sequentially([instruct(eachOpponent, loseLife(3)), gainLife(3)])),
       crew(2)],
     power = 6,

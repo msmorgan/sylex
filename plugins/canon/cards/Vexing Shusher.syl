@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [goblin, shaman],
     text = [
-      static(cant(any, counter(thisSpell))),
+      static(cant(any, counter(this(spell)))),
       activated(mana([hybridPip(red, green)]), establish(cant(any, counter(target(spell)))))],
     power = 2,
     toughness = 2})

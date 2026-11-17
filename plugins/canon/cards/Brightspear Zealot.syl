@@ -7,7 +7,7 @@ card singleFaced({
       vigilance,
       static(
         onlyWhile(
-          getsPt(thisCreature, up(2), up(0)),
+          getsPt(this(creature), up(2), up(0)),
           compareAmt(eventCount(actor(you), cast(a(spell)), soFarThisTurn), atLeast, 2)))],
     power = 2,
     toughness = 4})

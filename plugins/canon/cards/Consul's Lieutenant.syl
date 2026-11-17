@@ -7,7 +7,7 @@ card singleFaced({
       firstStrike,
       renown(1),
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         if = is(it, hasDesignation(renowned)),
         get(
           bare(nominal(pre = [other, attacking], creature, post = [youControl])),

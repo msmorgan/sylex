@@ -23,12 +23,12 @@ ability harmonize(cost: Cost) {
                       nominal(pre = [untapped], creature, post = [youControl]))))]))))),
     static(
       if(
-        keywordCostPaid(thisSpell, harmonize),
+        keywordCostPaid(this(spell), harmonize),
         costShift(
-          thisSpell,
+          this(spell),
           generic(down(powerOf(the(nominal(pre = [was(tap(which))], creature)))), none)))),
     static(
       replace(
-        would(actor(thisSpell), leave(from = stack)),
-        doIf(keywordCostPaid(thisSpell, harmonize), instead(exile(thisSpell)))))]
+        would(actor(this(spell)), leave(from = stack)),
+        doIf(keywordCostPaid(this(spell), harmonize), instead(exile(this(spell))))))]
 }

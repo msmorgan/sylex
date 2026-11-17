@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       whenever(
         does(
-          actor(thisCreature),
+          actor(this(creature)),
           attack(
             defender = a(
               nominal(player, post = [superlative(max, playerStat(lifeTotal), player)])))),

@@ -6,9 +6,9 @@ ability evoke(cost: Cost) {
   lexical = {lemma = "evoke", parameters = [[Cost]]},
   spelling = "evoke $cost",
   body = [
-    static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
+    static(can(actor(you), cast(this(card), altCost = payingInstead($cost)))),
     when(
-      does(actor(thisPermanent), enter),
-      if = keywordCostPaid(thisPermanent, evoke),
-      instruct(controllerOf(thisPermanent), sacrifice(thisPermanent)))]
+      does(actor(this(permanent)), enter),
+      if = keywordCostPaid(this(permanent), evoke),
+      instruct(controllerOf(this(permanent)), sacrifice(this(permanent))))]
 }

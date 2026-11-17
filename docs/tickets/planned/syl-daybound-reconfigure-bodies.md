@@ -28,13 +28,13 @@ Written against the surface (`cleanup-step6-surface`).
 ## Done when
 
 - Reconfigure's body is its two activated abilities [CR#702.151a], its unattach guard respelled
-  `is(thisPermanent, attachedTo(a(isCreature)))`, and the [CR#702.151b] rule row exists,
+  `is(this(permanent), attachedTo(a(isCreature)))`, and the [CR#702.151b] rule row exists,
   conferred by the reconfigure ability.
 - `isDoubleFacedCard` exists, documented "The member is represented by a double-faced card
   [CR#712.1,702.145b]". Daybound's first static is a `replace` of its entering that, if it is
   night and the permanent `isDoubleFacedCard`, enters it transformed (`withRiders`).
 - Nightbound's static ("if this permanent is back face up" [CR#702.145e]) writes
-  `is(thisPermanent, currentFace(back))` instead of `isTransformed`.
+  `is(this(permanent), currentFace(back))` instead of `isTransformed`.
 - The other statics of both keywords are unchanged, and the day/night game rules stay out of
   these bodies.
 - `plugins/canon/cards/Lizard Blades.syl` ({1}{R} Artifact Creature — Equipment Lizard 1/1:

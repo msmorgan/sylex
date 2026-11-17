@@ -9,7 +9,7 @@ card singleFaced({
           and([
               exists(nominal(plains, post = [anOpponentControls])),
               exists(nominal(mountain, post = [youControl]))]),
-          can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
+          can(actor(you), cast(this(spell), altCost = withoutPaying)))),
       haste],
     power = 1,
     toughness = 1})

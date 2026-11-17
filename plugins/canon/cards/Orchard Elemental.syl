@@ -6,10 +6,10 @@ card singleFaced({
     text = [
       councilsDilemma(
         when(
-          does(actor(thisCreature), enter),
+          does(actor(this(creature)), enter),
           sequentially([
               instruct(eachPlayer, voteStartingWith(you, byLabel(["sprout", "harvest"]))),
-              putCounters(times(2, votesFor("sprout")), printedKind(p1p1Counter), thisCreature),
+              putCounters(times(2, votesFor("sprout")), printedKind(p1p1Counter), this(creature)),
               gainLife(times(3, votesFor("harvest")))])))],
     power = 2,
     toughness = 2})

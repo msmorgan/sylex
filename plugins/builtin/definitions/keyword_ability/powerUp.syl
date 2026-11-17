@@ -9,6 +9,6 @@ ability powerUp(ability: Ability) {
     qualified($ability, limit = oncePerObject),
     static(
       if(
-        did(actor(thisPermanent), enter, within(soFarThisTurn)),
-        reducedBySymbols(thisAbility, manaCostOf(thisPermanent))))]
+        did(actor(this(permanent)), enter, within(soFarThisTurn)),
+        reducedBySymbols(this(ability), manaCostOf(this(permanent)))))]
 }

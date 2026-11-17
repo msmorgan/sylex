@@ -998,21 +998,21 @@ fn at_refuses_an_event_and_whenever_refuses_a_turn_point() {
             "card singleFaced({\n\
                name = \"Elvish Visionary\",\n\
                types = [creature],\n\
-               text = [at(does(actor(thisCreature), enter), draw(lit(1)))]})\n\
+               text = [at(does(actor(this(creature)), enter), draw(lit(1)))]})\n\
              card singleFaced({\n\
                name = \"Thallid\",\n\
                types = [creature],\n\
                text = [\n\
                  whenever(\n\
                    beginningOfYour(upkeep),\n\
-                   putCounters(lit(1), printedKind(sporeCounter), thisCreature))]})\n\
+                   putCounters(lit(1), printedKind(sporeCounter), this(creature)))]})\n\
              card singleFaced({\n\
                name = \"Myr Prototype\",\n\
                types = [artifact, creature],\n\
                text = [\n\
                  when(\n\
                    beginningOfYour(upkeep),\n\
-                   putCounters(lit(1), printedKind(p1p1Counter), thisCreature))]})"
+                   putCounters(lit(1), printedKind(p1p1Counter), this(creature)))]})"
         ),
         [
             (
@@ -1065,13 +1065,13 @@ fn joined_trigger_conditions_are_one_disjunction() {
                    and([\n\
                      at(beginningOfYour(upkeep)),\n\
                      whenever(does(actor(you), cast(a(nominal(pre = [black], spell)))))]),\n\
-                   putCounters(lit(1), printedKind(chargeCounter), thisArtifact))]})\n\
+                   putCounters(lit(1), printedKind(chargeCounter), this(artifact)))]})\n\
              card singleFaced({\n\
                name = \"Minsc & Boo, Timeless Heroes\",\n\
                types = [planeswalker],\n\
                text = [\n\
                  triggered(\n\
-                   and([when(does(actor(thisPlaneswalker), enter)), at(beginningOfYour(upkeep))]),\n\
+                   and([when(does(actor(this(planeswalker)), enter)), at(beginningOfYour(upkeep))]),\n\
                    may(\n\
                      create(\n\
                        lit(1),\n\
@@ -1090,7 +1090,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                types = [creature],\n\
                text = [\n\
                  triggered(\n\
-                   and([when(does(actor(thisCreature), die)), when(does(actor(you), discard(thisCard)))]),\n\
+                   and([when(does(actor(this(creature)), die)), when(does(actor(you), discard(this(card))))]),\n\
                    create(lit(1), defined(foodToken)))]})\n\
              card singleFaced({\n\
                name = \"Tenuous Truce\",\n\
@@ -1104,13 +1104,13 @@ fn joined_trigger_conditions_are_one_disjunction() {
                        does(\n\
                          actor(enchanted(player)),\n\
                          attack(defender = or([you, a(nominal(planeswalker, post = [youControl]))]))))]),\n\
-                   sacrifice(thisAura))]})\n\
+                   sacrifice(this(aura)))]})\n\
              card singleFaced({\n\
                name = \"Bartered Cow\",\n\
                types = [creature],\n\
                text = [\n\
                  triggered(\n\
-                   and([when(does(actor(thisCreature), die)), does(actor(you), discard(thisCard))]),\n\
+                   and([when(does(actor(this(creature)), die)), does(actor(you), discard(this(card)))]),\n\
                    create(lit(1), defined(foodToken)))]})"
         ),
         [(
@@ -2130,11 +2130,11 @@ fn triggered_refuses_a_bare_when_whenever_or_at_condition() {
     assert_eq!(
         plugin_refusals(
             "template a: Ability {\n\
-               body = triggered(when(does(actor(thisCreature), enter)), draw(1))\n\
+               body = triggered(when(does(actor(this(creature)), enter)), draw(1))\n\
              }\n\
              template b: Ability {\n\
                body = triggered(\n\
-                 whenever(does(actor(thisCreature), attack)),\n\
+                 whenever(does(actor(this(creature)), attack)),\n\
                  intervening = is(you, hasDesignation(monarch)),\n\
                  draw(1))\n\
              }\n\
@@ -2145,12 +2145,12 @@ fn triggered_refuses_a_bare_when_whenever_or_at_condition() {
         [
             (
                 RefusalKind::SingleConditionTriggered(s("when")),
-                s("triggered(when(does(actor(thisCreature), enter)), draw(1))")
+                s("triggered(when(does(actor(this(creature)), enter)), draw(1))")
             ),
             (
                 RefusalKind::SingleConditionTriggered(s("whenever")),
                 s("triggered(\n\
-                 whenever(does(actor(thisCreature), attack)),\n\
+                 whenever(does(actor(this(creature)), attack)),\n\
                  intervening = is(you, hasDesignation(monarch)),\n\
                  draw(1))")
             ),
@@ -2219,7 +2219,7 @@ fn trigger_condition_and_and_or_refuse_fewer_than_two_conditions() {
             "template a: Ability { body = triggered(or([]), draw(1)) }\n\
              template b: Ability { body = triggered(and([]), draw(1)) }\n\
              template c: Ability {\n\
-               body = triggered(or([when(does(actor(thisCreature), enter))]), draw(1))\n\
+               body = triggered(or([when(does(actor(this(creature)), enter))]), draw(1))\n\
              }\n\
              template d: Ability {\n\
                body = triggered(and([at(beginningOfYour(upkeep))]), draw(1))\n\
@@ -2246,7 +2246,7 @@ fn trigger_condition_and_and_or_refuse_fewer_than_two_conditions() {
                     sort: s("TriggerCondition"),
                     instead: s("when(...)"),
                 },
-                s("or([when(does(actor(thisCreature), enter))])")
+                s("or([when(does(actor(this(creature)), enter))])")
             ),
             (
                 RefusalKind::SingleItemCoordination {

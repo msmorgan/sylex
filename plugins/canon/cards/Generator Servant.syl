@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [elemental],
     text = [
       activated(
-        compound([tapSymbol, perform(sacrifice(thisCreature))]),
+        compound([tapSymbol, perform(sacrifice(this(creature)))]),
         addMana(
           symbols([colorlessPip, colorlessPip]),
           riders = [

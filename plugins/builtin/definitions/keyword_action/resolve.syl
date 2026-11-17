@@ -4,7 +4,7 @@
 #
 # "Put into a graveyard during its resolution" (haunt's spell half [CR#702.55a]) and "as it
 # resolves" (buyback [CR#702.27a], rebound [CR#702.88a]) write the resolution as the cause of the
-# move: `causes(byEvent(does(any, resolve(thisSpell))), <move>)` on a trigger event and
+# move: `causes(byEvent(does(any, resolve(this(spell)))), <move>)` on a trigger event and
 # `causedBy(byEvent(…), <clause>)` on a replacement's would-clause. `byEvent` is the relation
 # the rules give: the spell is put into the graveyard as the final part of its resolution
 # [CR#608.2n], so the resolution causes the move, and the one form serves a trigger event and a

@@ -3,7 +3,7 @@ card singleFaced({
     name = "Aether Hub",
     types = [land],
     text = [
-      when(does(actor(thisLand), enter), putCounters(1, printedKind(energy), you)),
+      when(does(actor(this(land)), enter), putCounters(1, printedKind(energy), you)),
       activated(tapSymbol, addMana(symbols([colorlessPip]))),
       activated(
         compound([tapSymbol, perform(removeCounters(exactly(1), printedKind(energy), you))]),

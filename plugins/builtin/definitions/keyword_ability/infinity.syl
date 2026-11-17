@@ -5,6 +5,6 @@ ability infinity(ability: Ability) {
   body = [
     static(
       asLongAs(
-        is(thisPermanent, hasDesignation(harnessed)),
-        abilityGrant(thisPermanent, [$ability])))]
+        is(this(permanent), hasDesignation(harnessed)),
+        abilityGrant(this(permanent), [$ability])))]
 }

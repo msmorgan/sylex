@@ -4,7 +4,7 @@ ability cascade {
   spelling = "cascade",
   body = [
     when(
-      does(actor(you), cast(thisSpell)),
+      does(actor(you), cast(this(spell))),
       sequentially([
           exile(
             run(
@@ -12,12 +12,12 @@ ability cascade {
               nominal(
                 pre = [non(land)],
                 card,
-                post = [compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)])]),
+                post = [compare(less, statOf(stat(manaValue), this(spell)), [stat(manaValue)])]),
               libraryOf(you))),
           may(
             cast(
               that(card),
-              resulting = compare(less, statOf(stat(manaValue), thisSpell), [stat(manaValue)]),
+              resulting = compare(less, statOf(stat(manaValue), this(spell)), [stat(manaValue)]),
               altCost = withoutPaying)),
           move(
             allOf(

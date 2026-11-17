@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [lizard, assassin],
     text = [
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         sequentially([instruct(defendingPlayer, loseLife(1)), gainLife(1)]))],
     power = 1,
     toughness = 3})

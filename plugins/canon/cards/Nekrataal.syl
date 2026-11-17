@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       firstStrike,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         doUnderProhibition(
           destroy(target(nominal(pre = [non(artifact), non(black)], creature))),
           regeneration(that(creature))))],

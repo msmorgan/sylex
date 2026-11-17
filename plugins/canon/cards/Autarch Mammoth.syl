@@ -6,11 +6,11 @@ card singleFaced({
     text = [
       triggered(
         and([
-            when(does(actor(thisCreature), enter)),
+            when(does(actor(this(creature)), enter)),
             whenever(
               timed(
                 does(actor(it), attack),
-                whileTrue(is(thisCreature, hasDesignation(saddled)))))]),
+                whileTrue(is(this(creature), hasDesignation(saddled)))))]),
         create(1, written(creatureToken(3, 3, [green], [elephant])))),
       saddle(5)],
     power = 5,

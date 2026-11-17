@@ -5,5 +5,5 @@ subtype aura {
   spelling = "Aura",
   types = [enchantment],
   name = "Aura",
-  confers = [stateBased(not(legallyAttached(thisAura)), putInto(thisAura, graveyard))]
+  confers = [stateBased(not(legallyAttached(this(aura))), putInto(this(aura), graveyard))]
 }

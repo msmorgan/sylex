@@ -8,5 +8,5 @@ card singleFaced({
       whenever(
         does(any, dealDamage(recipient = enchanted(creature))),
         instruct(
-          thisAura,
+          this(aura),
           dealDamage(amount = thatMuch, recipient = controllerOf(that(creature)))))]})

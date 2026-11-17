@@ -17,5 +17,5 @@ card singleFaced({
                     in(yourGraveyard)])),
               from = yourGraveyard)])),
       activated(
-        compound([mana([generic(1)]), perform(sacrifice(thisEnchantment))]),
+        compound([mana([generic(1)]), perform(sacrifice(this(enchantment)))]),
         gainLife(aggregateAll(max, stat(manaValue), nominal(creature, post = [youControl]))))]})

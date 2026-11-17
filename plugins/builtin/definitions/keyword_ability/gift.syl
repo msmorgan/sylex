@@ -10,7 +10,7 @@ ability gift(promise: VerbPhrase) {
     static(addedCost(this, optional, plusAdditional(perform(choose(anOpponent))))),
     ifPermanentType(
       when(
-        does(actor(thisPermanent), enter),
+        does(actor(this(permanent)), enter),
         if = keywordCostPaid(this, gift),
         instruct(the(nominal(pre = [chosen], player)), $promise)),
       spell(

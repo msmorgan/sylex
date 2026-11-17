@@ -7,14 +7,14 @@ ability myriad {
   spelling = "myriad",
   body = [
     whenever(
-      does(actor(thisCreature), attack),
+      does(actor(this(creature)), attack),
       sequentially([
           doForEach(
             each(nominal(opponent, post = [otherThan(defendingPlayer)])),
             may(
               create(
                 1,
-                copyOf(thisCreature),
+                copyOf(this(creature)),
                 riders = [
                   entersAs(tapped),
                   entersAttacking(

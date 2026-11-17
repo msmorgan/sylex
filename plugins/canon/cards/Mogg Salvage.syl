@@ -8,5 +8,5 @@ card singleFaced({
           and([
               exists(nominal(island, post = [anOpponentControls])),
               exists(nominal(mountain, post = [youControl]))]),
-          can(actor(you), cast(thisSpell, altCost = withoutPaying)))),
+          can(actor(you), cast(this(spell), altCost = withoutPaying)))),
       spell(destroy(target(artifact)))]})

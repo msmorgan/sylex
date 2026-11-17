@@ -6,8 +6,8 @@ ability dethrone {
   body = [
     whenever(
       does(
-        actor(thisCreature),
+        actor(this(creature)),
         attack(
           defender = a(nominal(player, post = [superlative(max, playerStat(lifeTotal), player)])))),
-      putCounters(1, printedKind(p1p1Counter), thisCreature))]
+      putCounters(1, printedKind(p1p1Counter), this(creature)))]
 }

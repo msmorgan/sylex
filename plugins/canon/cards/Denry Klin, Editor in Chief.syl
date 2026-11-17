@@ -18,8 +18,8 @@ card singleFaced({
         if = is(shortenedName, hasCounter),
         doForEachKind(
           counterKind,
-          domain = thisCreature,
+          domain = this(creature),
           counterKind,
-          putCounters(statOf(boundCounter, thisCreature), thatKind, that(creature))))],
+          putCounters(statOf(boundCounter, this(creature)), thatKind, that(creature))))],
     power = 2,
     toughness = 2})

@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       trample,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         doUnless(
           scaledGenericMana(forEach(1, nominal(card, post = [in(yourHand)]))),
           sacrifice(it)))],

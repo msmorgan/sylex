@@ -8,9 +8,12 @@ ability increment {
     whenever(
       does(actor(you), cast(a(spell))),
       if = and([
-          is(thisPermanent, noun(a(creature))),
+          is(this(permanent), noun(a(creature))),
           or([
-              compareAmt(manaValueSpentToCast(that(spell)), greater, powerOf(thisCreature)),
-              compareAmt(manaValueSpentToCast(that(spell)), greater, toughnessOf(thisCreature))])]),
-      putCounters(1, printedKind(p1p1Counter), thisCreature))]
+              compareAmt(manaValueSpentToCast(that(spell)), greater, powerOf(this(creature))),
+              compareAmt(
+                manaValueSpentToCast(that(spell)),
+                greater,
+                toughnessOf(this(creature)))])]),
+      putCounters(1, printedKind(p1p1Counter), this(creature)))]
 }

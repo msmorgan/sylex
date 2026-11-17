@@ -17,6 +17,7 @@ card singleFaced({
                     subtypes = [food],
                     text = [
                       activated(
-                        compound([mana([generic(2)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+                        compound(
+                          [mana([generic(2)]), tapSymbol, perform(sacrifice(this(artifact)))]),
                         gainLife(3))]}})),
             allAbilityLoss(it)]))]})

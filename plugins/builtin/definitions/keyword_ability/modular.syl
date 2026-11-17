@@ -3,12 +3,12 @@ ability modular(count: Amount) {
   lexical = {lemma = "modular", parameters = [[Amount], [DashKeyword]]},
   spelling = "modular $count",
   body = [
-    static(entersWithCounters(thisPermanent, $count, p1p1Counter)),
+    static(entersWithCounters(this(permanent), $count, p1p1Counter)),
     when(
-      does(actor(thisPermanent), die),
+      does(actor(this(permanent)), die),
       may(
         putCounters(
-          countersOn(p1p1Counter, thisPermanent),
+          countersOn(p1p1Counter, this(permanent)),
           printedKind(p1p1Counter),
           target(nominal(pre = [artifact], creature)))))]
 }

@@ -7,7 +7,7 @@ card singleFaced({
         compound([mana([generic(4)]), tapSymbol]),
         putCounters(1, printedKind(fateCounter), target(permanent))),
       activated(
-        compound([mana([generic(5)]), tapSymbol, perform(sacrifice(thisArtifact))]),
+        compound([mana([generic(5)]), tapSymbol, perform(sacrifice(this(artifact)))]),
         sequentially([
             destroy(
               each(

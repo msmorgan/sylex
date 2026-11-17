@@ -7,7 +7,7 @@ card transforming({
       at(
         beginningOfEach(upkeep),
         if = not(was(cast(a(spell)), within(lastTurn))),
-        transform(thisCreature))],
+        transform(this(creature)))],
     power = 3,
     toughness = 2},
   {
@@ -16,13 +16,13 @@ card transforming({
     subtypes = [werewolf],
     text = [
       whenever(
-        does(any, transform(thisCreature, into = named(printedName("Werewolf Ransacker")))),
+        does(any, transform(this(creature), into = named(printedName("Werewolf Ransacker")))),
         sequentially([
             may(destroy(target(artifact))),
             doIf(
               did(actor(that(artifact)), putInto(subject, graveyard), thisWay),
               instruct(
-                thisCreature,
+                this(creature),
                 dealDamage(amount = 3, recipient = controllerOf(that(artifact)))))])),
       at(
         beginningOfEach(upkeep),
@@ -30,6 +30,6 @@ card transforming({
           aggregateOver(max, player, eventCount(actor(they), cast(a(spell)), lastTurn)),
           atLeast,
           2),
-        transform(thisCreature))],
+        transform(this(creature)))],
     power = 5,
     toughness = 4})

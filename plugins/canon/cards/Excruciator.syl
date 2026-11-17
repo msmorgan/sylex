@@ -4,6 +4,6 @@ card singleFaced({
     types = [creature],
     subtypes = [avatar],
     text = [
-      static(cant(any, preventDamage(allDamage, damage = would(by(thisCreature), dealDamage))))],
+      static(cant(any, preventDamage(allDamage, damage = would(by(this(creature)), dealDamage))))],
     power = 7,
     toughness = 7})

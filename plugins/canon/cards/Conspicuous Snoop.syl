@@ -9,6 +9,6 @@ card singleFaced({
       static(
         asLongAs(
           is(topSlice(1), noun(a(nominal(pre = [goblin], card)))),
-          abilityGrantFrom(thisCreature, [anyActivated], topSlice(1))))],
+          abilityGrantFrom(this(creature), [anyActivated], topSlice(1))))],
     power = 2,
     toughness = 2})

@@ -7,7 +7,7 @@ card singleFaced({
       flying,
       haste,
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         may(
           pay(payment(mana([generic(5), pip(red), pip(red)])), once),
           ifDid = sequentially([

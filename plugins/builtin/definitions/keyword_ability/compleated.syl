@@ -10,13 +10,13 @@ ability compleated {
     static(
       replace(
         would(
-          actor(thisPermanent),
+          actor(this(permanent)),
           enter(riders = [withCounters(anyAmount, printedKind(loyaltyCounter), fresh)])),
         doIf(
-          compareAmt(phyrexianPaidWithLife(thisSpell), atLeast, 1),
+          compareAmt(phyrexianPaidWithLife(this(spell)), atLeast, 1),
           withRiders([
               withCounters(
-                times(2, phyrexianPaidWithLife(thisSpell)),
+                times(2, phyrexianPaidWithLife(this(spell))),
                 printedKind(loyaltyCounter),
                 fewer)]))))]
 }

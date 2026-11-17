@@ -4,10 +4,10 @@ card singleFaced({
     types = [creature],
     subtypes = [sphinx],
     text = [
-      static(cant(any, counter(thisSpell))),
+      static(cant(any, counter(this(spell)))),
       flying,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         sequentially([
             lookAt(topSlice(5)),
             separateIntoPiles(them, 2, faces = [faceDown, faceUp]),

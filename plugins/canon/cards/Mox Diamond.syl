@@ -5,10 +5,10 @@ card singleFaced({
     text = [
       static(
         replace(
-          would(actor(thisArtifact), enter),
+          would(actor(this(artifact)), enter),
           instead(
             may(
               discard(a(nominal(pre = [land], card, post = [in(yourHand)]))),
-              ifDid = putOntoBattlefield(thisArtifact),
+              ifDid = putOntoBattlefield(this(artifact)),
               ifNot = putInto(it, graveyard))))),
       activated(tapSymbol, addMana(counted(1, ofAnyColor(sameColor))))]})

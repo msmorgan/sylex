@@ -12,7 +12,7 @@ card singleFaced({
         replace(
           causedBy(
             bySource(a(nominal(or([spell, abilityHead(anyOnStack)]), post = [anOpponentControls]))),
-            would(actor(you), discard(thisCard))),
+            would(actor(you), discard(this(card)))),
           instead(putOntoBattlefield(it))))],
     power = 4,
     toughness = 4})

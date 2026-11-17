@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(1)],
     types = [artifact],
     text = [
-      static(entersChoosing(thisArtifact, cardName)),
+      static(entersChoosing(this(artifact), cardName)),
       static(
         cant(
           any,

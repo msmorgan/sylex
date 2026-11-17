@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       reach,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         instruct(it, dealDamage(amount = 2, recipient = target(anyTarget)))),
       channel(
         activated(

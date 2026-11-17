@@ -13,7 +13,7 @@ something that isn't a permanent, or something that's a permanent they don't con
 creature, and so can a bare "sacrifice a creature". The restriction cannot be written yet:
 `.syl` has no way to restrict a noun phrase of any plurality by a predicate while mentioning it
 once. A partitive over the subject is refused for a singular one (a Saga's
-`sacrifice(thisSaga)`), and `doIf(is($subject, actorControls), move($subject, …))` mentions the
+`sacrifice(this(saga))`), and `doIf(is($subject, actorControls), move($subject, …))` mentions the
 subject twice.
 
 Written against the surface (`cleanup-step6-surface`).

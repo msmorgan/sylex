@@ -6,7 +6,7 @@ card singleFaced({
       whenever(
         does(actor(counted(orMore(1), creature)), attack),
         instruct(
-          thisEnchantment,
+          this(enchantment),
           dealDamage(
             amount = countOf(nominal(pre = [attacking], creature)),
             recipient = eachOf(those(creature)))))]})

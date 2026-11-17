@@ -17,6 +17,6 @@ ability jumpStart {
           addedCost = plusAdditional(perform(discard(a(card))))))),
     static(
       replace(
-        would(actor(thisSpell), leave(from = stack)),
-        doIf(choiceWasTaken(thisSpell, byKeyword(jumpStart)), instead(exile(thisSpell)))))]
+        would(actor(this(spell)), leave(from = stack)),
+        doIf(choiceWasTaken(this(spell), byKeyword(jumpStart)), instead(exile(this(spell))))))]
 }

@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       static(
         asLongAs(
-          is(thisArtifact, untapped),
+          is(this(artifact), untapped),
           replace(
             would(actor(a(creature)), dealDamage(kind = combat, recipient = you)),
             instead(preventDamage(ofThatDamage(1)))))),

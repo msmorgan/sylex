@@ -16,6 +16,6 @@ ability crew(amount: Amount) {
             atLeast,
             $amount))),
       establishThroughout(
-        characteristicChange(thisPermanent, [typeLine(adds, {types = [artifact, creature]})]),
+        characteristicChange(this(permanent), [typeLine(adds, {types = [artifact, creature]})]),
         untilEndOfTurn))]
 }

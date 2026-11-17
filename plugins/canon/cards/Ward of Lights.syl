@@ -8,8 +8,8 @@ card singleFaced({
     text = [
       asThoughFlashSacrificedAtCleanup,
       enchant(hasType(creature)),
-      static(entersChoosing(thisAura, color)),
+      static(entersChoosing(this(aura), color)),
       static(
         conjunction([
             abilityGrant(enchanted(creature), [protection(ofChosen(color))]),
-            doesnt(actor(thisEffect), remove(thisAura))]))]})
+            doesnt(actor(thisEffect), remove(this(aura)))]))]})

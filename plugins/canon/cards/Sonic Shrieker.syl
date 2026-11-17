@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       flying,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         sequentially([
             instruct(it, dealDamage(amount = 2, recipient = target(anyTarget))),
             gainLife(2),

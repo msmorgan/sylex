@@ -2,5 +2,5 @@
 ability defender {
   lexical = {lemma = "defender"},
   spelling = "defender",
-  body = [static(cant(actor(thisCreature), attack))]
+  body = [static(cant(actor(this(creature)), attack))]
 }

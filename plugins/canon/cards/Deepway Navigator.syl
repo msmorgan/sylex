@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       flash,
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         untap(each(nominal(pre = [other], merfolk, post = [youControl])))),
       static(
         asLongAs(

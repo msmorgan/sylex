@@ -5,13 +5,13 @@ card singleFaced({
     subtypes = [equipment],
     text = [
       when(
-        does(actor(thisEquipment), enter),
+        does(actor(this(equipment)), enter),
         instruct(it, dealDamage(amount = 3, recipient = targets(upTo(1), creature)))),
       whenever(
         does(actor(counted(orMore(1), creature)), die),
-        putCounters(1, printedKind(revCounter), thisEquipment)),
+        putCounters(1, printedKind(revCounter), this(equipment))),
       static(
         conjunction([
             getsPt(equipped(creature), up(letter(x)), up(0)),
-            letterDefinition(x, countersOn(revCounter, thisEquipment))])),
+            letterDefinition(x, countersOn(revCounter, this(equipment)))])),
       equip(mana([generic(3)]))]})

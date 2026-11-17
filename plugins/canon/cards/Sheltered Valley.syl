@@ -4,7 +4,7 @@ card singleFaced({
     text = [
       static(
         replace(
-          would(actor(thisLand), enter),
+          would(actor(this(land)), enter),
           instead(
             sequentially([
                 sacrifice(
@@ -13,7 +13,7 @@ card singleFaced({
                       pre = [other],
                       permanent,
                       post = [named(printedName("Sheltered Valley")), youControl]))),
-                putOntoBattlefield(thisLand)])))),
+                putOntoBattlefield(this(land))])))),
       at(
         beginningOfYour(upkeep),
         if = compareAmt(countOf(nominal(land, post = [youControl])), atMost, 3),

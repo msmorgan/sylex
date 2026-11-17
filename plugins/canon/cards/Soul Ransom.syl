@@ -11,5 +11,5 @@ card singleFaced({
           repeatTimes(
             sequentially([choose(a(nominal(card, post = [in(hand)]))), discard(that(card))]),
             2)),
-        sequentially([instruct(controllerOf(thisAura), sacrifice(it)), instruct(they, draw(2))]),
+        sequentially([instruct(controllerOf(this(aura)), sacrifice(it)), instruct(they, draw(2))]),
         yourOpponents)]})

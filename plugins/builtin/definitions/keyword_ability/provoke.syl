@@ -6,12 +6,12 @@ ability provoke {
   spelling = "provoke",
   body = [
     whenever(
-      does(actor(thisCreature), attack),
+      does(actor(this(creature)), attack),
       may(
         establishThroughout(
           must(
             actor(target(nominal(creature, post = [controlledBy(defendingPlayer)]))),
-            block(attacker = thisCreature)),
+            block(attacker = this(creature))),
           untilEndOfCombat),
         ifDid = untap(that(creature))))]
 }

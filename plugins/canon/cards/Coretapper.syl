@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       activated(tapSymbol, putCounters(1, printedKind(chargeCounter), target(artifact))),
       activated(
-        perform(sacrifice(thisCreature)),
+        perform(sacrifice(this(creature))),
         putCounters(2, printedKind(chargeCounter), target(artifact)))],
     power = 1,
     toughness = 1})

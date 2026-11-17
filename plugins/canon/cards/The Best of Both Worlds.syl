@@ -19,5 +19,5 @@ card singleFaced({
       when(
         chapterMark([3]),
         sequentially([
-            exile(the(nominal(borg, post = [did(by(thisSaga), assimilate(which))]))),
+            exile(the(nominal(borg, post = [did(by(this(saga)), assimilate(which))]))),
             returnToBattlefield(it, riders = [underControlOf(ownerOf(it))])]))]})

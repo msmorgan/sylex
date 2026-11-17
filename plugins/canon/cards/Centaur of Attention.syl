@@ -4,11 +4,13 @@ card singleFaced({
     types = [creature],
     subtypes = [centaur, performer],
     text = [
-      when(does(actor(thisCreature), enter), sequentially([rollDice(count = 5), storeResults(it)])),
-      at(beginningOfYour(combat), may(rerollStored(anyNumber, thisCreature))),
+      when(
+        does(actor(this(creature)), enter),
+        sequentially([rollDice(count = 5), storeResults(it)])),
+      at(beginningOfYour(combat), may(rerollStored(anyNumber, this(creature)))),
       static(
         conjunction([
-            getsPt(thisCreature, up(letter(x)), up(letter(x))),
+            getsPt(this(creature), up(letter(x)), up(letter(x))),
             letterDefinition(x, greatestStoredMatch(it))]))],
     power = 3,
     toughness = 3})

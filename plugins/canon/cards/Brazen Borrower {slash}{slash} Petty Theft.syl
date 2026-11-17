@@ -8,7 +8,7 @@ card adventurer({
       flying,
       static(
         cant(
-          actor(thisCreature),
+          actor(this(creature)),
           block(
             attacker = bare(nominal(creature, post = [not(hasKeyword(theKeyword(flying)))])))))],
     power = 3,

@@ -3,9 +3,10 @@ card singleFaced({
     cost = [generic(4)],
     types = [artifact],
     text = [
-      static(mayDeclineUntap(thisArtifact, you)),
+      static(mayDeclineUntap(this(artifact), you)),
       activated(
         compound([mana([generic(2)]), tapSymbol, perform(sacrifice(a(creature)))]),
         gainControl(
           target(creature),
-          duration = forAsLongAs(and([controls(you, thisArtifact), is(thisArtifact, tapped)]))))]})
+          duration = forAsLongAs(
+            and([controls(you, this(artifact)), is(this(artifact), tapped)]))))]})

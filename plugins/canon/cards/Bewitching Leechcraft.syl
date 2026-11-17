@@ -5,14 +5,14 @@ card singleFaced({
     subtypes = [aura],
     text = [
       enchant(hasType(creature)),
-      when(does(actor(thisAura), enter), tap(enchanted(creature))),
+      when(does(actor(this(aura)), enter), tap(enchanted(creature))),
       static(
         abilityGrant(
           enchanted(creature),
           [
             static(
               replace(
-                would(actor(thisCreature), setStatus(untapped, subject)),
+                would(actor(this(creature)), setStatus(untapped, subject)),
                 instead(
                   doIfDone(
                     removeCounters(exactly(1), printedKind(p1p1Counter), it),

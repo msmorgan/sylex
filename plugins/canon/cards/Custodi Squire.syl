@@ -7,7 +7,7 @@ card singleFaced({
       flying,
       willOfTheCouncil(
         when(
-          does(actor(thisCreature), enter),
+          does(actor(this(creature)), enter),
           sequentially([
               instruct(
                 eachPlayer,

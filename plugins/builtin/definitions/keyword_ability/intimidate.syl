@@ -7,10 +7,10 @@ ability intimidate {
     static(
       cant(
         any,
-        block(attacker = thisCreature),
+        block(attacker = this(creature)),
         except = byObjects(
           bare(
             andOr([
                 nominal(pre = [artifact], creature),
-                nominal(creature, post = [shares(color, share, thisCreature)])])))))]
+                nominal(creature, post = [shares(color, share, this(creature))])])))))]
 }

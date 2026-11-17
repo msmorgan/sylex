@@ -9,14 +9,14 @@ ability blitz(cost: Cost) {
   lexical = {lemma = "blitz", parameters = [[Cost]]},
   spelling = "blitz $cost",
   body = [
-    static(can(actor(you), cast(thisCard, altCost = payingInstead($cost)))),
+    static(can(actor(you), cast(this(card), altCost = payingInstead($cost)))),
     static(
       resolutionDelayedTrigger(
         doIf(
-          keywordCostPaid(thisSpell, blitz),
-          atNext(beginningOfNext(endStep), sacrifice(becomes(thisSpell)))))),
+          keywordCostPaid(this(spell), blitz),
+          atNext(beginningOfNext(endStep), sacrifice(becomes(this(spell))))))),
     static(
       asLongAs(
-        keywordCostPaid(thisPermanent, blitz),
-        abilityGrant(thisPermanent, [haste, when(does(actor(thisPermanent), die), draw(1))])))]
+        keywordCostPaid(this(permanent), blitz),
+        abilityGrant(this(permanent), [haste, when(does(actor(this(permanent)), die), draw(1))])))]
 }

@@ -5,5 +5,5 @@ ability prototype {
   lexical = {lemma = "prototype", parameters = [[Cost, DashPowerToughness]]},
   # TODO(spelling): `prototype` prints "prototype <cost> — <power>/<toughness>" from the card's
   # `PrototypeFrame` rather than parameters on this declaration (`prototype` at `Card` [CR#719.1]).
-  body = [static(can(actor(you), cast(thisCard, payment = prototyped)))]
+  body = [static(can(actor(you), cast(this(card), payment = prototyped)))]
 }

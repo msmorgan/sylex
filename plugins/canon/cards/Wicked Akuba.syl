@@ -12,7 +12,7 @@ card singleFaced({
               player,
               post = [
                 did(
-                  actor(thisCreature),
+                  actor(this(creature)),
                   dealDamage(recipient = which),
                   within = within(soFarThisTurn))])),
           loseLife(1)))],

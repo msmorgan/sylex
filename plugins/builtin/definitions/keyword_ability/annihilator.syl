@@ -5,6 +5,6 @@ ability annihilator(amount: Amount) {
   spelling = "annihilator $amount",
   body = [
     whenever(
-      does(actor(thisCreature), attack),
+      does(actor(this(creature)), attack),
       instruct(defendingPlayer, sacrifice(counted(exactlyOf($amount), permanent))))]
 }

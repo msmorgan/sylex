@@ -4,7 +4,7 @@ card singleFaced({
     types = [creature],
     subtypes = [elemental],
     text = [
-      static(cant(any, counter(thisSpell))),
+      static(cant(any, counter(this(spell)))),
       haste,
       static(
         cant(
@@ -15,6 +15,6 @@ card singleFaced({
                   nominal(
                     ability,
                     post = [fromSource(bare(nominal(pre = [non(green)], source)))])]))),
-          target(thisCreature)))],
+          target(this(creature))))],
     power = 8,
     toughness = 5})

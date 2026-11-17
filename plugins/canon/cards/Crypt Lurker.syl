@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [horror],
     text = [
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         may(
           chooseOne(
             sacrifice(a(creature)),

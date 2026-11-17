@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       haste,
       when(
-        does(actor(thisCreature), die),
+        does(actor(this(creature)), die),
         create(
           1,
           written({
@@ -14,7 +14,7 @@ card singleFaced({
                 colors = [black],
                 types = [creature],
                 subtypes = [rat],
-                text = [static(cant(actor(thisToken), block))],
+                text = [static(cant(actor(this(token)), block))],
                 power = 1,
                 toughness = 1}})))],
     power = 1,

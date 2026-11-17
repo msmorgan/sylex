@@ -2,6 +2,6 @@ card singleFaced({
     name = "Thriving Heath",
     types = [land],
     text = [
-      static(entersTapped(thisLand)),
+      static(entersTapped(this(land))),
       static(entersChoosingFrom(it, color, colorOtherThan(white))),
       activated(tapSymbol, addMana(or([symbols([pip(white)]), counted(1, ofTheChosenColor)])))]})

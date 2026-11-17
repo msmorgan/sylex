@@ -3,7 +3,7 @@ card singleFaced({
     cost = [generic(5)],
     types = [artifact],
     text = [
-      static(entersChoosing(thisArtifact, color)),
+      static(entersChoosing(this(artifact), color)),
       static(getsPt(bare(nominal(creature, post = [ofChosen(color)])), up(1), up(1))),
       whenever(
         does(any, tapForMana(a(nominal(pre = [basic], land)), type = ofColor(thatColor))),

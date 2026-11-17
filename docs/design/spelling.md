@@ -181,7 +181,7 @@ be dealt damage", the frame `deal` declares for it); and the prepositional passi
 prepositional frame, whose preposition's object is promoted and the preposition stranded ("each
 card looked at"). Which parameter of the Action fills that complement is its frame's. Abrupt
 Decay's
-"This spell can't be countered" is `cant(any, counter(thisSpell))`. The patient is an argument
+"This spell can't be countered" is `cant(any, counter(this(spell)))`. The patient is an argument
 of `counter` ([Surface](surface.md) §7.4), yet it is printed before "can't be", where
 `cant`'s wording has its Subject, and "countered" in the verb-phrase Hole. No card under
 `plugins/` writes `doesnt` with `any` or `by(np)`. Where one verb has two frames with two
@@ -190,10 +190,10 @@ open (§10).
 
 The rule applies only where the Subject is `any` or `by(np)`. `becomeBlocked` ("becomes
 blocked") and `resolve` ("resolves") are subjectless Actions read like `die`: what becomes
-blocked or resolves is the context's Subject, active, as in `does(actor(thisCreature),
+blocked or resolves is the context's Subject, active, as in `does(actor(this(creature)),
 becomeBlocked)`, so the rule has nothing to promote. That form is not yet built: the
 `syl-shared-phrase-written-once` ticket builds it, and the corpus writes
-`does(any, becomeBlocked(x))` (afflict, rampage, bushido) and `does(any, resolve(thisSpell))`
+`does(any, becomeBlocked(x))` (afflict, rampage, bushido) and `does(any, resolve(this(spell)))`
 (buyback, haunt, rebound) today. "Becomes blocked by $blocker" (73 cards) is no passive of
 `block`: the passive of `block`'s frame is "is blocked by"
 (*General Jarkeld*'s "all creatures that the other is blocked by"), so "becomes blocked by" is
@@ -410,7 +410,7 @@ once in one of two ways:
   coordinated phrases stand under one subject: Predator's Strike's two continuous-effect verb
   phrases under the one Construction that supplies their subject (not yet built, §2), and one
   `does` over an `or` of the Actions of "attacks or blocks" and of Chub Toad's "blocks or becomes
-  blocked", `does(actor(thisCreature), or([block, becomeBlocked]))` (not yet built: no `or` stands
+  blocked", `does(actor(this(creature)), or([block, becomeBlocked]))` (not yet built: no `or` stands
   at `VerbPhrase` under `plugins/builtin/`, the event gate refuses one (`semantics.md` §3.2,
   `surface.md` §7.5), `becomeBlocked` still takes its subject, and the
   `syl-shared-phrase-written-once` ticket settles both). The subject of Predator's Strike is no

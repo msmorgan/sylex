@@ -18,12 +18,12 @@ ability protection(quality: Predicate) {
     static(cantBeAttached(this, enchanted, by = bare(nominal(pre = [hasQuality($quality)], aura)))),
     static(
       cantBeAttached(
-        thisPermanent,
+        this(permanent),
         equipped,
         by = bare(nominal(pre = [hasQuality($quality)], equipment)))),
     static(
       cantBeAttached(
-        thisPermanent,
+        this(permanent),
         fortified,
         by = bare(nominal(pre = [hasQuality($quality)], fortification)))),
     static(
@@ -35,5 +35,5 @@ ability protection(quality: Predicate) {
     static(
       cant(
         by(bare(nominal(pre = [hasQuality($quality)], creature))),
-        block(attacker = thisCreature)))]
+        block(attacker = this(creature))))]
 }

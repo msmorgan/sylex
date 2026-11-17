@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         can(
-          actor(thisCreature),
+          actor(this(creature)),
           block(attacker = counted(additional(exactly(1)), creature)),
           timing = eachCombat))],
     power = 2,

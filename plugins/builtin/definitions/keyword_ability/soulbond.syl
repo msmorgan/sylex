@@ -9,19 +9,19 @@ ability soulbond {
   spelling = "soulbond",
   body = [
     when(
-      does(actor(thisCreature), enter),
+      does(actor(this(creature)), enter),
       if = and([
-          is(thisCreature, and([controlledBy(you), not(related(paired))])),
+          is(this(creature), and([controlledBy(you), not(related(paired))])),
           exists(nominal(pre = [other], creature, post = [youControl, not(related(paired))]))]),
       may(
         relate(
-          thisCreature,
+          this(creature),
           paired,
           a(nominal(pre = [other], creature, post = [youControl, not(related(paired))]))))),
     whenever(
       does(actor(a(nominal(pre = [other], creature, post = [youControl]))), enter),
       if = and([
-          is(thisCreature, and([controlledBy(you), not(related(paired))])),
+          is(this(creature), and([controlledBy(you), not(related(paired))])),
           is(that(creature), and([controlledBy(you), not(related(paired))]))]),
-      may(relate(that(creature), paired, thisCreature)))]
+      may(relate(that(creature), paired, this(creature))))]
 }

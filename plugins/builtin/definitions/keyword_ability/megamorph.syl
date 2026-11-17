@@ -8,12 +8,12 @@ ability megamorph(cost: Cost) {
   spelling = "megamorph $cost",
   body = [
     static(
-      can(actor(you), cast(thisCard, payment = faceDown(faceDownCreature, mana([generic(3)]))))),
+      can(actor(you), cast(this(card), payment = faceDown(faceDownCreature, mana([generic(3)]))))),
     static(specialAction(none, $cost, turnFaceUp(this))),
     static(
       replace(
-        would(any, turnFaceUp(thisPermanent)),
+        would(any, turnFaceUp(this(permanent))),
         doIf(
-          keywordCostPaid(thisPermanent, morph),
-          alongside(putCounters(1, printedKind(p1p1Counter), thisPermanent)))))]
+          keywordCostPaid(this(permanent), morph),
+          alongside(putCounters(1, printedKind(p1p1Counter), this(permanent))))))]
 }

@@ -5,8 +5,8 @@ subtype fortification {
   types = [artifact],
   name = "Fortification",
   confers = [
-    property(mayBeAttachedTo(thisFortification, allOf(land))),
+    property(mayBeAttachedTo(this(fortification), allOf(land))),
     stateBased(
-      and([isAttached(thisFortification), not(legallyAttached(thisFortification))]),
-      attachment(unattached, thisFortification))]
+      and([isAttached(this(fortification)), not(legallyAttached(this(fortification)))]),
+      attachment(unattached, this(fortification)))]
 }

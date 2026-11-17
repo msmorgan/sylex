@@ -3,10 +3,10 @@ card singleFaced({
     cost = [generic(6), pip(white), pip(white)],
     types = [enchantment],
     text = [
-      static(entersWithCounters(thisEnchantment, 2, interventionCounter)),
+      static(entersWithCounters(this(enchantment), 2, interventionCounter)),
       at(
         beginningOfYour(upkeep),
-        removeCounters(exactly(1), printedKind(interventionCounter), thisEnchantment)),
+        removeCounters(exactly(1), printedKind(interventionCounter), this(enchantment))),
       when(
-        does(by(you), removeCounters(theLast, printedKind(interventionCounter), thisEnchantment)),
+        does(by(you), removeCounters(theLast, printedKind(interventionCounter), this(enchantment))),
         drawGame)]})

@@ -5,7 +5,7 @@ card singleFaced({
     subtypes = [human, soldier],
     text = [
       whenever(
-        does(actor(thisCreature), attack),
+        does(actor(this(creature)), attack),
         tap(target(nominal(creature, post = [controlledBy(defendingPlayer)]))))],
     power = 3,
     toughness = 2})

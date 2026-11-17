@@ -6,14 +6,15 @@ card singleFaced({
     text = [
       imprint(
         when(
-          does(actor(thisCreature), enter),
+          does(actor(this(creature)), enter),
           may(exile(target(nominal(pre = [non(token)], creature)))))),
       static(
         conjunction([
-            getsPt(thisCreature, up(letter(x)), up(letter(y))),
+            getsPt(this(creature), up(letter(x)), up(letter(y))),
             letterDefinition(
               x,
-              powerOf(the(nominal(pre = [creature], card, post = [in(exiledWith(thisCreature))])))),
+              powerOf(
+                the(nominal(pre = [creature], card, post = [in(exiledWith(this(creature)))])))),
             letterDefinition(y, toughnessOf(that(card)))]))],
     power = 3,
     toughness = 3})

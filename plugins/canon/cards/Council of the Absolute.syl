@@ -6,7 +6,7 @@ card singleFaced({
     text = [
       static(
         entersChoosingFrom(
-          thisCreature,
+          this(creature),
           cardName,
           nameOfCard(not(or([hasType(creature), hasType(land)]))))),
       static(cant(actor(yourOpponents), cast(bare(nominal(spell, post = [named(chosenName)]))))),

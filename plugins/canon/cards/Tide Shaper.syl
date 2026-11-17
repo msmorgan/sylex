@@ -6,14 +6,14 @@ card singleFaced({
     text = [
       kicker(mana([generic(1)])),
       when(
-        does(actor(thisCreature), enter),
+        does(actor(this(creature)), enter),
         if = keywordCostPaid(it, kicker),
         establish(
           qualityChange(target(land), sets, bundle({characteristics = {subtypes = [island]}})),
-          duration = forAsLongAs(is(thisCreature, in(battlefield))))),
+          duration = forAsLongAs(is(this(creature), in(battlefield))))),
       static(
         onlyWhile(
-          getsPt(thisCreature, up(1), up(1)),
+          getsPt(this(creature), up(1), up(1)),
           exists(nominal(island, post = [opponentsControl]))))],
     power = 1,
     toughness = 1})

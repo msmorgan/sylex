@@ -6,7 +6,7 @@ ability splitSecond {
   body = [
     static(
       asLongAs(
-        is(thisSpell, in(stack)),
+        is(this(spell), in(stack)),
         conjunction([
             cant(actor(bare(player)), cast(bare(nominal(pre = [other], spell)))),
             cant(

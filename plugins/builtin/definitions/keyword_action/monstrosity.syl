@@ -6,8 +6,8 @@ action monstrosity(amount: Amount) {
       {lemma = "monstrosity", frames = [Complement(Amount)], parameters = [[Head, Slot(Amount)]]}]},
   spelling = "monstrosity $amount",
   body = doIf(
-    not(is(thisPermanent, hasDesignation(monstrous))),
+    not(is(this(permanent), hasDesignation(monstrous))),
     sequentially([
-        putCounters($amount, printedKind(p1p1Counter), thisPermanent),
-        gainDesignation(thisPermanent, monstrous)]))
+        putCounters($amount, printedKind(p1p1Counter), this(permanent)),
+        gainDesignation(this(permanent), monstrous)]))
 }

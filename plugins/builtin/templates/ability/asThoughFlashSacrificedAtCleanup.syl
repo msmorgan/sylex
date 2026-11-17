@@ -11,7 +11,7 @@ template asThoughFlashSacrificedAtCleanup: Ability {
   body = static(
     can(
       actor(you),
-      cast(thisSpell),
+      cast(this(spell)),
       asThough = asThoughHadFlash(it),
       rider = doIf(
         did(actor(you), cast(it), within(thisGame, timing = not(asSorcery))),

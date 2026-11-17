@@ -4,6 +4,6 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [scarecrow],
     text = [
-      activated(mana([generic(1)]), becomeColor(thisCreature, every, duration = untilEndOfTurn))],
+      activated(mana([generic(1)]), becomeColor(this(creature), every, duration = untilEndOfTurn))],
     power = 3,
     toughness = 2})

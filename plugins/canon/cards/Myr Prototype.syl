@@ -4,15 +4,15 @@ card singleFaced({
     types = [artifact, creature],
     subtypes = [myr],
     text = [
-      at(beginningOfYour(upkeep), putCounters(1, printedKind(p1p1Counter), thisCreature)),
+      at(beginningOfYour(upkeep), putCounters(1, printedKind(p1p1Counter), this(creature))),
       static(
         conjunction([
             gatedBy(
-              actor(thisCreature),
+              actor(this(creature)),
               attack,
               scaledGenericMana(times(1, countersOn(p1p1Counter, it)))),
             gatedBy(
-              actor(thisCreature),
+              actor(this(creature)),
               block,
               scaledGenericMana(times(1, countersOn(p1p1Counter, it))))]))],
     power = 2,

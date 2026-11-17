@@ -15,7 +15,7 @@ token youngHeroRoleToken {
             enchanted(creature),
             [
               whenever(
-                does(actor(thisCreature), attack),
-                if = compareAmt(toughnessOf(thisCreature), atMost, 3),
-                putCounters(1, printedKind(p1p1Counter), thisCreature))]))]}}
+                does(actor(this(creature)), attack),
+                if = compareAmt(toughnessOf(this(creature)), atMost, 3),
+                putCounters(1, printedKind(p1p1Counter), this(creature)))]))]}}
 }

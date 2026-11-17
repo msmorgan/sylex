@@ -3,5 +3,5 @@ card singleFaced({
     cost = [generic(3)],
     types = [artifact],
     text = [
-      static(entersChoosing(thisArtifact, color)),
+      static(entersChoosing(this(artifact), color)),
       activated(tapSymbol, addMana(counted(1, ofTheChosenColor)))]})

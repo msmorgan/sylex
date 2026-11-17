@@ -12,5 +12,5 @@ card singleFaced({
             getsPt(equipped(creature), up(letter(x)), up(0)),
             letterDefinition(
               x,
-              powerOf(the(nominal(card, post = [in(exiledWith(thisEquipment))]))))])),
+              powerOf(the(nominal(card, post = [in(exiledWith(this(equipment)))]))))])),
       equip(mana([generic(2)]))]})
