@@ -5090,7 +5090,7 @@ fn postposed_modifier(
     postposed: usize,
     modifier_name: &str,
 ) -> Option<Draft> {
-    if draft.gap_slot.is_some() {
+    if draft.derived() {
         return None;
     }
     let crossed = draft.children.get(2..)?;

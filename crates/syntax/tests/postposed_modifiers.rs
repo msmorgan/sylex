@@ -29,15 +29,18 @@ fn lexicon() -> Lexicon {
         Lexeme::verb("v:put", "put", core()),
         Lexeme::verb("v:search", "search", core()),
         Lexeme::verb("v:spend", "spend", core()),
+        Lexeme::verb("v:grant", "grant", core()),
         Lexeme::verb("v:gain", "gain", core()),
         Lexeme::verb("v:shine", "shine", core()),
         Lexeme::noun("n:card", "card", vec![Countability::Count], core()),
         Lexeme::noun("n:library", "library", vec![Countability::Count], core()),
         Lexeme::noun("n:hand", "hand", vec![Countability::Count], core()),
+        Lexeme::invariant("pr:you", "you", Category::Pronoun, core()),
         Lexeme::invariant("k:flying", "flying", Category::Keyword, core()),
         Lexeme::invariant("d:a", "a", Category::Determinative, core()),
         Lexeme::invariant("d:two", "two", Category::Determinative, core()),
         Lexeme::invariant("p:at", "at", Category::Preposition, core()),
+        Lexeme::invariant("p:by", "by", Category::Preposition, core()),
         Lexeme::invariant("p:into", "into", Category::Preposition, core()),
         Lexeme::invariant("p:for", "for", Category::Preposition, core()),
         Lexeme::invariant("p:from", "from", Category::Preposition, core()),
@@ -58,11 +61,13 @@ const FRAMES: &str = r#"(
             (family: TransitiveWithPP, slots: [(relation: Object, fill: NP), (relation: Complement, fill: PP(["p:for"]))]),
         ],
         "v:spend": [(family: Monotransitive, slots: [(relation: Object, fill: NP)])],
+        "v:grant": [(family: Ditransitive, slots: [(relation: IndirectObject, fill: NP), (relation: Object, fill: NP)])],
         "v:gain": [(family: Monotransitive, slots: [(relation: Object, fill: KeywordPhrase)])],
         "v:shine": [(family: Intransitive, slots: [])],
     },
     prepositions: {
         "p:at": [(complement: AdjP, hosts: Predicate)],
+        "p:by": [(complement: NP, hosts: ComplementOnly)],
         "p:into": [(complement: NP, hosts: ComplementOnly)],
         "p:for": [(complement: NP, hosts: Predicate)],
         "p:from": [(complement: NP, hosts: NominalAndPredicate)],
@@ -78,9 +83,10 @@ feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
 feature Voice = Active | Passive
 feature ClauseMarking = Unmarked | Relative
 feature ComplementKind = NP | AdjP | KeywordPhrase | Intransitive
+feature Postmodification = Closed
 category Sentence
 category VerbPhrase [Number, VerbForm, Voice] {{ gap }}
-category NounPhrase [Number] {{ gap }}
+category NounPhrase [Number, Postmodification] {{ gap }}
 category Nominal [Number]
 category PrepositionPhrase [ComplementKind] {{ gap }}
 category AdjectivePhrase
@@ -93,6 +99,7 @@ word A = "d:a"
 word Two = "d:two"
 word That = "sub:that"
 word To = "sub:to"
+word By = "p:by"
 slot NP = NounPhrase
 slot PP = PrepositionPhrase
 slot AdjP = AdjectivePhrase
@@ -101,6 +108,7 @@ slot ToInf = ToInf
 Imperative: Sentence -> clause:VerbPhrase '.' where clause.VerbForm = Plain
 SingularNP: NounPhrase -> det:Word(A) Nominal where $.Number = Singular
 PluralNP: NounPhrase -> det:Word(Two) Nominal where $.Number = Plural
+PronounNP: NounPhrase -> Lex(Pronoun) where $.Number = Singular, $.Postmodification = Closed
 BareNoun: Nominal -> Lex(Noun)
 NominalPP: Nominal -> Nominal modifier:Hosted(PrepositionPhrase, Nominal)
 Adj: AdjectivePhrase -> Lex(Adjective)
@@ -131,10 +139,16 @@ const DEFAULT_VALENCE: &str = r"
 valence VerbPhrase {
     head: Verb,
     active: [$.Voice = Active],
+    passive: By,
+    verbal_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
+    prepositional_passive: [$.Voice = Passive, $.VerbForm = PastParticiple],
     heavy_shift,
     postposed: [
-        PostposedModifier -> [],
-        BarePostposedModifier -> [adjunct.ComplementKind = AdjP],
+        PostposedModifier -> [object.Postmodification != Closed],
+        BarePostposedModifier -> [
+            object.Postmodification != Closed,
+            adjunct.ComplementKind = AdjP,
+        ],
     ],
 }
 ";
@@ -223,7 +237,11 @@ fn bare_relative_gates_on_adjp_adjunct_and_same_head_complement_priority_holds()
 #[test]
 fn steals_no_non_object_gap_and_ignores_non_np_objects() {
     let lex = lexicon();
-    let grammar = build(DEFAULT_VALENCE, "").unwrap();
+    let grammar = build(
+        DEFAULT_VALENCE,
+        "PassiveClause: Sentence -> subject:NounPhrase clause:VerbPhrase '.' where clause.VerbForm = PastParticiple, clause.Voice = Passive",
+    )
+    .unwrap();
 
     // `Put into a hand` (heavy-shifted with stranded `into` Gap = NP) builds
     // no double-Object VP with `a card at random that shines`.
@@ -254,6 +272,37 @@ fn steals_no_non_object_gap_and_ignores_non_np_objects() {
     assert!(
         parse_readings(&grammar, "Gain flying at random that shines.").is_empty(),
         "KeywordPhrase Object takes no postposed Modifier"
+    );
+    // Closed-postmodification Object (`PronounNP`) takes no postposed Modifier.
+    assert!(
+        parse_readings(&grammar, "Choose you at random that shines.").is_empty(),
+        "Pronoun Object with Postmodification = Closed takes no postposed Modifier"
+    );
+    assert!(
+        parse_readings(&grammar, "Put you into a hand that shines.").is_empty(),
+        "Pronoun Object across selected PP takes no postposed Modifier"
+    );
+    // Passive ditransitive (`Ditransitive(NP,NP)/passive` and `/passive+by`,
+    // which drop `IndirectObject` and keep `object`) is a derived variant and
+    // derives no postposed Modifier on its retained Object.
+    assert_eq!(
+        parse_readings(&grammar, "A library granted a card by a hand.").len(),
+        1,
+        "passive ditransitive clause parses without postposing"
+    );
+    assert!(
+        parse_readings(&grammar, "A library granted a card by a hand that shines.").is_empty(),
+        "passive ditransitive + by-PP takes no postposed Modifier on retained Object"
+    );
+    assert!(
+        parse_readings(&grammar, "A library granted a card at random that shines.").is_empty(),
+        "passive ditransitive + Adjunct takes no postposed Modifier on retained Object"
+    );
+    assert!(
+        !grammar
+            .production_ids()
+            .any(|id| id.contains("passive") && id.contains("postposed")),
+        "passive variants derive no postposed Modifier productions"
     );
 }
 
