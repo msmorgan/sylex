@@ -13,7 +13,9 @@ ability hexproofFrom(quality: Predicate) {
             nominal(
               or([
                   nominal(pre = [hasQuality($quality)], spell),
-                  abilityOf(bare(nominal(pre = [hasQuality($quality)], source)))]),
+                  nominal(
+                    ability,
+                    post = [fromSource(bare(nominal(pre = [hasQuality($quality)], source)))])]),
               post = [opponentsControl]))),
         target(thisPermanent)))]
 }

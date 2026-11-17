@@ -12,7 +12,9 @@ card singleFaced({
             bare(
               or([
                   nominal(pre = [non(green)], spell),
-                  abilityOf(bare(nominal(pre = [non(green)], source)))]))),
+                  nominal(
+                    ability,
+                    post = [fromSource(bare(nominal(pre = [non(green)], source)))])]))),
           target(thisCreature)))],
     power = 8,
     toughness = 5})

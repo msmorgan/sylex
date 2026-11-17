@@ -11,7 +11,9 @@ ability protection(quality: Predicate) {
           bare(
             or([
                 nominal(pre = [hasQuality($quality)], spell),
-                abilityOf(allOf(nominal(pre = [hasQuality($quality)], source)))]))),
+                nominal(
+                  ability,
+                  post = [fromSource(bare(nominal(pre = [hasQuality($quality)], source)))])]))),
         target(this))),
     static(cant(any, attachTo(bare(nominal(pre = [hasQuality($quality)], aura)), this))),
     static(

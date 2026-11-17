@@ -1,0 +1,6 @@
+# "from <source>": restricts an ability Nominal to abilities whose source is `source`
+# ("abilities from nongreen sources", *Gaea's Revenge*) [CR#113.7,702.16b].
+template fromSource(source: NounPhrase): PostModifier {
+  spelling = "from $source",
+  body = ofSource($source)
+}
