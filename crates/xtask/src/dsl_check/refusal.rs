@@ -221,6 +221,11 @@ pub enum RefusalKind {
     UnplacedStacked,
     #[error("an Agreement postmodifier requires an enclosing plural group determiner")]
     AgreementWithoutGroup,
+    #[error(
+        "`{word}` at {sort} has no number for the Agreement check; classify it in \
+         `dsl_check/nominal.rs`"
+    )]
+    UnclassifiedNumber { word: String, sort: String },
     #[error("`{0}` stands only in a card face, never in builtin")]
     OwnNameInBuiltin(String),
     #[error("`{word}` requires a card face with a Shortened Name; `{face}` has none")]

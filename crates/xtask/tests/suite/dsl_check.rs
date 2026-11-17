@@ -2528,6 +2528,11 @@ fn nominal_allows_coordinated_heads_and_refuses_bare_and_nested_nominals() {
            body = nominal(\n\
              or([nominal(pre = [white], creature), nominal(pre = [black], zombie)]),\n\
              post = [youControl])\n\
+         }}\n\
+         template withPost(n: Nominal): Nominal {{ body = nominal($n, post = [youControl]) }}\n\
+         template headWord: Nominal {{ body = withPost(creature) }}\n\
+         template coordArgument: Nominal {{\n\
+           body = withPost(or([nominal(pre = [white], creature), zombie]))\n\
          }}"
     );
     assert_eq!(kinds(&valid), []);
@@ -2535,13 +2540,42 @@ fn nominal_allows_coordinated_heads_and_refuses_bare_and_nested_nominals() {
     let invalid = format!(
         "{NOMINAL_PREAMBLE}\
          template bare: Nominal {{ body = nominal(creature) }}\n\
-         template emptyPre: Nominal {{ body = nominal(pre = [], creature) }}\n\
-         template emptyPost: Nominal {{ body = nominal(creature, post = []) }}\n\
          template nestedPre: Nominal {{ body = nominal(pre = [white], nominal(pre = [tapped], creature)) }}\n\
-         template nestedPost: Nominal {{ body = nominal(nominal(pre = [white], creature), post = [youControl]) }}"
+         template nestedPost: Nominal {{ body = nominal(nominal(pre = [white], creature), post = [youControl]) }}\n\
+         template whiteCreature: Nominal {{ body = nominal(pre = [white], creature) }}\n\
+         template throughBody: Nominal {{ body = nominal(whiteCreature, post = [youControl]) }}\n\
+         template withPost(n: Nominal): Nominal {{ body = nominal($n, post = [youControl]) }}\n\
+         template throughParameter: Nominal {{ body = withPost(nominal(pre = [black], zombie)) }}"
     );
     assert_eq!(
         refusals(&[("a.syl", &invalid)]),
+        [
+            (RefusalKind::RedundantNominal, s("nominal(creature)")),
+            (
+                RefusalKind::NestedNominal,
+                s("nominal(pre = [tapped], creature)")
+            ),
+            (
+                RefusalKind::NestedNominal,
+                s("nominal(pre = [white], creature)")
+            ),
+            (RefusalKind::NestedNominal, s("whiteCreature")),
+            (
+                RefusalKind::NestedNominal,
+                s("nominal(pre = [black], zombie)")
+            ),
+        ]
+    );
+
+    // An empty list is its default, refused as such; the nominal rules run
+    // only on bundles every earlier rule accepts.
+    let empty = format!(
+        "{NOMINAL_PREAMBLE}\
+         template emptyPre: Nominal {{ body = nominal(pre = [], creature) }}\n\
+         template emptyPost: Nominal {{ body = nominal(creature, post = []) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &empty)]),
         [
             (
                 RefusalKind::RedundantDefault {
@@ -2556,23 +2590,6 @@ fn nominal_allows_coordinated_heads_and_refuses_bare_and_nested_nominals() {
                     argument: s("post"),
                 },
                 s("post = []")
-            ),
-            (RefusalKind::RedundantNominal, s("nominal(creature)")),
-            (
-                RefusalKind::RedundantNominal,
-                s("nominal(pre = [], creature)")
-            ),
-            (
-                RefusalKind::RedundantNominal,
-                s("nominal(creature, post = [])")
-            ),
-            (
-                RefusalKind::NestedNominal,
-                s("nominal(pre = [tapped], creature)")
-            ),
-            (
-                RefusalKind::NestedNominal,
-                s("nominal(pre = [white], creature)")
             ),
         ]
     );
@@ -2590,21 +2607,42 @@ fn stacked_requires_two_elements_inside_a_premodifier_coordination() {
          }}\n\
          template inCoord: Nominal {{\n\
            body = nominal(pre = [coord(or, [white, stacked([tapped, black, white])])], card)\n\
-         }}"
+         }}\n\
+         template whiteBlack: PreModifier {{ body = stacked([white, black]) }}\n\
+         template namedArm: Nominal {{ body = nominal(pre = [or([tapped, whiteBlack])], card) }}"
     );
     assert_eq!(kinds(&valid), []);
 
     let invalid = format!(
         "{NOMINAL_PREAMBLE}\
-         template empty: Nominal {{ body = nominal(pre = [or([white, stacked([])])], card) }}\n\
-         template single: Nominal {{ body = nominal(pre = [or([white, stacked([black])])], card) }}\n\
          template directInPre: Nominal {{ body = nominal(pre = [stacked([white, black])], card) }}\n\
          template underNon: Nominal {{ body = nominal(pre = [or([white, non(stacked([tapped, black]))])], card) }}\n\
          template nestedInStacked: Nominal {{ body = nominal(pre = [or([white, stacked([tapped, stacked([black, white])])])], card) }}\n\
-         template standalone: PreModifier {{ body = stacked([white, black]) }}"
+         template literalAnd: Nominal {{ body = nominal(pre = [coord(and, [white, black])], card) }}\n\
+         template whiteBlack: PreModifier {{ body = stacked([white, black]) }}\n\
+         template namedInPre: Nominal {{ body = nominal(pre = [whiteBlack], card) }}"
     );
     assert_eq!(
         refusals(&[("a.syl", &invalid)]),
+        [
+            (RefusalKind::UnplacedStacked, s("stacked([white, black])")),
+            (RefusalKind::UnplacedStacked, s("stacked([tapped, black])")),
+            (RefusalKind::UnplacedStacked, s("stacked([black, white])")),
+            (
+                RefusalKind::UnplacedStacked,
+                s("coord(and, [white, black])")
+            ),
+            (RefusalKind::UnplacedStacked, s("whiteBlack")),
+        ]
+    );
+
+    let short = format!(
+        "{NOMINAL_PREAMBLE}\
+         template empty: Nominal {{ body = nominal(pre = [or([white, stacked([])])], card) }}\n\
+         template single: Nominal {{ body = nominal(pre = [or([white, stacked([black])])], card) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &short)]),
         [
             (
                 RefusalKind::EmptyCoordination {
@@ -2621,61 +2659,72 @@ fn stacked_requires_two_elements_inside_a_premodifier_coordination() {
                 },
                 s("stacked([black])")
             ),
-            (RefusalKind::UnplacedStacked, s("stacked([white, black])")),
-            (RefusalKind::UnplacedStacked, s("stacked([tapped, black])")),
-            (RefusalKind::UnplacedStacked, s("stacked([black, white])")),
-            (RefusalKind::UnplacedStacked, s("stacked([white, black])")),
         ]
     );
 }
 
+const AGREEMENT_PREAMBLE: &str = "\
+    primitive cardName: QualitySort = CardName\n\
+    primitive differ: Agreement = Differ\n\
+    primitive agree(axis: QualitySort, agreement: Agreement): PostModifier = Agree\n\
+    template withDifferentNames: PostModifier { body = agree(cardName, differ) }\n\
+    primitive one: Plurality = One\n\
+    primitive many: Plurality = Many\n\
+    primitive unmarked: ChoiceMode = Unmarked\n\
+    primitive lit(value: Int): Amount = Literal\n\
+    coercion(value: Int): Amount { body = lit($value) }\n\
+    primitive chosenNumber: Amount = ChosenNumber\n\
+    primitive range(low: Option(Nat) = none, high: Option(Nat) = none): Quantity = Range\n\
+    primitive exactlyOf(amount: Amount): Quantity = ExactlyOf\n\
+    primitive upToOf(amount: Amount): Quantity = UpToOf\n\
+    primitive moreThanOf(amount: Amount): Quantity = MoreThanOf\n\
+    primitive additional(quantity: Quantity): Quantity = Additional\n\
+    primitive theLast: Quantity = Last\n\
+    primitive worth(n: Nat): Quantity = Worth\n\
+    primitive all: DetPhrase = All\n\
+    primitive each: DetPhrase = Each\n\
+    primitive a(mode: ChoiceMode): DetPhrase = A\n\
+    primitive the(plur: Plurality = one): DetPhrase = The\n\
+    primitive count(quantity: Quantity, mode: Option(ChoiceMode)): DetPhrase = Count\n\
+    primitive target(quantity: Quantity): DetPhrase = Target\n\
+    primitive described(determiner: DetPhrase, nominal: Nominal): NounPhrase = Described\n\
+    template a(n: Nominal): NounPhrase { body = described(a(unmarked), $n) }\n\
+    template each(n: Nominal): NounPhrase { body = described(each, $n) }\n\
+    template the(n: Nominal): NounPhrase { body = described(the, $n) }\n\
+    template thePlural(n: Nominal): NounPhrase { body = described(the(plur = many), $n) }\n\
+    template allOf(n: Nominal): NounPhrase { body = described(all, $n) }\n\
+    template counted(q: Quantity, n: Nominal): NounPhrase { body = described(count($q, none), $n) }\n\
+    template target(n: Nominal): NounPhrase { body = described(target(range(low = 1, high = 1)), $n) }\n\
+    template targets(q: Quantity, n: Nominal): NounPhrase { body = described(target($q), $n) }\n\
+    primitive whole: SliceCount = Whole\n\
+    primitive sliceCounted(quantity: Quantity): SliceCount = Counted\n\
+    primitive totaling(bound: Amount): SliceCount = Totaling\n\
+    primitive someOf(count: SliceCount, description: Option(Nominal) = none, group: NounPhrase): NounPhrase = SomeOf\n\
+    primitive numberOf(group: NounPhrase): Amount = CountOf\n\
+    template countOf(n: Nominal): Amount { body = numberOf(described(all, $n)) }\n\
+    template forEach(per: Amount, n: Nominal): Amount { body = countOf($n) }\n\
+    primitive didDiscard(group: NounPhrase): PostModifier = DidDiscard\n\
+    primitive always: Condition = Always\n\
+    primitive nothing: VerbPhrase = Nothing\n";
+
 #[test]
 fn agreement_postmodifier_requires_a_plural_group_determiner() {
-    let preamble = format!(
-        "{NOMINAL_PREAMBLE}\
-         primitive cardName: QualitySort = CardName\n\
-         primitive differ: Agreement = Differ\n\
-         primitive agree(axis: QualitySort, agreement: Agreement): PostModifier = Agree\n\
-         template withDifferentNames: PostModifier {{ body = agree(cardName, differ) }}\n\
-         primitive one: Plurality = One\n\
-         primitive many: Plurality = Many\n\
-         primitive unmarked: ChoiceMode = Unmarked\n\
-         primitive lit(value: Int): Amount = Literal\n\
-         coercion(value: Int): Amount {{ body = lit($value) }}\n\
-         primitive range(low: Option(Nat) = none, high: Option(Nat) = none): Quantity = Range\n\
-         primitive exactlyOf(amount: Amount): Quantity = ExactlyOf\n\
-         primitive all: DetPhrase = All\n\
-         primitive each: DetPhrase = Each\n\
-         primitive a(mode: ChoiceMode): DetPhrase = A\n\
-         primitive the(plur: Plurality = one): DetPhrase = The\n\
-         primitive count(quantity: Quantity, mode: Option(ChoiceMode)): DetPhrase = Count\n\
-         primitive target(quantity: Quantity): DetPhrase = Target\n\
-         primitive described(determiner: DetPhrase, nominal: Nominal): NounPhrase = Described\n\
-         template a(n: Nominal): NounPhrase {{ body = described(a(unmarked), $n) }}\n\
-         template each(n: Nominal): NounPhrase {{ body = described(each, $n) }}\n\
-         template the(n: Nominal): NounPhrase {{ body = described(the, $n) }}\n\
-         template thePlural(n: Nominal): NounPhrase {{ body = described(the(plur = many), $n) }}\n\
-         template allOf(n: Nominal): NounPhrase {{ body = described(all, $n) }}\n\
-         template counted(q: Quantity, n: Nominal): NounPhrase {{ body = described(count($q, none), $n) }}\n\
-         template target(n: Nominal): NounPhrase {{ body = described(target(range(low = 1, high = 1)), $n) }}\n\
-         template targets(q: Quantity, n: Nominal): NounPhrase {{ body = described(target($q), $n) }}\n\
-         primitive whole: SliceCount = Whole\n\
-         primitive sliceCounted(quantity: Quantity): SliceCount = Counted\n\
-         primitive totaling(bound: Amount): SliceCount = Totaling\n\
-         primitive someOf(count: SliceCount, description: Option(Nominal) = none, group: NounPhrase): NounPhrase = SomeOf\n\
-         primitive numberOf(group: NounPhrase): Amount = CountOf\n\
-         template countOf(n: Nominal): Amount {{ body = numberOf(described(all, $n)) }}\n\
-         template forEach(per: Amount, n: Nominal): Amount {{ body = countOf($n) }}\n\
-         primitive didDiscard(group: NounPhrase): PostModifier = DidDiscard\n\
-         primitive always: Condition = Always\n\
-         primitive nothing: VerbPhrase = Nothing\n"
-    );
+    let preamble = format!("{NOMINAL_PREAMBLE}{AGREEMENT_PREAMBLE}");
 
+    // Every determiner, plurality, slice count and quantity form that admits
+    // more than one member, and a determiner or quantity left to a Template's
+    // caller.
     let valid = format!(
         "{preamble}\
          template okAny: NounPhrase {{ body = counted(range(low = 0), nominal(card, post = [withDifferentNames])) }}\n\
          template okTwo: NounPhrase {{ body = counted(exactlyOf(2), nominal(card, post = [withDifferentNames])) }}\n\
+         template okChosen: NounPhrase {{ body = counted(exactlyOf(chosenNumber), nominal(card, post = [withDifferentNames])) }}\n\
          template okUpToSix: NounPhrase {{ body = targets(range(high = 6), nominal(creature, post = [withDifferentNames])) }}\n\
+         template okUpToTwoOf: NounPhrase {{ body = targets(upToOf(2), nominal(creature, post = [withDifferentNames])) }}\n\
+         template okMoreThanOne: NounPhrase {{ body = counted(moreThanOf(1), nominal(card, post = [withDifferentNames])) }}\n\
+         template okMoreThanZero: NounPhrase {{ body = counted(moreThanOf(0), nominal(card, post = [withDifferentNames])) }}\n\
+         template okAdditionalTwo: NounPhrase {{ body = counted(additional(exactlyOf(2)), nominal(card, post = [withDifferentNames])) }}\n\
+         template okWorthThree: NounPhrase {{ body = counted(worth(3), nominal(card, post = [withDifferentNames])) }}\n\
          template okAll: NounPhrase {{ body = allOf(nominal(card, post = [withDifferentNames])) }}\n\
          template okPluralThe: NounPhrase {{ body = thePlural(nominal(card, post = [withDifferentNames])) }}\n\
          template okWholeSlice(g: NounPhrase): NounPhrase {{\n\
@@ -2684,12 +2733,23 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          template okTotaling(g: NounPhrase): NounPhrase {{\n\
            body = someOf(totaling(4), description = nominal(card, post = [withDifferentNames]), $g)\n\
          }}\n\
+         template okCountedSlice(g: NounPhrase): NounPhrase {{\n\
+           body = someOf(sliceCounted(exactlyOf(3)), description = nominal(card, post = [withDifferentNames]), $g)\n\
+         }}\n\
          template okNestedInSingular: NounPhrase {{\n\
            body = a(nominal(creature, post = [didDiscard(counted(exactlyOf(2), nominal(card, post = [withDifferentNames])))]))\n\
+         }}\n\
+         template okDeterminerParameter(d: DetPhrase): NounPhrase {{\n\
+           body = described($d, nominal(card, post = [withDifferentNames]))\n\
+         }}\n\
+         template okQuantityParameter(q: Quantity): NounPhrase {{\n\
+           body = counted($q, nominal(card, post = [withDifferentNames]))\n\
          }}"
     );
     assert_eq!(kinds(&valid), []);
 
+    // Every form that admits at most one member, a consumer that forms no
+    // group, and a Template whose caller supplies a singular determiner.
     let invalid = format!(
         "{preamble}\
          template badA: NounPhrase {{ body = a(nominal(card, post = [withDifferentNames])) }}\n\
@@ -2697,11 +2757,19 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
          template badThe: NounPhrase {{ body = the(nominal(card, post = [withDifferentNames])) }}\n\
          template badTarget: NounPhrase {{ body = target(nominal(creature, post = [withDifferentNames])) }}\n\
          template badUpToOne: NounPhrase {{ body = targets(range(high = 1), nominal(creature, post = [withDifferentNames])) }}\n\
+         template badUpToOneOf: NounPhrase {{ body = targets(upToOf(1), nominal(creature, post = [withDifferentNames])) }}\n\
          template badCountOne: NounPhrase {{ body = counted(exactlyOf(1), nominal(card, post = [withDifferentNames])) }}\n\
+         template badAdditionalOne: NounPhrase {{ body = counted(additional(exactlyOf(1)), nominal(card, post = [withDifferentNames])) }}\n\
+         template badTheLast: NounPhrase {{ body = counted(theLast, nominal(card, post = [withDifferentNames])) }}\n\
+         template badWorthOne: NounPhrase {{ body = counted(worth(1), nominal(card, post = [withDifferentNames])) }}\n\
          template badSliceOne(g: NounPhrase): NounPhrase {{\n\
            body = someOf(sliceCounted(exactlyOf(1)), description = nominal(card, post = [withDifferentNames]), $g)\n\
          }}\n\
          template badForEach: Amount {{ body = forEach(1, nominal(card, post = [withDifferentNames])) }}\n\
+         template differentCards(d: DetPhrase): NounPhrase {{\n\
+           body = described($d, nominal(card, post = [withDifferentNames]))\n\
+         }}\n\
+         template badThroughParameter: NounPhrase {{ body = differentCards(each) }}\n\
          sba badRule {{\n\
            body = {{ scope = nominal(creature, post = [withDifferentNames]), when = always, then = nothing }}\n\
          }}"
@@ -2709,15 +2777,44 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
     assert_eq!(
         refusals(&[("a.syl", &invalid)]),
         [
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
-            (RefusalKind::AgreementWithoutGroup, s("withDifferentNames")),
+            vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames")); 12],
+            // Inside a Template's body, at the call that supplies the determiner.
+            vec![(
+                RefusalKind::AgreementWithoutGroup,
+                s("differentCards(each)")
+            )],
+            vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames"))],
+        ]
+        .concat()
+    );
+}
+
+#[test]
+fn agreement_refuses_a_number_form_it_does_not_classify() {
+    let source = format!(
+        "{NOMINAL_PREAMBLE}{AGREEMENT_PREAMBLE}\
+         primitive fewest: DetPhrase = Fewest\n\
+         template cards: NounPhrase {{ body = described(fewest, nominal(card, post = [withDifferentNames])) }}\n\
+         primitive most: Quantity = Most\n\
+         template most: NounPhrase {{ body = counted(most, nominal(card, post = [withDifferentNames])) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::UnclassifiedNumber {
+                    word: s("fewest"),
+                    sort: s("DetPhrase"),
+                },
+                s("fewest")
+            ),
+            (
+                RefusalKind::UnclassifiedNumber {
+                    word: s("most"),
+                    sort: s("Quantity"),
+                },
+                s("most")
+            ),
         ]
     );
 }
