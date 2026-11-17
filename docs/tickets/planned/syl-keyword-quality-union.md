@@ -20,9 +20,7 @@ color among permanents you control", *Pledge of Loyalty*), or, in 17 units, an a
 ## Open questions
 
 - **The sort.** One sort whose members are `Nominal`, `NounPhrase` and `AdjectivePhrase` matches
-  the parse. `and`, `or`, `andOr` and `coord` are declared at both `Nominal` and `NounPhrase`,
-  which would collide in its Reaches, so it needs coordinators of its own or one of the two kinds
-  to stand through the other.
+  the parse, with the coordinators standing at it by their `at` lists.
 - **A color as a quality.** A color word is a member of `AdjectivePhrase`, and "protection from
   black" prints it as a noun. Either the color word also stands as a noun there, by a route that
   does not give `red` two readings before a head, or the term writes the adjective and recovery
@@ -54,6 +52,6 @@ color among permanents you control", *Pledge of Loyalty*), or, in 17 units, an a
 
 ## Pointers
 
-`docs/specs/kind-sorts-and-position-unions.md` §4; `plugins/builtin/definitions/keyword_ability/`;
+`docs/specs/kind-sorts-and-position-unions.md` §5; `plugins/builtin/definitions/keyword_ability/`;
 `plugins/builtin/{primitives,templates}/predicate/`;
 `cargo xtask english forestwalk --card "White Knight"`.

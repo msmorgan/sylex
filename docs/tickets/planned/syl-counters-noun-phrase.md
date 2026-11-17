@@ -1,6 +1,6 @@
 ---
-needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter]
-specs: [voice-and-object-phrases]
+needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter, syl-union-membership]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
 ---
 
 # The counters a verb puts or removes are a noun phrase
@@ -99,4 +99,4 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
   `plugins/builtin/templates/action/{removeAllCounters,loseCounters,distributeCounters}.syl`,
   `plugins/builtin/primitives/zone/withCounters.syl`,
   `plugins/builtin/primitives/noun/{printedKind,anyKind,thoseCounters,chosenKind,distinctChosenKinds,sameKindAs}.syl`,
-  `plugins/builtin/definitions/counter/`, `plugins/builtin/members/`
+  `plugins/builtin/definitions/counter/`

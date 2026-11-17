@@ -87,7 +87,8 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 
 ## Not in scope
 
-- Declaring a coordinator once for every sort it coordinates.
+- The coordinators at sorts that describe nothing (`Cost`, `Condition`, `Timing`, …):
+  `syl-coordinators-outside-descriptions`.
 - The verb phrase's dependent list and `MoveRider`'s removal: `syl-verb-phrase-dependents`.
 - A typed Rust representation of the surface term.
 

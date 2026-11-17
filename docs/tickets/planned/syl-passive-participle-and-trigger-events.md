@@ -31,8 +31,22 @@ So:
 The spec's §2 to §4 replace this; this ticket builds the passive words and the trigger event,
 and the tickets after it the other words that take a `Subject`.
 
+## Open questions
+
+- **What the participle sort changes in the spec's terms.** `done` and `ing` produce a
+  `Participle` (`docs/specs/kind-sorts-and-position-unions.md` §2), and the spec's §3 writes
+  *Abu Ja'far*'s "blocking or blocked by it" as `shared` over an active verb phrase and a `done`
+  phrase in `post`, and *Cephalid Illusionist* as `be(shared(and([done…, done…]), …))`. Whether
+  `shared` stands at `Participle` as well as `VerbPhrase`, and what `be` over an active phrase is
+  once `ing` exists.
+- **Negation over `be`.** About 85 lines print "isn't", "wasn't" or "weren't" before a
+  participle ("isn't blocked", "wasn't cast", *Verity Circle*'s "isn't being declared as an
+  attacker"), which the spec's §11 leaves undesigned and `isnt` (a copula with a `Predicative`)
+  does not cover.
+
 ## Done when
 
+- The open questions are answered in `docs/specs/voice-and-object-phrases.md`.
 - `done(phrase: VerbPhrase, by: Option(NounPhrase) = none): VerbPhrase` and
   `be(phrase: VerbPhrase): VerbPhrase` exist, and the word `subject` stands in the slot a `done`
   phrase promotes.

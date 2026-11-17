@@ -16,7 +16,9 @@ sites the checker resolves to a declaration, builtin / canon.
 ## 1. The kind sorts
 
 Each is named for the English grammar's Category of the same name
-(`crates/english/grammar/english.fug`).
+(`crates/english/grammar/english.fug`); the grammar's `Participle` is the participle before a
+head, and after a head or under "be" it parses the same phrase as a `VerbPhrase` in a participle
+form.
 
 | Sort | A phrase of it | Stands |
 |---|---|---|
@@ -143,16 +145,18 @@ card files also call them bare. A test is no kind of phrase. It is declared once
   `NounPhrase` and `VerbPhrase` denote themselves: a type word before a head is read where it
   stands (§2), not expanded to a test.
 
-A declaration's signature and `spelling` are surface; its body is in body mode. After expansion
-every describing phrase is a `Test`, so expansion keeps each slot well sorted, and a parameter
-may be typed by a kind.
+A declaration's signature and `spelling` are surface; its body is in body mode, whatever its
+kind (`template`, `ability`, `action`, `token`, `counter`, `sba`, `conferral`). After expansion a
+describing phrase is a `Test` or a member word standing as itself (a color, a supertype, a type
+word), so expansion keeps each slot well sorted, and a parameter may be typed by a kind.
 
 **Reaches.** SurfaceReaches(`T`) is `T` and every sort that reaches it through `member`.
 BodyReaches(`Test`) is `Test` and SurfaceReaches of each kind that denotes it; BodyReaches of
 such a kind, or of a position sort, is its SurfaceReaches and `Test`; BodyReaches of any other
-sort is its SurfaceReaches. A word declared at two sorts of one Reaches set, in either mode, is
-refused at load, as `syl.md` §3 refuses it for coercions today, and so is a literal that stands
-at two (an integer when `Int` and `Nat` both reach a sort). Over §5's placement no word is
+sort is its SurfaceReaches. Two declarations of one word at two sorts of one Reaches set, in
+either mode, are refused at load, as `syl.md` §3 refuses them for coercions today, and so is a
+literal that stands at two (an integer when `Int` and `Nat` both reach a sort). One declaration
+with an `at` list (§4) is one declaration at all its sorts and is not such a pair. Over §5's placement no word is
 (`docs/evidence/syl-kind-sorts/reframe-check.md`).
 
 **Resolution.** `syl.md` §3's order keeps four steps, and its fourth changes. At expected sort
@@ -163,7 +167,8 @@ at two (an integer when `Int` and `Nat` both reach a sort). Over §5's placement
 3. if `T` is `Option(U)`, the value at `U`, by steps 2 and 4;
 4. at the one sort in the mode's Reaches(`T`) that the value stands at.
 
-**A position sort's own declarations** are Templates for wordings bound to that position:
+**A position sort's own declarations** are Templates or primitives for wordings bound to that
+position:
 "face-down" before a head; `withMostVotes`, "with the most votes or tied for most votes", a
 coordination of unlike kinds fixed in one wording. Anything else at a position sort is refused at
 load, except the declarations §5 lists as staying, which the check names with their tickets.
@@ -174,8 +179,10 @@ sorts.
 
 **Calls of a test in a card.** Forty-nine calls in 44 canon files write a test bare where the
 card prints a phrase no declaration spells. Surface mode refuses each. Four take a spelled phrase
-that this design gives them (§5); the rest are named in the check as exceptions, resolved in body
-mode, until `syl-spelled-test-phrases` writes their phrases.
+that this design gives them (§5); the rest are named in the check as exceptions until
+`syl-spelled-test-phrases` writes their phrases. An exception covers the smallest argument of a
+slot typed by a position sort that contains the call, and that argument resolves in body mode,
+so *Glaring Spotlight*'s `is(…, not(hasKeyword(…)))` keeps its `not` at `Test`.
 
 ## 4. Coordination and negation
 
@@ -192,15 +199,21 @@ for the sort it stands at:
     }
 
 `and`, `andOr`, `both` and the primitive `coord` are declared the same way, each with the sorts
-the pool coordinates with it. The coordinators at `Cost`, `Condition`, `Timing`, `Location`,
+the pool coordinates with it, and `andOr`'s body is `coord(andOr, $items)` at every sort. A
+declaration with an `at` list is checked once for each sort in it, with `Self` that sort; a
+primitive with one builds its constructor at each. The coordinators at `Cost`, `Condition`, `Timing`, `Location`,
 `GameEvent`, `TriggerCondition`, `ProducedMana` and `Predicate` stay separate declarations;
 `syl-coordinators-outside-descriptions` (NEW) folds them in.
 
 **A call of such a word stands at the lowest of its sorts that holds every arm.** Each arm has
-one sort: its head word's, which is unique in Reaches(`T`); a parameter's declared sort; or, for
-a nested coordination, the sort it resolved at. Reaches(`T`) is a tree, so the arms' sorts have
-one lowest common sort, and the call resolves at the lowest sort in the word's `at` list at or
-above it. In body mode `Test` is tried last, when no surface sort holds the arms.
+one sort: its head word's, which is unique in Reaches(`T`); a parameter's declared sort, with a
+list parameter passed whole giving its element sort; or, for a nested call of a word with an `at`
+list, the sort that call resolved at. Reaches(`T`) is a tree, with `Test` in body mode a child of
+the kind or position sort expected, so the arms' sorts have one lowest common sort, and the call
+resolves at the lowest sort in the word's `at` list that is at or above it and in Reaches(`T`).
+In body mode, when no such sort exists and the word stands at `Test`, the call stands at `Test`
+and its arms resolve at expected sort `Test`: `youDontControl`'s `not(controls(you))`, since
+`not` does not stand at `RelativeClause`. An empty list is refused.
 
 - `or([white, blue])` in `pre` or after "that's": both arms are colors, so it stands at
   `AdjectivePhrase`. The grammar parses "white or blue" as a coordination of adjective phrases in
@@ -212,13 +225,13 @@ above it. In body mode `Test` is tried last, when no surface sort holds the arms
 - A coordination of an adjective and a participle ("tapped and attacking") stands at the position
   sort, where the grammar puts a coordination of unlike kinds.
 - `or([bare(artifact), bare(creature), bare(enchantment), bare(land)])` is *Solemnity*'s
-  "artifacts, creatures, enchantments, or lands", a coordination of noun phrases. The grammar has
-  no bare plural over coordinated nominals, so `bare(or([…]))`, which *Solemnity*, *Clarion
-  Conqueror*, *Damping Matrix* and *Grand Abolisher* write today, is no Reading's term.
+  "artifacts, creatures, enchantments, or lands", which parses as a coordination of four bare
+  plurals in every Derivation. `bare(or([…]))`, which *Solemnity*, *Clarion Conqueror*, *Damping
+  Matrix* and *Grand Abolisher* write today, is no Reading of theirs.
 
 This is the one place resolution reads a call's arguments. It stays one pass with no
 backtracking, because an arm's sort never depends on the coordinator's. Of the 165 coordinator
-calls in `plugins/` at these sorts, 121 stand where they do today, 29 move from `PreModifier` to
+calls in `plugins/` at these sorts, 127 stand where they do today, 29 move from `PreModifier` to
 `Nominal`, 3 from `Predicative` to `AdjectivePhrase`, 2 from `PostModifier` to
 `PrepositionPhrase`, 2 from `PreModifier` to `Participle`, and 2 need the rewrites §5 gives them
 (`historic`, *Acclaimed Contender*); each of the 13 sampled calls that lands at a kind has its
@@ -233,18 +246,24 @@ card".
 **Negation is three constructions.**
 
 - **The prefix "non-"** attaches to a nominal ("nonland", 1,813 units), an adjective ("nonbasic",
-  245) or a participle ("nonattacking", 5), and the result is of the same kind: `non` is declared
-  once `at = [AdjectivePhrase, Nominal, Participle]`. So "If that land was nonbasic" (*Molten
+  245) or a participle ("nonattacking", 5), and the result is of the same kind: `non` is a
+  primitive declared once `at = [AdjectivePhrase, Nominal, Participle]`, with a constructor of
+  its own that semantics reads where it stands; it is no longer a Template over `not`. So "If that land was nonbasic" (*Molten
   Rain*) and "nonlands" as a head have terms, which `non` at `PreModifier` did not give them.
 - **"Not" before a phrase** stands before an adjective phrase ("that's not historic",
   *Desynchronization*), a preposition phrase ("card not on the battlefield", *Anafenza, the
   Foremost*), a noun phrase ("if it's not a Kree", *Captain Marvel, Apex Avenger*) or a participle
   ("not named …", *Escaped Shapeshifter*): `not` is declared once `at = [AdjectivePhrase,
-  PrepositionPhrase, NounPhrase, Participle, Test]`. It never stands before a head ("Exile target
-  not green creature." has no Reading), and `not` at `PreModifier` goes.
+  PrepositionPhrase, NounPhrase, Participle, Test]`; its spelling is never used at `Test`. English
+  does not print it before a head ("Exile target not green creature." has no Reading), and `not`
+  at `PreModifier` goes; `pre = [not(green)]` still types, as membership by kind admits it. "It's
+  not a Kree" has two Readings, "not" on the copula and "not" on the noun phrase, and one term,
+  `is(it, not(a(kree)))`.
 - **"Isn't" and "aren't"** negate the copula, not its complement: "Creatures that aren't of the
   chosen type" (*Crippling Fear*) parses with the verb "aren't" over "of the chosen type". They
-  are `isnt` and `thatIsnt` (NEW) beside `is` and `thatIs`.
+  are `isnt` and `thatIsnt` (NEW) beside `is` and `thatIs`, for a copula with a `Predicative`.
+  "Isn't blocked" and "wasn't cast", a negated `be` over a participle (about 85 lines), are
+  `syl-passive-participle-and-trigger-events`'s.
 
 ## 5. What each declaration becomes
 
@@ -268,8 +287,8 @@ Reading was checked.
   and `controlledBy` names the participle. `hasCounter` and `hasKeyword` at `PostModifier` spell
   "with a counter on it" and "with $keyword" and at `Predicative` are the unspelled tests: the
   with-phrases are `withCounter` and `withKeyword`, Templates over the tests of the old names.
-- **Bodies rewritten.** `historic` is `or([hasType(artifact), legendary, hasSubtype(saga)])`, a
-  test's `or` over two tests and an adjective; `was` is written over `predicateDid`, the test
+- **Bodies rewritten.** `historic` is `or([hasType(artifact), legendary, hasSubtype(saga)])`, an
+  `or` at `AdjectivePhrase` over two tests and an adjective; `was` is written over `predicateDid`, the test
   `did` is over. `youDontControl` and `outsideTheGame` keep the bodies they have, which body mode
   types.
 - **Cards that take the spelled phrase.** *Blessed Reversal*, *Tidal Flats*, *Beckoning
@@ -304,8 +323,10 @@ and `attachment` with `word` passed by name), so every call resolves unchanged.
 - The coordinators and negations of the three position sorts (`or`, `andOr`, `and`, `both`,
   `coord`, `non`, `not`), those of `Nominal` and `NounPhrase`, `stacked`, and the `PreModifier`
   copy of `was`: §4's declarations stand in their place. Each caller of `not` at `PostModifier`
-  writes what its card prints: `not` before a preposition phrase or a participle, `thatIsnt`, or
-  a `without` preposition phrase ("without flying").
+  writes what its card prints: `not` before a preposition phrase or a participle; `thatIsnt`;
+  `withoutKeyword` (NEW, "without $keyword") or `withNoCounters` (NEW, "with no counters on it",
+  *Damning Verdict*), each a `PrepositionPhrase`. *Containment Priest* and *Hallowed Moonlight*
+  print a clause, "and it wasn't cast", and are among the exceptions of §3.
 
 ### The position sort's own
 
@@ -382,7 +403,9 @@ Built by:
 
 Changed by this spec: `docs/specs/voice-and-object-phrases.md` and
 `syl-passive-participle-and-trigger-events` (`done` and `ing` produce a `Participle`, `be` takes
-one, and a verb phrase is no member of a position sort), `syl-lookback-operator-and-holds` and
+one, and a verb phrase is no member of a position sort; that spec's §3 and §8 still put a verb
+phrase in `post`, as `did(…)`, as `did` over `done`, and as `shared` over an active and a passive
+arm, and the passive and lookback tickets settle each), `syl-lookback-operator-and-holds` and
 `syl-clause-and-imperative` (`did` and `was`; a relative composed from a clause with a gap, at
 `RelativeClause`), `syl-zone-words` (a location phrase is a `PrepositionPhrase`),
 `syl-damage-and-life-noun-phrases` (its modifiers are declared at kinds),
@@ -407,6 +430,7 @@ it does.
 
 | Document | Today | Then |
 |---|---|---|
+| `syl.md` §1 | "each constructor has exactly one [primitive], at its result sort" | a primitive with an `at` list builds its constructor at each of its sorts |
 | `syl.md` §2 | "No conversions besides `Option` and the declared coercions"; "There are nine" | no conversions; the `member` and `denotes` declarations, §2's memberships, and a declaration's `at` list |
 | `syl.md` §3 | step 4 is a coercion, one hop; Reaches(`T`) is `T` and the from-sorts of coercions into it; a call resolves from its head word and the expected sort alone | §3 here; §4's rule for a word with an `at` list |
 | `syl.md` §4 | a Template's body is a term of the Template's sort | resolved in body mode (§3) |

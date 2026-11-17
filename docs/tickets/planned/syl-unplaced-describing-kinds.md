@@ -17,7 +17,7 @@ position sort (units are Corpus Units with some Derivation that has the phrase i
 | before a head | a name ("Wicked Role token") | 69 |
 | before a head | mana symbols ("{2}{U} kicker") | 30 |
 | after a head | a temporal noun phrase ("the first time each turn") | 131 |
-| after a copula | a measure ("except it's 1/1", *Endless Evil*) | 23 |
+| after a copula | a measure ("except the token is 1/1", *Endless Evil*) | 23 |
 
 ## Open questions
 
@@ -39,5 +39,5 @@ position sort (units are Corpus Units with some Derivation that has the phrase i
 
 ## Pointers
 
-`docs/specs/kind-sorts-and-position-unions.md` §5; `crates/english/README.md` (the forest
+`docs/specs/kind-sorts-and-position-unions.md` §7; `crates/english/README.md` (the forest
 database).

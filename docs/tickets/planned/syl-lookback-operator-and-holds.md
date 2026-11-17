@@ -25,6 +25,12 @@ same `Subject` and verb phrase.
 
 ## Open questions
 
+- **Where a lookback stands after a head.** The spec's §8 puts `did(phrase, within)`, a
+  `VerbPhrase`, in a nominal's `post` ("creatures that attacked this turn") and writes
+  "creatures destroyed this way" as `did` over a `done` phrase. A verb phrase is no member of
+  `PostModifier`, and `done` produces a `Participle`
+  (`docs/specs/kind-sorts-and-position-unions.md` §2). "That attacked this turn" is a relative
+  clause and "destroyed this way" a participle with its span; what each is written with.
 - **"If it was blocked this turn"** (*Fyndhorn Druid*), written
   `was(becomeBlocked(it), within(soFarThisTurn))` today. Two terms are well sorted, and the spec
   picks neither (§9): the passive of `block`, `holds(it, did(be(done(block(attacker =
@@ -46,7 +52,7 @@ same `Subject` and verb phrase.
   the way `syl-nominal-descriptions` settles for a verb phrase there; a relativized object keeps
   `which` (*Alabaster Leech*'s "White spells you cast").
 - `did` is gone at `Predicative`
-  (`docs/specs/kind-sorts-and-position-unions.md` §4). `was` is gone at `Condition` and at `Predicate`, and no lookback holds `actor(…)`, `any` or
+  (`docs/specs/kind-sorts-and-position-unions.md` §5). `was` is gone at `Condition` and at `Predicate`, and no lookback holds `actor(…)`, `any` or
   `by(…)`. Each former `was(…)`, `did(any, …)` and `did(by(…), …)` site, and each `did(actor(…),
   …)` whose card prints a participle, is read from its Oracle line: *Sengir Vampire*'s
   description is a `did` over `done(dealIndirect(subject, …), by = this(creature))`, *Phyrexian

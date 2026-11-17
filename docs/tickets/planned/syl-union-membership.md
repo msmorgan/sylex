@@ -38,10 +38,12 @@ knows a membership yet.
   *Damping Matrix* and *Grand Abolisher* coordinate their bare plurals as noun phrases.
 - *Blessed Reversal*, *Tidal Flats*, *Beckoning Will-o'-Wisp* and *Triarch Stalker* write
   `attacking(…)` or `blocking(…)` where they call `inCombat`, and each new route the design
-  opens that no existing call takes has one card authored or rewritten to take it: a supertype
-  after a copula, "nonbasic" after a copula (*Molten Rain*), "not" before a preposition phrase
-  (*Anafenza, the Foremost*), "aren't" (*Crippling Fear*), a participle with a dependent after a
-  head, "face-up" before a head, "face down" after a copula.
+  opens that no existing call takes has one card authored or rewritten to take it, chosen so
+  that it needs no verb ticket: a supertype after a copula (*Stunning Strike*'s "isn't
+  legendary", *Scrying Sheets*'s "is snow"), "aren't" (*Crippling Fear*), a participle with a
+  dependent after a head, "face-up" before a head, "face down" after a copula (*Unable to
+  Scream*). A route no such card takes ("nonbasic" after "was", "not" before a preposition
+  phrase after a head) is named in the landing with the card and ticket that will take it.
 - `docs/evidence/syl-kind-sorts/reframe_check.py` and `test_sort_check.py` are rerun for the
   spec's §5 as built, and the landing reports their collisions, unresolved bodies and
   coordinator calls with no common sort, which are none.

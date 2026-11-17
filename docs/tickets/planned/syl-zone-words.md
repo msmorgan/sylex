@@ -74,8 +74,8 @@ Scourge*'s "but not from anywhere else") has no written form either.
 
 ## Done when
 
-- `outsideTheGame` is gone at `PostModifier` and `Predicative`
-  (`docs/specs/kind-sorts-and-position-unions.md` §4).
+- `outsideTheGame` is no describing phrase: "from outside the game" is written as a place
+  (`docs/specs/kind-sorts-and-position-unions.md` §5).
 - Each zone Template's spelling says what its body means, and no two share a spelling with
   different bodies; every caller in `plugins/` uses the one its printed words mean.
 - An unscoped destination's doc comment cites [CR#400.3], and `zone`'s doc comment says what

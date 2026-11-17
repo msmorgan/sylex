@@ -36,5 +36,5 @@ check as its exceptions. Three declarations at a kind have no spelling either: `
 
 ## Pointers
 
-`docs/specs/kind-sorts-and-position-unions.md` §2, §4;
+`docs/specs/kind-sorts-and-position-unions.md` §3, §5;
 `docs/evidence/syl-kind-sorts/test-sort-check.md` (the callers of each test).

@@ -7,8 +7,8 @@ specs: [kind-sorts-and-position-unions, voice-and-object-phrases]
 
 ## Why
 
-The tests `hasCounter`, `hasKeyword`, `compare`, `shares` and `hasDesignation`, and `named` at
-`Predicative`, are called after "is" for wordings whose verb is "have": "has no ice counters on
+The tests `hasCounter`, `hasKeyword`, `compare`, `shares` and `hasDesignation` are called after
+"is" for wordings whose verb is "have", as are the two canon calls of `named` at `Predicative`: "has no ice counters on
 it" (*Dark Depths*), "has two or fewer loyalty counters on him" (*Garruk Relentless*), "as though
 it didn't have defender" (*Bristlepack Sentry*), "has the same name as" (*Candles of Leng*), "has
 the city's blessing" (ascend), "has the chosen name". Each is unspelled or spelled as a different
@@ -38,5 +38,6 @@ phrase (the with-phrase of the same name), so the term does not say what the car
 
 ## Pointers
 
-`docs/specs/kind-sorts-and-position-unions.md` §4; `docs/specs/voice-and-object-phrases.md`;
-`plugins/builtin/primitives/predicative/named.syl` and the tests at `Test`.
+`docs/specs/kind-sorts-and-position-unions.md` §2; `docs/specs/voice-and-object-phrases.md`;
+the tests at `Test`; the two canon callers of `named` at `Predicative` (the declaration itself is
+`syl-passive-participle-and-trigger-events`'s).
