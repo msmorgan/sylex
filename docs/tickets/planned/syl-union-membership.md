@@ -21,6 +21,8 @@ knows a membership yet.
 
 ## Done when
 
+- Where the spec, a DRAFT, turns out wrong or incomplete in the building, the spec is revised
+  and the landing lists each revision with what showed it.
 - `sylex_syl` parses `member(S): T`, `denotes(K): T` and a declaration's `at` list with `Self`,
   and `cargo xtask dsl check` resolves a card's term in surface mode and a body in body mode
   (spec §3), a word with an `at` list at the lowest of its sorts that holds its arms (spec §4),

@@ -6,5 +6,8 @@ doc comments. A design only one ticket builds goes in that ticket's Design secti
 ticket that builds a spec names it in its `specs:` front matter
 ([`../tickets/README.md`](../tickets/README.md)).
 
+A spec marked `## Status: DRAFT` has not been built or checked against the code: it gives
+direction, and what building it finds outranks its text.
+
 A spec lives only until its design is in the code. The landing that builds it moves what stays
 true into doc comments, tests or a design doc, and deletes the spec file.

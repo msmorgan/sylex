@@ -1,5 +1,16 @@
 # Kind sorts, membership and two modes: a describing phrase is declared once, at its kind of phrase
 
+## Status: DRAFT
+
+This spec gives direction, not a settled design. It has been reviewed against the declarations
+and simulated over them (`docs/evidence/syl-kind-sorts/`), and no part of it has been built or
+run through `cargo xtask dsl check`. Where building it shows a rule here to be wrong or
+incomplete, the finding stands and this text is revised; a builder reports the conflict and does
+not bend the code to fit the spec. Known to be unsettled: how the lookback and the passive stand
+after a head once a participle is its own sort, and negation over "be" (§8); the per-word unit
+counts, which are upper bounds; and §4's coordinator rule, which is simulated over 165 calls of
+which only three land at a position sort.
+
 A phrase that describes something is declared at the sort that names its kind: an adjective
 phrase, a preposition phrase, a relative clause, a participle, a nominal or a noun phrase. The
 places such a phrase stands (before a head, after it, after a copula) are sorts whose members are
