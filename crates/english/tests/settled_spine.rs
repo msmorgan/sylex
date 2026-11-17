@@ -29,8 +29,8 @@ use sylex_syntax::SettledSpine;
 use sylex_vocabulary::LexicalEnvironment;
 
 /// Real units, each for what it exercises:
-/// - *Draugr Necromancer* (3,312 Derivations), *Maralen, Fae Ascendant* (6,208)
-///   and *Remove Enchantments* (1,536): large forests, and on narrowing a spine
+/// - *Draugr Necromancer* (3,312 Derivations), *Maralen, Fae Ascendant* and
+///   *Remove Enchantments* (3,472): large forests, and on narrowing a spine
 ///   that grows to the whole tree;
 /// - *Crook of Condemnation*: a spine that stops where one dependency fork
 ///   begins;

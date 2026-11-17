@@ -444,7 +444,7 @@ mod tests {
     /// Real units for what their forks exercise: a dependency fork
     /// (*Crook of Condemnation*), two attachments one vertex packs
     /// (*Counterbore*), many forks of a large forest with aliases (*Remove
-    /// Enchantments*, 1,536 Derivations), frame Productions the dependency
+    /// Enchantments*, 3,472 Derivations), frame Productions the dependency
     /// answers determine (*Auriok Salvagers*), a frame fork (*Citadel
     /// Gate*), a lexical fork (*Up the Beanstalk*), two leaves in one word
     /// (*The Eternal Wanderer*) and a node on two words' Head Lines (*Helga,

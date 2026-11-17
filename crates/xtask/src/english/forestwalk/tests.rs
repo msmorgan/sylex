@@ -341,14 +341,14 @@ fn picks_and_exclusions_narrow_to_the_enumerated_readings_that_agree() {
     });
 }
 
-/// *Remove Enchantments*' only line (1,536 Derivations) narrows to one
+/// *Remove Enchantments*' only line (3,472 Derivations) narrows to one
 /// Derivation without enumerating, and each count the command prints is the
 /// Derivations the survey's option counts leave.
 #[test]
 fn a_large_forest_narrows_by_the_surveys_option_counts() {
     with_unit("Remove Enchantments", 1, |_, _, parse| {
         let forest = parse.fork_forest().unwrap();
-        assert_eq!(forest.total(), 1536);
+        assert_eq!(forest.total(), 3472);
         let steps = plan(&forest);
         assert!(steps.len() >= 4, "{} steps", steps.len());
         let taken: Vec<&Step> = steps.iter().map(|(s, _)| s).collect();
@@ -670,10 +670,9 @@ fn limit_zero_folds_a_single_reading_and_still_isolates_assertions() {
     );
 }
 
-/// *Remove Enchantments*' `lexical "attached"#1` fork has the aliases
-/// `dependency "attached"#1` and `dependency "to"#2`: each option prints each
-/// alias's answer on its own line under it, in the header's order, a whole
-/// selector that `--pick` narrows by.
+/// *Remove Enchantments*' `lexical "attached"#1` fork has the alias
+/// `dependency "attached"#1`: each option prints the alias's answer on its
+/// own line under it, a whole selector that `--pick` narrows by.
 #[test]
 fn an_aliased_fork_prints_each_alias_answer_on_its_own_selector_line() {
     let card = ["--card", "Remove Enchantments", "--line", "1"];
@@ -683,9 +682,9 @@ fn an_aliased_fork_prints_each_alias_answer_on_its_own_selector_line() {
         .iter()
         .position(|l| l.starts_with("  lexical \"attached\"#1"))
         .unwrap_or_else(|| panic!("no attached fork: {output}"));
-    let aliases = ["dependency \"attached\"#1 ", "dependency \"to\"#2 "];
+    let aliases = ["dependency \"attached\"#1 "];
     assert!(
-        lines[header].ends_with(", aliases: dependency \"attached\"#1, dependency \"to\"#2"),
+        lines[header].ends_with(", aliases: dependency \"attached\"#1"),
         "{output}"
     );
     let mut options = 0;

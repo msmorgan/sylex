@@ -33,8 +33,8 @@ const ENUMERATE: u128 = 10_000;
 /// few (*Crook of Condemnation*, *Cruel Calculations*, and *Aetheric
 /// Amplifier*'s three live roots); tens (*Hauken's Insight*); hundreds
 /// (*Dawnhand Dissident*'s two live roots, *Coram, the Undertaker*); and
-/// thousands (*Draugr Necromancer* 3,312, *Maralen, Fae Ascendant* 6,208,
-/// *Remove Enchantments* 1,536).
+/// thousands (*Draugr Necromancer* 3,312, *Maralen, Fae Ascendant*, *Remove
+/// Enchantments* 3,472).
 const SAMPLE: &[&str] = &[
     "+2 Mace",
     "Crook of Condemnation",
