@@ -298,6 +298,9 @@ punctuation, and where the grammar admits two punctuation forms they are
 distinct Productions, so the tree already says which was written. That works
 because Oracle's punctuation is uniform, and the Editorial Corrections
 ([`corrections.txt`](../../crates/english/corrections.txt)) fix its exceptions.
+The Packed Forest stores none either: a Constituent's children there are
+Constituents and lexical leaves, and the chart crosses a Production's marks
+without recording them, so whatever needs a mark reads it from the Production.
 
 **A Reading stores no capitalization.** No leaf records which case a word was
 written in, and realization derives each capital from structure, as it
