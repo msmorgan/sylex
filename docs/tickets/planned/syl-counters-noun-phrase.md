@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter, syl-union-membership]
+needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter]
 specs: [voice-and-object-phrases, kind-sorts-and-position-unions, confers-and-rules]
 ---
 
