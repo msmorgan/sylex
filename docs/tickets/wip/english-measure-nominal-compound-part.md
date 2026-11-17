@@ -22,7 +22,8 @@ every `Nominal` coordination, so one whose non-final conjunct is a determined si
 
 ## Done when
 
-- `+NounPhrase a 2/2 or 3/3` and `+NounPhrase a white 2/2 and blue 3/3` each have 1 Reading, while
+- `+NounPhrase a 2/2 or 3/3` has 1 Reading and `+NounPhrase a white 2/2 and blue 3/3` has 2 Readings
+  (narrow `Premodifier` on *2/2* and wide `CoordinationPremodifier` over *2/2 and blue 3/3*), while
   `+NounPhrase a +2/+0, +1/+1, or +0/+2 counter` and `+NounPhrase a +1/+1 or -1/-1 counter` each
   keep 1 Reading (`Kind`).
 - The census shows no Reading lost on the supported corpus, and `cargo xtask english strata

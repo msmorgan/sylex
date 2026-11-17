@@ -293,7 +293,7 @@ category ComplementNounPhrase : NounPhrase [
 // Complement's.
 category Nominal [
     Variable, Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead,
+    ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead, KindLicense,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, Determination, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
@@ -1313,10 +1313,11 @@ PawprintPremodifier: BareNominal -> modifier:Pawprints BareNominal
 SymbolPremodifier: BareNominal -> modifier:Symbols BareNominal
 // A slash measure is a noun only under a determiner (*an additional
 // +2/+2*); bare, it is a MeasureNounPhrase. A fused head (*a 3/3*
-// [creature]), so never a non-final Conjunct of a Nominal Coordination, an
+// [creature]), so never coordinated with a final *counter* Conjunct, an
 // admission gate (english.md §6): it keeps *[a +2/+0], [+1/+1], or [+0/+2
 // counter]* from beside the coordination of the counter's kinds *a [+2/+0,
-// +1/+1, or +0/+2] counter* (Frankenstein's Monster).
+// +1/+1, or +0/+2] counter* (Frankenstein's Monster) while admitting *a
+// 2/2 or 3/3* and *a white 2/2 and blue 3/3*.
 MeasureNominal: BareNominal -> Measure
     where $.MeasureHead = Fused,
           $.Determination = Overt,
@@ -3768,17 +3769,17 @@ coordination NounPhrase {
 coordination Nominal {
     coordinators: And,
     unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead],
-    proximate: [NounDistribution],
+    proximate: [NounDistribution, KindLicense],
 }
-    where first.MeasureHead != Fused,
+    where !(first.MeasureHead = Fused & last.KindLicense = Head),
           $.Number = Plural,
           $.ConjunctNumber = first.Number
 coordination Nominal {
     coordinators: Disjunctive,
     unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber, MeasureHead],
-    proximate: [NounDistribution],
+    proximate: [NounDistribution, KindLicense],
 }
-    where first.MeasureHead != Fused,
+    where !(first.MeasureHead = Fused & last.KindLicense = Head),
           $.ConjunctNumber = $.Number
 coordination GenitiveNominals {
     coordinators: Coordinator,
