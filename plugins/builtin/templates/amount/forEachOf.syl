@@ -1,0 +1,7 @@
+# "N for each of <group>": `forEach` over a group named by a noun phrase, where the distributive
+# partitive "each of" quantifies it ("{1} for each of those creatures"). The count is of the whole
+# group, every one of its members.
+template forEachOf(per: Amount, group: NounPhrase): Amount {
+  spelling = "$per for each of $group",
+  body = times($per, numberOf($group))
+}

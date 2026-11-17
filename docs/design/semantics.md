@@ -174,7 +174,9 @@ endophora. Whatever the technique, a referent is accessible to an anaphor only i
    creature with mana value 3 or less. They can't be regenerated."; *Promise of Loyalty*'s "Each
    player puts a vow counter on a creature they control … Each of those creatures …"). Inside a
    deontic rule's Unless Condition (§3.3), a universal participant is read one member at a time: a
-   plural anaphor reads the domain distributively, and a singular one reads the member at hand.
+   plural anaphor reads the whole domain, a predicate on it holding of each member and a count of
+   it counting every member (*Archon of Absolution*'s "pays {1} for each of those creatures"), and
+   a singular one reads the member at hand.
 3. Its sort, zone and Head Noun fit the anaphor's carrier word ([CR#109.2]).
 4. The consuming verb can apply to it in its zone ([CR#109.2,701.21a]). A creature that died
    cannot be sacrificed or have counters put on it as a permanent.

@@ -10,6 +10,6 @@ card singleFaced({
         gatedBy(
           actor(allOf(creature)),
           attack(defender = or([you, allOf(nominal(planeswalker, post = [youControl]))])),
-          scaledGenericMana(times(1, numberOf(those(creature))))))],
+          scaledGenericMana(forEachOf(1, those(creature)))))],
     power = 3,
     toughness = 2})
