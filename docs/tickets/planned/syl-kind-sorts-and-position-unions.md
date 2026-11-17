@@ -51,8 +51,33 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
   a Template's body, until the clause and voice tickets compose each wording from its verb.
   `Predicate` retires when the last of them and its other consumers leave.
 
+- A depictive ("enters tapped", "put onto the battlefield face down") is built from the same
+  kinds, so no word is declared again for standing after a verb; `MoveRider` stays as it is until
+  `syl-verb-phrase-dependents` replaces it.
+
+## Open questions
+
+- **Keyword parameters.** The grammar reads them as a nominal, a noun phrase or an adjective
+  phrase ("enchant creature", "protection from red"), a union of its own, and retyping them is
+  what retires `Predicate`'s largest consumers. Is that union part of this spec or a later one?
+- **Complements after a head.** "Abilities of creatures" has "of creatures" as a complement of
+  the noun, not a modifier, and it stands in `post`. Is `post` the head's post-head dependents
+  under its present sort name, or do complements get a slot of their own?
+- **Status words.** "Tapped" is an adjective, "face down" a preposition phrase and "face-down" a
+  third word; the first two are both members of `Predicative`, so they need distinct names, and
+  `becomeStatus` and `entersAs` must say which they take.
+- **Negation.** `not` at `PostModifier` is spelled "not $modifier" where its callers mostly print
+  "without", "with no" or "that aren't", which are different wordings and so different
+  declarations.
+- **The relative clause's owner.** `syl-lookback-operator-and-holds`,
+  `syl-passive-participle-and-trigger-events` and `syl-clause-and-imperative` each could declare
+  `RelativeClause`.
+- **A verb's form in a union slot.** A verb phrase in `post` prints as a participle, and the
+  spelling notation has no way to say which form a union-typed Hole takes.
+
 ## Done when
 
+- The open questions are answered, each answer written in the spec.
 - `docs/specs/kind-sorts-and-position-unions.md` states the design above and settles what it
   leaves open: the membership declaration's syntax; where membership falls in a word's resolution
   order (`syl.md` §3) and how Reaches and the ambiguous-skeleton load rule (`spelling.md` §7)
@@ -78,6 +103,7 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 ## Not in scope
 
 - Declaring a coordinator once for every sort it coordinates.
+- The verb phrase's dependent list and `MoveRider`'s removal: `syl-verb-phrase-dependents`.
 - A typed Rust representation of the surface term.
 
 ## Pointers
@@ -85,7 +111,8 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 - Evidence: `docs/evidence/syl-kind-sorts/research.md` (the findings, pool counts and experiments)
   and `declaration-table.md` (every declaration classified).
 - `plugins/builtin/{primitives,templates}/{preModifier,postModifier,predicative,predicate}/`,
-  `plugins/builtin/coercions/`; `crates/xtask/src/dsl_check/{coercion,nominal,schema,sort,spelling}.rs`
+  `plugins/builtin/coercions/`;
+  `crates/xtask/src/dsl_check/{coercion,nominal,schema,sort,spelling}.rs`
 - `crates/english/grammar/english.fug` (the `{ function }` Categories and their productions);
   `crates/english/README.md` for reading a card's parse
 - `docs/design/{syl,surface,spelling,semantics,architecture}.md`;
