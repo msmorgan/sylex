@@ -27,6 +27,10 @@ color among permanents you control", *Pledge of Loyalty*), or, in 17 units, an a
   black" prints it as a noun. Either the color word also stands as a noun there, by a route that
   does not give `red` two readings before a head, or the term writes the adjective and recovery
   maps the noun to it.
+- **What is left of `Predicate`.** Its unspelled tests (`compare`, `currentFace`, `hasPossessor`,
+  `predicateDid`) duplicate the ones at `Test`, and its spelled copies of phrases (`in`, `named`,
+  `youControl`, `hasType`, …) duplicate the kind declarations. Each goes when its last caller
+  takes the kind's or `Test`'s.
 - **A quality inside a description.** 23 rule bodies write `pre = [hasQuality($quality)]`
   (`protection`, `landwalk`, `affinity`, `champion`, `splice`, `typecycling`, `behold`,
   `devourEntry`, `splitSecond` and others). A noun-phrase quality is no premodifier, so each body

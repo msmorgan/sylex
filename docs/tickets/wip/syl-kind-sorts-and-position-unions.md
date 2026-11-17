@@ -27,17 +27,17 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
 
 - The kinds of phrase are sorts: `AdjectivePhrase` ("red", "legendary", "tapped", "other than
   X"), `PrepositionPhrase` ("in your graveyard", "with flying", "face down"), `RelativeClause`
-  ("you control", "that's white or blue"), and the existing `VerbPhrase` (as a participle:
-  "exiled", "attacking"), `NounPhrase` and `Nominal`. Each phrase is declared once, at its kind.
+  ("you control", "that's white or blue"), `Participle` ("attacking", "exiled", "controlled by
+  X") until the passive makes it `VerbPhrase`, and the existing `NounPhrase` and `Nominal`. Each
+  phrase is declared once, at its kind.
 - A sort may have member sorts: a member's values are the sort's values, written as themselves,
   with no body. Membership is transitive and replaces coercion: `Color` and `Supertype` are
   members of `AdjectivePhrase`, `CardType` and `Subtype` of `Nominal`, `Int` of `Amount`, and the
   wrapping primitives go.
 - `PreModifier`, `PostModifier` and `Predicative` are position sorts, whose members are the kinds
-  that stand there: an adjective phrase, a nominal or a verb phrase before a head; a preposition
-  phrase, a relative clause, a verb phrase or an adjective phrase after it; an adjective phrase,
-  a preposition phrase or a noun phrase after a copula. A verb phrase's membership states that it
-  is a participle there.
+  that stand there.
+- The unspelled tests (`hasPossessor`, `inCombat`, `compare`, …) are declared once at `Test`, a
+  member of the three position sorts, and a Template at a kind may have its body there.
 - Membership is by kind. It admits a wording English does not print in that position; no finer
   sort refuses it.
 - A type or subtype word is one word wherever it stands, and `token` and `permanent` are one
@@ -50,14 +50,13 @@ phrase. `docs/specs/voice-and-object-phrases.md` already puts a `VerbPhrase` in 
   it is at until that ticket lands.
 - `post` holds every dependent printed after the head in printed order, a complement the head
   selects ("half of this split card") and a modifier alike; the term does not mark which.
-- `Status` is not a sort of the surface term: "tapped", "untapped" and "flipped" are adjective
-  phrases, "face down", "face up", "phased in" and "phased out" preposition phrases, and
-  "face-down" and "phased-out" Templates bound to the place before a head.
+- `Status` stays the sort of the game's statuses and is a member of nothing: "tapped", "untapped"
+  and "flipped" are adjective phrases over the status, "face down", "face up", "phased in" and
+  "phased out" preposition phrases, and "face-down" and "phased-out" Templates bound to the place
+  before a head.
 - `not` at `PostModifier` goes. Each caller writes what it prints: a `without` preposition phrase,
   "with no …" as its own wording, or a relative clause over the predicative `not`. `non-` stays at
   `PreModifier` and `not` at `Predicative`.
-- The ticket that builds membership declares `RelativeClause` and moves today's fixed relatives
-  onto it; `syl-clause-and-imperative` composes a relative from a clause with a gap.
 - Keyword parameters stay at `Predicate`; `syl-keyword-quality-union` decides their sort.
 - A depictive ("enters tapped", "put onto the battlefield face down") is built from the same
   kinds; `MoveRider` stays as it is until `syl-verb-phrase-dependents` replaces it.

@@ -7,8 +7,8 @@ specs: [kind-sorts-and-position-unions, voice-and-object-phrases]
 
 ## Why
 
-`hasCounter`, `hasKeyword`, `compare`, `shares`, `hasDesignation` and `named` stand at
-`Predicative`, the complement of "be", for wordings whose verb is "have": "has no ice counters on
+The tests `hasCounter`, `hasKeyword`, `compare`, `shares` and `hasDesignation`, and `named` at
+`Predicative`, are called after "is" for wordings whose verb is "have": "has no ice counters on
 it" (*Dark Depths*), "has two or fewer loyalty counters on him" (*Garruk Relentless*), "as though
 it didn't have defender" (*Bristlepack Sentry*), "has the same name as" (*Candles of Leng*), "has
 the city's blessing" (ascend), "has the chosen name". Each is unspelled or spelled as a different
@@ -24,8 +24,8 @@ phrase (the with-phrase of the same name), so the term does not say what the car
 ## Done when
 
 - The open question is answered in the declaration's doc comment.
-- Each wording above is written as its card or rule prints it, and no declaration at
-  `Predicative` stands for a "has …" wording. `hasDesignation`'s three wordings ("you're the
+- Each wording above is written as its card or rule prints it, and no test or `Predicative`
+  declaration stands for a "has …" wording. `hasDesignation`'s three wordings ("you're the
   monarch", "while saddled", "has the city's blessing") are each written at the kind they print.
 - The landing runs the `syl-number-snapshot` diff and explains every flagged line.
 - `cargo xtask dsl check`, `cargo xtask dsl fmt --check` and `cargo test -p xtask` pass.
@@ -39,4 +39,4 @@ phrase (the with-phrase of the same name), so the term does not say what the car
 ## Pointers
 
 `docs/specs/kind-sorts-and-position-unions.md` §4; `docs/specs/voice-and-object-phrases.md`;
-`plugins/builtin/primitives/predicative/{hasCounter,hasKeyword,compare,shares,hasDesignation,named}.syl`.
+`plugins/builtin/primitives/predicative/named.syl` and the tests at `Test`.
