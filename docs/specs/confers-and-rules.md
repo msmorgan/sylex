@@ -4,6 +4,19 @@ A declaration that carries rules states each one in one of two fields, and the f
 many times the rule is enabled. Top-level rules rows can be named, so that card text can name a
 rule the way it names a keyword.
 
+## Status: DRAFT
+
+This spec gives direction, not a settled design. One of the tickets that build it has landed
+(`syl-supertype-declarations`); the rest has not been built or run through `cargo xtask dsl
+check`. Where building it shows a rule here to be wrong or incomplete, the finding stands and
+this text is revised; a builder reports the conflict and does not bend the code to fit the spec.
+
+Known to be unsettled: `syl-counters-noun-phrase` makes a +X/+Y kind `boost(power, toughness)`
+and a keyword counter's kind a parameterized kind over its keyword, and deletes the per-kind
+declarations (`p1p1Counter`, `flyingCounter`). So the `confers` §2 and §3 put on those
+declarations are the parameterized kinds', a scope written `hasCounter(kind = p1p1Counter)` names
+its kind another way, and `printedKind` in §7's example goes.
+
 The `.syl` below is the shape of the design. It has not been run through `cargo xtask dsl check`;
 every word it uses exists at the sort it is used at unless it is marked NEW.
 
@@ -100,15 +113,15 @@ and toxic 1 gives three poison counters once [CR#702.164c]. Its scope names `tox
 
     ability toxic(amount: Amount) {
       lexical = {lemma = "toxic", parameters = [[Amount]]},
-      spelling = "toxic <amount>",
+      spelling = "toxic $amount",
       number = $amount,                      # NEW field
       body = [],
       rules = [{                             # NEW field
         scope = nominal(creature, post = [hasKeyword(theKeyword(toxic))]),
         confer = property(
           asEvent(
-            does(actor(this), dealDamage(kind = combat, recipient = a(player))),
-            putCounters(totalToxicValue(this), printedKind(poison), that(player))))}]
+            does(actor(this(creature)), dealDamage(kind = combat, recipient = a(player))),
+            putCounters(totalToxicValue(this(creature)), printedKind(poison), that(player))))}]
     }
 
 ## 8. No parameter reads inside `rules`

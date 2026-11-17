@@ -1,5 +1,5 @@
 ---
-needs: [cleanup-step6-surface, syl-declaration-rules-field]
+needs: [cleanup-step6-surface, syl-declaration-rules-field, syl-counters-noun-phrase]
 specs: [confers-and-rules]
 ---
 
@@ -21,8 +21,8 @@ Written against the surface (`cleanup-step6-surface`).
 
 ## Design
 
-- A per-counter effect stays in the counter's `confers`: the keyword counters' keywords
-  [CR#122.1b] and hone [CR#122.1j]. A once-for-one-or-more effect goes in its `rules`, scoped with
+- A per-counter effect stays in a kind's `confers`: the keyword kind's keyword [CR#122.1b], which
+  `syl-counters-noun-phrase` writes, and hone [CR#122.1j]. A once-for-one-or-more effect goes in its `rules`, scoped with
   `hasCounter(<kind>)`: shield [CR#122.1c], stun [CR#122.1d], finality [CR#122.1h], rad
   [CR#122.1i,729.1] and the ten-poison loss [CR#122.1f,704.5c] (spec §3).
 
@@ -33,10 +33,9 @@ Written against the surface (`cleanup-step6-surface`).
 
 ## Done when
 
-- Every keyword counter [CR#122.1b] (`firstStrikeCounter`, `doubleStrikeCounter`,
-  `deathtouchCounter`, `decayedCounter`, `exaltedCounter`, `hasteCounter`, `hexproofCounter`,
-  `indestructibleCounter`, `lifelinkCounter`, `menaceCounter`, `reachCounter`, `shadowCounter`,
-  `trampleCounter`, `vigilanceCounter`) confers its keyword as `flyingCounter` does.
+- The keyword kind confers its keyword [CR#122.1b] and `boost` its numbers [CR#122.1a], each per
+  counter, as `syl-counters-noun-phrase` leaves them; no keyword counter has a declaration of its
+  own.
 - `shieldCounter` [CR#122.1c], `stunCounter` [CR#122.1d], `finalityCounter` [CR#122.1h],
   `radCounter` [CR#122.1i,729.1] and `honeCounter` [CR#122.1j] write the effect their rule
   states, hone in `confers` and the others in `rules`.

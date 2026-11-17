@@ -1,6 +1,6 @@
 ---
 needs: [cleanup-step6-spine, syl-nominal-descriptions, english-counter-kind-premodifies-counter, syl-union-membership]
-specs: [voice-and-object-phrases, kind-sorts-and-position-unions]
+specs: [voice-and-object-phrases, kind-sorts-and-position-unions, confers-and-rules]
 ---
 
 # The counters a verb puts or removes are a noun phrase
@@ -39,11 +39,13 @@ the passive of "put" has nothing to promote until the counters are a phrase (spe
     kind names and also keywords that no keyword counter can be.
 - A coordination of kinds is written inside the argument: *Denry Klin, Editor in Chief*'s "a
   +1/+1, first strike, or vigilance counter".
-- What a counter confers is stated once per rule: a keyword counter gives its keyword and a
-  +X/+Y counter its boost [CR#122.1a,122.1b]. The per-kind `counter` declarations that only repeat
-  their keyword or measure (`flyingCounter`, `p1p1Counter` and the others
+- What a counter confers is stated once per rule, in the `confers` of the parameterized kind,
+  enabled once per counter (`docs/specs/confers-and-rules.md` §1): `boost` gives its numbers
+  [CR#122.1a] and the keyword kind its keyword [CR#122.1b]. The per-kind `counter` declarations
+  that only repeat their keyword or measure (`flyingCounter`, `p1p1Counter` and the others
   `english-counter-kind-premodifies-counter` lists) and the uncalled `grants` Template are
-  deleted.
+  deleted. The counters whose rules are their own (shield, stun, finality, rad, hone, poison)
+  are `syl-counter-conferrals`'s.
 - `printedKind` and `anyKind` are deleted, and `thoseCounters`, `chosenKind`,
   `distinctChosenKinds` and `sameKindAs` are each replaced by the noun phrase their line prints
   (*Winding Constrictor*'s "of each of those kinds of counters", *Helica Glider*'s "your choice
