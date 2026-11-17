@@ -163,7 +163,7 @@ Each was settled while adjudicating the migrated judgments.
   (CGEL Ch. 15 §5, pp. 1350–1351).
 - A multiword term declared as one lexeme is one leaf, named by its quoted
   lemma (`as Modifier of "combat damage"`), except where its words straddle a
-  constituent boundary (*the first time [counters have been put ...]*).
+  constituent boundary (`docs/design/lexicon.md` §5).
 - A card's own name, full or Shortened, is its own only on that card:
   `<card=...>` is needed for any self-reference by name. Without it a card
   name is another card's, which stands only after *named* (`NameComplement

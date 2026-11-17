@@ -148,23 +148,32 @@ some declaration is too broad, such as a preposition's Host Categories, and the
 fix is to correct that declaration.
 
 **License features.** A license feature is a lexical feature by which a Catalog
-licenses its own words in one position: it marks each of the Catalog's words,
-which stand nowhere else, and the head that admits them there, which admits
-no other word of their kind there. It is declared by the Catalog, on its words
-and on that head, never by the grammar on a word it names. One is allowed where
-the Catalog's words, read as words of an ordinary Category, would take that
-Category's whole distribution, and the census shows the distribution
-multiplying Readings on real card text. Its feature comment in the grammar
-names the Catalog and the position. `KindLicense` is the one: the
-counter Catalog marks each counter's kind name (*charge*, *time*), which stands
-only as the kind premodifying the noun *counter*, and *counter*, which takes no
-noun premodifier but its kind, a slash measure or a keyword [CR#122.1]. As
-ordinary nouns, the kind names would head nominals and premodify any noun,
-and many are homographs of other words (*Treasure*, *time*). Why: the counter
-kinds are open, as every Catalog is, and *counter* is the one head they
-modify. A license states that as a lexical fact of the Catalog, where a
-Production per kind would name Catalog items (§2), and it leaves the
-attachment of general adjuncts to Category, function and grammatical feature.
+licenses one position: it marks the Catalog's words that stand only there, and
+the one head whose position it is, which takes there only what the license
+admits. The Catalog declares it, on its words and on that head; the grammar
+never puts it on a word it names. One is allowed where the Catalog's words,
+read as words of an ordinary Category, would take that Category's whole
+distribution, and the census shows that distribution multiplying Readings on
+real card text. Each equation that reads it is an admission gate (§6), and its
+comment names a real card and the spurious structure it prevents.
+`KindLicense` is the one. The counter Catalog marks each counter's kind name
+(*charge*, *time*) and each keyword a keyword counter can be [CR#122.1b]
+`Kind`, and the noun *counter* `Head`. A `Kind` word is a kind only before
+*counter*, and a kind name is nothing else: it heads no nominal, premodifies
+no other noun and names nothing. *Counter* takes its kind as one premodifier,
+a slash measure, a licensed keyword, a kind name or a coordination of them,
+and no other noun premodifier: a measure or keyword before it is its kind,
+never also the general measure or keyword premodifier, and an ordinary noun
+before it (*time*, *loyalty*) is no premodifier of it. A slash measure and a
+keyword are no Catalog words, so the license reaches them only through the
+head. `Head` has one holder, *counter*, which binding reports as a value with
+fewer than two holders ([Lexicon](lexicon.md) §4): the position has one head.
+Why: as ordinary nouns the kind names would head nominals and premodify any
+noun, and many are homographs of other words (*Treasure*, *time*). The kinds
+are open, as every Catalog is; a license states their one position as a
+lexical fact of the Catalog, where a Production per kind would name Catalog
+items (§2), and it leaves the attachment of general adjuncts to Category,
+function and grammatical feature.
 
 ## 4. Admission and ambiguity
 
