@@ -228,12 +228,12 @@ GROUP BY lemma, frame ORDER BY some_units DESC LIMIT 6;
 
 ```
 lemma  frame                                                                              some_units  every_units
-block  Monotransitive(NP)                                                                        719           16
-put    TransitiveWithPP(NP,PP[prep:into|prep:in|prep:on|prep:onto|prep:back|prep:there])         558          549
+block  Monotransitive(NP)                                                                        718           15
+put    TransitiveWithPP(NP,PP[prep:into|prep:in|prep:on|prep:onto|prep:back|prep:there])         558          542
 deal   TransitiveWithPP(NP,PP[prep:to])                                                          405          393
-deal   Ditransitive(NP,NP)                                                                       390           81
-name   ComplexTransitive(NP,Name)                                                                334          314
-exile  Monotransitive(NP)                                                                        323          247
+deal   Ditransitive(NP,NP)                                                                       390           82
+name   ComplexTransitive(NP,Name)                                                                343          318
+exile  Monotransitive(NP)                                                                        323          243
 ```
 
 The verbs of *would* clauses, by Voice (1,084 units have one):
@@ -249,7 +249,7 @@ lemma  voice    units
 deal   Passive    449
 deal   Active     207
 put    Passive    125
-be     Active     116
+be     Active     115
 die    Active      95
 draw   Active      49
 gain   Active      20
@@ -266,12 +266,12 @@ FROM verb_phrase_tokens GROUP BY context ORDER BY some_units DESC;
 
 ```
 context                   some_units  every_units
-effect clause                  45182        43571
-other                          15507        14007
-trigger clause                 13668        13406
-relative clause                11509        11203
-deontic                         7199         5221
-participial postmodifier        1959         1244
+effect clause                  45182        43642
+other                          15528        14088
+trigger clause                 13669        13399
+relative clause                11500        11209
+deontic                         7199         5202
+participial postmodifier        1951         1269
 would clause                    1084          919
 ```
 
@@ -309,12 +309,12 @@ FROM coordinations GROUP BY 1, 2, 3 ORDER BY some_nodes DESC LIMIT 6;
 
 ```
 category          coordinator          conjuncts  some_nodes  settled_nodes
-Nominal           or                           2        4958           1006
-VerbPhrase        and                          2        4242           1146
-Clause            Clause#LinkedClause          2        2485            459
-Clause            and                          2        2411           1215
-NounPhrase        and                          2        2359            564
-DeterminerPhrase  or                           2        1969           1709
+Nominal           or                           2        4937           1007
+VerbPhrase        and                          2        4504           1152
+NounPhrase        and                          2        2867            467
+Clause            Clause#LinkedClause          2        2505            458
+Clause            and                          2        2436           1206
+DeterminerPhrase  or                           2        1971           1709
 ```
 
 Forks whose options are a wide and a narrow attachment over a coordination
@@ -327,8 +327,8 @@ modifies *gets +2/+2 and gains trample* or *gains trample*, and in *put a
 +1/+1 counter on each creature you control and those creatures gain trample
 until end of turn* the Clause coordination or the Verb Phrase *gain*. Each
 option's count is the whole option's: where an option also packs Derivations
-that coordinate differently, `narrow_derivations` counts those too. 4,882
-forks in 3,856 units, by each option's function and governor Category:
+that coordinate differently, `narrow_derivations` counts those too. 5,753
+forks in 4,533 units, by each option's function and governor Category:
 
 ```sql
 SELECT wide_function, wide_governor_category, narrow_function, narrow_governor_category,
@@ -338,12 +338,12 @@ FROM wide_narrow_attachments GROUP BY 1, 2, 3, 4 ORDER BY forks DESC LIMIT 6;
 
 ```
 wide_function  wide_governor_category  narrow_function  narrow_governor_category  forks  units
-modifier       Nominal                 modifier         Nominal                    1635   1361
-adjunct        VerbPhrase              adjunct          VerbPhrase                 1461   1229
-adjunct        Clause                  adjunct          VerbPhrase                  734    633
-adjunct        Clause                  adjunct          Clause                      718    643
-adjunct        Clause                  modifier         Nominal                     336    296
-adjunct        VerbPhrase              modifier         Nominal                     247    209
+modifier       Nominal                 modifier         Nominal                    1641   1367
+adjunct        VerbPhrase              adjunct          VerbPhrase                 1409   1220
+modifier       NounPhrase              modifier         Nominal                    1061    822
+adjunct        Clause                  adjunct          VerbPhrase                  735    634
+adjunct        Clause                  adjunct          Clause                      717    643
+adjunct        Clause                  modifier         Nominal                     339    299
 ```
 
 Units where the two options are every Derivation:
@@ -364,7 +364,7 @@ Abandon Reason                 until      and   gain                        1   
 Aberrant                       controls   or    enchantment                 1                   1            2
 Aberrant Mind Sorcerer         When       then  choose                      5                   5           10
 Abeyance                       Until      and   can't                       1                   1            2
-Abomination, Irradiated Brute  control    or    Villain                     1                   1            2
+Abomination                    creature   or    by                          1                   1            2
 ```
 
 The census faces with no Vintage `Legal` or `Restricted` printing in mtgjson
