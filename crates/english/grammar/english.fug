@@ -2165,6 +2165,8 @@ ComparativeIndirectComplement: Nominal ->
           modifier.AdjectivePosition != Predicative,
           modifier.Determination = $.Determination
 // The same for a non-scalar governor of inequality (CGEL 13§5.4:1143–1145).
+// English also has *from* and *to* here (*a different question from the one I
+// asked*); Oracle prints only *than*.
 NonScalarIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, Than)
     where modifier.Grade := NonScalarInequality,
