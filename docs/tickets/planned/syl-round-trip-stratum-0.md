@@ -1,5 +1,5 @@
 ---
-needs: []
+needs: [english-capitalization-derived]
 ---
 
 # A term is recovered from a Reading and printed back: Stratum 0
