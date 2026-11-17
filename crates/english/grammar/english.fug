@@ -2476,11 +2476,17 @@ ClauseCondition: Condition -> Clause
 KeywordInstruction: Sentence -> KeywordLineItem '.' { capital: [head] } where head.KeywordForm = Parametric
 // A floating quantifier after a plural Subject (*they each*) or *you*,
 // singular in Oracle but with plural verb forms (*You each lose life*).
+// `!(adjunct.Number = Plural & subject.Number = Singular)`: an admission gate
+// (english.md §6) against *both* floated after *you*, where it is the
+// correlative of a coordination (*all enchantments you [both own and
+// control]*, Remove Enchantments); *both* floats after a plural Subject, as
+// FloatedObjectBoth's Object is plural.
 // Twin: RelativeFloatedEach.
 FloatedEach: Clause -> subject:NounPhrase adjunct:Class(FloatingQuantifier) VerbPhrase {
     transparent: [head],
 }
     where !(subject.Number = Singular & subject.Person = Third),
+          !(adjunct.Number = Plural & subject.Number = Singular),
           subject.Case != Accusative,
           subject.Number = head.Number,
           subject.Person = head.Person,
@@ -3218,6 +3224,7 @@ RelativeCliticSubjectPredicate: SubjectInitialClause ->
 RelativeFloatedEach: SubjectInitialClause ->
     subject:NounPhrase adjunct:Class(FloatingQuantifier) VerbPhrase { transparent: [head] }
     where !(subject.Number = Singular & subject.Person = Third),
+          !(adjunct.Number = Plural & subject.Number = Singular),
           subject.Case != Accusative,
           subject.Number = head.Number,
           subject.Person = head.Person,

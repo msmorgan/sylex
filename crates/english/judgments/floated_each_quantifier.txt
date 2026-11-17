@@ -13,6 +13,8 @@
 + <card=Ballroom Brawlers> Whenever this creature attacks, this creature and up to one other target creature you control both gain your choice of first strike or lifelink until end of turn. => NounPhrase "this creature and up to one other target creature you control" as Subject of gain
 + <card=Keen Duelist> At the beginning of your upkeep, you and target opponent each reveal the top card of your library. You each lose life equal to the mana value of the card revealed by the other player. You each put the card you revealed into your hand. => NounPhrase "you and target opponent" as Subject of reveal; NounPhrase "You" as Subject of lose; NounPhrase "You"#2 as Subject of put
 + <card=Juxtapose> You and target player exchange control of the creature you each control with the greatest mana value. => RelativeClause "you each control" gap "creature"
+# "Both" floats after a plural Subject; after "you" it is the correlative of the coordination
++ <card=Obelisk of Undoing> {6}, {T}: Return target permanent you both own and control to your hand. => readings 1
 *Clause this creature each gains flying
 *Clause this creature both gains flying
 *Clause you each loses 2 life

@@ -457,6 +457,19 @@ struct Child {
     gap: GapRule,
 }
 
+impl Child {
+    /// Whether it is a Preposition Phrase a frame selects.
+    fn is_preposition_phrase(&self) -> bool {
+        matches!(
+            self.symbol,
+            Symbol::Cat {
+                prepositions: Some(_),
+                ..
+            }
+        )
+    }
+}
+
 /// A Production under construction, before equations are resolved.
 #[derive(Clone)]
 #[expect(
@@ -3765,6 +3778,36 @@ impl<'a> Binder<'a> {
         Ok(drafts)
     }
 
+    /// `draft` with its Object postposed to the end of the phrase.
+    fn shifted_object_order(draft: &Draft) -> Draft {
+        let mut shifted = draft.clone();
+        shifted.extend_id("shifted-object");
+        shifted.shifted_object = true;
+        let object = shifted.children.remove(1);
+        shifted.children.push(object);
+        // The postposed Object follows any Gap.
+        shifted.gap_followed = shifted.introduces != Gap::None;
+        let last = shifted.children.len() - 1;
+        let map = |i| match i {
+            0 => 0,
+            1 => last,
+            _ => i - 1,
+        };
+        remap_draft(&mut shifted, map);
+        // An admission gate (english.md §6): a Preposition Phrase the
+        // Object crosses holds no Gap, so no Object is postposed past a
+        // stranded preposition (*each Aura attached to* — *[it]*, Portal of
+        // Sanctuary; *all Auras you own attached to* — *[permanents you
+        // control]*, Remove Enchantments). The same words always have the
+        // Object's own Gap (*attached* — *to it*).
+        for child in &mut shifted.children[1..last] {
+            if child.is_preposition_phrase() && child.gap == GapRule::Transparent {
+                child.gap = GapRule::Closed;
+            }
+        }
+        shifted
+    }
+
     fn internalized_orders(draft: &Draft) -> Vec<Draft> {
         let mut ordered = Vec::new();
         // The internalized Complement (CGEL, Ch. 16 §10.1.1, pp. 1428–1429)
@@ -3874,15 +3917,7 @@ impl<'a> Binder<'a> {
         let mut unordered = BTreeSet::new();
         for draft in drafts {
             ordered.extend(Self::internalized_orders(&draft));
-            let pp = |c: &Child| {
-                matches!(
-                    c.symbol,
-                    Symbol::Cat {
-                        prepositions: Some(_),
-                        ..
-                    }
-                )
-            };
+            let pp = Child::is_preposition_phrase;
             // An Object postposes to the end of its phrase (CGEL, Ch. 16 §4,
             // pp. 1382–1384): past selected Preposition Phrases ([1iv] *put
             // on the table [a large blue bucket full of ice-cubes]*), and,
@@ -3901,20 +3936,8 @@ impl<'a> Binder<'a> {
                 && (2..draft.children.len())
                     .all(|i| pp(&draft.children[i]) || draft.predicative == Some(i))
             {
-                let mut shifted = draft.clone();
-                shifted.extend_id("shifted-object");
-                shifted.shifted_object = true;
-                let object = shifted.children.remove(1);
-                shifted.children.push(object);
-                // The postposed Object follows any Gap.
-                shifted.gap_followed = shifted.introduces != Gap::None;
+                let mut shifted = Self::shifted_object_order(&draft);
                 let last = shifted.children.len() - 1;
-                let map = |i| match i {
-                    0 => 0,
-                    1 => last,
-                    _ => i - 1,
-                };
-                remap_draft(&mut shifted, map);
                 if last == 1 || !draft.children[2..].iter().all(pp) {
                     // Only an Object that carries their features is heavy:
                     // not one of another Slot Kind (a keyword phrase).

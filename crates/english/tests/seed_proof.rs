@@ -388,6 +388,16 @@ fn extraction_across_verb_forms() {
         "hand the card is put into",
         "is put into",
     );
+    // No Object is postposed past a stranded preposition: the Gap is the
+    // Object's (*put* — *into the card*), never *into*'s.
+    let crossed = s.readings("Exile the hand you put into the card.");
+    assert_ne!(crossed, [] as [Reading; 0]);
+    for reading in &crossed {
+        assert!(
+            !s.has(reading, "PrepositionPhrase", "into"),
+            "an Object postposed past a stranded preposition"
+        );
+    }
 }
 
 #[test]

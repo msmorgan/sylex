@@ -22,8 +22,7 @@ Object after it. `valence_order` in `crates/syntax/src/compile.rs` postposes an 
 selected Preposition Phrase, a gapped one included. Across the pool a shifted Object inside a
 relative clause is in 28 units and is the only analysis in none (*attach* 8, *deal* 10, *put* 7);
 on *Portal of Sanctuary* the shifted Object is the pronoun "it" (*each Aura attached to* — *it*).
-Postposing depends on the weight of what is crossed (CGEL, Ch. 16 §4, pp. 1382–1384), and a
-stranded preposition is no heavier than a particle.
+The same words always have the analysis with the Object's own Gap (*attached* — *to it*).
 
 Reproduce with `cargo xtask english forestwalk --card 'Remove Enchantments' --line 1` and read
 the options of `dependency "both"#1` and `dependency "permanents"#1`.
@@ -41,7 +40,7 @@ the options of `dependency "both"#1` and `dependency "permanents"#1`.
 ## Done when
 
 - *Remove Enchantments* line 1 has no Derivation in which *both* is an Adjunct of a Clause, and
-  none in which "permanents" or "creatures" is the Object of *attached*.
+  none in which "permanents" or "creatures" is the Object of *attached* after a Gap under *to*.
 - *Portal of Sanctuary* line 1 has no Derivation in which "it" is the Object of *attached*.
 - Judgment entries witness the floated *both* after a plural Subject and the shifted Object past a
   complete Preposition Phrase on real card text, and refuse the two gated structures.
