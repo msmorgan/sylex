@@ -11,7 +11,7 @@ ability harmonize(cost: Cost) {
       can(
         actor(you),
         cast(
-          this,
+          this(card),
           from = yourGraveyard,
           altCost = payingInstead(
             compound([
@@ -29,6 +29,6 @@ ability harmonize(cost: Cost) {
           generic(down(powerOf(the(nominal(pre = [was(tap(which))], creature)))), none)))),
     static(
       replace(
-        would(actor(this(spell)), leave(from = stack)),
-        doIf(keywordCostPaid(this(spell), harmonize), instead(exile(this(spell))))))]
+        would(actor(this(card)), leave(from = stack)),
+        doIf(keywordCostPaid(this(spell), harmonize), instead(exile(this(card))))))]
 }

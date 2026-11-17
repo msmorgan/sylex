@@ -1,4 +1,5 @@
-# The results of damage dealt to `this`, `result` reading the damage dealt as `thatMuch` or `thatMany`.
-template damageResult(result: VerbPhrase): Conferral {
-  body = property(asEvent(does(any, dealDamage(recipient = this)), $result))
+# The results of damage dealt to the holder, named by the head its rule prints ("Damage dealt to a
+# creature" [CR#120.3e]), `result` reading the damage dealt as `thatMuch` or `thatMany`.
+template damageResult(head: Nominal, result: VerbPhrase): Conferral {
+  body = property(asEvent(does(any, dealDamage(recipient = this($head))), $result))
 }

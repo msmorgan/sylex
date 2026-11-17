@@ -3,5 +3,7 @@
 # no count.
 template boost(powerValue: Delta(Amount), toughnessValue: Delta(Amount)): Conferral {
   body = property(
-    characteristicChange(this, [stat(power, $powerValue), stat(toughness, $toughnessValue)]))
+    characteristicChange(
+      this(object),
+      [stat(power, $powerValue), stat(toughness, $toughnessValue)]))
 }

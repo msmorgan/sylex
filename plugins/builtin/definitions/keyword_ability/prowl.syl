@@ -6,7 +6,7 @@ ability prowl(cost: Cost) {
   body = [
     static(
       onlyIf(
-        altCost(payingInstead($cost), this),
+        altCost(payingInstead($cost), this(spell)),
         did(
           actor(
             a(nominal(source, post = [youControl, shares(subtype(creature), share, this(spell))]))),

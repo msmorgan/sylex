@@ -15,5 +15,5 @@ ability splice(quality: Predicate, cost: Cost) {
         a(nominal(pre = [hasQuality($quality)], spell)),
         conjunction([
             addedCost(that(spell), mandatory, plusAdditional($cost)),
-            textChange(that(spell), appendTextOf(this))])))]
+            textChange(that(spell), appendTextOf(this(card)))])))]
 }

@@ -1,6 +1,7 @@
 # "Protection from [quality]". Targeting, enchanting and damage are a "permanent or player"'s
-# [CR#702.16b,702.16c,702.16e], so those clauses are written over the holder (`this`); equipping
-# and fortifying are a permanent's [CR#702.16d] and blocking a creature's [CR#702.16f].
+# [CR#702.16b,702.16c,702.16e], so those clauses are written over the holder
+# (`this(or([permanent, player]))`); equipping and fortifying are a permanent's
+# [CR#702.16d] and blocking a creature's [CR#702.16f].
 ability protection(quality: Predicate) {
   lexical = {lemma = "protection", parameters = [[Quality(Some("from"))]]},
   spelling = "protection from $quality",
@@ -14,8 +15,12 @@ ability protection(quality: Predicate) {
                 nominal(
                   ability,
                   post = [fromSource(bare(nominal(pre = [hasQuality($quality)], source)))])]))),
-        target(this))),
-    static(cantBeAttached(this, enchanted, by = bare(nominal(pre = [hasQuality($quality)], aura)))),
+        target(this(or([permanent, player]))))),
+    static(
+      cantBeAttached(
+        this(or([permanent, player])),
+        enchanted,
+        by = bare(nominal(pre = [hasQuality($quality)], aura)))),
     static(
       cantBeAttached(
         this(permanent),
@@ -30,7 +35,7 @@ ability protection(quality: Predicate) {
       replace(
         would(
           by(bare(nominal(pre = [hasQuality($quality)], source))),
-          dealDamage(recipient = this)),
+          dealDamage(recipient = this(or([permanent, player])))),
         instead(preventDamage(allDamage)))),
     static(
       cant(

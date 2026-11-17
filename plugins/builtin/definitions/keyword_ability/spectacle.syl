@@ -6,6 +6,6 @@ ability spectacle(cost: Cost) {
   body = [
     static(
       onlyIf(
-        altCost(payingInstead($cost), this),
+        altCost(payingInstead($cost), this(spell)),
         did(actor(anOpponent), loseLife(anyAmount), within(soFarThisTurn))))]
 }

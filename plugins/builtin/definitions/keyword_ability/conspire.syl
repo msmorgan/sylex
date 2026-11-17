@@ -8,7 +8,7 @@ ability conspire {
   body = [
     static(
       addedCost(
-        this,
+        this(spell),
         optional,
         plusAdditional(
           perform(
@@ -18,9 +18,9 @@ ability conspire {
                 nominal(
                   pre = [untapped],
                   creature,
-                  post = [youControl, shares(color, share, this(spell))]))))))),
+                  post = [youControl, shares(color, share, it)]))))))),
     when(
       does(actor(you), cast(this(spell))),
-      if = keywordCostPaid(this(spell), conspire),
-      sequentially([copyOnStack(this(spell)), may(chooseNewTargets(that(copy)))]))]
+      if = keywordCostPaid(it, conspire),
+      sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))]
 }

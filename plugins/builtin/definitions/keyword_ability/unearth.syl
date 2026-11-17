@@ -9,11 +9,8 @@ ability unearth(cost: Cost) {
       $cost,
       sequentially([
           returnToBattlefield(this(card), from = yourGraveyard),
-          gain(this(permanent), [haste]),
-          atNext(beginningOfNext(endStep), exile(this(permanent))),
-          replaceEvent(
-            none,
-            would(actor(this(permanent)), leave),
-            instead(exile(this(permanent))))]),
+          gain(it, [haste]),
+          atNext(beginningOfNext(endStep), exile(it)),
+          replaceEvent(none, would(actor(it), leave), instead(exile(it)))]),
       asSorcery)]
 }

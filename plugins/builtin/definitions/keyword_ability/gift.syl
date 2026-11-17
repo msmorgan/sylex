@@ -7,14 +7,14 @@ ability gift(promise: VerbPhrase) {
   # TODO(spelling): Naming the promised gift's noun phrase rather than its action clause waits on
   # `syl-dead-weight-sweep` (each gift phrasing currently has its own `gift*` Template).
   body = [
-    static(addedCost(this, optional, plusAdditional(perform(choose(anOpponent))))),
+    static(addedCost(this(spell), optional, plusAdditional(perform(choose(anOpponent))))),
     ifPermanentType(
       when(
         does(actor(this(permanent)), enter),
-        if = keywordCostPaid(this, gift),
+        if = keywordCostPaid(it, gift),
         instruct(the(nominal(pre = [chosen], player)), $promise)),
       spell(
         doIf(
-          keywordCostPaid(this, gift),
+          keywordCostPaid(this(spell), gift),
           instruct(the(nominal(pre = [chosen], player)), $promise))))]
 }

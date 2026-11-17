@@ -7,7 +7,7 @@ ability impending(amount: Amount, cost: Cost) {
   lexical = {lemma = "impending", parameters = [[Amount, DashCost]]},
   spelling = "impending $amount—$cost",
   body = [
-    static(altCost(payingInstead($cost), this)),
+    static(altCost(payingInstead($cost), this(spell))),
     static(
       replace(
         would(actor(this(permanent)), enter),

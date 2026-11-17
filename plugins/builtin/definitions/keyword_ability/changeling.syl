@@ -3,5 +3,5 @@
 ability changeling {
   lexical = {lemma = "changeling"},
   spelling = "changeling",
-  body = [static(definesQuality(this, adds, everyTypeOf(creature)))]
+  body = [static(definesQuality(this(object), adds, everyTypeOf(creature)))]
 }

@@ -5,10 +5,10 @@ ability awaken(amount: Amount, cost: Cost) {
   lexical = {lemma = "awaken", parameters = [[Amount, DashCost]]},
   spelling = "awaken $amount—$cost",
   body = [
-    static(altCost(payingInstead($cost), this)),
+    static(altCost(payingInstead($cost), this(spell))),
     spell(
       doIf(
-        keywordCostPaid(this, awaken),
+        keywordCostPaid(this(spell), awaken),
         sequentially([
             putCounters(
               $amount,

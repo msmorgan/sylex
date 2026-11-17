@@ -2,5 +2,5 @@
 # by its ability declaration (`grants(flying)`).
 template grants(keyword: Ability): Conferral {
   spelling = "$keyword",
-  body = property(characteristicChange(this, [addedAbilities([$keyword])]))
+  body = property(characteristicChange(this(object), [addedAbilities([$keyword])]))
 }

@@ -9,6 +9,6 @@ ability recover(cost: Cost) {
       does(any, putInto(a(creature), yourGraveyard, from = battlefield)),
       may(
         pay(payment($cost), once),
-        ifDid = returnToHand(this, from = yourGraveyard),
-        ifNot = exile(this)))]
+        ifDid = returnToHand(this(card), from = yourGraveyard),
+        ifNot = exile(this(card))))]
 }

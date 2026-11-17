@@ -9,12 +9,12 @@ ability ninjutsu(cost: Cost) {
     activated(
       compound([
           $cost,
-          perform(reveal(this)),
+          perform(reveal(this(card))),
           perform(
             returnToHand(
               a(nominal(pre = [unblocked, attacking], creature, post = [youControl]))))]),
       putOntoBattlefieldTappedAttacking(
-        this,
+        this(card),
         from = yourHand,
         defender = the(
           nominal(

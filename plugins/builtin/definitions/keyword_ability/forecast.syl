@@ -6,7 +6,7 @@ ability forecast(ability: Ability) {
   body = [
     qualified(
       $ability,
-      timing = duringPart(whose = ownerOf(this), upkeep),
+      timing = duringPart(whose = ownerOf(this(card)), upkeep),
       limit = oncePerTurn,
       from = hand)]
 }

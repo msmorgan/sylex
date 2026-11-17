@@ -5,5 +5,5 @@
 ability lifelink {
   lexical = {lemma = "lifelink"},
   spelling = "lifelink",
-  body = [static(asEvent(does(actor(this), dealDamage), gainLife(thatMuch)))]
+  body = [static(asEvent(does(actor(this(source)), dealDamage), gainLife(thatMuch)))]
 }

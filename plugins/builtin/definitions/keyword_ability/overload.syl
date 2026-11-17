@@ -6,6 +6,6 @@ ability overload(cost: Cost) {
   lexical = {lemma = "overload", parameters = [[Cost]]},
   spelling = "overload $cost",
   body = [
-    static(altCost(payingInstead($cost), this)),
+    static(altCost(payingInstead($cost), this(spell))),
     static(if(keywordCostPaid(this(spell), overload), textChange(this(spell), targetToEach)))]
 }

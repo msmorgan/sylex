@@ -12,12 +12,12 @@ ability infect {
   body = [
     static(
       replace(
-        causedBy(bySource(this), would(any, markDamage(a(creature)))),
+        causedBy(bySource(this(source)), would(any, markDamage(a(creature)))),
         instead(putCounters(thatMany, printedKind(m1m1Counter), that(creature))))),
     static(
       replace(
         causedBy(
-          byEvent(does(actor(this), dealDamage(recipient = a(player)))),
+          byEvent(does(actor(this(source)), dealDamage(recipient = a(player)))),
           would(any, loseLife(anyAmount))),
         instead(putCounters(thatMany(sort = damageDealt), printedKind(poison), that(player)))))]
 }

@@ -15,21 +15,24 @@ card_type creature {
   stats = [power, toughness],
   confers = [
     castableFrom(yourHand, asSorcery),
-    property(combatant(this)),
-    property(can(actor(this), attack)),
-    property(can(actor(this), block)),
-    property(cant(actor(this), attack, unless = controlledSinceTheirTurnBegan(it))),
+    property(combatant(this(creature))),
+    property(can(actor(this(creature)), attack)),
+    property(can(actor(this(creature)), block)),
+    property(cant(actor(this(creature)), attack, unless = controlledSinceTheirTurnBegan(it))),
     property(
       cant(
         any,
-        activate(possessive(this, nominal(abilityHead(anyActivated), post = [tapOrUntapInCost]))),
-        unless = controlledSinceTheirTurnBegan(this))),
-    damageResult(markDamage(amount = thatMuch, this)),
-    stateBased(compareAmt(toughnessOf(this), atMost, 0), putInto(this, graveyard)),
+        activate(
+          possessive(
+            this(creature),
+            nominal(abilityHead(anyActivated), post = [tapOrUntapInCost]))),
+        unless = controlledSinceTheirTurnBegan(this(creature)))),
+    damageResult(creature, markDamage(amount = thatMuch, this(creature))),
+    stateBased(compareAmt(toughnessOf(this(creature)), atMost, 0), putInto(it, graveyard)),
     stateBased(
       and([
-          compareAmt(toughnessOf(this), greater, 0),
-          compareAmt(statOf(markedDamage, this), greater, 0),
-          compareAmt(statOf(markedDamage, this), atLeast, toughnessOf(this))]),
-      destroy(this))]
+          compareAmt(toughnessOf(this(creature)), greater, 0),
+          compareAmt(statOf(markedDamage, it), greater, 0),
+          compareAmt(statOf(markedDamage, it), atLeast, toughnessOf(it))]),
+      destroy(this(creature)))]
 }

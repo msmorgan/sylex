@@ -9,11 +9,11 @@ ability sunburst {
   body = [
     static(
       replace(
-        would(actor(this(permanent)), enter(from = stack)),
+        would(actor(this(object)), enter(from = stack)),
         doIf(
           coloredManaSpentToCast(this(spell)),
           doIf(
-            is(this(permanent), hasTypeIgnoringTypeChanges(creature)),
+            is(this(object), hasTypeIgnoringTypeChanges(creature)),
             withRiders([
                 withCounters(colorsSpentToCast(this(spell)), printedKind(p1p1Counter), fresh)]),
             otherwise = withRiders([

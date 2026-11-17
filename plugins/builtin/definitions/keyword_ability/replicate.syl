@@ -6,11 +6,11 @@ ability replicate(cost: Cost) {
   lexical = {lemma = "replicate", parameters = [[Cost]]},
   spelling = "replicate $cost",
   body = [
-    static(addedCost(this, optional, plusAdditional($cost, times = anyNumberOfTimes))),
+    static(addedCost(this(spell), optional, plusAdditional($cost, times = anyNumberOfTimes))),
     when(
       does(actor(you), cast(this(spell))),
-      if = keywordCostPaid(this(spell), replicate),
+      if = keywordCostPaid(it, replicate),
       sequentially([
-          copyOnStack(this(spell), times = timesPaid(this(spell), byKeyword(replicate))),
+          copyOnStack(it, times = timesPaid(it, byKeyword(replicate))),
           may(chooseNewTargets(those(copy)))]))]
 }

@@ -9,7 +9,7 @@ ability retrace {
       can(
         actor(you),
         cast(
-          this,
+          this(card),
           from = yourGraveyard,
           addedCost = plusAdditional(perform(discard(a(nominal(pre = [land], card))))))))]
 }

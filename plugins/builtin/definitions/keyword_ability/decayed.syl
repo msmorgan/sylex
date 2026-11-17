@@ -5,5 +5,5 @@ ability decayed {
   spelling = "decayed",
   body = [
     static(cant(actor(this(creature)), block)),
-    when(does(actor(this(creature)), attack), atNext(endOfCombat, sacrifice(this(permanent))))]
+    when(does(actor(this(creature)), attack), atNext(endOfCombat, sacrifice(it)))]
 }

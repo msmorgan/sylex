@@ -14,7 +14,7 @@ ability ripple(amount: Amount) {
             cast(
               someOf(
                 counted(anyNumber),
-                description = nominal(card, post = [shares(cardName, share, this)]),
+                description = nominal(card, post = [shares(cardName, share, this(spell))]),
                 those(card)),
               altCost = withoutPaying),
             move(

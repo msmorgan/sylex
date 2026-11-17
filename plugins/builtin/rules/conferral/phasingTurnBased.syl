@@ -18,16 +18,16 @@ conferral phasingTurnBased {
     confer = turnBased(
       untapStep,
       doIf(
-        duringPart(whose = controllerOf(this), turn),
+        duringPart(whose = controllerOf(this(permanent)), turn),
         doIf(
-          is(this, phasedOut),
+          is(this(permanent), phasedOut),
           doIf(
             not(
               is(
-                this,
+                this(permanent),
                 attachment(attachment, counterpart = a(nominal(pre = [phasedOut], permanent))))),
-            setStatus(phasedIn, this)),
+            setStatus(phasedIn, this(permanent))),
           otherwise = doIf(
-            is(this, hasKeyword(theKeyword(phasing))),
-            setStatus(phasedOut, this)))))}
+            is(this(permanent), hasKeyword(theKeyword(phasing))),
+            setStatus(phasedOut, this(permanent))))))}
 }

@@ -1,7 +1,7 @@
 # "Shroud": "This permanent or player can't be the target of spells or abilities"
-# [CR#702.18a], written over its holder (`this`).
+# [CR#702.18a], written over its holder (`this(or([permanent, player]))`).
 ability shroud {
   lexical = {lemma = "shroud"},
   spelling = "shroud",
-  body = [static(cant(any, target(this)))]
+  body = [static(cant(any, target(this(or([permanent, player])))))]
 }

@@ -4,5 +4,5 @@
 conferral foretoldCardLook {
   body = {
     scope = nominal(pre = [foretold], card, post = [in(exileZone)]),
-    confer = ability(static(visibility(lookAt, you, objects(this))))}
+    confer = ability(static(visibility(lookAt, you, objects(this(card)))))}
 }

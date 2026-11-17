@@ -12,14 +12,16 @@ card_type battle {
   stats = [defense],
   confers = [
     castableFrom(yourHand, asSorcery),
-    ability(static(entersWithCounters(this, statOf(stat(defense), this), defenseCounter))),
-    property(can(any, attack(defender = this))),
-    damageResult(loseCounters(printedKind(defenseCounter), thatMany, agent = this)),
+    ability(static(entersWithCounters(this(permanent), statOf(stat(defense), it), defenseCounter))),
+    property(can(any, attack(defender = this(battle)))),
+    damageResult(battle, loseCounters(printedKind(defenseCounter), thatMany, agent = this(battle))),
     stateBased(
-      and([not(is(this, noun(a(siege)))), compareAmt(countersOn(defenseCounter, this), equal, 0)]),
-      putInto(this, graveyard)),
+      and([
+          not(is(this(battle), noun(a(siege)))),
+          compareAmt(countersOn(defenseCounter, it), equal, 0)]),
+      putInto(it, graveyard)),
     property(
       onlyUnless(
-        entryChoice(this, a(nominal(player, post = [not(otherThan(you))]))),
-        is(this, noun(a(siege)))))]
+        entryChoice(this(battle), a(nominal(player, post = [not(otherThan(you))]))),
+        is(it, noun(a(siege)))))]
 }

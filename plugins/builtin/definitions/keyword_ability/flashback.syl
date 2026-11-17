@@ -10,12 +10,12 @@ ability flashback(cost: Cost) {
       can(
         actor(you),
         cast(
-          this,
+          this(card),
           from = yourGraveyard,
           resulting = or([hasType(instant), hasType(sorcery)]),
           altCost = payingInstead($cost)))),
     static(
       replace(
-        would(actor(this(spell)), leave(from = stack)),
-        doIf(keywordCostPaid(this(spell), flashback), instead(exile(this(spell))))))]
+        would(actor(this(card)), leave(from = stack)),
+        doIf(keywordCostPaid(this(spell), flashback), instead(exile(this(card))))))]
 }

@@ -5,9 +5,9 @@ ability squad(cost: Cost) {
   lexical = {lemma = "squad", parameters = [[Cost]]},
   spelling = "squad $cost",
   body = [
-    static(addedCost(this, optional, plusAdditional($cost, times = anyNumberOfTimes))),
+    static(addedCost(this(spell), optional, plusAdditional($cost, times = anyNumberOfTimes))),
     when(
       does(actor(this(creature)), enter),
-      if = keywordCostPaid(this(creature), squad),
-      create(timesPaid(this(creature), byKeyword(squad)), copyOf(this(creature))))]
+      if = keywordCostPaid(it, squad),
+      create(timesPaid(it, byKeyword(squad)), copyOf(it)))]
 }

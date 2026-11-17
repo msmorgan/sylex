@@ -9,7 +9,7 @@ ability mutate(cost: Cost) {
     verbs = [{lemma = "mutate", frames = [Intransitive]}]},
   spelling = "mutate $cost",
   body = [
-    static(altCost(payingInstead($cost), this)),
+    static(altCost(payingInstead($cost), this(spell))),
     static(
       if(
         choiceWasTaken(this(spell), byKeyword(mutate)),

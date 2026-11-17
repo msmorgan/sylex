@@ -18,5 +18,5 @@ ability blitz(cost: Cost) {
     static(
       asLongAs(
         keywordCostPaid(this(permanent), blitz),
-        abilityGrant(this(permanent), [haste, when(does(actor(this(permanent)), die), draw(1))])))]
+        abilityGrant(it, [haste, when(does(actor(this(permanent)), die), draw(1))])))]
 }

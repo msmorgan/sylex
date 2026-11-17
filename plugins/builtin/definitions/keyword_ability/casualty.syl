@@ -7,12 +7,12 @@ ability casualty(amount: Amount) {
   body = [
     static(
       addedCost(
-        this,
+        this(spell),
         optional,
         plusAdditional(
           perform(sacrifice(a(nominal(creature, post = [hasPower(atLeast, $amount)]))))))),
     when(
       does(actor(you), cast(this(spell))),
-      if = keywordCostPaid(this(spell), casualty),
-      sequentially([copyOnStack(this(spell)), may(chooseNewTargets(that(copy)))]))]
+      if = keywordCostPaid(it, casualty),
+      sequentially([copyOnStack(it), may(chooseNewTargets(that(copy)))]))]
 }

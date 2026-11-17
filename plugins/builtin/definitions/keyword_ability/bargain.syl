@@ -6,7 +6,7 @@ ability bargain {
   body = [
     static(
       addedCost(
-        this,
+        this(spell),
         optional,
         plusAdditional(
           perform(

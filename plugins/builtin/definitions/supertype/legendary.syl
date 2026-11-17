@@ -16,10 +16,10 @@ supertype legendary {
   confers = [
     property(
       asLongAs(
-        is(this, noun(a(or([instant, sorcery])))),
+        is(this(spell), noun(a(or([instant, sorcery])))),
         cant(
           actor(a(player)),
-          cast(this),
+          cast(this(spell)),
           unless = exists(
             nominal(
               or([nominal(pre = [legendary], creature), nominal(pre = [legendary], planeswalker)]),

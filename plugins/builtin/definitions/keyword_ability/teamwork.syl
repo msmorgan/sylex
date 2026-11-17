@@ -6,7 +6,7 @@ ability teamwork(amount: Amount) {
   body = [
     static(
       addedCost(
-        this,
+        this(spell),
         optional,
         plusAdditional(
           perform(

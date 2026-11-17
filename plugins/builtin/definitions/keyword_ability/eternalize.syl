@@ -10,7 +10,7 @@ ability eternalize(cost: Cost) {
       create(
         1,
         copyOf(
-          this,
+          this(card),
           exceptions = [
             characteristicEdits([
                 colors(sets, colors([black])),

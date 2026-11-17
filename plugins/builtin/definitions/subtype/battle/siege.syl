@@ -15,7 +15,7 @@ subtype siege {
           [exile(it), may(cast(it, resulting = isTransformed, altCost = withoutPaying))]))),
     stateBased(
       and([
-          compareAmt(countersOn(defenseCounter, this), equal, 0),
-          not(exists(nominal(ability, post = [ofSource(this), triggeredNotLeftStack])))]),
-      putInto(this, graveyard))]
+          compareAmt(countersOn(defenseCounter, this(battle)), equal, 0),
+          not(exists(nominal(ability, post = [ofSource(it), triggeredNotLeftStack])))]),
+      putInto(it, graveyard))]
 }

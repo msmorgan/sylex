@@ -18,5 +18,5 @@ supertype world {
           permanent,
           post = [
             superlative(min, heldFor(hasSupertype(world)), nominal(pre = [world], permanent))])),
-      putInto(this, graveyard))]
+      putInto(this(permanent), graveyard))]
 }

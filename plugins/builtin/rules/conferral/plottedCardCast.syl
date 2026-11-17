@@ -11,7 +11,7 @@ conferral plottedCardCast {
         onlyUnless(
           can(
             actor(you),
-            cast(this, from = exileZone, altCost = withoutPaying),
+            cast(this(card), from = exileZone, altCost = withoutPaying),
             timing = asSorcery),
-          was(gainDesignation(this, plotted), within(soFarThisTurn)))))}
+          was(gainDesignation(it, plotted), within(soFarThisTurn)))))}
 }
