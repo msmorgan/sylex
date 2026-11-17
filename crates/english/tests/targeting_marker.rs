@@ -69,3 +69,23 @@ fn the_targeting_marker_heads_the_determiner() {
         );
     }
 }
+
+#[test]
+fn undetermined_or_outer_marked_under_number_of_is_refused() {
+    for text in [
+        "other target creatures",
+        "any number of another target creatures",
+        "any number of a target creatures",
+        "two target target creatures",
+    ] {
+        let readings = noun_phrase_readings(text);
+        assert!(readings.is_empty(), "{text}: {readings:#?}");
+    }
+    for text in [
+        "any number of target creatures",
+        "any number of other target creatures",
+    ] {
+        let readings = noun_phrase_readings(text);
+        assert_eq!(readings.len(), 1, "{text}: {readings:#?}");
+    }
+}

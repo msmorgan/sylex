@@ -150,6 +150,10 @@ feature CentralPosition = Occupied
 feature QualityHead = Fused
 // A slash measure as the fused head of its nominal (*a 3/3*).
 feature MeasureHead = Fused
+// A Determiner Phrase headed by `TargetingMarker` (*two target*, *up to one
+// other target*), which determines a nominal and never nests inside another
+// determiner, quantity or partitive.
+feature TargetMarked = Marked
 // A license feature (english.md §3), which the counter catalog declares:
 // `Kind` on a counter's kind name (*charge*, *time*), which stands only as
 // the kind of the noun *counter*, and on a keyword a keyword counter can be
@@ -366,15 +370,16 @@ category NominalClusters : NominalCluster [
 // A determinative's Complement has a Number of its own (*all but one*).
 category DeterminerPhrase [
     Number, Countability, DeterminativeDistribution, NounKind, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution,
+    ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution, TargetMarked,
 ]
 category Multiplier
-// The Targeting Marker as an outer determiner's head, the word alone or
-// after an adjective (*two target creatures*, *a second target creature*);
-// the outer determiner gives it its Number.
+// The Targeting Marker as an outer determiner's head or the determiner of
+// TargetedNounPhrase, the word alone or after an adjective (*two target
+// creatures*, *a second target creature*, *any number of other target
+// creatures*).
 category TargetingMarker : DeterminerPhrase [
     Countability, DeterminativeDistribution, NounKind, ComplementKind, ObliqueNumber, ObliqueKind,
-    ObliqueDetermination,
+    ObliqueDetermination, TargetMarked,
 ]
 // A Preposition Phrase's Number and Determination are its Complement's
 // (*up to two*, a determiner; *of them*, a partitive oblique), and so is its
@@ -1433,6 +1438,7 @@ EquativeDeterminer: DeterminerPhrase -> modifier:Word(DegreeAs) Class(DegreeQuan
 // never *that much*.
 FusedDegreeDeterminer: FusedNounPhrase -> DeterminerPhrase { heavy: [head], uncoordinated: [head] }
     where head.ComplementKind = Intransitive,
+          head.TargetMarked != Marked,
           head.DeterminativeDistribution != Independent | Numerical | IndefiniteArticle | Distributive | Deictic | SingularOrQuantified | FreeChoice | Multiplier | Targeting,
           $.Countability = head.Countability,
           $.Countability = Count,
@@ -1497,7 +1503,8 @@ AdverbModifiedPrepositionPhrase: PrepositionPhrase -> modifier:AdverbPhrase Prep
     where modifier.AdjunctPosition = Phrasal
 AdverbModifiedDeterminerPhrase: DeterminerPhrase -> modifier:AdverbPhrase DeterminerPhrase
     where modifier.AdjunctPosition = Bounding,
-          head.DeterminativeDistribution = Numerical
+          head.DeterminativeDistribution = Numerical,
+          head.TargetMarked != Marked
 // *Attack only alone*.
 AdverbModifiedAdjectivePhrase: AdjectivePhrase -> modifier:AdverbPhrase AdjectivePhrase
     where modifier.AdjunctPosition = Phrasal,
@@ -1532,6 +1539,7 @@ TemporalLocation: TemporalNounPhrase -> determiner:DeterminerPhrase BareNominal
     where head.NounKind = Temporal,
           head.NounDistribution != Serial,
           determiner.DeterminativeDistribution != Dependent | Degree | Numerical | IndefiniteArticle,
+          determiner.TargetMarked != Marked,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number,
           $.Determination = Overt,
@@ -1669,6 +1677,7 @@ ModifiedQuantity: ModifiedQuantifiedNominal -> modifier:AdjectivePhrase Quantifi
 // *target* over *[opponent or planeswalker and half] X damage*.
 DeterminedQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNominal
     where determiner.DeterminativeDistribution != FreeChoice | Multiplier | Targeting,
+          determiner.TargetMarked != Marked,
           determiner.Number = head.QuantityNumber,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
@@ -1679,6 +1688,7 @@ DeterminedQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNominal
 DistributiveQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNominal
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.DeterminativeDistribution = Distributive,
+          determiner.TargetMarked != Marked,
           $.Number = determiner.Number,
           determiner.Countability = Count,
           $.Countability = Count,
@@ -1697,6 +1707,7 @@ DistributiveQuantity: NounPhrase -> determiner:DeterminerPhrase QuantifiedNomina
 DeterminedModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQuantifiedNominal
     where determiner.Number := Singular,
           determiner.DeterminativeDistribution != Distributive,
+          determiner.TargetMarked != Marked,
           head.QuantityNumber = Plural,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
@@ -1710,6 +1721,7 @@ DeterminedModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQu
 AgreeingModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQuantifiedNominal
     where determiner.Number = head.QuantityNumber,
           determiner.DeterminativeDistribution != Distributive | FreeChoice,
+          determiner.TargetMarked != Marked,
           $.Number = head.QuantityNumber,
           determiner.Countability = Count,
           $.Countability = Count,
@@ -1719,6 +1731,7 @@ AgreeingModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQuan
 DistributiveModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase ModifiedQuantifiedNominal
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.DeterminativeDistribution = Distributive,
+          determiner.TargetMarked != Marked,
           $.Number = determiner.Number,
           determiner.Countability = Count,
           $.Countability = Count,
@@ -1799,6 +1812,7 @@ MaximumPartitive: PartitiveHead ->
           $.Person = Third
 QuantityPartitive: PartitiveHead -> DeterminerPhrase complement:Selected(PrepositionPhrase, Of)
     where head.DeterminativeDistribution = Numerical,
+          head.TargetMarked != Marked,
           $.NounKind = Ordinary,
           $.Determination = Overt,
           $.Case = Plain,
@@ -1814,6 +1828,7 @@ QuantityPartitiveOfEach: FusedNounPhrase -> DeterminerPhrase preposition:Word(Of
     unshared: [DeterminativeDistribution],
 }
     where head.DeterminativeDistribution = Numerical,
+          head.TargetMarked != Marked,
           $.DeterminativeDistribution = Distributive,
           $.NounKind = Ordinary,
           $.Determination = Overt,
@@ -1846,6 +1861,7 @@ DegreePartitive: PartitiveHead -> DeterminerPhrase complement:Selected(Prepositi
     heavy: [head],
 }
     where head.ComplementKind = Intransitive,
+          head.TargetMarked != Marked,
           head.DeterminativeDistribution != Independent | Numerical | IndefiniteArticle | Distributive | Deictic | SingularOrQuantified | FreeChoice | Multiplier | Targeting,
           head.Countability = complement.Countability,
           $.NounKind = Ordinary,
@@ -1871,6 +1887,7 @@ PostpositiveInfinitivalAdjective: Nominal -> Nominal modifier:AdjectivePhrase { 
 ComparativeBoundedAlternative: AdjectivePhrase ->
     first:DeterminerPhrase coordinator:Word(Or) last:AdjectivePhrase
     where first.DeterminativeDistribution = Numerical,
+          first.TargetMarked != Marked,
           $.Grade = last.Grade,
           $.AdjectivePosition = last.AdjectivePosition,
           $.Voice = last.Voice,
@@ -2016,7 +2033,8 @@ ArithmeticDeterminer: NumericalDeterminer ->
 // determinative (*half*), a multiplying adverb (*twice*) or a cardinal and
 // a serial noun (*three times*).
 DeterminativeMultiplier: Multiplier -> DeterminerPhrase
-    where head.DeterminativeDistribution := Multiplier
+    where head.DeterminativeDistribution := Multiplier,
+          head.TargetMarked != Marked
 AdverbMultiplier: Multiplier -> AdverbPhrase where head.AdjunctPosition := Multiplying
 SerialMultiplier: Multiplier -> factor:Numeral(Cardinal) BareNominal
     where head.NounDistribution = Serial,
@@ -2027,7 +2045,8 @@ MultipliedNumber: NumericalDeterminer -> multiplier:Multiplier NumericalDetermin
 // A multiplier and a degree determinative form one degree determinative
 // (*create [twice that many] of those tokens*, Doubling Season).
 MultipliedDegree: DeterminerPhrase -> multiplier:Multiplier DeterminerPhrase
-    where head.DeterminativeDistribution := Degree
+    where head.DeterminativeDistribution := Degree,
+          head.TargetMarked != Marked
 // *three times this creature's power*. A head determined by a number or
 // degree determinative is excluded: *five times X damage* (Crackle with
 // Power) is MultipliedNumber's *[five times X] damage*, and *three times
@@ -2070,6 +2089,7 @@ FrequencyAdverbArithmetic: AdverbPhrase ->
 DegreeArithmetic: DeterminerPhrase ->
     DeterminerPhrase modifier:Selected(PrepositionPhrase, Plus, Minus) { heavy: [head] }
     where head.ComplementKind = Intransitive,
+          head.TargetMarked != Marked,
           modifier.DeterminativeDistribution != Distributive,
           modifier.NounKind != Ordinary | Temporal | Manner
 // *Half their life*, *double that damage*. A head determined by a number or
@@ -2078,6 +2098,7 @@ DegreeArithmetic: DeterminerPhrase ->
 // (Ochre Jelly) MultipliedDegree's *[half that many] +1/+1 counters*.
 MultiplierPredetermination: NounPhrase -> determiner:DeterminerPhrase NounPhrase
     where determiner.DeterminativeDistribution = Multiplier,
+          determiner.TargetMarked != Marked,
           head.DeterminativeDistribution != Numerical | Degree,
           head.Determination = Overt
 AdverbAdverbial: Adverbial -> AdverbPhrase where head.AdjunctPosition = End
@@ -2195,6 +2216,7 @@ MeasuredComparativeDetermined: NounPhrase ->
     modifier:DeterminerPhrase determiner:Class(ComparativeQuantifier) Nominal
     complement:Selected(PrepositionPhrase, Than)
     where modifier.DeterminativeDistribution = Numerical,
+          modifier.TargetMarked != Marked,
           head.Number = Plural,
           head.Countability = Count,
           determiner.Countability = head.Countability,
@@ -2208,6 +2230,7 @@ MeasuredComparativeDeterminer: DeterminerPhrase ->
     unshared: [Number, DeterminativeDistribution],
 }
     where modifier.DeterminativeDistribution = Numerical,
+          modifier.TargetMarked != Marked,
           $.Number = modifier.Number,
           $.Countability = Count,
           $.DeterminativeDistribution = Numerical,
@@ -2374,6 +2397,7 @@ NumericalDetermination: DeterminerPhrase -> NumericalDeterminer
           $.ComplementKind = Intransitive
 MeasuredMass: NounPhrase -> determiner:DeterminerPhrase Nominal
     where determiner.DeterminativeDistribution = Numerical,
+          determiner.TargetMarked != Marked,
           $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           head.NounDistribution = DirectMeasure,
           head.Countability = Mass,
@@ -2385,6 +2409,7 @@ MeasuredMass: NounPhrase -> determiner:DeterminerPhrase Nominal
 DistributiveMeasure: NounPhrase -> determiner:DeterminerPhrase Nominal
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.DeterminativeDistribution = Distributive,
+          determiner.TargetMarked != Marked,
           head.NounDistribution = DirectMeasure,
           head.Countability = Mass,
           head.Number = Singular,
@@ -2704,8 +2729,10 @@ TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal {
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// *Any number of target creatures*: the Targeting Marker alone in the
-// oblique takes the oblique's plural, since the quantity, not the Marker,
+// *Any number of target creatures*, *any number of other target creatures*:
+// on its own *target* determines a singular count noun, while without an outer
+// determiner in *number of*'s oblique (TargetingMarker) it combines with the
+// plural nominal directly as an Oracle exception, since the outer quantity
 // counts the targets.
 TargetedQuantity: BareNominal -> FreeLex(Noun) complement:TargetedOblique
     where head.NounDistribution = Quantity,
@@ -2716,10 +2743,8 @@ TargetedQuantity: BareNominal -> FreeLex(Noun) complement:TargetedOblique
 TargetedOblique: TargetedOblique -> Word(Of) complement:TargetedNounPhrase
     where $.Number = complement.Number,
           $.NounKind = complement.NounKind
-TargetedNounPhrase: TargetedNounPhrase -> determiner:DeterminerPhrase Nominal
-    where determiner.DeterminativeDistribution := Targeting,
-          determiner.Number := Singular,
-          head.Number = Plural,
+TargetedNounPhrase: TargetedNounPhrase -> determiner:TargetingMarker Nominal
+    where head.Number = Plural,
           head.Determination = Overt,
           determiner.Countability = head.Countability
 // *Pay {1}{G} any number of times*: as TransparentQuantity, with NounKind
@@ -2742,6 +2767,7 @@ DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase No
     unshared: [Number, NounKind, Countability],
 }
     where determiner.DeterminativeDistribution != FreeChoice,
+          determiner.TargetMarked != Marked,
           head.NounDistribution = Quantity,
           head.ComplementKind = PP,
           head.ObliqueNumber := Plural,
@@ -2831,10 +2857,9 @@ Unmodified: Nominal -> BareNominal { transparent: [head] }
 // DeterminerPhrase (*target creature*). BareTargetingMarker builds the word,
 // and ModifiedTargetingMarker the word after one adjective, as the head an
 // outer determiner takes (MarkedDeterminer, *two other target creatures*;
-// MarkedMaximum, *up to one other target creature*).
-// UndeterminedModifiedMarker is the word after one adjective with no outer
-// determiner (*any number of other target creatures*), its Number left to
-// its nominal. Each takes the word, never a DeterminerPhrase, so a
+// MarkedMaximum, *up to one other target creature*) or the determiner of
+// TargetedNounPhrase (*any number of target creatures*, *any number of other
+// target creatures*). Each takes the word, never a DeterminerPhrase, so a
 // determined or modified Marker is no Marker again (not *two three target
 // creatures*, *other other target creatures*), and an adjective stays inside
 // the outer determiner, an external dependent (CGEL 5§2:330; not *other two
@@ -2842,24 +2867,24 @@ Unmodified: Nominal -> BareNominal { transparent: [head] }
 // target creature*, *two target target creatures*).
 BareTargetingMarker: TargetingMarker -> Lex(Determinative)
     where head.DeterminativeDistribution := Targeting,
-          $.ComplementKind = Intransitive
+          $.ComplementKind = Intransitive,
+          $.TargetMarked = Marked
 ModifiedTargetingMarker: TargetingMarker -> modifier:AdjectivePhrase Lex(Determinative)
     where head.DeterminativeDistribution := Targeting,
           $.ComplementKind = Intransitive,
+          $.TargetMarked = Marked,
           modifier.ComplementKind = Intransitive,
           modifier.AdjectivePosition != Predicative
-UndeterminedModifiedMarker: DeterminerPhrase ->
-    modifier:AdjectivePhrase Lex(Determinative) { unshared: [Number] }
-    where head.DeterminativeDistribution := Targeting,
-          $.ComplementKind = Intransitive,
-          modifier.ComplementKind = Intransitive,
-          modifier.AdjectivePosition != Predicative
-// The phrase takes the outer determiner's Countability as it takes its
-// Number, so a mass determinative is no determiner of a count noun through
-// the Marker (*all target creature*).
-MarkedDeterminer: DeterminerPhrase -> determiner:DeterminerPhrase TargetingMarker
+// The phrase takes the outer determiner's Countability, Number and
+// DeterminativeDistribution, so a mass determinative is no determiner of a
+// count noun through the Marker (*all target creature*).
+MarkedDeterminer: DeterminerPhrase -> determiner:DeterminerPhrase TargetingMarker {
+    unshared: [DeterminativeDistribution],
+}
     where determiner.ComplementKind != PP,
           determiner.DeterminativeDistribution != Targeting,
+          determiner.TargetMarked != Marked,
+          $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           determiner.Countability = $.Countability,
           $.Number = determiner.Number
 MarkedMaximum: DeterminerPhrase -> determiner:Selected(PrepositionPhrase, Up) TargetingMarker {
@@ -3912,7 +3937,9 @@ coordination DeterminerPhrase {
     proximate: [Number, Countability, DeterminativeDistribution, NounKind],
 }
     where first.DeterminativeDistribution != Targeting,
-          last.DeterminativeDistribution != Targeting
+          last.DeterminativeDistribution != Targeting,
+          first.TargetMarked != Marked,
+          last.TargetMarked != Marked
 coordination NominalClusters {
     coordinators: And,
     unshared: [ConjunctNumber, DeterminativeDistribution],
