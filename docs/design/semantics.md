@@ -215,10 +215,17 @@ many" (`thatMany`) by the noun quantified rather than by whether the antecedent 
 group (*Ingenious Artillerist*, *Ageless Entity*, *Doubling Season*). Unqualified (`sort = none`), it excludes clause-mate subjects, ranks accessible
 numeric antecedents by clause prominence (*Neheb, Dreadhorde Champion*, *Memory Vampire*), and is
 refused when two tie; a sort-qualified read (`preventedThisWay`, `removedThisWay`, or `infect`'s
-`damageDealt` [CR#702.90b]) filters by `OutcomeSort`. `theDifference` is separate: a strict
-inequality (`compareAmt`, `compareOver`) introduces its positive difference into that comparison's
-branch alone, closed across negation (`not`, an `else` branch) and disjunction (`or`) and never
-eligible for bare `thatMuch`. `chosenNumber` is no numeric anaphor: it belongs to the `ChoiceRef`
+`damageDealt` [CR#702.90b]) filters by `OutcomeSort`. `theDifference` is separate: it reads the
+positive difference a strict inequality establishes, and that difference is never eligible for
+bare `thatMuch`. A `compareAmt` that is a conditional's condition (a `doIf`, a trigger's
+intervening "if") introduces its difference into the conditional's antecedent, not into the
+comparison's own box that closes on exit (§2.2 item 5), so the difference is accessible in the
+consequent and closed after it (§2.2 item 2): *Sandstone Oracle*'s "If that player has more cards
+in hand than you, draw cards equal to the difference". It is not accessible in an `else` branch,
+under `not`, or from one arm of an `or`. A `compareOver` introduces a difference for each member
+its description admits (*Tales of the Ancestors*' "Each player with fewer cards in hand than the
+player with the most cards in hand draws cards equal to the difference"); where that difference
+is accessible is open (§6). `chosenNumber` is no numeric anaphor: it belongs to the `ChoiceRef`
 family (`theChoice`, `theLatestChoice`) and crosses ability boundaries on linked choice abilities
 ([CR#607.2d]).
 
@@ -552,3 +559,10 @@ are found over enumerated candidates or over a packed form is open (§6).
     (§5 step 2). Refusing what is not understood instead would drop real constructions.
 17. **Boxes for modes.** §2.2 has no box for `chooseModes`: a mode is neither a branch that
     closes nor top-level text.
+18. **Where a description's difference is read.** A `compareOver` admits each member by a strict
+    inequality, and the corpus reads that member's difference in the nuclear scope of a
+    distributive over the description (*Tales of the Ancestors*, *Spiteful Repossession*,
+    *Sovereign Okinec Ahau*) and in a later sentence after an indefinite chosen from it (*Boreas
+    Charger*'s "choose an opponent who controls more lands than you. Search your library for a
+    number of Plains cards equal to the difference"). §2.2 item 5 closes the description on exit,
+    and no rule says how the difference outlives it.
