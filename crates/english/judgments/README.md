@@ -111,7 +111,15 @@ would exist only to reject some text is never added, and no entry asks for one.
 
 An entry's text is real Oracle text (a corpus unit, or a contiguous span of one
 under a Category mark), or a simplification of a named card's text that keeps
-the construction under test. A Category-marked entry is written as the
+the construction under test. Invented words are allowed where they are what the
+entry tests: *Put a goddamn counter on it.* shows that any word names a
+counter. Invented structure is not: the constituents, their order and their
+attachments are a card's, and a Reading or a refusal of a form no card prints is
+no judgment's to hold in place (`docs/design/english.md` §4). A simplification
+may cut a clause from a longer line, put *this creature* for the card's name or
+the reverse, or swap a word in a slot the entry is about; it may not join
+constructions no one card joins, reorder them, or add a constituent the card
+does not have. A Category-marked entry is written as the
 Constituent opens inside a sentence: in lower case, unless one of its own
 Productions states a capital (`docs/design/english.md` §7). So a span that
 opens its line is lower-cased (`+NounPhrase target creature`, not *Target
