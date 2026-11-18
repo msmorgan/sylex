@@ -535,8 +535,6 @@ fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
         "--pick",
         "dependency \"and\"#3 object of VerbPhrase \"destroy\"#1",
         "--pick",
-        "dependency \"both\"#1 correlative of VerbPhrase \"and\"#1",
-        "--pick",
         "lexical \"attached\"#1 action:attach PastParticiple {finiteness=Nonfinite}",
         "--pick",
         "dependency \"attached\"#1 modifier of Nominal \"Auras\"#1",
