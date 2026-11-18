@@ -21,6 +21,7 @@ fn lexicon() -> Lexicon {
     };
     let mut lexemes = vec![
         Lexeme::verb("v:see", "see", core()),
+        Lexeme::verb("v:sleep", "sleep", core()),
         Lexeme::invariant("p:of", "of", Category::Preposition, core()),
     ];
     for noun in ["turn", "end", "top"] {
@@ -37,6 +38,7 @@ fn lexicon() -> Lexicon {
 const FRAMES: &str = r#"(
     frames: {
         "v:see": [(family: Monotransitive, slots: [(relation: Object, fill: NP)])],
+        "v:sleep": [(family: Intransitive, slots: [])],
         "n:end": [(family: NounComplement, slots: [(relation: Complement, fill: PP(["p:of"]))])],
         "n:top": [
             (family: NounComplement, slots: [(relation: Complement, fill: PP(["p:of"]))]),
@@ -112,4 +114,12 @@ fn an_intransitive_frame_makes_the_complement_optional() {
     assert_eq!(readings(true, "See top of turn.").len(), 1);
     // The bare phrase is the Intransitive frame's only realization.
     assert_eq!(readings(false, "See top.").len(), 1);
+}
+
+#[test]
+fn a_nouns_intransitive_frame_heads_no_verb_phrase() {
+    // *Sleep* and *top* declare the one Intransitive frame; only the verb
+    // heads a Verb Phrase with it.
+    assert_eq!(readings(true, "Sleep.").len(), 1);
+    assert_eq!(readings(true, "Top.").len(), 0);
 }

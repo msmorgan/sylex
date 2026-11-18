@@ -996,6 +996,24 @@ impl<'a> Binder<'a> {
                 if !frame.is_well_formed() {
                     return Err(invalid(format!("frame {frame:?} of `{id}` is ill-formed")));
                 }
+                // A non-verb's Intransitive frame only makes its Complement
+                // optional (`optional_complement`); it is no frame a Valence
+                // schema heads, or the verb's Intransitive frame, which it
+                // interns to, would let the noun head a Verb Phrase wherever
+                // an intransitive verb's stands (*Top.* an imperative,
+                // tests/obligatory_frames.rs). Every other family belongs to
+                // one category, checked here, so a frame test needs no
+                // category of its own.
+                match frame_category(frame.family) {
+                    None if facts.category != LexicalCategory::Verb => continue,
+                    Some(category) if category != facts.category => {
+                        return Err(invalid(format!(
+                            "frame {frame:?} of `{id}` belongs to a {category:?}, not a {:?}",
+                            facts.category
+                        )));
+                    }
+                    None | Some(_) => {}
+                }
                 let index = intern(&mut frames, frame);
                 facts.frames.insert(index);
             }
@@ -6749,4 +6767,29 @@ fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
     *fills_preposition = fills_preposition.map(&map);
     *internalized = internalized.map(&map);
     *clusters = clusters.map(|(at, f)| (map(at), f));
+}
+
+/// The one lexical category that declares a frame of `family`; none for
+/// Intransitive, which any head may declare.
+fn frame_category(family: FrameFamily) -> Option<LexicalCategory> {
+    Some(match family {
+        FrameFamily::NounComplement => LexicalCategory::Noun,
+        FrameFamily::AdjectiveComplement => LexicalCategory::Adjective,
+        FrameFamily::DeterminativeComplement => LexicalCategory::Determinative,
+        FrameFamily::Intransitive => return None,
+        FrameFamily::Monotransitive
+        | FrameFamily::Ditransitive
+        | FrameFamily::TransitiveWithComplement
+        | FrameFamily::TransitiveWithPP
+        | FrameFamily::Prepositional
+        | FrameFamily::Copular
+        | FrameFamily::Catenative
+        | FrameFamily::ComplexTransitive
+        | FrameFamily::ComplexCatenative
+        | FrameFamily::ContentClause
+        | FrameFamily::Amount
+        | FrameFamily::TransitiveAmount
+        | FrameFamily::Cost
+        | FrameFamily::Idiom => LexicalCategory::Verb,
+    })
 }
