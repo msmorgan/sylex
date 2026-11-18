@@ -2642,7 +2642,14 @@ impl<'a> Binder<'a> {
                 forms,
                 prefix,
                 equations,
-            } => self.premodification(*head, modifier, host, forms, *prefix, equations),
+            } => self.premodification(
+                *head,
+                modifier,
+                host.as_deref(),
+                forms,
+                *prefix,
+                equations,
+            ),
             SchemaDecl::Parameters {
                 head,
                 phrase,
@@ -2967,13 +2974,15 @@ impl<'a> Binder<'a> {
         &mut self,
         head: LexicalCategory,
         modifier: &str,
-        host: &str,
+        host: Option<&str>,
         forms: &[sylex_lexicon::WordForm],
         prefix: bool,
         equations: &[(sylex_lexicon::WordForm, Vec<Equation>)],
     ) -> Result<Vec<Draft>, LoadError> {
         let modifier_id = self.category(modifier)?;
-        let host_id = self.category(host)?;
+        let host_id = host.map(|host| self.category(host)).transpose()?;
+        // Its Productions are named for the host, or for the Modifier alone.
+        let host = host.unwrap_or(modifier);
         let symbol = |category| Symbol::Cat {
             category,
             binding: None,
@@ -3027,6 +3036,9 @@ impl<'a> Binder<'a> {
             affixed.child("head", symbol(modifier_id), GapRule::Closed);
             drafts.push(affixed);
         }
+        let Some(host_id) = host_id else {
+            return Ok(drafts);
+        };
         let mut attachment = Draft::new(
             format!("Premodification:{host}/{head:?}/attach"),
             host_id,

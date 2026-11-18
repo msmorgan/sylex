@@ -511,7 +511,11 @@ pub enum SchemaDecl {
     Premodification {
         head: sylex_lexicon::Category,
         modifier: Ident,
-        host: Ident,
+        /// The Category the Modifier premodifies, as `modifier host`. With
+        /// none, the schema derives the Modifier alone and the grammar's own
+        /// Productions attach it.
+        #[serde(default)]
+        host: Option<Ident>,
         forms: Vec<sylex_lexicon::WordForm>,
         #[serde(default)]
         prefix: bool,
