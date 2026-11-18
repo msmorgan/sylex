@@ -90,11 +90,11 @@ fn render(file: &File) -> String {
                 Entry::Comment(c) => format!("#{}", c.text),
                 Entry::Node(d) => match &d.shape {
                     Shape::Value(v) => format!("{} <{}>", d.kind.ident, value(v)),
+                    Shape::Relation(r) => {
+                        format!("{}({}): {}", d.kind.ident, sort(&r.subject), sort(&r.sort))
+                    }
                     Shape::Header(n) => {
-                        let mut out = d.kind.ident.to_string();
-                        if let Some(name) = n.name {
-                            let _ = write!(out, " {}", name.ident);
-                        }
+                        let mut out = format!("{} {}", d.kind.ident, n.name.ident);
                         if !n.params.is_empty() {
                             let params = items(&n.params, |p| match &p.default {
                                 Some(v) => {
@@ -109,6 +109,9 @@ fn render(file: &File) -> String {
                         }
                         if let Some(c) = &n.constructor {
                             let _ = write!(out, " = {}", c.ident);
+                        }
+                        if !n.at.is_empty() {
+                            let _ = write!(out, " at [{}]", items(&n.at, sort));
                         }
                         if let Some(body) = &n.body {
                             let _ = write!(
@@ -198,22 +201,89 @@ fn shape_does_not_depend_on_kind_word() {
     check("template f(x = y)", "template <f(x = y)>");
 }
 
-// --- header without a name ----------------------------------------------
+// --- relation between two sorts ---------------------------------------------
 
 #[test]
-fn a_header_may_omit_its_name() {
+fn a_relation_names_two_sorts() {
     check(
-        "coercion(type: CardType): Nominal { body = type($type) }",
-        "coercion(type: CardType): Nominal {body = type($type)}",
+        "member(Color): AdjectivePhrase",
+        "member(Color): AdjectivePhrase",
     );
-    check("coercion: X", "coercion: X");
-    let source = "coercion(a: A): X";
+    check(
+        "denotes(List(A)): Option(B)\nmember(A): B",
+        "denotes(List(A)): Option(B)\nmember(A): B",
+    );
+    let source = "member(Color): AdjectivePhrase";
     let file = ok(source);
-    let Shape::Header(header) = &file.declarations().next().unwrap().shape else {
-        panic!("a header");
+    let Shape::Relation(relation) = &file.declarations().next().unwrap().shape else {
+        panic!("a relation");
     };
-    assert_eq!(header.name, None);
-    assert_eq!(header.span.text(source), "(a: A): X");
+    assert_eq!(relation.span.text(source), "(Color): AdjectivePhrase");
+    assert_eq!(relation.subject.span.text(source), "Color");
+    assert_eq!(relation.sort.span.text(source), "AdjectivePhrase");
+}
+
+#[test]
+fn a_relation_has_one_subject_a_sort_and_nothing_else() {
+    let expected = |expected, found: &str| ErrorKind::Expected {
+        expected,
+        found: found.to_owned(),
+    };
+    check_err("member(a: A): X", &expected("')'", "':'"), ":");
+    check_err("member(A, B): X", &expected("')'", "','"), ",");
+    check_err("member(A)", &expected("':'", "end of file"), "");
+    check_err("member: X", &expected("a value", "':'"), ":");
+    check_err(
+        "member(A): X { body = a }",
+        &expected("a declaration", "'{'"),
+        "{",
+    );
+}
+
+// --- the `at` list --------------------------------------------------------------
+
+#[test]
+fn a_block_may_list_the_sorts_its_declaration_stands_at() {
+    check(
+        "template or(items: List(Self)): Self { at = [A, List(B)], body = coord(or, $items) }",
+        "template or(items: List(Self)): Self at [A; List(B)] {body = coord(or; $items)}",
+    );
+    // Wherever it is written, it leaves the block's fields.
+    check(
+        "primitive not(p: Self): Self = Not { spelling = \"not $p\", at = [A] }",
+        "primitive not(p: Self): Self = Not at [A] {spelling = \"not $p\"}",
+    );
+    check(
+        "primitive coord: Self = C { at = [A, B] }",
+        "primitive coord: Self = C at [A; B] {}",
+    );
+}
+
+#[test]
+fn an_at_list_is_a_list_of_sorts_written_once() {
+    check_err(
+        "template t: Self { at = [] }",
+        &ErrorKind::EmptyAtList,
+        "[]",
+    );
+    check_err(
+        "template t: Self { at = [A], at = [B] }",
+        &ErrorKind::DuplicateAtList,
+        "at",
+    );
+    check_err(
+        "template t: Self { at = A }",
+        &ErrorKind::Expected {
+            expected: "'['",
+            found: "word `A`".to_owned(),
+        },
+        "A",
+    );
+    // Only a declaration's block has one: in a record it is a field.
+    check(
+        "template t: X { body = {at = b} }",
+        "template t: X {body = {at = b}}",
+    );
 }
 
 // --- value shape ----------------------------------------------------------
@@ -740,7 +810,7 @@ fn spans_cover_their_nodes() {
     assert!(declaration.span.text(source).ends_with("2),\n}"));
     assert_eq!(declaration.kind.span.text(source), "template");
     let Shape::Header(named) = &declaration.shape else { panic!("named") };
-    assert_eq!(named.name.unwrap().span.text(source), "t");
+    assert_eq!(named.name.span.text(source), "t");
     assert!(named.span.text(source).starts_with("t(a: "));
     assert!(named.span.text(source).ends_with("2),\n}"));
     assert_eq!(named.span.end, declaration.span.end);

@@ -23,6 +23,7 @@ use super::check;
 use super::probe;
 use super::role;
 use crate::dsl_check::Checked;
+use crate::dsl_check::SortKey;
 
 /// The word a verb phrase reads what it is said of through as a participant,
 /// at `NounPhrase`.
@@ -92,12 +93,19 @@ fn destroy_contains_die_with_its_subject_bound() {
 }
 
 /// Every Definition a value reaches, written in it or in the body of a
-/// Template it calls; a Definition's own body is not entered.
-fn definitions_reached(checked: &Checked<'_>, value: &Value, out: &mut Vec<String>) {
+/// Template it calls; a Definition's own body is not entered. Inside the body
+/// of a Template with an `at` list, `self_sort` is the sort of that list the
+/// call resolved at.
+fn definitions_reached(
+    checked: &Checked<'_>,
+    value: &Value,
+    self_sort: Option<&SortKey>,
+    out: &mut Vec<String>,
+) {
     match &value.kind {
         ValueKind::Call(call) => {
             let word = call.head.ident.as_str();
-            let resolved = checked.resolutions.call(call);
+            let resolved = checked.resolutions.call(call, self_sort);
             assert!(
                 resolved.is_some() || (word == "none" && call.is_bare()),
                 "`{word}` was never resolved, and only a bare `none` is not"
@@ -109,24 +117,25 @@ fn definitions_reached(checked: &Checked<'_>, value: &Value, out: &mut Vec<Strin
                     match role(decl.kind.word).unwrap() {
                         Role::Definition => out.push(word.to_owned()),
                         Role::Template => {
-                            definitions_reached(checked, decl.field("body").unwrap(), out);
+                            let inner = signature.at_list.then_some(&sort);
+                            definitions_reached(checked, decl.field("body").unwrap(), inner, out);
                         }
                         Role::Primitive | Role::Named => {}
                     }
                 }
             }
             for arg in call.args.iter().filter_map(Item::node) {
-                definitions_reached(checked, &arg.value, out);
+                definitions_reached(checked, &arg.value, self_sort, out);
             }
         }
         ValueKind::List(items) => {
             for item in items.iter().filter_map(Item::node) {
-                definitions_reached(checked, item, out);
+                definitions_reached(checked, item, self_sort, out);
             }
         }
         ValueKind::Record(record) => {
             for field in record.nodes() {
-                definitions_reached(checked, &field.value, out);
+                definitions_reached(checked, &field.value, self_sort, out);
             }
         }
         ValueKind::String(_) | ValueKind::Integer(_) | ValueKind::Parameter(_) => {}
@@ -246,7 +255,7 @@ fn a_definition_call_is_one_mark_with_its_deed() {
             // Definition would drop that mark and fail this check on a correct
             // expansion; no Template does today, so a failure here is real.
             let mut reached = Vec::new();
-            definitions_reached(checked, decl.field("body").unwrap(), &mut reached);
+            definitions_reached(checked, decl.field("body").unwrap(), None, &mut reached);
             for inner in reached {
                 let nested = marks(body).into_iter().any(
                     |mark| matches!(mark, Node::Mark { definition, .. } if *definition == inner),
@@ -328,10 +337,10 @@ fn an_omitted_argument_takes_its_default() {
     );
 }
 
-/// An integer at `Amount` goes through its coercion: *Abrupt Decay*'s "mana
-/// value 3 or less" holds `Literal(3)`.
+/// An integer at `Amount` stands as itself, `Int` being a member of `Amount`:
+/// *Abrupt Decay*'s "mana value 3 or less" compares against `3`.
 #[test]
-fn an_integer_at_amount_is_coerced() {
+fn an_integer_at_amount_stands_as_itself() {
     let bundles = bundles(Vec::new()).unwrap();
     let checked = check(&bundles).unwrap();
     let decl = checked
@@ -342,13 +351,94 @@ fn an_integer_at_amount_is_coerced() {
         })
         .unwrap();
     let card = Expander::new(&checked).card(decl).unwrap();
-    let literal = Node::Call {
-        constructor: "Literal".to_owned(),
-        word: "lit".to_owned(),
-        sort: "Amount".to_owned(),
-        args: vec![Node::Integer(3)],
-    };
-    assert!(card.descendants().contains(&&literal), "{card}");
+    let compare = card
+        .descendants()
+        .into_iter()
+        .find_map(|node| match node {
+            Node::Call {
+                constructor, args, ..
+            } if constructor == "Compare" => Some(args),
+            Node::Call { .. }
+            | Node::Word { .. }
+            | Node::Mark { .. }
+            | Node::Param(_)
+            | Node::UnnamedPerformer
+            | Node::String(_)
+            | Node::Integer(_)
+            | Node::List(_)
+            | Node::Record(_)
+            | Node::None => None,
+        })
+        .unwrap_or_else(|| panic!("no comparison:\n{card}"));
+    assert_eq!(compare[1], Node::Integer(3), "{card}");
+}
+
+/// A member word stands as itself at its own sort: a card type written where
+/// a `Nominal` is expected is the word at `CardType`, and a color written
+/// where a `PreModifier` is expected the word at `Color`.
+#[test]
+fn a_member_word_stands_as_itself() {
+    let probes = vec![probe(
+        "probeMember",
+        &[],
+        "Nominal",
+        "nominal(pre = [red], creature)",
+    )];
+    with_probes(probes, |_, expander| {
+        let expansion = expander.term("probeMember", "Nominal").unwrap();
+        let Node::Call {
+            constructor, args, ..
+        } = &expansion
+        else {
+            panic!("a nominal expands to no call:\n{expansion}");
+        };
+        assert_eq!(constructor, "Nominal");
+        let word = |word: &str, sort: &str| Node::Word {
+            word: word.to_owned(),
+            sort: sort.to_owned(),
+        };
+        assert_eq!(args[1], word("creature", "CardType"), "{expansion}");
+        let Node::List(pre) = &args[0] else {
+            panic!("`pre` expands to no list:\n{expansion}");
+        };
+        let [red] = pre.as_slice() else {
+            panic!("`pre` holds one modifier:\n{expansion}");
+        };
+        assert!(
+            matches!(red, Node::Call { word, sort, .. } if word == "red" && sort == "Color"),
+            "{expansion}"
+        );
+    });
+}
+
+/// A primitive with an `at` list builds its constructor at the sort its call
+/// resolved at: `or([white, blue])` in `pre` holds two colors, so it stands
+/// at `AdjectivePhrase`, the lowest sort of its list above `Color`.
+#[test]
+fn an_at_list_primitive_builds_at_the_resolved_sort() {
+    let probes = vec![probe(
+        "probeOr",
+        &[],
+        "Nominal",
+        "nominal(pre = [or([white, blue])], creature)",
+    )];
+    with_probes(probes, |_, expander| {
+        let expansion = expander.term("probeOr", "Nominal").unwrap();
+        let Node::Call { args, .. } = &expansion else {
+            panic!("a nominal expands to no call:\n{expansion}");
+        };
+        let Node::List(pre) = &args[0] else {
+            panic!("`pre` expands to no list:\n{expansion}");
+        };
+        let [coordination] = pre.as_slice() else {
+            panic!("`pre` holds one modifier:\n{expansion}");
+        };
+        assert!(
+            matches!(coordination, Node::Call { constructor, sort, .. }
+                if constructor == "Coordination" && sort == "AdjectivePhrase"),
+            "{expansion}"
+        );
+    });
 }
 
 /// An observation of something occurring expands to a tree that holds the

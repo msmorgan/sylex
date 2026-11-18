@@ -112,8 +112,8 @@ pub struct Name {
     pub span: Span,
 }
 
-/// A declaration: its kind word, followed by either a header or a single
-/// value.
+/// A declaration: its kind word, followed by a header, a single value or a
+/// relation between two sorts.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Declaration {
     /// The first word, such as `primitive`, `template` or `card`. The parser
@@ -123,35 +123,64 @@ pub struct Declaration {
     pub span: Span,
 }
 
-/// The two declaration shapes, told apart by the tokens after the kind word.
+/// The three declaration shapes, told apart by the tokens after the kind word.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Shape {
     /// `kind name(params): Sort = Constructor { fields }`, every part after
-    /// the name optional, or the same with no name,
-    /// `kind(params): Sort { fields }`.
+    /// the name optional.
     Header(Header),
     /// `kind value`, such as `card singleFaced({ ... })` or
     /// `card split({ ... })`.
     Value(Value),
+    /// `kind(Subject): Sort`, such as `member(Color): AdjectivePhrase`.
+    Relation(Relation),
+}
+
+/// A declaration that relates two sorts and declares no word.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Relation {
+    /// The sort in parentheses.
+    pub subject: Sort,
+    /// The sort after `:`.
+    pub sort: Sort,
+    pub span: Span,
 }
 
 /// The parts of a declaration's header.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Header {
-    /// `None` for a header written without a name, which starts at its `(` or
-    /// `:`.
-    pub name: Option<Name>,
+    pub name: Name,
     /// Empty when no parameter list is written.
     pub params: Vec<Item<Param>>,
     /// The sort after `:`.
     pub sort: Option<Sort>,
     /// The constructor clause after `=`, a capitalized word.
     pub constructor: Option<Name>,
-    /// The `{ ... }` block.
+    /// The block's `at = [Sort, ...]` list: the sorts the declaration stands
+    /// at, each of which `Self` names in its signature. Empty when the block
+    /// writes none.
+    pub at: Vec<Item<Sort>>,
+    /// The comments written directly before the `at` list in the block.
+    pub at_comments: Vec<Comment>,
+    /// The `{ ... }` block, without its `at` list.
     pub body: Option<Record>,
-    /// From the name, or the first part written, through the last part.
+    /// From the name through the last part.
     pub span: Span,
 }
+
+impl Header {
+    /// The sorts of the `at` list, without the comments.
+    pub fn at_sorts(&self) -> impl Iterator<Item = &Sort> {
+        self.at.iter().filter_map(Item::node)
+    }
+}
+
+/// The block field that lists the sorts a declaration stands at.
+pub const AT_FIELD: &str = "at";
+
+/// The sort that names, in the signature of a declaration with an `at` list,
+/// the sort the declaration stands at.
+pub const SELF_SORT: &str = "Self";
 
 /// A header parameter, `name: Sort` or `name: Sort = default`.
 #[derive(Debug, Clone, PartialEq, Eq)]

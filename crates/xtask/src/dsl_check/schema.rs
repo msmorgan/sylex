@@ -13,7 +13,8 @@ pub struct Kind {
     /// How a declaration of this kind is written.
     pub form: Form,
     /// The sort a declaration of this kind declares its name at; `None` when
-    /// the header writes it (`primitive`, `template`, `coercion`).
+    /// the declaration writes it (`primitive`, `template`, `member`,
+    /// `denotes`).
     pub sort: Option<&'static str>,
     /// Implicit parameters resolved in this kind's block without being written
     /// in its header (`$actor` on `action`, `syl.md` §4).
@@ -37,8 +38,8 @@ pub enum Form {
     OptionalBlock,
     /// A value alone, with no name: a card.
     Value,
-    /// A header with no name, and a block: a coercion.
-    NamelessBlock,
+    /// Two sorts and no name, `kind(Subject): Sort`: a membership.
+    Relation,
 }
 
 /// A second sort a kind declares its name at.
@@ -129,8 +130,22 @@ pub const PRIMITIVE: &str = "primitive";
 /// The kind word of a Template declaration (`syl.md` §1).
 pub const TEMPLATE: &str = "template";
 
-/// The kind word of a coercion, which declares no word (`syl.md` §3).
-pub const COERCION: &str = "coercion";
+/// The kind word of a membership: every value of its subject is a value of its
+/// sort, written as itself (`syl.md` §2).
+pub const MEMBER: &str = "member";
+
+/// The kind word of the relation that lets a body write a test where a phrase
+/// of its subject kind is expected, and such a phrase where a test is
+/// (`syl.md` §3).
+pub const DENOTES: &str = "denotes";
+
+const fn relation(word: &'static str) -> Kind {
+    Kind {
+        sort: None,
+        form: Form::Relation,
+        ..kind(word, "", &[])
+    }
+}
 
 /// Every declaration kind.
 pub const KINDS: &[Kind] = &[
@@ -151,19 +166,8 @@ pub const KINDS: &[Kind] = &[
             }],
         )
     },
-    Kind {
-        sort: None,
-        form: Form::NamelessBlock,
-        ..kind(
-            COERCION,
-            "",
-            &[FieldSpec {
-                name: "body",
-                sort: None,
-                required: true,
-            }],
-        )
-    },
+    relation(MEMBER),
+    relation(DENOTES),
     Kind {
         implicit: &[("actor", "NounPhrase")],
         secondary: Some(Secondary {
@@ -486,4 +490,106 @@ pub const RECORDS: &[RecordSort] = &[
             ("subtypes", "Option(List(Subtype))", true),
         ],
     ),
+];
+
+/// The kind word of a card, whose term is resolved in surface mode
+/// (`syl.md` §3).
+pub const CARD: &str = "card";
+
+/// A position sort's own declarations, `(sort, word)`: wordings bound to that
+/// one position (`surface.md` §1). Any other declaration at a position sort is
+/// refused unless [`POSITION_STAYING`] names it.
+pub const POSITION_OWN: &[(&str, &str)] = &[
+    ("PreModifier", "faceDown"),
+    ("PreModifier", "faceUp"),
+    ("PreModifier", "phasedOut"),
+    ("PostModifier", "withMostVotes"),
+    ("Predicative", "hasTypeIgnoringTypeChanges"),
+];
+
+/// Declarations that stay at a position sort until the ticket named composes
+/// them at their kind, `(sort, word, ticket)`.
+pub const POSITION_STAYING: &[(&str, &str, &str)] = &[
+    (
+        "Predicative",
+        "attachedTo",
+        "syl-passive-participle-and-trigger-events",
+    ),
+    (
+        "Predicative",
+        "attachedBy",
+        "syl-passive-participle-and-trigger-events",
+    ),
+    (
+        "Predicative",
+        "controlledBy",
+        "syl-passive-participle-and-trigger-events",
+    ),
+    (
+        "Predicative",
+        "named",
+        "syl-passive-participle-and-trigger-events",
+    ),
+    (
+        "Predicative",
+        "was",
+        "syl-passive-participle-and-trigger-events",
+    ),
+    ("Predicative", "did", "syl-lookback-operator-and-holds"),
+    ("PreModifier", "hasQuality", "syl-keyword-quality-union"),
+    ("PreModifier", "copied", "syl-canon-wording-defects"),
+];
+
+/// The ticket that writes the phrase each card of [`TEST_EXCEPTIONS`] prints.
+pub const TEST_EXCEPTION_TICKET: &str = "syl-spelled-test-phrases";
+
+/// Cards whose term calls a test where the card prints a phrase no
+/// declaration spells yet, `(card file name, test)`. The smallest argument of
+/// a slot typed by a position sort that holds the call resolves in body mode
+/// (`syl.md` §3); [`TEST_EXCEPTION_TICKET`] writes each phrase and deletes
+/// its row.
+pub const TEST_EXCEPTIONS: &[(&str, &str)] = &[
+    ("Archon of Coronation", "hasDesignation"),
+    ("Autarch Mammoth", "hasDesignation"),
+    ("Aven Shrine", "shares"),
+    ("Awesome Presence", "inCombat"),
+    ("Bifurcate", "shares"),
+    ("Bile Blight", "shares"),
+    ("Bombur, Gentle Dreamer", "hasDesignation"),
+    ("Bristlepack Sentry", "hasKeyword"),
+    ("Candles of Leng", "shares"),
+    ("Celestial Convergence", "superlative"),
+    ("Chillerpillar", "hasDesignation"),
+    ("Coat of Arms", "shares"),
+    ("Consul's Lieutenant", "hasDesignation"),
+    ("Culling Scales", "superlative"),
+    ("Dark Depths", "hasCounter"),
+    ("Deadeye Brawler", "hasDesignation"),
+    ("Denry Klin, Editor in Chief", "hasCounter"),
+    ("Echoing Ruin", "shares"),
+    ("Éomer of the Riddermark", "superlative"),
+    ("Everlasting Torment", "hasKeyword"),
+    (
+        "Garruk Relentless {slash}{slash} Garruk, the Veil-Cursed",
+        "compare",
+    ),
+    ("Ghostfire Blade", "targeting"),
+    ("Ghostly Prison", "inCombat"),
+    ("Glaring Spotlight", "hasKeyword"),
+    ("Gnarlback Rhino", "targeting"),
+    ("Jared Carthalion, True Heir", "hasDesignation"),
+    ("Juxtapose", "superlative"),
+    ("Keeper of the Flame", "compare"),
+    ("Kopala, Warden of Waves", "targeting"),
+    ("Loxodon Peacekeeper", "superlative"),
+    ("Menacing Ogre", "choseExtreme"),
+    ("Passageway Seer", "hasDesignation"),
+    ("Phyrexian Unlife", "hasKeyword"),
+    ("Propaganda", "inCombat"),
+    ("Secrets of the Golden City", "hasDesignation"),
+    ("Seraphic Greatsword", "superlative"),
+    ("Talion, the Kindly Lord", "compare"),
+    ("Topple", "superlative"),
+    ("Undercover Butler", "superlative"),
+    ("Verity Circle", "inCombat"),
 ];

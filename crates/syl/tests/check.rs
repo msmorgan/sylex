@@ -86,27 +86,42 @@ fn a_nameless_primitive_is_refused() {
 }
 
 #[test]
-fn a_nameless_header_primitive_is_refused() {
+fn a_primitive_at_self_builds_its_constructor_at_each_sort_of_its_at_list() {
+    // One primitive, one constructor at each of its sorts: no duplicate.
     assert_eq!(
-        refusals(&[("p.syl", "primitive(a: A): X = C")]),
+        refusals(&[(
+            "c.syl",
+            "primitive coord(items: List(Self)): Self = Coordination { at = [A, B] }"
+        )]),
+        []
+    );
+    // A second primitive for the constructor at one of those sorts is one.
+    assert_eq!(
+        refusals(&[
+            (
+                "c.syl",
+                "primitive coord(items: List(Self)): Self = Coordination { at = [A, B] }"
+            ),
+            ("d.syl", "primitive join(items: List(B)): B = Coordination"),
+        ]),
         [(
-            RefusalKind::NamelessPrimitive,
-            "primitive(a: A): X = C".to_owned()
+            RefusalKind::DuplicateConstructor {
+                first: "coord".to_owned(),
+                second: "join".to_owned(),
+                constructor: "Coordination".to_owned(),
+                sort: "B".to_owned(),
+            },
+            "Coordination".to_owned()
         )]
     );
 }
 
 #[test]
-fn a_constructor_clause_on_a_nameless_header_is_refused() {
+fn a_relation_declares_no_word_and_is_no_primitive() {
+    assert_eq!(refusals(&[("m.syl", "member(A): B")]), []);
     assert_eq!(
-        refusals(&[("c.syl", "coercion(a: A): X = C")]),
-        [(
-            RefusalKind::ConstructorOutsidePrimitive {
-                declaration: "coercion".to_owned(),
-                constructor: "C".to_owned(),
-            },
-            "C".to_owned()
-        )]
+        refusals(&[("m.syl", "primitive(A): B")]),
+        [(RefusalKind::NamelessPrimitive, "primitive(A): B".to_owned())]
     );
 }
 

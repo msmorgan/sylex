@@ -16,6 +16,8 @@
 //!   moves: everything else keeps its unhugged place. See
 //!   [`Style::hug_first_list`] for the exact rule.
 //! - Sorts are never broken.
+//! - A declaration's `at` list is the first entry of its block, after the
+//!   comments written directly before it.
 //! - Comments print verbatim on their own line at their sequence's indent. A
 //!   comment or a recorded blank line inside a sequence forces it to break.
 //! - A recorded blank line is kept as one blank line, except before the first
@@ -24,11 +26,13 @@
 
 use std::fmt::Write as _;
 
+use crate::tree::AT_FIELD;
 use crate::tree::Arg;
 use crate::tree::Declaration;
 use crate::tree::Entry;
 use crate::tree::Field;
 use crate::tree::File;
+use crate::tree::Header;
 use crate::tree::Item;
 use crate::tree::Param;
 use crate::tree::Record;
@@ -395,10 +399,15 @@ impl Printer<'_> {
                 let layout = self.builder().value(value);
                 self.layout(&layout, 0, 0);
             }
+            Shape::Relation(relation) => {
+                self.text(&format!(
+                    "({}): {}",
+                    sort(&relation.subject),
+                    sort(&relation.sort)
+                ));
+            }
             Shape::Header(header) => {
-                if let Some(name) = header.name {
-                    self.text(&format!(" {}", name.ident));
-                }
+                self.text(&format!(" {}", header.name.ident));
                 let mut rest = String::new();
                 if let Some(sort_ref) = &header.sort {
                     let _ = write!(rest, ": {}", sort(sort_ref));
@@ -418,10 +427,37 @@ impl Printer<'_> {
                 }
                 self.text(&rest);
                 if let Some(body) = &header.body {
-                    self.body(body);
+                    self.block(header, body);
                 }
             }
         }
+    }
+
+    /// A declaration's block: its `at` list, then its fields.
+    fn block(&mut self, header: &Header, record: &Record) {
+        if header.at.is_empty() {
+            return self.body(record);
+        }
+        let builder = self.builder();
+        let sorts = elements(&header.at, |s| (String::new(), Layout::Text(sort(s))));
+        let mut entries: Vec<Element> = header
+            .at_comments
+            .iter()
+            .map(|comment| Element {
+                blank_line_before: false,
+                kind: ElementKind::Comment(comment.text.clone()),
+            })
+            .collect();
+        entries.push(Element {
+            blank_line_before: false,
+            kind: ElementKind::Node {
+                prefix: format!("{AT_FIELD} = "),
+                layout: builder.seq(SeqKind::List, "[".to_owned(), sorts),
+            },
+        });
+        entries.extend(elements(&record.fields, |f| builder.field(f)));
+        self.text("{");
+        self.elements(&entries, 0, "}", 0, true, false);
     }
 
     /// A declaration body: broken unless empty, its `}` on its own line.

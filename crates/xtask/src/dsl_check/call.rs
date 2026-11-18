@@ -29,7 +29,8 @@ use super::Registry;
 use super::Resolver;
 use super::Signature;
 use super::Slot;
-use super::coercion::Coercion;
+use super::membership::Mode;
+use super::membership::Sorts;
 use super::schema;
 use super::sort::SortKey;
 
@@ -53,7 +54,7 @@ pub(super) struct WrittenForms {
 pub(super) fn written_forms(
     decls: &[Decl<'_>],
     registry: &Registry,
-    coercions: &[Coercion],
+    sorts: &Sorts,
 ) -> WrittenForms {
     let mut forms = WrittenForms::default();
     let triggered_sort = SortKey::named(schema::TRIGGERED_ABILITY.0);
@@ -83,7 +84,7 @@ pub(super) fn written_forms(
             }
         }
     }
-    while propagate_templates(decls, registry, coercions, &mut forms) {}
+    while propagate_templates(decls, registry, sorts, &mut forms) {}
     for &(decl_idx, param_idx) in forms.two_or_more.keys() {
         let decl = &decls[decl_idx];
         if decl.sort == trig_cond_sort
@@ -98,7 +99,7 @@ pub(super) fn written_forms(
 fn propagate_templates(
     decls: &[Decl<'_>],
     registry: &Registry,
-    coercions: &[Coercion],
+    sorts: &Sorts,
     forms: &mut WrittenForms,
 ) -> bool {
     let mut changed = false;
@@ -114,11 +115,14 @@ fn propagate_templates(
             decl,
             root_body: body,
             registry,
-            coercions,
+            sorts,
             forms,
             changed: &mut changed,
         };
-        prop.walk(body, &decl.sort);
+        // Every sort of an `at` list has the one declaration's parameters, so
+        // its first sort stands for all.
+        let own = decl.at.first().unwrap_or(&decl.sort);
+        prop.walk(body, own);
     }
     changed
 }
@@ -128,7 +132,7 @@ struct Propagator<'a, 'd> {
     decl: &'a Decl<'d>,
     root_body: &'a Value,
     registry: &'a Registry,
-    coercions: &'a [Coercion],
+    sorts: &'a Sorts,
     forms: &'a mut WrittenForms,
     changed: &'a mut bool,
 }
@@ -136,10 +140,15 @@ struct Propagator<'a, 'd> {
 impl Propagator<'_, '_> {
     /// Walks a Template's `body` before the main resolution pass so every
     /// `Resolver::call` sees the transitive closure regardless of declaration
-    /// order. Unresolved heads, ambiguous coercions, and unbound or duplicate
-    /// arguments are skipped here because `Resolver::value_at` and
-    /// `Resolver::call` check and refuse them on the main pass.
+    /// order. Unresolved heads and unbound or duplicate arguments are skipped
+    /// here because `Resolver::word` and `Resolver::call` check and refuse
+    /// them on the main pass.
     fn walk(&mut self, value: &Value, expected: &SortKey) {
+        let own = self.decl.at.first();
+        let expected = &match own {
+            Some(own) => expected.instantiate(own),
+            None => expected.clone(),
+        };
         let at = expected.option_inner().unwrap_or(expected);
         match &value.kind {
             ValueKind::Call(call) => {
@@ -147,28 +156,7 @@ impl Propagator<'_, '_> {
                 if head == "none" || (head == "some" && expected.option_inner().is_some()) {
                     return;
                 }
-                let signature = self
-                    .registry
-                    .get(&(head.to_owned(), expected.clone()))
-                    .or_else(|| {
-                        expected
-                            .option_inner()
-                            .and_then(|inner| self.registry.get(&(head.to_owned(), inner.clone())))
-                    })
-                    .or_else(|| {
-                        let mut via = self.coercions.iter().filter(|c| {
-                            c.to == *at
-                                && self
-                                    .registry
-                                    .contains_key(&(head.to_owned(), c.from.clone()))
-                        });
-                        match (via.next(), via.next()) {
-                            (Some(c), None) => {
-                                self.registry.get(&(head.to_owned(), c.from.clone()))
-                            }
-                            _ => None,
-                        }
-                    });
+                let signature = signature_in(self.registry, self.sorts, head, expected);
                 let Some(sig) = signature.filter(|sig| !sig.secondary) else {
                     return;
                 };
@@ -243,6 +231,34 @@ impl Propagator<'_, '_> {
             }
             ValueKind::Parameter(_) | ValueKind::String(_) | ValueKind::Integer(_) => {}
         }
+    }
+}
+
+/// The signature a call of `head` binds its arguments against where
+/// `expected` is expected in a body: the declaration at `expected` itself, at
+/// the sort `expected` is `Option` of, or at a sort of that sort's Reaches.
+/// Every sort of an `at` list has the one declaration's parameter names and
+/// order, so the first found stands for all; `None` when the word stands at no
+/// such sort, or at sorts of two declarations.
+fn signature_in<'r>(
+    registry: &'r Registry,
+    sorts: &Sorts,
+    head: &str,
+    expected: &SortKey,
+) -> Option<&'r Signature> {
+    if let Some(signature) = registry.get(&(head.to_owned(), expected.clone())) {
+        return Some(signature);
+    }
+    let at = expected.option_inner().unwrap_or(expected);
+    let mut found: Vec<&Signature> = sorts
+        .reaches(at, Mode::Body)
+        .into_iter()
+        .filter_map(|sort| registry.get(&(head.to_owned(), sort)))
+        .collect();
+    found.dedup_by_key(|signature| signature.decl);
+    match found.as_slice() {
+        [signature] => Some(signature),
+        _ => None,
     }
 }
 
@@ -501,8 +517,7 @@ impl Resolver<'_> {
     }
 
     /// `value` printed so that two values print alike exactly when they
-    /// mean the same: layout and spans dropped, a coercion's wrap looked
-    /// through (`lit(0)` prints as `0` at Amount), arguments named and in
+    /// mean the same: layout and spans dropped, arguments named and in
     /// declaration order, record fields sorted, and each `$name` in `params`
     /// replaced by its value. `expected` is the sort `value` stands at, when
     /// known.
@@ -570,69 +585,46 @@ impl Resolver<'_> {
         if call.is_bare() {
             return head.to_owned();
         }
-        if let Some(at) = at {
-            if let [arg] = args.as_slice()
-                && arg.name.is_none()
-                && let Some(coercion) = self
-                    .coercions
-                    .iter()
-                    .find(|c| c.to == *at && c.wrap == head)
-            {
-                return self.canonical(&arg.value, Some(&coercion.from), params);
-            }
-            let key = (head.to_owned(), at.clone());
-            if !self.registry.contains_key(&key) {
-                // A call that stands at `at` only through a coercion is
-                // printed at the coercion's from-sort.
-                let mut from = self.coercions.iter().filter(|c| {
-                    c.to == *at
-                        && self
-                            .registry
-                            .contains_key(&(head.to_owned(), c.from.clone()))
-                });
-                if let (Some(coercion), None) = (from.next(), from.next()) {
-                    return self.canonical_call(call, Some(&coercion.from), params);
+        if let Some(at) = at
+            && let Some(signature) = signature_in(self.registry, self.sorts, head, at)
+        {
+            let mut bound: Vec<Option<&Arg>> = vec![None; signature.params.len()];
+            let mut unbound = Vec::new();
+            for arg in args {
+                let index = match arg.name {
+                    Some(name) => signature
+                        .params
+                        .iter()
+                        .position(|p| p.name == name.ident.as_str()),
+                    None => (0..signature.params.len())
+                        .find(|&i| !signature.params[i].optional && bound[i].is_none()),
+                };
+                match index {
+                    Some(index) if bound[index].is_none() => bound[index] = Some(arg),
+                    // Refused when the call itself is resolved.
+                    Some(_) | None => unbound.push(arg),
                 }
             }
-            if let Some(signature) = self.registry.get(&key) {
-                let mut bound: Vec<Option<&Arg>> = vec![None; signature.params.len()];
-                let mut unbound = Vec::new();
-                for arg in args {
-                    let index = match arg.name {
-                        Some(name) => signature
-                            .params
-                            .iter()
-                            .position(|p| p.name == name.ident.as_str()),
-                        None => (0..signature.params.len())
-                            .find(|&i| !signature.params[i].optional && bound[i].is_none()),
-                    };
-                    match index {
-                        Some(index) if bound[index].is_none() => bound[index] = Some(arg),
-                        // Refused when the call itself is resolved.
-                        Some(_) | None => unbound.push(arg),
-                    }
-                }
-                let mut written: Vec<String> = signature
-                    .params
-                    .iter()
-                    .zip(&bound)
-                    .filter_map(|(param, arg)| {
-                        arg.map(|arg| {
-                            format!(
-                                "{} = {}",
-                                param.name,
-                                self.canonical(&arg.value, Some(&param.sort), params)
-                            )
-                        })
+            let mut written: Vec<String> = signature
+                .params
+                .iter()
+                .zip(&bound)
+                .filter_map(|(param, arg)| {
+                    arg.map(|arg| {
+                        format!(
+                            "{} = {}",
+                            param.name,
+                            self.canonical(&arg.value, Some(&param.sort), params)
+                        )
                     })
-                    .collect();
-                written.extend(
-                    unbound
-                        .into_iter()
-                        .map(|arg| self.canonical_arg(arg, params)),
-                );
-                return format!("{head}({})", written.join(", "));
-            }
+                })
+                .collect();
+            written.extend(
+                unbound
+                    .into_iter()
+                    .map(|arg| self.canonical_arg(arg, params)),
+            );
+            return format!("{head}({})", written.join(", "));
         }
         let written: Vec<String> = args
             .into_iter()

@@ -39,13 +39,16 @@ fn value_comments(value: &Value) -> usize {
 fn file_comments(file: &File) -> usize {
     count_items(&file.items, |d| match &d.shape {
         Shape::Value(value) => value_comments(value),
+        Shape::Relation(_) => 0,
         Shape::Header(named) => {
             count_items(&named.params, |p| {
                 p.default.as_ref().map_or(0, value_comments)
-            }) + named
-                .body
-                .as_ref()
-                .map_or(0, |r| count_items(&r.fields, |f| value_comments(&f.value)))
+            }) + count_items(&named.at, |_| 0)
+                + named.at_comments.len()
+                + named
+                    .body
+                    .as_ref()
+                    .map_or(0, |r| count_items(&r.fields, |f| value_comments(&f.value)))
         }
     })
 }

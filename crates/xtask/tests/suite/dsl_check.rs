@@ -998,21 +998,21 @@ fn at_refuses_an_event_and_whenever_refuses_a_turn_point() {
             "card singleFaced({\n\
                name = \"Elvish Visionary\",\n\
                types = [creature],\n\
-               text = [at(does(actor(this(creature)), enter), draw(lit(1)))]})\n\
+               text = [at(does(actor(this(creature)), enter), draw(1))]})\n\
              card singleFaced({\n\
                name = \"Thallid\",\n\
                types = [creature],\n\
                text = [\n\
                  whenever(\n\
                    beginningOfYour(upkeep),\n\
-                   putCounters(lit(1), printedKind(sporeCounter), this(creature)))]})\n\
+                   putCounters(1, printedKind(sporeCounter), this(creature)))]})\n\
              card singleFaced({\n\
                name = \"Myr Prototype\",\n\
                types = [artifact, creature],\n\
                text = [\n\
                  when(\n\
                    beginningOfYour(upkeep),\n\
-                   putCounters(lit(1), printedKind(p1p1Counter), this(creature)))]})"
+                   putCounters(1, printedKind(p1p1Counter), this(creature)))]})"
         ),
         [
             (
@@ -1065,7 +1065,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                    and([\n\
                      at(beginningOfYour(upkeep)),\n\
                      whenever(does(actor(you), cast(a(nominal(pre = [black], spell)))))]),\n\
-                   putCounters(lit(1), printedKind(chargeCounter), this(artifact)))]})\n\
+                   putCounters(1, printedKind(chargeCounter), this(artifact)))]})\n\
              card singleFaced({\n\
                name = \"Minsc & Boo, Timeless Heroes\",\n\
                types = [planeswalker],\n\
@@ -1074,7 +1074,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                    and([when(does(actor(this(planeswalker)), enter)), at(beginningOfYour(upkeep))]),\n\
                    may(\n\
                      create(\n\
-                       lit(1),\n\
+                       1,\n\
                        written({\n\
                          characteristics = {\n\
                            name = \"Boo\",\n\
@@ -1083,15 +1083,15 @@ fn joined_trigger_conditions_are_one_disjunction() {
                            types = [creature],\n\
                            subtypes = [hamster],\n\
                            text = [trample, haste],\n\
-                           power = lit(1),\n\
-                           toughness = lit(1)}}))))]})\n\
+                           power = 1,\n\
+                           toughness = 1}}))))]})\n\
              card singleFaced({\n\
                name = \"Bartered Cow\",\n\
                types = [creature],\n\
                text = [\n\
                  triggered(\n\
                    and([when(does(actor(this(creature)), die)), when(does(actor(you), discard(this(card))))]),\n\
-                   create(lit(1), defined(foodToken)))]})\n\
+                   create(1, defined(foodToken)))]})\n\
              card singleFaced({\n\
                name = \"Tenuous Truce\",\n\
                types = [enchantment],\n\
@@ -1111,7 +1111,7 @@ fn joined_trigger_conditions_are_one_disjunction() {
                text = [\n\
                  triggered(\n\
                    and([when(does(actor(this(creature)), die)), does(actor(you), discard(this(card)))]),\n\
-                   create(lit(1), defined(foodToken)))]})"
+                   create(1, defined(foodToken)))]})"
         ),
         [(
             RefusalKind::UnknownWord {
@@ -1123,47 +1123,44 @@ fn joined_trigger_conditions_are_one_disjunction() {
     );
 }
 
-/// Three coercions over their primitives.
-const COERCIONS: &str = "primitive type(type: CardType): Nominal = Type\n\
-     primitive subtype(subtype: Subtype): Nominal = Subtype\n\
-     primitive lit(value: Int): Amount = Literal\n\
+/// Three memberships: card types and subtypes are nominals, and an integer
+/// is an amount.
+const MEMBERS: &str = "member(CardType): Nominal\n\
+     member(Subtype): Nominal\n\
+     member(Int): Amount\n\
      primitive noun(word: Nominal): Condition = Noun\n\
-     coercion(type: CardType): Nominal { body = type($type) }\n\
-     coercion(subtype: Subtype): Nominal { body = subtype($subtype) }\n\
-     coercion(value: Int): Amount { body = lit($value) }\n\
+     primitive amountHolds(amount: Amount): Condition = AmountHolds\n\
      primitive true: Bool = True\n\
      card_type creature { permanentType = true }\n\
      subtype goblin { types = [creature] }\n";
 
 #[test]
-fn a_coercion_applies_at_a_sort_mismatch() {
+fn a_member_stands_at_the_sort_it_is_a_member_of() {
     let source = format!(
-        "{COERCIONS}\
+        "{MEMBERS}\
          template word: Nominal {{ body = creature }}\n\
          template sub: Nominal {{ body = goblin }}\n\
          template int: Amount {{ body = -2 }}\n\
          template param(t: CardType): Nominal {{ body = $t }}\n\
          template items: List(Nominal) {{ body = [creature, goblin] }}\n\
-         template wrapped: Nominal {{ body = type(creature) }}\n\
-         template literal: Amount {{ body = lit(3) }}\n\
          template own: Int {{ body = 3 }}\n\
          template arg: Condition {{ body = noun(goblin) }}"
     );
     assert_eq!(kinds(&source), []);
 }
 
-/// The redundant-default refusal looks through a coercion: `n = 0` is the
-/// default `lit(0)`, and `w = type(creature)` the default `creature`.
+/// A member word and an integer at a member sort are compared with a
+/// default as written: `w = creature` and `n = 0` are their defaults.
 #[test]
-fn a_named_argument_equal_to_its_default_through_a_coercion_is_refused() {
+fn a_named_argument_equal_to_its_member_default_is_refused() {
     let source = format!(
-        "{COERCIONS}\
-         template amt(x: Int, n: Amount = lit(0)): Int {{ body = $x }}\n\
-         template noun(x: Int, w: Nominal = creature): Int {{ body = $x }}\n\
+        "{MEMBERS}\
+         template amt(x: Int, n: Amount = 0): Int {{ body = $x }}\n\
+         template nom(x: Int, w: Nominal = creature): Int {{ body = $x }}\n\
          template bare: Int {{ body = amt(1, n = 0) }}\n\
-         template wrapped: Int {{ body = noun(1, w = type(creature)) }}\n\
+         template word: Int {{ body = nom(1, w = creature) }}\n\
          template other: Int {{ body = amt(1, n = 1) }}\n\
-         template sub: Int {{ body = noun(1, w = goblin) }}"
+         template sub: Int {{ body = nom(1, w = goblin) }}"
     );
     let redundant = |word: &str, argument: &str| RefusalKind::RedundantDefault {
         word: s(word),
@@ -1173,45 +1170,41 @@ fn a_named_argument_equal_to_its_default_through_a_coercion_is_refused() {
         refusals(&[("a.syl", &source)]),
         [
             (redundant("amt", "n"), s("n = 0")),
-            (redundant("noun", "w"), s("w = type(creature)")),
+            (redundant("nom", "w"), s("w = creature")),
         ]
     );
 }
 
-/// A value reached through a coercion keeps its arguments bound by name:
-/// `sq(1)` at Amount is the default `lit(sq(1))`.
+/// A call standing at a member sort keeps its arguments bound by name:
+/// `sq(1)` at Amount is the default `sq(1)`, and `sq(1, k = 2)` is not.
 #[test]
-fn a_named_argument_equal_to_its_default_through_a_coerced_call_is_refused() {
+fn a_named_argument_equal_to_its_default_call_at_a_member_sort_is_refused() {
     let source = format!(
-        "{COERCIONS}\
+        "{MEMBERS}\
          template sq(n: Int, k: Int = 0): Int {{ body = $n }}\n\
-         template h(x: Int, y: Amount = lit(sq(1))): Int {{ body = $x }}\n\
-         template g(x: Int, y: Amount = sq(1)): Int {{ body = $x }}\n\
+         template h(x: Int, y: Amount = sq(1)): Int {{ body = $x }}\n\
          template a: Int {{ body = h(1, y = sq(1)) }}\n\
-         template b: Int {{ body = g(1, y = lit(sq(1))) }}\n\
          template c: Int {{ body = h(1, y = sq(2)) }}\n\
-         template d: Int {{ body = g(1, y = sq(1, k = 2)) }}"
+         template d: Int {{ body = h(1, y = sq(1, k = 2)) }}"
     );
-    let redundant = |word: &str, argument: &str| RefusalKind::RedundantDefault {
-        word: s(word),
-        argument: s(argument),
-    };
     assert_eq!(
         refusals(&[("a.syl", &source)]),
-        [
-            (redundant("h", "y"), s("y = sq(1)")),
-            (redundant("g", "y"), s("y = lit(sq(1))")),
-        ]
+        [(
+            RefusalKind::RedundantDefault {
+                word: s("h"),
+                argument: s("y")
+            },
+            s("y = sq(1)")
+        )]
     );
 }
 
-/// A record's fields are compared at their sorts, so a coercion inside one
-/// is looked through.
+/// A record's fields are compared at their sorts, so an integer at a member
+/// sort inside one is compared as written.
 #[test]
 fn a_named_record_argument_equal_to_its_default_is_refused() {
-    let source = "primitive lit(value: Int): Amount = Literal\n\
-                  coercion(value: Int): Amount { body = lit($value) }\n\
-                  template f(x: Int, c: Characteristics = { name = \"a\", power = lit(2) }): Int { body = $x }\n\
+    let source = "member(Int): Amount\n\
+                  template f(x: Int, c: Characteristics = { name = \"a\", power = 2 }): Int { body = $x }\n\
                   template same: Int { body = f(1, c = { power = 2, name = \"a\" }) }\n\
                   template other: Int { body = f(1, c = { name = \"a\", power = 3 }) }";
     assert_eq!(
@@ -1242,9 +1235,9 @@ fn a_default_reading_an_unbound_parameter_is_no_callers_parameter() {
 }
 
 #[test]
-fn a_coercion_composes_with_option() {
+fn a_member_stands_at_an_option_of_its_sort() {
     let source = format!(
-        "{COERCIONS}\
+        "{MEMBERS}\
          template word: Option(Nominal) {{ body = creature }}\n\
          template int: Option(Amount) {{ body = 2 }}\n\
          template param(t: Subtype): Option(Nominal) {{ body = $t }}\n\
@@ -1254,9 +1247,9 @@ fn a_coercion_composes_with_option() {
 }
 
 #[test]
-fn a_value_no_coercion_reaches_is_refused() {
+fn a_value_no_membership_reaches_is_refused() {
     let source = format!(
-        "{COERCIONS}\
+        "{MEMBERS}\
          template s: Amount {{ body = \"two\" }}\n\
          template t(n: Nat): Amount {{ body = $n }}\n\
          template u: CardType {{ body = goblin }}"
@@ -1279,73 +1272,144 @@ fn a_value_no_coercion_reaches_is_refused() {
 }
 
 #[test]
-fn a_coercion_is_one_hop() {
-    // `CardType` to `Nominal` to `Condition`: refused at load, and a card
-    // type at `Condition` is not coerced twice.
+fn membership_is_transitive() {
+    // `CardType` is a member of `Nominal`, a member of `Condition`: a card
+    // type, a card-type parameter and a nominal all stand at `Condition`.
     let source = format!(
-        "{COERCIONS}\
-         coercion(word: Nominal): Condition {{ body = noun($word) }}\n\
-         template t: Condition {{ body = creature }}"
+        "{MEMBERS}\
+         member(Nominal): Condition\n\
+         template t: Condition {{ body = creature }}\n\
+         template p(c: CardType): Condition {{ body = $c }}\n\
+         template n: Condition {{ body = goblin }}"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+#[test]
+fn a_duplicate_relation_is_refused() {
+    let source = format!(
+        "{MEMBERS}\
+         primitive holds(test: Test): Condition = Holds\n\
+         member(Int): Amount\n\
+         denotes(Color): Test\n\
+         denotes(Color): Condition"
     );
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [
             (
-                RefusalKind::ChainedCoercion {
-                    from: s("CardType"),
-                    via: s("Nominal"),
-                    to: s("Condition")
+                RefusalKind::DuplicateRelation {
+                    kind: "member",
+                    subject: s("Int")
                 },
-                s("coercion(word: Nominal): Condition { body = noun($word) }")
+                s("member(Int): Amount")
             ),
             (
-                RefusalKind::ChainedCoercion {
-                    from: s("Subtype"),
-                    via: s("Nominal"),
-                    to: s("Condition")
+                RefusalKind::DuplicateRelation {
+                    kind: "denotes",
+                    subject: s("Color")
                 },
-                s("coercion(word: Nominal): Condition { body = noun($word) }")
-            ),
-            (
-                RefusalKind::UnknownWord {
-                    word: s("creature"),
-                    sort: s("Condition")
-                },
-                s("creature")
+                s("denotes(Color): Condition")
             ),
         ]
     );
 }
 
 #[test]
-fn a_duplicate_coercion_is_refused() {
+fn a_relation_of_a_sort_to_itself_is_refused() {
     let source = format!(
-        "{COERCIONS}\
-         primitive count(value: Int): Amount = Count\n\
-         coercion(n: Int): Amount {{ body = count($n) }}"
+        "{MEMBERS}\
+         primitive isRed: Test = IsRed\n\
+         primitive holds(test: Test): Condition = Holds\n\
+         member(Amount): Amount\n\
+         denotes(Test): Test"
     );
     assert_eq!(
         refusals(&[("a.syl", &source)]),
+        [
+            (
+                RefusalKind::RelationToItself {
+                    kind: "member",
+                    sort: s("Amount")
+                },
+                s("member(Amount): Amount")
+            ),
+            (
+                RefusalKind::RelationToItself {
+                    kind: "denotes",
+                    sort: s("Test")
+                },
+                s("denotes(Test): Test")
+            ),
+        ]
+    );
+}
+
+#[test]
+fn a_membership_cycle_is_refused() {
+    let source = format!("{MEMBERS}member(Nominal): Condition\nmember(Condition): CardType");
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
         [(
-            RefusalKind::DuplicateCoercion {
-                from: s("Int"),
-                to: s("Amount")
+            RefusalKind::MembershipCycle {
+                member: s("Condition"),
+                of: s("CardType")
             },
-            s("coercion(n: Int): Amount { body = count($n) }")
+            s("member(Condition): CardType")
         )]
     );
 }
 
 #[test]
-fn a_word_at_two_from_sorts_of_one_target_is_refused_with_no_call_site() {
-    let source = format!("{COERCIONS}subtype creature {{ types = [creature] }}");
+fn a_sort_reaching_another_by_two_paths_is_refused() {
+    // `CardType` reaches `Condition` through `Nominal` and directly.
+    let source = format!("{MEMBERS}member(Nominal): Condition\nmember(CardType): Condition");
+    assert_eq!(
+        kinds(&source),
+        [RefusalKind::SecondPath {
+            member: s("CardType"),
+            of: s("Condition"),
+            first: s("Condition"),
+            second: s("Nominal"),
+        }]
+    );
+    // Two members of one sort that reach nothing in common are one tree.
+    assert_eq!(kinds(&format!("{MEMBERS}member(Nominal): Condition")), []);
+}
+
+#[test]
+fn coercion_is_no_declaration_kind() {
+    assert_eq!(
+        kinds("coercion(Int): Amount"),
+        [RefusalKind::UnknownKind(s("coercion"))]
+    );
+}
+
+#[test]
+fn a_relation_written_with_a_name_or_as_a_value_is_refused() {
+    let source = "member(Int): Amount\n\
+                  member amt: Amount { body = 1 }\n\
+                  denotes [1]";
+    assert_eq!(
+        kinds(source),
+        [
+            RefusalKind::RelationForm(s("member")),
+            RefusalKind::RelationForm(s("denotes")),
+        ]
+    );
+}
+
+#[test]
+fn a_word_at_two_members_of_one_sort_is_refused_with_no_call_site() {
+    let source = format!("{MEMBERS}subtype creature {{ types = [creature] }}");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [(
             RefusalKind::AmbiguousWord {
                 word: s("creature"),
                 sorts: vec![s("CardType"), s("Subtype")],
-                target: s("Nominal")
+                target: s("Nominal"),
+                mode: "surface",
             },
             s("subtype creature { types = [creature] }")
         )]
@@ -1353,29 +1417,62 @@ fn a_word_at_two_from_sorts_of_one_target_is_refused_with_no_call_site() {
 }
 
 #[test]
-fn a_word_at_a_target_and_at_a_sort_coerced_into_it_is_refused_with_no_call_site() {
+fn a_word_at_a_sort_and_at_its_member_is_refused_with_no_call_site() {
     // A leftover head-noun Template beside its card type.
-    let source = format!("{COERCIONS}template creature: Nominal {{ body = type(creature) }}");
+    let source = format!("{MEMBERS}template creature: Nominal {{ body = goblin }}");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [(
             RefusalKind::AmbiguousWord {
                 word: s("creature"),
                 sorts: vec![s("CardType"), s("Nominal")],
-                target: s("Nominal")
+                target: s("Nominal"),
+                mode: "surface",
             },
-            s("template creature: Nominal { body = type(creature) }")
+            s("template creature: Nominal { body = goblin }")
         )]
     );
 }
 
+/// A kind and the test it denotes share a Reaches set only in body mode, so
+/// a word at both collides there alone.
 #[test]
-fn an_integer_literal_reaching_a_target_from_int_and_nat_is_refused_with_no_call_site() {
-    let source = format!(
-        "{COERCIONS}\
-         primitive count(value: Nat): Amount = Count\n\
-         coercion(n: Nat): Amount {{ body = count($n) }}"
+fn a_word_at_a_kind_and_at_the_test_it_denotes_is_refused_in_body_mode() {
+    let source = "denotes(AdjectivePhrase): Test\n\
+                  primitive holds(test: Test): Condition = Holds\n\
+                  primitive red: AdjectivePhrase = Red\n\
+                  primitive red: Test = IsRed";
+    assert_eq!(
+        refusals(&[("a.syl", source)]),
+        [(
+            RefusalKind::AmbiguousWord {
+                word: s("red"),
+                sorts: vec![s("AdjectivePhrase"), s("Test")],
+                target: s("AdjectivePhrase"),
+                mode: "body",
+            },
+            s("primitive red: Test = IsRed")
+        )]
     );
+}
+
+/// One declaration with an `at` list is one declaration at all its sorts,
+/// however many of them one Reaches set holds.
+#[test]
+fn an_at_list_declaration_at_sorts_of_one_reaches_set_is_no_ambiguity() {
+    let source = "member(AdjectivePhrase): PreModifier\n\
+                  primitive red: AdjectivePhrase = Red\n\
+                  primitive pre(modifier: PreModifier): Condition = Pre\n\
+                  primitive either: Coordinator = Either\n\
+                  primitive coord(coordinator: Coordinator, items: List(Self)): Self = Coordination {\n\
+                    at = [AdjectivePhrase, PreModifier]\n\
+                  }";
+    assert_eq!(kinds(source), []);
+}
+
+#[test]
+fn an_integer_literal_reaching_a_sort_from_int_and_nat_is_refused_with_no_call_site() {
+    let source = format!("{MEMBERS}member(Nat): Amount");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [(
@@ -1384,17 +1481,16 @@ fn an_integer_literal_reaching_a_target_from_int_and_nat_is_refused_with_no_call
                 sorts: vec![s("Int"), s("Nat")],
                 target: s("Amount")
             },
-            s("coercion(n: Nat): Amount { body = count($n) }")
+            s("member(Nat): Amount")
         )]
     );
 }
 
 #[test]
-fn a_record_literal_reaching_a_target_from_two_record_sorts_is_refused_with_no_call_site() {
-    let source = "primitive ordinalOf(o: EventOrdinal): Condition = OrdinalOf\n\
-         primitive faceDownOf(f: FaceDown): Condition = FaceDownOf\n\
-         coercion(o: EventOrdinal): Condition { body = ordinalOf($o) }\n\
-         coercion(f: FaceDown): Condition { body = faceDownOf($f) }";
+fn a_record_literal_reaching_a_sort_from_two_record_sorts_is_refused_with_no_call_site() {
+    let source = "primitive faceDownHolds(f: FaceDown): Condition = FaceDownHolds\n\
+                  member(EventOrdinal): Condition\n\
+                  member(FaceDown): Condition";
     assert_eq!(
         refusals(&[("a.syl", source)]),
         [(
@@ -1403,17 +1499,16 @@ fn a_record_literal_reaching_a_target_from_two_record_sorts_is_refused_with_no_c
                 sorts: vec![s("EventOrdinal"), s("FaceDown")],
                 target: s("Condition")
             },
-            s("coercion(f: FaceDown): Condition { body = faceDownOf($f) }")
+            s("member(FaceDown): Condition")
         )]
     );
 }
 
 #[test]
-fn a_word_at_two_sorts_no_coercion_joins_is_no_ambiguity() {
-    // `snow` is a supertype and a mana symbol; neither reaches a coercion's
-    // target.
+fn a_word_at_two_sorts_no_membership_joins_is_no_ambiguity() {
+    // `snow` is a supertype and a mana symbol; no sort reaches both.
     let source = format!(
-        "{COERCIONS}\
+        "{MEMBERS}\
          supertype snow {{ name = \"Snow\" }}\n\
          primitive snowPip: ManaSymbol = Snow\n\
          template snow: ManaSymbol {{ body = snowPip }}"
@@ -1422,75 +1517,38 @@ fn a_word_at_two_sorts_no_coercion_joins_is_no_ambiguity() {
 }
 
 #[test]
-fn a_malformed_coercion_is_refused() {
-    let source = format!(
-        "{COERCIONS}\
-         template article: Nominal {{ body = type(creature) }}\n\
-         coercion(a: Int, b: Int): Amount {{ body = lit($a) }}\n\
-         coercion(a: Int = 1): Amount {{ body = lit($a) }}\n\
-         coercion(a: CardType): Nominal {{ body = article }}\n\
-         template articleOf(t: CardType): Nominal {{ body = type($t) }}\n\
-         coercion(a: CardType): Nominal {{ body = articleOf($a) }}\n\
-         coercion(a: Nat): Amount {{ body = lit(1) }}\n\
-         coercion named(a: Int): Amount {{ body = lit($a) }}\n\
-         coercion(a: Int): Amount\n\
-         coercion [1]\n\
-         coercion(a: Int): Amount {{}}"
-    );
+fn a_card_written_as_a_relation_is_refused() {
     assert_eq!(
-        kinds(&source),
-        [
-            RefusalKind::WrittenName(s("coercion")),
-            RefusalKind::MissingBlock(s("coercion")),
-            RefusalKind::MissingHeader(s("coercion")),
-            RefusalKind::CoercionParameters,
-            RefusalKind::CoercionParameters,
-            RefusalKind::CoercionBody(s("Nominal")),
-            RefusalKind::CoercionBody(s("Nominal")),
-            RefusalKind::CoercionBody(s("Amount")),
-            RefusalKind::MissingField {
-                field: s("body"),
-                at: s("`coercion`(Int): Amount")
-            },
-        ]
-    );
-}
-
-#[test]
-fn a_card_written_as_a_header_without_a_name_is_refused() {
-    assert_eq!(
-        kinds("card(a: Int): Card { body = 1 }"),
+        kinds("card(Int): Card"),
         [RefusalKind::WrittenHeader(s("card"))]
     );
 }
 
 #[test]
-fn a_word_at_an_option_of_a_target_and_at_a_from_sort_is_refused_with_no_call_site() {
+fn a_word_at_an_option_of_a_sort_and_at_its_member_is_refused_with_no_call_site() {
     // At an `Option(Nominal)` position the `Option` declaration would be
-    // found before the coercion from `CardType` is tried.
-    let source =
-        format!("{COERCIONS}template creature: Option(Nominal) {{ body = type(creature) }}");
+    // found before the member `CardType` is tried.
+    let source = format!("{MEMBERS}template creature: Option(Nominal) {{ body = goblin }}");
     assert_eq!(
         refusals(&[("a.syl", &source)]),
         [(
             RefusalKind::AmbiguousWord {
                 word: s("creature"),
                 sorts: vec![s("CardType"), s("Option(Nominal)")],
-                target: s("Option(Nominal)")
+                target: s("Option(Nominal)"),
+                mode: "surface",
             },
-            s("template creature: Option(Nominal) { body = type(creature) }")
+            s("template creature: Option(Nominal) { body = goblin }")
         )]
     );
 }
 
 #[test]
-fn a_list_literal_reaching_a_target_from_two_list_sorts_is_refused_with_no_call_site() {
+fn a_list_literal_reaching_a_sort_from_two_list_sorts_is_refused_with_no_call_site() {
     let source = format!(
-        "{COERCIONS}\
-         primitive ofTypes(types: List(CardType)): Condition = OfTypes\n\
-         primitive ofSubtypes(subtypes: List(Subtype)): Condition = OfSubtypes\n\
-         coercion(t: List(CardType)): Condition {{ body = ofTypes($t) }}\n\
-         coercion(t: List(Subtype)): Condition {{ body = ofSubtypes($t) }}"
+        "{MEMBERS}\
+         member(List(CardType)): Condition\n\
+         member(List(Subtype)): Condition"
     );
     assert_eq!(
         refusals(&[("a.syl", &source)]),
@@ -1500,41 +1558,15 @@ fn a_list_literal_reaching_a_target_from_two_list_sorts_is_refused_with_no_call_
                 sorts: vec![s("List(CardType)"), s("List(Subtype)")],
                 target: s("Condition")
             },
-            s("coercion(t: List(Subtype)): Condition { body = ofSubtypes($t) }")
+            s("member(List(Subtype)): Condition")
         )]
     );
 }
 
 #[test]
-fn a_coercion_from_a_sort_to_itself_is_refused() {
-    let source = format!(
-        "{COERCIONS}\
-         primitive twice(n: Amount): Amount = Twice\n\
-         coercion(n: Amount): Amount {{ body = twice($n) }}"
-    );
+fn a_relation_on_a_named_kind_is_refused() {
     assert_eq!(
-        refusals(&[("a.syl", &source)]),
-        [
-            (
-                RefusalKind::CoercionToItself(s("Amount")),
-                s("coercion(n: Amount): Amount { body = twice($n) }")
-            ),
-            (
-                RefusalKind::ChainedCoercion {
-                    from: s("Int"),
-                    via: s("Amount"),
-                    to: s("Amount")
-                },
-                s("coercion(n: Amount): Amount { body = twice($n) }")
-            ),
-        ]
-    );
-}
-
-#[test]
-fn a_nameless_header_on_a_named_kind_is_refused() {
-    assert_eq!(
-        kinds("template(x: Int): Int { body = $x }"),
+        kinds("template(Int): Int"),
         [RefusalKind::MissingName(s("template"))]
     );
 }
@@ -2013,8 +2045,7 @@ fn spelling_rule_7_unprinted_parameter_must_be_omissible() {
 fn spelling_rule_8_skeleton_must_be_unambiguous() {
     let source = format!(
         "{COLORS}\
-         primitive lit(n: Int): Amount = Lit\n\
-         coercion(n: Int): Amount {{ body = lit($n) }}\n\
+         member(Int): Amount\n\
          template okDistinctWords(start: Option(Color), end: Option(Color)): Option(Color) {{\n\
            spelling = \"<from $start >until< $end>\",\n\
            body = $start\n\
@@ -2035,7 +2066,7 @@ fn spelling_rule_8_skeleton_must_be_unambiguous() {
            spelling = \"pick< $a>< $b>\",\n\
            body = $a\n\
          }}\n\
-         template coercedOptionals(a: Option(Int), b: Option(Amount)): Option(Amount) {{\n\
+         template memberOptionals(a: Option(Int), b: Option(Amount)): Option(Amount) {{\n\
            spelling = \"count< $a>< $b>\",\n\
            body = $b\n\
          }}\n\
@@ -2512,7 +2543,8 @@ const NOMINAL_PREAMBLE: &str = "\
     primitive white: PreModifier = White\n\
     primitive black: PreModifier = Black\n\
     primitive tapped: PreModifier = Tapped\n\
-    primitive youControl: PostModifier = YouControl\n\
+    member(RelativeClause): PostModifier\n\
+    primitive youControl: RelativeClause = YouControl\n\
     primitive card: Nominal = Card\n\
     primitive creature: Nominal = Creature\n\
     primitive zombie: Nominal = Zombie\n\
@@ -2522,7 +2554,6 @@ const NOMINAL_PREAMBLE: &str = "\
     primitive coord(coordinator: Coordinator, items: List(PreModifier)): PreModifier = Coordination\n\
     template or(disjuncts: List(PreModifier)): PreModifier { body = coord(or, $disjuncts) }\n\
     template andOr(disjuncts: List(PreModifier)): PreModifier { body = or($disjuncts) }\n\
-    template stacked(modifiers: List(PreModifier)): PreModifier { body = coord(and, $modifiers) }\n\
     primitive non(p: PreModifier): PreModifier = Non\n";
 
 #[test]
@@ -2603,88 +2634,16 @@ fn nominal_allows_coordinated_heads_and_refuses_bare_and_nested_nominals() {
     );
 }
 
-#[test]
-fn stacked_requires_two_elements_inside_a_premodifier_coordination() {
-    let valid = format!(
-        "{NOMINAL_PREAMBLE}\
-         template inOr: Nominal {{\n\
-           body = nominal(pre = [or([white, stacked([tapped, black])])], card)\n\
-         }}\n\
-         template inAndOr: Nominal {{\n\
-           body = nominal(pre = [andOr([white, stacked([tapped, black])])], card)\n\
-         }}\n\
-         template inCoord: Nominal {{\n\
-           body = nominal(pre = [coord(or, [white, stacked([tapped, black, white])])], card)\n\
-         }}\n\
-         template whiteBlack: PreModifier {{ body = stacked([white, black]) }}\n\
-         template namedArm: Nominal {{ body = nominal(pre = [or([tapped, whiteBlack])], card) }}\n\
-         primitive andOr: Coordinator = AndOr\n\
-         template inAndOrCoord: Nominal {{\n\
-           body = nominal(pre = [coord(andOr, [white, stacked([tapped, black])])], card)\n\
-         }}"
-    );
-    assert_eq!(kinds(&valid), []);
-
-    let invalid = format!(
-        "{NOMINAL_PREAMBLE}\
-         template directInPre: Nominal {{ body = nominal(pre = [stacked([white, black])], card) }}\n\
-         template underNon: Nominal {{ body = nominal(pre = [or([white, non(stacked([tapped, black]))])], card) }}\n\
-         template nestedInStacked: Nominal {{ body = nominal(pre = [or([white, stacked([tapped, stacked([black, white])])])], card) }}\n\
-         template literalAnd: Nominal {{ body = nominal(pre = [coord(and, [white, black])], card) }}\n\
-         template whiteBlack: PreModifier {{ body = stacked([white, black]) }}\n\
-         template namedInPre: Nominal {{ body = nominal(pre = [whiteBlack], card) }}"
-    );
-    assert_eq!(
-        refusals(&[("a.syl", &invalid)]),
-        [
-            (RefusalKind::UnplacedStacked, s("stacked([white, black])")),
-            (RefusalKind::UnplacedStacked, s("stacked([tapped, black])")),
-            (RefusalKind::UnplacedStacked, s("stacked([black, white])")),
-            (
-                RefusalKind::UnplacedStacked,
-                s("coord(and, [white, black])")
-            ),
-            (RefusalKind::UnplacedStacked, s("whiteBlack")),
-        ]
-    );
-
-    let short = format!(
-        "{NOMINAL_PREAMBLE}\
-         template empty: Nominal {{ body = nominal(pre = [or([white, stacked([])])], card) }}\n\
-         template single: Nominal {{ body = nominal(pre = [or([white, stacked([black])])], card) }}"
-    );
-    assert_eq!(
-        refusals(&[("a.syl", &short)]),
-        [
-            (
-                RefusalKind::EmptyCoordination {
-                    word: s("stacked"),
-                    sort: s("PreModifier"),
-                },
-                s("stacked([])")
-            ),
-            (
-                RefusalKind::SingleItemCoordination {
-                    word: s("stacked"),
-                    sort: s("PreModifier"),
-                    instead: s("black"),
-                },
-                s("stacked([black])")
-            ),
-        ]
-    );
-}
-
 const AGREEMENT_PREAMBLE: &str = "\
     primitive cardName: QualitySort = CardName\n\
     primitive differ: Agreement = Differ\n\
-    primitive agree(axis: QualitySort, agreement: Agreement): PostModifier = Agree\n\
-    template withDifferentNames: PostModifier { body = agree(cardName, differ) }\n\
+    denotes(RelativeClause): Test\n\
+    primitive agree(axis: QualitySort, agreement: Agreement): Test = Agree\n\
+    template withDifferentNames: Test { body = agree(cardName, differ) }\n\
     primitive one: Plurality = One\n\
     primitive many: Plurality = Many\n\
     primitive unmarked: ChoiceMode = Unmarked\n\
-    primitive lit(value: Int): Amount = Literal\n\
-    coercion(value: Int): Amount { body = lit($value) }\n\
+    member(Int): Amount\n\
     primitive chosenNumber: Amount = ChosenNumber\n\
     primitive range(low: Option(Nat) = none, high: Option(Nat) = none): Quantity = Range\n\
     primitive exactlyOf(amount: Amount): Quantity = ExactlyOf\n\
@@ -2718,11 +2677,11 @@ const AGREEMENT_PREAMBLE: &str = "\
     primitive numberOf(group: NounPhrase): Amount = CountOf\n\
     template countOf(n: Nominal): Amount { body = numberOf(described(bare, $n)) }\n\
     template forEach(per: Amount, n: Nominal): Amount { body = countOf($n) }\n\
-    primitive didDiscard(group: NounPhrase): PostModifier = DidDiscard\n\
+    primitive didDiscard(group: NounPhrase): RelativeClause = DidDiscard\n\
     primitive max: AggregateOp = Max\n\
     primitive manaValue: ProjAxis = ManaValue\n\
     primitive aggregateOver(op: AggregateOp, domain: Nominal, body: Amount): Amount = AggregateOver\n\
-    primitive superlative(op: AggregateOp, axis: ProjAxis, domain: Nominal): PostModifier = Superlative\n\
+    primitive superlative(op: AggregateOp, axis: ProjAxis, domain: Nominal): Test = Superlative\n\
     primitive atLeast: Comparator = AtLeast\n\
     primitive compareOver(domain: Nominal, measure: Amount, comparator: Comparator, bound: Amount): Nominal = CompareOver\n\
     primitive this(head: Nominal): NounPhrase = This\n\
@@ -2834,19 +2793,6 @@ fn agreement_postmodifier_requires_a_plural_group_determiner() {
             vec![(RefusalKind::AgreementWithoutGroup, s("withDifferentNames"))],
         ]
         .concat()
-    );
-}
-
-#[test]
-fn stacked_refuses_a_coordinator_it_does_not_classify() {
-    let source = format!(
-        "{NOMINAL_PREAMBLE}\
-         primitive nor: Coordinator = Nor\n\
-         template neither: Nominal {{ body = nominal(pre = [coord(nor, [white, black])], card) }}"
-    );
-    assert_eq!(
-        refusals(&[("a.syl", &source)]),
-        [(RefusalKind::UnclassifiedCoordinator(s("nor")), s("nor"))]
     );
 }
 
@@ -3081,5 +3027,342 @@ fn shortened_name_requires_a_face_with_a_shortened_name() {
                 face: s("Omega"),
             },
         ]
+    );
+}
+
+/// Two adjacent optional Holes are ambiguous when their sorts' surface
+/// Reaches sets share a sort: a color fills either Hole of `pick` below.
+#[test]
+fn spelling_skeleton_holes_overlap_through_membership() {
+    let source = format!(
+        "{COLORS}\
+         member(Color): AdjectivePhrase\n\
+         member(Color): Condition\n\
+         primitive tapped: AdjectivePhrase = Tapped\n\
+         primitive always: Condition = Always\n\
+         primitive both(a: AdjectivePhrase, c: Condition): Nat = Both\n\
+         template shared(a: Option(AdjectivePhrase), c: Option(Condition)): Option(Condition) {{\n\
+           spelling = \"pick< $a>< $c>\",\n\
+           body = $c\n\
+         }}\n\
+         template unrelated(a: Option(AdjectivePhrase), n: Option(Nat)): Option(Nat) {{\n\
+           spelling = \"pick< $a>< $n>\",\n\
+           body = $n\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::SpellingAmbiguousSkeleton,
+            s("\"pick< $a>< $c>\"")
+        )]
+    );
+}
+
+#[test]
+fn self_and_at_lists_are_checked_in_the_header() {
+    assert_eq!(
+        kinds("template id(x: Self): Self { at = [Int, Nat], body = $x }"),
+        []
+    );
+    assert_eq!(
+        kinds(
+            "template noList(x: Self): Int { body = 1 }\n\
+             template noSelf(x: Int): Int { at = [Int, Nat], body = $x }\n\
+             template twice(x: Self): Self { at = [Int, Int], body = $x }\n\
+             ability listed { at = [Int] }"
+        ),
+        [
+            RefusalKind::SelfWithoutAtList,
+            RefusalKind::AtListWithoutSelf,
+            RefusalKind::DuplicateAtSort(s("Int")),
+            RefusalKind::AtListOnKind(s("ability")),
+        ]
+    );
+}
+
+/// Describing phrases and their positions, after the builtin plugins: two
+/// kinds that denote `Test`, the position sorts they and `Nominal` are members
+/// of, and words with `at` lists over them.
+const POSITIONS: &str = "\
+    denotes(AdjectivePhrase): Test\n\
+    denotes(RelativeClause): Test\n\
+    member(Color): AdjectivePhrase\n\
+    member(AdjectivePhrase): PreModifier\n\
+    member(Nominal): PreModifier\n\
+    member(RelativeClause): PostModifier\n\
+    member(RelativeClause): Predicative\n\
+    primitive white: Color = White\n\
+    primitive blue: Color = Blue\n\
+    primitive tapped: AdjectivePhrase = Tapped\n\
+    primitive youControl: RelativeClause = YouControl\n\
+    primitive card: Nominal = Card\n\
+    primitive creature: Nominal = Creature\n\
+    primitive inCombat: Test = InCombat\n\
+    primitive nominal(pre: List(PreModifier) = [], head: Nominal, post: List(PostModifier) = []): Nominal = Nominal\n\
+    primitive is(what: Predicative): Condition = Is\n\
+    primitive and: Coordinator = And\n\
+    primitive coord(coordinator: Coordinator, items: List(Self)): Self = Coordination {\n\
+      at = [AdjectivePhrase, RelativeClause, Nominal, PreModifier, PostModifier, Test]\n\
+    }\n\
+    primitive either(items: List(Self)): Self = Either { at = [AdjectivePhrase, Nominal] }\n\
+    primitive not(phrase: Self): Self = Not { at = [AdjectivePhrase, Test], spelling = \"not $phrase\" }\n";
+
+/// A call of a word with an `at` list stands at the lowest sort of its list
+/// that holds its arms: two adjective phrases at `AdjectivePhrase`, where
+/// `either` stands, and an adjective phrase and a nominal only at the
+/// position sort `PreModifier`, where `coord` stands and `either` does not.
+#[test]
+fn an_at_list_call_stands_at_the_lowest_sort_holding_its_arms() {
+    let valid = format!(
+        "{POSITIONS}\
+         template likeKinds: Nominal {{ body = nominal(pre = [either([white, tapped])], card) }}\n\
+         template unlikeKinds: Nominal {{ body = nominal(pre = [coord(and, [tapped, creature])], card) }}\n\
+         template nested: Nominal {{\n\
+           body = nominal(pre = [coord(and, [either([white, blue]), creature])], card)\n\
+         }}"
+    );
+    assert_eq!(kinds(&valid), []);
+    let invalid = format!(
+        "{POSITIONS}\
+         template unlike: Nominal {{ body = nominal(pre = [either([tapped, creature])], card) }}\n\
+         template empty: Nominal {{ body = nominal(pre = [coord(and, [])], card) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [
+            (
+                RefusalKind::NoCommonSort {
+                    word: s("either"),
+                    sort: s("PreModifier"),
+                    arms: vec![s("AdjectivePhrase"), s("Nominal")],
+                },
+                s("either")
+            ),
+            (
+                RefusalKind::EmptyCoordination {
+                    word: s("coord"),
+                    sort: s("PreModifier"),
+                },
+                s("coord(and, [])")
+            ),
+        ]
+    );
+}
+
+/// In body mode a word with an `at` list that holds its arms at no listed
+/// sort stands at the test sort when it is listed there: `youDontControl`'s
+/// `not(youControl)`, `not` standing at no `RelativeClause`. A word not
+/// listed at `Test` has no such fallback.
+#[test]
+fn an_at_list_call_falls_back_to_the_test_sort_in_body_mode() {
+    let valid = format!(
+        "{POSITIONS}\
+         template youDontControl: RelativeClause {{ body = not(youControl) }}"
+    );
+    assert_eq!(kinds(&valid), []);
+    let invalid = format!(
+        "{POSITIONS}\
+         template youDontControl: RelativeClause {{ body = either([youControl, youControl]) }}"
+    );
+    assert_eq!(
+        kinds(&invalid),
+        [RefusalKind::UnknownWord {
+            word: s("either"),
+            sort: s("RelativeClause")
+        }]
+    );
+}
+
+/// The refusals of a canon bundle of one file, `file`, checked beside a
+/// builtin bundle of `builtin`; `None` when the check passes.
+fn card_refusals(builtin: &str, file: &str, cards: &str) -> Vec<(RefusalKind, String)> {
+    let builtin = bundle("builtin", FileId(0), &[("builtin.syl", builtin)]);
+    let canon = bundle("canon", builtin.next_file_id(), &[(file, cards)]);
+    match check(&builtin, &[&canon]) {
+        Ok(_) => Vec::new(),
+        Err(CheckError::Declarations(error)) => panic!("sylex_syl refused: {error}"),
+        Err(CheckError::Resolution { refusals, .. }) => refusals
+            .into_iter()
+            .map(|refusal| {
+                let file = canon.file(refusal.span.file).expect("refusal in the cards");
+                (refusal.kind, refusal.span.text(&file.source).to_owned())
+            })
+            .collect(),
+    }
+}
+
+/// A card's term is read in surface mode, where a test stands nowhere; a
+/// Template's body is read in body mode, where it stands in a position. A
+/// card `schema::TEST_EXCEPTIONS` lists (*Propaganda*, `inCombat`) may call
+/// its test in a slot typed by a position sort.
+#[test]
+fn a_test_in_a_cards_term_is_refused_unless_the_card_is_excepted() {
+    let builtin = format!(
+        "{POSITIONS}\
+         primitive mark(post: PostModifier): Card = Mark\n\
+         template attackingYouControl: Condition {{ body = is(coord(and, [inCombat, youControl])) }}\n\
+         primitive holds(post: PostModifier): Condition = Holds\n\
+         template inCombatHolds: Condition {{ body = holds(inCombat) }}\n"
+    );
+    assert_eq!(
+        card_refusals(&builtin, "Glorious Anthem.syl", "card mark(youControl)"),
+        []
+    );
+    assert_eq!(
+        card_refusals(&builtin, "Glorious Anthem.syl", "card mark(inCombat)"),
+        [(
+            RefusalKind::TestInCard {
+                word: s("inCombat"),
+                test: s("Test")
+            },
+            s("inCombat")
+        )]
+    );
+    assert_eq!(
+        card_refusals(&builtin, "Propaganda.syl", "card mark(inCombat)"),
+        []
+    );
+    // The exception names one test: another stays refused.
+    assert_eq!(
+        card_refusals(
+            &format!("{builtin}primitive isRed: Test = IsRed\n"),
+            "Propaganda.syl",
+            "card mark(isRed)"
+        ),
+        [(
+            RefusalKind::TestInCard {
+                word: s("isRed"),
+                test: s("Test")
+            },
+            s("isRed")
+        )]
+    );
+}
+
+/// Nothing at a test sort prints, so a declaration there writes no
+/// `spelling`; a word with an `at` list that also stands at the test sort
+/// spells its other sorts.
+#[test]
+fn a_spelling_at_a_test_sort_is_refused() {
+    assert_eq!(kinds(POSITIONS), []);
+    let source = format!("{POSITIONS}primitive isRed: Test = IsRed {{ spelling = \"red\" }}");
+    assert_eq!(
+        refusals(&[("a.syl", &source)]),
+        [(
+            RefusalKind::SpellingAtTest {
+                word: s("isRed"),
+                sort: s("Test")
+            },
+            s("\"red\"")
+        )]
+    );
+}
+
+/// A declaration with an `at` list is exempt from the position rule and
+/// the test rule only when its list holds another sort as well.
+#[test]
+fn an_at_list_of_only_position_or_test_sorts_is_no_exemption() {
+    let source = format!(
+        "{POSITIONS}\
+         template fooPre: Self {{ at = [PreModifier], body = tapped }}\n\
+         template barTest: Self {{ at = [Test], spelling = \"bar\", body = inCombat }}"
+    );
+    assert_eq!(
+        kinds(&source),
+        [
+            RefusalKind::PositionDeclaration {
+                word: s("fooPre"),
+                sort: s("PreModifier")
+            },
+            RefusalKind::SpellingAtTest {
+                word: s("barTest"),
+                sort: s("Test")
+            },
+        ]
+    );
+}
+
+/// A body of a declaration with an `at` list is resolved for each sort of
+/// the list on its own: a fixed word may be the sort itself for one and a
+/// member of it for another.
+#[test]
+fn an_at_list_body_resolves_for_each_sort_on_its_own() {
+    let source = format!(
+        "{POSITIONS}\
+         primitive wrap(x: Self): Self = Wrap {{ at = [AdjectivePhrase, PreModifier] }}\n\
+         template fixed(x: Self): Self {{ at = [AdjectivePhrase, PreModifier], body = wrap(tapped) }}\n\
+         template user: Nominal {{ body = nominal(pre = [fixed(white), fixed(creature)], card) }}"
+    );
+    assert_eq!(kinds(&source), []);
+}
+
+/// A position sort holds only its own wordings (`schema::POSITION_OWN`) and
+/// those staying there for a ticket (`schema::POSITION_STAYING`).
+#[test]
+fn a_declaration_at_a_position_sort_is_refused_unless_a_table_lists_it() {
+    let listed = format!(
+        "{POSITIONS}\
+         primitive faceDown: PreModifier = FaceDown\n\
+         primitive did: Predicative = Did"
+    );
+    assert_eq!(kinds(&listed), []);
+    let unlisted = format!(
+        "{POSITIONS}\
+         primitive sideways: PreModifier = Sideways\n\
+         template underYourControl: PostModifier {{ body = youControl }}"
+    );
+    assert_eq!(
+        kinds(&unlisted),
+        [
+            RefusalKind::PositionDeclaration {
+                word: s("sideways"),
+                sort: s("PreModifier")
+            },
+            RefusalKind::PositionDeclaration {
+                word: s("underYourControl"),
+                sort: s("PostModifier")
+            },
+        ]
+    );
+}
+
+/// A `nominal` with modifiers of its own in another's `pre` would hand its
+/// modifiers to the wrong head; as an arm of a coordination it is one item.
+#[test]
+fn a_modified_nominal_in_pre_is_refused_outside_a_coordination() {
+    let valid = format!(
+        "{POSITIONS}\
+         template armed: Nominal {{\n\
+           body = nominal(pre = [coord(and, [nominal(pre = [white], creature), tapped])], card)\n\
+         }}\n\
+         template head: Nominal {{ body = nominal(pre = [creature], card) }}"
+    );
+    assert_eq!(kinds(&valid), []);
+    let invalid = format!(
+        "{POSITIONS}\
+         template direct: Nominal {{ body = nominal(pre = [nominal(pre = [white], creature)], card) }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &invalid)]),
+        [(
+            RefusalKind::ModifiedNominalInPre,
+            s("nominal(pre = [white], creature)")
+        )]
+    ); // Under "non" it is the same nominal.
+    let negated = format!(
+        "{POSITIONS}\
+         primitive non(p: Self): Self = Non {{ at = [AdjectivePhrase, Nominal] }}\n\
+         template word: Nominal {{ body = nominal(pre = [non(creature)], card) }}\n\
+         template direct: Nominal {{\n\
+           body = nominal(pre = [non(nominal(pre = [white], creature))], card)\n\
+         }}"
+    );
+    assert_eq!(
+        refusals(&[("a.syl", &negated)]),
+        [(
+            RefusalKind::ModifiedNominalInPre,
+            s("nominal(pre = [white], creature)")
+        )]
     );
 }

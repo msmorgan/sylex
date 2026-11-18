@@ -66,6 +66,27 @@ impl SortKey {
         (self.head == "List").then(|| &self.args[0])
     }
 
+    /// The sort a declaration with an `at` list stands at, in its signature.
+    pub(crate) fn self_sort() -> SortKey {
+        SortKey::named(sylex_syl::SELF_SORT)
+    }
+
+    /// Whether this sort names `Self` anywhere.
+    pub(super) fn mentions_self(&self) -> bool {
+        self.head == sylex_syl::SELF_SORT || self.args.iter().any(SortKey::mentions_self)
+    }
+
+    /// This sort with `Self` replaced by `sort`.
+    pub(crate) fn instantiate(&self, sort: &SortKey) -> SortKey {
+        if self.head == sylex_syl::SELF_SORT && self.args.is_empty() {
+            return sort.clone();
+        }
+        SortKey {
+            head: self.head.clone(),
+            args: self.args.iter().map(|arg| arg.instantiate(sort)).collect(),
+        }
+    }
+
     /// Every sort name in this sort, its arguments' included.
     pub(super) fn heads<'a>(&'a self, out: &mut BTreeSet<&'a str>) {
         out.insert(&self.head);

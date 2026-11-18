@@ -9,6 +9,7 @@ use crate::lex::TokenKind;
 use crate::lex::lex;
 use crate::span::FileId;
 use crate::span::Span;
+use crate::tree::AT_FIELD;
 use crate::tree::Arg;
 use crate::tree::Call;
 use crate::tree::Comment;
@@ -22,6 +23,7 @@ use crate::tree::METADATA_FIELDS;
 use crate::tree::Name;
 use crate::tree::Param;
 use crate::tree::Record;
+use crate::tree::Relation;
 use crate::tree::Shape;
 use crate::tree::Sort;
 use crate::tree::Value;
@@ -255,11 +257,11 @@ impl Parser<'_> {
 
     fn declaration(&mut self) -> Result<Declaration> {
         let kind = self.lowercase_word("a declaration")?;
-        let shape = if self.nameless_header_follows() {
-            Shape::Header(self.header(None)?)
+        let shape = if self.relation_follows() {
+            Shape::Relation(self.relation()?)
         } else if self.named_header_follows() {
             let name = self.lowercase_word("a declaration name")?;
-            Shape::Header(self.header(Some(name))?)
+            Shape::Header(self.header(name)?)
         } else {
             Shape::Value(self.value()?)
         };
@@ -270,10 +272,24 @@ impl Parser<'_> {
         })
     }
 
-    /// Whether the tokens after a kind word start a header with no name: a
-    /// `(` or a `:`, which no value starts with.
-    fn nameless_header_follows(&self) -> bool {
-        matches!(self.peek().kind, TokenKind::LParen | TokenKind::Colon)
+    /// Whether the tokens after a kind word start a relation between two
+    /// sorts: a `(`, which no value starts with.
+    fn relation_follows(&self) -> bool {
+        self.peek().kind == TokenKind::LParen
+    }
+
+    /// `(Subject): Sort`.
+    fn relation(&mut self) -> Result<Relation> {
+        let open = self.bump().span;
+        let subject = self.sort()?;
+        self.expect(&TokenKind::RParen, "')'")?;
+        self.expect(&TokenKind::Colon, "':'")?;
+        let sort = self.sort()?;
+        Ok(Relation {
+            subject,
+            sort,
+            span: self.span_from(open),
+        })
     }
 
     /// Whether the tokens after a kind word start a named header: a word
@@ -300,9 +316,9 @@ impl Parser<'_> {
         }
     }
 
-    /// The header after its name, if any.
-    fn header(&mut self, name: Option<Name>) -> Result<Header> {
-        let start = name.map_or_else(|| self.peek().span, |name| name.span);
+    /// The header after its name.
+    fn header(&mut self, name: Name) -> Result<Header> {
+        let start = name.span;
         let params = if self.at(&TokenKind::LParen) {
             let open = self.bump().span;
             let params = self.sequence(&TokenKind::RParen, "',' or ')'", Self::param)?;
@@ -335,9 +351,11 @@ impl Parser<'_> {
         } else {
             None
         };
+        let mut at_list = Vec::new();
+        let mut at_comments = Vec::new();
         let body = if self.at(&TokenKind::LBrace) {
             let open = self.bump().span;
-            Some(self.record(open)?)
+            Some(self.block(open, &mut at_list, &mut at_comments)?)
         } else {
             None
         };
@@ -346,6 +364,8 @@ impl Parser<'_> {
             params,
             sort,
             constructor,
+            at: at_list,
+            at_comments,
             body,
             span: self.span_from(start),
         })
@@ -439,20 +459,94 @@ impl Parser<'_> {
 
     /// Parses a record's fields after its `{`.
     fn record(&mut self, open: Span) -> Result<Record> {
-        let fields = self.sequence(&TokenKind::RBrace, "',' or '}'", |p| {
+        let fields = self.sequence(&TokenKind::RBrace, "',' or '}'", Self::field)?;
+        Ok(Record {
+            fields,
+            span: self.span_from(open),
+        })
+    }
+
+    fn field(&mut self) -> Result<Field> {
+        let name = self.lowercase_word("a field name")?;
+        self.expect(&TokenKind::Equals, "'='")?;
+        self.field_value(name)
+    }
+
+    /// A field's value, after its name and `=`.
+    fn field_value(&mut self, name: Name) -> Result<Field> {
+        let outer = self.in_metadata;
+        self.in_metadata |= METADATA_FIELDS.contains(&name.ident.as_str());
+        let value = self.value();
+        self.in_metadata = outer;
+        let value = value?;
+        Ok(Field {
+            name,
+            value,
+            span: self.span_from(name.span),
+        })
+    }
+
+    /// Parses a declaration's block after its `{`: a record whose `at` field,
+    /// a list of sorts, goes to `at_list` instead of the record, and the
+    /// comments directly before it to `at_comments`.
+    fn block(
+        &mut self,
+        open: Span,
+        at_list: &mut Vec<Item<Sort>>,
+        at_comments: &mut Vec<Comment>,
+    ) -> Result<Record> {
+        let mut written: Option<Span> = None;
+        let mut sorts = Vec::new();
+        let entries = self.sequence(&TokenKind::RBrace, "',' or '}'", |p| {
             let name = p.lowercase_word("a field name")?;
             p.expect(&TokenKind::Equals, "'='")?;
-            let outer = p.in_metadata;
-            p.in_metadata |= METADATA_FIELDS.contains(&name.ident.as_str());
-            let value = p.value();
-            p.in_metadata = outer;
-            let value = value?;
-            Ok(Field {
-                name,
-                value,
-                span: p.span_from(name.span),
-            })
+            if name.ident != AT_FIELD {
+                return p.field_value(name).map(Some);
+            }
+            if written.is_some() {
+                return Err(Error::new(name.span, ErrorKind::DuplicateAtList));
+            }
+            written = Some(name.span);
+            let bracket = p.expect(&TokenKind::LBracket, "'['")?.span;
+            sorts = p.sequence(&TokenKind::RBracket, "',' or ']'", Self::sort)?;
+            if sorts.iter().all(|item| item.node().is_none()) {
+                return Err(Error::new(p.span_from(bracket), ErrorKind::EmptyAtList));
+            }
+            Ok(None)
         })?;
+        *at_list = sorts;
+        // The `at` entry leaves the record with the comments directly before
+        // it; a blank line before it is dropped.
+        let mut entries = entries;
+        if let Some(at) = entries
+            .iter()
+            .position(|item| matches!(item.entry, Entry::Node(None)))
+        {
+            let first = entries[..at]
+                .iter()
+                .rposition(|item| item.comment().is_none())
+                .map_or(0, |node| node + 1);
+            for item in entries.drain(first..at) {
+                let Entry::Comment(comment) = item.entry else {
+                    unreachable!("only comments stand between `first` and `at`");
+                };
+                at_comments.push(comment);
+            }
+        }
+        let fields = entries
+            .into_iter()
+            .filter_map(|item| {
+                let entry = match item.entry {
+                    Entry::Comment(comment) => Entry::Comment(comment),
+                    Entry::Node(Some(field)) => Entry::Node(field),
+                    Entry::Node(None) => return None,
+                };
+                Some(Item {
+                    blank_line_before: item.blank_line_before,
+                    entry,
+                })
+            })
+            .collect();
         Ok(Record {
             fields,
             span: self.span_from(open),

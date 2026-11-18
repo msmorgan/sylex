@@ -50,32 +50,40 @@ pub enum RefusalKind {
     WrittenSort { kind: String, sort: String },
     #[error("a `{0}` declaration has a `{{ ... }}` block")]
     MissingBlock(String),
-    #[error("a `{0}` declaration is written as a header, `(params): Sort {{ ... }}`")]
-    MissingHeader(String),
     #[error("a `{0}` declaration is written as a value, with no header")]
     WrittenHeader(String),
-    #[error("a coercion takes exactly one parameter, with no default")]
-    CoercionParameters,
-    #[error("a coercion's body is a primitive at {0} applied to the coercion's parameter alone")]
-    CoercionBody(String),
-    #[error("a coercion from {0} to itself; a coercion goes from one sort to another")]
-    CoercionToItself(String),
-    #[error("duplicate coercion from {from} to {to}")]
-    DuplicateCoercion { from: String, to: String },
-    #[error(
-        "the coercion from {via} to {to} starts where the coercion from {from} to {via} ends; \
-         a coercion is one hop"
-    )]
-    ChainedCoercion {
-        from: String,
-        via: String,
-        to: String,
+    #[error("a `{0}` declaration is written `{0}(Sort): Sort`")]
+    RelationForm(String),
+    #[error("a `{kind}` of {sort} to itself; it relates one sort to another")]
+    RelationToItself { kind: &'static str, sort: String },
+    #[error("duplicate `{kind}` declaration for {subject}")]
+    DuplicateRelation { kind: &'static str, subject: String },
+    #[error("{member} as a member of {of} closes a cycle: {of} already reaches {member}")]
+    MembershipCycle { member: String, of: String },
+    #[error("{member} reaches {of} by a second path, through {second} as well as through {first}")]
+    SecondPath {
+        member: String,
+        of: String,
+        first: String,
+        second: String,
     },
-    #[error("`{word}` is declared at {}, which each reach {target}", .sorts.join(" and "))]
+    #[error("`Self` names a sort of an `at` list; this declaration has none")]
+    SelfWithoutAtList,
+    #[error("a declaration with an `at` list stands at `Self`; write `: Self`")]
+    AtListWithoutSelf,
+    #[error("a `{0}` declaration takes no `at` list")]
+    AtListOnKind(String),
+    #[error("{0} is listed twice in `at`")]
+    DuplicateAtSort(String),
+    #[error(
+        "`{word}` is declared at {}, which each reach {target} in {mode} mode",
+        .sorts.join(" and ")
+    )]
     AmbiguousWord {
         word: String,
         sorts: Vec<String>,
         target: String,
+        mode: &'static str,
     },
     #[error("{literal} literal stands at {}, which each reach {target}", .sorts.join(" and "))]
     AmbiguousLiteral {
@@ -83,8 +91,29 @@ pub enum RefusalKind {
         sorts: Vec<String>,
         target: String,
     },
-    #[error("value reaches {sort} through coercions from {}", .from.join(" and "))]
-    AmbiguousCoercion { sort: String, from: Vec<String> },
+    #[error(
+        "`{word}` stands at no sort that holds its arms at {sort}: {}",
+        .arms.join(", ")
+    )]
+    NoCommonSort {
+        word: String,
+        sort: String,
+        arms: Vec<String>,
+    },
+    #[error("`{word}` at {sort} has a `spelling`; nothing at {sort} prints")]
+    SpellingAtTest { word: String, sort: String },
+    #[error("`{word}` is declared at the position sort {sort}; declare it at its kind of phrase")]
+    PositionDeclaration { word: String, sort: String },
+    #[error(
+        "`{word}` is a test at {test}, which a card's term cannot write; write the phrase the \
+         card prints"
+    )]
+    TestInCard { word: String, test: String },
+    #[error(
+        "`nominal` with modifiers of its own in `pre`; write its modifiers in the enclosing \
+         `pre` and `post`"
+    )]
+    ModifiedNominalInPre,
     #[error("duplicate parameter `{0}`")]
     DuplicateParameter(String),
     #[error("unknown sort `{0}`")]
@@ -217,8 +246,6 @@ pub enum RefusalKind {
         "`nominal` directly inside `nominal`; combine their `pre` and `post` lists on one `nominal`"
     )]
     NestedNominal,
-    #[error("`stacked` stands only as an arm of a `PreModifier` coordination")]
-    UnplacedStacked,
     #[error("an Agreement postmodifier requires an enclosing plural group determiner")]
     AgreementWithoutGroup,
     #[error(
@@ -226,11 +253,6 @@ pub enum RefusalKind {
          `dsl_check/nominal.rs`"
     )]
     UnclassifiedNumber { word: String, sort: String },
-    #[error(
-        "coordinator `{0}` is not classified for the `stacked` rule; classify it in \
-         `dsl_check/nominal.rs`"
-    )]
-    UnclassifiedCoordinator(String),
     #[error("`{0}` stands only in a card face, never in builtin")]
     OwnNameInBuiltin(String),
     #[error("`{word}` requires a card face with a Shortened Name; `{face}` has none")]

@@ -32,10 +32,34 @@ fn word(n: usize) -> String {
 // Layout.
 
 #[test]
-fn a_header_without_a_name_hugs_its_kind_word() {
+fn a_relation_hugs_its_kind_word() {
     assert_eq!(
-        fmt("coercion ( type : CardType ) : Nominal { body = type($type) }"),
-        "coercion(type: CardType): Nominal {\n  body = type($type)\n}\n"
+        fmt("member ( Color ) : AdjectivePhrase\ndenotes(List( A )):B"),
+        "member(Color): AdjectivePhrase\ndenotes(List(A)): B\n"
+    );
+}
+
+#[test]
+fn an_at_list_is_the_first_entry_of_its_block() {
+    assert_eq!(
+        fmt(
+            "template or(items: List(Self)): Self { spelling = \"$items#<or>\", at = [A, B], body = coord(or, $items) }"
+        ),
+        "template or(items: List(Self)): Self {\n  at = [A, B],\n  spelling = \"$items#<or>\",\n  body = coord(or, $items)\n}\n"
+    );
+    assert_eq!(
+        fmt("primitive coord: Self = C { at = [A] }"),
+        "primitive coord: Self = C {\n  at = [A]\n}\n"
+    );
+    // A comment directly before the list moves with it.
+    assert_eq!(
+        fmt("primitive coord: Self = C { spelling = \"x\",\n # the sorts\n at = [A] }"),
+        "primitive coord: Self = C {\n  # the sorts\n  at = [A],\n  spelling = \"x\"\n}\n"
+    );
+    // A comment in the list breaks it, and stays in it.
+    assert_eq!(
+        fmt("primitive coord: Self = C { at = [A, # why\n B] }"),
+        "primitive coord: Self = C {\n  at = [\n    A,\n    # why\n    B]\n}\n"
     );
 }
 

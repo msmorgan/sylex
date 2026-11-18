@@ -2,7 +2,7 @@
 //!
 //! [`sylex_spelling::parse`] checks the notation's syntax alone. [`check`]
 //! refuses a parsed [`Spelling`] when it breaks a load rule that its
-//! declaration's parameters, the declared coercions, or the lexicon's bound
+//! declaration's parameters, the declared memberships, or the lexicon's bound
 //! forms settle.
 
 use std::collections::BTreeMap;
@@ -26,7 +26,8 @@ use super::Decl;
 use super::Refusal;
 use super::RefusalKind;
 use super::Slot;
-use super::coercion::Coercion;
+use super::membership::Mode;
+use super::membership::Sorts;
 use super::sort::SortKey;
 
 /// The bound prefix and suffix forms the lexicon declares (`spelling.md` §7).
@@ -66,12 +67,7 @@ static BOUND_AFFIXES: LazyLock<BoundAffixes> = LazyLock::new(|| {
 });
 
 /// Checks `value` as `decl`'s `spelling` field (`spelling.md` §7).
-pub(super) fn check(
-    decl: &Decl<'_>,
-    value: &Value,
-    coercions: &[Coercion],
-    refusals: &mut Vec<Refusal>,
-) {
+pub(super) fn check(decl: &Decl<'_>, value: &Value, sorts: &Sorts, refusals: &mut Vec<Refusal>) {
     let span = value.span;
     let ValueKind::String(text) = &value.kind else {
         refusals.push(Refusal {
@@ -210,7 +206,7 @@ pub(super) fn check(
         }
     }
 
-    if valid_for_skeleton && skeleton_is_ambiguous(&parsed, &decl.params, coercions) {
+    if valid_for_skeleton && skeleton_is_ambiguous(&parsed, &decl.params, sorts) {
         refusals.push(Refusal {
             span,
             kind: RefusalKind::SpellingAmbiguousSkeleton,
@@ -321,7 +317,7 @@ enum Regex {
     Atom(Atom),
 }
 
-fn skeleton_is_ambiguous(spelling: &Spelling, params: &[Slot], coercions: &[Coercion]) -> bool {
+fn skeleton_is_ambiguous(spelling: &Spelling, params: &[Slot], sorts: &Sorts) -> bool {
     let regex = match spelling {
         Spelling::Gap(_) => Regex::Atom(Atom::Gap),
         Spelling::OwnName(form, _) => Regex::Atom(Atom::OwnName(*form)),
@@ -338,7 +334,7 @@ fn skeleton_is_ambiguous(spelling: &Spelling, params: &[Slot], coercions: &[Coer
             Regex::Seq(seq)
         }
     };
-    is_regex_ambiguous(&regex, coercions)
+    is_regex_ambiguous(&regex, sorts)
 }
 
 fn build_parts_regex(parts: &[Part], params: &[Slot]) -> Vec<Regex> {
@@ -429,10 +425,10 @@ fn words_of_text(text: &str) -> Vec<String> {
     words
 }
 
-fn atoms_overlap(left: &Atom, right: &Atom, coercions: &[Coercion]) -> bool {
+fn atoms_overlap(left: &Atom, right: &Atom, sorts: &Sorts) -> bool {
     match left {
         Atom::Word(a) => matches!(right, Atom::Word(b) if a == b),
-        Atom::Sort(a) => matches!(right, Atom::Sort(b) if sorts_overlap(a, b, coercions)),
+        Atom::Sort(a) => matches!(right, Atom::Sort(b) if sorts_overlap(a, b, sorts)),
         Atom::TailOpen(pa, ca) => matches!(right, Atom::TailOpen(pb, cb) if pa == pb && ca == cb),
         Atom::TailClose => matches!(right, Atom::TailClose),
         Atom::Gap => matches!(right, Atom::Gap),
@@ -440,11 +436,18 @@ fn atoms_overlap(left: &Atom, right: &Atom, coercions: &[Coercion]) -> bool {
     }
 }
 
-fn sorts_overlap(left: &SortKey, right: &SortKey, coercions: &[Coercion]) -> bool {
-    left == right
-        || coercions
-            .iter()
-            .any(|c| (c.from == *left && c.to == *right) || (c.from == *right && c.to == *left))
+/// Whether one printed phrase may fill a Hole of either sort: the sorts are
+/// one, or a card's term may write a value of one sort at both, which is a
+/// sort in Reaches of each.
+fn sorts_overlap(left: &SortKey, right: &SortKey, sorts: &Sorts) -> bool {
+    if left == right {
+        return true;
+    }
+    let right = sorts.reaches(right, Mode::Surface);
+    sorts
+        .reaches(left, Mode::Surface)
+        .iter()
+        .any(|sort| right.contains(sort))
 }
 
 struct Nfa {
@@ -515,7 +518,7 @@ impl Nfa {
 
 /// Whether two distinct paths through `regex` accept overlapping atom
 /// sequences.
-fn is_regex_ambiguous(regex: &Regex, coercions: &[Coercion]) -> bool {
+fn is_regex_ambiguous(regex: &Regex, sorts: &Sorts) -> bool {
     let mut nfa = Nfa::new();
     let (start, accept) = nfa.compile(regex);
     let state_count = nfa.eps.len();
@@ -567,7 +570,7 @@ fn is_regex_ambiguous(regex: &Regex, coercions: &[Coercion]) -> bool {
         }
         for &(eid1, a1, v1, m1) in &next_edges[s1] {
             for &(eid2, a2, v2, m2) in &next_edges[s2] {
-                if atoms_overlap(a1, a2, coercions) {
+                if atoms_overlap(a1, a2, sorts) {
                     let next_diff = differed || eid1 != eid2 || m1 >= 2 || m2 >= 2;
                     if seen.insert((v1, v2, next_diff)) {
                         queue.push_back((v1, v2, next_diff));

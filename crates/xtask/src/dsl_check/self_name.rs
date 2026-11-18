@@ -110,6 +110,7 @@ impl<'a> SelfNameChecker<'a, '_> {
                     self.walk(decl_idx, false, value, None, refusals);
                 }
             }
+            Shape::Relation(_) => {}
             Shape::Header(header) => {
                 for param in header.params.iter().filter_map(Item::node) {
                     if let Some(default) = &param.default {
@@ -131,7 +132,7 @@ impl<'a> SelfNameChecker<'a, '_> {
         let card_call = as_call(value).expect("resolved `card` value is a call");
         let call_sort = self
             .resolutions
-            .call(card_call)
+            .call(card_call, None)
             .expect("resolved `card` call has a sort");
         let sig = self
             .registry
@@ -245,7 +246,7 @@ impl<'a> SelfNameChecker<'a, '_> {
                 .expect("resolved `Bool` call is in registry");
             let permanent_type = match &self.decls[bsig.decl].declaration.shape {
                 Shape::Header(h) => h.constructor.is_some_and(|c| c.ident == "True"),
-                Shape::Value(_) => false,
+                Shape::Value(_) | Shape::Relation(_) => false,
             };
             // `sylex_vocabulary::short_name` reads only `name` and
             // `permanent_type`.
@@ -280,7 +281,9 @@ impl<'a> SelfNameChecker<'a, '_> {
                 }
             }
             ValueKind::Call(call) => {
-                if let Some(sort) = self.resolutions.call(call)
+                // No declaration with an `at` list names a card, so `Self`
+                // names no sort here and such a call is no own-name word.
+                if let Some(sort) = self.resolutions.call(call, None)
                     && let Some(sig) = self
                         .registry
                         .get(&(call.head.ident.to_string(), sort.clone()))

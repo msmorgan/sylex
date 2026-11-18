@@ -1,19 +1,19 @@
-//! Structural rules on `Nominal`, `PreModifier` and `PostModifier` terms
+//! Structural rules on `Nominal` terms and their modifier lists
 //! (`docs/design/spelling.md` §2, `docs/design/semantics.md` §2.4).
 //!
-//! Runs only on bundles every earlier rule accepted, so every call, argument
-//! and coercion it reads is resolved; a missing resolution is a defect in this
+//! Runs only on bundles every earlier rule accepted, so every call and
+//! argument it reads is resolved; a missing resolution is a defect in this
 //! validator and panics. Checks four invariants:
 //! - `nominal` writes at least one modifier list (`pre` or `post`), read on the
 //!   written call;
 //! - a nominal has one tree: no `Nominal = Nominal` stands as the `head` of
 //!   another once Templates and their arguments are expanded (a coordination of
 //!   nominals may);
-//! - a `PreModifier` `and` coordination (`stacked`) stands only as an item of a
-//!   `PreModifier` `or` or `and/or` coordination; a Template's own body is
-//!   checked where the Template is called;
-//! - an Agreement `PostModifier` (`PostModifier = Agree`) stands only inside a
-//!   `Nominal` consumed by a determiner or slice that forms a plural group.
+//! - a `nominal` with modifiers of its own stands in `pre` only as an arm of a
+//!   coordination, since outside one its modifiers are the enclosing
+//!   `nominal`'s;
+//! - an Agreement (`Test = Agree`) stands only inside a `Nominal` consumed by a
+//!   determiner or slice that forms a plural group.
 //!
 //! The last three read each declaration's values with every Template call
 //! replaced by its body, its parameters bound to the call's arguments, and
@@ -53,8 +53,10 @@ pub(super) fn check(
         resolutions,
     };
     for decl in decls {
-        checker.check_written(decl, refusals);
-        checker.check_expanded(decl, refusals);
+        for instance in decl.instances() {
+            checker.check_written(decl, instance, refusals);
+            checker.check_expanded(decl, instance, refusals);
+        }
     }
 }
 
@@ -62,19 +64,6 @@ struct NominalChecker<'a, 'd> {
     decls: &'d [Decl<'a>],
     registry: &'d Registry,
     resolutions: &'d Resolutions,
-}
-
-/// Where an expanded term stands, for the `stacked` rule.
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum Place {
-    /// A direct item of a `PreModifier` `or` or `and/or` coordination.
-    DisjunctionItem,
-    /// The root of a Template's own `body`, or an item of a coordination whose
-    /// coordinator is a declaration's parameter: checked where the declaration
-    /// is called.
-    Deferred,
-    /// Anywhere else.
-    Elsewhere,
 }
 
 /// Whether a determiner, slice count, plurality or quantity lets its
@@ -102,21 +91,25 @@ impl Number {
 type Args<'a> = [(String, SortKey, Term<'a>)];
 
 impl<'a> NominalChecker<'a, '_> {
-    /// The signature `call` resolved to.
-    fn signature(&self, call: &Call) -> &Signature {
+    /// The sort `call` resolved at and its signature there. Inside a
+    /// declaration with an `at` list, `self_sort` is the sort it is read at.
+    fn signature(&self, call: &Call, self_sort: Option<&SortKey>) -> (SortKey, &Signature) {
         let sort = self
             .resolutions
-            .call(call)
+            .call(call, self_sort)
             .unwrap_or_else(|| panic!("`{}` is resolved", call.head.ident));
-        self.registry
+        let signature = self
+            .registry
             .get(&(call.head.ident.to_string(), sort.clone()))
-            .unwrap_or_else(|| panic!("`{}` at {sort} is registered", call.head.ident))
+            .unwrap_or_else(|| panic!("`{}` at {sort} is registered", call.head.ident));
+        (sort, signature)
     }
 
-    /// The `(sort, constructor)` a primitive with no sort arguments builds.
-    fn constructor(&self, decl: usize) -> Option<(&str, &str)> {
+    /// The `(sort, constructor)` the primitive `decl` builds where it stands
+    /// at `at`, a sort with no arguments.
+    fn constructor<'s>(&'s self, decl: usize, at: &'s SortKey) -> Option<(&'s str, &'s str)> {
         let decl = &self.decls[decl];
-        if decl.kind.word != schema::PRIMITIVE || !decl.sort.args.is_empty() {
+        if decl.kind.word != schema::PRIMITIVE || !at.args.is_empty() {
             return None;
         }
         let Shape::Header(header) = &decl.declaration.shape else {
@@ -125,39 +118,48 @@ impl<'a> NominalChecker<'a, '_> {
         header
             .constructor
             .as_ref()
-            .map(|ident| (decl.sort.head.as_str(), ident.ident.as_str()))
+            .map(|ident| (at.head.as_str(), ident.ident.as_str()))
     }
 
-    fn builds(&self, decl: usize, sort: &str, ctor: &str) -> bool {
-        self.constructor(decl) == Some((sort, ctor))
+    fn builds(&self, decl: usize, at: &SortKey, sort: &str, ctor: &str) -> bool {
+        self.constructor(decl, at) == Some((sort, ctor))
     }
 
     // ---- The written call: `nominal` with a modifier list ----
 
-    fn check_written(&self, decl: &Decl<'a>, refusals: &mut Vec<Refusal>) {
+    fn check_written(
+        &self,
+        decl: &Decl<'a>,
+        self_sort: Option<&SortKey>,
+        refusals: &mut Vec<Refusal>,
+    ) {
         for (value, _) in decl_values(decl) {
-            self.walk_written(value, refusals);
+            self.walk_written(value, self_sort, refusals);
         }
     }
 
-    fn walk_written(&self, value: &Value, refusals: &mut Vec<Refusal>) {
+    fn walk_written(
+        &self,
+        value: &Value,
+        self_sort: Option<&SortKey>,
+        refusals: &mut Vec<Refusal>,
+    ) {
         match &value.kind {
             ValueKind::List(items) => {
                 for item in items.iter().filter_map(Item::node) {
-                    self.walk_written(item, refusals);
+                    self.walk_written(item, self_sort, refusals);
                 }
             }
             ValueKind::Record(record) => {
                 for field in record.nodes() {
-                    self.walk_written(&field.value, refusals);
+                    self.walk_written(&field.value, self_sort, refusals);
                 }
             }
             ValueKind::Call(call) => {
                 if call.head.ident != "none" || !call.is_bare() {
-                    let sig = self.signature(call);
-                    if self.resolutions.coerced(value).is_none()
-                        && !sig.secondary
-                        && self.builds(sig.decl, "Nominal", "Nominal")
+                    let (at, sig) = self.signature(call, self_sort);
+                    if !sig.secondary
+                        && self.builds(sig.decl, &at, "Nominal", "Nominal")
                         && !self.writes_a_modifier(call, sig)
                     {
                         refusals.push(Refusal {
@@ -167,7 +169,7 @@ impl<'a> NominalChecker<'a, '_> {
                     }
                 }
                 for arg in call.args.iter().filter_map(Item::node) {
-                    self.walk_written(&arg.value, refusals);
+                    self.walk_written(&arg.value, self_sort, refusals);
                 }
             }
             ValueKind::String(_) | ValueKind::Integer(_) | ValueKind::Parameter(_) => {}
@@ -188,9 +190,18 @@ impl<'a> NominalChecker<'a, '_> {
         })
     }
 
-    // ---- The expanded term: one tree, `stacked`, Agreement ----
+    // ---- The expanded term: one tree, a nominal in `pre`, Agreement ----
 
-    fn check_expanded(&self, decl: &Decl<'a>, refusals: &mut Vec<Refusal>) {
+    fn check_expanded(
+        &self,
+        decl: &Decl<'a>,
+        self_sort: Option<&SortKey>,
+        refusals: &mut Vec<Refusal>,
+    ) {
+        let own = match self_sort {
+            Some(self_sort) => decl.sort.instantiate(self_sort),
+            None => decl.sort.clone(),
+        };
         let mut env: BTreeMap<String, Term<'a>> = BTreeMap::new();
         for param in &decl.params {
             env.insert(param.name.clone(), Term::Param);
@@ -200,8 +211,11 @@ impl<'a> NominalChecker<'a, '_> {
         }
         for (value, slot) in decl_values(decl) {
             let sort = match slot {
-                ValueSlot::Declaration => decl.sort.clone(),
-                ValueSlot::Default(index) => decl.params[index].sort.clone(),
+                ValueSlot::Declaration => own.clone(),
+                ValueSlot::Default(index) => match self_sort {
+                    Some(self_sort) => decl.params[index].sort.instantiate(self_sort),
+                    None => decl.params[index].sort.clone(),
+                },
                 ValueSlot::Field(name) => {
                     let spec = decl
                         .kind
@@ -211,17 +225,11 @@ impl<'a> NominalChecker<'a, '_> {
                         .unwrap_or_else(|| {
                             panic!("field `{name}` of {} is declared", decl.label())
                         });
-                    spec.sort.map_or_else(|| decl.sort.clone(), SortKey::table)
+                    spec.sort.map_or_else(|| own.clone(), SortKey::table)
                 }
             };
-            let place =
-                if decl.kind.word == schema::TEMPLATE && matches!(slot, ValueSlot::Field("body")) {
-                    Place::Deferred
-                } else {
-                    Place::Elsewhere
-                };
-            let term = self.elaborate(value, &sort, &env, None, refusals);
-            self.walk(&term, place, refusals);
+            let term = self.elaborate(value, &sort, &env, self_sort, None, refusals);
+            self.walk(&term, refusals);
         }
     }
 
@@ -231,11 +239,11 @@ impl<'a> NominalChecker<'a, '_> {
         value: &'a Value,
         expected: &SortKey,
         env: &BTreeMap<String, Term<'a>>,
+        self_sort: Option<&SortKey>,
         span_override: Option<Span>,
         refusals: &mut Vec<Refusal>,
     ) -> Term<'a> {
-        let span = span_override.unwrap_or(value.span);
-        let term = match &value.kind {
+        match &value.kind {
             ValueKind::Parameter(name) => env
                 .get(name.ident.as_str())
                 .unwrap_or_else(|| panic!("`${}` is a parameter in scope", name.ident))
@@ -252,7 +260,9 @@ impl<'a> NominalChecker<'a, '_> {
                     items
                         .iter()
                         .filter_map(Item::node)
-                        .map(|item| self.elaborate(item, inner, env, span_override, refusals))
+                        .map(|item| {
+                            self.elaborate(item, inner, env, self_sort, span_override, refusals)
+                        })
                         .collect(),
                 )
             }
@@ -277,6 +287,7 @@ impl<'a> NominalChecker<'a, '_> {
                         &field.value,
                         &SortKey::table(fsort),
                         env,
+                        self_sort,
                         span_override,
                         refusals,
                     );
@@ -291,35 +302,26 @@ impl<'a> NominalChecker<'a, '_> {
                 if call.head.ident == "none" && call.is_bare() {
                     return Term::None;
                 }
-                self.elaborate_call(call, env, span_override, refusals)
+                self.elaborate_call(call, env, self_sort, span_override, refusals)
             }
-        };
-
-        if let Some(coercion_idx) = self.resolutions.coerced(value) {
-            let coercion_decl = &self.decls[coercion_idx];
-            let [param] = coercion_decl.params.as_slice() else {
-                panic!("a coercion takes one parameter");
-            };
-            let body = coercion_decl.field("body").expect("a coercion has a body");
-            let mut cenv = BTreeMap::new();
-            cenv.insert(param.name.clone(), term);
-            return self.elaborate(body, &coercion_decl.sort, &cenv, Some(span), refusals);
         }
-        term
     }
 
     fn elaborate_call(
         &self,
         call: &'a Call,
         env: &BTreeMap<String, Term<'a>>,
+        self_sort: Option<&SortKey>,
         span_override: Option<Span>,
         refusals: &mut Vec<Refusal>,
     ) -> Term<'a> {
-        let sig = self.signature(call);
+        let (at, sig) = self.signature(call, self_sort);
         if sig.secondary {
             return Term::Other;
         }
         let decl = &self.decls[sig.decl];
+        // The callee's own `Self`, when it has an `at` list.
+        let callee_self = sig.at_list.then_some(&at);
         let mut written: Vec<Option<&'a Value>> = vec![None; decl.params.len()];
         for arg in call.args.iter().filter_map(Item::node) {
             let index = self.resolutions.arg(arg).expect("every argument is bound");
@@ -336,14 +338,21 @@ impl<'a> NominalChecker<'a, '_> {
             .params
             .iter()
             .filter_map(Item::node)
-            .zip(&decl.params)
+            .zip(&sig.params)
             .zip(written)
         {
             let arg_term = match (arg_val, &hparam.default) {
-                (Some(val), _) => self.elaborate(val, &slot.sort, env, span_override, refusals),
-                (None, Some(def)) => {
-                    self.elaborate(def, &slot.sort, &callee_env, Some(call_span), refusals)
+                (Some(val), _) => {
+                    self.elaborate(val, &slot.sort, env, self_sort, span_override, refusals)
                 }
+                (None, Some(def)) => self.elaborate(
+                    def,
+                    &slot.sort,
+                    &callee_env,
+                    callee_self,
+                    Some(call_span),
+                    refusals,
+                ),
                 (None, None) => panic!("required argument `{}` is written", slot.name),
             };
             callee_env.insert(slot.name.clone(), arg_term.clone());
@@ -352,7 +361,14 @@ impl<'a> NominalChecker<'a, '_> {
 
         if decl.kind.word == schema::TEMPLATE {
             let body = decl.field("body").expect("a Template has a body");
-            return self.elaborate(body, &decl.sort, &callee_env, Some(call_span), refusals);
+            return self.elaborate(
+                body,
+                &at,
+                &callee_env,
+                callee_self,
+                Some(call_span),
+                refusals,
+            );
         }
         // A Definition (`action`, `ability`, …) stays one call, but its body is
         // checked here too with this call's arguments, as a Template's is: a
@@ -374,6 +390,7 @@ impl<'a> NominalChecker<'a, '_> {
                     body,
                     &sort,
                     &body_env,
+                    None,
                     Some(call_span),
                     refusals,
                 )))
@@ -382,17 +399,18 @@ impl<'a> NominalChecker<'a, '_> {
         };
         Term::Call {
             decl: sig.decl,
+            sort: at,
             span: call_span,
             args: bound_args,
             body,
         }
     }
 
-    fn walk(&self, term: &Term<'a>, place: Place, refusals: &mut Vec<Refusal>) {
+    fn walk(&self, term: &Term<'a>, refusals: &mut Vec<Refusal>) {
         match term {
             Term::List(items) => {
                 for item in items {
-                    self.walk(item, place, refusals);
+                    self.walk(item, refusals);
                 }
             }
             Term::Record { sort, fields } => {
@@ -409,79 +427,60 @@ impl<'a> NominalChecker<'a, '_> {
                     if is_nominal_sort(&SortKey::table(fsort)) {
                         self.refuse_agreement_in(fterm, refusals);
                     }
-                    self.walk(fterm, Place::Elsewhere, refusals);
+                    self.walk(fterm, refusals);
                 }
             }
             Term::Call {
                 decl,
+                sort,
                 span,
                 args,
                 body,
             } => {
-                self.walk_call(*decl, *span, args, place, refusals);
+                self.walk_call(*decl, sort, args, refusals);
                 if let Some(body) = body {
-                    self.walk(body, place, refusals);
+                    self.walk(body, refusals);
                 }
+                let _ = span;
             }
             Term::Int(_) | Term::Param | Term::None | Term::Other => {}
         }
     }
 
-    fn walk_call(
-        &self,
-        decl: usize,
-        span: Span,
-        args: &Args<'a>,
-        place: Place,
-        refusals: &mut Vec<Refusal>,
-    ) {
+    fn walk_call(&self, decl: usize, at: &SortKey, args: &Args<'a>, refusals: &mut Vec<Refusal>) {
         let arg = |name: &str| named(args, name);
-        match self.constructor(decl) {
+        match self.constructor(decl, at) {
             Some(("Nominal", "Nominal")) => {
                 if let Term::Call {
-                    decl: head, span, ..
+                    decl: head,
+                    sort,
+                    span,
+                    ..
                 } = arg("head")
-                    && self.builds(*head, "Nominal", "Nominal")
+                    && self.builds(*head, sort, "Nominal", "Nominal")
                 {
                     refusals.push(Refusal {
                         span: *span,
                         kind: RefusalKind::NestedNominal,
                     });
                 }
+                // A nominal in `pre` is a head word or a coordination; one
+                // with modifiers of its own stands there only as an arm of a
+                // coordination, which this loop does not look inside.
+                if let Term::List(items) = arg("pre") {
+                    for item in items {
+                        if let Some(span) = self.modified_nominal(item) {
+                            refusals.push(Refusal {
+                                span,
+                                kind: RefusalKind::ModifiedNominalInPre,
+                            });
+                        }
+                    }
+                }
                 // A nominal hands Agreement to its enclosing consumer.
                 for (_, _, aterm) in args {
-                    self.walk(aterm, Place::Elsewhere, refusals);
+                    self.walk(aterm, refusals);
                 }
-            }
-            Some(("PreModifier", "Coordination")) => {
-                let item_place = match arg("coordinator") {
-                    Term::Param => Place::Deferred,
-                    Term::Call {
-                        decl: coordinator,
-                        span: coordinator_span,
-                        ..
-                    } => match self.constructor(*coordinator) {
-                        Some(("Coordinator", "And")) => {
-                            if place == Place::Elsewhere {
-                                refusals.push(Refusal {
-                                    span,
-                                    kind: RefusalKind::UnplacedStacked,
-                                });
-                            }
-                            Place::Elsewhere
-                        }
-                        Some(("Coordinator", "Or" | "AndOr")) => Place::DisjunctionItem,
-                        _ => {
-                            refusals.push(Refusal {
-                                span: *coordinator_span,
-                                kind: RefusalKind::UnclassifiedCoordinator(self.word(*coordinator)),
-                            });
-                            Place::Elsewhere
-                        }
-                    },
-                    other => panic!("a Coordinator is a call or a parameter, not {other:?}"),
-                };
-                self.walk(arg("items"), item_place, refusals);
             }
             Some(("NounPhrase", "Described")) => {
                 let nominal = arg("nominal");
@@ -492,7 +491,7 @@ impl<'a> NominalChecker<'a, '_> {
                     self.refuse_agreement_in(nominal, refusals);
                 }
                 for (_, _, aterm) in args {
-                    self.walk(aterm, Place::Elsewhere, refusals);
+                    self.walk(aterm, refusals);
                 }
             }
             Some(("NounPhrase", "SomeOf")) => {
@@ -503,7 +502,7 @@ impl<'a> NominalChecker<'a, '_> {
                     self.refuse_agreement_in(arg("description"), refusals);
                 }
                 for (_, _, aterm) in args {
-                    self.walk(aterm, Place::Elsewhere, refusals);
+                    self.walk(aterm, refusals);
                 }
             }
             // A coordination of nominals hands Agreement to its enclosing
@@ -514,10 +513,10 @@ impl<'a> NominalChecker<'a, '_> {
             Some(
                 ("Nominal", "Coordination" | "CompareOver")
                 | ("Amount", "AggregateOver")
-                | ("PostModifier", "Superlative"),
+                | ("Test", "Superlative"),
             ) => {
                 for (_, _, aterm) in args {
-                    self.walk(aterm, Place::Elsewhere, refusals);
+                    self.walk(aterm, refusals);
                 }
             }
             // The rule, not a fallback: every other consumer of a `Nominal`
@@ -530,9 +529,33 @@ impl<'a> NominalChecker<'a, '_> {
                     if is_nominal_sort(psort) {
                         self.refuse_agreement_in(aterm, refusals);
                     }
-                    self.walk(aterm, Place::Elsewhere, refusals);
+                    self.walk(aterm, refusals);
                 }
             }
+        }
+    }
+
+    /// The span of the `nominal` with modifiers of its own that `item`, an
+    /// item of a `pre` list, is, bare or under "non" or "not"; `None` for a
+    /// head word and for a coordination, whose arms may be such nominals.
+    fn modified_nominal(&self, item: &Term<'a>) -> Option<Span> {
+        let Term::Call {
+            decl,
+            sort,
+            span,
+            args,
+            ..
+        } = item
+        else {
+            return None;
+        };
+        match self.constructor(*decl, sort) {
+            Some(("Nominal", "Nominal")) => Some(*span),
+            Some((_, "Non" | "Not")) => args
+                .iter()
+                .find_map(|(_, _, arg)| self.modified_nominal(arg)),
+            // Any other constructor, and a Template parameter's call.
+            Some(_) | None => None,
         }
     }
 
@@ -545,14 +568,16 @@ impl<'a> NominalChecker<'a, '_> {
         }
     }
 
-    /// Returns the span of the first `PostModifier = Agree` inside `term`'s own
+    /// Returns the span of the first Agreement (`Test = Agree`) inside `term`'s own
     /// `Nominal` structure (without crossing into nested `NounPhrase` or
     /// sub-domain arguments).
     fn nominal_agree_span(&self, term: &Term<'a>) -> Option<Span> {
         match term {
             Term::List(items) => items.iter().find_map(|it| self.nominal_agree_span(it)),
-            Term::Call { decl, args, .. } => {
-                if self.builds(*decl, "Nominal", "Nominal") {
+            Term::Call {
+                decl, sort, args, ..
+            } => {
+                if self.builds(*decl, sort, "Nominal", "Nominal") {
                     args.iter()
                         .find_map(|(pname, _, aterm)| match pname.as_str() {
                             // An Agreement phrase is a postmodifier, never a
@@ -562,7 +587,7 @@ impl<'a> NominalChecker<'a, '_> {
                             "post" => self.post_modifier_agree_span(aterm),
                             other => panic!("`nominal` has no parameter `{other}`"),
                         })
-                } else if self.builds(*decl, "Nominal", "Coordination") {
+                } else if self.builds(*decl, sort, "Nominal", "Coordination") {
                     args.iter()
                         .find_map(|(_, _, aterm)| self.nominal_agree_span(aterm))
                 } else {
@@ -582,13 +607,20 @@ impl<'a> NominalChecker<'a, '_> {
                 .iter()
                 .find_map(|it| self.post_modifier_agree_span(it)),
             Term::Call {
-                decl, span, args, ..
+                decl,
+                sort,
+                span,
+                args,
+                ..
             } => {
-                if self.builds(*decl, "PostModifier", "Agree") {
+                if self.builds(*decl, sort, "Test", "Agree") {
                     Some(*span)
-                } else if self.builds(*decl, "PostModifier", "Coordination")
-                    || self.builds(*decl, "PostModifier", "Not")
-                {
+                } else if matches!(
+                    self.constructor(*decl, sort),
+                    Some((_, "Coordination" | "Not"))
+                ) {
+                    // A coordination or a negation of postmodifiers, at
+                    // whichever sort holds its arms.
                     args.iter()
                         .find_map(|(_, _, aterm)| self.post_modifier_agree_span(aterm))
                 } else {
@@ -608,10 +640,10 @@ impl<'a> NominalChecker<'a, '_> {
     /// group, "a" and distributive "each" do not, "the" is its plurality's, and
     /// a count or a target is its quantity's.
     fn determiner_number(&self, det: &Term<'a>, refusals: &mut Vec<Refusal>) -> Number {
-        let Some((decl, span, args)) = call_of(det, "DetPhrase") else {
+        let Some((decl, at, span, args)) = call_of(det, "DetPhrase") else {
             return Number::Parameter;
         };
-        match self.constructor(decl) {
+        match self.constructor(decl, at) {
             Some(("DetPhrase", "All" | "Bare" | "Possessive")) => Number::Group,
             Some(("DetPhrase", "A" | "Each")) => Number::AtMostOne,
             Some(("DetPhrase", "The")) => self.plurality_number(named(args, "plur"), refusals),
@@ -625,10 +657,10 @@ impl<'a> NominalChecker<'a, '_> {
     /// A `SliceCount`'s number: the whole group and a slice totaling a bound
     /// form a group, and a counted slice is its quantity's.
     fn slice_count_number(&self, count: &Term<'a>, refusals: &mut Vec<Refusal>) -> Number {
-        let Some((decl, span, args)) = call_of(count, "SliceCount") else {
+        let Some((decl, at, span, args)) = call_of(count, "SliceCount") else {
             return Number::Parameter;
         };
-        match self.constructor(decl) {
+        match self.constructor(decl, at) {
             Some(("SliceCount", "Whole" | "Totaling")) => Number::Group,
             Some(("SliceCount", "Counted")) => {
                 self.quantity_number(named(args, "quantity"), refusals)
@@ -638,10 +670,10 @@ impl<'a> NominalChecker<'a, '_> {
     }
 
     fn plurality_number(&self, plur: &Term<'a>, refusals: &mut Vec<Refusal>) -> Number {
-        let Some((decl, span, _)) = call_of(plur, "Plurality") else {
+        let Some((decl, at, span, _)) = call_of(plur, "Plurality") else {
             return Number::Parameter;
         };
-        match self.constructor(decl) {
+        match self.constructor(decl, at) {
             Some(("Plurality", "Many")) => Number::Group,
             Some(("Plurality", "One")) => Number::AtMostOne,
             _ => self.unclassified(decl, span, refusals),
@@ -650,12 +682,14 @@ impl<'a> NominalChecker<'a, '_> {
 
     /// A `Quantity`'s number: at most one when it can never exceed one.
     fn quantity_number(&self, q: &Term<'a>, refusals: &mut Vec<Refusal>) -> Number {
-        let Some((decl, span, args)) = call_of(q, "Quantity") else {
+        let Some((decl, at, span, args)) = call_of(q, "Quantity") else {
             return Number::Parameter;
         };
-        match self.constructor(decl) {
+        match self.constructor(decl, at) {
             // "one", "two", "up to one", "up to three": bounded by the amount.
-            Some(("Quantity", "ExactlyOf" | "UpToOf")) => self.amount_number(named(args, "amount")),
+            Some(("Quantity", "ExactlyOf" | "UpToOf")) => {
+                Self::amount_number(named(args, "amount"))
+            }
             // "N or more", "any number", "one or two": bounded by `high`.
             Some(("Quantity", "Range")) => match named(args, "high") {
                 Term::Int(n) if *n <= 1 => Number::AtMostOne,
@@ -682,21 +716,14 @@ impl<'a> NominalChecker<'a, '_> {
         }
     }
 
-    /// An `Amount`'s number: a literal is its value; any other amount is a
+    /// An `Amount`'s number: an integer is its value; any other amount is a
     /// number the game supplies, which can exceed one.
-    fn amount_number(&self, amount: &Term<'a>) -> Number {
+    fn amount_number(amount: &Term<'a>) -> Number {
         match amount {
-            Term::Call { decl, args, .. } if self.builds(*decl, "Amount", "Literal") => {
-                match args.as_slice() {
-                    [(_, _, Term::Int(n))] if *n <= 1 => Number::AtMostOne,
-                    [(_, _, Term::Int(_))] => Number::Group,
-                    [(_, _, Term::Param)] => Number::Parameter,
-                    other => panic!("`lit` takes one integer, not {other:?}"),
-                }
-            }
-            Term::Call { .. } => Number::Group,
+            Term::Int(n) if *n <= 1 => Number::AtMostOne,
+            Term::Int(_) | Term::Call { .. } => Number::Group,
             Term::Param => Number::Parameter,
-            other => panic!("an Amount is a call or a parameter, not {other:?}"),
+            other => panic!("an Amount is an integer, a call or a parameter, not {other:?}"),
         }
     }
 
@@ -727,11 +754,18 @@ fn named<'t, 'a>(args: &'t Args<'a>, name: &str) -> &'t Term<'a> {
 
 /// `term` as a call at `sort`: its declaration, span and arguments, or `None`
 /// for a Template parameter.
-fn call_of<'t, 'a>(term: &'t Term<'a>, sort: &str) -> Option<(usize, Span, &'t Args<'a>)> {
+fn call_of<'t, 'a>(
+    term: &'t Term<'a>,
+    sort: &str,
+) -> Option<(usize, &'t SortKey, Span, &'t Args<'a>)> {
     match term {
         Term::Call {
-            decl, span, args, ..
-        } => Some((*decl, *span, args)),
+            decl,
+            sort,
+            span,
+            args,
+            ..
+        } => Some((*decl, sort, *span, args)),
         Term::Param => None,
         other => panic!("a {sort} is a call or a parameter, not {other:?}"),
     }
@@ -759,6 +793,7 @@ fn decl_values<'a>(decl: &Decl<'a>) -> Vec<(&'a Value, ValueSlot)> {
     let mut out = Vec::new();
     match &decl.declaration.shape {
         Shape::Value(value) => out.push((value, ValueSlot::Declaration)),
+        Shape::Relation(_) => {}
         Shape::Header(header) => {
             for (index, param) in header.params.iter().filter_map(Item::node).enumerate() {
                 if let Some(default) = &param.default {
@@ -791,6 +826,8 @@ fn decl_values<'a>(decl: &Decl<'a>) -> Vec<(&'a Value, ValueSlot)> {
 enum Term<'a> {
     Call {
         decl: usize,
+        /// The sort the call's word was found at.
+        sort: SortKey,
         span: Span,
         args: Vec<(String, SortKey, Term<'a>)>,
         /// A Definition's body with this call's arguments; `None` for a

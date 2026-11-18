@@ -40,11 +40,14 @@ fn normalized(file: &File) -> File {
         declaration.span = NOWHERE;
         match &mut declaration.shape {
             Shape::Value(v) => value(v),
+            Shape::Relation(relation) => {
+                relation.span = NOWHERE;
+                sort(&mut relation.subject);
+                sort(&mut relation.sort);
+            }
             Shape::Header(header) => {
                 header.span = NOWHERE;
-                if let Some(n) = &mut header.name {
-                    name(n);
-                }
+                name(&mut header.name);
                 items(&mut header.params, |param| {
                     param.span = NOWHERE;
                     name(&mut param.name);
@@ -58,6 +61,10 @@ fn normalized(file: &File) -> File {
                 }
                 if let Some(constructor) = &mut header.constructor {
                     name(constructor);
+                }
+                items(&mut header.at, sort);
+                for comment in &mut header.at_comments {
+                    comment.span = NOWHERE;
                 }
                 if let Some(body) = &mut header.body {
                     body.span = NOWHERE;

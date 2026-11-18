@@ -61,6 +61,10 @@ pub enum ErrorKind {
          capitalized, outside `lexical` and `spelling`"
     )]
     CapitalizedWord(String),
+    #[error("a declaration's block writes `at` once")]
+    DuplicateAtList,
+    #[error("empty `at` list: omit it instead")]
+    EmptyAtList,
     #[error("constructor `{0}` must be capitalized")]
     UncapitalizedConstructor(String),
 }

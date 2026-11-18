@@ -7,7 +7,8 @@
 //! - a primitive without a sort or a constructor clause, and a constructor
 //!   clause on any other kind of declaration;
 //! - two primitives for one constructor, that is, for the same constructor name
-//!   at the same result sort;
+//!   at the same result sort. A primitive at `Self` builds its constructor at
+//!   each sort of its `at` list;
 //! - a word that names no declaration. A word is checked by name only: which
 //!   declaration of that name it reaches depends on the expected sort, which
 //!   this crate does not know. `none` is the language's own word for an omitted
@@ -27,6 +28,7 @@ use crate::tree::Declaration;
 use crate::tree::Field;
 use crate::tree::Item;
 use crate::tree::METADATA_FIELDS;
+use crate::tree::SELF_SORT;
 use crate::tree::Shape;
 use crate::tree::Sort;
 use crate::tree::Value;
@@ -56,7 +58,7 @@ pub enum RefusalKind {
     NamelessPrimitive,
     #[error("only a primitive names a constructor; `{declaration}` names `{constructor}`")]
     ConstructorOutsidePrimitive {
-        /// The kind word and, when the header writes one, the name.
+        /// The kind word and the name.
         declaration: String,
         constructor: String,
     },
@@ -99,8 +101,8 @@ pub fn check(bundles: &[&Bundle]) -> Result<(), CheckError> {
     };
     let declared: BTreeSet<Ident> = declarations()
         .filter_map(|declaration| match &declaration.shape {
-            Shape::Header(header) => header.name.map(|name| name.ident),
-            Shape::Value(_) => None,
+            Shape::Header(header) => Some(header.name.ident),
+            Shape::Value(_) | Shape::Relation(_) => None,
         })
         .collect();
     let mut refusals = Vec::new();
@@ -113,6 +115,7 @@ pub fn check(bundles: &[&Bundle]) -> Result<(), CheckError> {
         };
         match &declaration.shape {
             Shape::Value(value) => words.value(value),
+            Shape::Relation(_) => {}
             Shape::Header(header) => {
                 for param in header.params.iter().filter_map(Item::node) {
                     if let Some(default) = &param.default {
@@ -151,7 +154,7 @@ fn constructor_clause(
     let kind = declaration.kind.ident;
     let header = match &declaration.shape {
         Shape::Header(header) => header,
-        Shape::Value(_) => {
+        Shape::Value(_) | Shape::Relation(_) => {
             if kind == PRIMITIVE {
                 refusals.push(Refusal {
                     span: declaration.span,
@@ -163,10 +166,7 @@ fn constructor_clause(
     };
     if kind != PRIMITIVE {
         if let Some(constructor) = header.constructor {
-            let declaration = match header.name {
-                Some(name) => format!("{kind} {}", name.ident),
-                None => kind.as_str().to_owned(),
-            };
+            let declaration = format!("{kind} {}", header.name.ident);
             refusals.push(Refusal {
                 span: constructor.span,
                 kind: RefusalKind::ConstructorOutsidePrimitive {
@@ -177,14 +177,7 @@ fn constructor_clause(
         }
         return;
     }
-    let Some(name) = header.name else {
-        refusals.push(Refusal {
-            span: declaration.span,
-            kind: RefusalKind::NamelessPrimitive,
-        });
-        return;
-    };
-    let name = name.ident;
+    let name = header.name.ident;
     let Some(sort) = &header.sort else {
         refusals.push(Refusal {
             span: header.span,
@@ -199,19 +192,25 @@ fn constructor_clause(
         });
         return;
     };
-    let sort = sort_text(sort);
-    if let Some(first) = constructors.get(&(sort.clone(), constructor.ident)) {
-        refusals.push(Refusal {
-            span: constructor.span,
-            kind: RefusalKind::DuplicateConstructor {
-                first: first.as_str().to_owned(),
-                second: name.as_str().to_owned(),
-                constructor: constructor.ident.as_str().to_owned(),
-                sort,
-            },
-        });
+    let sorts: Vec<String> = if sort.args.is_empty() && sort.head.ident == SELF_SORT {
+        header.at_sorts().map(sort_text).collect()
     } else {
-        constructors.insert((sort, constructor.ident), name);
+        vec![sort_text(sort)]
+    };
+    for sort in sorts {
+        if let Some(first) = constructors.get(&(sort.clone(), constructor.ident)) {
+            refusals.push(Refusal {
+                span: constructor.span,
+                kind: RefusalKind::DuplicateConstructor {
+                    first: first.as_str().to_owned(),
+                    second: name.as_str().to_owned(),
+                    constructor: constructor.ident.as_str().to_owned(),
+                    sort,
+                },
+            });
+        } else {
+            constructors.insert((sort, constructor.ident), name);
+        }
     }
 }
 

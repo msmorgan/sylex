@@ -13,15 +13,17 @@
 //! constructors have no `.syl` declaration; their provisional schemas are
 //! [`schema`]'s. The only words and sorts written here are the language's own
 //! (`none`, `some`, `Option`, `List` and the literal sorts, `syl.md` §3).
-//! The coercions are declared in `.syl`; [`coercion`] reads and checks them.
+//! The memberships between sorts are declared in `.syl`; [`membership`] reads
+//! and checks them. A card's term is resolved in surface mode and every other
+//! value in body mode (`syl.md` §3).
 //!
 //! The resolver records what it resolved ([`Resolutions`]) for
 //! [`crate::dsl_expand`], the throwaway expander; [`load`] returns the record
 //! with the registry it was resolved against.
 
 mod call;
-mod coercion;
 mod cycles;
+mod membership;
 mod nominal;
 mod refusal;
 pub(crate) mod schema;
@@ -54,7 +56,8 @@ use sylex_syl::Value;
 use sylex_syl::ValueKind;
 
 use self::call::WrittenForms;
-use self::coercion::Coercion;
+pub(crate) use self::membership::Mode;
+pub(crate) use self::membership::Sorts;
 pub use self::refusal::CheckError;
 pub use self::refusal::Refusal;
 pub use self::refusal::RefusalKind;
@@ -106,6 +109,9 @@ pub struct Summary {
     pub files: usize,
     /// The declarations of each kind.
     pub declarations: BTreeMap<&'static str, usize>,
+    /// The `(card file name, test)` exceptions the cards' terms used
+    /// (`schema::TEST_EXCEPTIONS`).
+    pub test_exceptions: BTreeSet<(String, String)>,
 }
 
 impl fmt::Display for Summary {
@@ -118,7 +124,12 @@ impl fmt::Display for Summary {
             }
             write!(f, "{kind} {count}")?;
         }
-        f.write_str(")")
+        write!(
+            f,
+            "); {} test exceptions until {}",
+            self.test_exceptions.len(),
+            schema::TEST_EXCEPTION_TICKET
+        )
     }
 }
 
@@ -144,6 +155,9 @@ pub(crate) struct Signature {
     /// The declaration's node in the dependency graph; `None` for a second
     /// registration and a catalog declaration, which are no dependency edge.
     node: Option<usize>,
+    /// One sort of a declaration with an `at` list: a call of the word stands
+    /// at the lowest of its sorts that holds its arms (`syl.md` §3).
+    pub(crate) at_list: bool,
     /// Declared under the Ring exception (`schema::RING_EXCEPTION`), so only
     /// the Ring's file may call it.
     ring_only: bool,
@@ -157,28 +171,27 @@ pub(crate) type Registry = BTreeMap<(String, SortKey), Signature>;
 /// bundle, for [`crate::dsl_expand`].
 #[derive(Debug, Default)]
 pub(crate) struct Resolutions {
-    /// The sort each call's word was found at: its registry key's sort.
-    calls: HashMap<*const Call, SortKey>,
+    /// The sort each call's word was found at, its registry key's sort, for
+    /// each sort of the enclosing declaration's `at` list (`None` when it has
+    /// none).
+    calls: HashMap<(*const Call, Option<SortKey>), SortKey>,
     /// The index of the parameter each argument binds.
     args: HashMap<*const Arg, usize>,
-    /// The declaration index of the coercion each coerced value went through.
-    coerced: HashMap<*const Value, usize>,
 }
 
 impl Resolutions {
-    /// The sort `call`'s word was found at, if it was resolved.
-    pub(crate) fn call(&self, call: &Call) -> Option<&SortKey> {
-        self.calls.get(&std::ptr::from_ref(call))
+    /// The sort `call`'s word was found at, if it was resolved. Inside a
+    /// declaration with an `at` list, `self_sort` is the sort of that list
+    /// the declaration is read at.
+    pub(crate) fn call(&self, call: &Call, self_sort: Option<&SortKey>) -> Option<SortKey> {
+        self.calls
+            .get(&(std::ptr::from_ref(call), self_sort.cloned()))
+            .cloned()
     }
 
     /// The index of the parameter `arg` binds, if it was bound.
     pub(crate) fn arg(&self, arg: &Arg) -> Option<usize> {
         self.args.get(&std::ptr::from_ref(arg)).copied()
-    }
-
-    /// The declaration index of the coercion `value` went through, if any.
-    pub(crate) fn coerced(&self, value: &Value) -> Option<usize> {
-        self.coerced.get(&std::ptr::from_ref(value)).copied()
     }
 }
 
@@ -196,8 +209,15 @@ pub(crate) struct Decl<'a> {
     pub(crate) kind: &'static Kind,
     /// `None` for a kind written without a name, which declares no word.
     pub(crate) name: Option<String>,
+    /// The sort it is declared at: `Self` when it has an `at` list.
     pub(crate) sort: SortKey,
     pub(crate) params: Vec<Slot>,
+    /// The sorts of its `at` list; empty when it has none.
+    pub(crate) at: Vec<SortKey>,
+    /// A `member` or `denotes` declaration's subject sort.
+    pub(crate) subject: Option<SortKey>,
+    /// A card's file name, without `.syl`.
+    pub(crate) card: Option<String>,
     /// Whether this declaration stands in the builtin bundle.
     pub(crate) in_builtin: bool,
     /// Whether this is the Ring exception's file.
@@ -208,19 +228,27 @@ impl<'a> Decl<'a> {
     pub(crate) fn block(&self) -> Option<&'a Record> {
         match &self.declaration.shape {
             Shape::Header(header) => header.body.as_ref(),
-            Shape::Value(_) => None,
+            Shape::Value(_) | Shape::Relation(_) => None,
         }
     }
 
+    /// The sorts the declaration is checked at: each sort of its `at` list,
+    /// or its one sort.
+    pub(crate) fn instances(&self) -> Vec<Option<&SortKey>> {
+        if self.at.is_empty() { vec![None] } else { self.at.iter().map(Some).collect() }
+    }
+
     /// The declaration as a refusal names it: its kind word and its name, or
-    /// for a nameless header its signature.
+    /// for a relation its two sorts.
     pub(crate) fn label(&self) -> String {
         let word = self.kind.word;
         if let Some(name) = &self.name {
             return format!("`{word}` {name}");
         }
-        let params: Vec<String> = self.params.iter().map(|p| p.sort.to_string()).collect();
-        format!("`{word}`({}): {}", params.join(", "), self.sort)
+        match &self.subject {
+            Some(subject) => format!("`{word}`({subject}): {}", self.sort),
+            None => format!("`{word}`"),
+        }
     }
 
     pub(crate) fn field(&self, name: &str) -> Option<&'a Value> {
@@ -253,15 +281,23 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     let mut summary = Summary {
         files: 0,
         declarations: BTreeMap::new(),
+        test_exceptions: BTreeSet::new(),
     };
     for bundle in bundles {
         let in_builtin = std::ptr::eq(*bundle, builtin);
         for file in bundle.files().values() {
             summary.files += 1;
             let ring = in_builtin && file.path == ring_file;
+            let card = file
+                .path
+                .file_stem()
+                .map(|stem| stem.to_string_lossy().into_owned());
             for declaration in file.ast.declarations() {
                 match header(declaration, in_builtin, ring) {
-                    Ok(decl) => {
+                    Ok(mut decl) => {
+                        if decl.kind.word == schema::CARD {
+                            decl.card.clone_from(&card);
+                        }
                         *summary.declarations.entry(decl.kind.word).or_default() += 1;
                         decls.push(decl);
                     }
@@ -272,19 +308,35 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     }
     let registry = register(&decls, &mut refusals);
     unknown_sorts(&decls, &known_sorts(&decls, &registry), &mut refusals);
-    let coercions = coercion::coercions(&decls, &registry, &mut refusals);
-    let forms = call::written_forms(&decls, &registry, &coercions);
+    let sorts = Sorts::read(&decls, &mut refusals);
+    membership::ambiguities(&sorts, &registry, &mut refusals);
+    placement(&decls, &sorts, &mut refusals);
+    let mut words: BTreeMap<&str, Vec<&SortKey>> = BTreeMap::new();
+    for (name, sort) in registry.keys() {
+        words.entry(name.as_str()).or_default().push(sort);
+    }
+    let forms = call::written_forms(&decls, &registry, &sorts);
     let shared_verbs = shared_verb_lemmas(&decls, &mut refusals);
     let tables = Tables {
+        decls: &decls,
         registry: &registry,
-        coercions: &coercions,
+        words: &words,
+        sorts: &sorts,
         forms: &forms,
         shared_verbs: &shared_verbs,
     };
     let mut edges = vec![Vec::new(); decls.len()];
     let mut resolutions = Resolutions::default();
+    let mut exceptions_used = BTreeSet::new();
     for (decl, edges) in decls.iter().zip(&mut edges) {
-        resolve(decl, &tables, &mut refusals, edges, &mut resolutions);
+        resolve(
+            decl,
+            &tables,
+            &mut refusals,
+            edges,
+            &mut resolutions,
+            &mut exceptions_used,
+        );
     }
     let found_cycles = cycles::cycles(&edges);
     for cycle in found_cycles {
@@ -304,6 +356,17 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     if refusals.is_empty() {
         self_name::check(&decls, &registry, &resolutions, &mut refusals);
     }
+    // A declaration with an `at` list is resolved once for each of its sorts,
+    // so one defect in it is found once for each.
+    let mut seen = Vec::new();
+    refusals.retain(|refusal| {
+        let new = !seen.contains(refusal);
+        if new {
+            seen.push(refusal.clone());
+        }
+        new
+    });
+    summary.test_exceptions = exceptions_used;
     if refusals.is_empty() {
         return Ok(Checked {
             summary,
@@ -325,7 +388,7 @@ pub(crate) fn load<'a>(bundles: &[&'a Bundle]) -> Result<Checked<'a>, CheckError
     Err(CheckError::Resolution { refusals, rendered })
 }
 
-/// Checks a declaration's kind, name, sort and parameters.
+/// Checks a declaration's kind, name, sort, parameters and `at` list.
 fn header(declaration: &Declaration, in_builtin: bool, ring: bool) -> Result<Decl<'_>, Refusal> {
     let refuse = |span, kind| Err(Refusal { span, kind });
     let word = declaration.kind.ident.as_str();
@@ -335,53 +398,55 @@ fn header(declaration: &Declaration, in_builtin: bool, ring: bool) -> Result<Dec
             RefusalKind::UnknownKind(word.to_owned()),
         );
     };
-    let decl = |name, sort, params| Decl {
+    let decl = |name, sort, params, at, subject| Decl {
         declaration,
         kind,
         name,
         sort,
         params,
+        at,
+        subject,
+        card: None,
         in_builtin,
         ring,
     };
     let header = match (&declaration.shape, kind.form) {
         (Shape::Value(_), Form::Value) => {
             let sort = kind.sort.expect("a value kind implies its sort");
-            return Ok(decl(None, SortKey::table(sort), Vec::new()));
+            return Ok(decl(
+                None,
+                SortKey::table(sort),
+                Vec::new(),
+                Vec::new(),
+                None,
+            ));
         }
-        (Shape::Header(header), Form::Block | Form::OptionalBlock) => match header.name {
-            Some(_) => header,
-            None => return refuse(declaration.span, RefusalKind::MissingName(word.to_owned())),
-        },
-        (Shape::Header(header), Form::NamelessBlock) => match header.name {
-            Some(name) => return refuse(name.span, RefusalKind::WrittenName(word.to_owned())),
-            None => header,
-        },
-        (Shape::Value(_), Form::Block | Form::OptionalBlock) => {
+        (Shape::Relation(relation), Form::Relation) => {
+            let subject = sort_key(&relation.subject)?;
+            let sort = sort_key(&relation.sort)?;
+            return Ok(decl(None, sort, Vec::new(), Vec::new(), Some(subject)));
+        }
+        (Shape::Header(header), Form::Block | Form::OptionalBlock) => header,
+        (Shape::Value(_) | Shape::Relation(_), Form::Block | Form::OptionalBlock) => {
             return refuse(declaration.span, RefusalKind::MissingName(word.to_owned()));
         }
-        (Shape::Value(_), Form::NamelessBlock) => {
+        (Shape::Value(_) | Shape::Header(_), Form::Relation) => {
+            return refuse(declaration.span, RefusalKind::RelationForm(word.to_owned()));
+        }
+        (Shape::Header(_), Form::Value) => {
+            return refuse(declaration.span, RefusalKind::WrittenName(word.to_owned()));
+        }
+        (Shape::Relation(_), Form::Value) => {
             return refuse(
                 declaration.span,
-                RefusalKind::MissingHeader(word.to_owned()),
+                RefusalKind::WrittenHeader(word.to_owned()),
             );
         }
-        (Shape::Header(header), Form::Value) => match header.name {
-            Some(_) => return refuse(declaration.span, RefusalKind::WrittenName(word.to_owned())),
-            None => {
-                return refuse(
-                    declaration.span,
-                    RefusalKind::WrittenHeader(word.to_owned()),
-                );
-            }
-        },
     };
-    if let Some(name) = header.name
-        && name.ident == "none"
-    {
-        return refuse(name.span, RefusalKind::NamedNone);
+    if header.name.ident == "none" {
+        return refuse(header.name.span, RefusalKind::NamedNone);
     }
-    let name = header.name.map(|name| name.ident.as_str());
+    let name = header.name.ident.as_str();
     let sort = match (kind.sort, &header.sort) {
         (None, Some(sort)) => sort_key(sort)?,
         (None, None) => return refuse(header.span, RefusalKind::MissingSort(word.to_owned())),
@@ -396,7 +461,7 @@ fn header(declaration: &Declaration, in_builtin: bool, ring: bool) -> Result<Dec
             );
         }
     };
-    if header.body.is_none() && matches!(kind.form, Form::Block | Form::NamelessBlock) {
+    if header.body.is_none() && kind.form == Form::Block {
         return refuse(header.span, RefusalKind::MissingBlock(word.to_owned()));
     }
     let mut params: Vec<Slot> = Vec::new();
@@ -417,7 +482,31 @@ fn header(declaration: &Declaration, in_builtin: bool, ring: bool) -> Result<Dec
             default: param.default.clone(),
         });
     }
-    Ok(decl(name.map(str::to_owned), sort, params))
+    let mut at: Vec<SortKey> = Vec::new();
+    for listed in header.at_sorts() {
+        if kind.sort.is_some() {
+            return refuse(listed.span, RefusalKind::AtListOnKind(word.to_owned()));
+        }
+        let listed_key = sort_key(listed)?;
+        if listed_key.mentions_self() {
+            return refuse(listed.span, RefusalKind::SelfWithoutAtList);
+        }
+        if at.contains(&listed_key) {
+            return refuse(
+                listed.span,
+                RefusalKind::DuplicateAtSort(listed_key.to_string()),
+            );
+        }
+        at.push(listed_key);
+    }
+    let mentions_self = sort.mentions_self() || params.iter().any(|p| p.sort.mentions_self());
+    if at.is_empty() && mentions_self {
+        return refuse(header.span, RefusalKind::SelfWithoutAtList);
+    }
+    if !at.is_empty() && sort != SortKey::self_sort() {
+        return refuse(header.span, RefusalKind::AtListWithoutSelf);
+    }
+    Ok(decl(Some(name.to_owned()), sort, params, at, None))
 }
 
 /// Registers every named declaration at its `(name, sort)` and its second
@@ -465,15 +554,34 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
             }
         }
         let span = decl.declaration.span;
-        let signature = Signature {
-            params: decl.params.clone(),
-            decl: index,
-            secondary: false,
-            node: (!decl.kind.catalog).then_some(index),
-            ring_only,
-            span,
-        };
-        insert((name.clone(), decl.sort.clone()), signature, span, refusals);
+        for instance in decl.instances() {
+            let instantiate = |sort: &SortKey| match instance {
+                Some(instance) => sort.instantiate(instance),
+                None => sort.clone(),
+            };
+            let signature = Signature {
+                params: decl
+                    .params
+                    .iter()
+                    .map(|param| Slot {
+                        sort: instantiate(&param.sort),
+                        ..param.clone()
+                    })
+                    .collect(),
+                decl: index,
+                secondary: false,
+                node: (!decl.kind.catalog).then_some(index),
+                at_list: instance.is_some(),
+                ring_only,
+                span,
+            };
+            insert(
+                (name.clone(), instantiate(&decl.sort)),
+                signature,
+                span,
+                refusals,
+            );
+        }
         let Some(secondary) = decl.kind.secondary else {
             continue;
         };
@@ -489,6 +597,7 @@ fn register(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> Registry {
             decl: index,
             secondary: true,
             node: None,
+            at_list: false,
             ring_only: false,
             span,
         };
@@ -503,10 +612,12 @@ const LITERAL_SORTS: [&str; 3] = ["String", "Int", "Nat"];
 
 /// The sort names a written sort may use: the literal sorts, the sort
 /// constructors and the undeclared sorts, and every name both produced and
-/// consumed. A declaration's result sort (a coercion's included) or a record
-/// sort produces a name; a parameter's sort, or a kind's sort or field sort, or
-/// a record field's sort consumes one. A name only produced or only consumed is
-/// a misspelling, or a sort no value can reach.
+/// consumed. A declaration's result sort, a record sort or a membership's
+/// subject produces a name; a parameter's sort, a kind's sort or field sort, a
+/// record field's sort or a membership's sort consumes one. A sort that a kind
+/// denotes is consumed where that kind is and produced where that kind is, and
+/// a kind that denotes one likewise. A name only produced or only consumed is a
+/// misspelling, or a sort no value can reach.
 fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
     fn add(sort: &SortKey, out: &mut BTreeSet<String>) {
         let mut heads = BTreeSet::new();
@@ -517,16 +628,53 @@ fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
     for (_, sort) in registry.keys() {
         add(sort, &mut produced);
     }
-    for decl in decls
-        .iter()
-        .filter(|decl| decl.kind.word == schema::COERCION)
-    {
-        add(&decl.sort, &mut produced);
-    }
     produced.extend(RECORDS.iter().map(|record| record.sort.to_owned()));
+    // A literal is a value of its sort, so a literal sort is produced, and a
+    // sort it is a member of with it.
+    produced.extend(LITERAL_SORTS.map(str::to_owned));
     let mut consumed = BTreeSet::new();
-    for param in decls.iter().flat_map(|decl| &decl.params) {
-        add(&param.sort, &mut consumed);
+    for decl in decls {
+        for param in &decl.params {
+            for instance in decl.instances() {
+                match instance {
+                    Some(instance) => add(&param.sort.instantiate(instance), &mut consumed),
+                    None => add(&param.sort, &mut consumed),
+                }
+            }
+        }
+    }
+    // A member's values are values of the sort it is a member of, so what
+    // produces the one produces the other and what consumes the other
+    // consumes the one. `denotes` joins its two sorts both ways.
+    let relations: Vec<(&SortKey, &SortKey, bool)> = decls
+        .iter()
+        .filter_map(|decl| {
+            let subject = decl.subject.as_ref()?;
+            Some((subject, &decl.sort, decl.kind.word == schema::DENOTES))
+        })
+        .collect();
+    loop {
+        let before = (produced.len(), consumed.len());
+        for (subject, sort, both_ways) in &relations {
+            let (subject, sort) = (subject.head.as_str(), sort.head.as_str());
+            if produced.contains(subject) {
+                produced.insert(sort.to_owned());
+            }
+            if consumed.contains(sort) {
+                consumed.insert(subject.to_owned());
+            }
+            if *both_ways {
+                if produced.contains(sort) {
+                    produced.insert(subject.to_owned());
+                }
+                if consumed.contains(subject) {
+                    consumed.insert(sort.to_owned());
+                }
+            }
+        }
+        if before == (produced.len(), consumed.len()) {
+            break;
+        }
     }
     for kind in KINDS {
         let secondary = kind.secondary.map(|secondary| secondary.sort);
@@ -553,29 +701,104 @@ fn known_sorts(decls: &[Decl<'_>], registry: &Registry) -> BTreeSet<String> {
         .collect()
 }
 
-/// Refuses every written sort name `known` lacks.
+/// Refuses every written sort name `known` lacks. `Self` is known in a
+/// declaration with an `at` list.
 fn unknown_sorts(decls: &[Decl<'_>], known: &BTreeSet<String>, refusals: &mut Vec<Refusal>) {
     for decl in decls {
-        let Shape::Header(header) = &decl.declaration.shape else {
-            continue;
-        };
-        let params = header.params.iter().filter_map(Item::node).map(|p| &p.sort);
-        for sort in header.sort.iter().chain(params) {
-            unknown_sort(sort, known, refusals);
+        let self_known = !decl.at.is_empty();
+        match &decl.declaration.shape {
+            Shape::Value(_) => {}
+            Shape::Relation(relation) => {
+                unknown_sort(&relation.subject, known, false, refusals);
+                unknown_sort(&relation.sort, known, false, refusals);
+            }
+            Shape::Header(header) => {
+                let params = header.params.iter().filter_map(Item::node).map(|p| &p.sort);
+                for sort in header.sort.iter().chain(params) {
+                    unknown_sort(sort, known, self_known, refusals);
+                }
+                for sort in header.at_sorts() {
+                    unknown_sort(sort, known, false, refusals);
+                }
+            }
         }
     }
 }
 
-fn unknown_sort(sort: &Sort, known: &BTreeSet<String>, refusals: &mut Vec<Refusal>) {
+fn unknown_sort(
+    sort: &Sort,
+    known: &BTreeSet<String>,
+    self_known: bool,
+    refusals: &mut Vec<Refusal>,
+) {
     let head = sort.head.ident.as_str();
-    if !known.contains(head) {
+    let is_self = self_known && head == sylex_syl::SELF_SORT;
+    if !known.contains(head) && !is_self {
         refusals.push(Refusal {
             span: sort.head.span,
             kind: RefusalKind::UnknownSort(head.to_owned()),
         });
     }
     for arg in &sort.args {
-        unknown_sort(arg, known, refusals);
+        unknown_sort(arg, known, self_known, refusals);
+    }
+}
+
+/// Refuses a declaration at a position sort that is neither that sort's own
+/// (`schema::POSITION_OWN`) nor one staying there for a ticket
+/// (`schema::POSITION_STAYING`), and a `spelling` at a test sort, where
+/// nothing prints (`syl.md` §3). A declaration whose `at` list holds another
+/// sort as well stands at all its sorts and is neither.
+fn placement(decls: &[Decl<'_>], sorts: &Sorts, refusals: &mut Vec<Refusal>) {
+    for decl in decls {
+        let Some(name) = &decl.name else {
+            continue;
+        };
+        // The expander's probe Template stands wherever a term is asked for.
+        if !decl.in_builtin && name == crate::dsl_expand::TERM {
+            continue;
+        }
+        // A declaration with an `at` list is at a position sort, or at a test
+        // sort, only when every sort of its list is one.
+        let at_only = |is: &dyn Fn(&SortKey) -> bool| match decl.at.as_slice() {
+            [] => is(&decl.sort),
+            listed => listed.iter().all(is),
+        };
+        let sort = match decl.at.as_slice() {
+            [] => decl.sort.to_string(),
+            listed => listed
+                .iter()
+                .map(ToString::to_string)
+                .collect::<Vec<_>>()
+                .join(", "),
+        };
+        if at_only(&|sort| sorts.is_position(sort)) {
+            let own = schema::POSITION_OWN
+                .iter()
+                .any(|(at, word)| *at == sort && word == name);
+            let staying = schema::POSITION_STAYING
+                .iter()
+                .any(|(at, word, _)| *at == sort && word == name);
+            if !own && !staying {
+                refusals.push(Refusal {
+                    span: decl.declaration.span,
+                    kind: RefusalKind::PositionDeclaration {
+                        word: name.clone(),
+                        sort,
+                    },
+                });
+            }
+        } else if at_only(&|sort| sorts.is_test(sort))
+            && let Some(spelling) = decl.field("spelling")
+        {
+            refusals.push(Refusal {
+                span: spelling.span,
+                kind: RefusalKind::SpellingAtTest {
+                    word: name.clone(),
+                    sort,
+                },
+            });
+        }
     }
 }
 
@@ -653,82 +876,105 @@ fn shared_verb_lemmas(decls: &[Decl<'_>], refusals: &mut Vec<Refusal>) -> BTreeM
 }
 
 struct Tables<'r> {
+    decls: &'r [Decl<'r>],
     registry: &'r Registry,
-    coercions: &'r [Coercion],
+    /// The sorts each word is declared at.
+    words: &'r BTreeMap<&'r str, Vec<&'r SortKey>>,
+    sorts: &'r Sorts,
     forms: &'r WrittenForms,
     shared_verbs: &'r BTreeMap<String, String>,
 }
 
-/// Resolves one declaration's parameter defaults and block or value.
+/// Resolves one declaration's parameter defaults and block or value, once
+/// for each sort of its `at` list.
 fn resolve(
     decl: &Decl<'_>,
     tables: &Tables<'_>,
     refusals: &mut Vec<Refusal>,
     edges: &mut Vec<usize>,
     record: &mut Resolutions,
+    exceptions_used: &mut BTreeSet<(String, String)>,
 ) {
     let ring = decl.ring;
-    if let Shape::Header(header) = &decl.declaration.shape {
-        // A default reads only the parameters before it.
-        for (index, param) in header.params.iter().filter_map(Item::node).enumerate() {
-            if let Some(default) = &param.default {
-                let sort = &decl.params[index].sort;
-                let params = &decl.params[..index];
+    let mode = if decl.kind.word == schema::CARD { Mode::Surface } else { Mode::Body };
+    let exceptions: Vec<&'static str> = decl.card.as_deref().map_or_else(Vec::new, |card| {
+        schema::TEST_EXCEPTIONS
+            .iter()
+            .filter(|(file, _)| *file == card)
+            .map(|(_, word)| *word)
+            .collect()
+    });
+    for instance in decl.instances() {
+        let instantiate = |sort: &SortKey| match instance {
+            Some(instance) => sort.instantiate(instance),
+            None => sort.clone(),
+        };
+        let params: Vec<Slot> = decl
+            .params
+            .iter()
+            .map(|param| Slot {
+                sort: instantiate(&param.sort),
+                ..param.clone()
+            })
+            .collect();
+        macro_rules! resolver {
+            ($params:expr, $ability_template_body:expr) => {
                 Resolver {
+                    decls: tables.decls,
                     registry: tables.registry,
-                    coercions: tables.coercions,
+                    words: tables.words,
+                    sorts: tables.sorts,
                     forms: tables.forms,
                     shared_verbs: tables.shared_verbs,
                     refusals: &mut *refusals,
                     edges: &mut *edges,
                     record: &mut *record,
-                    params,
-                    ability_template_body: None,
+                    exceptions_used: &mut *exceptions_used,
+                    params: $params.to_vec(),
+                    ability_template_body: $ability_template_body,
                     ring,
+                    mode,
+                    self_sort: instance.cloned(),
+                    card: decl.card.as_deref(),
+                    exceptions: &exceptions,
                 }
-                .value(default, sort);
+            };
+        }
+        if let Shape::Header(header) = &decl.declaration.shape {
+            // A default reads only the parameters before it.
+            for (index, param) in header.params.iter().filter_map(Item::node).enumerate() {
+                if let Some(default) = &param.default {
+                    resolver!(&params[..index], None).value(default, &params[index].sort);
+                }
             }
         }
+        let block_params: Vec<Slot> = match &decl.declaration.shape {
+            Shape::Header(_) => params
+                .iter()
+                .cloned()
+                .chain(decl.kind.implicit.iter().map(|(name, sort)| Slot {
+                    name: (*name).to_owned(),
+                    sort: SortKey::table(sort),
+                    optional: false,
+                    default: None,
+                }))
+                .collect(),
+            Shape::Value(_) | Shape::Relation(_) => Vec::new(),
+        };
+        let ability_template_body = match (
+            decl.kind.word,
+            decl.name.as_deref(),
+            decl.field("body").map(|v| &v.kind),
+        ) {
+            (schema::TEMPLATE, Some(name), Some(ValueKind::Call(body_call)))
+                if decl.sort == SortKey::named(schema::TRIGGERED_ABILITY.0) =>
+            {
+                Some((name, body_call))
+            }
+            _ => None,
+        };
+        resolver!(&block_params, ability_template_body).body(decl);
     }
-    let block_params: Vec<Slot> = match &decl.declaration.shape {
-        Shape::Header(_) => decl
-            .params
-            .iter()
-            .cloned()
-            .chain(decl.kind.implicit.iter().map(|(name, sort)| Slot {
-                name: (*name).to_owned(),
-                sort: SortKey::table(sort),
-                optional: false,
-                default: None,
-            }))
-            .collect(),
-        Shape::Value(_) => Vec::new(),
-    };
-    let ability_template_body = match (
-        decl.kind.word,
-        decl.name.as_deref(),
-        decl.field("body").map(|v| &v.kind),
-    ) {
-        (schema::TEMPLATE, Some(name), Some(ValueKind::Call(body_call)))
-            if decl.sort == SortKey::named(schema::TRIGGERED_ABILITY.0) =>
-        {
-            Some((name, body_call))
-        }
-        _ => None,
-    };
-    Resolver {
-        registry: tables.registry,
-        coercions: tables.coercions,
-        forms: tables.forms,
-        shared_verbs: tables.shared_verbs,
-        refusals,
-        edges,
-        record,
-        params: &block_params,
-        ability_template_body,
-        ring,
-    }
-    .body(decl);
 }
 
 /// Where a `{ ... }` field list stands.
@@ -741,23 +987,36 @@ enum FieldHost<'a, 'd> {
     RecordValue,
 }
 
+/// Why a call of a word with an `at` list, or one of its arms, has no sort.
+type NoSort = (Span, RefusalKind);
+
 /// Resolves values for one declaration.
 struct Resolver<'r> {
+    decls: &'r [Decl<'r>],
     registry: &'r Registry,
-    coercions: &'r [Coercion],
+    words: &'r BTreeMap<&'r str, Vec<&'r SortKey>>,
+    sorts: &'r Sorts,
     forms: &'r WrittenForms,
     shared_verbs: &'r BTreeMap<String, String>,
     refusals: &'r mut Vec<Refusal>,
     /// The dependency nodes the declaration reaches.
     edges: &'r mut Vec<usize>,
     record: &'r mut Resolutions,
+    exceptions_used: &'r mut BTreeSet<(String, String)>,
     /// The parameters a `$name` may read.
-    params: &'r [Slot],
+    params: Vec<Slot>,
     /// When resolving `template <name>: Ability`, `<name>` and its root `body`
     /// call so `when`, `whenever` and `at` may expand to
     /// `triggered(<name>(…))`.
     ability_template_body: Option<(&'r str, &'r Call)>,
     ring: bool,
+    mode: Mode,
+    /// The sort of the declaration's `at` list it is being resolved at.
+    self_sort: Option<SortKey>,
+    /// The card's file name, when a card's term is being resolved.
+    card: Option<&'r str>,
+    /// The tests this card's term may call (`schema::TEST_EXCEPTIONS`).
+    exceptions: &'r [&'static str],
 }
 
 impl Resolver<'_> {
@@ -765,9 +1024,19 @@ impl Resolver<'_> {
         self.refusals.push(Refusal { span, kind });
     }
 
+    /// `sort` with `Self` replaced by the sort the declaration is resolved
+    /// at.
+    fn instantiate(&self, sort: &SortKey) -> SortKey {
+        match &self.self_sort {
+            Some(self_sort) => sort.instantiate(self_sort),
+            None => sort.clone(),
+        }
+    }
+
     fn body(&mut self, decl: &Decl<'_>) {
         let header = match &decl.declaration.shape {
             Shape::Value(value) => return self.value(value, &decl.sort),
+            Shape::Relation(_) => return,
             Shape::Header(header) => header,
         };
         // Only a kind whose block is optional may omit it, and then there is
@@ -776,13 +1045,14 @@ impl Resolver<'_> {
             return;
         };
         let at = decl.label();
+        let own = self.instantiate(&decl.sort);
         let slots: Vec<Slot> = decl
             .kind
             .fields
             .iter()
             .map(|spec| Slot {
                 name: spec.name.to_owned(),
-                sort: spec.sort.map_or_else(|| decl.sort.clone(), SortKey::table),
+                sort: spec.sort.map_or_else(|| own.clone(), SortKey::table),
                 optional: !spec.required,
                 default: None,
             })
@@ -807,9 +1077,8 @@ impl Resolver<'_> {
                 && METADATA_FIELDS.contains(&name)
             {
                 match name {
-                    "spelling" => {
-                        spelling::check(decl, &field.value, self.coercions, self.refusals);
-                    }
+                    // Metadata is one declaration's, whatever its `at` list.
+                    "spelling" => spelling::check(decl, &field.value, self.sorts, self.refusals),
                     "lexical" => self.lexical(&field.value),
                     other => unreachable!("unhandled metadata field `{other}`"),
                 }
@@ -917,17 +1186,8 @@ impl Resolver<'_> {
 
     /// Resolves `value` at `expected` (`syl.md` §3).
     fn value(&mut self, value: &Value, expected: &SortKey) {
-        self.value_at(value, expected, true);
-    }
-
-    /// Resolves `value` at `expected`, trying a coercion into `expected` at a
-    /// sort mismatch when `coerce` holds. A value a coercion reached is
-    /// resolved with `coerce` false: a coercion is one hop.
-    fn value_at(&mut self, value: &Value, expected: &SortKey, coerce: bool) {
         match &value.kind {
-            ValueKind::Parameter(name) => {
-                return self.parameter(value, name.ident.as_str(), expected, coerce);
-            }
+            ValueKind::Parameter(name) => self.parameter(value, name.ident.as_str(), expected),
             ValueKind::Call(call) => {
                 let head = call.head.ident.as_str();
                 if head == "none" {
@@ -942,24 +1202,373 @@ impl Resolver<'_> {
                 if head == "some" && expected.option_inner().is_some() {
                     return self.refuse(value.span, RefusalKind::SomeWritten);
                 }
-                if let Some(signature) = self.registry.get(&(head.to_owned(), expected.clone())) {
-                    self.record
-                        .calls
-                        .insert(std::ptr::from_ref(call), expected.clone());
-                    return self.call(call, expected, signature);
-                }
+                self.word(call, expected);
             }
             ValueKind::String(_)
             | ValueKind::Integer(_)
             | ValueKind::List(_)
-            | ValueKind::Record(_) => {}
+            | ValueKind::Record(_) => self.literal(value, expected),
         }
-        // A `T` at `Option(T)`.
+    }
+
+    /// The sorts of `reaches` that `word` is declared at.
+    fn standing<'s>(&self, word: &str, reaches: &'s [SortKey]) -> Vec<&'s SortKey> {
+        let declared = self.words.get(word).map_or(&[][..], Vec::as_slice);
+        reaches
+            .iter()
+            .filter(|sort| declared.contains(sort))
+            .collect()
+    }
+
+    fn is_at_list(&self, word: &str, sort: &SortKey) -> bool {
+        self.registry
+            .get(&(word.to_owned(), sort.clone()))
+            .is_some_and(|signature| signature.at_list)
+    }
+
+    /// Records that `call`'s word was found at `sort`, for the sort of the
+    /// `at` list the declaration is resolved at.
+    fn found(&mut self, call: &Call, sort: &SortKey) {
+        self.record.calls.insert(
+            (std::ptr::from_ref(call), self.self_sort.clone()),
+            sort.clone(),
+        );
+    }
+
+    /// Resolves the call `call` at `expected`: at `expected` itself, at the
+    /// sort `expected` is `Option` of, or at the one sort of the mode's
+    /// Reaches(`expected`) its word is declared at. A word with an `at` list
+    /// stands at the lowest of its sorts that holds its arms.
+    fn word(&mut self, call: &Call, expected: &SortKey) {
+        let head = call.head.ident.as_str();
+        if let Some(signature) = self.registry.get(&(head.to_owned(), expected.clone()))
+            && !signature.at_list
+        {
+            self.found(call, expected);
+            return self.call(call, expected, signature);
+        }
         if let Some(inner) = expected.option_inner() {
-            return self.value_at(value, inner, coerce);
+            return self.word(call, inner);
         }
-        if coerce && !self.stands_at(value, expected) && self.coerce(value, expected) {
+        if self.mode == Mode::Surface
+            && self.sorts.is_position(expected)
+            && let Some(test) = self.excepted(call, expected)
+        {
+            let card = self.card.expect("only a card's term has exceptions");
+            self.exceptions_used
+                .insert((card.to_owned(), test.to_owned()));
+            self.mode = Mode::Body;
+            self.word(call, expected);
+            self.mode = Mode::Surface;
             return;
+        }
+        let reaches = self.sorts.reaches(expected, self.mode);
+        let standing = self.standing(head, &reaches);
+        if standing.iter().any(|sort| self.is_at_list(head, sort)) {
+            return match self.at_list_sort(call, expected, &reaches) {
+                Ok(sort) => {
+                    let signature = &self.registry[&(head.to_owned(), sort.clone())];
+                    self.found(call, &sort);
+                    self.call(call, &sort, signature);
+                }
+                Err((span, kind)) => self.refuse(span, kind),
+            };
+        }
+        match standing.as_slice() {
+            [] => {
+                let kind = self.unknown_word(head, expected);
+                self.refuse(call.head.span, kind);
+            }
+            [sort] => {
+                let signature = &self.registry[&(head.to_owned(), (*sort).clone())];
+                self.found(call, sort);
+                self.call(call, sort, signature);
+            }
+            [..] => self.refuse(
+                call.head.span,
+                RefusalKind::AmbiguousWord {
+                    word: head.to_owned(),
+                    sorts: standing.iter().map(ToString::to_string).collect(),
+                    target: expected.to_string(),
+                    mode: self.mode.name(),
+                },
+            ),
+        }
+    }
+
+    /// Why `word` stands nowhere in Reaches(`expected`): in a card's term, a
+    /// test a body could write there; else a word unknown at `expected`.
+    fn unknown_word(&self, word: &str, expected: &SortKey) -> RefusalKind {
+        if self.mode == Mode::Surface {
+            let body = self.sorts.reaches(expected, Mode::Body);
+            if let Some(test) = self
+                .standing(word, &body)
+                .into_iter()
+                .find(|sort| self.sorts.is_test(sort))
+            {
+                return RefusalKind::TestInCard {
+                    word: word.to_owned(),
+                    test: test.to_string(),
+                };
+            }
+        }
+        RefusalKind::UnknownWord {
+            word: word.to_owned(),
+            sort: expected.to_string(),
+        }
+    }
+
+    /// The test of this card's exceptions that `call`, an argument of a slot
+    /// typed by the position sort `expected`, calls where surface mode has no
+    /// word: as its own word, or as an arm of a word with an `at` list.
+    fn excepted(&self, call: &Call, expected: &SortKey) -> Option<&'static str> {
+        if self.exceptions.is_empty() {
+            return None;
+        }
+        let head = call.head.ident.as_str();
+        let surface = self.sorts.reaches(expected, Mode::Surface);
+        let body = self.sorts.reaches(expected, Mode::Body);
+        let standing = self.standing(head, &body);
+        if standing.iter().any(|sort| self.is_at_list(head, sort)) {
+            return call
+                .args
+                .iter()
+                .filter_map(Item::node)
+                .flat_map(|arg| match &arg.value.kind {
+                    ValueKind::List(items) => items.iter().filter_map(Item::node).collect(),
+                    ValueKind::Call(_)
+                    | ValueKind::Parameter(_)
+                    | ValueKind::String(_)
+                    | ValueKind::Integer(_)
+                    | ValueKind::Record(_) => vec![&arg.value],
+                })
+                .find_map(|arm| match &arm.kind {
+                    ValueKind::Call(arm) => self.excepted(arm, expected),
+                    ValueKind::List(_)
+                    | ValueKind::Parameter(_)
+                    | ValueKind::String(_)
+                    | ValueKind::Integer(_)
+                    | ValueKind::Record(_) => None,
+                });
+        }
+        let test = self.exceptions.iter().find(|word| **word == head)?;
+        let is_test = standing.iter().any(|sort| self.sorts.is_test(sort));
+        (is_test && self.standing(head, &surface).is_empty()).then_some(*test)
+    }
+
+    /// The arms of a call of a word with an `at` list: the arguments of its
+    /// parameters typed by `Self`, and each item of a list written for a
+    /// parameter typed `List(Self)`. Arguments are bound as [`Resolver::call`]
+    /// binds them, which refuses the ones that bind nothing.
+    fn arms<'c>(call: &'c Call, params: &[Slot]) -> Vec<&'c Value> {
+        let mut bound = vec![false; params.len()];
+        let mut arms = Vec::new();
+        for arg in call.args.iter().filter_map(Item::node) {
+            let index = match arg.name {
+                Some(name) => params.iter().position(|p| p.name == name.ident.as_str()),
+                None => (0..params.len()).find(|&i| !params[i].optional && !bound[i]),
+            };
+            let Some(index) = index.filter(|&i| !bound[i]) else {
+                continue;
+            };
+            bound[index] = true;
+            if !params[index].sort.mentions_self() {
+                continue;
+            }
+            match &arg.value.kind {
+                ValueKind::List(items) => arms.extend(items.iter().filter_map(Item::node)),
+                ValueKind::Call(_)
+                | ValueKind::Parameter(_)
+                | ValueKind::String(_)
+                | ValueKind::Integer(_)
+                | ValueKind::Record(_) => arms.push(&arg.value),
+            }
+        }
+        arms
+    }
+
+    /// The sort a call of a word with an `at` list stands at, where
+    /// `expected` is expected and `reaches` is the mode's Reaches(`expected`):
+    /// the lowest sort of its `at` list that is at or above the lowest common
+    /// sort of its arms. In body mode, when no such sort exists and the word
+    /// stands at a test sort, the call stands there.
+    fn at_list_sort(
+        &self,
+        call: &Call,
+        expected: &SortKey,
+        reaches: &[SortKey],
+    ) -> Result<SortKey, NoSort> {
+        let head = call.head.ident.as_str();
+        let listed: Vec<&SortKey> = self
+            .standing(head, reaches)
+            .into_iter()
+            .filter(|sort| self.is_at_list(head, sort))
+            .collect();
+        let signature = &self.registry[&(head.to_owned(), listed[0].clone())];
+        let arms = Self::arms(call, &self.decls[signature.decl].params);
+        if arms.is_empty() {
+            return Err((
+                call.span,
+                RefusalKind::EmptyCoordination {
+                    word: head.to_owned(),
+                    sort: expected.to_string(),
+                },
+            ));
+        }
+        let mut arm_sorts = Vec::with_capacity(arms.len());
+        for arm in arms {
+            arm_sorts.push(self.arm_sort(arm, expected, reaches)?);
+        }
+        let mut common: Option<Vec<SortKey>> = None;
+        for sort in &arm_sorts {
+            let path = self
+                .sorts
+                .path(expected, sort, self.mode)
+                .expect("an arm's sort is in Reaches of the expected sort");
+            common = Some(match common {
+                None => path,
+                Some(common) => common
+                    .into_iter()
+                    .zip(path)
+                    .take_while(|(a, b)| a == b)
+                    .map(|(a, _)| a)
+                    .collect(),
+            });
+        }
+        let common = common.expect("a call with arms has a common path");
+        if let Some(sort) = common.iter().rev().find(|sort| listed.contains(sort)) {
+            return Ok(sort.clone());
+        }
+        if self.mode == Mode::Body
+            && let [test] = listed
+                .iter()
+                .filter(|sort| self.sorts.is_test(sort))
+                .collect::<Vec<_>>()
+                .as_slice()
+        {
+            return Ok((**test).clone());
+        }
+        Err((
+            call.head.span,
+            RefusalKind::NoCommonSort {
+                word: head.to_owned(),
+                sort: expected.to_string(),
+                arms: arm_sorts.iter().map(ToString::to_string).collect(),
+            },
+        ))
+    }
+
+    /// The one sort of `reaches`, the mode's Reaches(`expected`), that the
+    /// arm `value` stands at: its head word's, a parameter's declared sort (a
+    /// list parameter passed whole giving its element sort), or for a nested
+    /// call of a word with an `at` list the sort that call stands at.
+    fn arm_sort(
+        &self,
+        value: &Value,
+        expected: &SortKey,
+        reaches: &[SortKey],
+    ) -> Result<SortKey, NoSort> {
+        let one = |standing: Vec<&SortKey>, none: RefusalKind| match standing.as_slice() {
+            [sort] => Ok((*sort).clone()),
+            [] => Err((value.span, none)),
+            [..] => Err((
+                value.span,
+                RefusalKind::AmbiguousLiteral {
+                    literal: "this".to_owned(),
+                    sorts: standing.iter().map(ToString::to_string).collect(),
+                    target: expected.to_string(),
+                },
+            )),
+        };
+        let at = expected.to_string();
+        match &value.kind {
+            ValueKind::Parameter(name) => {
+                let name = name.ident.as_str();
+                let Some(param) = self.params.iter().find(|p| p.name == name) else {
+                    return Err((value.span, RefusalKind::UnknownParameter(name.to_owned())));
+                };
+                let sort = param.sort.option_inner().unwrap_or(&param.sort);
+                let sort = sort.list_inner().unwrap_or(sort);
+                if reaches.contains(sort) {
+                    Ok(sort.clone())
+                } else {
+                    Err((
+                        value.span,
+                        RefusalKind::ParameterSort {
+                            name: name.to_owned(),
+                            sort: param.sort.to_string(),
+                            expected: at,
+                        },
+                    ))
+                }
+            }
+            ValueKind::Call(call) => {
+                let head = call.head.ident.as_str();
+                let standing = self.standing(head, reaches);
+                if standing.iter().any(|sort| self.is_at_list(head, sort)) {
+                    return self.at_list_sort(call, expected, reaches);
+                }
+                match standing.as_slice() {
+                    [sort] => Ok((*sort).clone()),
+                    [] => Err((call.head.span, self.unknown_word(head, expected))),
+                    [..] => Err((
+                        call.head.span,
+                        RefusalKind::AmbiguousWord {
+                            word: head.to_owned(),
+                            sorts: standing.iter().map(ToString::to_string).collect(),
+                            target: at,
+                            mode: self.mode.name(),
+                        },
+                    )),
+                }
+            }
+            ValueKind::String(_) => one(
+                reaches
+                    .iter()
+                    .filter(|s| membership::string_stands_at(s))
+                    .collect(),
+                RefusalKind::StringAt(at),
+            ),
+            ValueKind::Integer(number) => one(
+                reaches
+                    .iter()
+                    .filter(|s| membership::integer_stands_at(*number, s))
+                    .collect(),
+                RefusalKind::IntegerAt(at),
+            ),
+            ValueKind::List(_) => one(
+                reaches
+                    .iter()
+                    .filter(|s| membership::list_stands_at(s))
+                    .collect(),
+                RefusalKind::ListAt(at),
+            ),
+            ValueKind::Record(_) => one(
+                reaches
+                    .iter()
+                    .filter(|s| membership::record_stands_at(s))
+                    .collect(),
+                RefusalKind::RecordAt(at),
+            ),
+        }
+    }
+
+    /// Resolves the literal `value` at `expected`: at `expected` itself, at
+    /// the sort `expected` is `Option` of, or at the one sort of the mode's
+    /// Reaches(`expected`) it stands at.
+    fn literal(&mut self, value: &Value, expected: &SortKey) {
+        if let Some(inner) = expected.option_inner() {
+            return self.literal(value, inner);
+        }
+        if !Self::stands_at(value, expected) {
+            let reaches = self.sorts.reaches(expected, self.mode);
+            let standing: Vec<&SortKey> = reaches
+                .iter()
+                .filter(|sort| Self::stands_at(value, sort))
+                .collect();
+            if let [sort] = standing.as_slice() {
+                return self.literal(value, sort);
+            }
         }
         let at = expected.to_string();
         match &value.kind {
@@ -982,101 +1591,43 @@ impl Resolver<'_> {
                 None => self.refuse(value.span, RefusalKind::ListAt(at)),
             },
             ValueKind::Record(record) => self.record(record, expected),
-            ValueKind::Call(call) => self.refuse(
-                call.head.span,
-                RefusalKind::UnknownWord {
-                    word: call.head.ident.as_str().to_owned(),
-                    sort: at,
-                },
-            ),
-            ValueKind::Parameter(_) => unreachable!("a parameter is resolved above"),
-        }
-    }
-
-    /// Whether `value`, not a parameter, stands at `sort` itself, with no
-    /// coercion: a word declared there, or a literal at its own sort. Only the
-    /// value's head is looked at; its arguments, items and fields are resolved
-    /// once the sort is chosen.
-    fn stands_at(&self, value: &Value, sort: &SortKey) -> bool {
-        match &value.kind {
-            ValueKind::Parameter(_) => unreachable!("a parameter is resolved before stands_at"),
-            ValueKind::Call(call) => self
-                .registry
-                .contains_key(&(call.head.ident.as_str().to_owned(), sort.clone())),
-            ValueKind::String(_) => coercion::string_stands_at(sort),
-            ValueKind::Integer(number) => coercion::integer_stands_at(*number, sort),
-            ValueKind::List(_) => coercion::list_stands_at(sort),
-            ValueKind::Record(_) => coercion::record_stands_at(sort),
-        }
-    }
-
-    /// Resolves `value` through the coercion into `expected` whose from-sort
-    /// it stands at, if there is one. A value standing at two from-sorts is
-    /// refused, never resolved by declaration order. Whether `value` was
-    /// resolved or refused here.
-    fn coerce(&mut self, value: &Value, expected: &SortKey) -> bool {
-        let coercions = self.coercions;
-        let reached: Vec<&Coercion> = coercions
-            .iter()
-            .filter(|c| c.to == *expected && self.stands_at(value, &c.from))
-            .collect();
-        match reached.as_slice() {
-            [] => false,
-            [coercion] => {
-                self.edges.push(coercion.node);
-                self.record
-                    .coerced
-                    .insert(std::ptr::from_ref(value), coercion.node);
-                self.value_at(value, &coercion.from, false);
-                true
+            ValueKind::Call(_) | ValueKind::Parameter(_) => {
+                unreachable!("a call or a parameter is no literal")
             }
-            [..] => {
-                self.refuse(
-                    value.span,
-                    RefusalKind::AmbiguousCoercion {
-                        sort: expected.to_string(),
-                        from: reached.iter().map(|c| c.from.to_string()).collect(),
-                    },
-                );
-                true
+        }
+    }
+
+    /// Whether the literal `value` stands at `sort` itself.
+    fn stands_at(value: &Value, sort: &SortKey) -> bool {
+        match &value.kind {
+            ValueKind::String(_) => membership::string_stands_at(sort),
+            ValueKind::Integer(number) => membership::integer_stands_at(*number, sort),
+            ValueKind::List(_) => membership::list_stands_at(sort),
+            ValueKind::Record(_) => membership::record_stands_at(sort),
+            ValueKind::Call(_) | ValueKind::Parameter(_) => {
+                unreachable!("a call or a parameter is no literal")
             }
         }
     }
 
     /// `$name` at `expected`: the parameter's own sort, `Option` of it, or a
-    /// sort it is coerced into.
-    fn parameter(&mut self, value: &Value, name: &str, expected: &SortKey, coerce: bool) {
+    /// sort the parameter's sort reaches in the mode.
+    fn parameter(&mut self, value: &Value, name: &str, expected: &SortKey) {
         let span = value.span;
         let Some(param) = self.params.iter().find(|p| p.name == name) else {
             return self.refuse(span, RefusalKind::UnknownParameter(name.to_owned()));
         };
         let sort = &param.sort;
         let at = expected.option_inner().unwrap_or(expected);
-        if sort == expected || sort == at {
+        if sort == expected || sort == at || self.sorts.reaches(at, self.mode).contains(sort) {
             return;
         }
-        // Duplicate coercions are refused and dropped at load, so at most one
-        // goes from the parameter's sort into `at`.
-        let coercion = self
-            .coercions
-            .iter()
-            .find(|c| c.from == *sort && c.to == *at);
-        match coercion {
-            Some(coercion) if coerce => {
-                self.edges.push(coercion.node);
-                self.record
-                    .coerced
-                    .insert(std::ptr::from_ref(value), coercion.node);
-            }
-            Some(_) | None => self.refuse(
-                span,
-                RefusalKind::ParameterSort {
-                    name: name.to_owned(),
-                    sort: sort.to_string(),
-                    expected: expected.to_string(),
-                },
-            ),
-        }
+        let kind = RefusalKind::ParameterSort {
+            name: name.to_owned(),
+            sort: sort.to_string(),
+            expected: expected.to_string(),
+        };
+        self.refuse(span, kind);
     }
 }
 
@@ -1085,6 +1636,67 @@ mod tests {
     use std::path::Path;
 
     use super::*;
+
+    fn plugin_bundles() -> (std::sync::Arc<Bundle>, std::sync::Arc<Bundle>) {
+        let plugins = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../plugins");
+        let builtin = Bundle::load(plugins.join("builtin"), FileId(0)).unwrap();
+        let canon = Bundle::load(plugins.join("canon"), builtin.next_file_id()).unwrap();
+        (builtin, canon)
+    }
+
+    /// Every row of `schema::TEST_EXCEPTIONS` is used by its card, and every
+    /// exception a card uses is a row.
+    #[test]
+    fn the_test_exceptions_are_exactly_the_ones_used() {
+        let (builtin, canon) = plugin_bundles();
+        let checked = load(&[&builtin, &canon]).unwrap_or_else(|error| panic!("{error}"));
+        let rows: BTreeSet<(String, String)> = schema::TEST_EXCEPTIONS
+            .iter()
+            .map(|(card, test)| ((*card).to_owned(), (*test).to_owned()))
+            .collect();
+        assert_eq!(rows, checked.summary.test_exceptions);
+    }
+
+    /// Every row of the position tables names a declaration at its sort.
+    #[test]
+    fn every_position_table_row_names_a_declaration() {
+        let (builtin, canon) = plugin_bundles();
+        let checked = load(&[&builtin, &canon]).unwrap_or_else(|error| panic!("{error}"));
+        let staying = schema::POSITION_STAYING
+            .iter()
+            .map(|(sort, word, _)| (*sort, *word));
+        let missing: Vec<(&str, &str)> = schema::POSITION_OWN
+            .iter()
+            .copied()
+            .chain(staying)
+            .filter(|(sort, word)| {
+                !checked
+                    .registry
+                    .contains_key(&((*word).to_owned(), SortKey::named(sort)))
+            })
+            .collect();
+        assert_eq!(missing, []);
+    }
+
+    /// Every ticket the tables name is an open ticket.
+    #[test]
+    fn every_ticket_the_tables_name_is_open() {
+        let tickets = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../docs/tickets");
+        let named: BTreeSet<&str> = schema::POSITION_STAYING
+            .iter()
+            .map(|(_, _, ticket)| *ticket)
+            .chain([schema::TEST_EXCEPTION_TICKET])
+            .collect();
+        let missing: Vec<&str> = named
+            .into_iter()
+            .filter(|ticket| {
+                !["planned", "critical", "maybe", "wip"]
+                    .iter()
+                    .any(|column| tickets.join(column).join(format!("{ticket}.md")).is_file())
+            })
+            .collect();
+        assert_eq!(missing, Vec::<&str>::new());
+    }
 
     /// Every sort the kind and record tables write is one the plugins
     /// produce and consume, so the tables name no misspelled sort.
