@@ -671,13 +671,13 @@ mod tests {
                 "Sage Owl | When | adjunct | Clause | then | adjunct | Clause | look | 2 | 2 | 4",
                 "Sage Owl | in | adjunct | Clause | then | adjunct | VerbPhrase | put | 2 | 2 | 4",
                 "Sands of Time | control | modifier | Nominal | and | modifier | Nominal | land | \
-                 30 | 20 | 50",
+                 16 | 16 | 32",
                 "Sands of Time | simultaneously | adjunct | VerbPhrase | and | adjunct | \
-                 VerbPhrase | untaps | 25 | 25 | 50",
+                 VerbPhrase | untaps | 16 | 16 | 32",
                 "Sands of Time | tapped | modifier | Nominal | and | modifier | Nominal | artifact \
-                 | 30 | 20 | 50",
+                 | 16 | 16 | 32",
                 "Sands of Time | untapped | modifier | Nominal | and | modifier | Nominal | \
-                 artifact | 30 | 20 | 50",
+                 artifact | 16 | 16 | 32",
             ]
         );
     }

@@ -150,6 +150,29 @@ feature Postmodification = Closed
 // creature*). Being local it is the outermost such
 // phrase's alone. HeadFinalPossessor excludes it.
 feature Periphery = External { local }
+// A head with one dependent before it and one after it has one nesting of
+// the two (english.md §8): either nesting gives each dependent the same
+// function in a phrase of the same Category and head word. Each feature
+// below is privative and local, valued by the Productions that add the
+// dependent canonically outermost, and read by the Productions of the other
+// dependent, which refuse a head it marks.
+// A Verb Phrase whose own Production adds a central Adjunct (CentralAdverbial,
+// a central Preposition Phrase, a floated quantifier). The central Adjunct is
+// outermost: *it also [gets +3/+0 until end of turn]* (Goatnap), never *[also
+// gets +3/+0] until end of turn*; *not [chosen this way]* (The Eternal
+// Wanderer).
+feature OuterAdjunct = Central { local }
+// A Nominal whose own Production adds a postmodifier. The postmodifier is
+// outermost over a premodifier of a coordination (CoordinationPremodifier),
+// as it is over a single head's premodifiers: *[other [instant and sorcery
+// spell]] you've cast this turn* (Lock and Load), never *other [[instant and
+// sorcery spell] you've cast this turn]*.
+feature OuterModifier = Postmodifier { local }
+// A Noun Phrase that NounPhraseArithmetic builds. The arithmetic is
+// outermost over a multiplier (MultipliedNounPhrase), as it is in the
+// conventional order of operations: *[[twice the number of age counters on
+// this enchantment] minus 2]* (Heart of Bogardan).
+feature OuterOperation = Arithmetic { local }
 // The DeterminativeDistribution of a determinative's Complement's
 // Noun Phrase (*all but [the highest roll]*).
 feature ObliqueDistribution =
@@ -344,7 +367,7 @@ category AdjunctGapClause : Clause [VerbForm, ClauseShape] { gap }
 category Participle : VerbPhrase [Inflection, Polarity]
 category VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
-    PastTime, NonPastTime, Ellipsis,
+    PastTime, NonPastTime, Ellipsis, OuterAdjunct,
 ] { gap }
 // A Linked Conjunct: a Clause or Verb Phrase opened by its linking
 // connective (*Each player discards a card, [then draws a card]*), as *so*
@@ -391,7 +414,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 category NounPhrase [
     Periphery, Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution, Postmodification,
-    Comparison,
+    Comparison, OuterOperation,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
 // (*three times*; 8§9:713–716). NounDistribution is `Serial` on one headed
@@ -408,7 +431,7 @@ category ComplementNounPhrase : NounPhrase [
 category Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, BareMass, BareMassHead,
-    RelativeBound, GenitiveAlternant,
+    RelativeBound, GenitiveAlternant, OuterModifier,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, DeterminerNeed, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
@@ -1367,10 +1390,12 @@ EndAdverbial: VerbPhrase -> VerbPhrase adjunct:AdverbPhrase {
     unadjoined: [adjunct -> [TemporalNounPhrase]],
     transparent: [head],
 }
-    where adjunct.AdjunctPosition = End
+    where adjunct.AdjunctPosition = End,
+          head.OuterAdjunct != Central
 CentralAdverbial: VerbPhrase -> adjunct:AdverbPhrase VerbPhrase { transparent: [head] }
     where adjunct.AdjunctPosition = Central,
-          $.CentralPosition = Occupied
+          $.CentralPosition = Occupied,
+          $.OuterAdjunct = Central
 
 // A Gap passes through an auxiliary's Complement.
 AuxiliaryParticiple: AuxiliaryComplement -> VerbPhrase { transparent: [head] }
@@ -1514,6 +1539,7 @@ OrdinalAdjective: AdjectivePhrase -> Numeral(Ordinal)
 // *Third from the top*.
 OrdinalFromEnd: PositionPhrase -> Numeral(Ordinal) complement:Selected(PrepositionPhrase, From)
 PositionDepictive: VerbPhrase -> VerbPhrase adjunct:PositionPhrase { cost: 2, transparent: [head] }
+    where head.OuterAdjunct != Central
 PositionAdjunct: PredicateAdjunct -> filler:PositionPhrase where $.ConjunctKind = AdjP
 InterleavedRelative: InterleavedModifier -> RelativeClause { cost: 0 }
 InterleavedPreposition: Interleaved -> PrepositionPhrase { cost: 0 }
@@ -1569,7 +1595,8 @@ CoordinatedDepictive: VerbPhrase -> VerbPhrase adjunct:DepictiveCoordination {
     cost: 2,
     transparent: [head],
 }
-    where head.VerbKind != Auxiliary | Modal
+    where head.VerbKind != Auxiliary | Modal,
+          head.OuterAdjunct != Central
 PrepositionalAdjunct: PredicateAdjunct -> filler:Hosted(PrepositionPhrase, Predicate)
     where $.ConjunctKind = PP
 DepictiveAdjunct: PredicateAdjunct -> filler:AdjectivePhrase
@@ -1594,6 +1621,7 @@ CoordinatedAdjunct: VerbPhrase -> VerbPhrase adjunct:AdjunctCoordination {
     cost: 2,
     transparent: [head],
 }
+    where head.OuterAdjunct != Central
 // Predicative adjuncts are a subset of predicative complements (CGEL
 // 6§2.1:529; 4§5.3:261–263): comparative, inequality and equative relations
 // (*less*, *different*, *equal to …*, *same as …*) denote no depictive or
@@ -1610,7 +1638,8 @@ DepictiveAdjective: VerbPhrase -> VerbPhrase adjunct:AdjectivePhrase {
     where adjunct.Voice != Passive,
           adjunct.ComplementKind != Amount,
           adjunct.AdjectivePosition != Attributive,
-          adjunct.Grade != Equative | Comparative | NonScalarInequality | Mixed
+          adjunct.Grade != Equative | Comparative | NonScalarInequality | Mixed,
+          head.OuterAdjunct != Central
 
 PhrasalAdverb: AdverbPhrase -> Class(PhrasalAdverb) where $.AdjunctPosition = Phrasal
 MultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb)
@@ -1839,13 +1868,16 @@ PreposedPrepositionPair: Clause ->
 // *The first time each turn*.
 TemporalPostmodifier: Nominal -> Nominal modifier:TemporalNounPhrase { cost: 2 }
     where head.NounKind = Temporal,
-          $.RelativeBound = head.RelativeBound
+          $.RelativeBound = head.RelativeBound,
+          $.OuterModifier = Postmodifier
 TemporalAdjunct: VerbPhrase -> VerbPhrase adjunct:TemporalNounPhrase {
     cost: 2,
     transparent: [head],
 }
+    where head.OuterAdjunct != Central
 MannerAdjunct: VerbPhrase -> VerbPhrase adjunct:NounPhrase { cost: 2, transparent: [head] }
-    where adjunct.NounKind := Manner
+    where adjunct.NounKind := Manner,
+          head.OuterAdjunct != Central
 FrequencyInterval: AdverbPhrase -> AdverbPhrase adjunct:TemporalNounPhrase
     where head.AdjunctPosition != Central | Phrasal | Multiplying | Linking
 NumericCountPremodifier: QuantifiedNominal -> modifier:Amount BareNominal
@@ -2060,19 +2092,22 @@ PostpositiveAdjective: Nominal -> Nominal modifier:AdjectivePhrase {
     where modifier.ComplementKind = PP,
           modifier.Voice != Passive,
           modifier.AdjectivalPassive != Lexical,
-          $.BareMassHead = Expanded
+          $.BareMassHead = Expanded,
+          $.OuterModifier = Postmodifier
 PostpositiveCoordinationAdjective: Nominal -> Nominal modifier:AdjectivePhrase {
     coordinated: [head],
     heavy: [modifier],
 }
     where modifier.ComplementKind = PP,
           modifier.Voice != Passive,
-          modifier.AdjectivalPassive != Lexical
+          modifier.AdjectivalPassive != Lexical,
+          $.OuterModifier = Postmodifier
 // *Creatures able to block it* (CGEL 5§14.2:445).
 PostpositiveInfinitivalAdjective: Nominal -> Nominal modifier:AdjectivePhrase { heavy: [modifier] }
     where modifier.ComplementKind = ToInf,
           modifier.AdjectivePosition != Attributive,
-          modifier.Voice != Passive
+          modifier.Voice != Passive,
+          $.OuterModifier = Postmodifier
 // A number, or a comparative adjective with that number as its standard
 // (*power 3 or greater*). Its `Amount` ComplementKind keeps it out of
 // depictives: never *[with power] [10 or greater]*.
@@ -2117,7 +2152,8 @@ PostpositiveComparative: Nominal -> Nominal modifier:DeterminerPhrase { cost: 2,
     where head.Number = Singular,
           modifier.ComplementKind = PP,
           modifier.Countability = Count,
-          modifier.ObliqueKind != AdvP
+          modifier.ObliqueKind != AdvP,
+          $.OuterModifier = Postmodifier
 PostpositiveLocativeAdjective: LocativeHead -> LocativeHead modifier:AdjectivePhrase {
     heavy: [modifier],
 }
@@ -2233,6 +2269,7 @@ MultipliedNounPhrase: NounPhrase -> multiplier:Multiplier NounPhrase
     where head.Determination = Overt,
           head.Case = Plain,
           head.DeterminativeDistribution != Numerical | Degree | Distributive,
+          head.OuterOperation != Arithmetic,
           $.Periphery = External
 // A multiplier before a symbol sequence, a bare quantity of mana (*unless its
 // controller pays twice {X}*, Thassa's Intervention).
@@ -2252,7 +2289,8 @@ NumericArithmetic: NounPhrase -> Amount modifier:Selected(PrepositionPhrase, Plu
           $.Person = Third
 NounPhraseArithmetic: NounPhrase -> NounPhrase modifier:Selected(PrepositionPhrase, Plus, Minus)
     where head.NounKind != Numeric,
-          head.Case := Plain
+          head.Case := Plain,
+          $.OuterOperation = Arithmetic
 // *That many times plus an additional time*.
 TemporalArithmetic: TemporalNounPhrase ->
     TemporalNounPhrase modifier:Selected(PrepositionPhrase, Plus, Minus)
@@ -2413,7 +2451,8 @@ FloatedEachAdjective: AdjectivePhrase -> adjunct:Word(Each) AdjectivePhrase
 // *Creature cards each with mana value 3 or less*.
 FloatedEachPostmodifier: Nominal ->
     Nominal adjunct:Word(Each) modifier:Hosted(PrepositionPhrase, Nominal) { heavy: [modifier] }
-    where head.Number = Plural
+    where head.Number = Plural,
+          $.OuterModifier = Postmodifier
 // Nominals under one determiner, then a Noun Phrase with its own (*their
 // hand, graveyard, and all permanents they own*). The shared nominals are
 // singular count, so none is a Noun Phrase alone and no serial Noun Phrase
@@ -2496,7 +2535,8 @@ AuxiliaryFloatedEach: VerbPhrase -> adjunct:Class(FloatingQuantifier) VerbPhrase
     cost: 2,
     transparent: [head],
 }
-    where head.VerbForm = Plain
+    where head.VerbForm = Plain,
+          $.OuterAdjunct = Central
 // Two front dependents under one comma (*Then if ...*); the adverb is the
 // Clause's Adjunct, not the Preposition Phrase's modifier.
 PreposedAdverbAndPreposition: Clause ->
@@ -3221,7 +3261,8 @@ CoordinationPremodifier: Nominal -> modifier:Premodifier Nominal
     where modifier.PremodifierKind := Adjectival,
           modifier.DeterminerNeed = $.DeterminerNeed,
           head.Number = Plural,
-          head.ConjunctNumber := Singular
+          head.ConjunctNumber := Singular,
+          head.OuterModifier != Postmodifier
 GenitiveConjunct: GenitiveNominal -> BareNominal marker:Word(Genitive)
 MultipleGenitive: NounPhrase -> determiner:DeterminerPhrase GenitiveNominals
     where $.Determination = Bare,
@@ -3234,7 +3275,8 @@ MultipleGenitive: NounPhrase -> determiner:DeterminerPhrase GenitiveNominals
 NominalPostmodifier: Nominal -> Nominal modifier:Postmodifier
     where head.ConjunctNumber = modifier.Number,
           head.NounKind = modifier.NounKind,
-          $.RelativeBound = modifier.RelativeBound
+          $.RelativeBound = modifier.RelativeBound,
+          $.OuterModifier = Postmodifier
 // *The next 3 damage that would be dealt*.
 QuantifiedPostmodifier: ModifiedQuantifiedNominal -> QuantifiedNominal modifier:Postmodifier
     where head.QuantityNumber = modifier.Number,
@@ -3286,6 +3328,7 @@ GerundParticipialConjunct: PostmodifierConjunct -> filler:VerbPhrase { heavy: [f
     where filler.VerbForm = GerundParticiple,
           $.ConjunctKind = Participial
 CoordinatedPostmodifier: Nominal -> Nominal modifier:PostmodifierCoordination
+    where $.OuterModifier = Postmodifier
 RelativePostmodifier: Postmodifier -> RelativeClause where $.RelativeBound = Bound
 // A participial clause with dependents (*each creature tapped this way*): a
 // bare passive, never headed by *been*.
@@ -3308,14 +3351,16 @@ SingleParticipialPostmodifier: Nominal -> BareNominal modifier:VerbPhrase {
           modifier.VerbForm = PastParticiple,
           modifier.Voice = Passive,
           modifier.AdjectivalPassive != Lexical,
-          modifier.VerbKind != Auxiliary
+          modifier.VerbKind != Auxiliary,
+          $.OuterModifier = Postmodifier
 SingleGerundParticipialPostmodifier: Nominal -> BareNominal modifier:VerbPhrase {
     cost: 3,
     light: [modifier],
 }
     where $.ConjunctNumber = $.Number,
           $.BareMassHead = Expanded,
-          modifier.VerbForm = GerundParticiple
+          modifier.VerbForm = GerundParticiple,
+          $.OuterModifier = Postmodifier
 // A bare relative: a finite clause with an object Gap. A marked one may
 // also have a subject Gap, which agrees with the antecedent.
 BareRelative: RelativeClause -> clause:Clause
@@ -3534,7 +3579,8 @@ adjunct PrepositionPhrase { host: BareInf, side: Before, host_kind: Predicate }
 // The same in finite and participial Verb Phrases.
 adjunct PrepositionPhrase { host: VerbPhrase, side: Before, host_kind: Predicate }
     where adjunct.ComplementKind = Intransitive,
-          head.VerbForm != Plain
+          head.VerbForm != Plain,
+          $.OuterAdjunct = Central
 // A past participle spelled like a declared Adjective (*tapped*) has
 // that Adjective as its Adjectival Passive, which premodifies in its
 // place. The participle attaches as a Premodifier (ParticipialPremodifier).
@@ -3774,7 +3820,9 @@ adjunct PrepositionPhrase { host: LocativeHead, side: After, host_kind: Nominal 
 adjunct PrepositionPhrase { host: PartitiveHead, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: SymbolHead, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: Nominal, side: After, host_kind: Nominal }
+    where $.OuterModifier = Postmodifier
 adjunct PrepositionPhrase { host: VerbPhrase, side: After, host_kind: Predicate }
+    where head.OuterAdjunct != Central
 adjunct PrepositionPhrase { host: ExistentialPredicate, side: After, host_kind: Predicate }
     where head.ExistentialLocation := Located
 adjunct PrepositionPhrase { host: Clause, side: Before, host_kind: Predicate, delimiter: ',' }
@@ -3816,6 +3864,7 @@ adjunct PrepositionPhrase {
     cost: 2,
     nonfinal,
 }
+    where head.OuterAdjunct != Central
 // A comma-set Supplement to a keyword line's item or an indexed
 // instruction, never to a Keyword Phrase in a sentence (english.md §2).
 adjunct PrepositionPhrase {
@@ -3839,17 +3888,20 @@ adjunct Gerund { host: Clause, side: Before, host_kind: Predicate, delimiter: ',
 // only: after an auxiliary it is the progressive's (*the player it is
 // attacking*).
 adjunct Gerund { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
-    where head.VerbKind != Auxiliary | Modal
+    where head.VerbKind != Auxiliary | Modal,
+          head.OuterAdjunct != Central
 // A purpose *to*-infinitival, unless the head's frame selects a
 // *to*-infinitival Complement (*costs {2} less to activate*, Arm-Mounted
 // Anchor).
 adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
+    where head.OuterAdjunct != Central
 // A purpose *to*-infinitival whose object Gap a relative clause binds (*the
 // first spell that mana from a Treasure was spent to cast*, Rain of Riches),
 // unless the head's frame selects a *to*-infinitival Complement (*Equip
 // abilities you activate ... cost {3} less to activate*, Strong Back).
 adjunct ToInf { host: VerbPhrase, side: After, host_kind: Predicate, cost: 2 }
-    where adjunct.Gap = NP
+    where adjunct.Gap = NP,
+          head.OuterAdjunct != Central
 // Conjuncts share Voice and resolve VerbKind (*it has attacked or blocked* is
 // no passive perfect). Disjunctive coordination excludes a modal catenative
 // paired with a plain lexical finite VP (*can't attack or block* coordinates
