@@ -160,8 +160,8 @@ feature PronounKind = Personal | Existential | Relative
 // gate is Determined's).
 // `IndefiniteArticle`: only *a*. `SingularOrQuantified`: only *another*,
 // which also takes a quantified plural (*another three bodies*; CGEL
-// 5§3.4:353) and a temporal location (*another day*, never *a day*; a gate
-// on TemporalLocation).
+// 5§3.4:353) and determines a temporal location Noun Phrase (*another day*;
+// 8§6.3:698). TemporalLocation refuses *a*, an admission gate.
 // `Targeting`: only the Targeting Marker *target*. Kept apart from
 // `Dependent` and `Degree`, which FusedDegreeDeterminer and DegreePartitive
 // require: it never fuses or partitions (not *choose target*, *target of
@@ -1633,27 +1633,42 @@ SingularQuantifier: DeterminerPhrase -> Word(Any) modifier:Numeral(Cardinal)
     where modifier.Number = Singular,
           $.Number = Singular,
           $.ComplementKind = Intransitive
-// A period noun with a deictic or distributive determinative (*this turn*,
-// *each combat*), never an article, genitive or postmodifier (CGEL
-// 8§6.3:698). SerialTemporal: *time* with any determinative (*three
-// times*).
-TemporalLocation: TemporalNounPhrase -> determiner:DeterminerPhrase BareNominal
-    where head.NounKind = Temporal,
+// A temporal location or frequency Adjunct is a Noun Phrase (CGEL
+// 8§6.3:698, 8§9:715), the one the Noun Phrase Productions build, and these
+// take it whole. TemporalLocation: a period noun, which as such an Adjunct
+// requires a dependent (*this turn*, *each combat*, *last turn*), *the* only
+// with another one (*the following year*, never ∗*She resigned the day*;
+// 8§6.3:698). Refusing the `Dependent` determinatives is an admission gate
+// (english.md §6) that keeps *End [the turn]* (Time Stop) from a temporal
+// Adjunct; refusing `IndefiniteArticle` and
+// `Numerical` keeps *begin [an extra turn]* (Gerrard's Hourglass Pendant)
+// and *its controller's next [two untap steps]* (Telekinesis) from one.
+// SerialTemporal: a Noun Phrase headed by *time* (*three times*, *up to
+// three times*, *every time*; 8§9:715), whatever its determiner.
+// Both take a Noun Phrase that ends in its head (`head_final`), an admission
+// gate: a relative clause bounds RelativeTemporalLocation's nominal, and a
+// temporal Noun Phrase with *this* or *each* after the head is read as a
+// second Adjunct (as *each year* probably is in *on three occasions each
+// year*, 8§9:715; the clear postmodifiers there are *a* phrases, *twice a
+// week*, which no card prints), which keeps *[the next time a
+// source of your choice would deal damage to you this turn]* (Circle of
+// Protection: Red) from a second tree beside RelativeTemporalLocation's and
+// *[four or more [times this turn]]* (Dragon Whelp) from one beside two
+// Adjuncts. Nor is TemporalLocation's Noun Phrase one with a dependent
+// outside its determiner (`Periphery`), an admission gate: an adverb
+// modifies the temporal Noun Phrase (AdverbModifiedTemporal), and *Activate
+// no more than [twice [each turn]]* (Pit Imp) is no multiplied Adjunct.
+TemporalLocation: TemporalNounPhrase -> NounPhrase { head_final: [head] }
+    where head.NounKind := Temporal,
           head.NounDistribution != Serial,
-          determiner.DeterminativeDistribution != Dependent | Degree | Numerical | IndefiniteArticle,
-          determiner.TargetMarked != Marked,
-          determiner.Countability = head.Countability,
-          determiner.Number = head.Number,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-SerialTemporal: TemporalNounPhrase -> determiner:DeterminerPhrase BareNominal
-    where head.NounDistribution = Serial,
-          determiner.Countability = head.Countability,
-          determiner.Number = head.Number,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
+          head.DeterminativeDistribution != Dependent | Numerical | IndefiniteArticle,
+          head.Periphery != External,
+          head.Determination := Overt,
+          head.Case := Plain
+SerialTemporal: TemporalNounPhrase -> NounPhrase { head_final: [head] }
+    where head.NounDistribution := Serial,
+          head.Determination := Overt,
+          head.Case := Plain
 // A comparative or equative count of *times* with its Complement after the
 // head (*more times than ...*; *as many times as you choose*; CGEL
 // 8§9:715): the Noun Phrase ComparativeCountDetermined or
@@ -1671,15 +1686,6 @@ ModifiedComparativeFrequency: TemporalNounPhrase ->
           head.Number = Plural,
           determiner.Number = head.Number,
           determiner.Countability = head.Countability,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-// *Pay {G} up to three times*: the Preposition Phrase in Determiner
-// function, as in MaximumDetermination.
-MaximumSerialTemporal: TemporalNounPhrase -> determiner:Selected(PrepositionPhrase, Up) BareNominal
-    where head.NounDistribution = Serial,
-          determiner.Determination = Bare,
-          determiner.Number = head.Number,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -2784,7 +2790,10 @@ DistributiveCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase No
 // A singular determiner over an *and*-coordination of singular nominals,
 // with joint reference: one entity each conjunct describes (*is also a
 // Cleric, Rogue, Warrior, and Wizard*; CGEL 5§18.4:507–508). Number is
-// unshared: the Noun Phrase is singular, the coordination plural.
+// unshared: the Noun Phrase is singular, the coordination plural. Refusing a
+// temporal head is an admission gate (english.md §6): no one period is two,
+// and it keeps *[This [turn and next turn]], creatures can't attack* (Peace
+// Talks) from a jointly determined temporal Adjunct.
 JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
     transparent: [head],
     unshared: [Number],
@@ -2794,6 +2803,7 @@ JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
           determiner.DeterminativeDistribution != Distributive | Independent | FreeChoice,
           determiner.ComplementKind != PP,
           head.ConjunctNumber := Singular,
+          head.NounKind != Temporal,
           head.Number = Plural,
           $.Number = Singular,
           determiner.Countability = head.Countability,

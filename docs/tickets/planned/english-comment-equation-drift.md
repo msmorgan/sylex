@@ -14,8 +14,6 @@ implement, or state a corpus or style observation as a fact of English (`docs/de
   Category.
 - `valence VerbPhrase`'s `shifted_object: [object.Determination := Overt]`: "A shifted heavy
   Object is determined", stating a corpus gate as a general heavy-shift condition.
-- `TemporalLocation`: "never an article, genitive or postmodifier (CGEL Ch. 8 §6.3, p. 698)",
-  while the equation also excludes `Numerical` and `Dependent` determiners.
 - `AsyndeticAttributes`, `AttributeSequence`, `FinalAttribute`: grounded in the style guide alone.
 - `FloatedAll`: *all* floats "after a personal pronoun
   Subject only", whereas CGEL p. 413 lists *all*, *both* and *each* together with full Noun Phrase
