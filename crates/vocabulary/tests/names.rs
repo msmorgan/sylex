@@ -6,7 +6,6 @@ use sylex_lexicon::LexicalReading;
 use sylex_lexicon::NameForm;
 use sylex_lexicon::card_name_id;
 use sylex_vocabulary::LexicalEnvironment;
-use sylex_vocabulary::Sources;
 use sylex_vocabulary::face_scope;
 use sylex_vocabulary::shortened_name;
 use sylex_vocabulary::stated_scope;
@@ -110,11 +109,6 @@ fn a_shortened_name_never_spells_vocabulary_in_scope_on_its_card() {
         Some("Wolverine")
     );
     assert_eq!(short("Goblin Guide", "Goblin"), None);
-    // An Introduced Name is other vocabulary on the cards that introduce it,
-    // and only there.
-    assert_eq!(short("Hornet Cannon", "Hornet"), None);
-    assert_eq!(short("Wirefly Hive", "Wirefly"), None);
-    assert_eq!(short("Hornet Nest", "Hornet").as_deref(), Some("Hornet"));
     // A token name is other vocabulary even before a comma.
     assert_eq!(short("Walker, Night Stalker", "Walker"), None);
     // Another card's name is no vocabulary a Shortened Name competes with:
@@ -143,7 +137,8 @@ fn a_name_is_its_card_s_own_in_its_scope_and_another_card_s_elsewhere() {
             .filter(|reading| match reading {
                 LexicalReading::Word(value) => value.lexeme == other,
                 LexicalReading::OwnName { .. } => true,
-                LexicalReading::Numeral { .. }
+                LexicalReading::IntroducedName { .. }
+                | LexicalReading::Numeral { .. }
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. } => false,
             })
@@ -163,59 +158,79 @@ fn a_name_is_its_card_s_own_in_its_scope_and_another_card_s_elsewhere() {
     );
 }
 
-/// Whether `text` analyzes, whole, as `lexeme` with `scope`'s cards in scope.
-fn spells(environment: &LexicalEnvironment, text: &str, lexeme: &str, scope: &[&str]) -> bool {
-    let scope = CardScope::full_names(scope.iter().copied());
-    let analyzed = environment
+/// The title runs analysis offers in `text` on the card named `card`.
+fn title_runs(environment: &LexicalEnvironment, text: &str, card: &str) -> Vec<String> {
+    let scope = CardScope::full_names([card]);
+    environment
         .lexicon
-        .analyze_source_scoped(text, None, &scope);
-    let whole = analyzed.tokens.len();
-    analyzed.matches.iter().any(|found| {
-        found.start == 0
-            && found.end == whole
-            && matches!(&found.reading, LexicalReading::Word(value) if value.lexeme == lexeme)
-    })
+        .analyze_source_scoped(text, None, &scope)
+        .matches
+        .into_iter()
+        .filter_map(|found| match found.reading {
+            LexicalReading::IntroducedName { name } => Some(name),
+            _ => None,
+        })
+        .collect()
 }
 
 #[test]
-fn an_introduced_name_is_in_scope_only_on_the_cards_that_use_it() {
+fn an_introduced_name_is_a_title_run_and_no_lexeme() {
     let environment = LexicalEnvironment::load().unwrap();
-    for (name, card) in [
-        ("Marit Lage", "Dark Depths"),
-        ("Marit Lage", "Marit Lage's Slumber"),
-        ("Icingdeath, Frost Tongue", "Icingdeath, Frost Tyrant"),
-        ("Tuktuk the Returned", "Tuktuk the Explorer"),
-        ("Moon", "Princess Yue"),
+    assert!(
+        !environment
+            .lexicon
+            .lexemes()
+            .keys()
+            .any(|id| id.as_str().starts_with("introduced_name:"))
+    );
+    // Dark Depths, Tuktuk the Explorer, Princess Yue, Tolsimir, Friend to
+    // Wolves: the name is the run written after *create* or *named*.
+    for (text, card, name) in [
+        (
+            "create Marit Lage, a legendary 20/20",
+            "Dark Depths",
+            "Marit Lage",
+        ),
+        (
+            "create Tuktuk the Returned, a legendary 5/5",
+            "Tuktuk the Explorer",
+            "Tuktuk the Returned",
+        ),
+        ("She's a land named Moon.", "Princess Yue", "Moon"),
+        (
+            "create Voja, Friend to Elves, a legendary 3/3",
+            "Tolsimir, Friend to Wolves",
+            "Voja, Friend to Elves",
+        ),
     ] {
-        let id = format!("introduced_name:{name}");
-        assert!(spells(&environment, name, &id, &[card]), "{name} on {card}");
-        assert!(!spells(&environment, name, &id, &[]), "{name} elsewhere");
         assert!(
-            !spells(&environment, name, &id, &["Vampire Hexmage"]),
-            "{name} on another card"
+            title_runs(&environment, text, card)
+                .iter()
+                .any(|run| run == name),
+            "{name} on {card}"
         );
     }
     // Its spelling is exact.
-    assert!(!spells(
-        &environment,
-        "moon",
-        "introduced_name:Moon",
-        &["Princess Yue"]
-    ));
-}
-
-#[test]
-fn every_introducing_card_admits_its_introduced_names() {
-    let environment = LexicalEnvironment::load().unwrap();
-    let sources = Sources::load().unwrap();
-    for introduced in &sources.introduced_names {
-        let id = format!("introduced_name:{}", introduced.name);
-        for card in &introduced.cards {
-            assert!(
-                spells(&environment, &introduced.name, &id, &[card]),
-                "{} on {card}",
-                introduced.name
-            );
-        }
-    }
+    assert_eq!(
+        title_runs(&environment, "a land named moon", "Princess Yue"),
+        [] as [&str; 0]
+    );
+    // A card's name is never one: Vanille, Cheerful l'Cie names Fang,
+    // Fearless l'Cie, and Urza, Lord Protector The Mightstone and Weakstone.
+    assert_eq!(
+        title_runs(
+            &environment,
+            "named Fang, Fearless l'Cie",
+            "Vanille, Cheerful l'Cie"
+        ),
+        [] as [&str; 0]
+    );
+    assert_eq!(
+        title_runs(
+            &environment,
+            "named The Mightstone and Weakstone",
+            "Urza, Lord Protector"
+        ),
+        [] as [&str; 0]
+    );
 }

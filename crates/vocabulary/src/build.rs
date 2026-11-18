@@ -177,6 +177,10 @@ impl Builder {
             return Err(invalid("only a contracted auxiliary is bound"));
         }
         let mut lexeme = Lexeme::verb(id, &entry.lemma, source);
+        lexeme
+            .properties
+            .classes
+            .extend(entry.classes.iter().map(|class| Ident::new(class)));
         // Oracle text has no first person: a paradigm has
         // second- and third-person cells only.
         lexeme
@@ -322,6 +326,10 @@ impl Builder {
             )));
         }
         let mut lexeme = Lexeme::noun(id, &entry.lemma, entry.countability.clone(), source);
+        lexeme
+            .properties
+            .classes
+            .extend(entry.classes.iter().map(|class| Ident::new(class)));
         lexeme.properties.features.insert(
             "NounDistribution".into(),
             Ident::new(&format!("{:?}", entry.distribution)),

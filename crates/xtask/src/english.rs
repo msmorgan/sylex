@@ -457,6 +457,9 @@ fn dump_reading(
             Some(sylex_lexicon::LexicalReading::OwnName { name, form }) => {
                 format!("{name} / own name / {form:?}")
             }
+            Some(sylex_lexicon::LexicalReading::IntroducedName { name }) => {
+                format!("{name} / introduced name / -")
+            }
             Some(
                 sylex_lexicon::LexicalReading::Numeral { .. }
                 | sylex_lexicon::LexicalReading::FlavorWord { .. }

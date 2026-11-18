@@ -9,7 +9,7 @@
 + <card=Hungering Puppetbeast> When this creature enters, create a Heartwood token. => Nominal "Heartwood"
 + <card=Invasion of Pyrulea> If it's a land or double-faced card, draw a card. => AdjectivePhrase "double-faced"
 + <card=Nick Fury, Agent of S.H.I.E.L.D.> If it's a double-faced card, you may transform it. => AdjectivePhrase "double-faced"
-+Clause <card=Stangg> create Stangg Twin => NounPhrase "Stangg Twin"
++Clause <card=Stangg> create Stangg Twin, a legendary 3/4 red and green Human Warrior creature token => NounPhrase "Stangg Twin" as Object of create
 +Clause <card=Gemini Engine> create a colorless Construct artifact creature token named Twin => Name "Twin"
 +NounPhrase <card=Gemini Engine> a colorless Construct artifact creature token named Twin that's attacking => Name "Twin"
 + <card=Enkira, Hostile Scavenger> When Enkira, Hostile Scavenger enters, create two Walker tokens. => Name "Walker" as Modifier of token
@@ -19,7 +19,7 @@
 +Clause <card=Powerful Broker> give that permanent or player another counter of that kind => VerbPhrase "give that permanent or player another counter of that kind"
 +Clause <card=Etched Host Doombringer> an opponent protects it => VerbPhrase "protects it"
 +Clause <card=Dáin Ironfoot> create a colorless Equipment artifact token named Axe => Name "Axe"
-+Clause <card=Minsc, Beloved Ranger> create Boo => NounPhrase "Boo"
++Clause <card=Minsc, Beloved Ranger> create Boo, a legendary 1/1 red Hamster creature token with trample and haste => NounPhrase "Boo" as Object of create
 + <card=Castle Doom> Create a 3/3 colorless Robot Villain artifact creature token named Doombot. => Name "Doombot"
 + <card=Doctor Doom> When Doctor Doom enters, create two 3/3 colorless Robot Villain artifact creature tokens named Doombot. => Name "Doombot"
 +Clause <card=Mole Man, Moloid Master> create a 1/1 green Minion creature token named Moloid => Name "Moloid"
@@ -71,8 +71,8 @@
 +NounPhrase <card=Koma, Cosmos Serpent> <legendary> a 3/3 blue Serpent creature token named Koma's Coil => Name "Koma's Coil"
 +NounPhrase <card=Koma, World-Eater> <legendary> four 3/3 blue Serpent creature tokens named Koma's Coil => Name "Koma's Coil"
 +NounPhrase <card=Nurgle's Rot> a 1/3 black Demon creature token named Plaguebearer of Nurgle => Name "Plaguebearer of Nurgle"
-+Clause <card=Marit Lage's Slumber> create Marit Lage => NounPhrase "Marit Lage"
-+Clause <card=The Book of Vile Darkness> create Vecna => NounPhrase "Vecna"
++ <card=Marit Lage's Slumber> At the beginning of your upkeep, if you control ten or more snow permanents, sacrifice Marit Lage's Slumber. If you do, create Marit Lage, a legendary 20/20 black Avatar creature token with flying and indestructible. => NounPhrase "Marit Lage" as Object of create
++ <card=The Book of Vile Darkness> {T}, Exile The Book of Vile Darkness and artifacts you control named Eye of Vecna and Hand of Vecna: Create Vecna, a legendary 8/8 black Zombie God creature token with indestructible and all triggered abilities of the exiled cards. => NounPhrase "Vecna" as Object of create
 +NounPhrase <card=Hand of Vecna> a creature you control named Vecna => Name "Vecna"
 + <card=Gor Muldrak, Amphinologist> At the beginning of your end step, each player who controls the fewest creatures creates a 4/3 blue Salamander Warrior creature token. => DeterminerPhrase "the fewest" as Determiner of creature
 +NounPhrase <card=Gor Muldrak, Amphinologist> each player who controls the fewest creatures => DeterminerPhrase "the fewest" as Determiner of creature
@@ -97,54 +97,29 @@
 +NounPhrase <card=Travel Through Caradhras> Redhorn Pass
 +NounPhrase <card=Jace, Multiverse Architect> Jaces you control => Nominal "Jaces you control"
 +PrepositionPhrase <card=Jace, Reality Sculptor> among Jaces you control => NounPhrase "Jaces you control"
-+Clause <card=Rinoa Heartilly> create Angelo => NounPhrase "Angelo"
-+NounPhrase <card=Rinoa Heartilly> Angelo
 +NounPhrase <card=Kibo, Uktabi Prince> a colorless artifact token named Banana => Name "Banana"
-+NounPhrase <card=Kibo, Uktabi Prince> Banana
 +NounPhrase <card=Giant Caterpillar> a 1/1 green Insect creature token with flying named Butterfly => Name "Butterfly"
-+NounPhrase <card=Giant Caterpillar> Butterfly
 +NounPhrase <card=Tooth and Claw> a 3/1 red Beast creature token named Carnivore => Name "Carnivore"
-+NounPhrase <card=Tooth and Claw> Carnivore
 +NounPhrase <card=Scriv, the Obligator> a white Aura enchantment token named Contract => Name "Contract"
-+NounPhrase <card=Scriv, the Obligator> Contract
-+Clause <card=Mabel, Heir to Cragflame> create Cragflame => NounPhrase "Cragflame"
-+NounPhrase <card=Mabel, Heir to Cragflame> Cragflame
-+Clause <card=Rufus Shinra> create Darkstar => NounPhrase "Darkstar"
-+NounPhrase <card=Rufus Shinra> Darkstar
++Clause <card=Mabel, Heir to Cragflame> create Cragflame, a legendary colorless Equipment artifact token with "Equipped creature gets +1/+1 and has vigilance, trample, and haste" and equip {2} => NounPhrase "Cragflame" as Object of create
++Clause <card=Rufus Shinra> create Darkstar, a legendary 2/2 white and black Dog creature token => NounPhrase "Darkstar" as Object of create
 +VerbPhrase <card=Honest Work> named Humble Merchant => Name "Humble Merchant"
-+NounPhrase <card=Honest Work> Humble Merchant
-+Clause <card=Helm of Kaldra> create Kaldra => NounPhrase "Kaldra"
-+NounPhrase <card=Helm of Kaldra> Kaldra
-+Clause <card=Tatsunari, Toad Rider> create Keimi => NounPhrase "Keimi"
-+NounPhrase <card=Tatsunari, Toad Rider> Keimi
++Clause <card=Helm of Kaldra> create Kaldra, a legendary 4/4 colorless Avatar creature token => NounPhrase "Kaldra" as Object of create
++Clause <card=Tatsunari, Toad Rider> create Keimi, a legendary 3/3 black and green Frog creature token with "Whenever you cast an enchantment spell, each opponent loses 1 life and you gain 1 life" => NounPhrase "Keimi" as Object of create
 +NounPhrase <card=Wall of Kelp> a 0/1 blue Plant Wall creature token with defender named Kelp => Name "Kelp"
-+NounPhrase <card=Wall of Kelp> Kelp
 +NounPhrase <card=Kwia Vigorbloom> a colorless artifact token named Lotus => Name "Lotus"
-+NounPhrase <card=Kwia Vigorbloom> Lotus
 +NounPhrase <card=Weapons Manufacturing> a colorless artifact token named Munitions => Name "Munitions"
-+NounPhrase <card=Weapons Manufacturing> Munitions
-+Clause <card=Tamiyo, Compleated Sage> <legendary> create Tamiyo's Notebook => NounPhrase "Tamiyo's Notebook"
-+NounPhrase <card=Tamiyo, Compleated Sage> <legendary> Tamiyo's Notebook
-+Clause <card=Ozox, the Clattering King> create Jumblebones => NounPhrase "Jumblebones"
-+NounPhrase <card=Ozox, the Clattering King> Jumblebones
++Clause <card=Tamiyo, Compleated Sage> <legendary> create Tamiyo's Notebook, a legendary colorless Book artifact token with "Spells you cast cost {2} less to cast" and "{T}: Draw a card" => NounPhrase "Tamiyo's Notebook" as Object of create
++Clause <card=Ozox, the Clattering King> create Jumblebones, a legendary 2/1 black Skeleton creature token with "Jumblebones can't block" and "When Jumblebones leaves the battlefield, return target card named Ozox, the Clattering King from your graveyard to your hand" => NounPhrase "Jumblebones" as Object of create
 +NounPhrase <card=Svella, Ice Shaper> a colorless snow artifact token named Icy Manalith => Name "Icy Manalith"
-+NounPhrase <card=Svella, Ice Shaper> Icy Manalith
 +NounPhrase <card=Nahiri, the Lithomancer> a colorless Equipment artifact token named Stoneforged Blade => Name "Stoneforged Blade"
-+NounPhrase <card=Nahiri, the Lithomancer> Stoneforged Blade
 +NounPhrase <card=Rite of the Raging Storm> creatures named Lightning Rager => Name "Lightning Rager"
-+NounPhrase <card=Rite of the Raging Storm> Lightning Rager
 +NounPhrase <card=Awakening of Vitu-Ghazi> a legendary 0/0 Elemental creature with haste named Vitu-Ghazi => Name "Vitu-Ghazi"
-+NounPhrase <card=Awakening of Vitu-Ghazi> Vitu-Ghazi
-+Clause <card=Mishra, Eminent One> <legendary> its name is Mishra's Warform => NounPhrase "Mishra's Warform"
-+NounPhrase <card=Mishra, Eminent One> <legendary> Mishra's Warform
-+Clause <card=Mechtitan Core> create Mechtitan => NounPhrase "Mechtitan"
-+NounPhrase <card=Mechtitan Core> Mechtitan
-+Clause <card=Ka-Zar of the Savage Land> create Zabu => NounPhrase "Zabu"
-+NounPhrase <card=Ka-Zar of the Savage Land> Zabu
++ <card=Mishra, Eminent One> <legendary> At the beginning of combat on your turn, create a token that's a copy of target noncreature artifact you control, except its name is Mishra's Warform and it's a 4/4 Construct artifact creature in addition to its other types. => Clause "its name is Mishra's Warform"
++Clause <card=Mechtitan Core> create Mechtitan, a legendary 10/10 Construct artifact creature token with flying, vigilance, trample, lifelink, and haste that's all colors => NounPhrase "Mechtitan" as Object of create
++Clause <card=Ka-Zar of the Savage Land> create Zabu, a legendary 2/2 green Cat creature token with "Landfall — Whenever a land you control enters, put a +1/+1 counter on Zabu" => NounPhrase "Zabu" as Object of create
 +NounPhrase <card=Hornet Cannon> a 1/1 colorless Insect artifact creature token with flying and haste named Hornet => Name "Hornet"
-+NounPhrase <card=Hornet Cannon> Hornet
 +NounPhrase <card=Jungle Patrol> a token named Wood => Name "Wood"
-+NounPhrase <card=Jungle Patrol> Wood
 +Nominal <card=Rocket Launcher> recent turn => AdjectivePhrase "recent"
 +AdjectivePhrase <card=Rocket Launcher> recent
 + <card=Reverse the Sands> Redistribute any number of players' life totals. => VerbPhrase "Redistribute any number of players' life totals"
@@ -153,21 +128,12 @@
 + <card=The Deck of Many Things> Roll a d20 and subtract the number of cards in your hand. => VerbPhrase "subtract the number of cards in your hand"
 +RelativeClause <card=Opposition Agent> they find
 +VerbPhrase <card=Odric, Blood-Cursed> found among creatures you control
-+Clause <card=Falcon, Winged Wonder> create Redwing => NounPhrase "Redwing"
-+NounPhrase <card=Falcon, Winged Wonder> Redwing
++Clause <card=Falcon, Winged Wonder> create Redwing, a legendary 1/1 blue Bird Scout creature token with flying and "Whenever Redwing attacks, surveil 1" => NounPhrase "Redwing" as Object of create
 +VerbPhrase <card=Toggo, Goblin Weaponsmith> named Rock => Name "Rock"
-+NounPhrase <card=Toggo, Goblin Weaponsmith> Rock
 +VerbPhrase <card=Preston Garvey, Minuteman> named Settlement => Name "Settlement"
-+NounPhrase <card=Preston Garvey, Minuteman> Settlement
 +VerbPhrase <card=Dragonbroods' Relic> named Reliquary Dragon => Name "Reliquary Dragon"
-+NounPhrase <card=Dragonbroods' Relic> Reliquary Dragon
 +VerbPhrase <card=Wirefly Hive> named Wirefly => Name "Wirefly"
-+NounPhrase <card=Wirefly Hive> Wirefly
 +VerbPhrase <card=Lita, Mechanical Engineer> named Zeppelin => Name "Zeppelin"
-+NounPhrase <card=Lita, Mechanical Engineer> Zeppelin
 +VerbPhrase <card=Pia Nalaar, Chief Mechanic> named Nalaar Aetherjet => Name "Nalaar Aetherjet"
-+NounPhrase <card=Pia Nalaar, Chief Mechanic> Nalaar Aetherjet
-+Clause <card=Tomb of Urami> create Urami => NounPhrase "Urami"
-+NounPhrase <card=Tomb of Urami> Urami
++ <card=Tomb of Urami> {2}{B}{B}, {T}, Sacrifice all lands you control: Create Urami, a legendary 5/5 black Demon Spirit creature token with flying. => NounPhrase "Urami" as Object of create
 +VerbPhrase <card=Kibo, Uktabi Prince> named Banana => Name "Banana"
-+NounPhrase <card=Tuktuk the Explorer> <legendary> Tuktuk the Returned

@@ -5,7 +5,6 @@
 # from: Tamiyo, Compleated Sage
 + <card=Tamiyo, Compleated Sage> <legendary> Create Tamiyo's Notebook, a legendary colorless Book artifact token. => NounPhrase "Tamiyo's Notebook" as Object of create; NounPhrase "a legendary colorless Book artifact token"; !NounPhrase "Tamiyo's Notebook, a legendary colorless Book artifact token" as Object of create
 + <card=Tuktuk the Explorer> <legendary> When Tuktuk the Explorer dies, create Tuktuk the Returned, a legendary 5/5 colorless Goblin Golem artifact creature token. => NounPhrase "Tuktuk the Returned" as Object of create; NounPhrase "a legendary 5/5 colorless Goblin Golem artifact creature token"; !NounPhrase "Tuktuk the Returned, a legendary 5/5 colorless Goblin Golem artifact creature token" as Object of create
-+ <card=Rinoa Heartilly> Create Angelo. => NounPhrase "Angelo" as Object of create
 + <card=Peer Review> Create a 2/2 colorless Wizard Soldier creature token named Cadet.
 # from: Stangg
 + <card=Stangg> Create Stangg Twin, a legendary 3/4 red and green Human Warrior creature token.

@@ -22,7 +22,8 @@
         (lemma: "counter", frames: [Monotransitive]),
     ]),
     (rule: "[CR#701.7]", name: "Create", verbs: [
-        (lemma: "create", frames: [Monotransitive]),
+        // Its Object may be the name the text gives the token [CR#111.4].
+        (lemma: "create", frames: [Monotransitive], classes: ["NamingVerb"]),
     ]),
     (rule: "[CR#701.8]", name: "Destroy", verbs: [
         (lemma: "destroy", frames: [Monotransitive]),

@@ -26,6 +26,7 @@ fn verb(lemma: &str, frames: Vec<FrameSpec>) -> VerbEntry {
         binding: None,
         frames,
         active_only: false,
+        classes: Vec::new(),
     }
 }
 
@@ -141,6 +142,7 @@ fn a_frame_belongs_to_its_head_category() {
             frames: vec![FrameSpec::Monotransitive],
             prefix_hyphenation: None,
             onset: None,
+            classes: Vec::new(),
         }));
     rejects(&sources, "is not a frame of a Noun");
 }
@@ -155,19 +157,16 @@ fn an_identity_is_declared_once() {
 
 #[test]
 fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
-    let card_names = "Dark Depths\nMarit Lage's Slumber\nCitadel Siege\n";
+    let card_names = "Dark Depths\nTravel Through Caradhras\nCitadel Siege\n";
     let mut sources = Sources::load().unwrap();
     sources
-        .introduced_names
-        .retain(|name| name.name == "Marit Lage");
+        .vote_options
+        .retain(|option| option.name == "Redhorn Pass");
     sources.anchor_words.clear();
-    sources.vote_options.clear();
     sources.environment(card_names).unwrap();
 
     let mut stray = sources.clone();
-    stray.introduced_names[0]
-        .cards
-        .push("Not a Card".to_owned());
+    stray.vote_options[0].cards.push("Not a Card".to_owned());
     let error = stray.environment(card_names).unwrap_err().to_string();
     assert!(error.contains("which is not a card name"), "{error}");
 
@@ -179,16 +178,15 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
     let error = stray.environment(card_names).unwrap_err().to_string();
     assert!(error.contains("which is not a card name"), "{error}");
 
-    // A scoped name may be spelled like a card's name (Disa the Restless's
-    // *create a Tarmogoyf token*): another card's name stands only after
-    // *named*, *Partner with* or *from among*, so the two never compete
-    // elsewhere.
+    // A scoped name may be spelled like a card's name: another card's name
+    // stands only in the positions that opt in to it, so the two never
+    // compete elsewhere.
     let env = sources
-        .environment(&format!("{card_names}Marit Lage\n"))
+        .environment(&format!("{card_names}Redhorn Pass\n"))
         .unwrap();
     let lexeme = |id: &str| &env.lexicon.lexemes()[&sylex_lexicon::LexemeId::new(id)];
-    assert!(lexeme("name:Marit Lage").card_name);
-    assert!(!lexeme("introduced_name:Marit Lage").card_name);
+    assert!(lexeme("name:Redhorn Pass").card_name);
+    assert!(!lexeme("vote_option:Redhorn Pass").card_name);
     let mut spelled_alike = sources.clone();
     spelled_alike.vote_options.push(scoped("Dark Depths"));
     spelled_alike.environment(card_names).unwrap();
@@ -319,6 +317,7 @@ fn bare_mass_modified_requires_mass_countability() {
             frames: Vec::new(),
             prefix_hyphenation: None,
             onset: None,
+            classes: Vec::new(),
         }));
     rejects(&sources, "requires `Mass` countability");
 }

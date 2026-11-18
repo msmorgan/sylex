@@ -138,13 +138,15 @@ impl Class {
         match reading {
             LexicalReading::Numeral { .. } => Self::Number,
             LexicalReading::FlavorWord { .. } => Self::FlavorWord,
-            LexicalReading::OwnName { .. } => Self::CardName,
+            LexicalReading::OwnName { .. } | LexicalReading::IntroducedName { .. } => {
+                Self::CardName
+            }
             LexicalReading::SetName { .. } => Self::SetName,
             LexicalReading::Word(value) => {
                 let id = value.lexeme.as_str();
                 let prefix = id.split(':').next().unwrap_or("");
                 match prefix {
-                    "name" | "introduced_name" | "anchor_name" => Self::CardName,
+                    "name" | "anchor_name" => Self::CardName,
                     "type" | "supertype" => Self::CardType,
                     "subtype" => Self::Subtype,
                     "counter" => Self::CounterKind,
@@ -183,6 +185,41 @@ impl Class {
             Self::SetName => "<SetName>",
         })
     }
+}
+
+/// The Introduced Names of a text, by where its title runs stand. A
+/// profile is taken before any parse, and without a grammar where none
+/// binds, so like the rest of the profile it reads the words around a run,
+/// not the run's position in a Reading: it stratifies a unit and settles
+/// nothing about its structure. A run is a name after *named*, after
+/// *name is*, and after *create* where a comma and an indefinite article
+/// follow it (*create Angelo, a legendary ... token*).
+fn introduced_names(analyzed: &AnalyzedText) -> BTreeSet<&str> {
+    let chars = &analyzed.tokens;
+    let after = |end: usize, words: &[&str]| {
+        words.iter().any(|word| {
+            let word: Vec<char> = format!(" {word} ").chars().collect();
+            let mut before = vec![' '];
+            before.extend(&chars[..end]);
+            before.ends_with(&word)
+        })
+    };
+    let before = |start: usize, words: &[&str]| {
+        words
+            .iter()
+            .any(|word| chars[start..].starts_with(&word.chars().collect::<Vec<_>>()))
+    };
+    analyzed
+        .matches
+        .iter()
+        .filter_map(|found| match &found.reading {
+            LexicalReading::IntroducedName { name } => (after(found.start, &["named", "name is"])
+                || (after(found.start, &["create", "Create", "creates"])
+                    && before(found.end, &[", a ", ", an "])))
+            .then_some(name.as_str()),
+            _ => None,
+        })
+        .collect()
 }
 
 /// One lexical alternative of a token.
@@ -420,6 +457,7 @@ impl<'e> Profiler<'e> {
         let chars = &analyzed.tokens;
         let lexemes = self.env.lexicon.lexemes();
         let catalog = &self.env.frames;
+        let introduced = introduced_names(analyzed);
         let mut out = Vec::new();
         let mut at = 0;
         while at < chars.len() {
@@ -428,11 +466,18 @@ impl<'e> Profiler<'e> {
                 continue;
             }
             // A Flavor Word reading spans its label and dash; the spine finds
-            // labels itself. A type line names no card.
+            // labels itself. A type line names no card. A title run is a
+            // name only where the text introduces it.
             let words = || {
                 analyzed.matches.iter().filter(|m| {
                     !matches!(m.reading, LexicalReading::FlavorWord { .. })
                         && (kind != UnitKind::TypeLine || Class::of(&m.reading) != Class::CardName)
+                        && match &m.reading {
+                            LexicalReading::IntroducedName { name } => {
+                                introduced.contains(name.as_str())
+                            }
+                            _ => true,
+                        }
                 })
             };
             let end = words().filter(|m| m.start == at).map(|m| m.end).max();

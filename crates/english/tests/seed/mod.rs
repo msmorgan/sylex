@@ -229,6 +229,9 @@ pub fn lexicon() -> Lexicon {
         do_verb,
         genitive,
         verb("attack", Core),
+        // *named*, a Closed Word of the grammar: its Complement introduces
+        // a name.
+        verb("name", Core),
         verb("enter", Core),
         // Keyword actions [CR#701.1] are catalog vocabulary.
         verb("destroy", Catalog),
@@ -260,7 +263,7 @@ pub fn lexicon() -> Lexicon {
     }
     for word in [
         "in", "into", "on", "onto", "for", "with", "from", "during", "by", "up", "of", "than",
-        "plus", "minus", "as", "among", "under", "outside", "after", "but",
+        "plus", "minus", "as", "among", "under", "outside", "after", "but", "except",
     ] {
         lexemes.push(invariant("prep", word, Category::Preposition, Core));
     }

@@ -102,6 +102,17 @@ fn leaks(grammar: &Grammar, catalog: &BTreeSet<String>) -> BTreeSet<String> {
         names.push(&production.name);
         names.push(&production.lhs);
         names.extend(production.transparent.iter().map(|name| &**name));
+        names.extend(production.headed_by.iter().map(|(_, word)| &**word));
+        names.extend(
+            [
+                &production.complement_of,
+                &production.within,
+                &production.not_complement_of,
+            ]
+            .into_iter()
+            .flatten()
+            .map(|word| &**word),
+        );
         for symbol in &production.rhs {
             match symbol {
                 SymbolDecl::Attached(child, name, _)
@@ -125,7 +136,10 @@ fn leaks(grammar: &Grammar, catalog: &BTreeSet<String>) -> BTreeSet<String> {
                 SymbolDecl::FreeLex(child, _)
                 | SymbolDecl::Numeral(child, _)
                 | SymbolDecl::Lex(child, _)
-                | SymbolDecl::OtherCardName(child) => names.push(child),
+                | SymbolDecl::OtherCardName(child)
+                | SymbolDecl::DistinctOtherCardName(child)
+                | SymbolDecl::IntroducedName(child)
+                | SymbolDecl::RepeatedName(child) => names.push(child),
                 SymbolDecl::Punct(_) | SymbolDecl::Mark(..) | SymbolDecl::SpokenMark(..) => {}
             }
         }

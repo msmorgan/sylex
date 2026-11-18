@@ -235,6 +235,11 @@ pub struct VerbEntry {
     /// a verb with frames may declare it.
     #[serde(default)]
     pub active_only: bool,
+    /// The Lexical Classes of the grammar it is a member of
+    /// (`NamingVerb`: its Object is an object it brings into being, which
+    /// the text may name, [CR#111.4]).
+    #[serde(default)]
+    pub classes: Vec<String>,
 }
 
 /// Noun subclasses with distinct adjunct distributions.
@@ -283,6 +288,10 @@ pub struct NounEntry {
     /// Unicorn*).
     #[serde(default)]
     pub onset: Option<sylex_lexicon::Onset>,
+    /// The Lexical Classes of the grammar it is a member of (`TokenNoun`,
+    /// `NameNoun`).
+    #[serde(default)]
+    pub classes: Vec<String>,
 }
 
 fn count() -> Vec<Countability> {
@@ -312,6 +321,7 @@ impl NounDecl {
                 frames: Vec::new(),
                 prefix_hyphenation: None,
                 onset: None,
+                classes: Vec::new(),
             },
             Self::Entry(entry) => entry.clone(),
         }
@@ -829,15 +839,6 @@ pub struct Token {
     pub subtype: String,
     #[serde(default)]
     pub names: Vec<String>,
-}
-
-/// A name a card's own text gives an object that is not a card name, with the
-/// cards whose text uses it.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct IntroducedName {
-    pub name: String,
-    pub cards: Vec<String>,
 }
 
 /// A name in scope only on the cards that print it: a vote option

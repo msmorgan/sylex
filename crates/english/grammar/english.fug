@@ -275,11 +275,19 @@ category CardTypes
 category Subtypes
 category KeywordList
 category Quality
+// Privative: an Introduced Name named again, outside the positions that
+// introduce one (*Ragavan enters tapped and attacking*).
+feature NameMention = Repeated
 // A name is number-neutral: the agreement its text shows fixes its Number
 // (*When The Notary Hobbits enter*, *Mizzium Mortars deals*), and where the
 // text shows none it stays unvalued. Never another card's name, which
 // `Lex(Catalog)` does not admit.
-category Name [Number]
+category Name [Number, NameMention]
+// The name a Complement of *named* introduces: a Name that stands nowhere
+// else, so that no other position offers a title run as one.
+category NewName : Name
+// A card's name before *token*, the name of a token named for that card.
+category TokenCardName : Name
 // A name in a position that takes a card's name: after *named*, as the
 // parameter of *Partner with* [CR#702.124j], as the complement of *among*
 // after *from*, wherever that attaches, as in a choice (*choose a card name
@@ -645,6 +653,10 @@ category QuotedCost
 category InterrogativeClause : Clause
 category InterrogativePhrase : NounPhrase [Number, Person]
 
+// The words whose Complements introduce a name (`docs/design/lexicon.md`
+// §6): the Complement of *named*, and a copy's exception under *except*.
+word NameVerb = "verb:name"
+word Except = "prep:except"
 word By = "prep:by"
 word Up = "prep:up"
 word Of = "prep:of"
@@ -750,6 +762,13 @@ class Subtype { typed }
 class ParameterizedKeyword { typed }
 class AbilityWord { typed }
 class AnchorWord { typed }
+// A verb whose Object is an object it brings into being, which the text may
+// name: only *create* [CR#111.4].
+class NamingVerb { typed }
+// Only *token*, which heads a named token's description.
+class TokenNoun { typed }
+// Only *name*, the Subject of *its name is ...*.
+class NameNoun { typed }
 class BracedSymbol { typed }
 class Variable { typed }
 // Only `LEVEL`, the marker of a level symbol [CR#711.2a].
@@ -1047,6 +1066,13 @@ KeywordFollowedBySentences: Ability -> first:KeywordLineItem rest:Sentences
 // expansion*) in that card's own text (tests/set_names.rs).
 NamePremodifier: BareNominal -> modifier:Name BareNominal
     where head.SetNameLicense != Head
+// A token named for a card, in the Object of *create*: it has the
+// characteristics of the card so named [CR#111.11] (*create a Tarmogoyf
+// token*, *create a tapped Mutavault token*). A card name that a subtype or
+// a predefined token's name also spells is that word (*create a Blood
+// token*).
+CardNamedToken: BareNominal -> modifier:TokenCardName Class(TokenNoun) { within: NamingVerb }
+CardNameBeforeToken: TokenCardName -> DistinctOtherCardName()
 ModeBullet: Mode -> '•':Free Ability { capital: [head] }
 PlusCostedMode: Mode -> '+':Free:Spoken cost:Cost '—':Free ModeEffect { capital: [head] }
 LabeledCostedMode: Mode -> '•':Free label:Lex(FlavorWord) cost:Cost '—':Free ModeEffect { capital: [label, head] }
@@ -1074,7 +1100,27 @@ AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
 // in *Manifest dread* (Under the Skin).
 NamedParameter: Name -> Lex(Catalog) where head.KindLicense != Kind
 SetNameWord: SetName -> Lex(SetName)
-NameAsComplement: NameComplement -> Name { cost: 0 }
+// An Introduced Name named again: the Reading introduces it elsewhere
+// (*create Ragavan, ... Ragavan enters tapped and attacking*; a token's own
+// ability names the token, [CR#201.5]).
+// It is never *create*'s Object, which offers the name for a new token (*if
+// you don't control a creature named Mowu, create Mowu, a legendary 3/3
+// green Dog creature token*).
+RepeatedIntroducedName: Name -> RepeatedName() { not_complement_of: NamingVerb }
+    where $.NameMention = Repeated
+// The Complement of *named* introduces the name written there, the name of a
+// token or of a permanent the text changes [CR#111.4]: no inventory lists
+// it (*a 2/2 colorless Wizard Soldier creature token named Cadet*; *a
+// creature you control named Vecna*).
+NameAfterNamed: NewName -> IntroducedName() { within: NameVerb }
+NewNameComplement: NameComplement -> NewName
+// The name of a token as the Object of *create*, which only the description
+// after its Clause introduces (`NamedTokenDescription`): *Create Angelo.*
+// names nothing.
+NamedTokenName: Name -> IntroducedName() { undescribed, complement_of: NamingVerb }
+// After *named* a name its text introduces is introduced there too, never
+// named again.
+NameAsComplement: NameComplement -> Name { cost: 0 } where head.NameMention != Repeated
 OtherCardNameComplement: NameComplement -> OtherCardName()
 SlashMeasure: Measure -> first:SignedAmount '/':Bound second:SignedAmount
     where first.Adjustment = second.Adjustment,
@@ -1129,6 +1175,18 @@ SpecifyingBe: VerbPhrase -> Class(BeVerb) predicative_complement:SpecifyingValue
     where head.Number != Plural,
           $.Voice = Active
 SubtypeSpecifyingValue: SpecifyingValue -> Class(Subtype) where head.Number = Singular
+// A specifying copular Clause whose Subject is headed by *name* and whose
+// value is the name the text gives, in a copy's exception (*except its name
+// is Mishra's Warform*; CGEL 4§5.5:266–269).
+NameSpecification: Clause -> subject:NounPhrase Class(BeVerb) predicative_complement:IntroducedName() {
+    within: Except,
+    headed_by: [subject -> NameNoun],
+}
+    where subject.Number = head.Number,
+          subject.Person = head.Person,
+          head.VerbForm = Finite,
+          subject.Case != Accusative | Genitive,
+          $.ClauseMarking = Unmarked
 // A bound auxiliary clitic has a nominative pronoun host (*it's*, *you're*,
 // *they've*).
 CliticSubjectPredicate: Clause -> subject:NounPhrase Attached(VerbPhrase, Suffix) {
@@ -1237,6 +1295,14 @@ GerundParticipialSupplement: Clause -> Clause ',' supplement:VerbPhrase {
 // its anchor stays a constituent of the Clause, never part of a larger Noun
 // Phrase (CGEL 15§5.1:1350–1351).
 NounPhraseSupplement: Clause -> Clause ',' supplement:NounPhrase
+// A named token's description introduces the name its anchor Clause ends
+// in, the Object of *create* (*create Angelo, a legendary 1/1 green and
+// white Dog creature token*; [CR#111.4]). The description is headed by
+// *token*.
+NamedTokenDescription: Clause -> Clause ',' supplement:NounPhrase {
+    describes: head,
+    headed_by: [supplement -> TokenNoun],
+}
 // *But* or *and* adds a fragment focused by *only* or *not* to the whole
 // main Clause, with no comma (*Any player may activate this ability but
 // only during their turn*; CGEL 15§4.5:1346–1347). A Clause ending in a

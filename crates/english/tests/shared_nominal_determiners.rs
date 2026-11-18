@@ -24,6 +24,7 @@ fn word_lexemes(reading: &Reading, out: &mut Vec<String>) {
         Reading::Leaf(LexicalReading::Word(word)) => out.push(word.lexeme.to_string()),
         Reading::Leaf(
             LexicalReading::OwnName { .. }
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. },

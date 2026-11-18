@@ -45,7 +45,6 @@ use crate::schema::AnchorWord;
 use crate::schema::ClosedClass;
 use crate::schema::CounterKind;
 use crate::schema::Designation;
-use crate::schema::IntroducedName;
 use crate::schema::KeywordAbility;
 use crate::schema::KeywordAction;
 use crate::schema::NounDecl;
@@ -92,7 +91,7 @@ pub enum SourceError {
 
 /// Every data file of this crate, by path: embedded at build time in release
 /// and wasm builds, read at run time in dev builds ([`data_text!`]).
-static FILES: [(&str, LazyLock<String>); 20] = [
+static FILES: [(&str, LazyLock<String>); 19] = [
     (CLOSED_CLASS, data_text!("lexicon/english/closed_class.ron")),
     (PREPOSITIONS, data_text!("lexicon/english/prepositions.ron")),
     (VERBS, data_text!("lexicon/english/verbs.ron")),
@@ -113,10 +112,6 @@ static FILES: [(&str, LazyLock<String>); 20] = [
     (STATUSES, data_text!("catalogs/statuses.ron")),
     (TURN_PARTS, data_text!("catalogs/turn_parts.ron")),
     (TOKENS, data_text!("catalogs/tokens.ron")),
-    (
-        INTRODUCED_NAMES,
-        data_text!("catalogs/introduced_names.ron"),
-    ),
     (ANCHOR_WORDS, data_text!("catalogs/anchor_words.ron")),
     (VOTE_OPTIONS, data_text!("catalogs/vote_options.ron")),
 ];
@@ -141,7 +136,6 @@ const DESIGNATIONS: &str = "catalogs/designations.ron";
 const STATUSES: &str = "catalogs/statuses.ron";
 const TURN_PARTS: &str = "catalogs/turn_parts.ron";
 const TOKENS: &str = "catalogs/tokens.ron";
-const INTRODUCED_NAMES: &str = "catalogs/introduced_names.ron";
 const ANCHOR_WORDS: &str = "catalogs/anchor_words.ron";
 const VOTE_OPTIONS: &str = "catalogs/vote_options.ron";
 /// The card-name catalog, relative to the repository root.
@@ -184,7 +178,6 @@ pub struct Sources {
     pub turn_parts: Vec<TurnPart>,
     pub statuses: Vec<schema::Status>,
     pub tokens: Vec<Token>,
-    pub introduced_names: Vec<IntroducedName>,
     pub anchor_words: Vec<AnchorWord>,
     pub vote_options: Vec<ScopedName>,
     /// The names of the dungeon cards, read from [`DUNGEON_NAMES`].
@@ -277,7 +270,6 @@ impl Sources {
             turn_parts: parse(TURN_PARTS)?,
             statuses: parse(STATUSES)?,
             tokens: parse(TOKENS)?,
-            introduced_names: parse(INTRODUCED_NAMES)?,
             anchor_words: parse(ANCHOR_WORDS)?,
             vote_options: parse(VOTE_OPTIONS)?,
             dungeon_names: generated_names(&dungeon_names_path())?,
@@ -581,16 +573,6 @@ impl Sources {
                     catalog(TOKENS, token.rule.number()),
                 ));
             }
-        }
-        for introduced in &self.introduced_names {
-            let id = format!("introduced_name:{}", introduced.name);
-            let lexeme = exact(
-                &id,
-                &introduced.name,
-                Category::Catalog,
-                catalog(INTRODUCED_NAMES, &introduced.name),
-            );
-            builder.push(card_scoped(lexeme, &introduced.cards));
         }
         self.vote_options(builder);
         for name in &self.dungeon_names {

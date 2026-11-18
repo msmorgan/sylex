@@ -185,8 +185,8 @@ Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
 - `units`; `nodes` (Category, span, surface, Gap, features, coordinator,
   settled); `alternatives` (Production, completed item); `items` (Production,
   dot, span); `families` (previous item, child node or leaf); `leaves` (a
-  word with its lexeme, the face's own name with its name form, a Flavor Word
-  or a numeral);
+  word with its lexeme, the face's own name with its name form, an Introduced
+  Name, a Flavor Word or a numeral);
 - per alternative: `heads` (head leaf, lexeme and form),
   `alternative_embeddings` (the Embedding it stands under: `embeddings`, with
   its context, and `embedding_steps`) and, for a coordination, `conjuncts`;

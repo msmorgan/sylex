@@ -374,6 +374,7 @@ fn unit_rows(
                 let word = |leaf: Option<usize>| match forest.leaf_reading(leaf?) {
                     LexicalReading::Word(word) => Some((word.lexeme, word.form)),
                     LexicalReading::OwnName { .. }
+                    | LexicalReading::IntroducedName { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. }
                     | LexicalReading::Numeral { .. } => None,
@@ -876,6 +877,12 @@ fn write_leaves(
                 Val::Static("own name"),
                 Val::Null,
                 Val::Debug(form),
+                Val::Null,
+            ),
+            LexicalReading::IntroducedName { .. } => (
+                Val::Static("introduced name"),
+                Val::Null,
+                Val::Null,
                 Val::Null,
             ),
             LexicalReading::FlavorWord { .. } => {
