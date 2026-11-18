@@ -99,6 +99,9 @@ impl ValueFacts {
     }
 }
 
+/// A license feature and its head value (`Grammar::licenses`), by id.
+pub(crate) type License = (usize, u16);
+
 /// A grammar bound to a lexical environment, ready to parse, admit and realize.
 #[derive(Debug)]
 pub struct CompiledGrammar {
@@ -134,6 +137,8 @@ pub struct CompiledGrammar {
     /// (`Projection::leaf_features`): those of a Catalog word that declares
     /// none.
     pub(crate) own_name_features: Vec<(usize, u16)>,
+    /// Each license feature (`Grammar::licenses`) and its head value.
+    pub(crate) licenses: Vec<License>,
     pub(crate) frames: Vec<Frame>,
     /// Each frame's shape for Complement Clusters, as the index of the first
     /// frame with the same: the relation of each Frame Slot, and what fills
@@ -804,6 +809,25 @@ impl<'a> Binder<'a> {
                 .position(|f| f == name)
                 .ok_or_else(|| invalid(format!("unknown feature `{name}`")))
         };
+        let licenses = grammar
+            .licenses
+            .iter()
+            .map(|(name, head)| {
+                let feature = feature_id(name)?;
+                let value = values[feature]
+                    .iter()
+                    .position(|v| v == head)
+                    .ok_or_else(|| {
+                        invalid(format!(
+                            "license `{name}` names `{head}`, none of its values"
+                        ))
+                    })?;
+                Ok((
+                    feature,
+                    u16::try_from(value).expect("feature domains are small"),
+                ))
+            })
+            .collect::<Result<Vec<_>, LoadError>>()?;
         // Each coordination schema gets an engine-owned serial tail Category.
         let mut declared = grammar.categories.clone();
         let mut tail_bases = BTreeMap::new();
@@ -1175,6 +1199,7 @@ impl<'a> Binder<'a> {
                 word_values,
                 spelled_forms,
                 own_name_features,
+                licenses,
                 lexeme_ids,
                 lexemes,
                 frames,

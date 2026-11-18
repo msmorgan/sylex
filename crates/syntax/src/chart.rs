@@ -8,12 +8,14 @@ use std::sync::OnceLock;
 use hashbrown::HashTable;
 use hashbrown::hash_table::Entry;
 use sylex_lexicon::AnalyzedText;
+use sylex_lexicon::LexicalMatch;
 use sylex_lexicon::LexicalReading;
 use sylex_lexicon::Lexicon;
 
 use crate::alternatives::HeadLeaf;
 use crate::alternatives::Inside;
 use crate::compile::CompiledGrammar;
+use crate::compile::License;
 use crate::counts::ForestCycle;
 use crate::counts::Vertex;
 use crate::hash::ChartHasher;
@@ -438,7 +440,7 @@ pub(crate) fn quotations(tokens: &[char], covered: &[bool]) -> (Vec<char>, Vec<O
 }
 
 /// The spans of the multiword nouns of one input whose words also reach the
-/// chart as leaves of their own.
+/// chart as leaves of their own, and of its licensed terms.
 ///
 /// The separate words stand apart only where they straddle a constituent
 /// boundary: in the smallest Constituent spanning the term, the child holding
@@ -446,23 +448,28 @@ pub(crate) fn quotations(tokens: &[char], covered: &[bool]) -> (Vec<char>, Vec<O
 /// ends after it. Where either child begins or ends with the term, its words
 /// rebuild the term's own analysis, alone (*[first] [strike]*) or with a
 /// dependent of one part (*mana [cost for ...]*), beside the term itself.
+/// A licensed term's own analysis is built from its words, by a Production
+/// that admits the license's head, which alone may rebuild it (*a [time]
+/// [counter]* beside *[plot] [counters]*, a verb and its Object).
 ///
 /// The rule is checked where a Production that began at or before the term
 /// takes the child that reaches the term's end from inside it: an item
 /// records, for each term whose words its end falls between, whether one of
 /// its children begins where that term begins.
 struct Seams {
-    spans: Vec<Range<usize>>,
+    /// Each span, with the license whose head admits the term's own
+    /// analysis, for a licensed term.
+    spans: Vec<(Range<usize>, Option<License>)>,
     /// For each position, the spans strictly containing it.
     inside: Vec<Vec<usize>>,
 }
 
 impl Seams {
-    fn new(mut spans: Vec<Range<usize>>, n: usize) -> Self {
-        spans.sort_by_key(|span| (span.start, span.end));
+    fn new(mut spans: Vec<(Range<usize>, Option<License>)>, n: usize) -> Self {
+        spans.sort_by_key(|(span, license)| (span.start, span.end, *license));
         spans.dedup();
         let mut inside = vec![Vec::new(); n + 1];
-        for (index, span) in spans.iter().enumerate() {
+        for (index, (span, _)) in spans.iter().enumerate() {
             for at in &mut inside[span.start + 1..span.end] {
                 at.push(index);
             }
@@ -479,12 +486,14 @@ impl Seams {
             .is_some_and(|bit| seam >> bit & 1 == 1)
     }
 
-    /// The seam bits of an item whose first word is at `first` and that ends
-    /// at `end`, after a child whose first word is at `child`, following
-    /// `previous` (its end and seam bits); or `None` when that child leaves
-    /// a term's words not straddling a constituent boundary.
+    /// The seam bits of an item of `production` whose first word is at
+    /// `first` and that ends at `end`, after a child whose first word is at
+    /// `child`, following `previous` (its end and seam bits); or `None` when
+    /// that child leaves a term's words not straddling a constituent
+    /// boundary, outside a licensed term's own analysis.
     fn after(
         &self,
+        production: &Production,
         first: usize,
         previous: Option<(usize, u64)>,
         child: usize,
@@ -494,17 +503,22 @@ impl Seams {
             return Some(0);
         }
         let had_start = |span: usize| {
-            let start = self.spans[span].start;
+            let start = self.spans[span].0.start;
             child == start
                 || (child > start && previous.is_some_and(|(at, seam)| self.bit(at, seam, span)))
         };
-        let rebuilt = self.spans.iter().enumerate().any(|(index, span)| {
-            first <= span.start
-                && span.start < child
-                && child < span.end
-                && span.end <= end
-                && (span.end == end || had_start(index))
-        });
+        let rebuilt = self
+            .spans
+            .iter()
+            .enumerate()
+            .any(|(index, (span, license))| {
+                first <= span.start
+                    && span.start < child
+                    && child < span.end
+                    && span.end <= end
+                    && (span.end == end || had_start(index))
+                    && !license.is_some_and(|license| production.admits_head(license))
+            });
         if rebuilt {
             return None;
         }
@@ -664,6 +678,40 @@ impl CompiledGrammar {
             .collect()
     }
 
+    /// The spans of the licensed terms of `analyzed`, each with its license
+    /// (`Grammar::licenses`): a word that carries a value of a license
+    /// feature other than its head's, then, after one space, a word that
+    /// carries the head value (*time counters*, `docs/design/lexicon.md` §5).
+    pub(crate) fn licensed_terms(&self, analyzed: &AnalyzedText) -> Vec<(Range<usize>, License)> {
+        let words: Vec<(&LexicalMatch, LeafFacts)> = analyzed
+            .matches
+            .iter()
+            .filter(|m| matches!(m.reading, LexicalReading::Word(_)))
+            .map(|m| {
+                let facts = self
+                    .leaf_facts(&m.reading)
+                    .expect("an analyzed lexical match is licensed by the grammar's lexicon");
+                (m, facts)
+            })
+            .collect();
+        let mut terms = Vec::new();
+        for &(feature, head) in &self.licenses {
+            for (holder, facts) in &words {
+                if facts.features[feature].is_none_or(|value| value == head)
+                    || analyzed.tokens.get(holder.end) != Some(&' ')
+                {
+                    continue;
+                }
+                for (last, facts) in &words {
+                    if last.start == holder.end + 1 && facts.features[feature] == Some(head) {
+                        terms.push((holder.start..last.end, (feature, head)));
+                    }
+                }
+            }
+        }
+        terms
+    }
+
     #[expect(clippy::too_many_lines, reason = "one Earley loop reads best whole")]
     pub(crate) fn run<'g>(&'g self, analyzed: &AnalyzedText, root: usize) -> Parse<'g> {
         let n = analyzed.tokens.len();
@@ -732,7 +780,12 @@ impl CompiledGrammar {
         let seams = Seams::new(
             atomic
                 .into_iter()
-                .filter_map(|(span, splits)| splits.then_some(span))
+                .filter_map(|(span, splits)| splits.then_some((span, None)))
+                .chain(
+                    self.licensed_terms(analyzed)
+                        .into_iter()
+                        .map(|(span, license)| (span, Some(license))),
+                )
                 .collect(),
             n,
         );
@@ -783,7 +836,13 @@ impl CompiledGrammar {
                     return None;
                 }
                 let mut next = production.accept(self, &state, dot, &ChildView::Punct)?;
-                seam = seams.after(skip(start), (dot > 0).then_some((position, seam)), at, end)?;
+                seam = seams.after(
+                    production,
+                    skip(start),
+                    (dot > 0).then_some((position, seam)),
+                    at,
+                    end,
+                )?;
                 next.unwritten_period = at == end;
                 (dot, position, state) = (dot + 1, end, next);
             }
@@ -888,6 +947,7 @@ impl CompiledGrammar {
                         {
                             let (p, d, s) = (item.production, item.dot, item.start);
                             let Some(seam) = seams.after(
+                                parent_production,
                                 skip(s),
                                 (d > 0).then_some((item.end, item.seam)),
                                 skip(start),
@@ -962,6 +1022,7 @@ impl CompiledGrammar {
                                 let end = forest.leaves[leaf].end;
                                 let item = &forest.items[id];
                                 let Some(seam) = seams.after(
+                                    production,
                                     skip(start),
                                     (dot > 0).then_some((item.end, item.seam)),
                                     at,

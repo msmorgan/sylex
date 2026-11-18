@@ -447,6 +447,126 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
     }
 }
 
+/// A licensed term's words, a holder of a license feature directly before its
+/// head, stand apart as a catalog term's do: only where they straddle a
+/// constituent boundary, as in *[big time] [counter damage]*, and never
+/// where another analysis rebuilds them, as the homograph noun *time*
+/// premodifying *counter* would. The term's own analysis, the Production that
+/// admits the head, builds it from its words (`docs/design/lexicon.md` §5;
+/// Sibylline Soothsayer's *time counters*).
+#[test]
+fn licensed_term_words_straddle_but_only_its_own_analysis_rebuilds_it() {
+    let license = |mut lexeme: Lexeme, value: &str| {
+        lexeme
+            .properties
+            .features
+            .insert("KindLicense".into(), Ident::new(value));
+        lexeme
+    };
+    let mut kind = word("counter:time", "time", Category::Catalog);
+    kind.source.kind = SourceKind::Catalog;
+    let lexicon = Lexicon::new([
+        license(kind, "Kind"),
+        license(noun("counter"), "Head"),
+        noun("time"),
+        noun("damage"),
+        word("a:big", "big", Category::Adjective),
+    ])
+    .unwrap();
+    let source = |head: &str| {
+        format!(
+            r"
+            root Sentence
+            feature KindLicense = Kind | Head {head}
+            category Sentence
+            category Nominal [KindLicense]
+            category Kind
+            category Phrase
+            Sentence: Sentence -> Nominal '.' {{ capital: [head] }}
+            Split: Sentence -> modifier:Phrase Nominal '.' {{ capital: [modifier] }}
+            Phrase: Phrase -> modifier:Lex(Adjective) Lex(Noun)
+            Noun: Nominal -> Lex(Noun)
+            KindName: Kind -> Lex(Catalog)
+            KindPremodifier: Nominal -> modifier:Kind Nominal
+                where head.KindLicense := Head
+            Compound: Nominal -> modifier:Lex(Noun) Nominal
+            Premodified: Nominal -> modifier:Lex(Adjective) Nominal
+            "
+        )
+    };
+    let licensed = bind(&source("{ head: Head }"), &lexicon, NO_FRAMES).unwrap();
+    let unlicensed = bind(&source(""), &lexicon, NO_FRAMES).unwrap();
+    assert!(matches!(
+        bind(&source("{ head: Tail }"), &lexicon, NO_FRAMES),
+        Err(LoadError::Invalid(message)) if message.contains("names `Tail`, none of its values")
+    ));
+    let found = |grammar: &CompiledGrammar, text: &str| -> BTreeSet<Vec<String>> {
+        readings(grammar, &lexicon, text)
+            .iter()
+            .map(lexemes)
+            .collect()
+    };
+    let words = |ids: &[&str]| ids.iter().map(|&id| id.to_owned()).collect::<Vec<_>>();
+    assert_eq!(
+        found(&unlicensed, "Time counter."),
+        BTreeSet::from([
+            words(&["counter:time", "n:counter"]),
+            words(&["n:time", "n:counter"]),
+        ])
+    );
+    assert_eq!(
+        found(&licensed, "Time counter."),
+        BTreeSet::from([words(&["counter:time", "n:counter"])])
+    );
+    // *[Big time] [counter damage]* straddles the boundary; *big [time
+    // [counter damage]]* rebuilds the term with the noun and a dependent of
+    // *counter*.
+    let damage = ["a:big", "n:time", "n:counter", "n:damage"];
+    assert_eq!(
+        unlicensed
+            .parse(&lexicon, "Big time counter damage.")
+            .readings()
+            .filter(|reading| lexemes(reading) == damage)
+            .count(),
+        2
+    );
+    assert_eq!(
+        found(&licensed, "Big time counter damage."),
+        BTreeSet::from([words(&damage)])
+    );
+    let split = |reading: &Reading| {
+        reading
+            .node()
+            .is_some_and(|n| n.production.as_str() == "Split")
+    };
+    assert!(
+        licensed
+            .parse(&lexicon, "Big time counter damage.")
+            .readings()
+            .all(|reading| split(&reading))
+    );
+    // Admission decides the same on the Reading's own structure.
+    let scope = sylex_lexicon::CardScope::default();
+    for text in ["Time counter.", "Big time counter damage."] {
+        for reading in unlicensed.parse(&lexicon, text).readings() {
+            let rebuilds = lexemes(&reading).contains(&"n:time".to_owned()) && !split(&reading);
+            let admitted = licensed.admit(&reading, &lexicon, &scope);
+            if rebuilds {
+                assert!(
+                    matches!(
+                        admitted,
+                        Err(AdmissionError::Rejected { ref production, .. })
+                            if production == "lexical atomicity"
+                    ),
+                    "{reading:#?}"
+                );
+            } else {
+                assert_eq!(admitted, Ok(()), "{reading:#?}");
+            }
+        }
+    }
+}
+
 /// Obligations 3 and 4, discharged by construction: no Category is nullable.
 /// A Production with an empty right-hand side is a load error, the engine
 /// has no literal symbol, and every lexical alternative spans at least one

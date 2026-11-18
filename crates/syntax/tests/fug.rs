@@ -30,6 +30,14 @@ fn malformed_items_are_rejected_naming_the_defect() {
         ("category S", "`S` is declared twice"),
         ("root T", "`root` is given twice"),
         ("feature F = A | B | A", "3:21: `A` is listed twice"),
+        (
+            "feature F = A | B { holder: A }",
+            "a feature's settings are `local` and a license's `head: Value`, each once",
+        ),
+        (
+            "feature F = A | B { head: B, head: A }",
+            "a feature's settings are `local` and a license's `head: Value`, each once",
+        ),
         ("category T [F, G, F]", "`F` is listed twice"),
         (
             "A: S -> B { heavy: [head, head] }",

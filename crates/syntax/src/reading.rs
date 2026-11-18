@@ -871,6 +871,13 @@ fn least(a: Tier, b: Tier) -> Tier {
     }
 }
 
+/// A text's multiword nouns, each with whether its words may stand apart,
+/// and its licensed terms, each with its license.
+type Terms<'a> = (
+    &'a [(Range<usize>, bool)],
+    &'a [(Range<usize>, crate::compile::License)],
+);
+
 impl CompiledGrammar {
     /// Whether a Constituent of `category` with this Summary attaches high
     /// by its Attachment Class: the grammar declares its Category with a
@@ -1028,8 +1035,9 @@ impl CompiledGrammar {
         let (text, offsets) = join(&atoms);
         let analyzed = lexicon.analyze_source_scoped(&text, None, scope);
         let atomic = self.atomic_spans(&analyzed);
+        let licensed = self.licensed_terms(&analyzed);
         // An own name is checked against the analysis of its text.
-        if atomic.is_empty() && scope.forms().next().is_none() {
+        if atomic.is_empty() && licensed.is_empty() && scope.forms().next().is_none() {
             return Ok(());
         }
         let mut chars = vec![0; text.len() + 1];
@@ -1043,12 +1051,12 @@ impl CompiledGrammar {
             .collect();
         let mut next = 0;
         if self
-            .atomic_reading(reading, &atoms, &atomic, &analyzed, &mut next)?
+            .atomic_reading(reading, &atoms, (&atomic, &licensed), &analyzed, &mut next)?
             .is_none()
         {
             return Err(AdmissionError::Rejected {
                 production: "lexical atomicity".into(),
-                reason: "a declared multiword noun's words rebuild it".into(),
+                reason: "a declared multiword noun's or a licensed term's words rebuild it".into(),
             });
         }
         Ok(())
@@ -1060,17 +1068,21 @@ impl CompiledGrammar {
     /// words may stand apart, and then only where they straddle a constituent
     /// boundary. In the smallest Constituent spanning the term, the child
     /// holding its last word must end after it and no child may begin where
-    /// it begins. Returns the subtree's character span, or `None` where it
-    /// rebuilds a term. `atoms` holds each atom's character span, in the
-    /// order [`CompiledGrammar::atoms`] realizes them.
+    /// it begins. A licensed term's words (`CompiledGrammar::licensed_terms`)
+    /// stand apart as a splitting term's do, and its own analysis, a
+    /// Production that admits the license's head, may rebuild it. Returns the
+    /// subtree's character span, or `None` where it rebuilds a term. `atoms`
+    /// holds each atom's character span, in the order
+    /// [`CompiledGrammar::atoms`] realizes them.
     fn atomic_reading(
         &self,
         reading: &Reading,
         atoms: &[Range<usize>],
-        atomic: &[(Range<usize>, bool)],
+        terms: Terms<'_>,
         analyzed: &sylex_lexicon::AnalyzedText,
         next: &mut usize,
     ) -> Result<Option<Range<usize>>, AdmissionError> {
+        let (atomic, licensed) = terms;
         let inside = |at: usize, span: &Range<usize>| span.start < at && at < span.end;
         let node = match reading {
             Reading::Leaf(value) => {
@@ -1112,7 +1124,7 @@ impl CompiledGrammar {
                     production: node.production.to_string(),
                     reason: "missing child".to_owned(),
                 })?;
-                match self.atomic_reading(child, atoms, atomic, analyzed, next)? {
+                match self.atomic_reading(child, atoms, terms, analyzed, next)? {
                     Some(span) => span,
                     None => return Ok(None),
                 }
@@ -1123,10 +1135,18 @@ impl CompiledGrammar {
             return Ok(Some(0..0));
         };
         let whole = first.start..last.end;
+        let production = &self.productions[index];
         let rebuilt = atomic
             .iter()
-            .filter(|(term, splits)| *splits && whole.start <= term.start)
-            .any(|(term, _)| {
+            .filter_map(|(term, splits)| splits.then_some(term))
+            .chain(
+                licensed
+                    .iter()
+                    .filter(|(_, license)| !production.admits_head(*license))
+                    .map(|(term, _)| term),
+            )
+            .filter(|term| whole.start <= term.start)
+            .any(|term| {
                 spans.iter().enumerate().any(|(i, child)| {
                     inside(child.start, term)
                         && term.end <= child.end

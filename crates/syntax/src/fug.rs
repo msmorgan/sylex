@@ -16,6 +16,7 @@
 //! root Document
 //! feature Number = Singular | Plural          // a leading `|` is allowed
 //! feature ClauseShape = SubjectInitial { local }  // no head or conjunct shares it implicitly
+//! feature KindLicense = Kind | Head { head: Head }  // a license feature and its head value
 //! category NounPhrase : Parent [Number, Case] { gap, closed_gaps: [Measure], function }
 //! word Of = "prep:of"                         // a Closed Word and its lexeme id
 //! class Coordinator = ["coord:and", "coord:or"]
@@ -1091,19 +1092,29 @@ fn schemas(keyword: &str, item: &mut Item) -> Result<Vec<SchemaDecl>, LoadError>
 }
 
 /// A feature's values and whether it is local (`{ local }`).
-fn feature(item: &mut Item) -> Result<(Vec<Ident>, bool), LoadError> {
+/// A feature's values, whether it is local, and, for a license feature, its
+/// head value.
+fn feature(item: &mut Item) -> Result<(Vec<Ident>, bool, Option<Ident>), LoadError> {
     let value = item.value()?;
     let values = match value.kind {
         ValueKind::Alt(values) => values,
         kind => vec![Value::new(kind, value.at)],
     };
     let values = read(Value::new(ValueKind::List(values), value.at))?;
-    let local = match item.props.take().as_deref() {
-        None => false,
-        Some([(key, None, _)]) if key == "local" => true,
-        Some(_) => return fail(item.at, "a feature's only setting is `{ local }`"),
-    };
-    Ok((values, local))
+    let (mut local, mut head) = (false, None);
+    for (key, value, at) in item.props.take().into_iter().flatten() {
+        match (key.as_str(), value) {
+            ("local", None) if !local => local = true,
+            ("head", Some(value)) if head.is_none() => head = Some(value.ident()?),
+            _ => {
+                return fail(
+                    at,
+                    "a feature's settings are `local` and a license's `head: Value`, each once",
+                );
+            }
+        }
+    }
+    Ok((values, local, head))
 }
 
 /// The Grammar's sections, filled item by item.
@@ -1145,9 +1156,12 @@ impl Builder {
                 false
             }
             Some("feature") => {
-                let (values, local) = feature(&mut item)?;
+                let (values, local, head) = feature(&mut item)?;
                 if local {
                     grammar.local_features.insert(name);
+                }
+                if let Some(head) = head {
+                    grammar.licenses.insert(name, head);
                 }
                 grammar.features.insert(name, values).is_some()
             }

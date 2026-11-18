@@ -1423,6 +1423,14 @@ impl Production {
             .rposition(|symbol| !matches!(symbol, Symbol::Punct(..)))
     }
 
+    /// Whether it admits a license's head (`child.F := Head`): it is a
+    /// licensed term's own analysis (`Grammar::licenses`).
+    pub(crate) fn admits_head(&self, license: crate::compile::License) -> bool {
+        self.slots
+            .iter()
+            .any(|slot| slot.carried.contains(&license))
+    }
+
     pub(crate) fn boundaries(&self, position: usize, child: &ChildView<'_>) -> (bool, bool) {
         use crate::reading::glues_after;
         use crate::reading::glues_before;

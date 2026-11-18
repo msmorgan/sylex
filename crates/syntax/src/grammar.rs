@@ -62,6 +62,12 @@ pub struct Grammar {
     /// feature tells apart from another is that other Category with the
     /// feature: the phrases some Productions build, without restating them.
     pub local_features: std::collections::BTreeSet<Ident>,
+    /// License features (`docs/design/english.md` §3) by feature name, each
+    /// with the value its one head carries (`feature F = A | Head { head:
+    /// Head }`): a word that carries another value of it, directly before a
+    /// word that carries the head value, is a licensed term, whose words
+    /// stand apart as a multiword term's do (`docs/design/lexicon.md` §5).
+    pub licenses: BTreeMap<Ident, Ident>,
     pub categories: BTreeMap<Ident, CategoryDecl>,
     /// Closed Words by grammar name, each naming one core closed-class lexeme
     /// id.
