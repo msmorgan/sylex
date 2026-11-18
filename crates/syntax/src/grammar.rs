@@ -62,6 +62,13 @@ pub struct Grammar {
     /// feature tells apart from another is that other Category with the
     /// feature: the phrases some Productions build, without restating them.
     pub local_features: std::collections::BTreeSet<Ident>,
+    /// Mixed features (`feature Name = ... { mixed: Value }`), each with
+    /// the value a coordination has when its conjuncts differ in it: every
+    /// coordination of a Category that carries one has its conjuncts' common
+    /// value, or that one when any two of them differ, a conjunct without a
+    /// value deciding nothing. A Coordination schema names it in none of
+    /// `unshared`, `proximate` and `resolve`.
+    pub mixed_features: BTreeMap<Ident, Ident>,
     /// License features (`docs/design/english.md` §3) by feature name, each
     /// with the value its one head carries (`feature F = A | Head { head:
     /// Head }`): a word that carries another value of it, directly before a

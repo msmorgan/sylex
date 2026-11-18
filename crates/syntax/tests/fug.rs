@@ -32,11 +32,11 @@ fn malformed_items_are_rejected_naming_the_defect() {
         ("feature F = A | B | A", "3:21: `A` is listed twice"),
         (
             "feature F = A | B { holder: A }",
-            "a feature's settings are `local` and a license's `head: Value`, each once",
+            "a feature's settings are `local`, a license's `head: Value` and `mixed: Value`, each once",
         ),
         (
             "feature F = A | B { head: B, head: A }",
-            "a feature's settings are `local` and a license's `head: Value`, each once",
+            "a feature's settings are `local`, a license's `head: Value` and `mixed: Value`, each once",
         ),
         ("category T [F, G, F]", "`F` is listed twice"),
         (

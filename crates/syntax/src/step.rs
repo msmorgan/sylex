@@ -27,6 +27,18 @@ pub(crate) const MAX_RESOLUTIONS: usize = 4;
 /// The most conditions the joint exclusions of one Production may list.
 pub(crate) const MAX_JOINT_CONDITIONS: usize = 32;
 
+/// How a coordination resolves a feature from its conjuncts' values.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Resolution {
+    /// Every conjunct but the last shares one value, which the whole
+    /// coordination resolves with the last one's
+    /// (`SchemaDecl::Coordination::resolve`).
+    Last,
+    /// Each conjunct gives its value, and the coordination has their common
+    /// one, or the mixed value when any two differ (`Grammar::mixed_features`).
+    Mixed,
+}
+
 /// One feature value, with the final byte value reserved for an unbound slot.
 /// Binding validates the domain before any value reaches a chart State.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Ord, PartialOrd)]
@@ -531,11 +543,11 @@ pub(crate) struct Production {
     /// index.
     pub joint_exclusions: Vec<usize>,
     pub joint_conditions: Vec<(usize, usize, u16)>,
-    /// Features a coordination resolves: (feature, value when the conjuncts
-    /// but the last and the last differ, the mother feature position a whole
-    /// coordination resolves; a serial tail binds that position to its
-    /// conjuncts but the last instead).
-    pub resolutions: Vec<(usize, u16, Option<usize>)>,
+    /// Features a coordination resolves: (feature, value when conjuncts
+    /// differ, the mother feature position the coordination resolves, how).
+    /// A serial tail resolves no `Last` feature: it binds that position to
+    /// its conjuncts but the last instead.
+    pub resolutions: Vec<(usize, u16, Option<usize>, Resolution)>,
     /// The children that carry the value of the conjuncts but the last.
     pub resolution_nonlast: Vec<usize>,
     /// The child that carries the last conjunct's value, as its own feature
@@ -2039,8 +2051,9 @@ impl Production {
     }
 
     /// Takes a child's values of the resolved features into the
-    /// coordination: those of the conjuncts but the last (which agree by
-    /// equation), or the last conjunct's.
+    /// coordination: for a `Last` feature, those of the conjuncts but the
+    /// last (which agree by equation) or the last conjunct's; for a `Mixed`
+    /// one, every conjunct's, folded.
     fn resolve(
         &self,
         next: &mut State,
@@ -2053,7 +2066,19 @@ impl Production {
             Some((at, from_tail)) if at == position => Some(from_tail),
             _ => None,
         };
-        for (i, &(feature, ..)) in self.resolutions.iter().enumerate() {
+        for (i, &(feature, differ, _, resolution)) in self.resolutions.iter().enumerate() {
+            if resolution == Resolution::Mixed {
+                // Every conjunct's value, a serial tail's its conjuncts' own.
+                if (nonlast || last.is_some())
+                    && let Some(value) = lookup(feature)
+                {
+                    next.nonlast[i] = FeatureValue::new(match next.nonlast[i].get() {
+                        Some(so_far) if so_far != value => differ,
+                        _ => value,
+                    });
+                }
+                continue;
+            }
             if nonlast && let Some(value) = lookup(feature) {
                 next.nonlast[i] = FeatureValue::new(value);
             }
@@ -2555,7 +2580,12 @@ impl Production {
             *value = var.map_or(FeatureValue::UNSET, |v| state.vars[v]);
         }
         let mut last_resolved = [FeatureValue::UNSET; MAX_RESOLUTIONS];
-        for (i, &(_, differ, at)) in self.resolutions.iter().enumerate() {
+        for (i, &(_, differ, at, resolution)) in self.resolutions.iter().enumerate() {
+            if resolution == Resolution::Mixed {
+                let at = at.expect("a mixed feature is resolved on the mother");
+                values[at] = state.nonlast[i];
+                continue;
+            }
             match at {
                 // The whole takes the common value, or `differ`.
                 Some(at) => {

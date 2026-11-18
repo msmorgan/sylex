@@ -41,6 +41,7 @@ use crate::step::FeatureValue;
 use crate::step::Gap;
 use crate::step::GapRule;
 use crate::step::Production;
+use crate::step::Resolution;
 use crate::step::Symbol;
 use crate::step::Test;
 use crate::step::Unlike;
@@ -569,8 +570,9 @@ struct Draft {
     joint_exclusions: Vec<Vec<(usize, usize, u16)>>,
     carried: Vec<(usize, usize, u16)>,
     /// Features a coordination resolves: (feature, value when they differ,
-    /// whether the mother is the whole coordination rather than a tail).
-    resolutions: Vec<(usize, u16, bool)>,
+    /// whether the mother resolves it: the whole coordination, or any for a
+    /// mixed feature; how).
+    resolutions: Vec<(usize, u16, bool, Resolution)>,
     resolution_nonlast: Vec<usize>,
     resolution_last: Option<(usize, bool)>,
     weights: Vec<(usize, Weight)>,
@@ -2606,7 +2608,7 @@ impl<'a> Binder<'a> {
                 Target::Path(_) => {}
             }
         }
-        for &(feature, value, _) in &draft.resolutions {
+        for &(feature, value, ..) in &draft.resolutions {
             self.setters
                 .entry((feature, value))
                 .or_default()
@@ -2709,7 +2711,7 @@ impl<'a> Binder<'a> {
                 crate::step::MAX_RESOLUTIONS
             )));
         }
-        for (feature, differ, whole) in draft.resolutions {
+        for (feature, differ, whole, resolution) in draft.resolutions {
             let at = self.out.category_features[production.lhs]
                 .iter()
                 .position(|f| *f == feature)
@@ -2727,7 +2729,7 @@ impl<'a> Binder<'a> {
             }
             production
                 .resolutions
-                .push((feature, differ, whole.then_some(at)));
+                .push((feature, differ, whole.then_some(at), resolution));
         }
         production.resolution_nonlast = draft.resolution_nonlast;
         production.resolution_last = draft.resolution_last;
@@ -5357,8 +5359,8 @@ struct Conjoin {
     proximate: BTreeSet<usize>,
     resolved: BTreeSet<usize>,
     /// Features resolved over the conjuncts: (feature, value when they
-    /// differ).
-    resolutions: Vec<(usize, u16)>,
+    /// differ, how).
+    resolutions: Vec<(usize, u16, Resolution)>,
     /// Equations over the whole coordination.
     whole: Vec<Equation>,
     /// Joint exclusions over a `first` conjunct and the last.
@@ -5470,7 +5472,24 @@ impl Conjoin {
                     "coordination of `{category}` cannot resolve `{name}`"
                 )));
             }
-            resolutions.push((feature, binder.value(feature, value)?));
+            resolutions.push((feature, binder.value(feature, value)?, Resolution::Last));
+        }
+        for &feature in &binder.out.category_features[lhs] {
+            let name = &binder.out.features[feature];
+            let Some(value) = binder.grammar.mixed_features.get(name) else {
+                continue;
+            };
+            if unshared.contains(&feature)
+                || proximate.contains(&feature)
+                || resolved.contains(&feature)
+                || resolutions.iter().any(|&(f, ..)| f == feature)
+            {
+                return Err(invalid(format!(
+                    "coordination of `{category}` names `{name}`, which every coordination \
+                     mixes"
+                )));
+            }
+            resolutions.push((feature, binder.value(feature, value)?, Resolution::Mixed));
         }
         let tail_name = serial_tail(&binder.grammar.schemas, schema, category);
         let tail_id = binder.out.category_id(&tail_name).ok_or_else(|| {
@@ -5678,8 +5697,13 @@ impl Conjoin {
         let whole = matches!(edge, Edge::Whole { .. });
         let ends = matches!(edge, Edge::Whole { last: true } | Edge::Tail { last: true });
         let (last, nonlast) = conjuncts.split_last().expect("a conjunct");
-        for &(feature, differ) in &self.resolutions {
-            draft.resolutions.push((feature, differ, whole));
+        for &(feature, differ, resolution) in &self.resolutions {
+            if resolution == Resolution::Mixed {
+                // Each conjunct gives its value, so no equation relates them.
+                draft.resolutions.push((feature, differ, true, resolution));
+                continue;
+            }
+            draft.resolutions.push((feature, differ, whole, resolution));
             // The first conjunct agrees with the rest of the conjuncts but
             // the last: a serial tail's own value.
             if !ends {
@@ -5817,7 +5841,7 @@ impl Conjoin {
         self.resolve(draft, conjuncts, edge);
         for &feature in &self.features {
             if self.unshared.contains(&feature)
-                || self.resolutions.iter().any(|&(f, _)| f == feature)
+                || self.resolutions.iter().any(|&(f, ..)| f == feature)
             {
                 // Resolved features are bound by `resolve`.
                 continue;

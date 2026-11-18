@@ -17,6 +17,7 @@
 //! feature Number = Singular | Plural          // a leading `|` is allowed
 //! feature ClauseShape = SubjectInitial { local }  // no head or conjunct shares it implicitly
 //! feature KindLicense = Kind | Head { head: Head }  // a license feature and its head value
+//! feature Time = Past | Mixed | NonPast { mixed: Mixed }  // differing conjuncts give `Mixed`
 //! category NounPhrase : Parent [Number, Case] { gap, closed_gaps: [Measure], function }
 //! word Of = "prep:of"                         // a Closed Word and its lexeme id
 //! class Coordinator = ["coord:and", "coord:or"]
@@ -1091,29 +1092,52 @@ fn schemas(keyword: &str, item: &mut Item) -> Result<Vec<SchemaDecl>, LoadError>
         .collect()
 }
 
-/// A feature's values, whether it is local (`{ local }`), and, for a license
-/// feature, its head value.
-fn feature(item: &mut Item) -> Result<(Vec<Ident>, bool, Option<Ident>), LoadError> {
+/// Declares a feature: its values, whether it is local (`{ local }`), for a
+/// license feature its head value, and for a mixed feature its value when
+/// coordinated conjuncts differ. Whether the name was declared before.
+fn feature(item: &mut Item, name: Ident, grammar: &mut Grammar) -> Result<bool, LoadError> {
     let value = item.value()?;
     let values = match value.kind {
         ValueKind::Alt(values) => values,
         kind => vec![Value::new(kind, value.at)],
     };
-    let values = read(Value::new(ValueKind::List(values), value.at))?;
-    let (mut local, mut head) = (false, None);
+    let values: Vec<Ident> = read(Value::new(ValueKind::List(values), value.at))?;
+    let (mut local, mut head, mut mixed) = (false, None, None);
     for (key, value, at) in item.props.take().into_iter().flatten() {
         match (key.as_str(), value) {
             ("local", None) if !local => local = true,
             ("head", Some(value)) if head.is_none() => head = Some(value.ident()?),
+            ("mixed", Some(value)) if mixed.is_none() => mixed = Some((value.ident()?, at)),
             _ => {
                 return fail(
                     at,
-                    "a feature's settings are `local` and a license's `head: Value`, each once",
+                    "a feature's settings are `local`, a license's `head: Value` and \
+                     `mixed: Value`, each once",
                 );
             }
         }
     }
-    Ok((values, local, head))
+    match mixed {
+        // No coordination shares a local feature, so none mixes one.
+        Some((_, at)) if local => return fail(at, "a local feature is never mixed"),
+        Some((value, at)) if !values.contains(&value) => {
+            return fail(
+                at,
+                format!("`mixed: {value}` names no value of the feature"),
+            );
+        }
+        Some((value, _)) => {
+            grammar.mixed_features.insert(name, value);
+        }
+        None => {}
+    }
+    if local {
+        grammar.local_features.insert(name);
+    }
+    if let Some(head) = head {
+        grammar.licenses.insert(name, head);
+    }
+    Ok(grammar.features.insert(name, values).is_some())
 }
 
 /// The Grammar's sections, filled item by item.
@@ -1154,16 +1178,7 @@ impl Builder {
                 self.root = Some(name);
                 false
             }
-            Some("feature") => {
-                let (values, local, head) = feature(&mut item)?;
-                if local {
-                    grammar.local_features.insert(name);
-                }
-                if let Some(head) = head {
-                    grammar.licenses.insert(name, head);
-                }
-                grammar.features.insert(name, values).is_some()
-            }
+            Some("feature") => feature(&mut item, name, grammar)?,
             Some("category") => {
                 let decl = category(&mut item)?;
                 grammar.categories.insert(name, decl).is_some()
