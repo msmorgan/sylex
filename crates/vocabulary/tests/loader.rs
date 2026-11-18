@@ -2,7 +2,6 @@
 
 use sylex_vocabulary::LexicalEnvironment;
 use sylex_vocabulary::Sources;
-use sylex_vocabulary::schema::AnchorWord;
 use sylex_vocabulary::schema::FrameSpec;
 use sylex_vocabulary::schema::NounDecl;
 use sylex_vocabulary::schema::ScopedName;
@@ -174,19 +173,10 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
     sources
         .vote_options
         .retain(|option| option.name == "Redhorn Pass");
-    sources.anchor_words.clear();
     sources.environment(card_names).unwrap();
 
     let mut stray = sources.clone();
     stray.vote_options[0].cards.push("Not a Card".to_owned());
-    let error = stray.environment(card_names).unwrap_err().to_string();
-    assert!(error.contains("which is not a card name"), "{error}");
-
-    let mut stray = sources.clone();
-    stray.anchor_words.push(AnchorWord {
-        word: "Khans".to_owned(),
-        cards: vec!["Not a Card".to_owned()],
-    });
     let error = stray.environment(card_names).unwrap_err().to_string();
     assert!(error.contains("which is not a card name"), "{error}");
 

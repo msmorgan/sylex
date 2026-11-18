@@ -123,8 +123,8 @@ fn oracle_you_is_one_player() {
 }
 
 /// Every lexical value realizes to a spelling that analyzes back to the same
-/// value, on the cards whose scope admits it: the cards that print an Anchor
-/// Word or another card-scoped word, and any card for another value.
+/// value, on the cards whose scope admits it: the cards that print a
+/// card-scoped word, and any card for another value.
 #[test]
 fn every_value_realizes_and_analyzes_back() {
     let environment = LexicalEnvironment::load().unwrap();

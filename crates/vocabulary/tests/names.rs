@@ -140,7 +140,8 @@ fn a_name_is_its_card_s_own_in_its_scope_and_another_card_s_elsewhere() {
                 LexicalReading::IntroducedName { .. }
                 | LexicalReading::Numeral { .. }
                 | LexicalReading::FlavorWord { .. }
-                | LexicalReading::SetName { .. } => false,
+                | LexicalReading::SetName { .. }
+                | LexicalReading::AnchorWord { .. } => false,
             })
             .collect()
     };

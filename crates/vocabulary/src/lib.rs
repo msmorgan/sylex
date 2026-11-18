@@ -41,7 +41,6 @@ pub use crate::names::stated_scope;
 use crate::schema::AbilityWord;
 use crate::schema::AdjectiveDecl;
 use crate::schema::AdverbEntry;
-use crate::schema::AnchorWord;
 use crate::schema::ClosedClass;
 use crate::schema::CounterKind;
 use crate::schema::Designation;
@@ -91,7 +90,7 @@ pub enum SourceError {
 
 /// Every data file of this crate, by path: embedded at build time in release
 /// and wasm builds, read at run time in dev builds ([`data_text!`]).
-static FILES: [(&str, LazyLock<String>); 19] = [
+static FILES: [(&str, LazyLock<String>); 18] = [
     (CLOSED_CLASS, data_text!("lexicon/english/closed_class.ron")),
     (PREPOSITIONS, data_text!("lexicon/english/prepositions.ron")),
     (VERBS, data_text!("lexicon/english/verbs.ron")),
@@ -112,7 +111,6 @@ static FILES: [(&str, LazyLock<String>); 19] = [
     (STATUSES, data_text!("catalogs/statuses.ron")),
     (TURN_PARTS, data_text!("catalogs/turn_parts.ron")),
     (TOKENS, data_text!("catalogs/tokens.ron")),
-    (ANCHOR_WORDS, data_text!("catalogs/anchor_words.ron")),
     (VOTE_OPTIONS, data_text!("catalogs/vote_options.ron")),
 ];
 
@@ -136,7 +134,6 @@ const DESIGNATIONS: &str = "catalogs/designations.ron";
 const STATUSES: &str = "catalogs/statuses.ron";
 const TURN_PARTS: &str = "catalogs/turn_parts.ron";
 const TOKENS: &str = "catalogs/tokens.ron";
-const ANCHOR_WORDS: &str = "catalogs/anchor_words.ron";
 const VOTE_OPTIONS: &str = "catalogs/vote_options.ron";
 /// The card-name catalog, relative to the repository root.
 pub const CARD_NAMES: &str = "data/gen/catalogs/card-names.txt";
@@ -178,7 +175,6 @@ pub struct Sources {
     pub turn_parts: Vec<TurnPart>,
     pub statuses: Vec<schema::Status>,
     pub tokens: Vec<Token>,
-    pub anchor_words: Vec<AnchorWord>,
     pub vote_options: Vec<ScopedName>,
     /// The names of the dungeon cards, read from [`DUNGEON_NAMES`].
     pub dungeon_names: Vec<String>,
@@ -270,7 +266,6 @@ impl Sources {
             turn_parts: parse(TURN_PARTS)?,
             statuses: parse(STATUSES)?,
             tokens: parse(TOKENS)?,
-            anchor_words: parse(ANCHOR_WORDS)?,
             vote_options: parse(VOTE_OPTIONS)?,
             dungeon_names: generated_names(&dungeon_names_path())?,
         })
@@ -686,31 +681,6 @@ impl Sources {
                 .insert("LabelKind".into(), "AbilityWord".into());
             lexeme.properties.classes.insert("AbilityWord".into());
             builder.push(lexeme);
-        }
-        for anchor in &self.anchor_words {
-            builder.push(card_scoped(
-                exact(
-                    &format!("anchor_name:{}", anchor.word),
-                    &anchor.word,
-                    Category::Catalog,
-                    catalog(ANCHOR_WORDS, &anchor.word),
-                ),
-                &anchor.cards,
-            ));
-            let id = format!("anchor_word:{}", anchor.word);
-            let mut lexeme = exact(
-                &id,
-                &anchor.word,
-                Category::Keyword,
-                catalog(ANCHOR_WORDS, &anchor.word),
-            );
-            lexeme.surface_structure = SurfaceStructure::Opaque;
-            lexeme
-                .properties
-                .features
-                .insert("LabelKind".into(), "AnchorWord".into());
-            lexeme.properties.classes.insert("AnchorWord".into());
-            builder.push(card_scoped(lexeme, &anchor.cards));
         }
     }
 

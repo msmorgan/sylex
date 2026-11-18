@@ -94,46 +94,6 @@ fn an_unregistered_label_is_a_flavor_word() {
 }
 
 #[test]
-fn an_anchor_word_is_a_registered_label_on_the_cards_that_print_it() {
-    let environment = LexicalEnvironment::load().unwrap();
-    let sources = Sources::load().unwrap();
-    for anchor in &sources.anchor_words {
-        let line = format!("• {} — Draw a card.", anchor.word);
-        assert!(
-            matches!(
-                environment.lexicon.analyze_italic_head(&anchor.word),
-                ItalicHead::AnchorWord(_)
-            ),
-            "anchor word {}",
-            anchor.word
-        );
-        for card in &anchor.cards {
-            let scope = sylex_lexicon::CardScope::full_names([card.as_str()]);
-            let analyzed = environment
-                .lexicon
-                .analyze_source_scoped(&line, None, &scope);
-            assert!(
-                !analyzed
-                    .matches
-                    .iter()
-                    .any(|found| matches!(found.reading, LexicalReading::FlavorWord { .. })),
-                "{} on {card}",
-                anchor.word
-            );
-            assert!(
-                analyzed.matches.iter().any(|found| matches!(
-                    &found.reading,
-                    LexicalReading::Word(value)
-                        if value.lexeme == format!("anchor_word:{}", anchor.word).as_str()
-                )),
-                "{} on {card}",
-                anchor.word
-            );
-        }
-    }
-}
-
-#[test]
 fn chapter_numerals_are_not_labels_and_can_precede_one() {
     let environment = LexicalEnvironment::load().unwrap();
     assert_eq!(

@@ -38,7 +38,6 @@ vocabulary, all hand-authored RON embedded at build time.
 | `catalogs/statuses.ron` | `status_adj:`, `prep:` |
 | `catalogs/turn_parts.ron` | `turn_part:` |
 | `catalogs/tokens.ron` | `token:` |
-| `catalogs/anchor_words.ron` | `anchor_word:`, `anchor_name:` |
 | `catalogs/vote_options.ron` | `vote_option:` |
 
 `data/gen/catalogs/card-names.txt` (the `name:` Lexemes) and
@@ -70,12 +69,13 @@ a card of a stated name).
   `cargo xtask catalogs generate`, and a Shortened Name is derived from a
   face's name and type line when its text is parsed; see
   [Lexicon](../../docs/design/lexicon.md) §6. What is hand-curated is
-  the card-scoped words
-  (`vote_options.ron`, `anchor_words.ron`). An expansion a card's text cites
+  the card-scoped words (`vote_options.ron`). An expansion a card's text cites
   (*the Antiquities expansion*) is in no list: it is a Set Name, read from
   the text ([Lexicon](../../docs/design/lexicon.md) §2). Nor is a name a
   card's text introduces, as the name of a token it creates: it is an
-  Introduced Name, read from the text (Lexicon §6).
+  Introduced Name, read from the text (Lexicon §6). Nor is an Anchor Word
+  [CR#614.12c]: it is read from the face's text across its units
+  (`sylex_english::corpus::Face::scope`).
 
 The loader refuses a Core word that is also a Catalog item of the same
 Category, and `cr_coverage` refuses a catalog item the CR does not enumerate.

@@ -848,14 +848,6 @@ pub struct ScopedName {
     pub cards: Vec<String>,
 }
 
-/// An Anchor Word [CR#614.12c] with the cards that print it.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct AnchorWord {
-    pub word: String,
-    pub cards: Vec<String>,
-}
-
 /// A notation symbol with catalog-declared lexical classes.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
