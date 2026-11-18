@@ -456,6 +456,18 @@ impl Sources {
         for part in &self.turn_parts {
             let mut entry = part.noun.entry();
             entry.kind = schema::NounKind::Temporal;
+            // A phase or step is a part of a turn [CR#500.1], and its of-phrase
+            // is a Complement naming the turn, the whole it is a part of (*the
+            // first combat phase of the turn*; CGEL, Ch. 5, §14.1, p. 442,
+            // [7vi]), or the player whose turn it is [CR#102.1], a term in
+            // that relation (*the upkeep of enchanted creature's controller*).
+            // Every phase and step has it, so it is declared here once.
+            entry
+                .frames
+                .push(schema::FrameSpec::Complement(schema::FillSpec::PPWith(
+                    vec!["of".into()],
+                    Box::new(schema::FillSpec::NP),
+                )));
             let id = format!("turn_part:{}", entry.lemma);
             builder.noun(&id, &entry, catalog(TURN_PARTS, part.rule.number()))?;
         }

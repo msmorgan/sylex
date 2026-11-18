@@ -1,11 +1,19 @@
 // Core common nouns. Catalog items (card types, subtypes, counter kinds,
 // designations, phases and steps, tokens, keywords) live in catalogs/.
 // A `PP(["of"])` frame marks an of-phrase that expresses a semantic argument of
-// a relational noun (CGEL, Ch. 5, §14.1, pp. 439–441); an of-phrase that only
+// a relational noun (CGEL, Ch. 5, §14.1, pp. 440–442); an of-phrase that only
 // describes ("a creature of your choice") is a modifier and gets no frame.
+// `PPWith(["of"], NP)` is the same where the argument is an object or player,
+// never an amount, gerund or bare nominal (*the mana value of instant and
+// sorcery cards* never has *of instant*).
 [
     (lemma: "bidding", countability: [Mass], bare_mass_modified: true),
     // Game nouns.
+    // *activated abilities of creatures*: the of-phrase names the object that
+    // has the ability, its source [CR#113.1a,113.7]: an entity involved in
+    // what the noun denotes, as a natural source or an owner is (CGEL, Ch. 5,
+    // §14.1, p. 442, [7v], [7vii]), and it alternates with a genitive (*a
+    // creature's abilities*; §16.5.3, p. 475).
     (lemma: "ability", frames: [Complement(PP(["of"]))]),
     "activation",
     (lemma: "amount", distribution: HeadOnly, frames: [Complement(PP(["of"]))]),
@@ -84,9 +92,14 @@
     "foe",
     "friend",
     (lemma: "game", kind: Temporal),
-    "graveyard",
+    // Each player has their own library, hand and graveyard [CR#400.1]: the
+    // of-phrase names the player whose zone it is (*the graveyard of the
+    // player*), a term in that relation (CGEL, Ch. 5, §14.1, p. 442).
+    (lemma: "graveyard", frames: [Complement(PPWith(["of"], NP))]),
     (lemma: "half", plural: "halves", frames: [Complement(PP(["of"]))]),
-    "hand",
+    // Bare after a preposition it omits *of X*, as *top* does (*cards in
+    // hand*).
+    (lemma: "hand", frames: [Complement(PPWith(["of"], NP)), Intransitive]),
     // The faces of a coin (*comes up heads*).
     (lemma: "heads", countability: [Mass]),
     (lemma: "tails", countability: [Mass]),
@@ -96,7 +109,7 @@
     "label",
     "left",
     "legend",
-    "library",
+    (lemma: "library", frames: [Complement(PPWith(["of"], NP))]),
     (lemma: "life", distribution: DirectMeasure, countability: [Mass]),
     // *has starting loyalty X*, as *power 3*; *having 0 loyalty*.
     (lemma: "loyalty", distribution: DirectMeasure, countability: [Mass], bare_mass_modified: true, frames: [Complement(Amount)]),
@@ -104,9 +117,10 @@
     // *to a maximum of 10*; the attributive *maximum* is the adjective's.
     (lemma: "maximum", distribution: HeadOnly, frames: [Complement(PP(["of"]))]),
     "mode",
-    // The Subject of a copy's exception that gives a name (*except its name
-    // is Mishra's Warform*).
-    (lemma: "name", classes: ["NameNoun"]),
+    // A card's name [CR#201.1] and its bearer (*the name of a nonland card*;
+    // CGEL, Ch. 5, §14.1, p. 442, [7i]). The Subject of a copy's exception
+    // that gives a name (*except its name is Mishra's Warform*).
+    (lemma: "name", classes: ["NameNoun"], frames: [Complement(PPWith(["of"], NP))]),
     // *a number 0 or greater*, as *a mana value 0 or greater*.
     (lemma: "number", distribution: Quantity, frames: [Complement(PP(["of"])), Complement(Amount)]),
     "offer",
@@ -152,7 +166,10 @@
     (lemma: "step", kind: Temporal),
     "symbol",
     // Not the Targeting Marker of "target creature", which has a Determinative Lexeme.
-    (lemma: "target", distribution: HeadOnly),
+    // *the target of a spell or ability*: the spell or ability whose target
+    // it is [CR#115.1], a term in the relation the noun denotes (CGEL, Ch. 5,
+    // §14.1, pp. 441–442).
+    (lemma: "target", distribution: HeadOnly, frames: [Complement(PPWith(["of"], NP))]),
     "team",
     "teammate",
     // A quoted ability follows *text* as its apposition (*has the text
@@ -191,10 +208,14 @@
 
     // Multiword rules terms, each one Lexeme.
     (lemma: "color identity", frames: [Complement(PP(["of"]))]),
-    (lemma: "combat damage", distribution: DirectMeasure, countability: [Mass]),
+    // *the combat damage of each creature attacking you*: the creature that
+    // assigns it [CR#510.1a], its source (CGEL, Ch. 5, §14.1, p. 442, [7v]).
+    (lemma: "combat damage", distribution: DirectMeasure, countability: [Mass], frames: [Complement(PPWith(["of"], NP))]),
     // A zone name [CR#408.1]; `command` occurs in no other sense.
     "command zone",
-    "life total",
+    // A player's life total [CR#119.1] and its bearer (*the life total of an
+    // opponent*; CGEL, Ch. 5, §14.1, p. 442, [7i]).
+    (lemma: "life total", frames: [Complement(PPWith(["of"], NP))]),
     // Where an object in none of the game's zones is [CR#400.11]: a count
     // conjunct beside zone nouns under their determiner, only in Invasion of
     // Arcavios and Turtles Forever (*search your library, graveyard, and/or
@@ -202,7 +223,9 @@
     // outside the game*, *cards you own outside the game*).
     "outside the game",
     (lemma: "mana cost", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PP(["for", "of"])), Complement(Cost)]),
-    (lemma: "mana value", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(Amount)]),
+    // An object's mana value [CR#202.3] and its bearer (*the mana value of the
+    // exiled card*; CGEL, Ch. 5, §14.1, p. 442, [7i]), as *power* takes.
+    (lemma: "mana value", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PPWith(["of"], NP)), Complement(Amount)]),
     // [CR#103.6]; `opening` occurs in no other sense.
     "opening hand",
     // The mana cost of a locked half, paid to unlock it [CR#709.5e].
