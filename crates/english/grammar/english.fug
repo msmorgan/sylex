@@ -306,10 +306,6 @@ feature TargetMarked = Marked
 // (Stalwart Successor).
 feature KindLicense = Kind | Head { head: Head }
 // A license feature (english.md §3), which a noun's parameter pattern
-// declares: `Head` on a noun a Set Name premodifies (*expansion*), which
-// takes no other premodifier there.
-feature SetNameLicense = Head
-// A license feature (english.md §3), which a noun's parameter pattern
 // declares: `Head` on a noun a cited option word premodifies (*each numbers
 // vote* [CR#701.38b]), which takes no noun premodifier there. A phrase
 // carries its head noun's, and a Verb Phrase its Complement's, so a clause
@@ -471,7 +467,7 @@ category ModifiedQuantifiedNominal : Nominal [
 ]
 category BareNominal : Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, SetNameLicense, OptionLicense,
+    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, OptionLicense,
     BareMass, GenitiveAlternant, RelativeGender,
 ] { gap }
 // The singular count nominals that share a determiner before the
@@ -1169,13 +1165,7 @@ KeywordPeriodSentences: Ability -> first:KeywordLineItem '.' rest:Sentences
 // item ends in a Supplement, a clause (*Firebending X, where X is this
 // creature's power.*), or in a parameter with a period of its own.
 SupplementedKeywordLine: Ability -> KeywordLineItem '.' where head.KeywordItemEnd := Supplement
-// *Expansion* takes its Set Name as its premodifier, and no Name: an
-// admission gate (english.md §3, §6) that keeps a second tree, a card's own
-// name premodifying *expansion*, off Golgothian Sylex's wording citing a set
-// spelled like a card (*a name originally printed in the Time Spiral
-// expansion*) in that card's own text (tests/set_names.rs).
 NamePremodifier: BareNominal -> modifier:Name BareNominal
-    where head.SetNameLicense != Head
 // A token named for a card, in the Object of *create*: it has the
 // characteristics of the card so named [CR#111.11] (*create a Tarmogoyf
 // token*, *create a tapped Mutavault token*). A card name that a subtype or
@@ -2849,10 +2839,6 @@ AttributedPremodifier: Premodifier -> Attributes { cost: 0 }
 // (english.md §3, §6) that keeps the noun *loyalty* from premodifying
 // *counter* beside the kind name in *Put a loyalty counter on target Gideon
 // planeswalker* (Gideon's Company).
-// Nor does *expansion* take a noun premodifier beside its Set Name: an
-// admission gate that keeps the subtypes *Urza's* and *Saga* from
-// premodifying it in Golgothian Sylex's wording citing Urza's Saga (*the
-// Urza's Saga expansion*, tests/set_names.rs).
 // Nor does *vote* take one beside the option it is counted by: an admission
 // gate that keeps the noun *money* from premodifying it beside the cited
 // option in *For each money vote* (Expropriate).
@@ -2868,7 +2854,6 @@ AttributedPremodifier: Premodifier -> Attributes { cost: 0 }
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
     where head.DeterminerNeed != Required,
           head.KindLicense != Head,
-          head.SetNameLicense != Head,
           head.OptionLicense != Head
 QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier QuantifiedNominal
 // A bare count singular nominal that a preposition's frame selects (*until

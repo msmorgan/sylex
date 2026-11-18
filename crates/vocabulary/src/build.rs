@@ -356,19 +356,12 @@ impl Builder {
         lexeme.properties.prefix_hyphenation = entry.prefix_hyphenation;
         lexeme.onset = entry.onset;
         // A noun whose pattern takes a Set Name before it is where analysis
-        // reads one, and takes no other premodifier: its license
-        // (`SetNameLicense`, english.md §3).
-        lexeme.set_name_host = licensed_host(id, entry, SlotKind::SetName, "a Set Name")?;
-        if lexeme.set_name_host {
-            lexeme
-                .properties
-                .features
-                .insert("SetNameLicense".into(), Ident::new("Head"));
-        }
+        // reads one (docs/design/lexicon.md §2).
+        lexeme.set_name_host = parameter_host(id, entry, SlotKind::SetName, "a Set Name")?;
         // A noun whose pattern takes a cited Vote Option before it (*each
         // numbers vote*) takes no noun premodifier there: its license
         // (`OptionLicense`, english.md §3).
-        if licensed_host(id, entry, SlotKind::OptionMention, "a cited option")? {
+        if parameter_host(id, entry, SlotKind::OptionMention, "a cited option")? {
             lexeme
                 .properties
                 .features
@@ -825,12 +818,13 @@ pub(crate) fn exact(id: &str, lemma: &str, category: Category, source: Source) -
 }
 
 /// Whether a noun's parameter patterns take a parameter of `kind` before
-/// the noun: a license feature's head (english.md §3).
+/// the noun, where analysis reads a Set Name (lexicon.md §2) or a cited
+/// option's host takes its license (`OptionLicense`, english.md §3).
 ///
 /// # Errors
 /// A pattern that takes one beside another parameter, or anywhere but right
 /// before its head.
-fn licensed_host(
+fn parameter_host(
     id: &str,
     entry: &NounEntry,
     kind: SlotKind,

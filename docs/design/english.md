@@ -204,7 +204,7 @@ read as words of an ordinary Category, would take that Category's whole
 distribution, and the census shows that distribution multiplying Readings on
 real card text. Each equation that reads it is an admission gate (§6), and its
 comment names a real card and the spurious structure it prevents. There are
-three, `KindLicense`, `SetNameLicense` and `OptionLicense`.
+two, `KindLicense` and `OptionLicense`.
 `KindLicense`: The counter Catalog marks each counter's kind name
 (*charge*, *time*) and each keyword a keyword counter can be [CR#122.1b]
 `Kind`, and the noun *counter* `Head`. A `Kind` word is a kind only before
@@ -227,16 +227,6 @@ are open, as every Catalog is; a license states their one position as a
 lexical fact of the Catalog, where a Production per kind would name Catalog
 items (§2), and it leaves the attachment of general adjuncts to Category,
 function and grammatical feature.
-`SetNameLicense`: a noun whose parameter pattern takes a Set Name before it
-([Lexicon](lexicon.md) §2), *expansion*, is `Head`, which the pattern's
-declaration gives it, not a list. A Set Name is open, so no word of it carries
-the license: being no Proper Name, it stands nowhere but before that noun. The
-noun takes its Set Name as its one premodifier, and neither a Name nor a noun
-premodifier: a set name is often spelled like a card's name or a subtype (*Time
-Spiral*, *Urza's Saga*), and as such *the Time Spiral expansion* would be
-a second tree, the card's name premodifying *expansion*, in Time Spiral's own
-text, and *the Urza's Saga expansion* two more, the subtypes *Urza's* and
-*Saga* premodifying it.
 `OptionLicense`: a noun whose parameter pattern takes a cited Vote Option
 before it ([Lexicon](lexicon.md) §2), *vote*, is `Head`, which the pattern's
 declaration gives it. A Vote Option is open, so no word of it carries the

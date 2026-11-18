@@ -42,33 +42,32 @@ fn set_name_readings(
 }
 
 /// Each set name, in another card's text and, where it is spelled like a
-/// card's name, in that card's own: every Reading reads it as one Set Name,
-/// and there are as many Readings as Golgothian Sylex's own text has, so no
-/// Name, subtype or run inside it builds another analysis of it.
+/// card's name, in that card's own: some Reading reads it as one Set Name.
+/// Where a card's own name or a subtype spells it, that word premodifying
+/// *expansion* reads in its place in other Readings (no card cites such a
+/// set); elsewhere every Reading reads the Set Name, so no run inside it
+/// builds another analysis of it.
 #[test]
-fn a_set_name_is_one_set_name_in_every_reading() {
+fn a_set_name_is_read_as_one_set_name() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let sylex = set_name_readings(
-        &env,
-        &grammar,
-        &SYLEX.replace("NAME", "Antiquities"),
-        "Antiquities",
-        &scope("Golgothian Sylex"),
-    );
-    assert!(!sylex.is_empty() && sylex.iter().all(|held| *held));
-    for (name, card) in [
-        ("Time Spiral", "Golgothian Sylex"),
-        ("Time Spiral", "Time Spiral"),
-        ("Urza's Saga", "Golgothian Sylex"),
-        ("Urza's Saga", "Urza's Saga"),
-        ("Phyrexia: All Will Be One", "Golgothian Sylex"),
-        ("The Brothers' War", "Golgothian Sylex"),
-        ("Shadows over Innistrad", "Golgothian Sylex"),
+    for (name, card, homograph) in [
+        ("Antiquities", "Golgothian Sylex", false),
+        ("Time Spiral", "Golgothian Sylex", false),
+        ("Time Spiral", "Time Spiral", true),
+        ("Urza's Saga", "Golgothian Sylex", true),
+        ("Urza's Saga", "Urza's Saga", true),
+        ("Phyrexia: All Will Be One", "Golgothian Sylex", false),
+        ("The Brothers' War", "Golgothian Sylex", false),
+        ("Shadows over Innistrad", "Golgothian Sylex", false),
         // Its first word is also the plural subtype *Adventure*.
-        ("Adventures in the Forgotten Realms", "Golgothian Sylex"),
-        ("Warhammer 40,000 Commander", "Golgothian Sylex"),
-        ("30th Anniversary Edition", "Golgothian Sylex"),
+        (
+            "Adventures in the Forgotten Realms",
+            "Golgothian Sylex",
+            false,
+        ),
+        ("Warhammer 40,000 Commander", "Golgothian Sylex", false),
+        ("30th Anniversary Edition", "Golgothian Sylex", false),
     ] {
         let held = set_name_readings(
             &env,
@@ -77,11 +76,12 @@ fn a_set_name_is_one_set_name_in_every_reading() {
             name,
             &scope(card),
         );
-        assert!(
-            held.iter().all(|held| *held),
-            "{name} in {card}'s text: {held:?}"
-        );
-        assert_eq!(held.len(), sylex.len(), "{name} in {card}'s text");
+        let read = if homograph {
+            held.iter().any(|held| *held)
+        } else {
+            !held.is_empty() && held.iter().all(|held| *held)
+        };
+        assert!(read, "{name} in {card}'s text: {held:?}");
     }
 }
 
