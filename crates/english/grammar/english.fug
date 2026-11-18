@@ -86,10 +86,12 @@ feature ComplementKind =
 feature ConjunctKind =
     | NP | MeasureNP | PP | AdjP | AdvP | NounPremodifier | Amount | Participial | KeywordPhrase
     | QuotedAbility
-// What a nominal's Premodifier is, which before *counter* may be its kind
-// (KindPremodifier): an Adjective Phrase, a slash measure or a bare keyword.
-// A participle or Attributes premodifier leaves it unvalued.
-feature PremodifierKind = Adjectival | Measure | Keyword
+// What a nominal's Premodifier is: an Adjective Phrase, a slash measure, a
+// bare keyword or a participle. Before *counter* a measure or keyword may be
+// its kind (KindPremodifier), and neither a keyword nor a participle
+// premodifies a nominal that needs a determiner. An Attributes premodifier
+// leaves it unvalued.
+feature PremodifierKind = Adjectival | Measure | Keyword | Participial
 // The Slot Kind of a determinative's Preposition Phrase's Complement: the
 // values of ComplementKind, which it agrees with.
 feature ObliqueKind =
@@ -442,7 +444,8 @@ category FusedQuantity : DeterminerPhrase [Number, Countability]
 // but a noun: an Adjective Phrase, a participle, coordinated or asyndetic
 // Attributes, a slash measure or a bare keyword. A bare nominal and a
 // determiner's Cluster take it alike. PremodifierKind names an Adjective
-// Phrase, a measure and a keyword; DeterminerNeed is an adjective's.
+// Phrase, a measure, a keyword and a participle; DeterminerNeed is an
+// adjective's.
 category Premodifier [PremodifierKind, DeterminerNeed] { function }
 category NominalCluster [
     Number, Countability, DeterminativeDistribution,
@@ -3062,7 +3065,7 @@ AdjectivalPremodifier: Premodifier -> AdjectivePhrase { cost: 0 }
     where head.ComplementKind = Intransitive,
           head.AdjectivePosition != Predicative,
           $.PremodifierKind = Adjectival
-ParticipialPremodifier: Premodifier -> Participle { cost: 0 }
+ParticipialPremodifier: Premodifier -> Participle { cost: 0 } where $.PremodifierKind = Participial
 // An adjective that needs an overt determiner passes the need to its
 // nominal (*the first creature*). Like an adjective, any premodifier stands
 // on a conjunct whose Complement is shared (*the noted number and kind of
@@ -3071,10 +3074,19 @@ ParticipialPremodifier: Premodifier -> Participle { cost: 0 }
 // second tree, the measure or keyword as a general premodifier of *counter*,
 // off *Put a +1/+1 counter on each of up to two target creatures* (Travel
 // Preparations) and *Put a double strike counter on Mai* (Mai, Jaded Edge).
+// A keyword or participle premodifies no nominal that needs a determiner
+// (NumeralNominal, SymbolNominal, LoyaltyNominal, CardinalNominal, or one an
+// adjective passes the need to): an admission gate (english.md §6), which
+// keeps a keyword or participle from premodifying its own Keyword Parameter,
+// *devour* the nominal *2* in *a ... token with flying and devour 2* (Dragon
+// Broodmother). An adjective still premodifies one (*a natural 20*, *an
+// additional {G}*).
 Premodifier: BareNominal -> modifier:Premodifier BareNominal { transparent: [head] }
     where modifier.DeterminerNeed = $.DeterminerNeed,
           !(modifier.PremodifierKind = Measure & head.KindLicense = Head),
-          !(modifier.PremodifierKind = Keyword & head.KindLicense = Head)
+          !(modifier.PremodifierKind = Keyword & head.KindLicense = Head),
+          !(modifier.PremodifierKind = Keyword & head.DeterminerNeed = Required),
+          !(modifier.PremodifierKind = Participial & head.DeterminerNeed = Required)
 // An attributive adjective over a whole *and*-coordination of singular
 // nominals, not only its first conjunct (*[total [power and toughness 5 or
 // less]]*; CGEL 15§1.3.4:1285–1286). A nominal's Complement is inside its
