@@ -15,10 +15,11 @@ use sylex_vocabulary::Sources;
 /// Terms that happen to spell a catalog item, each the standard name of a
 /// grammatical or notational concept rather than a use of the catalog word.
 // *Case* is the grammatical feature of nominative, accusative and genitive.
-// *Time* names the time of a clause's situation (`PastTime`); the catalog
-// word it spells is the time counter's kind name [CR#702.62a]. *Loyalty* names
-// the loyalty cost of a loyalty ability's symbol (*[+1]*, [CR#606.4]); the
-// catalog word it spells is the loyalty counter's kind name [CR#122.1e].
+// *Time* names the time of a clause's situation (the feature `Time`); the
+// catalog word it spells is the time counter's kind name [CR#702.62a].
+// *Loyalty* names the loyalty cost of a loyalty ability's symbol (*[+1]*,
+// [CR#606.4]); the catalog word it spells is the loyalty counter's kind name
+// [CR#122.1e].
 const GRAMMATICAL_TERMS: [&str; 3] = ["case", "time", "loyalty"];
 
 #[test]

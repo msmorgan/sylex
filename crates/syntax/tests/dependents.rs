@@ -2,7 +2,7 @@
 //! (`dependents Name = [Category, ...] where ...`): the binder adds them to
 //! every Production with such a dependent, authored, Schema-made or derived.
 //! The grammar here gives a temporal clause's time to the phrase it modifies,
-//! which may not carry the other time (*Whenever you cast a noncreature
+//! which may not have the other time (*Whenever you cast a noncreature
 //! spell, choose one*, Kykar, Zephyr Awakener: *cast* is present only; *the
 //! life you lost when it entered*, Soulgorger Orgg: *entered* modifies
 //! *lost*; CGEL, Ch. 8 §6, p. 700).
@@ -37,7 +37,18 @@ fn lexicon() -> Lexicon {
         }
         verb
     };
+    // A finite form with no tense, as a modal's preterite has none (*If you
+    // would draw a card while ...*, Laboratory Maniac); only a modal's
+    // preterite may lack one.
+    let mut pass = verb("v:pass", "pass", "passed");
+    pass.properties.modal = true;
+    for slot in &mut pass.forms {
+        if slot.form == WordForm::Preterite {
+            slot.features.tense = None;
+        }
+    }
     Lexicon::new([
+        pass,
         verb("v:cast", "cast", "cast"),
         verb("v:draw", "draw", "drew"),
         verb("v:put", "put", "put"),
@@ -64,6 +75,10 @@ const FRAMES: &str = r#"(
             (relation: Object, fill: NP),
             (relation: Complement, fill: PP(["p:into"])),
         ])],
+        "v:pass": [(family: TransitiveWithPP, slots: [
+            (relation: Object, fill: NP),
+            (relation: Complement, fill: PP(["p:when"])),
+        ])],
     },
     prepositions: {
         "p:when": [(complement: Clause(Temporal), hosts: Predicate)],
@@ -73,25 +88,22 @@ const FRAMES: &str = r#"(
 
 /// Indented under `grammar`'s items.
 const RULE: &str = "dependents Timed = [PrepositionPhrase, Interleaved]
-            where $.PastTime = dependent.PastTime,
-                  $.NonPastTime = dependent.NonPastTime,
-                  !(head.PastTime = Past & dependent.NonPastTime = NonPast),
-                  !(head.NonPastTime = NonPast & dependent.PastTime = Past)";
+            where $.Time = dependent.Time,
+                  head.Time = dependent.Time";
 
 fn grammar(lexicon: &Lexicon, rule: &str) -> Result<CompiledGrammar, sylex_syntax::LoadError> {
     let source = format!(
         "
         root Sentence
         feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
-        feature PastTime = Past
-        feature NonPastTime = NonPast
-        category Clause [VerbForm, PastTime, NonPastTime]
-        category Interleaved [PastTime, NonPastTime] {{ function }}
+        feature Time = Past | Mixed | NonPast
+        category Clause [VerbForm, Time]
+        category Interleaved [Time] {{ function }}
         category NounPhrase
-        category PrepositionPhrase [PastTime, NonPastTime]
+        category PrepositionPhrase [Time]
         category Sentence
-        category TemporalClause [PastTime, NonPastTime]
-        category VerbPhrase [VerbForm, PastTime, NonPastTime]
+        category TemporalClause [Time]
+        category VerbPhrase [VerbForm, Time]
         word You = \"pr:you\"
         slot NP = NounPhrase
         slot PP = PrepositionPhrase
@@ -99,8 +111,7 @@ fn grammar(lexicon: &Lexicon, rule: &str) -> Result<CompiledGrammar, sylex_synta
         Declarative: Sentence -> clause:Clause '.' {{ capital: [clause] }}
         Imperative: Clause -> VerbPhrase
             where head.VerbForm = Plain,
-                  $.NonPastTime = NonPast,
-                  head.PastTime != Past
+                  $.Time = NonPast
         SubjectPredicate: Clause -> subject:Word(You) VerbPhrase where head.VerbForm = Finite
         Temporal: TemporalClause -> Clause where head.VerbForm = Finite
         Noun: NounPhrase -> Lex(Noun)
@@ -108,7 +119,7 @@ fn grammar(lexicon: &Lexicon, rule: &str) -> Result<CompiledGrammar, sylex_synta
         valence VerbPhrase {{ head: Verb, interleaved: Interleaved }}
         valence PrepositionPhrase {{
             head: Preposition,
-            agree: [PastTime -> PastTime, NonPastTime -> NonPastTime],
+            agree: [Time -> Time],
         }}
         adjunct PrepositionPhrase {{ host: Clause, side: Before, host_kind: Predicate, delimiter: ',' }}
         adjunct PrepositionPhrase {{ host: VerbPhrase, side: After, host_kind: Predicate }}
@@ -181,20 +192,35 @@ fn a_dependent_after_a_verb_phrase_gives_it_its_time() {
     assert_eq!(with, BTreeSet::from([PRETERITE]));
 }
 
+/// The number of Readings the text has, with the rule and without.
+fn readings(text: &str) -> (usize, usize) {
+    let lexicon = lexicon();
+    let count = |rule: &str| {
+        let grammar = grammar(&lexicon, rule).unwrap();
+        grammar.parse(&lexicon, text).readings().count()
+    };
+    (count(RULE), count(""))
+}
+
 #[test]
-fn a_derived_interleaved_dependent_takes_the_rule() {
+fn a_derived_production_s_dependents_share_one_time_whatever_its_head_has() {
     // The engine derives the Production that interleaves an Adjunct before a
     // selected Complement (*deals 3 damage [this way] to any target*); the
-    // rule reaches it with no statement of its own.
-    let (with, without) = cast_forms("You gave card when you cast spell into hand.");
-    assert_eq!(with, BTreeSet::from([PRETERITE]));
-    assert_eq!(without, BTreeSet::from([PRESENT, PRETERITE]));
+    // rule reaches it with no statement of its own. *Passed* has no time, as
+    // a modal's preterite has none, so only the rule relates its interleaved
+    // temporal clause to its temporal Complement: the two locate one
+    // situation, and a past and a non-past one have no Reading together.
+    let (with, without) = readings("You passed card when you drew spell when you draw spell.");
+    assert_eq!(with, 0);
+    assert!(without > 0);
+    let (with, _) = readings("You passed card when you draw spell when you draw spell.");
+    assert!(with > 0);
 }
 
 #[test]
 fn an_equation_that_applies_nowhere_is_a_load_error() {
     let lexicon = lexicon();
-    let rule = "dependents Timed = [NounPhrase] where $.PastTime = dependent.PastTime";
+    let rule = "dependents Timed = [NounPhrase] where $.Time = dependent.Time";
     let error = grammar(&lexicon, rule).unwrap_err().to_string();
     assert!(error.contains("applies to no Production"), "{error}");
 }

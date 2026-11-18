@@ -1,8 +1,8 @@
 //! The lexicon feature-bundle mapping table carries a verb form's tense into
-//! the grammar as two features, each carried or not: a present carries
-//! `NonPastTime`, a preterite `PastTime`, and a form with no tense neither: a
-//! modal's preterite, ambiguous between past time and modal remoteness, fixes
-//! no time (CGEL, Ch. 3 §2.4, p. 107).
+//! the grammar as its `Time`: a present is `NonPast`, a preterite `Past`, and
+//! a form with no tense leaves it unvalued: a modal's preterite, ambiguous
+//! between past time and modal remoteness, fixes no time (CGEL, Ch. 3 §2.4,
+//! p. 107).
 
 use sylex_lexicon::Lexeme;
 use sylex_lexicon::Lexicon;
@@ -40,16 +40,15 @@ fn lexicon() -> Lexicon {
     Lexicon::new([draw, will]).unwrap()
 }
 
-/// Whether the text is a verb carrying `PastTime`, and whether one carrying
-/// `NonPastTime`.
+/// Whether the text is a verb whose `Time` is `Past`, and whether one whose
+/// `Time` is `NonPast`.
 fn times(text: &str) -> (bool, bool) {
     let lexicon = lexicon();
     let parses = |equations: &str| {
         let source = format!(
             "
             root Sentence
-            feature PastTime = Past
-            feature NonPastTime = NonPast
+            feature Time = Past | Mixed | NonPast
             category Sentence
             Verb: Sentence -> Lex(Verb) '.' {{ capital: [head] }} {equations}
             "
@@ -64,8 +63,8 @@ fn times(text: &str) -> (bool, bool) {
     };
     assert!(parses(""), "{text}");
     (
-        parses("where head.PastTime := Past"),
-        parses("where head.NonPastTime := NonPast"),
+        parses("where head.Time := Past"),
+        parses("where head.Time := NonPast"),
     )
 }
 

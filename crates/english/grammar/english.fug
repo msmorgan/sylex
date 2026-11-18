@@ -45,16 +45,16 @@ feature AdjectivalPassive = Lexical
 // non-modal NICE verbs (*be*, *have*, *don't*); `Lexical`: all other verbs;
 // `Mixed`: a coordination of unlike VerbKinds.
 feature VerbKind = Lexical | Auxiliary | Modal | Mixed
-// A Clause's or Verb Phrase's time, two privative features, each carried or
-// not; the lexicon's tense gives them: a preterite carries `Past`, a present
-// `NonPast`. A modal's preterite is ambiguous between past time and modal
-// remoteness, remoteness being much the more common (CGEL 3§2.4:107), so the
-// form fixes no time and carries neither; nor does a plain form or a
-// participle, whose verb leaves its time open (CGEL 3§7:162), nor irrealis
-// *were*. A phrase carries its head's time and its time-giving dependents'
-// (TimeGiving), and a coordination every time any conjunct carries.
-feature PastTime = Past
-feature NonPastTime = NonPast
+// A Clause's or Verb Phrase's time; the lexicon's tense gives it: a preterite
+// is `Past`, a present `NonPast`. A modal's preterite is ambiguous between
+// past time and modal remoteness, remoteness being much the more common (CGEL
+// 3§2.4:107), so the form fixes no time and leaves it unvalued; so does a
+// plain form or a participle, whose verb leaves its time open (CGEL
+// 3§7:162), and irrealis *were*. A phrase has its head's time and its
+// time-giving dependents' (TimeGiving). A coordination has its conjuncts'
+// one time, or `Mixed` when any two of them differ, whatever their order,
+// which neither a past nor a non-past phrase admits.
+feature Time = Past | Mixed | NonPast { mixed: Mixed }
 // A prefixed negative premodifier's (*nonland*, *nonattacking*, *non-Aura*):
 // `Negative` on an Adjective Phrase, a participle or a noun premodifier under
 // a negative prefix, and on an Attribute over one; otherwise unvalued. The
@@ -376,8 +376,7 @@ category Sentences
 // irrealis *were*. Number and Person are the Subject's, which a
 // SubjectRemnant recovers.
 category Clause [
-    Number, Person, VerbForm, ClauseMarking, Inflection, FrontPosition, PastTime, NonPastTime,
-    Ellipsis, ClauseShape,
+    Number, Person, VerbForm, ClauseMarking, Inflection, FrontPosition, Time, Ellipsis, ClauseShape,
 ] { gap }
 // Number: a subject relative agrees with its antecedent. NounKind: an
 // adverbial relative modifies a temporal nominal.
@@ -390,22 +389,20 @@ category AdjunctGapClause : Clause [VerbForm, ClauseShape] { gap }
 category Participle : VerbPhrase [Inflection, Polarity]
 category VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
-    PastTime, NonPastTime, Ellipsis, OuterAdjunct, OptionLicense,
+    Time, Ellipsis, OuterAdjunct, OptionLicense,
 ] { gap }
 // A Linked Conjunct: a Clause or Verb Phrase opened by its linking
 // connective (*Each player discards a card, [then draws a card]*), as *so*
 // and *yet* are a coordination's sole linking item (CGEL 15§2.10:1320).
-category LinkedClause : Clause [
-    VerbForm, ClauseMarking, Inflection, FrontPosition, PastTime, NonPastTime,
-] { gap }
+category LinkedClause : Clause [VerbForm, ClauseMarking, Inflection, FrontPosition, Time] { gap }
 category LinkedVerbPhrase : VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
-    PastTime, NonPastTime,
+    Time,
 ] { gap }
 // Existential *there*, and the predicate it is subject of.
 category DummyPronoun : NounPhrase [Number, Person]
 category ExistentialPredicate : VerbPhrase [
-    Number, Person, VerbForm, Inflection, ExistentialLocation, PastTime, NonPastTime,
+    Number, Person, VerbForm, Inflection, ExistentialLocation, Time,
 ]
 category DisplacedSubject : NounPhrase [Number, Case] { gap }
 category FusedNounPhrase : NounPhrase [
@@ -547,7 +544,7 @@ category TargetingMarker : DeterminerPhrase [
 // time (slot `TemporalClause`).
 category PrepositionPhrase [
     ComplementKind, Number, Determination, Case, NounKind, Countability, DeterminativeDistribution,
-    PastTime, NonPastTime,
+    Time,
 ] { gap }
 // An Adjectival Passive is Passive; it is a predicative Complement
 // only, never a depictive Adjunct or a premodifier.
@@ -567,12 +564,12 @@ category Depictive : Predicative [ConjunctKind] { function }
 category DepictiveCoordination : Predicative [ConjunctKind] { function }
 // Unlike categories coordinated as a predicate Adjunct (*only during your
 // turn and only once each turn*), and each conjunct.
-category PredicateAdjunct [ConjunctKind, PastTime, NonPastTime] { function }
+category PredicateAdjunct [ConjunctKind, Time] { function }
 // A verb's Complements, each with an optional Adjunct, coordinated after
 // the shared verb (*put [one of them into your hand] and [the rest into
 // your graveyard]*; CGEL 15§4.3:1341–1343).
-category ComplementCluster [PastTime, NonPastTime]
-category ClusterCoordination : ComplementCluster [PastTime, NonPastTime]
+category ComplementCluster [Time]
+category ClusterCoordination : ComplementCluster [Time]
 // A later Cluster's keyword parameters, the keyword elided (*gain
 // protection from white if ..., [from blue] if ...*).
 category ParameterRemnant
@@ -580,8 +577,8 @@ category ParameterRemnant
 // Complement (*enters [with a +1/+1 counter on it for each other red
 // creature you control] and [a +1/+1 counter on it for each other green
 // creature you control]*).
-category AdjunctCluster [PastTime, NonPastTime]
-category AdjunctClusterCoordination : AdjunctCluster [PastTime, NonPastTime]
+category AdjunctCluster [Time]
+category AdjunctClusterCoordination : AdjunctCluster [Time]
 // A later Adjunct Cluster's Complement, the preposition elided (*[a +1/+1
 // counter on it] for each ...*, *with* elided).
 category PrepositionRemnant
@@ -621,15 +618,13 @@ category PostmodifierCoordination : Postmodifier [ConjunctKind] { function }
 category Attribute : Attributes [ConjunctKind, Polarity] { function }
 // The premodifiers of an asyndetic chain after its first.
 category AttributeChain : Attributes [ConjunctKind] { function }
-category AdjunctCoordination : PredicateAdjunct [ConjunctKind, PastTime, NonPastTime] {
-    function,
-}
+category AdjunctCoordination : PredicateAdjunct [ConjunctKind, Time] { function }
 // An Adverb Phrase or a frequency Noun Phrase as Complement (*more than
 // twice*, *more than three times*).
 category Adverbial { function }
 // The Adjunct function before a selected Complement or shifted Object.
 // NounKind is a Noun Phrase Adjunct's (InterleavedManner).
-category Interleaved [PastTime, NonPastTime, NounKind] { function }
+category Interleaved [Time, NounKind] { function }
 // The Adjunct function in central position between *be* or a copula and
 // its Complement (*is still on top of your library*, *become no longer
 // suspected*; english.md §3).
@@ -669,7 +664,7 @@ category SignedAmount [Adjustment]
 category Cost
 // A preposition's or verb's finite Clause Complement. It carries its time,
 // which a temporal preposition's phrase takes (slot `TemporalClause`).
-category FiniteClause : Clause [PastTime, NonPastTime]
+category FiniteClause : Clause [Time]
 // The Complement of *than* or equative *as* (CGEL 13§2.1:1108).
 category ComparativeClause : Clause
 // The Complement of manner *as* (CGEL 13§5.5:1149).
@@ -687,19 +682,19 @@ category AbsoluteClause : Clause
 category ToInf : Clause { gap, closed_gaps: [Pred] }
 // Its object Gap is filled by the Subject of the verb selecting it.
 category HollowInf : Clause
-category BareInf : VerbPhrase [Number, Person, VerbForm, Voice, PastTime, NonPastTime] {
+category BareInf : VerbPhrase [Number, Person, VerbForm, Voice, Time] {
     gap,
     closed_gaps: [Pred],
 }
 // An auxiliary's participial Complement: passive or progressive *be*'s (*is
 // being __*) and perfect *have*'s (*have been __*).
-category AuxiliaryComplement : VerbPhrase [VerbForm, Voice, VerbKind, PastTime, NonPastTime] {
+category AuxiliaryComplement : VerbPhrase [VerbForm, Voice, VerbKind, Time] {
     gap,
     closed_gaps: [Pred],
     function,
 }
 category Gerund : VerbPhrase [Number, Person, VerbForm, Voice] { gap }
-category PastPart : VerbPhrase [VerbForm, Voice] {
+category PastPart : VerbPhrase [VerbForm, Voice, Time] {
     gap,
     closed_gaps: [Pred],
 }
@@ -904,9 +899,7 @@ slot FiniteClause = FiniteClause
 // *whenever*, *until*, *before*, *after*, *while*, *as*; CGEL 8§6:700); any
 // other preposition's has none (a conditional clause is independent of its
 // host in time, CGEL 8§14.1.2:743).
-slot TemporalClause = FiniteClause
-    where $.PastTime = slot.PastTime,
-          $.NonPastTime = slot.NonPastTime
+slot TemporalClause = FiniteClause where $.Time = slot.Time
 slot ComparativeClause = ComparativeClause
 slot MannerClause = MannerClause
 slot ExpandableClause = ExpandableClause
@@ -1248,8 +1241,7 @@ Imperative: Clause -> VerbPhrase { uncoordinated: [head] }
     where head.VerbForm = Plain,
           $.ClauseMarking = Unmarked,
           head.CentralPosition != Occupied,
-          head.PastTime != Past,
-          $.NonPastTime = NonPast
+          $.Time = NonPast
 Declarative: Sentence -> clause:Clause '.' { capital: [clause] }
     where clause.ClauseMarking = Unmarked,
           clause.Inflection != Irrealis
@@ -3809,44 +3801,55 @@ dependents GenitiveDependents = [DeterminerPhrase, NounPhrase]
 dependents RelativeAntecedent = [Postmodifier, InterleavedModifier, RelativeClause]
     where dependent.RelativeGender = head.RelativeGender
 // A temporal clause locates its host's situation at the time of its own
-// (CGEL 8§6:700), so a dependent that gives a phrase its time never carries
-// a time the phrase's head does not: no past clause under a non-past head
+// (CGEL 8§6:700), so a dependent that gives a phrase its time never has a
+// time the phrase's head does not: no past clause under a non-past head
 // (*Whenever you cast a spell, draw a card* and *..., you may draw a card*
 // have no preterite *cast*) and no non-past one under a past head (in
 // *you gain life equal to the life you lost when it entered*, Soulgorger
-// Orgg, *when it entered* modifies *lost*, never *gain*). A side that carries
-// neither agrees with either (*If you would draw a card while your library
-// has no cards in it*, Laboratory Maniac). The phrase carries the
-// dependent's time with its head's: a plain-form Verb Phrase takes the time
-// of a temporal clause inside it (*draw a card whenever you cast a spell*),
-// and a coordination carries every time of its conjuncts, so a dependent of
-// one agrees with each conjunct, as a modifier of a coordination applies to
-// each coordinate (CGEL 15§1.3.4:1286).
+// Orgg, *when it entered* modifies *lost*, never *gain*). A side with no
+// time agrees with either (*If you would draw a card while your library
+// has no cards in it*, Laboratory Maniac). The phrase has the dependent's
+// time with its head's: a plain-form Verb Phrase takes the time of a
+// temporal clause inside it (*draw a card whenever you cast a spell*). So
+// every time-giving dependent of a phrase agrees with every other, whatever
+// its head has: a past and a non-past one locate one situation at two
+// times. A coordination whose conjuncts differ is `Mixed`, which no past or
+// non-past dependent agrees with, as a modifier of a coordination applies
+// to each coordinate (CGEL 15§1.3.4:1286).
 //
 // The dependents that give time: a Preposition Phrase, which has its
 // TemporalClause Complement's time and no other (a conditional clause is
 // independent of its host in time, CGEL 8§14.1.2:743); the functions that
 // carry one to its host, and a coordination of Clusters, which carries the
-// times its Clusters' Adjuncts give them; a bare infinitival Complement, of a
-// modal, whose situation is simultaneous with or later than the modal's
-// time (CGEL 3§7:160), or of supportive *do*; and the Complement of passive
-// *be*, which, like supportive *do*, is not temporally distinct from its
-// Complement, or of progressive *be*, which is not either when it expresses
-// progressive aspect (CGEL 14§4.2.2:1217; its futurate use, *At that time
-// he was still arriving tomorrow*, is, and the grammar does not tell the two
-// apart). Perfect
+// times its Clusters' Adjuncts give them; and the non-finite Complements of
+// heads that locate their Complement's situation at their own time. These
+// are a bare infinitival Complement of a modal, whose situation is
+// simultaneous with or later than the modal's time (CGEL 3§7:160), or of
+// supportive *do*; the Complement of passive *be*, which, like supportive
+// *do*, is not temporally distinct from its Complement, or of progressive
+// *be*, which is not either when it expresses progressive aspect (CGEL
+// 14§4.2.2:1217; its futurate use, *At that time he was still arriving
+// tomorrow*, is, and the grammar does not tell the two apart); and three
+// for which CGEL states no time relation, so that the grammar's is the
+// claim: causative *have*'s bare-infinitival or past-participial Complement
+// (CGEL 14§5.4:1236, 14§5.6.2:1244–1245), whose situation is the one *have*
+// locates (*if you had a land enter the battlefield under your control this
+// turn*, Groundswell: the land entered then); the bare infinitival of
+// non-coordinative *rather than* (15§2.8:1317), whose situation is the one
+// forgone at the host's time (*you may pay {U} rather than pay this spell's
+// mana cost*, Lethargy Trap); and that of cost *plus*, a part of the one
+// cost (*the card's mana cost plus exile three other cards from your
+// graveyard*, Underworld Breach). Perfect
 // *have*'s Complement gives none (Perfect and PassivePerfect exempt it): the
-// perfect is itself a past tense (CGEL 3§5:139). A Nominal carries no time, so a temporal clause
-// that modifies one is free (*the player's life total before the damage was
-// dealt*, Soul Burn).
+// perfect is itself a past tense (CGEL 3§5:139). A Nominal has no time, so a
+// temporal clause that modifies one is free (*the player's life total
+// before the damage was dealt*, Soul Burn).
 dependents TimeGiving = [
     PrepositionPhrase, PredicateAdjunct, AdjunctCoordination, Interleaved, ClusterCoordination,
-    AdjunctClusterCoordination, BareInf, AuxiliaryComplement,
+    AdjunctClusterCoordination, BareInf, PastPart, AuxiliaryComplement,
 ]
-    where $.PastTime = dependent.PastTime,
-          $.NonPastTime = dependent.NonPastTime,
-          !(head.PastTime = Past & dependent.NonPastTime = NonPast),
-          !(head.NonPastTime = NonPast & dependent.PastTime = Past)
+    where $.Time = dependent.Time,
+          head.Time = dependent.Time
 // A property noun's comparative bound is the postpositive comparative
 // adjective's (*mana value less than X*), never its Amount Complement, which
 // is no ComparativeAmount (whose ComplementKind is `PP`): that is the

@@ -92,3 +92,14 @@
 
 # A past temporal clause under a participle, which has no time of its own.
 + <card=Minion of the Wastes> Minion of the Wastes's power and toughness are each equal to the life paid as it entered. => PrepositionPhrase "as it entered" as Adjunct of pay; !PrepositionPhrase "as it entered" as Adjunct of be
+
+# Inside a non-finite Complement that gives its governor its time: causative
+# "have"'s bare infinitival and past participial, and the bare infinitival of
+# "rather than", each under a present-tense modal host.
++ <card=Melira's Keepers> This creature can't have counters put on it while it's attacking. => VerbPhrase "put on it while it's attacking" as Complement of have
++ <card=Melira's Keepers> This creature can't have counters put on it while it was attacking. => !VerbPhrase "put on it while it was attacking" as Complement of have
+# from: Quill-Slinger Boggart
+* Whenever a player casts a Kithkin spell, you may have target player lose 1 life whenever an opponent gained life.
++ <card=Lethargy Trap> If three or more creatures are attacking, you may pay {U} rather than pay this spell's mana cost before it resolves. => VerbPhrase "pay this spell's mana cost before it resolves" as Complement of "rather than"
+# from: Lethargy Trap
+* If three or more creatures are attacking, you may pay {U} rather than pay this spell's mana cost after it was cast.
