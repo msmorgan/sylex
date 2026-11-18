@@ -655,6 +655,9 @@ struct Draft {
 struct Derivations<'d> {
     /// The phrase's feature naming its first Frame Slot's Slot Kind.
     complement_kind: Option<usize>,
+    /// The phrase's privative feature that a genitive-alternant frame's
+    /// phrases value, and its one value.
+    genitive_alternant: Option<(usize, u16)>,
     /// Equations on every active phrase.
     active: &'d [Equation],
     passive: Option<PassiveDecl<'d>>,
@@ -2854,6 +2857,25 @@ impl<'a> Binder<'a> {
         Ok(true)
     }
 
+    /// A feature a Valence schema names in `role`, which its phrase must
+    /// carry.
+    fn carried(
+        &self,
+        lhs: usize,
+        phrase: &str,
+        role: &str,
+        name: &str,
+    ) -> Result<usize, LoadError> {
+        let feature = self.feature(name)?;
+        if self.out.category_features[lhs].contains(&feature) {
+            Ok(feature)
+        } else {
+            Err(invalid(format!(
+                "valence `{phrase}`: {role} `{name}` is not a feature the phrase carries"
+            )))
+        }
+    }
+
     /// A Valence schema's declared derivations, validated: a `passive` or
     /// `adjectival` derivation needs its equations, and `complement_kind`
     /// names a feature the phrase carries.
@@ -2864,6 +2886,7 @@ impl<'a> Binder<'a> {
         let SchemaDecl::Valence {
             phrase,
             complement_kind,
+            genitive_alternant,
             active,
             passive,
             verbal_passive,
@@ -2892,29 +2915,22 @@ impl<'a> Binder<'a> {
             .collect::<Result<Vec<_>, _>>()?;
         let unshared = unshared
             .iter()
-            .map(|name| {
-                let feature = self.feature(name)?;
-                if self.out.category_features[lhs].contains(&feature) {
-                    Ok(feature)
-                } else {
-                    Err(invalid(format!(
-                        "valence `{phrase}`: unshared feature `{name}` is not one the phrase \
-                         carries"
-                    )))
-                }
-            })
+            .map(|name| self.carried(lhs, phrase, "unshared feature", name))
             .collect::<Result<Vec<_>, _>>()?;
         let complement_kind = complement_kind
             .as_deref()
+            .map(|name| self.carried(lhs, phrase, "complement kind", name))
+            .transpose()?;
+        let genitive_alternant = genitive_alternant
+            .as_deref()
             .map(|name| {
-                let feature = self.feature(name)?;
-                if self.out.category_features[lhs].contains(&feature) {
-                    Ok(feature)
-                } else {
-                    Err(invalid(format!(
-                        "Valence complement kind: `{phrase}` does not carry `{name}`"
-                    )))
+                let feature = self.carried(lhs, phrase, "genitive alternant", name)?;
+                if self.out.values[feature].len() != 1 {
+                    return Err(invalid(format!(
+                        "valence `{phrase}`: genitive alternant `{name}` is not privative"
+                    )));
                 }
+                Ok((feature, 0))
             })
             .transpose()?;
         let passive = passive
@@ -2989,6 +3005,7 @@ impl<'a> Binder<'a> {
             .transpose()?;
         Ok(Derivations {
             complement_kind,
+            genitive_alternant,
             active,
             passive,
             adjectival,
@@ -3782,6 +3799,32 @@ impl<'a> Binder<'a> {
         vec![binary, serial, more, end]
     }
 
+    /// The values every active phrase of `frame` takes: the Slot Kind of its
+    /// first Frame Slot (`complement_kind`), and, from a genitive-alternant
+    /// frame, `genitive_alternant`'s one value.
+    fn frame_phrase_values(
+        &self,
+        family: &mut [Draft],
+        derivations: &Derivations<'_>,
+        frame: &Frame,
+    ) -> Result<(), LoadError> {
+        let mut values = Vec::new();
+        if let (Some(f), Some(first)) = (derivations.complement_kind, frame.slots.first()) {
+            values.push((f, self.kind_value(f, first.fill.kind())?));
+        }
+        if let (Some(value), true) = (derivations.genitive_alternant, frame.genitive_alternant) {
+            values.push(value);
+        }
+        for draft in family {
+            for &(f, value) in &values {
+                draft
+                    .equations
+                    .push((Path::Mother(f), Target::Value(value)));
+            }
+        }
+        Ok(())
+    }
+
     #[expect(clippy::too_many_arguments, reason = "the Valence schema's fields")]
     fn valence(
         &self,
@@ -3866,12 +3909,7 @@ impl<'a> Binder<'a> {
                     gappable,
                     heavy_shift,
                 )?;
-                if let (Some(f), Some(first)) = (complement_kind, slots.first()) {
-                    let kind = self.kind_value(f, first.kind())?;
-                    for draft in &mut family {
-                        draft.equations.push((Path::Mother(f), Target::Value(kind)));
-                    }
-                }
+                self.frame_phrase_values(&mut family, derivations, frame)?;
                 for draft in &mut family {
                     draft.unshared.extend(&derivations.unshared);
                 }
@@ -6423,7 +6461,8 @@ pub(crate) fn frame_label(frame: &Frame) -> String {
         FrameVoice::ActiveOnly => "[ActiveOnly]",
         FrameVoice::PassiveOnly => "[PassiveOnly]",
     };
-    format!("{family}({}){voice}", slots.join(","))
+    let genitive = if frame.genitive_alternant { "[GenitiveAlternant]" } else { "" };
+    format!("{family}({}){voice}{genitive}", slots.join(","))
 }
 
 /// The frames a head's declared `frames` derive for the grammar's unlike
@@ -6431,14 +6470,17 @@ pub(crate) fn frame_label(frame: &Frame) -> String {
 /// are two or more of an unlike slot's kinds, a frame with that slot's
 /// unlike coordination of those kinds there (CGEL, Ch. 15 §3.1, p. 1323,
 /// rule [1]). It has the voices all of them have, and there is none when
-/// an Active-only frame meets a Passive-only one.
+/// an Active-only frame meets a Passive-only one. It is a genitive alternant
+/// if all of them are.
 fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Frame> {
     let mut derived = Vec::new();
     for (index, (name, kinds)) in slots.iter().enumerate() {
         let slot = u8::try_from(index).expect("at most 256 unlike slots");
         // (family, varied position, every other slot, its relation) -> the
-        // kinds selected there, and the voices all such frames have.
-        let mut groups: BTreeMap<_, (BTreeSet<SlotKind>, Option<FrameVoice>)> = BTreeMap::new();
+        // kinds selected there, the voices all such frames have and whether
+        // every one is a genitive alternant.
+        let mut groups: BTreeMap<_, (BTreeSet<SlotKind>, Option<FrameVoice>, bool)> =
+            BTreeMap::new();
         for frame in frames {
             for (at, varied) in frame.slots.iter().enumerate() {
                 let kind = varied.fill.kind();
@@ -6449,12 +6491,13 @@ fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Fram
                 rest.remove(at);
                 let group = groups
                     .entry((frame.family, at, rest, varied.relation))
-                    .or_insert((BTreeSet::new(), Some(FrameVoice::ActiveOrPassive)));
+                    .or_insert((BTreeSet::new(), Some(FrameVoice::ActiveOrPassive), true));
                 group.0.insert(kind);
                 group.1 = group.1.and_then(|voice| voice.meet(frame.voice));
+                group.2 &= frame.genitive_alternant;
             }
         }
-        for ((family, at, rest, relation), (selected, voice)) in groups {
+        for ((family, at, rest, relation), (selected, voice, genitive_alternant)) in groups {
             let Some(voice) = voice.filter(|_| selected.len() >= 2) else {
                 continue;
             };
@@ -6470,6 +6513,7 @@ fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Fram
                 family,
                 slots,
                 voice,
+                genitive_alternant,
             });
         }
     }

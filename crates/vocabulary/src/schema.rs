@@ -277,6 +277,17 @@ pub struct NounEntry {
     pub plural: Option<String>,
     #[serde(default)]
     pub frames: Vec<FrameSpec>,
+    /// A genitive subject-determiner names something other than its *of*
+    /// Complement, so the two combine: the Noun Phrase is bivalent, the
+    /// genitive naming a second argument (*your choice of a creature type*,
+    /// as *Van Dyck's portrait of Charles I*; CGEL, Ch. 5, §16.5.3,
+    /// pp. 475–476, [56i], [57i]), or the *of* phrase's relation has no
+    /// genitive counterpart (*the two kinds of shrub*, ∗*shrub's two kinds*;
+    /// *a bid of 1*; p. 477, [60]). Otherwise the *of* Complement names the
+    /// noun's one argument, which a genitive names too, and the two compete
+    /// (`Frame::genitive_alternant`; [56ii], [59]).
+    #[serde(default)]
+    pub distinct_genitive: bool,
     /// How a prefix joins the noun, where it is not solid, the default
     /// (*nonland*): hyphenated (*non-outlaw*). A subtype takes it hyphenated
     /// without declaring it (*non-Vampire*).
@@ -317,6 +328,7 @@ impl NounDecl {
                 bare_mass_modified: false,
                 plural: None,
                 frames: Vec::new(),
+                distinct_genitive: false,
                 prefix_hyphenation: None,
                 onset: None,
                 classes: Vec::new(),

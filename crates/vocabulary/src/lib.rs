@@ -456,7 +456,12 @@ impl Sources {
             // first combat phase of the turn*; CGEL, Ch. 5, §14.1, p. 442,
             // [7vi]), or the player whose turn it is [CR#102.1], a term in
             // that relation (*the upkeep of enchanted creature's controller*).
-            // Every phase and step has it, so it is declared here once.
+            // Every phase and step has it, so it is declared here once. Its
+            // genitive names the player whose turn it is beside the whole, two
+            // complements (*your first main phase of the game*, Chancellor of
+            // the Tangle), as *Van Dyck's portrait of Charles I* has (CGEL,
+            // Ch. 5, §16.5.3, p. 475, [56i]).
+            entry.distinct_genitive = true;
             entry
                 .frames
                 .push(schema::FrameSpec::Complement(schema::FillSpec::PPWith(

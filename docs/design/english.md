@@ -136,6 +136,18 @@ Why: a selected and an unselected attachment to the same head are one
 analysis, so keeping both is a second tree (§8), while attachments to
 different heads are different analyses that only meaning can choose between.
 
+**A genitive and an *of* Complement compete.** A noun's *of* frame names the
+argument a genitive subject-determiner names (*its mana value*, *the mana
+value of that card*), so a nominal whose frame's Complement is realized or
+shared by Right Node Raising takes no genitive determiner; the lexicon marks
+the frame a genitive alternant. A noun with a `distinct_genitive` combines the
+two: its genitive names a second argument (*your choice of a creature type*;
+CGEL, Ch. 5, §16.5.3, pp. 475–476), or its *of* phrase a quantity, type,
+collection or part that no genitive names (*a pair of*; p. 477, [60]).
+Why: in a monovalent Noun Phrase the two are one complement in two forms, so a
+phrase with both is a tree no reader builds (*[your hand or the top] of your
+library*).
+
 **A central Adjunct after *be* or a copula.** An adverb in central position
 follows an auxiliary and precedes its Complement (*He is always miserable*),
 while the same order after a lexical verb is ungrammatical (∗*He looks always

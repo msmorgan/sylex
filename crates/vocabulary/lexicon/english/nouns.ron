@@ -5,7 +5,12 @@
 // describes ("a creature of your choice") is a modifier and gets no frame.
 // `PPWith(["of"], NP)` is the same where the argument is an object or player,
 // never an amount, gerund or bare nominal (*the mana value of instant and
-// sorcery cards* never has *of instant*).
+// sorcery cards* never has *of instant*). Such an argument is the one a
+// genitive names too (*its mana value*), so a phrase with the Complement takes
+// no genitive determiner (CGEL, Ch. 5, §16.5.3, pp. 475–476), unless the noun
+// has a `distinct_genitive`: a second argument the genitive names (*your choice
+// of*), or an *of* relation with no genitive counterpart, a quantity, type,
+// collection or part (*a pair of*, *each kind of*; p. 477, [60]).
 [
     (lemma: "bidding", countability: [Mass], bare_mass_modified: true),
     // Game nouns.
@@ -16,14 +21,21 @@
     // creature's abilities*; §16.5.3, p. 475).
     (lemma: "ability", frames: [Complement(PP(["of"]))]),
     "activation",
-    (lemma: "amount", distribution: HeadOnly, frames: [Complement(PP(["of"]))]),
+    // A quantity, type, collection or part: no genitive names what its *of*
+    // phrase names (∗*shrub's two kinds*, ∗*the boys' youngest*; CGEL, Ch. 5,
+    // §16.5.3, p. 477, [60]), as for *amount*, *combination*, *excess*,
+    // *half*, *instance*, *kind*, *maximum*, *number*, *pair*, *part*,
+    // *point*, *rest*, *total* and *worth*.
+    (lemma: "amount", distribution: HeadOnly, frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "attacker",
     // Pre-head dependent in "base power and toughness"; a noun, so that it
     // scopes over the coordination.
     "base",
     "battlefield",
     (lemma: "beginning", frames: [Complement(PP(["of"]))]),
-    (lemma: "bid", frames: [Complement(PP(["of"]))]),
+    // *a bid of 1*: its size, which no genitive names (CGEL, Ch. 5, §16.5.3,
+    // p. 477, [60xi]).
+    (lemma: "bid", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "bidder",
     "blocker",
     "booster",
@@ -36,17 +48,21 @@
     // The event of the keyword action [CR#701.30]: *Whenever you win a clash*.
     "clash",
     // *your choice of a flying counter or a first strike counter*; *your
-    // choice of 5/1 or 1/5*.
-    (lemma: "choice", frames: [Complement(PP(["of"])), Complement(PPWith(["of"], MeasureNP))]),
+    // choice of 5/1 or 1/5*: the chooser and what is chosen.
+    (lemma: "choice", frames: [Complement(PP(["of"])), Complement(PPWith(["of"], MeasureNP))], distinct_genitive: true),
     "coin",
     "color",
     // "until end of combat" (mass); "attacks each combat" (count).
     // *each combat*
     (lemma: "combat", kind: Temporal, countability: [Count, Mass]),
-    (lemma: "combination", frames: [Complement(PP(["of"]))]),
-    (lemma: "control", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))]),
+    (lemma: "combination", frames: [Complement(PP(["of"]))], distinct_genitive: true),
+    // The controller and what is controlled, as in *Alexander the Great's
+    // conquest of Persia* (CGEL, Ch. 5, §16.5.3, p. 476, [57i]).
+    (lemma: "control", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))], distinct_genitive: true),
     (lemma: "controller", frames: [Complement(PP(["of"]))]),
-    (lemma: "copy", frames: [Complement(PP(["of"]))]),
+    // The original, beside an owner or maker a genitive names, as in *Van
+    // Dyck's portrait of Charles I* (CGEL, Ch. 5, §16.5.3, p. 475, [56i]).
+    (lemma: "copy", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     // "an additional cost to cast this spell"; "the mana cost for Rune spells".
     (lemma: "cost", frames: [Complement(PP(["for", "of"])), Complement(ToInf)]),
     // A counter on an object; Oracle never uses it attributively (*Counter
@@ -80,7 +96,7 @@
     // the noun of the fossilized *in excess of* (CGEL, Ch. 7 §3.1, p. 618; §5.3,
     // p. 646), a bare count nominal after *in*; it is never a bare Noun Phrase
     // (Ch. 2 §5, p. 57), so it cannot head one across *excess damage*.
-    (lemma: "excess", distribution: HeadOnly, frames: [Complement(PP(["of"]))]),
+    (lemma: "excess", distribution: HeadOnly, frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "exchange",
     // The zone; the verb is a keyword action [CR#701.13].
     (lemma: "exile", countability: [Mass]),
@@ -96,16 +112,16 @@
     // of-phrase names the player whose zone it is (*the graveyard of the
     // player*), a term in that relation (CGEL, Ch. 5, §14.1, p. 442).
     (lemma: "graveyard", frames: [Complement(PPWith(["of"], NP))]),
-    (lemma: "half", plural: "halves", frames: [Complement(PP(["of"]))]),
+    (lemma: "half", plural: "halves", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     // Bare after a preposition it omits *of X*, as *top* does (*cards in
     // hand*).
     (lemma: "hand", frames: [Complement(PPWith(["of"], NP)), Intransitive]),
     // The faces of a coin (*comes up heads*).
     (lemma: "heads", countability: [Mass]),
     (lemma: "tails", countability: [Mass]),
-    (lemma: "instance", frames: [Complement(PP(["of"]))]),
+    (lemma: "instance", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "item",
-    (lemma: "kind", frames: [Complement(PP(["of"]))]),
+    (lemma: "kind", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "label",
     "left",
     "legend",
@@ -115,14 +131,14 @@
     (lemma: "loyalty", distribution: DirectMeasure, countability: [Mass], bare_mass_modified: true, frames: [Complement(Amount)]),
     (lemma: "mana", distribution: DirectMeasure, countability: [Mass]),
     // *to a maximum of 10*; the attributive *maximum* is the adjective's.
-    (lemma: "maximum", distribution: HeadOnly, frames: [Complement(PP(["of"]))]),
+    (lemma: "maximum", distribution: HeadOnly, frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "mode",
     // A card's name [CR#201.1] and its bearer (*the name of a nonland card*;
     // CGEL, Ch. 5, §14.1, p. 442, [7i]). The Subject of a copy's exception
     // that gives a name (*except its name is Mishra's Warform*).
     (lemma: "name", classes: ["NameNoun"], frames: [Complement(PPWith(["of"], NP))]),
     // *a number 0 or greater*, as *a mana value 0 or greater*.
-    (lemma: "number", distribution: Quantity, frames: [Complement(PP(["of"])), Complement(Amount)]),
+    (lemma: "number", distribution: Quantity, frames: [Complement(PP(["of"])), Complement(Amount)], distinct_genitive: true),
     "offer",
     // *the opponent to your left*
     (lemma: "opponent", frames: [Complement(PP(["to"]))]),
@@ -131,8 +147,8 @@
     (lemma: "outlaw", prefix_hyphenation: Hyphenated),
     (lemma: "owner", frames: [Complement(PP(["of"]))]),
     "pack",
-    (lemma: "pair", frames: [Complement(PP(["of"]))]),
-    (lemma: "part", frames: [Complement(PP(["of"]))]),
+    (lemma: "pair", frames: [Complement(PP(["of"]))], distinct_genitive: true),
+    (lemma: "part", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "party",
     "permanent",
     (lemma: "phase", kind: Temporal),
@@ -140,7 +156,7 @@
     // *the player to your right*
     (lemma: "player", frames: [Complement(PP(["to"]))]),
     // "each point of bushido it has".
-    (lemma: "point", frames: [Complement(PP(["of"]))]),
+    (lemma: "point", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "pool",
     // Count across creatures (*different powers*) and mass as an unquantified
     // characteristic (*power and toughness*, *power 3 or less*, *power equal to …*).
@@ -149,7 +165,7 @@
     "quality",
     (lemma: "radiation", countability: [Mass]),
     // Quantificational "the rest (of …)" has no plural.
-    (lemma: "rest", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))]),
+    (lemma: "rest", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))], distinct_genitive: true),
     (lemma: "result", frames: [Complement(PP(["of"]))]),
     "right",
     // The result of rolling a die: *ignore the lower roll* (OSG §12,
@@ -190,7 +206,7 @@
     // "for the same value", "double the value of X".
     (lemma: "value", frames: [Complement(PP(["of"]))]),
     // *the total of those results*; the attributive word is the adjective.
-    (lemma: "total", distribution: HeadOnly, frames: [Complement(PP(["of"]))]),
+    (lemma: "total", distribution: HeadOnly, frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "vote",
     "voter",
     (lemma: "way", kind: Manner),
@@ -248,5 +264,5 @@
     "snitch",
     (lemma: "war", countability: [Count, Mass]),
     // A measure noun: *five {P} worth of modes* (CGEL Ch. 5, p. 470).
-    (lemma: "worth", distribution: DirectMeasure, countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))]),
+    (lemma: "worth", distribution: DirectMeasure, countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))], distinct_genitive: true),
 ]

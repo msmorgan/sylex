@@ -151,6 +151,7 @@ fn a_frame_belongs_to_its_head_category() {
             bare_mass_modified: false,
             plural: None,
             frames: vec![FrameSpec::Monotransitive],
+            distinct_genitive: false,
             prefix_hyphenation: None,
             onset: None,
             classes: Vec::new(),
@@ -317,6 +318,7 @@ fn bare_mass_modified_requires_mass_countability() {
             bare_mass_modified: true,
             plural: None,
             frames: Vec::new(),
+            distinct_genitive: false,
             prefix_hyphenation: None,
             onset: None,
             classes: Vec::new(),
@@ -351,4 +353,60 @@ fn a_set_name_parameter_stands_right_before_its_noun() {
         misplaced.nouns[at] = NounDecl::Entry(expansion);
         rejects(&misplaced, "a Set Name is a whole pattern's one parameter");
     }
+}
+
+/// A noun's *of* Complement frame alternates with a genitive determiner
+/// unless the noun's genitive names something else: *hand* (*your hand*, *the
+/// hand of that player*) and *mana cost*'s *for* or *of* frame do; *choice*
+/// (*your choice of a creature type*), a phase (*your first main phase of the
+/// game*) and *kind* (*each kind of counter*) do not, and no frame without
+/// *of* does (*devotion to black*).
+#[test]
+fn an_of_frame_alternates_with_a_genitive_unless_its_noun_has_a_distinct_one() {
+    let sources = Sources::load().unwrap();
+    let (_, frames) = sources.vocabulary().unwrap();
+    let alternants = |lexeme: &str| {
+        frames
+            .frames
+            .iter()
+            .find(|(id, _)| id.as_str() == lexeme)
+            .unwrap_or_else(|| panic!("no frames for `{lexeme}`"))
+            .1
+            .iter()
+            .filter(|frame| frame.genitive_alternant)
+            .count()
+    };
+    assert_eq!(alternants("noun:hand"), 1);
+    assert_eq!(alternants("noun:mana cost"), 1);
+    assert_eq!(alternants("noun:choice"), 0);
+    assert_eq!(alternants("turn_part:main phase"), 0);
+    assert_eq!(alternants("noun:kind"), 0);
+    assert_eq!(alternants("noun:devotion"), 0);
+}
+
+#[test]
+fn only_a_noun_with_an_of_frame_has_a_distinct_genitive() {
+    let mut sources = Sources::load().unwrap();
+    sources
+        .nouns
+        .push(NounDecl::Entry(sylex_vocabulary::schema::NounEntry {
+            distribution: sylex_vocabulary::schema::NounDistribution::Ordinary,
+            kind: sylex_vocabulary::schema::NounKind::Ordinary,
+            parameters: Vec::new(),
+            lemma: "frobnication".to_owned(),
+            countability: vec![sylex_lexicon::Countability::Count],
+            bare_mass_modified: false,
+            plural: None,
+            frames: vec![FrameSpec::Complement(
+                sylex_vocabulary::schema::FillSpec::PP(vec!["to".to_owned()]),
+            )],
+            distinct_genitive: true,
+            prefix_hyphenation: None,
+            onset: None,
+            classes: Vec::new(),
+        }));
+    rejects(
+        &sources,
+        "only a noun with an *of* Complement frame has a distinct genitive",
+    );
 }

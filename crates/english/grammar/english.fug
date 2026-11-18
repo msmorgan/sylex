@@ -113,6 +113,12 @@ feature BareMass = Modified
 // `CoordinatedBareMass` admits a coordinated Nominal only when at least one
 // conjunct could not stand as a `ModifiedBareMass` Noun Phrase on its own.
 feature BareMassHead = Unmodified | Expanded
+// Privative: a nominal whose head noun has a Complement that names the one
+// argument a genitive subject-determiner names, realized or shared by Right
+// Node Raising (a genitive-alternant frame). The two compete (*the flood's
+// consequences*, *the consequences of the flood*; CGEL 5§16.5.3:475–476,
+// [56ii], [59]), so no genitive determines it (GenitiveDependents).
+feature GenitiveAlternant = Filled
 // `Quantity`: a fused-head quantity (*choose one*). `Manner`: only *way*,
 // the one noun that is a Manner Adjunct without a preposition (*do it this
 // way*; CGEL 8§2.1:671). `Resource`: a measured mass quantity or symbol
@@ -402,7 +408,7 @@ category ComplementNounPhrase : NounPhrase [
 category Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, BareMass, BareMassHead,
-    RelativeBound,
+    RelativeBound, GenitiveAlternant,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, DeterminerNeed, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
@@ -411,6 +417,7 @@ category ModifiedQuantifiedNominal : Nominal [
 category BareNominal : Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, SetNameLicense, BareMass,
+    GenitiveAlternant,
 ] { gap }
 // The singular count nominals that share a determiner before the
 // final, determined conjunct of a SharedDeterminerCoordination.
@@ -468,9 +475,11 @@ category NominalClusters : NominalCluster [
     Number, ConjunctNumber, Countability, DeterminativeDistribution,
 ]
 // A determinative's Complement has a Number of its own (*all but one*).
+// Case is a genitive pronoun's (*your*), and unvalued elsewhere.
 category DeterminerPhrase [
     Number, Countability, DeterminativeDistribution, NounKind, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueDetermination, ObliqueDistribution, TargetMarked, Grade,
+    Case,
 ]
 category Multiplier
 // The Targeting Marker as an outer determiner's head or the determiner of
@@ -3050,6 +3059,7 @@ IndependentGenitive: NounPhrase -> Lex(Pronoun) { unshared: [Number, Person, Cas
 PossessiveDeterminer: DeterminerPhrase -> Lex(Pronoun) { unshared: [Number] }
     where $.DeterminativeDistribution = Dependent,
           $.ComplementKind = Intransitive,
+          $.Case = Genitive,
           head.Case := Genitive,
           head.Inflection = Invariant,
           head.PronounKind != Relative
@@ -3596,6 +3606,14 @@ valence PrepositionPhrase {
     ],
     remnants: [NP -> PrepositionRemnant],
 }
+// A genitive subject-determiner, a pronoun (*your*) or a Noun Phrase
+// (*that player's*), never determines a nominal whose Complement has the
+// argument it would name (GenitiveAlternant): *your hand* and *its power*
+// share no *of* phrase by Right Node Raising (*your hand or the top of your
+// library*, One with the Multiverse; *its power and the power of target
+// creature*, Serene Master), and neither takes its own.
+dependents GenitiveDependents = [DeterminerPhrase, NounPhrase]
+    where !(dependent.Case = Genitive & head.GenitiveAlternant = Filled)
 // A temporal clause locates its host's situation at the time of its own
 // (CGEL 8§6:700), so a dependent that gives a phrase its time never carries
 // a time the phrase's head does not: no past clause under a non-past head
@@ -3642,6 +3660,7 @@ dependents TimeGiving = [
 valence BareNominal {
     head: Noun,
     complement_kind: ComplementKind,
+    genitive_alternant: GenitiveAlternant,
     slots: [Amount -> [slot.ComplementKind != PP]],
     interleaved: InterleavedModifier,
     agree: [ObliqueNumber -> Number, ObliqueKind -> ComplementKind, ObliqueNounKind -> NounKind],

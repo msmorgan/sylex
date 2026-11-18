@@ -55,6 +55,9 @@ pub(crate) struct Builder {
     parameters: std::collections::BTreeMap<LexemeId, Vec<Vec<sylex_syntax::frames::ParameterPart>>>,
     pub(crate) lexemes: Vec<Lexeme>,
     frames: Vec<(LexemeId, Category, Vec<FrameSpec>, String)>,
+    /// Nouns whose genitive names something other than their *of*
+    /// Complement (`NounEntry::distinct_genitive`).
+    distinct_genitive: std::collections::BTreeSet<LexemeId>,
     prepositions: Vec<(LexemeId, Vec<PrepositionFrameSpec>, String)>,
 }
 
@@ -361,9 +364,17 @@ impl Builder {
                 .features
                 .insert("SetNameLicense".into(), Ident::new("Head"));
         }
+        if entry.distinct_genitive && !entry.frames.iter().any(selects_of) {
+            return Err(SourceError::Invalid(format!(
+                "noun `{id}`: only a noun with an *of* Complement frame has a distinct genitive"
+            )));
+        }
         let id = lexeme.id;
         self.push(lexeme);
         self.frames(id, Category::Noun, &entry.frames);
+        if entry.distinct_genitive {
+            self.distinct_genitive.insert(id);
+        }
         if !entry.parameters.is_empty() {
             self.parameters.insert(id, entry.parameters.clone());
         }
@@ -478,7 +489,10 @@ impl Builder {
         for (id, category, specs, owner) in &self.frames {
             let mut frames = Vec::new();
             for spec in specs {
-                let frame = resolver.frame(spec, *category, owner)?;
+                let mut frame = resolver.frame(spec, *category, owner)?;
+                frame.genitive_alternant = *category == Category::Noun
+                    && !self.distinct_genitive.contains(id)
+                    && selects_of(spec);
                 if frames.contains(&frame) {
                     return Err(SourceError::Invalid(format!(
                         "`{owner}` declares {spec:?} twice"
@@ -758,6 +772,7 @@ impl Resolver<'_> {
             family,
             slots,
             voice: FrameVoice::ActiveOrPassive,
+            genitive_alternant: false,
         };
         if !frame.is_well_formed() {
             return Err(SourceError::Invalid(format!(
@@ -766,6 +781,19 @@ impl Resolver<'_> {
         }
         Ok(frame)
     }
+}
+
+/// Whether a Complement frame selects an *of* phrase, the oblique that
+/// alternates with a genitive subject-determiner: other roles than the
+/// agent's take the default preposition *of* (CGEL, Ch. 5, §16.5.3,
+/// p. 476). A frame that names *for* beside *of* names one argument in
+/// either form (*the mana cost for spells you cast*), and alternates whole.
+fn selects_of(spec: &FrameSpec) -> bool {
+    matches!(
+        spec,
+        FrameSpec::Complement(FillSpec::PP(list) | FillSpec::PPWith(list, _))
+            if list.iter().any(|preposition| preposition == "of")
+    )
 }
 
 /// A Lexeme of a closed-class or catalog category, spelled exactly.

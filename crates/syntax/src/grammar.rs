@@ -677,6 +677,12 @@ pub enum SchemaDecl {
         /// the Complement it strands.
         #[serde(default)]
         complement_kind: Option<Ident>,
+        /// The privative feature, carried by the phrase, that every phrase of
+        /// a genitive-alternant frame (`Frame::genitive_alternant`) values,
+        /// its Complement realized or shared alike: the phrase has filled the
+        /// argument a genitive determiner would name.
+        #[serde(default)]
+        genitive_alternant: Option<Ident>,
         /// Equations on every active phrase of a frame, over `$`, the
         /// lexical child `head` (a verb's Voice) and the Frame Slot
         /// children, each named by its relation (`complement`).

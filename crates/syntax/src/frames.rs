@@ -302,6 +302,12 @@ pub struct Frame {
     pub slots: Vec<FrameSlot>,
     #[serde(default, skip_serializing_if = "FrameVoice::is_default")]
     pub voice: FrameVoice,
+    /// A noun's Complement names the one argument a genitive
+    /// subject-determiner names, so the two compete and its phrase takes no
+    /// genitive determiner: *the flood's consequences* or *the consequences
+    /// of the flood* (CGEL, Ch. 5, §16.5.3, pp. 475–476, [56ii], [59]).
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub genitive_alternant: bool,
 }
 
 impl Frame {

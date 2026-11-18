@@ -677,6 +677,7 @@ fn normal_form_identifies_same_head_complement_priority() {
                 fill: SlotFill::NP,
             }],
             voice: FrameVoice::ActiveOrPassive,
+            genitive_alternant: false,
         }),
         children: vp.children[..2].to_vec(),
         ..vp.clone()

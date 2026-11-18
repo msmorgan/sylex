@@ -1,10 +1,10 @@
 //! What a derived phrase carries beyond its frame comes from the grammar's
 //! declarations, never from feature or value names in the engine
-//! (`docs/design/english.md` §1): a Valence schema's voice
-//! and passive equations and its `complement_kind`, a Premodification's
-//! per-form equations, the grammar's `slot_equations` and `high_attachment`. A
-//! derivation whose declaration is missing is a load error, never a silent
-//! default.
+//! (`docs/design/english.md` §1): a Valence schema's voice and passive
+//! equations, its `complement_kind` and `genitive_alternant`, a
+//! Premodification's per-form equations, the grammar's `slot_equations` and
+//! `high_attachment`. A derivation whose declaration is missing is a load
+//! error, never a silent default.
 
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
@@ -142,7 +142,21 @@ fn an_adjectival_passive_without_its_equations_is_a_load_error() {
 fn a_complement_kind_the_phrase_does_not_carry_is_a_load_error() {
     let valence = format!("{VOICES}, complement_kind: ComplementKind");
     let error = load_error(&grammar(&valence, "", "", ""));
-    assert!(error.contains("does not carry"), "{error}");
+    assert!(error.contains("is not a feature the phrase carries"), "{error}");
+}
+
+#[test]
+fn a_genitive_alternant_the_phrase_does_not_carry_is_a_load_error() {
+    let valence = format!("{VOICES}, genitive_alternant: ComplementKind");
+    let error = load_error(&grammar(&valence, "", "", ""));
+    assert!(error.contains("genitive alternant"), "{error}");
+}
+
+#[test]
+fn a_genitive_alternant_with_two_values_is_a_load_error() {
+    let valence = format!("{VOICES}, genitive_alternant: Voice");
+    let error = load_error(&grammar(&valence, "", "", ""));
+    assert!(error.contains("is not privative"), "{error}");
 }
 
 #[test]
