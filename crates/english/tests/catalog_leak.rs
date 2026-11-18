@@ -126,7 +126,8 @@ fn leaks(grammar: &Grammar, catalog: &BTreeSet<String>) -> BTreeSet<String> {
     for schema in &grammar.schemas {
         match schema {
             SchemaDecl::Premodification { modifier, host, .. } => {
-                names.extend([modifier.as_str(), host.as_str()]);
+                names.push(modifier.as_str());
+                names.extend(host.as_deref());
             }
             SchemaDecl::Parameters { phrase, .. } => names.push(phrase),
             SchemaDecl::Valence {
@@ -146,11 +147,13 @@ fn leaks(grammar: &Grammar, catalog: &BTreeSet<String>) -> BTreeSet<String> {
                 category,
                 coordinators,
                 link,
+                negator,
                 ..
             } => {
                 names.push(category.as_str());
                 names.extend(coordinators.as_deref());
                 names.extend(link.as_deref());
+                names.extend(negator.as_deref());
             }
         }
     }

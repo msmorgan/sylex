@@ -1,7 +1,8 @@
 //! Coordinated determiners each with its own premodifiers over one shared
 //! nominal (`SharedNominalDetermined`, CGEL 5§14.4:449, 15§4.4(d):1344),
 //! agreement across conjuncts and the clause, canonicalization beside bare
-//! determiner coordination, and the `NominalModifier` admission gate
+//! determiner coordination, and the admission gate that a Cluster's
+//! `Premodifier` is no noun
 //! (`docs/design/english.md` §6, §8).
 
 use sylex_lexicon::CardScope;
@@ -346,7 +347,7 @@ fn bare_determiners_stay_on_the_canonical_path() {
 }
 
 #[test]
-fn nominal_modifier_gate_blocks_tautological_noun_doubling() {
+fn cluster_premodifier_gate_blocks_tautological_noun_doubling() {
     let env = LexicalEnvironment::load().unwrap();
     let gated = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let warpath = "Warpath deals 3 damage to each blocking creature and each blocked creature.";
@@ -355,7 +356,7 @@ fn nominal_modifier_gate_blocks_tautological_noun_doubling() {
     assert_eq!(gated_readings.len(), 1);
 
     let ungated_source = format!(
-        "{}\nNounNominalModifier: NominalModifier -> NounPremodifier\n",
+        "{}\nNounPremodifierInCluster: Premodifier -> NounPremodifier\n",
         sylex_english::GRAMMAR.as_str()
     );
     let ungated = CompiledGrammar::bind(

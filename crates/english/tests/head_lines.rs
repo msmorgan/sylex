@@ -6,9 +6,12 @@ use sylex_vocabulary::LexicalEnvironment;
 
 /// (Production, the name of its head-line child), by step: a Linked
 /// Conjunct's connective; a `head`; a coordination schema's coordinator, and
-/// its serial tail; the only child; a `coordinator` the grammar writes; a
-/// relative clause's `marker`; the first child bearing no dependent function
-/// (`not`'s `filler`); the first child (a Complement Cluster's).
+/// its serial tail; a contrastive coordination's coordinator, not its
+/// `modifier` *not*; the only child; a `coordinator` the grammar writes; a
+/// relative clause's `marker`; the first child (a Complement Cluster's).
+/// No Production of the grammar takes the step between the last two, the
+/// first child bearing no dependent function: `sylex_syntax`'s own tests pin
+/// it.
 const HEAD_LINES: &[(&str, &str)] = &[
     ("LinkedClause", "adjunct"),
     ("Determined", "head"),
@@ -17,7 +20,10 @@ const HEAD_LINES: &[(&str, &str)] = &[
     ("BareRelative", "clause"),
     ("AddedElement", "coordinator"),
     ("SubjectRelative", "marker"),
-    ("NegatedConjunct", "filler"),
+    (
+        "Coordination:PrepositionPhrase#But/binary-delimited",
+        "coordinator",
+    ),
     (
         "Valence:VerbPhrase/Ditransitive(NP,NP)/cluster",
         "indirect_object",
