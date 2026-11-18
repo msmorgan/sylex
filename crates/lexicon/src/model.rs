@@ -37,6 +37,17 @@ pub struct LexicalProperties {
     /// Only a verb is a modal.
     #[serde(default)]
     pub modal: bool,
+    /// A word of a closed class that stands before a noun or
+    /// heads its own phrase there: a determinative other than a compound one,
+    /// which is a fused determiner-head alone (CGEL, Ch. 5 §9.6, p. 423), a
+    /// pronoun, a preposition, a coordinator, a subordinator or an auxiliary
+    /// verb. Pronouns and auxiliaries are closed classes and prepositions a
+    /// relatively closed one, which "does not readily accept the addition of
+    /// new members" (CGEL, Ch. 5 §10, p. 425; Ch. 3 §2, p. 102; Ch. 7 §1,
+    /// p. 603), and cards coin kinds, so no Kind Name spells one
+    /// ([`Lexicon::analyze`]).
+    #[serde(default)]
+    pub closed_class: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
@@ -129,6 +140,11 @@ pub struct Lexeme {
     /// forms ([`Lexicon::analyze`]).
     #[serde(default)]
     pub set_name_host: bool,
+    /// The Lexeme is a noun a counter's kind premodifies (*a charge
+    /// counter*): analysis reads a Kind Name only right before one of its
+    /// forms ([`Lexicon::analyze`]).
+    #[serde(default)]
+    pub kind_name_host: bool,
 }
 
 impl Lexeme {
@@ -155,6 +171,7 @@ impl Lexeme {
             card_name: false,
             onset: None,
             set_name_host: false,
+            kind_name_host: false,
             surface_structure: if matches!(
                 category,
                 crate::Category::Catalog | crate::Category::Symbol

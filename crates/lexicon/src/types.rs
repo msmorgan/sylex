@@ -33,6 +33,8 @@ pub enum Category {
     FlavorWord,
     /// Open name of an expansion, cited before the noun *expansion*.
     SetName,
+    /// Open name of a counter's kind, read before the noun *counter*.
+    KindName,
     /// Open Anchor Word [CR#614.12c], which its face's text introduces.
     AnchorWord,
     /// Open word a vote offers, a Vote Option [CR#701.38b], which its
@@ -43,6 +45,20 @@ pub enum Category {
 }
 
 impl Category {
+    /// Whether the Category is a closed class of function words: a
+    /// determinative, pronoun, preposition, coordinator or subordinator.
+    #[must_use]
+    pub fn is_function_word(self) -> bool {
+        matches!(
+            self,
+            Self::Determinative
+                | Self::Pronoun
+                | Self::Preposition
+                | Self::Coordinator
+                | Self::Subordinator
+        )
+    }
+
     /// Whether a word of the Category hosts a prefix: a noun (*nonland*,
     /// *non-Vampire*), an adjective (*nonlegendary*) or a verb's participle
     /// (*nonattacking*).
@@ -165,6 +181,17 @@ pub enum LexicalReading {
     /// ([`crate::Lexicon::analyze`]).
     SetName {
         name: String,
+    },
+    /// A Kind Name: a counter's kind, read from the text as the word
+    /// directly before the noun *counter* (*a charge counter*, *a goddamn
+    /// counter*), where no slash measure or keyword names the kind
+    /// ([`crate::Lexicon::analyze`]). It is spelled as the word, and its
+    /// Onset is the one the article before it agrees with, the text's own
+    /// record of a sound no Lexeme declares (*an hour counter*, *a unity
+    /// counter*).
+    KindName {
+        kind: String,
+        onset: Option<crate::Onset>,
     },
     /// An Anchor Word [CR#614.12c]: one of the two words a face's text
     /// offers as its permanent enters, each heading the bulleted ability

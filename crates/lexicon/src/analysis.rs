@@ -148,6 +148,7 @@ impl AnalyzedText {
             | LexicalReading::OwnName { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
+            | LexicalReading::KindName { .. }
             | LexicalReading::Numeral { .. } => true,
         };
         self.words()
@@ -358,6 +359,9 @@ impl Lexicon {
             if lexeme.set_name_host && lexeme.category != Category::Noun {
                 return Err(error("a Set Name premodifies only a noun"));
             }
+            if lexeme.kind_name_host && lexeme.category != Category::Noun {
+                return Err(error("a Kind Name premodifies only a noun"));
+            }
             result.lexemes.insert(lexeme.id, lexeme);
         }
         Ok(result)
@@ -416,7 +420,8 @@ impl Lexicon {
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::AnchorWord { .. }
             | LexicalReading::VoteOption { .. }
-            | LexicalReading::SetName { .. } => {
+            | LexicalReading::SetName { .. }
+            | LexicalReading::KindName { .. } => {
                 self.realize(reading)?;
                 crate::Edges::non_word(reading).ok_or(LexicalError::UnlicensedValue)
             }
@@ -470,6 +475,12 @@ impl Lexicon {
                     return Err(LexicalError::UnlicensedValue);
                 }
                 Ok(name.clone())
+            }
+            LexicalReading::KindName { kind, .. } => {
+                if !crate::kind_name::valid_kind_name(kind) {
+                    return Err(LexicalError::UnlicensedValue);
+                }
+                Ok(kind.clone())
             }
             // An Anchor Word is spelled exactly, as the label it heads its
             // ability with.
@@ -634,16 +645,10 @@ impl Lexicon {
                 None => return false,
             }
         }
-        self.trie[node].values.iter().any(|(value, _, _)| {
-            matches!(
-                self.lexemes[&value.lexeme].category,
-                Category::Determinative
-                    | Category::Pronoun
-                    | Category::Preposition
-                    | Category::Coordinator
-                    | Category::Subordinator
-            )
-        })
+        self.trie[node]
+            .values
+            .iter()
+            .any(|(value, _, _)| self.lexemes[&value.lexeme].category.is_function_word())
     }
 
     /// Whether a lexical value stands in the text of a face whose card names
@@ -681,7 +686,8 @@ impl Lexicon {
             LexicalReading::AnchorWord { .. }
             | LexicalReading::VoteOption { .. }
             | LexicalReading::Numeral { .. }
-            | LexicalReading::SetName { .. } => true,
+            | LexicalReading::SetName { .. }
+            | LexicalReading::KindName { .. } => true,
         }
     }
 
@@ -905,6 +911,7 @@ impl Lexicon {
                 | LexicalReading::IntroducedName { .. }
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. }
+                | LexicalReading::KindName { .. }
                 | LexicalReading::AnchorWord { .. }
                 | LexicalReading::VoteOption { .. }
                 | LexicalReading::Numeral { .. } => false,
@@ -912,6 +919,7 @@ impl Lexicon {
             .map(|found| found.start)
             .collect();
         crate::set_name::set_name_matches(&tokens, &hosts, &mut matches);
+        self.kind_name_matches(&tokens, &mut matches);
         matches.retain(|found| match &found.reading {
             LexicalReading::FlavorWord { label } => {
                 self.title_cased(label) && self.stands_in(&found.reading, scope)
@@ -922,7 +930,8 @@ impl Lexicon {
             | LexicalReading::Numeral { .. }
             | LexicalReading::AnchorWord { .. }
             | LexicalReading::VoteOption { .. }
-            | LexicalReading::SetName { .. } => true,
+            | LexicalReading::SetName { .. }
+            | LexicalReading::KindName { .. } => true,
         });
         AnalyzedText {
             raw: raw.to_owned(),
@@ -932,6 +941,52 @@ impl Lexicon {
             open_words,
             scope: scope.clone(),
         }
+    }
+
+    /// Adds the Kind Names before each word a counter's kind premodifies
+    /// ([`crate::Lexeme::kind_name_host`]), where no word of a closed class,
+    /// adjective or numeral spells the word there
+    /// ([`crate::LexicalProperties::closed_class`]).
+    fn kind_name_matches(&self, tokens: &[char], matches: &mut Vec<LexicalMatch>) {
+        let kind_hosts = matches
+            .iter()
+            .filter(|found| match &found.reading {
+                LexicalReading::Word(value) => self.lexemes[&value.lexeme].kind_name_host,
+                LexicalReading::OwnName { .. }
+                | LexicalReading::IntroducedName { .. }
+                | LexicalReading::FlavorWord { .. }
+                | LexicalReading::SetName { .. }
+                | LexicalReading::KindName { .. }
+                | LexicalReading::AnchorWord { .. }
+                | LexicalReading::VoteOption { .. }
+                | LexicalReading::Numeral { .. } => false,
+            })
+            .map(|found| found.start)
+            .collect();
+        let closed: Vec<(usize, usize)> = matches
+            .iter()
+            .filter(|found| match &found.reading {
+                LexicalReading::Word(value) => {
+                    let lexeme = &self.lexemes[&value.lexeme];
+                    lexeme.properties.closed_class || lexeme.category == Category::Adjective
+                }
+                LexicalReading::Numeral { .. } => true,
+                LexicalReading::OwnName { .. }
+                | LexicalReading::IntroducedName { .. }
+                | LexicalReading::FlavorWord { .. }
+                | LexicalReading::SetName { .. }
+                | LexicalReading::KindName { .. }
+                | LexicalReading::AnchorWord { .. }
+                | LexicalReading::VoteOption { .. } => false,
+            })
+            .map(|found| (found.start, found.end))
+            .collect();
+        crate::kind_name::kind_name_matches(
+            tokens,
+            &kind_hosts,
+            |start, end| closed.contains(&(start, end)),
+            matches,
+        );
     }
 }
 
@@ -957,7 +1012,8 @@ fn drop_shortened_inside_full(matches: &mut Vec<LexicalMatch>) {
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::AnchorWord { .. }
             | LexicalReading::VoteOption { .. }
-            | LexicalReading::SetName { .. } => None,
+            | LexicalReading::SetName { .. }
+            | LexicalReading::KindName { .. } => None,
         })
         .collect();
     matches.retain(|found| match &found.reading {
@@ -977,7 +1033,8 @@ fn drop_shortened_inside_full(matches: &mut Vec<LexicalMatch>) {
         | LexicalReading::FlavorWord { .. }
         | LexicalReading::AnchorWord { .. }
         | LexicalReading::VoteOption { .. }
-        | LexicalReading::SetName { .. } => true,
+        | LexicalReading::SetName { .. }
+        | LexicalReading::KindName { .. } => true,
     });
 }
 

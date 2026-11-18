@@ -4,6 +4,7 @@
 mod analysis;
 mod dimensions;
 mod introduced;
+mod kind_name;
 mod model;
 mod morphology;
 pub mod numeral;

@@ -1801,3 +1801,119 @@ fn only_a_noun_takes_a_set_name() {
     host.set_name_host = true;
     assert!(Lexicon::new([host]).is_err());
 }
+
+/// The Kind Names analysis reads in `text`, each with its Onset.
+fn kind_names(lexicon: &Lexicon, text: &str) -> BTreeSet<(String, Option<Onset>)> {
+    lexicon
+        .analyze(text)
+        .matches
+        .iter()
+        .filter_map(|found| match &found.reading {
+            LexicalReading::KindName { kind, onset } => Some((kind.clone(), *onset)),
+            _ => None,
+        })
+        .collect()
+}
+
+fn kind_name_host(more: impl IntoIterator<Item = Lexeme>) -> Lexicon {
+    let mut counter = noun("noun:counter", "counter");
+    counter.kind_name_host = true;
+    let mut those = invariant("det:those", "those", Category::Determinative);
+    those.properties.closed_class = true;
+    let mut have = verb("verb:have", "have");
+    have.properties.closed_class = true;
+    Lexicon::new(
+        [
+            counter,
+            those,
+            have,
+            invariant("det:a", "a", Category::Determinative),
+            invariant("adj:additional", "additional", Category::Adjective),
+            noun("noun:time", "time"),
+        ]
+        .into_iter()
+        .chain(more),
+    )
+    .unwrap()
+}
+
+/// A Kind Name is any one word right before a noun a counter's kind
+/// premodifies [CR#122.1], an English word or none: no list of kinds is
+/// consulted. Its Onset is the one the article before it agrees with (*an
+/// hour counter*, Midnight Clock; *a unity counter*, Call for Unity), and
+/// otherwise its first letter's.
+#[test]
+fn a_kind_name_is_the_word_before_its_noun() {
+    let lexicon = kind_name_host([]);
+    for (text, kind, onset) in [
+        ("Put a goddamn counter on it.", "goddamn", Onset::Consonant),
+        (
+            "Put an hour counter on this artifact.",
+            "hour",
+            Onset::Vowel,
+        ),
+        (
+            "put a unity counter on this enchantment",
+            "unity",
+            Onset::Consonant,
+        ),
+        ("with three time counters on it", "time", Onset::Consonant),
+        (
+            "Each land with an everything counter on it",
+            "everything",
+            Onset::Vowel,
+        ),
+        ("Stun counters", "Stun", Onset::Consonant),
+    ] {
+        assert_eq!(
+            kind_names(&lexicon, text),
+            BTreeSet::from([(kind.to_owned(), Some(onset))]),
+            "{text}"
+        );
+    }
+    let reading = LexicalReading::KindName {
+        kind: "hour".into(),
+        onset: Some(Onset::Vowel),
+    };
+    assert_eq!(lexicon.realize(&reading).unwrap(), "hour");
+    assert!(lexicon.stands_in(&reading, &CardScope::default()));
+    assert_eq!(
+        lexicon.edges(&reading).unwrap().left.onset,
+        Some(Onset::Vowel)
+    );
+    assert!(
+        lexicon
+            .realize(&LexicalReading::KindName {
+                kind: "+1/+1".into(),
+                onset: None,
+            })
+            .is_err()
+    );
+}
+
+/// No Kind Name is a word of a closed class, a numeral or an adjective,
+/// each of which premodifies or determines the noun as itself (*those
+/// counters*, *have counters*, *two counters*, *an additional counter*), nor
+/// a word that is not right before the noun after a space.
+#[test]
+fn a_kind_name_is_no_closed_class_word_numeral_or_adjective() {
+    let lexicon = kind_name_host([]);
+    for text in [
+        "remove those counters",
+        "can't have counters put on it",
+        "put two counters on it",
+        "put an additional counter of that kind",
+        "this creature, counters",
+        "time",
+        "+1/+1 counter",
+    ] {
+        assert_eq!(kind_names(&lexicon, text), BTreeSet::new(), "{text}");
+    }
+}
+
+#[test]
+fn only_a_noun_takes_a_kind_name() {
+    let mut host = invariant("prep:in", "in", Category::Preposition);
+    host.kind_name_host = true;
+    assert!(Lexicon::new([host]).is_err());
+}

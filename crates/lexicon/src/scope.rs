@@ -53,6 +53,7 @@ fn introducible(word: &LexicalReading) -> bool {
         | LexicalReading::OwnName { .. }
         | LexicalReading::FlavorWord { .. }
         | LexicalReading::SetName { .. }
+        | LexicalReading::KindName { .. }
         | LexicalReading::Numeral { .. } => false,
     }
 }
