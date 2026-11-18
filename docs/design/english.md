@@ -5,8 +5,8 @@ Oracle's conventions, not Magic ([Architecture](architecture.md), "The
 layers"). This document records how the grammar is designed and why, and the
 contract the parser keeps (§7–8). How words reach the grammar is in
 [Lexicon](lexicon.md). Everything in it follows from the
-charter in §4: the parser admits English, and it does not check Oracle's
-templating.
+charter in §4: the parser reads the English that cards print, and it does not
+check a printed card's templating.
 
 ## 1. The crate split
 
@@ -253,22 +253,42 @@ the two are different analyses, and only meaning chooses between them (§4).
 
 ## 4. Admission and ambiguity
 
-**The charter.** The parser admits all English on all Magic cards. It is not a
-linter that checks whether Oracle's templating conventions were followed. A
-grammatical sentence a card could print is admitted, even where Oracle would
-template it differently. The grammar refuses a grammatical form only where a
-gate measurably prevents spurious Readings or forest growth on real card text
-(§6). The style guide describes what Oracle writes: it is evidence about the
-register, never a rule a Reading must pass. So a template difference is never
+**The charter.** The grammar is for reading what Magic cards print. A form is
+admitted because card text has it: what justifies a Schema, a Production, a
+feature value or a Reading is the card text it reads. CGEL is the source for
+analyzing a form cards print, its constituents and their functions (§3), and
+for telling a grammatical Reading of card text from an ungrammatical one. It is
+not a list of forms to admit. A form no card prints needs no Production, and no
+rule or value is added or kept for one because CGEL calls it grammatical. A
+general rule that printed forms justify may also build forms no card prints,
+as the valence alternations derived from every frame do (§3); what has no
+place is a rule or value whose only justification is a form no card prints.
+Nor is a gate wrong because it refuses such a form: a gate earns its place by
+its measured effect on real card text (§6), and that effect is its whole
+justification. Why: CGEL describes a far wider English than the register, and
+a rule built for a form no card prints still applies to the text cards do
+print, where it adds Readings that text does not have.
+
+The parser is not a linter that checks whether a printed card follows Oracle's
+templating conventions: a printed card's text is read even where Oracle would
+template it differently. The style guide describes what Oracle writes: it is
+evidence about the register, never a rule a Reading must pass. So a template
+difference is never
 grounds for correcting a card's text; an Editorial Correction
 ([`corrections.txt`](../../crates/english/corrections.txt)) is only for an
 error in the text. A Reading that is grammatical but wrong for the rules is not
 the grammar's to reject either. In the direction the design is heading, the
 layers above resolve it, by meaning and then by likelihood
 ([Architecture](architecture.md), "Spelling is a construction grammar"). Why: a
-grammar that enforced templating would refuse any card, custom content
-included, whose wording departs from current templates, and it would decide by
-convention what only meaning can decide.
+grammar that enforced templating would refuse printed cards whose wording
+departs from current templates, which are the text it exists to read, and it
+would decide by convention what only meaning can decide.
+
+A custom card is read by the grammar of printed card text, and it is expected
+to follow Oracle's templating conventions. Wording on a custom card that departs
+from them is the card's to change, not the grammar's to admit. So the two
+differ: a printed card's departure from the templates is card text the grammar
+reads, and a custom card's is no justification for a rule.
 
 **Keep it packed.** When a phrase can attach at more than one site, every
 grammatical attachment stays in the Packed Forest, and nothing in this layer
@@ -279,7 +299,7 @@ reads the forest and never re-parses the text. Judgment evaluation
 (`Judge::evaluate`) enumerates every Reading of a unit, so that no verdict
 depends on rank (§5).
 
-**Structure over suppression.** A missing or wrong analysis is fixed by a
+**Structure over suppression.** A missing or wrong analysis of card text is fixed by a
 general rule that cites CGEL, the style guide or the CR. The rule adds whatever
 features, Categories, Productions or engine capability it needs. It is never an
 exclusion aimed at one card. A spurious analysis, which no English grammar
@@ -330,8 +350,10 @@ comparing the census ([`crates/english/README.md`](../../crates/english/README.m
 "Working rules"). The gate's comment names one real card and the spurious
 structure the gate prevents on it, as that rule says. That English never
 builds a form is not by itself a justification, and the style guide is
-evidence about the register, never a gate's justification. A form that is
-only dispreferred is ranked (§5), not gated.
+evidence about the register, never a gate's justification. Conversely, that
+CGEL calls grammatical a form a gate refuses is no case against the gate when
+no card prints the form (§4): a gate is kept or retired on its measured effect
+alone. A form that is only dispreferred is ranked (§5), not gated.
 Why: a gate with no effect on real cards refuses only forms no card prints,
 which only grows the grammar (§3), while a gate whose removal multiplies
 Readings on real cards keeps the forest one the layers above can work over.
@@ -438,6 +460,8 @@ merging after parsing would mean building them first.
 **Wrong analyses.** A Corpus Unit is read when a correct analysis is among its
 Readings. A grammatical Reading beside the intended one is tolerated, and
 the layers above disambiguate it (§4). An ungrammatical Reading is not: a newly
-admitted one is a defect, never a gain. A unit whose Readings are all known to
+admitted one is a defect, never a gain. A Reading built only by a rule that
+exists for a form no card prints is a defect too, grammatical or not: it goes
+with that rule (§4). A unit whose Readings are all known to
 be wrong is not covered. Why: coverage counts what the layers above can use, and they can use a
 unit only if its forest holds the right analysis.

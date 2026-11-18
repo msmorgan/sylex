@@ -15,6 +15,12 @@ lexemes of that lexicon and that none of its own names spells a catalog item.
 
 ## Working rules
 
+- **Card text justifies admission.** A Schema, Production, feature value or
+  Reading is added or kept because card text needs it. CGEL analyzes the
+  forms cards print and tells a grammatical Reading from an ungrammatical one;
+  a form only CGEL attests is no reason to add or keep a rule, and no reason
+  to retire a gate that refuses it
+  ([`docs/design/english.md`](../../docs/design/english.md) §4, §6).
 - **Census before and after.** Every change to the grammar, the engine, the
   lexicon or the census runs the census before and after it:
 

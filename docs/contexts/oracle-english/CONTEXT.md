@@ -8,8 +8,10 @@ meanings.
 
 Oracle text is a controlled register (`docs/oracle-style-guide.md`). *The
 Cambridge Grammar of the English Language* (CGEL) supplies the grammatical
-terminology and constituent structure, never a mandate to admit literary
-constructions Oracle does not use. CGEL terms (Noun Phrase, Complement,
+terminology and constituent structure for analyzing what cards print, and it
+tells a grammatical Reading from an ungrammatical one. It is never a list of
+forms to admit: a form is admitted because card text has it
+(`docs/design/english.md` §4). CGEL terms (Noun Phrase, Complement,
 Adjunct, Determinative, Gap and the rest) and Comprehensive Rules terms keep
 their standard meanings and are not redefined here. Predicate, Subject and
 Object here are CGEL's grammatical functions, not the Game Model terms.

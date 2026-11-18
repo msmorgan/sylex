@@ -20,8 +20,10 @@ taken as a list of forms the grammar must admit, it now produces spurious Readin
   list of forms to admit.
 - A form no card prints needs no Production, and a gate is not wrong because it refuses one. A
   gate still needs its measured effect on real card text (§6).
-- Custom cards are read by the same grammar: a custom card's wording that no printed card shares
-  is a reason to extend the grammar when that card exists, not before.
+- A custom card is read by the grammar of printed card text and is expected to follow Oracle's
+  templating conventions; wording that departs from them is the custom card's to change, not the
+  grammar's to admit. A printed card that departs from current templates is still read, not
+  corrected.
 
 ## Done when
 
