@@ -83,6 +83,18 @@ Why: these alternations are productive English. Written out by hand, they
 multiply as frames times forms. Filtered by attestation, they fail on the next
 card that uses one.
 
+The grammar says where a frame's phrase stands, never which words have the
+frame. A Valence schema may take only the frames that select named
+prepositions and project them to its own Category: a determinative's *of*
+frame builds the partitive's fused determiner-head (*each of those
+creatures*), and its *than* frame a Determiner Phrase whose Number is the
+standard's (*more than one*). A Production that places a Complement itself
+or omits it names the head by its frame (`Selecting`: *more lands than you*,
+*{1} less*), or the Complement by the head's (`SelectedBy`: an existential's
+Extension, which *be*'s prepositional frame selects). Why: a word list in the
+grammar is a second declaration of the frame, which drifts from the lexicon
+and which complement priority (below) cannot see.
+
 **A Complement Constraint is the grammar's, named by the frame.** What a
 preposition requires of its Complement beyond the Frame Slot's kind is declared
 in the grammar as a named constraint, and the preposition's frame in the
@@ -111,7 +123,10 @@ instance: in *Search your library for a card*, *for a card* is *search*'s
 Complement only. A noun, adjective or determinative standing bare with its
 Complement omitted takes a Preposition Phrase right after it that one of its
 frames selects as that Complement, never as a dependent of another host
-(*on top of your library*). Attachment to different heads stays packed (§4).
+(*on top of your library*). The head stands bare in any phrase that ends in
+it, a Valence schema's or an authored Production's (fused *either* in *one
+mana of either of the circled colors*, Cryptic Spires). Attachment to
+different heads stays packed (§4).
 Why: a selected and an unselected attachment to the same head are one
 analysis, so keeping both is a second tree (§8), while attachments to
 different heads are different analyses that only meaning can choose between.

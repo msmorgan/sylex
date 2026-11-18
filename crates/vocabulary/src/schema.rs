@@ -548,6 +548,9 @@ pub enum DeterminativeDistribution {
     /// fused and partitive Productions require (not *choose target*, *target
     /// of those*).
     Targeting,
+    /// A degree determinative, *many* or *much*, which a degree word
+    /// modifies (*that many*, *as much*, *how many*).
+    Degree,
 }
 
 /// One cell of a pronoun paradigm.

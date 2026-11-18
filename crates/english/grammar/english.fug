@@ -609,15 +609,9 @@ word Of = "prep:of"
 word Than = "prep:than"
 word From = "prep:from"
 word For = "prep:for"
-// `In` through `After`: the prepositions of an existential's extension
-// (LocatedExistentialBe).
-word In = "prep:in"
-word On = "prep:on"
-word Among = "prep:among"
-word Under = "prep:under"
-word Outside = "prep:outside"
-word After = "prep:after"
 word As = "prep:as"
+// Exceptive *but* (*all but one*).
+word ExceptiveBut = "prep:but"
 word DegreeAs = "adv:as"
 word Plus = "prep:plus"
 word Minus = "prep:minus"
@@ -649,7 +643,6 @@ word No = "det:no"
 word Anywhere = "det:anywhere"
 
 class Predeterminer = ["det:all.count", "det:all.mass", "det:both"]
-class DegreeQuantifier = ["det:many", "det:much"]
 class Coordinator = ["coord:and", "coord:or", "coord:and/or", "coord:nor"]
 class Disjunctive = ["coord:or", "coord:and/or", "coord:nor"]
 class Alternative = ["coord:or", "coord:nor"]
@@ -669,16 +662,6 @@ class StrandableModal = ["verb:can", "verb:can't", "verb:may", "verb:must", "ver
 class StrandableHave = ["verb:have", "verb:haven't"]
 class StrandableBe = ["verb:be", "verb:aren't"]
 class StrandableDo = ["verb:do", "verb:don't"]
-// They select a *than* Complement (*more than one*; CGEL 13§2.1:1104), and
-// a measure phrase modifies them.
-class ComparativeQuantifier = ["det:more.count", "det:more.mass", "det:less", "det:fewer"]
-// They head a partitive with an *of* oblique (*each of those creatures*;
-// CGEL 5§9.1:411). *Any* and a quantity have Productions of their own.
-class PartitiveQuantifier = [
-    "det:all.count", "det:all.mass", "det:another", "det:both", "det:each", "det:either",
-    "det:fewer", "det:less", "det:many", "det:more.count", "det:more.mass", "det:most", "det:much",
-    "det:neither", "det:none", "det:some",
-]
 // They float as an Adjunct after a plural Subject or an auxiliary (CGEL
 // 5§9.2:413). *All* floats after a personal pronoun only (FloatedAll).
 class FloatingQuantifier = ["det:each", "det:both"]
@@ -1149,10 +1132,10 @@ ExistentialBe: ExistentialPredicate -> Class(BeVerb) displaced_subject:Displaced
     where $.Number = displaced_subject.Number,
           displaced_subject.Case != Accusative,
           $.ComplementKind = NP
-// The prepositions are *be*'s prepositional frame's.
+// The Complement is the one *be*'s prepositional frame selects.
 LocatedExistentialBe: ExistentialPredicate ->
     Class(BeVerb) displaced_subject:DisplacedSubject
-    complement:Selected(PrepositionPhrase, In, On, Among, Under, Outside, After) {
+    complement:SelectedBy(PrepositionPhrase, BeVerb) {
     unextended: [displaced_subject],
 }
     where $.Number = displaced_subject.Number,
@@ -1490,18 +1473,16 @@ DepictiveAdjective: VerbPhrase -> VerbPhrase adjunct:AdjectivePhrase {
 PhrasalAdverb: AdverbPhrase -> Class(PhrasalAdverb) where $.AdjunctPosition = Phrasal
 MultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb) where $.AdjunctPosition = Multiplying
 BoundingAdverb: AdverbPhrase -> Class(BoundingAdverb) where $.AdjunctPosition = Bounding
-DegreeDeterminer: DeterminerPhrase -> modifier:Word(That) Class(DegreeQuantifier) {
-    unshared: [DeterminativeDistribution],
-}
-    where $.ComplementKind = Intransitive,
-          $.DeterminativeDistribution = Degree
+DegreeDeterminer: DeterminerPhrase -> modifier:Word(That) Lex(Determinative)
+    where head.DeterminativeDistribution := Degree,
+          $.ComplementKind = Intransitive
 // *As much*, *as many* (CGEL 13§4.3:1130). Degree *as* modifies the
 // determinative, never a Noun Phrase.
-EquativeDeterminer: DeterminerPhrase -> modifier:Word(DegreeAs) Class(DegreeQuantifier) {
-    unshared: [DeterminativeDistribution, Grade],
+EquativeDeterminer: DeterminerPhrase -> modifier:Word(DegreeAs) Lex(Determinative) {
+    unshared: [Grade],
 }
-    where $.ComplementKind = Intransitive,
-          $.DeterminativeDistribution = Degree,
+    where head.DeterminativeDistribution := Degree,
+          $.ComplementKind = Intransitive,
           $.Grade = Equative
 // *At least as many* (*at least as many lands as you do*, Land
 // Equilibrium): the bound is the equative determinative's, as it is a
@@ -1645,7 +1626,7 @@ ComparedFrequency: TemporalNounPhrase -> NounPhrase
 // than the number of snow Swamps you control*, Withering Wisps), which no
 // Noun Phrase Production builds.
 ModifiedComparativeFrequency: TemporalNounPhrase ->
-    modifier:Lex(Determinative) determiner:Class(ComparativeQuantifier) Nominal
+    modifier:Lex(Determinative) determiner:Selecting(Determinative, Than) Nominal
     complement:Selected(PrepositionPhrase, Than)
     where head.NounDistribution = Serial,
           head.Number = Plural,
@@ -1834,7 +1815,7 @@ FusedMaximum: NounPhrase -> Selected(PrepositionPhrase, Up)
           $.Case = Plain,
           $.Person = Third
 // *Costs {1} less to cast* (CGEL 13§4.4:1125–1126).
-MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Class(ComparativeQuantifier)
+MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Selecting(Determinative, Than)
     where modifier.Case := Plain,
           modifier.Countability != Count,
           $.NounKind = Ordinary,
@@ -1842,25 +1823,9 @@ MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Class(ComparativeQuan
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-// A determinative fused head and its *of* oblique (CGEL 5§9.1:411).
-// Number is the oblique's, a distributive head's singular its own, and
-// *any*'s open (*if any of those cards shares a card type*).
-Partitive: PartitiveHead -> Class(PartitiveQuantifier) complement:Selected(PrepositionPhrase, Of) { transparent: [complement] }
-    where head.DeterminativeDistribution != Distributive,
-          $.Number = complement.Number,
-          $.NounKind = Ordinary,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-DistributivePartitive: PartitiveHead ->
-    Class(PartitiveQuantifier) complement:Selected(PrepositionPhrase, Of)
-    where complement.Number = Plural,
-          head.DeterminativeDistribution != Dependent | Independent,
-          $.NounKind = Ordinary,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-// *Any* with a plural oblique leaves the Noun Phrase's Number open.
+// A determinative fused head and its *of* oblique (CGEL 5§9.1:411) are
+// `valence PartitiveHead`'s. *Any* with a plural oblique leaves the Noun
+// Phrase's Number open (*if any of those cards shares a card type*).
 AnyPartitive: PartitiveHead -> Word(Any) complement:Selected(PrepositionPhrase, Of)
     where complement.Number = Plural,
           $.NounKind = Ordinary,
@@ -1890,16 +1855,10 @@ QuantityPartitive: PartitiveHead -> DeterminerPhrase complement:Selected(Preposi
 // *Create one of each* (Academy Manufactor), flat because fused *each* is
 // no Complement (NonNumericComplement); fused at once, so no Preposition
 // Phrase after it modifies it (*one of each of those kinds of counters* is
-// the partitive of a partitive). It is Distributive, which its Numerical
-// head is not, only so that DegreeArithmetic refuses it as an operand:
-// otherwise *of those kinds of counters* is stranded after *each* in *[that
-// many plus one of each] [of those kinds of counters]* (Winding Constrictor).
-QuantityPartitiveOfEach: FusedNounPhrase -> DeterminerPhrase preposition:Word(Of) oblique:Word(Each) {
-    unshared: [DeterminativeDistribution],
-}
+// the partitive of a partitive).
+QuantityPartitiveOfEach: FusedNounPhrase -> DeterminerPhrase preposition:Word(Of) oblique:Word(Each)
     where head.DeterminativeDistribution = Numerical,
           head.TargetMarked != Marked,
-          $.DeterminativeDistribution = Distributive,
           $.NounKind = Ordinary,
           $.Determination = Overt,
           $.Case = Plain,
@@ -1925,8 +1884,8 @@ ComplementedMassPartitive: PartitiveHead ->
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// *That many of those tokens*; a bare degree determinative is a
-// PartitiveQuantifier.
+// *That many of those tokens*; a bare degree determinative's partitive
+// is `valence PartitiveHead`'s.
 DegreePartitive: PartitiveHead -> DeterminerPhrase complement:Selected(PrepositionPhrase, Of) {
     heavy: [head],
 }
@@ -1986,7 +1945,7 @@ ComparativeBoundedAmount: Amount -> first:Amount coordinator:Word(Or) last:Adjec
 // A comparative bound as the endpoint of a scalar change (*reduce it to
 // less than 1*; CGEL 8§5.2:691–692).
 ComparativeAmount: Amount ->
-    Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
+    Selecting(Determinative, Than) complement:Selected(PrepositionPhrase, Than)
     where head.Countability = Mass,
           complement.NounKind = Numeric,
           $.ComplementKind = PP
@@ -2037,7 +1996,7 @@ SuperlativeMassDeterminer: DeterminerPhrase -> marker:Word(The) Class(Superlativ
 // The *than* Complement after the head (*more lands than you*, *less life
 // than an opponent*; CGEL 13§2.1:1104).
 ComparativeCountDetermined: NounPhrase ->
-    determiner:Class(ComparativeQuantifier) Nominal complement:Selected(PrepositionPhrase, Than)
+    determiner:Selecting(Determinative, Than) Nominal complement:Selected(PrepositionPhrase, Than)
     where head.Number = Plural,
           head.Countability = Count,
           determiner.Number = head.Number,
@@ -2047,7 +2006,7 @@ ComparativeCountDetermined: NounPhrase ->
           $.Case = Plain,
           $.Person = Third
 ComparativeMassDetermined: NounPhrase ->
-    determiner:Class(ComparativeQuantifier) Nominal complement:Selected(PrepositionPhrase, Than)
+    determiner:Selecting(Determinative, Than) Nominal complement:Selected(PrepositionPhrase, Than)
     where head.Number = Singular,
           head.Countability = Mass,
           determiner.Number = head.Number,
@@ -2069,22 +2028,10 @@ EquativeCountDetermined: NounPhrase ->
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// The comparative and its *than* Complement as siblings (*more than one*).
-// The bare standard gives the phrase its Number (*more than two lands*), so
-// Number is unshared. A determined standard is ComparativeCountDetermined's,
-// a bounding frequency ComparativeAdverb's.
-ComparativeDeterminer: DeterminerPhrase ->
-    Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than) { unshared: [Number] }
-    where complement.Determination = Bare,
-          complement.ComplementKind != AdvP,
-          $.Number = complement.Number,
-          $.ComplementKind = PP,
-          $.ObliqueNumber = complement.Number,
-          $.ObliqueKind = complement.ComplementKind,
-          $.ObliqueDetermination = complement.Determination
-// *No more than one*, *many more than two*.
+// *No more than one*, *many more than two*: `valence DeterminerPhrase`'s
+// comparative with a modifier.
 ModifiedComparativeDeterminer: DeterminerPhrase ->
-    modifier:Lex(Determinative) Class(ComparativeQuantifier)
+    modifier:Lex(Determinative) Selecting(Determinative, Than)
     complement:Selected(PrepositionPhrase, Than) { unshared: [Number] }
     where complement.Determination = Bare,
           complement.ComplementKind != AdvP,
@@ -2095,7 +2042,7 @@ ModifiedComparativeDeterminer: DeterminerPhrase ->
           $.ObliqueDetermination = complement.Determination
 // *No more scream counters*: no *than* Complement.
 DegreeModifiedComparativeDeterminer: DeterminerPhrase ->
-    modifier:Word(No) Class(ComparativeQuantifier)
+    modifier:Word(No) Selecting(Determinative, Than)
     where $.ComplementKind = Intransitive
 // *Plus* and *minus* phrases modify a quantity (*2 plus the number of ...*,
 // *that many plus one*).
@@ -2163,17 +2110,14 @@ FrequencyAdverbArithmetic: AdverbPhrase ->
     AdverbPhrase modifier:Selected(PrepositionPhrase, Plus, Minus)
     where head.AdjunctPosition = End,
           modifier.NounKind = Temporal
-// Its operand is never QuantityPartitiveOfEach's *one of each*, which would
-// strand the *of* phrase after *each* (*[that many plus one of each] [of
-// those kinds of counters]*, Winding Constrictor). It adds a number, so its
-// operand is a quantity (*one*), never an ordinary Noun Phrase: an admission
-// gate (english.md §6) that keeps *[that many plus [one +1/+1]] counters*,
-// a fused measure noun as the operand, off Hardened Scales.
+// It adds a number, so its operand is a quantity (*one*), never an ordinary
+// Noun Phrase: an admission gate (english.md §6) that keeps *[that many plus
+// [one +1/+1]] counters*, a fused measure noun as the operand, off Hardened
+// Scales.
 DegreeArithmetic: DeterminerPhrase ->
     DeterminerPhrase modifier:Selected(PrepositionPhrase, Plus, Minus) { heavy: [head] }
     where head.ComplementKind = Intransitive,
           head.TargetMarked != Marked,
-          modifier.DeterminativeDistribution != Distributive,
           modifier.NounKind != Ordinary | Temporal | Manner | Resource
 // *Half their life*, *double that damage*. A head determined by a number or
 // degree determinative is excluded: *half X damage* (Banshee) is
@@ -2190,12 +2134,12 @@ FrequencyAdverbial: Adverbial -> TemporalNounPhrase
 // *Choose the same mode more than once*: the standard is a bounding
 // frequency, so *more* is count (CGEL 13§4.1:1123).
 ComparativeAdverb: AdverbPhrase ->
-    Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
+    Selecting(Determinative, Than) complement:Selected(PrepositionPhrase, Than)
     where complement.ComplementKind = AdvP,
           head.Countability = Count,
           $.AdjunctPosition = End
 ModifiedComparativeAdverb: AdverbPhrase ->
-    modifier:Lex(Determinative) Class(ComparativeQuantifier)
+    modifier:Lex(Determinative) Selecting(Determinative, Than)
     complement:Selected(PrepositionPhrase, Than)
     where complement.ComplementKind = AdvP,
           head.Countability = Count,
@@ -2265,7 +2209,7 @@ ComparativeFusedHead: NounPhrase -> DeterminerPhrase {
 // adjective's. DeterminativeDistribution is unshared, as in
 // ExceptiveFusedHead.
 ComparativeDeterminedStandard: NounPhrase ->
-    Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than) {
+    Selecting(Determinative, Than) complement:Selected(PrepositionPhrase, Than) {
     unshared: [Number, DeterminativeDistribution],
 }
     where complement.ComplementKind = NP,
@@ -2289,7 +2233,7 @@ FractionPartitive: PartitiveHead ->
 // numerically quantified: in *power less than this creature's power*,
 // *power* has a postpositive comparative.
 MeasuredComparativeStandard: NounPhrase ->
-    modifier:NounPhrase Class(ComparativeQuantifier) complement:Selected(PrepositionPhrase, Than)
+    modifier:NounPhrase Selecting(Determinative, Than) complement:Selected(PrepositionPhrase, Than)
     where modifier.Case := Plain,
           modifier.DeterminativeDistribution := Numerical,
           complement.ComplementKind != AdvP,
@@ -2299,7 +2243,7 @@ MeasuredComparativeStandard: NounPhrase ->
           $.Case = Plain,
           $.Person = Third
 MeasuredComparativeDetermined: NounPhrase ->
-    modifier:DeterminerPhrase determiner:Class(ComparativeQuantifier) Nominal
+    modifier:DeterminerPhrase determiner:Selecting(Determinative, Than) Nominal
     complement:Selected(PrepositionPhrase, Than)
     where modifier.DeterminativeDistribution = Numerical,
           modifier.TargetMarked != Marked,
@@ -2312,14 +2256,13 @@ MeasuredComparativeDetermined: NounPhrase ->
 // Takes the measure's Number (*one more spell*, *one fewer revival
 // counter*).
 MeasuredComparativeDeterminer: DeterminerPhrase ->
-    modifier:DeterminerPhrase Class(ComparativeQuantifier) {
-    unshared: [Number, DeterminativeDistribution],
+    modifier:DeterminerPhrase Selecting(Determinative, Than) {
+    unshared: [Number],
 }
     where modifier.DeterminativeDistribution = Numerical,
           modifier.TargetMarked != Marked,
           $.Number = modifier.Number,
           $.Countability = Count,
-          $.DeterminativeDistribution = Numerical,
           $.ComplementKind = Intransitive
 // *Are each equal to ...*, *power and toughness each equal to ...*.
 FloatedEachAdjective: AdjectivePhrase -> adjunct:Word(Each) AdjectivePhrase
@@ -3370,8 +3313,9 @@ InterrogativeDeterminer: InterrogativePhrase -> determiner:Word(Which) Nominal
     where $.Person = Third
 // *Note how many cards you've drafted*.
 DegreeInterrogativeDeterminer: InterrogativePhrase ->
-    degree:Word(How) determiner:Class(DegreeQuantifier) Nominal
-    where determiner.Number = head.Number,
+    degree:Word(How) determiner:Lex(Determinative) Nominal
+    where determiner.DeterminativeDistribution := Degree,
+          determiner.Number = head.Number,
           determiner.Countability = head.Countability,
           $.Person = Third
 SubjectInterrogative: InterrogativeClause -> subject:InterrogativePhrase VerbPhrase
@@ -3551,12 +3495,58 @@ valence BareNominal {
 // amount of [excess] damage dealt*).
 valence PrepositionalNominal { head: Noun, obligatory }
 valence AdjectivePhrase { head: Adjective, complement_kind: ComplementKind }
+// A determinative alone, or count or mass *all* with its exceptive
+// Complement (*all but one*).
 valence DeterminerPhrase {
     head: Determinative,
     complement_kind: ComplementKind,
+    selects: [ExceptiveBut],
     agree: [
         ObliqueNumber -> Number, ObliqueKind -> ComplementKind, ObliqueDetermination -> Determination,
         ObliqueDistribution -> DeterminativeDistribution,
+    ],
+}
+// A comparative determinative and its *than* Complement as siblings (*more
+// than one*; CGEL 13§2.1:1104). The bare standard gives the phrase its
+// Number (*more than two lands*), so Number is unshared. A determined
+// standard is ComparativeCountDetermined's, a bounding frequency
+// ComparativeAdverb's.
+valence DeterminerPhrase {
+    variant: Comparative,
+    head: Determinative,
+    complement_kind: ComplementKind,
+    selects: [Than],
+    complemented,
+    unshared: [Number],
+    active: [complement.Determination = Bare, complement.ComplementKind != AdvP],
+    agree: [
+        Number -> Number, ObliqueNumber -> Number, ObliqueKind -> ComplementKind,
+        ObliqueDetermination -> Determination,
+    ],
+}
+// A determinative fused head and its *of* oblique (*most of those cards*;
+// CGEL 5§9.1:411). Number is the oblique's.
+valence PartitiveHead {
+    head: Determinative,
+    selects: [Of],
+    complemented,
+    active: [
+        head.DeterminativeDistribution != Distributive,
+        $.NounKind = Ordinary, $.Determination = Overt, $.Case = Plain, $.Person = Third,
+    ],
+    agree: [Number -> Number],
+}
+// The same over a plural oblique, with the head's own singular (*each of
+// those creatures*).
+valence PartitiveHead {
+    variant: Distributive,
+    head: Determinative,
+    selects: [Of],
+    complemented,
+    active: [
+        complement.Number = Plural,
+        head.DeterminativeDistribution != Dependent | Independent,
+        $.NounKind = Ordinary, $.Determination = Overt, $.Case = Plain, $.Person = Third,
     ],
 }
 // A later conjunct's own negative premodifier (*artifact or non-Aura

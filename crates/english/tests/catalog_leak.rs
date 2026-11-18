@@ -115,6 +115,13 @@ fn leaks(grammar: &Grammar, catalog: &BTreeSet<String>) -> BTreeSet<String> {
                     names.extend([child.as_str(), name.as_str()]);
                     names.extend(words.iter().map(|name| &**name));
                 }
+                SymbolDecl::SelectedBy(child, name, class) => {
+                    names.extend([child.as_str(), name.as_str(), class.as_str()]);
+                }
+                SymbolDecl::Selecting(child, _, words) => {
+                    names.push(child.as_str());
+                    names.extend(words.iter().map(|name| &**name));
+                }
                 SymbolDecl::FreeLex(child, _)
                 | SymbolDecl::Numeral(child, _)
                 | SymbolDecl::Lex(child, _)

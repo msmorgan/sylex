@@ -260,7 +260,7 @@ pub fn lexicon() -> Lexicon {
     }
     for word in [
         "in", "into", "on", "onto", "for", "with", "from", "during", "by", "up", "of", "than",
-        "plus", "minus", "as", "among", "under", "outside", "after",
+        "plus", "minus", "as", "among", "under", "outside", "after", "but",
     ] {
         lexemes.push(invariant("prep", word, Category::Preposition, Core));
     }
@@ -269,9 +269,11 @@ pub fn lexicon() -> Lexicon {
     }
     for word in DEPENDENT_HEADS {
         let mut det = invariant("det", word, Category::Determinative, Core);
+        // *Many* and *much* are the degree determinatives.
+        let distribution = if matches!(word, "many" | "much") { "Degree" } else { "Dependent" };
         det.properties
             .features
-            .insert("DeterminativeDistribution".into(), "Dependent".into());
+            .insert("DeterminativeDistribution".into(), distribution.into());
         lexemes.push(det);
     }
     lexemes.extend(count_and_mass("more"));

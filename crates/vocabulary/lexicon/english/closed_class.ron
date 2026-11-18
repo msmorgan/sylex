@@ -3,17 +3,22 @@
     // CGEL's determinatives (Ch. 5 §4, p. 356) as Oracle uses them. Number
     // (this/those) and grade (many/more/most) are not features of a
     // determinative here, so each attested form is its own lemma.
+    //
+    // A determinative that heads a partitive selects its *of* oblique (*each
+    // of those creatures*; CGEL, Ch. 5 §9.1, p. 411), and a comparative one
+    // its *than* Complement (*more than one*; CGEL, Ch. 13 §2.1, p. 1104).
     determinatives: [
         (lemma: "last", distribution: Deictic, noun_kind: Some(Temporal)),
         (lemma: "a", distribution: IndefiniteArticle, number: Singular, countability: Count, allomorphs: {Consonant: "a", Vowel: "an"}),
         // *All* quantifies a count plural or a non-count singular (CGEL, Ch. 5
         // §7.3, p. 375); its count-singular use over parts (*all the book*)
         // is not Oracle's. Like *more*, each use is its own sense.
-        (number: Plural, countability: Count, lemma: "all", sense: Some("count"), frames: [Complement(PP(["but"]))]),
-        (number: Singular, countability: Mass, lemma: "all", sense: Some("mass"), frames: [Complement(PP(["but"]))]),
-        (number: Singular, countability: Count, lemma: "another", distribution: SingularOrQuantified),
-        // Its partitive is the grammar's: with a plural oblique the Noun
-        // Phrase may be singular or plural (*if any of those cards shares ...*).
+        (number: Plural, countability: Count, lemma: "all", sense: Some("count"), frames: [Complement(PP(["but"])), Complement(PP(["of"]))]),
+        (number: Singular, countability: Mass, lemma: "all", sense: Some("mass"), frames: [Complement(PP(["but"])), Complement(PP(["of"]))]),
+        (number: Singular, countability: Count, lemma: "another", distribution: SingularOrQuantified, frames: [Complement(PP(["of"]))]),
+        // Its partitive is the grammar's, so it declares no *of* frame: with
+        // a plural oblique the Noun Phrase may be singular or plural (*if any
+        // of those cards shares ...*).
         (lemma: "any", distribution: FreeChoice),
         // Oracle names the combat roles [CR#506.2] with a determinative (*defending player loses
         // 1 life*, *defending player's hand*), as it names an Aura's host *enchanted* [CR#303.4b].
@@ -27,12 +32,12 @@
         (number: Singular, countability: Count, lemma: "defending"),
         // Compound determinatives (CGEL p. 423): *from anywhere*, *protection from everything*.
         (lemma: "anywhere", distribution: Independent),
-        (number: Plural, countability: Count, lemma: "both"),
-        (number: Singular, countability: Count, lemma: "each", distribution: Distributive),
-        (number: Singular, countability: Count, lemma: "either", distribution: Distributive),
+        (number: Plural, countability: Count, lemma: "both", frames: [Complement(PP(["of"]))]),
+        (number: Singular, countability: Count, lemma: "each", distribution: Distributive, frames: [Complement(PP(["of"]))]),
+        (number: Singular, countability: Count, lemma: "either", distribution: Distributive, frames: [Complement(PP(["of"]))]),
         (number: Singular, countability: Count, lemma: "every", distribution: Distributive),
         (number: Singular, countability: Count, lemma: "everything"),
-        (number: Plural, countability: Count, lemma: "fewer"),
+        (number: Plural, countability: Count, lemma: "fewer", frames: [Complement(PP(["of"])), Complement(PP(["than"]))]),
         (number: Plural, countability: Count, lemma: "fewest"),
         // Fraction and multiplier predeterminers (*half their life*, *double
         // that damage*; CGEL, Ch. 5 §7.3, p. 434); the verb is a keyword action.
@@ -40,19 +45,19 @@
         (lemma: "double", distribution: Multiplier),
         (lemma: "triple", distribution: Multiplier),
         (number: Singular, countability: Mass, lemma: "least"),
-        (number: Singular, countability: Mass, lemma: "less"),
-        (number: Plural, countability: Count, lemma: "many"),
+        (number: Singular, countability: Mass, lemma: "less", frames: [Complement(PP(["of"])), Complement(PP(["than"]))]),
+        (number: Plural, countability: Count, lemma: "many", distribution: Degree, frames: [Complement(PP(["of"]))]),
         // *More* is the comparative of both *many* and *much* (CGEL, Ch. 13
         // §4.1.1, p. 1126): plural with a count head, singular with a mass one.
-        (number: Plural, countability: Count, lemma: "more", sense: Some("count")),
-        (number: Singular, countability: Mass, lemma: "more", sense: Some("mass")),
-        (lemma: "most"),
-        (number: Singular, countability: Mass, lemma: "much"),
-        (number: Singular, countability: Count, lemma: "neither", distribution: Distributive),
+        (number: Plural, countability: Count, lemma: "more", sense: Some("count"), frames: [Complement(PP(["of"])), Complement(PP(["than"]))]),
+        (number: Singular, countability: Mass, lemma: "more", sense: Some("mass"), frames: [Complement(PP(["of"])), Complement(PP(["than"]))]),
+        (lemma: "most", frames: [Complement(PP(["of"]))]),
+        (number: Singular, countability: Mass, lemma: "much", distribution: Degree, frames: [Complement(PP(["of"]))]),
+        (number: Singular, countability: Count, lemma: "neither", distribution: Distributive, frames: [Complement(PP(["of"]))]),
         (lemma: "no"),
         // The independent form of *no* (CGEL p. 356).
-        (lemma: "none", distribution: Independent),
-        (lemma: "some"),
+        (lemma: "none", distribution: Independent, frames: [Complement(PP(["of"]))]),
+        (lemma: "some", frames: [Complement(PP(["of"]))]),
         // The Targeting Marker (*target creature*, *two target creatures*),
         // distinct from the noun and the verb; the grammar builds it into
         // targeted nominals only. On its own it determines a singular count

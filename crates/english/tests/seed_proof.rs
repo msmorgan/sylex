@@ -448,6 +448,8 @@ fn role(symbol: &SymbolDecl) -> Option<&Ident> {
         | SymbolDecl::Class(role, _)
         | SymbolDecl::Hosted(role, ..)
         | SymbolDecl::Selected(role, ..)
+        | SymbolDecl::SelectedBy(role, ..)
+        | SymbolDecl::Selecting(role, ..)
         | SymbolDecl::Quoted(role, _)
         | SymbolDecl::OtherCardName(role) => Some(role),
         SymbolDecl::Punct(_) | SymbolDecl::Mark(..) | SymbolDecl::SpokenMark(..) => None,

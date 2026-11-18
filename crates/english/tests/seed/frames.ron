@@ -19,7 +19,17 @@
                 (relation: Complement, fill: PP(["prep:for"])),
             ]),
         ],
-        "verb:be": [(family: Copular, slots: [(relation: PredicativeComplement, fill: Pred)])],
+        // *Be* and its forms, with the locative Complement an existential's
+        // Extension is (`LocatedExistentialBe`).
+        "verb:be": [
+            (family: Copular, slots: [(relation: PredicativeComplement, fill: Pred)]),
+            (family: Prepositional, slots: [(relation: Complement, fill: PP(["prep:in", "prep:on"]))]),
+        ],
+        "verb:'re": [(family: Prepositional, slots: [(relation: Complement, fill: PP(["prep:in", "prep:on"]))])],
+        "verb:aren't": [(family: Prepositional, slots: [(relation: Complement, fill: PP(["prep:in", "prep:on"]))])],
+        // The comparative determinative, which the comparative Productions
+        // name by its *than* frame.
+        "det:more.count": [(family: DeterminativeComplement, slots: [(relation: Complement, fill: PP(["prep:than"]))])],
         "verb:get": [(family: Copular, slots: [(relation: PredicativeComplement, fill: Pred)])],
     },
     prepositions: {
@@ -38,5 +48,6 @@
         "prep:from": [(complement: NP, hosts: NominalAndPredicate)],
         // The Internalized Complement of a passive (*destroyed by the card*).
         "prep:by": [(complement: NP, hosts: ComplementOnly)],
+        "prep:than": [(complement: NP, hosts: ComplementOnly)],
     },
 )
