@@ -19,3 +19,6 @@
 +Clause this creature is saddled => AdjectivePhrase "saddled" as PredicativeComplement of be
 + <card=Marooned> Enchanted permanent doesn't untap during its controller's untap step and can't be beamed up. => VerbPhrase "beamed up" head beam; PrepositionPhrase "up" as Complement of beam
 + <card=Scotty, Miracle Worker> <legendary> Scotty can't be beamed up to cast a spell this way. => VerbPhrase "beamed up" head beam; PrepositionPhrase "up" as Complement of beam
+# Rules text says *equipped*, never active *equip*: a keyword line is no imperative
++ <card=Leather Armor> Equip {0}. Activate only once each turn. => KeywordParameters "Equip {0}"; !Sentence "Equip {0}."; readings 1
++ <card=Dáin Ironfoot> <legendary> When Dáin enters, create a colorless Equipment artifact token named Axe with "Equipped creature gets +1/+0" and equip {2}. When you do, attach it to target creature you control. => KeywordPhrase "equip {2}"; !VerbPhrase "equip {2}"

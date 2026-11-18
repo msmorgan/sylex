@@ -20,7 +20,10 @@
     (rule: "[CR#702.6]", name: "Equip", lemma: "equip", parameters: [[Cost], [Quality(None), Cost]],
         determinatives: [(number: Singular, countability: Count, lemma: "equipped")],
         verbs: [
-            (lemma: "equip", past: "equipped", gerund: "equipping", frames: [Monotransitive]),
+            // Rules text says *equipped* (*Equipped creature gets +1/+1*, *is
+            // equipped*); active *equip* occurs only in reminder text, which
+            // no card's parsed text carries, so *Equip {2}.* is no imperative.
+            (lemma: "equip", past: "equipped", gerund: "equipping", frames: [PassiveOnly(Monotransitive)]),
         ],
     ),
     (rule: "[CR#702.7]", name: "First Strike", lemma: "first strike"),
