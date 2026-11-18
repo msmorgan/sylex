@@ -2,7 +2,8 @@
 //! by its preposition and its Complement's kind: *ask for [Zombie]*, a cited
 //! word, is a Complement, while *ask for [the Zombie]* stays an Adjunct, not
 //! pre-empted by same-head complement priority. A slot that names no kind
-//! selects its preposition with any Complement but a `named_only` one.
+//! selects its preposition with any Complement but one whose frame names a
+//! `kind_selected` constraint.
 
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;
@@ -40,7 +41,7 @@ fn frames(ask: &str) -> String {
         "v:wait": [(family: Intransitive, slots: []), (family: Prepositional, slots: [(relation: Complement, fill: PP(["p:for"]))])],
     }},
     prepositions: {{
-        "p:for": [(complement: NP, hosts: Predicate), (complement: Mention, hosts: ComplementOnly, named_only: true)],
+        "p:for": [(complement: NP, hosts: Predicate), (complement: Mention, hosts: ComplementOnly, constraints: ["KindSelected"])],
     }},
 )"#
     )
@@ -58,6 +59,7 @@ const GRAMMAR: &str = r"
     category VerbPhrase [VerbForm]
     slot NP = NounPhrase
     slot PP = PrepositionPhrase
+    constraint KindSelected { kind_selected }
     slot Mention = Mention
     Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Determined: NounPhrase -> determiner:Lex(Determinative) Nominal
@@ -121,8 +123,8 @@ fn a_slot_naming_no_kind_selects_its_preposition_with_a_noun_phrase() {
 }
 
 #[test]
-fn a_named_only_frame_is_selected_only_by_a_slot_naming_its_kind() {
-    // *for* + Mention is `named_only`, and not an Adjunct: *wait* selects
+fn a_kind_selected_frame_is_selected_only_by_a_slot_naming_its_kind() {
+    // *for* + Mention is `kind_selected`, and not an Adjunct: *wait* selects
     // *for* alone, so the cited word has no site.
     assert_eq!(readings("Wait for Zombie.").len(), 0);
 }

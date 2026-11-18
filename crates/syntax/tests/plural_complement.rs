@@ -1,5 +1,5 @@
-//! A preposition whose frames carry `plural_complement` takes a plural
-//! Complement (*among*; CGEL, Ch. 7 §5.1(a), p. 636): a coordination itself,
+//! A preposition whose frames name a plural-Complement constraint takes a
+//! plural Complement (*among*; CGEL, Ch. 7 §5.1(a), p. 636): a coordination itself,
 //! or else a Noun Phrase that is not Singular. A singular Noun Phrase is
 //! refused even over a coordinated Nominal, and a keyword phrase, which has
 //! no Number, only as a coordination. Grounded in Abzan Charm's *distribute
@@ -62,8 +62,8 @@ const FRAMES: &str = r#"(
     },
     prepositions: {
         "p:among": [
-            (complement: NP, hosts: Predicate, plural_complement: true),
-            (complement: KeywordPhrase, hosts: Predicate, plural_complement: true),
+            (complement: NP, hosts: Predicate, constraints: ["Plural"]),
+            (complement: KeywordPhrase, hosts: Predicate, constraints: ["Plural"]),
         ],
     },
 )"#;
@@ -85,6 +85,10 @@ const GRAMMAR: &str = r#"
     class Coordinator = ["c:or"]
     slot NP = ComplementNounPhrase
     slot KeywordPhrase = KeywordPhrase
+    constraint Plural {
+        coordination: [NP, KeywordPhrase],
+        otherwise: [NP -> [slot.Number = Plural]],
+    }
     Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Wrapped: ComplementNounPhrase -> NounPhrase
     Singular: NounPhrase -> determiner:Word(A) Nominal where $.Number = Singular

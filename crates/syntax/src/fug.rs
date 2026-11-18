@@ -21,6 +21,8 @@
 //! class CardType { typed }                    // membership from the lexical environment
 //! slot NP = ComplementNounPhrase where slot.Case != Nominative
 //! slot AmountOrNP = AmountOrNounPhrase { unlike: [NP, Amount] }  // derived where a head selects two
+//! constraint Plural { coordination: [NP], otherwise: [NP -> [slot.Number = Plural]] }
+//! constraint KindSelected { kind_selected }   // named by a Preposition Frame of the lexicon
 //! high_attachment PrepositionPhrase where $.DeterminativeDistribution = Distributive
 //! dependents Timed = [PrepositionPhrase, BareInf] where $.F = dependent.F  // every such dependent
 //! correlative Both = And
@@ -1166,6 +1168,10 @@ impl Builder {
                     grammar.slot_equations.insert(slot, equations);
                 }
                 grammar.slot_categories.insert(slot, category).is_some()
+            }
+            Some("constraint") => {
+                let decl = read(item.record(Vec::new(), None)?)?;
+                grammar.constraints.insert(name, decl).is_some()
             }
             Some("high_attachment") => {
                 let equations = item.equations()?;

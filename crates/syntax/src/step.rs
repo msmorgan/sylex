@@ -2189,9 +2189,10 @@ impl Production {
             let Some((prep, frame)) = summary.preposition.as_ref() else {
                 return false;
             };
+            let kind_selected = grammar.kind_selected[*frame];
             let frame = &grammar.preposition_frames[*frame];
             if !list.contains(prep)
-                || complement.map_or(frame.named_only, |kind| frame.complement.kind() != kind)
+                || complement.map_or(kind_selected, |kind| frame.complement.kind() != kind)
                 || summary
                     .other_preposition
                     .is_some_and(|o| !list.contains(&o))

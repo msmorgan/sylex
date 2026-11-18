@@ -36,7 +36,8 @@
     // *from among flying, first strike, and lifelink*; a slash measure names
     // a +X/+Y counter's kind as a keyword names a keyword counter's
     // [CR#122.1a,122.1b] (*from among flying, ..., and +1/+1*).
-    // Its Complement is plural (CGEL, Ch. 7 §5.1(a), p. 636): a coordination
+    // Its Complement is plural, the grammar's `Plural` constraint on each of
+    // its frames (CGEL, Ch. 7 §5.1(a), p. 636): a coordination
     // itself, with any coordinator (*among flying, first strike, lifelink,
     // or vigilance*, Elspeth Resplendent; *among all permanents or a color
     // tied for most common*, Tsabo's Assassin), or else a Noun Phrase that is
@@ -46,14 +47,14 @@
     // (*among any of the creatures blocking it*, Defensive Formation), and a
     // collective singular (*among the crowd*) is not admitted. It keeps *of [a counter from among first strike],
     // vigilance, ...* off Aragorn, Company Leader.
-    (lemma: "among", plural_complement: true, frames: [
-        (complement: NP, hosts: Nominal),
-        (complement: KeywordPhrase, hosts: Nominal),
-        (complement: MeasureNP, hosts: Nominal),
+    (lemma: "among", frames: [
+        (complement: NP, hosts: Nominal, constraints: ["Plural"]),
+        (complement: KeywordPhrase, hosts: Nominal, constraints: ["Plural"]),
+        (complement: MeasureNP, hosts: Nominal, constraints: ["Plural"]),
         // A name cited as a name, where another card's name stands, only as
         // *from*'s Complement, wherever that attaches (*choose a card name
         // ... from among Disenchant, ..., and Black Lotus*).
-        (complement: Name, hosts: ComplementOnly, named_only: true),
+        (complement: Name, hosts: ComplementOnly, constraints: ["Plural", "KindSelected"]),
     ]),
     // *Activate only as a sorcery*; *as it enters*; *as part of casting a spell*;
     // Nominal: *that player's life total as the turn began* (Sengir, the Dark
@@ -139,7 +140,7 @@
         // A cited word, selected by a head that names it: *do the same for
         // Vampire, Dinosaur, and Merfolk* (CGEL, Ch. 5 §8.2, p. 401), never
         // by one that selects *for* alone (*votes for blue*).
-        (complement: Mention, hosts: ComplementOnly, named_only: true),
+        (complement: Mention, hosts: ComplementOnly, constraints: ["KindSelected"]),
     ]),
     // *cast spells ... from the top of your library*; *a card you own from
     // outside the game*, a Preposition Phrase Complement (CGEL, Ch. 7 §2,
@@ -195,7 +196,7 @@
         // text uses "the full name when the words identify an actual card
         // name or face", meld text included (`docs/oracle-style-guide.md`
         // §5).
-        (complement: Name, hosts: ComplementOnly, named_only: true),
+        (complement: Name, hosts: ComplementOnly, constraints: ["KindSelected"]),
     ]),
     // *5 minus X damage*
     (lemma: "minus", frames: [(complement: Amount, hosts: ComplementOnly), (complement: NP, hosts: ComplementOnly)]),
@@ -223,7 +224,7 @@
         // never after a head that selects *of* alone, where a measure before
         // *counter* would stand apart from it (*the number of [+1/+1]
         // [counters removed this way]*, Molten Hydra).
-        (complement: MeasureNP, hosts: ComplementOnly, named_only: true),
+        (complement: MeasureNP, hosts: ComplementOnly, constraints: ["KindSelected"]),
     ]),
     // *put it on top of its owner's library*; a locative *on*-phrase is a
     // Nominal postmodifier or a Predicate Adjunct (*second from the top or on

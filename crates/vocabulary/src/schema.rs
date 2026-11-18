@@ -464,14 +464,10 @@ pub struct PrepositionFrameSpec {
     pub relation: sylex_syntax::frames::SlotRelation,
     pub complement: FillSpec,
     pub hosts: Hosts,
-    /// Only a Frame Slot that names this Complement's kind selects the
-    /// phrase (`PPWith(prepositions, kind)`), never one that names its
-    /// preposition alone: a cited word after *for* is taken where a head
-    /// selects one (*do the same for Vampire*), not by a head that selects
-    /// *for* with a Noun Phrase (*vote for blue*), where it would be a second
-    /// tree of the bare noun.
+    /// The grammar's Complement Constraints the frame names
+    /// (`sylex_syntax::frames::PrepositionFrame::constraints`).
     #[serde(default)]
-    pub named_only: bool,
+    pub constraints: std::collections::BTreeSet<dpsi::Ident>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
@@ -479,10 +475,6 @@ pub struct PrepositionFrameSpec {
 pub struct PrepositionEntry {
     pub lemma: String,
     pub frames: Vec<PrepositionFrameSpec>,
-    /// Every frame's Complement is plural
-    /// (`sylex_syntax::frames::PrepositionFrame::plural_complement`).
-    #[serde(default)]
-    pub plural_complement: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]

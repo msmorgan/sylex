@@ -1,6 +1,7 @@
 //! Subcategorization Frames: the Complements each head licenses.
 
 use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 
 use dpsi::Ident;
 use serde::Deserialize;
@@ -465,22 +466,13 @@ pub struct PrepositionFrame {
     pub relation: SlotRelation,
     pub complement: SlotFill,
     pub hosts: Hosts,
-    /// Only a Frame Slot that names this Complement's kind selects the
-    /// phrase (`PP(prepositions, Some(kind))`), never one that names its
-    /// preposition alone: a cited word after *for* is taken where a head
-    /// selects one (*do the same for Vampire*), not by a head that selects
-    /// *for* with a Noun Phrase (*vote for blue*), where it would be a second
-    /// tree of the bare noun.
+    /// The grammar's Complement Constraints it names
+    /// (`crate::grammar::ConstraintDecl`): what
+    /// its Complement satisfies beyond its kind (*among*'s is plural), and
+    /// whether only a Frame Slot naming that kind selects the phrase (*do
+    /// the same for Vampire*, never *vote for [blue]* as a cited word).
     #[serde(default)]
-    pub named_only: bool,
-    /// The Complement is plural (*among*; CGEL, Ch. 7 §5.1(a), p. 636): a
-    /// coordination itself, through a Production whose only child is its
-    /// head but not under a determiner or modifier, or else a Noun Phrase
-    /// that requires Plural (`Require`, which an open Number passes). A
-    /// keyword phrase, slash measure or name has no Number, so only a
-    /// coordination of it is plural.
-    #[serde(default)]
-    pub plural_complement: bool,
+    pub constraints: BTreeSet<Ident>,
 }
 
 /// Subcategorization Frames by lexeme. Prepositions declare theirs in

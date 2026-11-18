@@ -417,11 +417,14 @@ fn load_errors() {
     }
 }
 
-/// A plural-Complement frame (*among*) that the grammar cannot check fails
-/// at load, naming its preposition: a Noun Phrase Category without Number, a
-/// grammar without Number, and a frame with no Complement.
+/// A Preposition Frame's Complement Constraint (*among*'s plural Complement)
+/// that the grammar cannot apply fails at load, naming the preposition or
+/// the constraint: an equation on a feature the Complement's Category lacks,
+/// a frame with no Complement, a Complement kind the constraint has no
+/// alternative for, a slot the grammar does not declare and a constraint it
+/// does not declare.
 #[test]
-fn plural_complement_load_errors() {
+fn constraint_load_errors() {
     let grammar = r#"
     root Sentence
     feature Number = Singular | Plural
@@ -433,50 +436,79 @@ fn plural_complement_load_errors() {
     category VerbPhrase [VerbForm]
     word The = "d:the"
     slot NP = NounPhrase
+    slot Nominal = Nominal
+    constraint Plural { coordination: [NP], otherwise: [NP -> [slot.Number = Plural]] }
     Imperative: Sentence -> clause:VerbPhrase '.' { capital: [clause] } where clause.VerbForm = Plain
     Transitive: VerbPhrase -> Lex(Verb) object:NounPhrase
     Determined: NounPhrase -> det:Word(The) Nominal
     Noun: Nominal -> Lex(Noun)
     valence PrepositionPhrase { head: Preposition }
 "#;
-    let frames = |complement: &str| {
+    let frames = |complement: &str, constraint: &str| {
         format!(
-            r#"(prepositions: {{ "p:on": [(complement: {complement}, hosts: Nominal, plural_complement: true)] }})"#
+            r#"(prepositions: {{ "p:on": [(complement: {complement}, hosts: Nominal, constraints: ["{constraint}"])] }})"#
         )
     };
-    let error = |grammar: &str, complement: &str| match CompiledGrammar::bind(
-        &Grammar::from_fug_str(grammar).unwrap(),
-        &lexicon(),
-        &FrameCatalog::from_ron_str(&frames(complement)).unwrap(),
+    let bind = |grammar: &str, complement: &str, constraint: &str| {
+        CompiledGrammar::bind(
+            &Grammar::from_fug_str(grammar).unwrap(),
+            &lexicon(),
+            &FrameCatalog::from_ron_str(&frames(complement, constraint)).unwrap(),
+        )
+    };
+    let error = |grammar: &str, complement: &str, constraint: &str| match bind(
+        grammar, complement, constraint,
     ) {
         Err(LoadError::Invalid(message)) => message,
         other => panic!("expected an invalid grammar, got {other:?}"),
     };
-    CompiledGrammar::bind(
-        &Grammar::from_fug_str(grammar).unwrap(),
-        &lexicon(),
-        &FrameCatalog::from_ron_str(&frames("NP")).unwrap(),
-    )
-    .unwrap();
+    bind(grammar, "NP", "Plural").unwrap();
     let message = error(
         &grammar.replacen("category NounPhrase [Number]", "category NounPhrase", 1),
         "NP",
+        "Plural",
     );
     assert!(
-        message.contains("p:on") && message.contains("`NounPhrase` has no Number"),
+        message.contains("p:on") && message.contains("`Plural`") && message.contains("Number"),
         "{message}"
     );
-    let unnumbered = grammar
-        .replacen("    feature Number = Singular | Plural\n", "", 1)
-        .replace(" [Number]", "");
-    let message = error(&unnumbered, "NP");
+    let message = error(
+        &grammar.replacen(
+            "otherwise: [",
+            "otherwise: [NP -> [slot.Number = Singular], ",
+            1,
+        ),
+        "NP",
+        "Plural",
+    );
     assert!(
-        message.contains("p:on") && message.contains("projects no Number"),
+        message.contains("lists `NP` twice under `otherwise`"),
         "{message}"
     );
-    let message = error(grammar, "Intransitive");
+    let message = error(grammar, "Intransitive", "Plural");
     assert!(
-        message.contains("p:on") && message.contains("no Complement"),
+        message.contains("p:on")
+            && message.contains("`Plural`")
+            && message.contains("no Complement"),
+        "{message}"
+    );
+    let message = error(grammar, "Nominal", "Plural");
+    assert!(
+        message.contains("p:on") && message.contains("no alternative"),
+        "{message}"
+    );
+    let message = error(
+        &grammar.replacen("coordination: [NP]", "coordination: [Gerund]", 1),
+        "NP",
+        "Plural",
+    );
+    assert!(
+        message.contains("`Gerund`, which is no declared slot"),
+        "{message}"
+    );
+    let message = error(grammar, "NP", "Dual");
+    assert!(
+        message.contains("p:on") && message.contains("`Dual`, which the grammar does not declare"),
         "{message}"
     );
 }

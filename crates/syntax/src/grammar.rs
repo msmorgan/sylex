@@ -9,6 +9,43 @@ use crate::LoadError;
 use crate::frames::SlotKind;
 use crate::step::Gap;
 
+/// A Complement Constraint: what a Preposition Frame that names it requires
+/// of its Complement beyond the Frame Slot's kind, and of what selects the
+/// phrase. A frame's Complement satisfies one alternative of each constraint
+/// it names, `coordination` or `otherwise`, which never both hold of one
+/// phrase, so every constraint's alternative is the same one; a constraint
+/// with neither leaves the Complement as its kind has it. A frame whose kind no alternative of a constraint with alternatives
+/// lists is a load error.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ConstraintDecl {
+    /// Slot kinds, by slot name, whose Complement may be itself a
+    /// coordination: a coordination, or a Production whose only child is its
+    /// head over one, never a phrase that only contains one (a Noun Phrase
+    /// over a coordinated Nominal).
+    #[serde(default)]
+    pub coordination: Vec<Ident>,
+    /// Slot kinds whose Complement may be a phrase that is not itself a
+    /// coordination, each with the equations it then satisfies, over the
+    /// child `slot`.
+    #[serde(default)]
+    pub otherwise: Vec<(Ident, Vec<Equation>)>,
+    /// Only a Frame Slot that names the Complement's kind selects the phrase
+    /// (`SlotFill::PP(prepositions, Some(kind))`), never one that names its
+    /// preposition alone, and the frame takes no part in a derived unlike
+    /// frame.
+    #[serde(default)]
+    pub kind_selected: bool,
+}
+
+impl ConstraintDecl {
+    /// Whether it has an alternative, so restricts the Complement itself.
+    #[must_use]
+    pub fn restricts_complement(&self) -> bool {
+        !self.coordination.is_empty() || !self.otherwise.is_empty()
+    }
+}
+
 /// An authored grammar data file.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Grammar {
@@ -40,6 +77,9 @@ pub struct Grammar {
     /// phrase, over the child `slot`: what fills the slot as a Complement
     /// (a Noun Phrase Complement is never nominative).
     pub slot_equations: BTreeMap<SlotKind, Vec<Equation>>,
+    /// Complement Constraints by name (`constraint Name { ... }`), which a
+    /// Preposition Frame names (`PrepositionFrame::constraints`).
+    pub constraints: BTreeMap<Ident, ConstraintDecl>,
     /// Equations stated once for every dependent of some Categories
     /// (`dependents Name = [Category, ...] where ...`).
     pub dependents: Vec<DependentsDecl>,

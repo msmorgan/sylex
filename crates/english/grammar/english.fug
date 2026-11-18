@@ -781,6 +781,27 @@ slot PastPart = PastPart
 slot QuotedAbility = QuotedAbility
 slot Mention = Mention
 
+// Complement Constraints, which a Preposition Frame of the lexicon names.
+//
+// A plural Complement, as *among* takes (CGEL 7§5.1(a):636): a coordination
+// itself, with any coordinator (*among flying, first strike, lifelink, or
+// vigilance*, Elspeth Resplendent; *among all permanents or a color tied for
+// most common*, Tsabo's Assassin), or else a Noun Phrase that is not
+// Singular (*among one or two targets*), which an open Number passes (*among
+// any of the creatures blocking it*, Defensive Formation). A keyword phrase,
+// slash measure or name has no Number, so only a coordination of it is
+// plural; a singular Noun Phrase over a coordinated Nominal is not (*among a
+// creature or planeswalker*).
+constraint Plural {
+    coordination: [NP, KeywordPhrase, MeasureNP, Name, UnlikeObject],
+    otherwise: [NP -> [slot.Number = Plural]],
+}
+// A Complement taken only where a head's Frame Slot names its kind: a cited
+// word after *for* (*do the same for Vampire*), never under a head that
+// selects *for* alone, where it would be a second tree of the bare noun
+// (*vote for blue*).
+constraint KindSelected { kind_selected }
+
 // A distributive adjunct (*for each …*) anchors to the outermost eligible
 // clause, as a comma-set Supplement does (english.md §5, AttachmentClass).
 high_attachment PrepositionPhrase where $.DeterminativeDistribution = Distributive

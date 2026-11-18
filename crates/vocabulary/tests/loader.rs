@@ -251,38 +251,43 @@ fn a_subtype_declares_no_prefix_hyphenation() {
     rejects(&sources, "declares a prefix hyphenation");
 }
 
-/// A preposition's `plural_complement` reaches every frame it declares, and
-/// no other preposition's: *among* takes a plural Complement (*from among
-/// flying, first strike, lifelink, or vigilance*, Elspeth Resplendent).
+/// A frame's Complement Constraints reach the frame catalog as declared:
+/// each of *among*'s names `Plural` (*from among flying, first strike,
+/// lifelink, or vigilance*, Elspeth Resplendent), and its cited-name frame
+/// `KindSelected` too (*from among Disenchant, ..., and Black Lotus*).
 #[test]
-fn a_plural_complement_marks_every_frame_of_its_preposition() {
+fn a_frames_constraints_reach_the_frame_catalog() {
     let sources = Sources::load().unwrap();
     let (_, frames) = sources.vocabulary().unwrap();
+    let names = |frame: &sylex_syntax::frames::PrepositionFrame| {
+        frame
+            .constraints
+            .iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+    };
     for (id, list) in &frames.prepositions {
         let among = id.as_str() == "prep:among";
         assert!(!list.is_empty(), "{}", id.as_str());
-        assert!(
-            list.iter().all(|frame| frame.plural_complement == among),
-            "{}: {list:?}",
-            id.as_str()
-        );
+        for frame in list {
+            assert_eq!(
+                names(frame).contains(&"Plural".to_owned()),
+                among,
+                "{frame:?}"
+            );
+        }
     }
-
-    let mut sources = Sources::load().unwrap();
-    let entry = sources
-        .prepositions
-        .iter_mut()
-        .find(|entry| entry.lemma == "among")
-        .unwrap();
-    entry.plural_complement = false;
-    let (_, frames) = sources.vocabulary().unwrap();
-    let among = frames
+    let among = &frames
         .prepositions
         .iter()
         .find(|(id, _)| id.as_str() == "prep:among")
         .unwrap()
         .1;
-    assert!(among.iter().all(|frame| !frame.plural_complement));
+    let name = among
+        .iter()
+        .find(|frame| frame.complement == sylex_syntax::frames::SlotFill::Name)
+        .unwrap();
+    assert_eq!(names(name), ["KindSelected", "Plural"]);
 }
 
 /// A declared Adjective spelled like a verb's past participle is that verb's

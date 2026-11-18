@@ -54,7 +54,7 @@ pub(crate) struct Builder {
     frames: Vec<(LexemeId, Category, Vec<FrameSpec>, String)>,
     /// Verbs whose every frame is restricted to active voice.
     active_only: std::collections::BTreeSet<LexemeId>,
-    prepositions: Vec<(LexemeId, Vec<PrepositionFrameSpec>, bool, String)>,
+    prepositions: Vec<(LexemeId, Vec<PrepositionFrameSpec>, String)>,
 }
 
 pub(crate) fn source(kind: SourceKind, path: &str, owner: &str) -> Source {
@@ -433,12 +433,8 @@ impl Builder {
         );
         let id = lexeme.id;
         self.push(lexeme);
-        self.prepositions.push((
-            id,
-            entry.frames.clone(),
-            entry.plural_complement,
-            id.to_string(),
-        ));
+        self.prepositions
+            .push((id, entry.frames.clone(), id.to_string()));
     }
 
     /// Validates and indexes everything gathered, resolving preposition lemmas.
@@ -471,15 +467,14 @@ impl Builder {
             }
             catalog.frames.insert(*id, frames);
         }
-        for (id, specs, plural_complement, owner) in &self.prepositions {
+        for (id, specs, owner) in &self.prepositions {
             let mut frames = Vec::new();
             for spec in specs {
                 let frame = PrepositionFrame {
                     relation: spec.relation,
                     complement: resolver.fill(&spec.complement, owner)?,
                     hosts: spec.hosts,
-                    named_only: spec.named_only,
-                    plural_complement: *plural_complement,
+                    constraints: spec.constraints.clone(),
                 };
                 if frames
                     .iter()

@@ -24,6 +24,7 @@ use crate::frames::SlotKind;
 use crate::frames::SlotRelation;
 use crate::frames::UnlikeFill;
 use crate::grammar::ClustersDecl;
+use crate::grammar::ConstraintDecl;
 use crate::grammar::Equation;
 use crate::grammar::Grammar;
 use crate::grammar::HostKind;
@@ -33,7 +34,6 @@ use crate::grammar::SymbolDecl;
 use crate::grammar::variant;
 use crate::lexeme::Lexeme;
 use crate::lexeme::Lexemes;
-use crate::projection::NUMBER;
 use crate::projection::Projection;
 use crate::step::Extension;
 use crate::step::FeatureValue;
@@ -125,6 +125,9 @@ pub struct CompiledGrammar {
     /// not coordinate).
     pub(crate) cluster_shapes: Vec<u16>,
     pub(crate) preposition_frames: Vec<PrepositionFrame>,
+    /// Per Preposition Frame, whether only a Frame Slot that names its
+    /// Complement's kind selects its phrase (`ConstraintDecl::kind_selected`).
+    pub(crate) kind_selected: Vec<bool>,
     /// Prepositions whose `PP` slot would extend a head's selected frame,
     /// by (lexeme, selected frame), as an index into `extension_sets`.
     pub(crate) extensions: BTreeMap<(Lexeme, Option<usize>), u16>,
@@ -894,6 +897,34 @@ impl<'a> Binder<'a> {
                 facts.frames.insert(index);
             }
         }
+        for (name, constraint) in &grammar.constraints {
+            let mut listed = BTreeSet::new();
+            for (alternative, kind) in constraint
+                .coordination
+                .iter()
+                .map(|kind| ("coordination", kind))
+                .chain(
+                    constraint
+                        .otherwise
+                        .iter()
+                        .map(|(kind, _)| ("otherwise", kind)),
+                )
+            {
+                let declared = grammar.unlike_slots.iter().any(|(slot, _)| slot == kind)
+                    || variant::<SlotKind>(kind)
+                        .is_some_and(|kind| grammar.slot_categories.contains_key(&kind));
+                if !declared {
+                    return Err(invalid(format!(
+                        "constraint `{name}` names `{kind}`, which is no declared slot"
+                    )));
+                }
+                if !listed.insert((alternative, kind)) {
+                    return Err(invalid(format!(
+                        "constraint `{name}` lists `{kind}` twice under `{alternative}`"
+                    )));
+                }
+            }
+        }
         for (id, list) in &catalog.prepositions {
             let facts = lexeme_ids
                 .get(id)
@@ -903,10 +934,21 @@ impl<'a> Binder<'a> {
                 return Err(invalid(format!("`{id}` is not a preposition")));
             }
             for frame in list {
+                if let Some(unknown) = frame
+                    .constraints
+                    .iter()
+                    .find(|name| !grammar.constraints.contains_key(*name))
+                {
+                    return Err(invalid(format!(
+                        "a frame of `{id}` names constraint `{unknown}`, which the grammar does not declare"
+                    )));
+                }
                 let index = intern(&mut preposition_frames, frame);
                 facts.preposition_frames.insert(index);
             }
-            for frame in unlike_preposition_frames(&grammar.unlike_slots, list) {
+            for frame in
+                unlike_preposition_frames(&grammar.unlike_slots, &grammar.constraints, list)
+            {
                 let index = intern(&mut preposition_frames, &frame);
                 facts.preposition_frames.insert(index);
             }
@@ -1081,6 +1123,10 @@ impl<'a> Binder<'a> {
                 lexemes,
                 frames,
                 cluster_shapes: Vec::new(),
+                kind_selected: preposition_frames
+                    .iter()
+                    .map(|frame| kind_selected(&grammar.constraints, frame))
+                    .collect(),
                 preposition_frames,
                 extensions,
                 extension_sets,
@@ -1189,13 +1235,9 @@ impl<'a> Binder<'a> {
     /// The value of a `complement_kind` or `unlike` feature that names a
     /// Slot Kind: an unlike slot's declared name, or the kind's own.
     fn kind_value(&self, feature: usize, kind: SlotKind) -> Result<u16, LoadError> {
-        let names = |name: &Ident| match kind {
-            SlotKind::Unlike(slot) => *name == self.grammar.unlike_slots[usize::from(slot)].0,
-            kind => variant::<SlotKind>(name) == Some(kind),
-        };
         let index = self.out.values[feature]
             .iter()
-            .position(names)
+            .position(|name| self.names_kind(name, kind))
             .ok_or_else(|| {
                 invalid(format!(
                     "feature `{}` has no value naming Slot Kind {kind:?}",
@@ -3448,18 +3490,21 @@ impl<'a> Binder<'a> {
             .collect();
         for index in used {
             let frame = &self.out.preposition_frames[index];
-            let mut draft = Draft::new(
-                format!(
-                    "Valence:{phrase}/{}@{:?}{}{}{}",
-                    complement_label(&frame.complement),
-                    frame.hosts,
-                    if frame.relation == SlotRelation::Complement { "" } else { "/predicative" },
-                    if frame.named_only { "/named" } else { "" },
-                    if frame.plural_complement { "/plural" } else { "" }
-                ),
-                lhs,
-                cost,
+            let id = format!(
+                "Valence:{phrase}/{}@{:?}{}{}",
+                complement_label(&frame.complement),
+                frame.hosts,
+                if frame.relation == SlotRelation::Complement { "" } else { "/predicative" },
+                frame
+                    .constraints
+                    .iter()
+                    .fold(String::new(), |mut names, name| {
+                        names.push('/');
+                        names.push_str(name.as_str());
+                        names
+                    })
             );
+            let mut draft = Draft::new(id.clone(), lhs, cost);
             draft.child(
                 "head",
                 Symbol::Leaf(Test::PrepositionFrame(index)),
@@ -3470,8 +3515,12 @@ impl<'a> Binder<'a> {
                 draft.equations.push((Path::Mother(f), Target::Value(kind)));
             }
             if frame.complement == SlotFill::Intransitive {
-                if frame.plural_complement {
-                    return Err(self.plural_fault(index, "it takes no Complement"));
+                if let Some(name) = frame
+                    .constraints
+                    .iter()
+                    .find(|name| self.grammar.constraints[*name].restricts_complement())
+                {
+                    return Err(self.constraint_fault(index, name, "it takes no Complement"));
                 }
                 drafts.push(draft);
             } else {
@@ -3482,30 +3531,11 @@ impl<'a> Binder<'a> {
                 );
                 self.slot_equations(&mut draft, child, frame.complement.kind())?;
                 self.unlike_slot(&mut draft, child, &frame.complement)?;
-                if frame.plural_complement {
-                    drafts.extend(self.plural_complement(&draft, index, child)?);
-                } else {
-                    drafts.push(draft);
-                }
+                drafts.extend(self.constrained_complement(draft, index, child)?);
             }
             if gap_capable && matches!(frame.complement, SlotFill::NP | SlotFill::Amount) {
                 let amount = frame.complement == SlotFill::Amount;
-                let mut stranded = Draft::new(
-                    format!(
-                        "Valence:{phrase}/{}@{:?}{}{}{}/gap0",
-                        complement_label(&frame.complement),
-                        frame.hosts,
-                        if frame.relation == SlotRelation::Complement {
-                            ""
-                        } else {
-                            "/predicative"
-                        },
-                        if frame.named_only { "/named" } else { "" },
-                        if frame.plural_complement { "/plural" } else { "" }
-                    ),
-                    lhs,
-                    cost,
-                );
+                let mut stranded = Draft::new(format!("{id}/gap0"), lhs, cost);
                 stranded.child(
                     "head",
                     Symbol::Leaf(Test::PrepositionFrame(index)),
@@ -3526,65 +3556,77 @@ impl<'a> Binder<'a> {
         Ok(drafts)
     }
 
-    /// A plural-Complement frame's phrases
-    /// (`PrepositionFrame::plural_complement`): one whose Complement is
-    /// itself a coordination and, for a Noun Phrase Complement, one whose
-    /// Complement is not and requires the lexicon mapping's Plural, a
-    /// `Require` that an open Number passes. A keyword phrase, slash
-    /// measure, name or unlike coordination has no Number of its own, so
-    /// only a coordination of it is plural; a frame of any other kind, or a
-    /// Noun Phrase Category without Number, is a load error.
-    fn plural_complement(
+    /// A Preposition Frame's phrases under the Complement Constraints it
+    /// names (`ConstraintDecl`): one per choice of an alternative of each
+    /// constraint that has any, for the frame's Slot Kind.
+    fn constrained_complement(
         &self,
-        draft: &Draft,
+        draft: Draft,
         frame: usize,
         child: usize,
     ) -> Result<Vec<Draft>, LoadError> {
-        let fill = &self.out.preposition_frames[frame].complement;
-        let fault = |why: String| self.plural_fault(frame, &why);
-        let mut coordinated = draft.clone();
-        coordinated.extend_id("coordinated");
-        coordinated.whole_coordination.push((child, true));
-        match fill.kind() {
-            SlotKind::KeywordPhrase
-            | SlotKind::MeasureNP
-            | SlotKind::Name
-            | SlotKind::Unlike(_) => {
-                return Ok(vec![coordinated]);
+        let frame_decl = &self.out.preposition_frames[frame];
+        let kind = frame_decl.complement.kind();
+        let mut drafts = vec![draft];
+        for name in &frame_decl.constraints {
+            let constraint = &self.grammar.constraints[name];
+            if !constraint.restricts_complement() {
+                continue;
             }
-            SlotKind::NP => {}
-            kind => {
-                return Err(fault(format!(
-                    "a {kind:?} Complement is neither a Noun Phrase nor a phrase without Number"
-                )));
+            let mut constrained = Vec::new();
+            // A phrase is or is not itself a coordination: a draft keeps
+            // only the alternatives that agree with those it already took.
+            let open =
+                |draft: &Draft, whole: bool| !draft.whole_coordination.contains(&(child, !whole));
+            for draft in &drafts {
+                if open(draft, true)
+                    && constraint
+                        .coordination
+                        .iter()
+                        .any(|listed| self.names_kind(listed, kind))
+                {
+                    let mut coordination = draft.clone();
+                    coordination.extend_id("coordination");
+                    coordination.whole_coordination.push((child, true));
+                    constrained.push(coordination);
+                }
+                for (_, equations) in constraint
+                    .otherwise
+                    .iter()
+                    .filter(|(listed, _)| open(draft, false) && self.names_kind(listed, kind))
+                {
+                    let mut otherwise = draft.clone();
+                    otherwise.extend_id("otherwise");
+                    otherwise.whole_coordination.push((child, false));
+                    self.equations_over_slot(&mut otherwise, child, equations)
+                        .map_err(|error| self.constraint_fault(frame, name, &error.to_string()))?;
+                    constrained.push(otherwise);
+                }
             }
+            if constrained.is_empty() {
+                return Err(self.constraint_fault(
+                    frame,
+                    name,
+                    "the constraint has no alternative for that Complement",
+                ));
+            }
+            drafts = constrained;
         }
-        let Symbol::Cat { category, .. } = draft.children[child].symbol else {
-            return Err(fault(
-                "the Complement is no phrase of a Category".to_owned(),
-            ));
-        };
-        let number = self.out.projection.ids[NUMBER]
-            .ok_or_else(|| fault("the grammar projects no Number".to_owned()))?;
-        if !self.out.category_features[category].contains(&number) {
-            return Err(fault(format!(
-                "Category `{}` has no Number",
-                self.out.categories[category]
-            )));
-        }
-        let mut plural = draft.clone();
-        plural.extend_id("number");
-        plural.whole_coordination.push((child, false));
-        let value = self.value(number, "Plural")?;
-        plural
-            .equations
-            .push((Path::Child(child, number), Target::Value(value)));
-        Ok(vec![coordinated, plural])
+        Ok(drafts)
     }
 
-    /// A plural-Complement frame that cannot be compiled, naming its
-    /// prepositions and Complement.
-    fn plural_fault(&self, frame: usize, why: &str) -> LoadError {
+    /// Whether `name` is the name of Slot Kind `kind`: an unlike slot's
+    /// declared name, or the kind's own.
+    fn names_kind(&self, name: &Ident, kind: SlotKind) -> bool {
+        match kind {
+            SlotKind::Unlike(slot) => *name == self.grammar.unlike_slots[usize::from(slot)].0,
+            kind => variant::<SlotKind>(name) == Some(kind),
+        }
+    }
+
+    /// A constrained frame that cannot be compiled, naming its prepositions,
+    /// Complement and constraint.
+    fn constraint_fault(&self, frame: usize, constraint: &Ident, why: &str) -> LoadError {
         let prepositions: Vec<String> = self
             .out
             .declared_lexemes()
@@ -3592,7 +3634,7 @@ impl<'a> Binder<'a> {
             .map(|(id, _)| self.out.lexeme_id(id).to_string())
             .collect();
         invalid(format!(
-            "plural Complement of {} ({}): {why}",
+            "constraint `{constraint}` on the Complement of {} ({}): {why}",
             prepositions.join(", "),
             complement_label(&self.out.preposition_frames[frame].complement)
         ))
@@ -4100,6 +4142,16 @@ impl<'a> Binder<'a> {
         let Some(equations) = self.grammar.slot_equations.get(&kind) else {
             return Ok(());
         };
+        self.equations_over_slot(draft, child, equations)
+    }
+
+    /// Adds `equations` to `draft` with child `child` named `slot`.
+    fn equations_over_slot(
+        &self,
+        draft: &mut Draft,
+        child: usize,
+        equations: &[Equation],
+    ) -> Result<(), LoadError> {
         let name = std::mem::replace(&mut draft.children[child].name, Ident::new("slot"));
         let result = self.equations(draft, equations);
         draft.children[child].name = name;
@@ -5788,31 +5840,37 @@ fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Fram
     derived
 }
 
+/// The frames of one relation that select kinds of an unlike slot: the
+/// kinds, the Host Categories all admit and the Complement Constraints any
+/// names.
+type UnlikeGroup = (BTreeSet<SlotKind>, Option<Hosts>, BTreeSet<Ident>);
+
 /// The frames a preposition's declared frames derive for the grammar's
 /// unlike slots, as [`unlike_frames`] derives a head's: one per relation
 /// whose frames select two or more of an unlike slot's kinds, admitting the
-/// Host Categories they all admit. A frame only a slot naming its kind
-/// selects (`named_only`) takes no part.
+/// Host Categories they all admit, under every Complement Constraint any of
+/// them names. A frame only a slot naming its kind selects
+/// (`ConstraintDecl::kind_selected`) takes no part.
 fn unlike_preposition_frames(
     slots: &[(Ident, Vec<SlotKind>)],
+    constraints: &BTreeMap<Ident, ConstraintDecl>,
     frames: &[PrepositionFrame],
 ) -> Vec<PrepositionFrame> {
     let mut derived = Vec::new();
     for (index, (name, kinds)) in slots.iter().enumerate() {
         let slot = u8::try_from(index).expect("at most 256 unlike slots");
-        let mut groups: BTreeMap<SlotRelation, (BTreeSet<SlotKind>, Option<Hosts>, bool)> =
-            BTreeMap::new();
+        let mut groups: BTreeMap<SlotRelation, UnlikeGroup> = BTreeMap::new();
         for frame in frames {
             let kind = frame.complement.kind();
-            if frame.named_only || !kinds.contains(&kind) {
+            if kind_selected(constraints, frame) || !kinds.contains(&kind) {
                 continue;
             }
             let group = groups.entry(frame.relation).or_default();
             group.0.insert(kind);
             group.1 = Some(group.1.map_or(frame.hosts, |hosts| hosts.meet(frame.hosts)));
-            group.2 |= frame.plural_complement;
+            group.2.extend(frame.constraints.iter().copied());
         }
-        for (relation, (selected, hosts, plural_complement)) in groups {
+        for (relation, (selected, hosts, constraints)) in groups {
             let (true, Some(hosts)) = (selected.len() >= 2, hosts) else {
                 continue;
             };
@@ -5820,12 +5878,20 @@ fn unlike_preposition_frames(
                 relation,
                 complement: SlotFill::Unlike(unlike_fill(slot, name, kinds, &selected)),
                 hosts,
-                named_only: false,
-                plural_complement,
+                constraints,
             });
         }
     }
     derived
+}
+
+/// Whether only a Frame Slot that names the frame's Complement's kind
+/// selects its phrase. Every constraint a frame names is declared.
+fn kind_selected(constraints: &BTreeMap<Ident, ConstraintDecl>, frame: &PrepositionFrame) -> bool {
+    frame
+        .constraints
+        .iter()
+        .any(|name| constraints[name].kind_selected)
 }
 
 /// The Fill of unlike slot `slot` restricted to `selected`, its kinds in the
