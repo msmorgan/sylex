@@ -305,12 +305,11 @@ fn the_settled_spine_agrees_with_the_counts_and_the_readings() {
     let mut failures = Vec::new();
     let mut several_roots = false;
     let mut whole_trees = 0;
-    for (face, text) in unit_texts::texts(&corpus, &env) {
+    let parsed = unit_texts::map(&corpus, &env, &grammar, |face, text, parse| {
+        (face, text.to_owned(), parse)
+    });
+    for (face, text, parse) in parsed {
         let name = |why: String| format!("{} | {text}: {why}", face.name);
-        let analyzed =
-            env.lexicon
-                .analyze_source_scoped(&text, None, &face.scope(&env.lexicon, &grammar));
-        let parse = grammar.parse_analyzed(&analyzed);
         let counts = parse.counts().unwrap();
         let forest = parse.fork_forest().unwrap();
         let spine = forest.settled_spine();

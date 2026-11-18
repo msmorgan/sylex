@@ -63,11 +63,10 @@ pub const OUTER_CATEGORIES: &[&str] = &[
 /// Structural punctuation a Segment's extent ignores at its edges.
 pub const SEGMENT_EDGES: &[char] = &['.', '•', '—', ':', '|', ','];
 
-pub mod anchors;
 pub mod cleave;
 pub mod corpus;
+pub mod face;
 pub mod judgment;
-pub mod options;
 pub mod profile;
 pub mod segments;
 

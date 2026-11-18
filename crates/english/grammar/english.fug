@@ -710,13 +710,15 @@ category Mention
 category MentionModifier
 // The two Anchor Words a replacement effect offers as its permanent enters
 // (*choose Khans or Dragons*): one of two abilities, each marked with its
-// word [CR#614.12c]. The words are cited, so it stands as a Mention.
+// word [CR#614.12c]. The words are cited, so it stands as a Mention. It
+// `offers` them: it reads whatever two capitalized words stand there, and
+// is a Reading only where the face heads an ability with one of them.
 category AnchorChoice
 // A word a vote offers, cited: one of the "words with no rules meaning that
 // are each connected to a different effect" [CR#701.38b]. It is no declared
-// word: it is read from the face's text, and stands where the Card Scope
-// holds it (`docs/design/lexicon.md` §2), in the three positions that take
-// one. OptionChoice is the two a vote offers (*votes for sickness or
+// word: the vote that offers it introduces it, and a mention uses it
+// (`docs/design/lexicon.md` §2), in the three positions that take one.
+// OptionChoice is the two a vote offers (*votes for sickness or
 // psychosis*), which only a frame that names it selects.
 category OptionMention
 category OptionChoice
@@ -1142,8 +1144,9 @@ LabeledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability { capital
 // *• Khans — ...*: an ability under an Anchor Word, after the ability
 // offering the choice [CR#607.2m]; the bullet is part of it [CR#614.12c].
 // Never a mode: no instruction to choose options precedes it [CR#700.2].
-// An Anchor Word is no declared word: it is read from the face's text, and
-// stands where the Card Scope holds it (`docs/design/lexicon.md` §2).
+// An Anchor Word is no declared word: the line that offers it introduces it
+// (`AnchorWordChoice`), and this line, after that one, uses it
+// (`docs/design/lexicon.md` §2).
 AnchoredAbility: Ability -> '•':Free label:Lex(AnchorWord) '—':Free Ability { capital: [label, head] }
 FlavorLabeledAbility: Ability -> label:Lex(FlavorWord) Ability { capital: [head] }
 NominalMode: Mode -> '•':Free Nominal '.' { capital: [head] }
@@ -2757,10 +2760,10 @@ FusedLocative: LocativeHead -> Word(Anywhere)
 // A cited noun (*choose land or nonland*): bare and singular, since it
 // names the word.
 WordMention: Mention -> FreeLex(Noun) where head.Inflection = Singular
-AnchorWordChoice: AnchorChoice -> first:Lex(AnchorWord) coordinator:Word(Or) last:Lex(AnchorWord)
+AnchorWordChoice: AnchorChoice -> first:Lex(AnchorWord) coordinator:Word(Or) last:Lex(AnchorWord) { offers }
 AnchorChoiceMention: Mention -> AnchorChoice
 OptionWordMention: OptionMention -> Lex(OptionWord)
-OptionWordChoice: OptionChoice -> first:Lex(OptionWord) coordinator:Word(Or) last:Lex(OptionWord)
+OptionWordChoice: OptionChoice -> first:Lex(OptionWord) coordinator:Word(Or) last:Lex(OptionWord) { offers }
 NegativeMention: Mention -> prefix:Lex(Affix) Mention { light: [head], uncoordinated: [head] }
 // A cited adjective that names a Quality (*choose odd or even*, Extinction
 // Event), as AdjectivalQuality's does after *protection from*.

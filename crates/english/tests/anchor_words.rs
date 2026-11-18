@@ -1,5 +1,6 @@
-//! Anchor Words [CR#614.12c] are read from a face's text across its units
-//! (`docs/design/lexicon.md` §2), with no list of the words a card prints.
+//! Anchor Words [CR#614.12c] are read from a face's text as its lines are
+//! read, once each and in order (`docs/design/lexicon.md` §2), with no list
+//! of the words a card prints.
 
 use std::collections::BTreeSet;
 
@@ -21,15 +22,20 @@ fn anchor_words(
     card: &str,
     lines: &[&str],
 ) -> Vec<String> {
-    let lines: Vec<String> = lines.iter().map(|line| (*line).to_owned()).collect();
-    sylex_english::anchors::anchor_words(
-        &lines,
+    let parses = sylex_english::face::read_lines(
+        lines,
         &CardScope::full_names([card]),
         &env.lexicon,
         grammar,
-    )
-    .into_iter()
-    .collect()
+    );
+    sylex_english::face::introduced_words(&parses)
+        .into_iter()
+        .filter_map(
+            |word| {
+                if let LexicalReading::AnchorWord { word } = word { Some(word) } else { None }
+            },
+        )
+        .collect()
 }
 
 fn scope(card: &str, anchors: &[&str]) -> CardScope {
@@ -73,8 +79,9 @@ fn productions(reading: &Reading, found: &mut BTreeSet<String>) {
     }
 }
 
-/// A face's Anchor Words are the labels of its bulleted lines that one of
-/// its lines offers as an Anchor Choice: a card face's name (*Believe*, of
+/// A face's Anchor Words are the words one of its lines offers as an
+/// Anchor Choice and a later line heads a bulleted ability with: a card
+/// face's name (*Believe*, of
 /// *Reason // Believe*), a plural subtype (*Dragons*), an adjective
 /// (*Phyrexian*) and an acronym (*NCR*) among them.
 #[test]
@@ -126,10 +133,11 @@ fn a_face_s_anchor_words_are_the_bulleted_labels_a_line_offers() {
     );
 }
 
-/// A line that offers two words no bulleted line is labeled with offers no
+/// A line that offers two words no later line is labeled with offers no
 /// Anchor Words (Roots of Life chooses a land type [CR#607.2d]), and bulleted
-/// labels no line offers are none either (Cult of Skaro's flavor-labeled
-/// modes [CR#207.2d]; Frontier Siege's own lines, one kind at a time).
+/// labels no line before them offers are none either (Cult of Skaro's
+/// flavor-labeled modes [CR#207.2d]; Frontier Siege's own lines, one kind at
+/// a time, and its bulleted lines before its offer).
 #[test]
 fn a_choice_or_a_label_alone_is_no_anchor_word() {
     let env = LexicalEnvironment::load().unwrap();
@@ -170,11 +178,68 @@ fn a_choice_or_a_label_alone_is_no_anchor_word() {
         anchor_words(&env, &grammar, "Frontier Siege", &FRONTIER_SIEGE[1..]),
         none
     );
-    // One of the two words labels a line: the choice is not between them.
+    // The lines are read in order: a label is an Anchor Word only after
+    // the line that offers it.
     assert_eq!(
-        anchor_words(&env, &grammar, "Frontier Siege", &FRONTIER_SIEGE[..2]),
+        anchor_words(
+            &env,
+            &grammar,
+            "Frontier Siege",
+            &[FRONTIER_SIEGE[1], FRONTIER_SIEGE[2], FRONTIER_SIEGE[0]]
+        ),
         none
     );
+    // A use of either word discharges the choice that offers the two.
+    assert_eq!(
+        anchor_words(&env, &grammar, "Frontier Siege", &FRONTIER_SIEGE[..2]),
+        ["Dragons", "Khans"]
+    );
+}
+
+/// Each line is parsed once, and the parse of a line alone in the Card
+/// Scope the face's reading leaves it with has the same Readings: the
+/// scope holds what the Readings depend on outside the line
+/// (`docs/design/english.md` §7). Roots of Life's offer keeps its subtype
+/// Reading, and its Anchor Choice, which nothing discharges, is refused.
+#[test]
+fn a_line_read_alone_in_its_scope_has_the_readings_the_face_gave_it() {
+    let env = LexicalEnvironment::load().unwrap();
+    let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
+    let roots = [
+        "As this enchantment enters, choose Island or Swamp.",
+        "Whenever a land of the chosen type an opponent controls becomes tapped, you gain 1 life.",
+    ];
+    for (card, lines) in [
+        ("Frontier Siege", &FRONTIER_SIEGE[..]),
+        ("Roots of Life", &roots[..]),
+    ] {
+        let names = CardScope::full_names([card]);
+        let parses = sylex_english::face::read_lines(lines, &names, &env.lexicon, &grammar);
+        for (line, parse) in lines.iter().zip(&parses) {
+            let together: BTreeSet<Reading> = parse.readings().collect();
+            let alone: BTreeSet<Reading> = readings(&env, &grammar, line, parse.scope())
+                .into_iter()
+                .collect();
+            assert_eq!(together, alone, "{line}");
+            assert!(!together.is_empty(), "{line}");
+            for reading in &together {
+                assert_eq!(
+                    grammar.admit(reading, &env.lexicon, parse.scope()),
+                    Ok(()),
+                    "{line}"
+                );
+            }
+        }
+    }
+    let names = CardScope::full_names(["Roots of Life"]);
+    let parses = sylex_english::face::read_lines(&roots, &names, &env.lexicon, &grammar);
+    let found: Vec<Reading> = parses[0].readings().collect();
+    let [reading] = &found[..] else {
+        panic!("{} Readings", found.len());
+    };
+    let mut used = BTreeSet::new();
+    productions(reading, &mut used);
+    assert!(!used.contains("AnchorWordChoice"), "{used:?}");
 }
 
 /// With its Anchor Words in scope each line of Frontier Siege has one
@@ -207,13 +272,14 @@ fn the_offer_and_each_bulleted_ability_read_their_anchor_words() {
     }
 }
 
-/// Admission refuses an Anchor Word the scope does not hold, and admits it
-/// where the scope does: the parse and admission take the one scope
+/// Admission refuses an Anchor Choice nothing discharges and an Anchor Word
+/// used that nothing introduces, and admits each where the scope states
+/// the word: the parse and admission take the one scope
 /// (`docs/design/english.md` §7). Off its face the same label is a Flavor
-/// Word heading a mode, which admission refuses where the scope holds the
-/// Anchor Word.
+/// Word heading a mode, which admission refuses where the scope introduces
+/// the Anchor Word.
 #[test]
-fn admission_takes_an_anchor_word_only_in_a_scope_that_holds_it() {
+fn admission_takes_an_anchor_word_only_where_it_is_introduced_and_used() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let held = scope("Frontier Siege", &["Khans", "Dragons"]);
@@ -229,14 +295,27 @@ fn admission_takes_an_anchor_word_only_in_a_scope_that_holds_it() {
             Ok(()),
             "{line}"
         );
-        for scope in [&other, &bare] {
-            assert!(
-                grammar.admit(reading, &env.lexicon, scope).is_err(),
-                "{line}"
-            );
-        }
+        assert!(
+            grammar.admit(reading, &env.lexicon, &bare).is_err(),
+            "{line}"
+        );
     }
-    // Without the word in scope the offer has an unknown word and no
+    // A scope that states *Dragons* discharges the choice that offers it,
+    // and introduces no *Khans* for the bulleted line to use.
+    let offer = readings(&env, &grammar, FRONTIER_SIEGE[0], &held);
+    assert_eq!(grammar.admit(&offer[0], &env.lexicon, &other), Ok(()));
+    assert_eq!(
+        grammar.admit(&offer[0], &env.lexicon, &bare),
+        Err(sylex_syntax::AdmissionError::Undischarged)
+    );
+    let ability = readings(&env, &grammar, FRONTIER_SIEGE[1], &held);
+    for scope in [&other, &bare] {
+        assert_eq!(
+            grammar.admit(&ability[0], &env.lexicon, scope),
+            Err(sylex_syntax::AdmissionError::NotIntroduced)
+        );
+    }
+    // Without the words in scope the offer is not discharged and has no
     // Reading, and the bulleted line is a flavor-labeled mode.
     assert_eq!(readings(&env, &grammar, FRONTIER_SIEGE[0], &bare), []);
     let found = readings(&env, &grammar, FRONTIER_SIEGE[1], &bare);

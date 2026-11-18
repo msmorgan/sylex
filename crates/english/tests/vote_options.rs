@@ -78,15 +78,25 @@ fn vote_options(
     card: &str,
     lines: &[&str],
 ) -> Vec<String> {
-    let lines: Vec<String> = lines.iter().map(|line| (*line).to_owned()).collect();
-    sylex_english::options::vote_options(
-        &lines,
+    let parses = sylex_english::face::read_lines(
+        lines,
         &CardScope::full_names([card]),
         &env.lexicon,
         grammar,
-    )
-    .into_iter()
-    .collect()
+    );
+    options_among(sylex_english::face::introduced_words(&parses))
+}
+
+/// The Vote Options among `words`.
+fn options_among(words: BTreeSet<LexicalReading>) -> Vec<String> {
+    words
+        .into_iter()
+        .filter_map(
+            |word| {
+                if let LexicalReading::VoteOption { word } = word { Some(word) } else { None }
+            },
+        )
+        .collect()
 }
 
 fn scope(card: &str, options: &[&str]) -> CardScope {
@@ -141,8 +151,13 @@ fn every_voting_card_reads_with_the_vote_options_of_its_own_text() {
         .faces
         .iter()
         .map(|face| {
-            let scope = face.scope(&env.lexicon, &grammar);
-            let options = scope.vote_options().map(str::to_owned).collect();
+            let parses = sylex_english::face::read_lines(
+                &face.lines(),
+                &face.name_scope(&env.lexicon),
+                &env.lexicon,
+                &grammar,
+            );
+            let options = options_among(sylex_english::face::introduced_words(&parses));
             (face.name.as_str(), options)
         })
         .collect();
@@ -164,9 +179,9 @@ fn every_voting_card_reads_with_the_vote_options_of_its_own_text() {
 /// A vote that offers two words makes them Vote Options only where the text
 /// then cites one of them [CR#701.38b]: Bite of the Black Rose's offer
 /// alone gives none, with either effect it gives both, and the effects
-/// without the offer give none.
+/// without the offer, or before it, give none.
 #[test]
-fn an_offer_is_confirmed_by_a_mention_of_one_of_its_words() {
+fn an_offer_is_discharged_by_a_mention_of_one_of_its_words() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let none: [&str; 0] = [];
@@ -192,6 +207,9 @@ fn an_offer_is_confirmed_by_a_mention_of_one_of_its_words() {
         vote_options(&env, &grammar, card, &[sickness, psychosis]),
         none
     );
+    // The lines are read in order: a mention on a line before the offer
+    // cites no word, so nothing discharges the offer.
+    assert_eq!(vote_options(&env, &grammar, card, &[sickness, offer]), none);
     // Trial of a Time Lord never cites *innocent*: the vote that offers it
     // offers *guilty*, which it does cite.
     assert_eq!(
@@ -238,25 +256,49 @@ fn the_offer_and_each_mention_read_their_vote_options() {
     );
 }
 
-/// Admission refuses a Vote Option the scope does not hold, and admits it
-/// where the scope does: the parse and admission take the one scope
-/// (`docs/design/english.md` §7).
+/// A line that offers its words and mentions them reads alone, with no
+/// word stated: the Reading that offers them introduces them. Admission
+/// refuses an offer nothing discharges and a mention of a word nothing
+/// introduces, and admits each where the scope states the word: the parse
+/// and admission take the one scope (`docs/design/english.md` §7).
 #[test]
-fn admission_takes_a_vote_option_only_in_a_scope_that_holds_it() {
+fn admission_takes_a_vote_option_only_where_it_is_introduced_and_used() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let card = "Bite of the Black Rose";
     let held = scope(card, &["sickness", "psychosis"]);
-    let other = scope(card, &["sickness"]);
     let bare = scope(card, &[]);
-    let found = readings(&env, &grammar, BITE, &held);
-    let [reading] = &found[..] else {
-        panic!("{} Readings", found.len());
+    let stated = readings(&env, &grammar, BITE, &held);
+    let alone = readings(&env, &grammar, BITE, &bare);
+    assert_eq!(stated, alone);
+    let [reading] = &alone[..] else {
+        panic!("{} Readings", alone.len());
     };
-    assert_eq!(grammar.admit(reading, &env.lexicon, &held), Ok(()));
-    for scope in [&other, &bare] {
-        assert!(grammar.admit(reading, &env.lexicon, scope).is_err());
-        assert_eq!(readings(&env, &grammar, BITE, scope), []);
+    for scope in [&held, &bare] {
+        assert_eq!(grammar.admit(reading, &env.lexicon, scope), Ok(()));
+    }
+    let offer = "Starting with you, each player votes for sickness or psychosis.";
+    let mention = "If psychosis gets more votes or the vote is tied, each opponent discards two \
+                   cards.";
+    for (text, refusal) in [
+        (offer, sylex_syntax::AdmissionError::Undischarged),
+        (mention, sylex_syntax::AdmissionError::NotIntroduced),
+    ] {
+        let stated = readings(&env, &grammar, text, &held);
+        let [reading] = &stated[..] else {
+            panic!("{text}: {} Readings", stated.len());
+        };
+        assert_eq!(
+            grammar.admit(reading, &env.lexicon, &held),
+            Ok(()),
+            "{text}"
+        );
+        assert_eq!(
+            grammar.admit(reading, &env.lexicon, &bare),
+            Err(refusal),
+            "{text}"
+        );
+        assert_eq!(readings(&env, &grammar, text, &bare), [], "{text}");
     }
 }
 

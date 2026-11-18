@@ -24,7 +24,6 @@ use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 use rayon::prelude::*;
-use sylex_lexicon::AnalyzedText;
 use sylex_syntax::CompiledGrammar;
 use sylex_vocabulary::LexicalEnvironment;
 
@@ -168,67 +167,99 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
     let cleaves = cleave_texts(corpus, &env.lexicon);
     let grammar = grammar.as_ref().ok();
     let profiler = Profiler::new(env);
-    let scopes = grammar.map(|(grammar, _)| corpus.scopes(&env.lexicon, grammar));
     let units = corpus
-        .units
-        .par_iter()
-        .zip(&cleaves)
-        .map(|(unit, cleave)| {
-            let face = &corpus.faces[unit.face];
-            let scope = match &scopes {
-                Some(scopes) => &scopes[unit.face],
-                None => &face.name_scope(&env.lexicon),
-            };
-            let analyzed = env.lexicon.analyze_source_scoped(&unit.text, None, scope);
-            let profile = profiler.profile(unit.kind, &analyzed);
-            let entries = |text: &str| -> Vec<&Judgment> {
-                by_text
-                    .get(text)
-                    .into_iter()
-                    .flatten()
-                    .filter(|e| {
-                        e.card
-                            .as_ref()
-                            .is_none_or(|c| *c == face.card || *c == face.name)
-                    })
-                    .copied()
-                    .collect()
-            };
-            let (verdict, derivations, segments, cheapest_tier) = match grammar {
-                None => (Verdict::Unread(Unread::Unbound), 0, None, 0),
-                Some((grammar, frame)) => {
-                    let judge = |text: &str, analyzed: &AnalyzedText| {
-                        let entries = entries(text);
-                        judge_unit(grammar, frame, env, analyzed, &entries)
+        .face_units()
+        .into_par_iter()
+        .enumerate()
+        .flat_map_iter(|(face, range)| {
+            let face = &corpus.faces[face];
+            let units = &corpus.units[range.clone()];
+            let cleaves = &cleaves[range];
+            let names = face.name_scope(&env.lexicon);
+            // The face's lines are read once each, in order
+            // (`crate::face::read_units`).
+            let mut parses = grammar
+                .map(|(grammar, _)| {
+                    crate::face::read_units(face, units, cleaves, &env.lexicon, grammar)
+                })
+                .map(Vec::into_iter);
+            // The words the face's Readings introduce, which stratify each
+            // of its units.
+            let words = parses.as_ref().map_or_else(BTreeSet::new, |parses| {
+                crate::face::introduced_words(parses.as_slice())
+            });
+            let scope = crate::face::scope_with(&names, &words);
+            units
+                .iter()
+                .zip(cleaves)
+                .map(|(unit, cleave)| {
+                    let analyzed = env.lexicon.analyze_source_scoped(&unit.text, None, &scope);
+                    let profile = profiler.profile(unit.kind, &analyzed);
+                    let entries = |text: &str| -> Vec<&Judgment> {
+                        by_text
+                            .get(text)
+                            .into_iter()
+                            .flatten()
+                            .filter(|e| {
+                                e.card
+                                    .as_ref()
+                                    .is_none_or(|c| *c == face.card || *c == face.name)
+                            })
+                            .copied()
+                            .collect()
                     };
-                    match cleave {
-                        None => judge(&unit.text, &analyzed),
-                        Some(cleave) => judge_cleave(cleave, |text| {
-                            let analyzed = env.lexicon.analyze_source_scoped(text, None, scope);
-                            judge(text, &analyzed)
-                        }),
+                    let (verdict, derivations, segments, cheapest_tier) =
+                        match (grammar, &mut parses) {
+                            (Some((grammar, frame)), Some(parses)) => {
+                                let parse = parses.next().expect("a parse of each unit read");
+                                let judge = |text: &str, parse: &sylex_syntax::Parse<'_>| {
+                                    judge_unit(grammar, frame, env, parse, &entries(text))
+                                };
+                                let read = judge(line_text(unit, cleave.as_ref()), &parse);
+                                match cleave {
+                                    None => read,
+                                    // The Cleaved Text is read in its line's
+                                    // Card Scope.
+                                    Some(cleave) => judge_cleave(read, || {
+                                        let analyzed = env.lexicon.analyze_source_scoped(
+                                            &cleave.cleaved,
+                                            None,
+                                            parse.scope(),
+                                        );
+                                        judge(&cleave.cleaved, &grammar.parse_analyzed(&analyzed))
+                                    }),
+                                }
+                            }
+                            _ => (Verdict::Unread(Unread::Unbound), 0, None, 0),
+                        };
+                    let surplus = segments
+                        .as_ref()
+                        .map_or(0, |s: &Segmentation| s.surplus(derivations));
+                    UnitResult {
+                        face: face.identity.clone(),
+                        name: face.name.clone(),
+                        kind: unit.kind,
+                        index: unit.index,
+                        text: unit.text.clone(),
+                        profile,
+                        verdict,
+                        derivations,
+                        segments,
+                        surplus,
+                        cheapest_tier,
                     }
-                }
-            };
-            let surplus = segments
-                .as_ref()
-                .map_or(0, |s: &Segmentation| s.surplus(derivations));
-            UnitResult {
-                face: face.identity.clone(),
-                name: face.name.clone(),
-                kind: unit.kind,
-                index: unit.index,
-                text: unit.text.clone(),
-                profile,
-                verdict,
-                derivations,
-                segments,
-                surplus,
-                cheapest_tier,
-            }
+                })
+                .collect::<Vec<_>>()
         })
         .collect();
     summarize(corpus.faces.len(), bind_error, units)
+}
+
+/// The text a unit is read as: a bracketed line of a cleave face as its
+/// Uncleaved Text, any other unit as written.
+#[must_use]
+pub fn line_text<'u>(unit: &'u crate::corpus::Unit, cleave: Option<&'u CleaveText>) -> &'u str {
+    cleave.map_or(unit.text.as_str(), |cleave| cleave.uncleaved.as_str())
 }
 
 /// The [`CleaveText`] of each unit of `corpus`, in unit order: of each line
@@ -259,16 +290,16 @@ pub fn cleave_texts(corpus: &Corpus, lexicon: &sylex_lexicon::Lexicon) -> Vec<Op
         .collect()
 }
 
-/// Judges a bracketed line of a cleave face as its Uncleaved Text, then, if
-/// that is read, its Cleaved Text: the line keeps the Uncleaved Text's counts
-/// and the first verdict that is not read.
+/// The judgment of a bracketed line of a cleave face, read as its Uncleaved
+/// Text and then, if that is read, its Cleaved Text: the line keeps the
+/// Uncleaved Text's counts and the first verdict that is not read.
 fn judge_cleave(
-    cleave: &CleaveText,
-    judge: impl Fn(&str) -> (Verdict, u128, Option<Segmentation>, u128),
+    uncleaved: (Verdict, u128, Option<Segmentation>, u128),
+    cleaved: impl FnOnce() -> (Verdict, u128, Option<Segmentation>, u128),
 ) -> (Verdict, u128, Option<Segmentation>, u128) {
-    let (verdict, derivations, segments, cheapest_tier) = judge(&cleave.uncleaved);
+    let (verdict, derivations, segments, cheapest_tier) = uncleaved;
     let verdict = match verdict {
-        Verdict::Read => judge(&cleave.cleaved).0,
+        Verdict::Read => cleaved().0,
         unread => unread,
     };
     (verdict, derivations, segments, cheapest_tier)
@@ -278,10 +309,9 @@ fn judge_unit(
     grammar: &CompiledGrammar,
     frame: &SegmentFrame,
     env: &LexicalEnvironment,
-    analyzed: &sylex_lexicon::AnalyzedText,
+    parse: &sylex_syntax::Parse<'_>,
     entries: &[&Judgment],
 ) -> (Verdict, u128, Option<Segmentation>, u128) {
-    let parse = grammar.parse_analyzed(analyzed);
     if !parse.vocabulary_gaps.is_empty() {
         return (Verdict::Unread(Unread::VocabularyGap), 0, None, 0);
     }
@@ -289,9 +319,9 @@ fn judge_unit(
     if derivations == 0 {
         return (Verdict::Unread(Unread::NoReading), 0, None, 0);
     }
-    let segments = Some(crate::segments::segments(&parse, frame));
+    let segments = Some(crate::segments::segments(parse, frame));
     let cheapest_tier = parse.cheapest_tier().map_or(0, |(_, tied)| tied);
-    let (verdict, derivations) = judge_parse(grammar, env, &parse, derivations, entries);
+    let (verdict, derivations) = judge_parse(grammar, env, parse, derivations, entries);
     (verdict, derivations, segments, cheapest_tier)
 }
 

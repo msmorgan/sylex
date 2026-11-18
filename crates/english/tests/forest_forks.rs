@@ -31,7 +31,6 @@ use std::time::Duration;
 use std::time::Instant;
 
 use dpsi::Ident;
-use rayon::prelude::*;
 use sylex_english::corpus::Corpus;
 use sylex_english::corpus::Face;
 use sylex_lexicon::LexicalReading;
@@ -412,17 +411,14 @@ struct Measure {
 }
 
 fn check(
-    grammar: &CompiledGrammar,
     env: &LexicalEnvironment,
     face: &Face,
     text: &str,
+    parse: &Parse<'_>,
     every_option_up_to: u128,
 ) -> Result<Measure, String> {
+    let grammar = parse.grammar();
     let name = |why: String| format!("{} | {text}: {why}", face.name);
-    let analyzed =
-        env.lexicon
-            .analyze_source_scoped(text, None, &face.scope(&env.lexicon, grammar));
-    let parse: Parse<'_> = grammar.parse_analyzed(&analyzed);
     let started = Instant::now();
     let forest = parse.fork_forest().map_err(|e| name(e.to_string()))?;
     let forks = forest.forks();
@@ -650,19 +646,15 @@ fn check_corpus(
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let corpus = Corpus::load(keep).unwrap();
-    let texts = unit_texts::texts(&corpus, &env);
     let pool = rayon::ThreadPoolBuilder::new()
         .stack_size(256 << 20)
         .build()
         .unwrap();
     let results: Vec<Result<(String, String, Measure), String>> = pool.install(|| {
-        texts
-            .par_iter()
-            .map(|(face, text)| {
-                check(&grammar, &env, face, text, every_option_up_to)
-                    .map(|m| (face.name.clone(), text.clone(), m))
-            })
-            .collect()
+        unit_texts::map(&corpus, &env, &grammar, |face, text, parse| {
+            check(&env, face, text, &parse, every_option_up_to)
+                .map(|m| (face.name.clone(), text.to_owned(), m))
+        })
     });
     let failures: Vec<&str> = results
         .iter()

@@ -19,10 +19,9 @@ use std::collections::BTreeSet;
 use std::time::Duration;
 use std::time::Instant;
 
-use rayon::prelude::*;
 use sylex_english::corpus::Corpus;
 use sylex_english::corpus::Face;
-use sylex_syntax::CompiledGrammar;
+use sylex_syntax::Parse;
 use sylex_vocabulary::LexicalEnvironment;
 
 /// Units with at most this many Derivations are also checked against an
@@ -49,27 +48,16 @@ const SAMPLE: &[&str] = &[
     "Muse Vortex",
 ];
 
-/// Time spent in each pass over one text.
+/// Time spent in each pass over one text's forest.
 #[derive(Clone, Copy, Default)]
 struct Timing {
-    parse: Duration,
     inside: Duration,
     counts: Duration,
 }
 
 /// Checks one text's counts, naming the unit on a disagreement.
-fn check(
-    grammar: &CompiledGrammar,
-    env: &LexicalEnvironment,
-    face: &Face,
-    text: &str,
-) -> Result<Timing, String> {
+fn check(face: &Face, text: &str, parse: &Parse<'_>) -> Result<Timing, String> {
     let name = |why: String| format!("{} | {text}: {why}", face.name);
-    let start = Instant::now();
-    let analyzed =
-        env.lexicon
-            .analyze_source_scoped(text, None, &face.scope(&env.lexicon, grammar));
-    let parse = grammar.parse_analyzed(&analyzed);
     let parsed = Instant::now();
     let total = parse.derivation_count();
     let inside = Instant::now();
@@ -88,9 +76,8 @@ fn check(
              (english.md §8)"
         )));
     }
-    forest_oracle::check(&parse, ENUMERATE).map_err(name)?;
+    forest_oracle::check(parse, ENUMERATE).map_err(name)?;
     Ok(Timing {
-        parse: parsed - start,
         inside: inside - parsed,
         counts: counted - inside,
     })
@@ -103,17 +90,16 @@ fn check_corpus(keep: impl Fn(&Face) -> bool) -> (BTreeSet<String>, usize, Timin
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let corpus = Corpus::load(keep).unwrap();
-    let texts = unit_texts::texts(&corpus, &env);
     let pool = rayon::ThreadPoolBuilder::new()
         .stack_size(256 << 20)
         .build()
         .unwrap();
     let results: Vec<Result<Timing, String>> = pool.install(|| {
-        texts
-            .par_iter()
-            .map(|(face, text)| check(&grammar, &env, face, text))
-            .collect()
+        unit_texts::map(&corpus, &env, &grammar, |face, text, parse| {
+            check(face, text, &parse)
+        })
     });
+    let texts = results.len();
     let failures: Vec<&str> = results
         .iter()
         .filter_map(|r| r.as_ref().err().map(String::as_str))
@@ -121,12 +107,11 @@ fn check_corpus(keep: impl Fn(&Face) -> bool) -> (BTreeSet<String>, usize, Timin
     assert!(failures.is_empty(), "{}", failures.join("\n"));
     let mut sum = Timing::default();
     for timing in results.into_iter().flatten() {
-        sum.parse += timing.parse;
         sum.inside += timing.inside;
         sum.counts += timing.counts;
     }
     let faces = corpus.faces.iter().map(|face| face.name.clone()).collect();
-    (faces, texts.len(), sum)
+    (faces, texts, sum)
 }
 
 #[test]
@@ -142,7 +127,7 @@ fn counts_agree_with_recounts_enumeration_and_readings_on_real_units() {
 fn counts_agree_with_recounts_enumeration_and_readings_on_the_pool() {
     let (_, texts, timing) = check_corpus(|_| true);
     eprintln!(
-        "{texts} texts; summed over threads: parse {:?}, inside count {:?}, counts {:?}",
-        timing.parse, timing.inside, timing.counts
+        "{texts} texts; summed over threads: inside count {:?}, counts {:?}",
+        timing.inside, timing.counts
     );
 }

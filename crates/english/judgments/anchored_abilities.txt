@@ -7,9 +7,9 @@
 + <card=Frontier Siege> <anchor=Khans> <anchor=Dragons> As this enchantment enters, choose Khans or Dragons. => AnchorChoice "Khans or Dragons"; Mention "Khans or Dragons" as Object of choose; !NounPhrase "Khans or Dragons"; readings 1
 + <card=Phenomenon Investigators> <anchor=Believe> <anchor=Doubt> As this creature enters, choose Believe or Doubt. => AnchorChoice "Believe or Doubt"; readings 1
 + <card=Battle of Hoover Dam> <anchor=NCR> <anchor=Legion> As this enchantment enters, choose NCR or Legion. => AnchorChoice "NCR or Legion"; readings 1
-# A word is an Anchor Word only where its face's text offers it: with the word in no scope it is unknown, and on a card that does not offer it (Frontier Siege's line, read as if on Cult of Skaro) its label is a Flavor Word heading a mode [CR#207.2d]
+# The offer reads whatever two words stand there, and stands only where its face uses one of them: alone, with no word stated, nothing discharges it. A use of either word discharges the choice of the two (`<anchor=Dragons>` states that the face introduces and uses *Dragons*). On a card that does not offer the word (Frontier Siege's line, read as if on Cult of Skaro) its label is a Flavor Word heading a mode [CR#207.2d]
 * <card=Frontier Siege> As this enchantment enters, choose Khans or Dragons.
-* <card=Frontier Siege> <anchor=Dragons> As this enchantment enters, choose Khans or Dragons.
++ <card=Frontier Siege> <anchor=Dragons> As this enchantment enters, choose Khans or Dragons. => AnchorChoice "Khans or Dragons"; readings 1
 + <card=Cult of Skaro> • Khans — At the beginning of each of your main phases, add {G}{G}. => Mode "• Khans — At the beginning of each of your main phases, add {G}{G}."; readings 1
-# A choice between two land types offers no Anchor Words [CR#607.2d]
+# A choice between two land types offers no Anchor Words [CR#607.2d]: Roots of Life heads no ability with either
 + <card=Roots of Life> As this enchantment enters, choose Island or Swamp. => Mention "Island or Swamp" as Object of choose; !AnchorChoice "Island or Swamp"; readings 1

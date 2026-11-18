@@ -16,10 +16,8 @@
 use std::collections::BTreeSet;
 use std::io::BufRead;
 
-use rayon::prelude::*;
 use sylex_lexicon::CardScope;
 use sylex_lexicon::Lexicon;
-use sylex_syntax::CompiledGrammar;
 use sylex_upstream::oracle_text::strip_reminder_text;
 use sylex_upstream::scryfall::OracleCard;
 use sylex_upstream::scryfall::OracleCardReader;
@@ -40,15 +38,13 @@ pub struct Face {
 }
 
 impl Face {
-    /// The Card Scope the face's text is read in: its own name in its Full
-    /// form and, for a legendary permanent whose name has one, in its
-    /// Shortened form [CR#201.5c], derived from the face's name and type
-    /// line as its text is parsed (`sylex_vocabulary::face_scope`); its
-    /// Anchor Words [CR#614.12c], read from its rules text across its lines
-    /// ([`crate::anchors::anchor_words`]); and its Vote Options
-    /// [CR#701.38b], read from that text likewise
-    /// ([`crate::options::vote_options`]). Nothing else of the card is in
-    /// it.
+    /// The face's card names, which every unit of it is read with in its
+    /// Card Scope: its own name in its Full form and, for a legendary
+    /// permanent whose name has one, in its Shortened form [CR#201.5c],
+    /// derived from the face's name and type line as its text is parsed
+    /// (`sylex_vocabulary::face_scope`). Nothing else of the card is in it;
+    /// the words its rules text introduces join a line's scope as the lines
+    /// are read ([`crate::face::read_lines`]).
     ///
     /// Each face of a double-faced card has its own name [CR#712.6], and two
     /// faces that shorten to one spelling (*Ral*) name one object, not two,
@@ -60,21 +56,6 @@ impl Face {
     /// On a face with no type line, or one whose type line has a word that
     /// is neither a supertype nor a card type before its dash.
     #[must_use]
-    pub fn scope(&self, lexicon: &Lexicon, grammar: &CompiledGrammar) -> CardScope {
-        let mut scope = self.name_scope(lexicon);
-        // A face with no rules text has no Anchor Words or Vote Options.
-        if let Some(text) = &self.oracle_text {
-            read_scope(&split_lines(text), &mut scope, lexicon, grammar);
-        }
-        scope
-    }
-
-    /// The face's card names alone ([`Face::scope`]): what its text is
-    /// analyzed with where no grammar reads it.
-    ///
-    /// # Panics
-    /// As [`Face::scope`].
-    #[must_use]
     pub fn name_scope(&self, lexicon: &Lexicon) -> CardScope {
         let type_line = self
             .type_line
@@ -82,6 +63,15 @@ impl Face {
             .unwrap_or_else(|| panic!("face {} has no type line", self.name));
         sylex_vocabulary::face_scope(&self.name, type_line, lexicon)
             .unwrap_or_else(|error| panic!("{error}"))
+    }
+
+    /// The face's rules-text lines ([`split_lines`]); none for a face with
+    /// no rules text.
+    #[must_use]
+    pub fn lines(&self) -> Vec<String> {
+        self.oracle_text
+            .as_deref()
+            .map_or_else(Vec::new, split_lines)
     }
 
     /// The face's units as (kind, index, text): its trimmed type line, then
@@ -97,24 +87,6 @@ impl Face {
             .flat_map(|text| split_lines(text).into_iter().enumerate())
             .map(|(line, text)| (UnitKind::Line, line, text));
         type_line.chain(lines)
-    }
-}
-
-/// Adds to `scope`, the card names of a face, what its rules-text lines
-/// `lines` put in its Card Scope: its Anchor Words
-/// ([`crate::anchors::anchor_words`]), then its Vote Options
-/// ([`crate::options::vote_options`]).
-pub fn read_scope(
-    lines: &[String],
-    scope: &mut CardScope,
-    lexicon: &Lexicon,
-    grammar: &CompiledGrammar,
-) {
-    for word in crate::anchors::anchor_words(lines, scope, lexicon, grammar) {
-        scope.insert_anchor_word(&word);
-    }
-    for word in crate::options::vote_options(lines, scope, lexicon, grammar) {
-        scope.insert_vote_option(&word);
     }
 }
 
@@ -314,18 +286,31 @@ impl Corpus {
         Ok(builder.finish())
     }
 
-    /// The Card Scope of each face ([`Face::scope`]), by its index in
-    /// [`Corpus::faces`]: a face's scope is read once, from all its lines,
-    /// for every unit of it.
+    /// The units of each face, by its index in [`Corpus::faces`]: a range of
+    /// [`Corpus::units`], its type line first and then its lines in order.
     ///
     /// # Panics
-    /// As [`Face::scope`].
+    /// On units that are not grouped by face, in face order.
     #[must_use]
-    pub fn scopes(&self, lexicon: &Lexicon, grammar: &CompiledGrammar) -> Vec<CardScope> {
-        self.faces
-            .par_iter()
-            .map(|face| face.scope(lexicon, grammar))
-            .collect()
+    pub fn face_units(&self) -> Vec<std::ops::Range<usize>> {
+        let mut start = 0;
+        let ranges = (0..self.faces.len())
+            .map(|face| {
+                let units = self.units[start..]
+                    .iter()
+                    .take_while(|unit| unit.face == face)
+                    .count();
+                let range = start..start + units;
+                start = range.end;
+                range
+            })
+            .collect();
+        assert_eq!(
+            start,
+            self.units.len(),
+            "units are grouped by face, in order"
+        );
+        ranges
     }
 
     /// Adds a face and its units.

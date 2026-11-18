@@ -248,15 +248,24 @@ fn alternatives_distributions_agree_with_enumerated_derivations_on_real_units() 
     let cleaves = sylex_english::census::cleave_texts(&corpus, &env.lexicon);
     let mut most = 0;
     let (mut truncated, mut wrapped) = (false, false);
-    for (unit, cleave) in corpus.units.iter().zip(&cleaves) {
+    let parses = corpus
+        .face_units()
+        .into_iter()
+        .enumerate()
+        .flat_map(|(face, range)| {
+            sylex_english::face::read_units(
+                &corpus.faces[face],
+                &corpus.units[range.clone()],
+                &cleaves[range],
+                &env.lexicon,
+                &grammar,
+            )
+        });
+    for ((unit, cleave), parse) in corpus.units.iter().zip(&cleaves).zip(parses) {
         let face = &corpus.faces[unit.face];
         let text = cleave
             .as_ref()
             .map_or(unit.text.as_str(), |c| c.uncleaved.as_str());
-        let analyzed =
-            env.lexicon
-                .analyze_source_scoped(text, None, &face.scope(&env.lexicon, &grammar));
-        let parse = grammar.parse_analyzed(&analyzed);
         let counts = parse.counts().unwrap();
         most = most.max(counts.total());
         let mut memo = BTreeMap::new();

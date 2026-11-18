@@ -450,8 +450,9 @@ impl Judgment {
     /// [CR#614.12c]; and each Vote Option it states with `<vote=WORD>`
     /// [CR#701.38b]. The name, the flag and the words are inputs like the
     /// text: no card is looked up, the name need be no printed card's, and
-    /// no other text confirms the words as a face's units do
-    /// ([`crate::corpus::Face::scope`]).
+    /// a stated word is one the rest of the face introduces and uses, as a
+    /// face's other lines do when they are read together
+    /// ([`crate::face::read_lines`]).
     #[must_use]
     pub fn scope(&self, lexicon: &Lexicon) -> CardScope {
         let mut scope = match &self.card {
