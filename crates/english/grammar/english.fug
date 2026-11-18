@@ -108,6 +108,12 @@ feature ObliqueDetermination = Bare | Mixed | Overt
 // whenever any conjunct does, so no nominal postmodifier scopes over one
 // (15§1.3.4:1286).
 feature Postmodification = Closed
+// Privative and local: a Noun Phrase with a dependent outside its own
+// determiner, a predeterminer, a multiplier or a focusing or multiplying
+// adverb (*all three cards*, *half the creature*, *three times this
+// creature*, *only this creature*). Being local it is the outermost such
+// phrase's alone. HeadFinalPossessor excludes it.
+feature Periphery = External { local }
 // The DeterminativeDistribution of a determinative's Complement's
 // Noun Phrase (*all but [the highest roll]*).
 feature ObliqueDistribution =
@@ -308,7 +314,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 // toughness 4/4*). NounDistribution is the head noun's, a coordination's
 // its last conjunct's (NominalPredicative).
 category NounPhrase [
-    Number, Person, Case, Determination, NounKind, Countability,
+    Periphery, Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution, Postmodification,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
@@ -351,19 +357,13 @@ category PrepositionalNominal : Nominal [Number, Countability, NounDistribution]
 category TargetedOblique : PrepositionPhrase [Number, NounKind]
 category TargetedNounPhrase : NounPhrase [Number, NounKind, Countability]
 category BareNominalComplement : Nominal
-// A genitive's possessor, never postmodified: Oracle fronts the player noun
-// "to avoid a dangling possessive" (OSG §6, Controller and owner). An
-// admission gate (english.md §6): it restates the Noun Phrase Productions over
-// BareNominal, which keeps *[the top card of target player]'s library* from
-// a possessor (Merfolk Observer).
-category Possessor : NounPhrase [Number, Person, Case]
-// One genitive over coordinated nominals (*target artifact or creature's
-// owner*).
-category PossessorNominals : Nominal [Number, Countability, NounKind]
 // A genitive on each coordinated nominal (*that creature's or spell's
 // controller*), and each genitive.
 category GenitiveNominal : Nominal [Number, Countability, NounKind]
 category GenitiveNominals : Nominal [Number, Countability, NounKind]
+// A genitive's possessor: a Noun Phrase with the Number and Person the
+// genitive keeps (HeadFinalPossessor, TransparentPossessor).
+category Possessor : NounPhrase [Number, Person, Case]
 category NumericalDeterminer : DeterminerPhrase [Number, Countability]
 // An ordinal's position from an end (*third from the top*): where a card is
 // put, never a nominal's modifier.
@@ -1538,14 +1538,16 @@ BoundingNounPhrase: NounPhrase -> modifier:AdverbPhrase determiner:DeterminerPhr
           $.Case = Plain,
           $.Person = Third
 AdverbModifiedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
-    where modifier.AdjunctPosition = Phrasal
+    where modifier.AdjunctPosition = Phrasal,
+          $.Periphery = External
 // *Twice its power*. A head determined by a number or degree determinative
 // is excluded: *twice X damage* (Stonesplitter Bolt) is MultipliedNumber's
 // *[twice X] damage*, and *twice that many cards* (Bruvac the Grandiloquent)
 // MultipliedDegree's *[twice that many] cards*.
 AdverbMultipliedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Multiplying,
-          head.DeterminativeDistribution != Numerical | Degree
+          head.DeterminativeDistribution != Numerical | Degree,
+          $.Periphery = External
 // *Both* floated after a plural Object (*put two cards from your hand both
 // on top of your library or both on the bottom of your library*, Dream
 // Cache), where the second *both* is the second Cluster's own Object. A
@@ -1576,7 +1578,8 @@ PredeterminerCount: NounPhrase -> determiner:Class(Predeterminer) NounPhrase
     where head.Determination = Overt,
           head.Number = Plural,
           determiner.Number = head.Number,
-          determiner.Countability = head.Countability
+          determiner.Countability = head.Countability,
+          $.Periphery = External
 // *All* before a fused cardinal (*if you've done all four*; CGEL 5§12:434).
 AllFusedCardinal: NounPhrase -> determiner:Word(All) ChoiceQuantity
     where head.Number = Plural,
@@ -2129,7 +2132,8 @@ MultipliedNounPhrase: NounPhrase -> factor:Numeral(Cardinal) multiplier:BareNomi
     where multiplier.NounDistribution = Serial,
           multiplier.Number = Plural,
           head.DeterminativeDistribution != Numerical | Degree,
-          head.Determination = Overt
+          head.Determination = Overt,
+          $.Periphery = External
 MultipliedAmount: Amount -> factor:Numeral(Cardinal) multiplier:BareNominal Amount
     where multiplier.NounDistribution = Serial,
           multiplier.Number = Plural
@@ -2173,7 +2177,8 @@ MultiplierPredetermination: NounPhrase -> determiner:DeterminerPhrase NounPhrase
     where determiner.DeterminativeDistribution = Multiplier,
           determiner.TargetMarked != Marked,
           head.DeterminativeDistribution != Numerical | Degree,
-          head.Determination = Overt
+          head.Determination = Overt,
+          $.Periphery = External
 AdverbAdverbial: Adverbial -> AdverbPhrase where head.AdjunctPosition = End
 FrequencyAdverbial: Adverbial -> TemporalNounPhrase
 // *Choose the same mode more than once*: the standard is a bounding
@@ -2961,6 +2966,31 @@ PossessiveDeterminer: DeterminerPhrase -> Lex(Pronoun) { unshared: [Number] }
           head.Case := Genitive,
           head.Inflection = Invariant,
           head.PronounKind != Relative
+// A possessor ends in its head noun, where the genitive marker stands
+// (`head_final`): an admission gate (english.md §6) that keeps *[the top card
+// of target player]'s library* from a possessor (Merfolk Observer); Oracle
+// fronts the player noun "to avoid a dangling possessive" (OSG §6, Controller
+// and owner). One genitive stands over coordinated nominals (*target artifact
+// or creature's owner*), not over coordinated Noun Phrases (`uncoordinated`):
+// an admission gate that keeps *[that player or that planeswalker]'s
+// controller* off Blightning and *[the player's life total ..., the
+// planeswalker's loyalty ..., or the creature]'s toughness* off Drain Life.
+// Nor is a possessor a Noun Phrase with a dependent outside its determiner
+// (`Periphery`): an admission gate that keeps *[half the creature]'s power*
+// off Catacomb Dragon and *[Only this creature]'s owner* off Personal
+// Incarnation, where the dependent stands outside the genitive's Noun Phrase.
+HeadFinalPossessor: Possessor -> NounPhrase { head_final: [head], uncoordinated: [head] }
+    where head.Periphery != External
+// A number-transparent quantity's genitive marks its oblique, whose Number
+// the quantity has (*any number of target players' graveyards*, Thraben
+// Charm; TransparentQuantity). A plural Noun Phrase headed by *number* is
+// such a quantity: the noun itself is singular. The oblique ends in its head
+// in turn (`complement_final`), which keeps *[any number of target artifact
+// cards from target player]'s graveyard* from a possessor (Drafna's
+// Restoration).
+TransparentPossessor: Possessor -> NounPhrase { complement_final: [head] }
+    where head.NounDistribution := Quantity,
+          head.Number := Plural
 // The possessor is plain, the genitive Noun Phrase genitive: Case is
 // unshared.
 GenitivePossessor: NounPhrase -> Possessor marker:Word(Genitive) { unshared: [Case] }
@@ -3066,16 +3096,6 @@ CoordinationPremodifier: Nominal -> modifier:AdjectivePhrase Nominal
           modifier.AdjectivePosition != Predicative,
           head.Number = Plural,
           head.ConjunctNumber := Singular
-DeterminedPossessor: Possessor -> determiner:DeterminerPhrase BareNominal
-    where $.Case = Plain,
-          $.Person = Third,
-          determiner.Countability = head.Countability,
-          determiner.Number = head.Number
-CoordinatedPossessor: Possessor -> determiner:DeterminerPhrase PossessorNominals
-    where $.Case = Plain,
-          $.Person = Third,
-          determiner.Countability = head.Countability,
-          determiner.Number = head.Number
 GenitiveConjunct: GenitiveNominal -> BareNominal marker:Word(Genitive)
 MultipleGenitive: NounPhrase -> determiner:DeterminerPhrase GenitiveNominals
     where $.Determination = Bare,
@@ -3083,22 +3103,6 @@ MultipleGenitive: NounPhrase -> determiner:DeterminerPhrase GenitiveNominals
           $.Person = Third,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
-GenitiveDeterminedPossessor: Possessor -> determiner:NounPhrase BareNominal
-    where determiner.Case := Genitive,
-          $.Case = Plain,
-          $.Person = Third
-// *up to one target player's life total*.
-MaximumPossessor: Possessor -> determiner:Selected(PrepositionPhrase, Up) BareNominal
-    where determiner.Determination = Bare,
-          determiner.Number = head.Number,
-          head.Countability = Count,
-          $.Case = Plain,
-          $.Person = Third
-PluralPossessor: Possessor -> BareNominal
-    where $.Case = Plain,
-          head.Number = Plural,
-          $.Person = Third
-ProperPossessor: Possessor -> Name where $.Case = Plain, $.Person = Third
 // A postmodifier agrees with each conjunct of an *and*-coordinated nominal
 // (*each creature and planeswalker that is tapped*).
 NominalPostmodifier: Nominal -> Nominal modifier:Postmodifier
@@ -3921,11 +3925,6 @@ coordination GenitiveNominals {
     coordinators: Coordinator,
     proximate: [Number, Countability, NounKind],
     conjunct: GenitiveNominal,
-}
-coordination PossessorNominals {
-    coordinators: Coordinator,
-    proximate: [Number, Countability, NounKind],
-    conjunct: BareNominal,
 }
 // Marked or bare relative clauses (*tokens that are copies of it and that are
 // tapped and attacking*, *permanent you own and an opponent controls*, *any
