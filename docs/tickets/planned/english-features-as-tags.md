@@ -10,7 +10,7 @@ different categories:
 
 - `Determination` means "has a determiner" (`Bare | Mixed | Overt`) on `NounPhrase` and
   `PrepositionPhrase`, and "needs an overt determiner" on `Nominal`, `BareNominal`,
-  `QuantifiedNominal`, `ModifiedQuantifiedNominal`, `RelativeTemporalNominal` and `AdjectivePhrase`
+  `QuantifiedNominal`, `ModifiedQuantifiedNominal` and `AdjectivePhrase`
   (propagating `Mixed` across categories that have no determination resolution).
 - `ComplementKind` serves as the Slot Kind of a head's selected Complement, as the filler tag in
   unlike-coordination categories (`Depictive`, `PredicateAdjunct`, `Attributes`, `ObjectConjunct`,
@@ -23,7 +23,7 @@ different categories:
 ## Design
 
 - Split a privative `feature DeterminerNeed = Required` on `Nominal`, `BareNominal`,
-  `QuantifiedNominal`, `ModifiedQuantifiedNominal`, `RelativeTemporalNominal` and `AdjectivePhrase`
+  `QuantifiedNominal`, `ModifiedQuantifiedNominal` and `AdjectivePhrase`
   (including `adjectives.ron` / `crates/vocabulary/src/build.rs`) from `Determination` (`Bare |
   Mixed | Overt` on `NounPhrase` and `PrepositionPhrase`).
 - Split `ConjunctKind` for unlike-coordination filler categories from `ComplementKind`, and replace

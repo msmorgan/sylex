@@ -9,9 +9,6 @@ Several comments in `crates/english/grammar/english.fug` state restrictions thei
 implement, or state a corpus or style observation as a fact of English (`docs/design/english.md`
 §6):
 
-- `category RelativeTemporalNominal`: "a *when*-less adverbial relative, then at most a
-  temporal bound, and no other postmodifier", while `RelativeTime` and `RelativeTimePostmodifier`
-  take `Nominal`, enforce no `ClauseMarking` requirement and allow recursion.
 - `FusedPostmodifier`: "Only a marked relative follows a fused head", while
   `FusedParticipialPostmodifier`, right after it, adds a participial postmodifier to the same
   Category.
@@ -20,7 +17,7 @@ implement, or state a corpus or style observation as a fact of English (`docs/de
 - `TemporalLocation`: "never an article, genitive or postmodifier (CGEL Ch. 8 §6.3, p. 698)",
   while the equation also excludes `Numerical` and `Dependent` determiners.
 - `AsyndeticAttributes`, `AttributeSequence`, `FinalAttribute`: grounded in the style guide alone.
-- `FloatedAll` (and its twin `RelativeFloatedAll`): *all* floats "after a personal pronoun
+- `FloatedAll`: *all* floats "after a personal pronoun
   Subject only", whereas CGEL p. 413 lists *all*, *both* and *each* together with full Noun Phrase
   Subjects.
 - `FusedDegreeDeterminer`: "Count only: never *that much*", a register gate behind

@@ -221,6 +221,13 @@ words that stand only there and the one head whose position it is.
 `KindLicense` marks each counter's kind name, each keyword a keyword counter
 can be, and the noun *counter* (english.md §3).
 
+**Local Feature**:
+A grammar feature that is a fact of the phrase's own Production: no mother
+shares it with its head implicitly and no coordination's conjuncts share it,
+so it marks the phrases some Productions of a Category build and nothing
+built over them. `ClauseShape` marks a Clause that is its Subject and its
+Verb Phrase and no more (english.md §6).
+
 **Lexical Environment**:
 The declared vocabulary and frames available for analyzing an expression.
 

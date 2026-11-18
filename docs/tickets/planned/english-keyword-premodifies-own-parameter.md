@@ -5,7 +5,7 @@ needs: [english-category-restriction, english-features-as-tags]
 
 ## Why
 
-`KeywordPremodifier` takes a bare keyword before any `BareNominal`, and a number or mana symbol
+A bare keyword is a `Premodifier` before any `BareNominal`, and a number or mana symbol
 can head one (`NumeralNominal`, `SymbolNominal`). So *a 1/1 red and green Dragon creature token
 with flying and devour 2* (*Dragon Broodmother*) has, beside the correct *[devour 2]*, a Reading
 with the keyword *devour* as premodifier of the nominal *2*. The same holds for *crew 2*,
@@ -21,10 +21,9 @@ Two grammatical premodifier Readings stand beside the intended Reading and stay 
 
 ## Design
 
-- Require `head.DeterminerNeed != Required` on `BareNominal` premodification (`KeywordPremodifier`,
-  `QuotedKeywordPremodifier`, shared `Premodifier`, and participle `BareNominal` attachment,
-  extending `premodification` in `sylex_syntax` to support host equations or authoring the
-  attachment Production in `english.fug`), so determiner-demanding `NumeralNominal` and
+- Require `head.DeterminerNeed != Required` of a keyword or participle `Premodifier` on the one
+  `BareNominal` premodification Production (`Premodifier`, a joint exclusion over the kind
+  `ParticipialPremodifier` and `KeywordPremodifier` give the `Premodifier` Category), so determiner-demanding `NumeralNominal` and
   `SymbolNominal` (`2`, `{1}`) are never premodified by a keyword or participle while preserving
   adjectival premodification (*a natural 20*, *an additional {G}*).
 
@@ -40,6 +39,7 @@ Two grammatical premodifier Readings stand beside the intended Reading and stay 
 
 ## Pointers
 
-- `crates/english/grammar/english.fug`: `KeywordPremodifier`, `QuotedKeywordPremodifier`,
-  `premodification Participle`, `NumeralNominal`, `SymbolNominal`.
+- `crates/english/grammar/english.fug`: `category Premodifier`, `Premodifier`,
+  `KeywordPremodifier`, `ParticipialPremodifier`, `premodification Participle`, `NumeralNominal`,
+  `SymbolNominal`.
 - `crates/syntax/src/fug.rs`, `crates/syntax/src/grammar.rs`, `crates/syntax/src/compile.rs`.

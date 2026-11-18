@@ -175,12 +175,13 @@ feature Ellipsis = Code
 // keeps *each turn, those coins come up heads* from an adverbial relative of
 // *The first time you flip one or more coins* (Edgar, King of Figaro).
 feature ClauseShape = SubjectInitial { local }
-// Privative and local: a Nominal bounded by a relative clause, then by
-// temporal Noun Phrases only (*next time you cast a spell this turn*), and
-// the relative clause as its Postmodifier. RelativePostmodifier values it,
-// NominalPostmodifier takes it from the Postmodifier and TemporalPostmodifier
-// keeps its head's; being local it is on no Nominal with another postmodifier
-// or a premodifier outside the relative, and on no coordination.
+// Privative and local: a Nominal whose last postmodifier is a relative
+// clause, or temporal Noun Phrases after one (*next time you cast a spell
+// this turn*), and the relative clause as its Postmodifier.
+// RelativePostmodifier values it, NominalPostmodifier takes it from the
+// Postmodifier and TemporalPostmodifier keeps its head's; being local it is
+// on no Nominal with any other postmodifier after the relative or a
+// premodifier outside it, and on no coordination.
 // RelativeTemporalLocation carries it, an admission gate (english.md §6): without
 // the relative, every determined temporal nominal is a temporal Adjunct too
 // (*End [the turn]*, Time Stop).

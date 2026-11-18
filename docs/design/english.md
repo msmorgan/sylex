@@ -253,8 +253,13 @@ Packed Forest, without building trees.
 
 An admission gate is an `Exclude`, `Require` or `Carry` equation, a schema
 flag that refuses a structure (as the Preposition Phrase valence's
-`closed_complement` does), or a Category that restates some Productions in
-order to omit others.
+`closed_complement` does), or a gate a Production puts on a child (as
+`head_final` is on a genitive's possessor).
+No Category restates another's Productions in order to omit some. A phrase
+that only some Productions of a Category build is that Category with a
+feature those Productions value, local where no phrase built over one keeps
+it (`ClauseShape`, by which a bare relative takes a Clause that opens with its
+Subject), and the gate is the equation that reads the feature.
 An equation on the mother that only values a feature is not a gate. A gate
 earns its place by what it prevents on real card text: spurious Readings and
 forest growth. That effect is measured by ablation, removing the gate and
