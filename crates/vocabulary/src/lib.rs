@@ -894,15 +894,7 @@ impl Sources {
                 ));
                 return vec![parts, verbal];
             }
-            // Preserve the fixed set-off forms' existing line behavior.
-            let kind = match parameters.last() {
-                Some(KeywordParameter::DashCost) => Some("SetOffCost"),
-                Some(KeywordParameter::DashAbility) => Some("SetOffAbility"),
-                _ => None,
-            };
-            if let Some(kind) = kind {
-                parts.push(ParameterPart::Feature("FinalParameter".into(), kind.into()));
-            }
+            parts.extend(final_set_off(parameters.last()));
             vec![parts]
         };
         let patterns = |parameters: &[Vec<KeywordParameter>]| -> Vec<Vec<ParameterPart>> {
@@ -1099,6 +1091,39 @@ impl<'a> SharedVerbs<'a> {
             }
         }
         Ok(())
+    }
+}
+
+/// The parts that close a keyword's parameter pattern after a final em-dash
+/// parameter that is no Cost. A final em-dash Condition is a sentence, ending
+/// in its own period as a verbal Cost does (*Companion — … .*); a final
+/// em-dash Ability runs to the end of the line. A final em-dash mana cost
+/// ends in no period (*suspend 4—{1}{U}*).
+fn final_set_off(
+    last: Option<&schema::KeywordParameter>,
+) -> Vec<sylex_syntax::frames::ParameterPart> {
+    use schema::KeywordParameter;
+    use sylex_syntax::frames::ParameterPart;
+    let feature = |value: &str| ParameterPart::Feature("FinalParameter".into(), value.into());
+    match last {
+        Some(KeywordParameter::DashCondition) => {
+            vec![
+                ParameterPart::Mark('.', Binding::Suffix),
+                feature("SetOffCost"),
+            ]
+        }
+        Some(KeywordParameter::DashAbility) => vec![feature("SetOffAbility")],
+        Some(
+            KeywordParameter::Amount
+            | KeywordParameter::Cost
+            | KeywordParameter::DashCost
+            | KeywordParameter::Quality(_)
+            | KeywordParameter::QualityBefore
+            | KeywordParameter::Name(_)
+            | KeywordParameter::DashPowerToughness
+            | KeywordParameter::DashKeyword,
+        )
+        | None => Vec::new(),
     }
 }
 

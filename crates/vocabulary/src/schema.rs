@@ -748,10 +748,11 @@ pub enum KeywordParameter {
     /// life.*). A final Cost lowers to one Production per spelling, carrying
     /// `FinalParameter: Cost` or `FinalParameter: SetOffCost`.
     Cost,
-    /// A mana cost after an em dash: *suspend 4—{1}{U}*. When final, it
-    /// carries `FinalParameter: SetOffCost`.
+    /// A mana cost after an em dash: *suspend 4—{1}{U}*. It ends in no
+    /// period of its own, so it carries no `FinalParameter`.
     DashCost,
-    /// A condition after an em dash: *companion—…*.
+    /// A condition after an em dash, a sentence ending in its own period:
+    /// *companion — … .* When final, it carries `FinalParameter: SetOffCost`.
     DashCondition,
     /// A Keyword Quality, after the preposition named, if any:
     /// *protection from red*, *enchant creature*.
