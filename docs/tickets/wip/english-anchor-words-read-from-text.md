@@ -36,17 +36,23 @@ holds the label.
 - Where `CardScope` holds an Anchor Word, `Lexicon::stands_in` admits the open Anchor Word reading
   and refuses `FlavorWord` on the same spelling; elsewhere `FlavorWord` stands and the Anchor Word
   is refused.
-- Confirmation across units is paired in a shared `sylex_english` face-scope helper (called by
-  `census`, `forests`, `english parse --card` and `english forestwalk --card`): candidate words
-  `{A, B}` from an entry-choice unit (`As … enters, choose A or B.`) are committed only when
-  bulleted units on the face begin with `• A — ` and `• B — ` [CR#614.12c]; otherwise the choice
-  unit parses without anchor candidates (*Roots of Life* keeps its single `WordMention` Reading,
-  and *Believe* needs no card-name refusal).
-- `english.fug` licenses `choose A or B` through a dedicated binary `or`-coordination complement of
-  `choose` whose arms are both read Anchor Words rather than general `NounPhrase`s (1 Derivation on
-  the five `choose Khans or Dragons` Sieges).
-- Standalone judgment entries and `english parse` state anchor context with `<anchor=Khans>` /
-  `--anchor Khans` beside `<card=NAME>`.
+- Confirmation across units is one shared helper, `sylex_english::anchors::anchor_words` (behind
+  `Face::scope`, which `census` and `forests` call, and behind `english parse --card` and
+  `english forestwalk --card`). The candidates are the labels of the face's bulleted lines
+  (`• A — `). The face's lines are parsed with every candidate in scope, and a candidate is
+  committed only when an Anchor Choice in some Derivation of a line offers it [CR#614.12c]: the
+  offer is found by the parse, never by matching `As … enters, choose A or B.` as a string.
+  Without bulleted labels there are no candidates (*Roots of Life* keeps its single
+  `WordMention` Reading, and *Believe* needs no card-name refusal).
+- Each unit is then parsed, and its Readings admitted, with the one `CardScope`, so the parse and
+  admission agree on a unit by construction (round-trip law 2). The Introduced Name's one-pass
+  design (`english-names-read-from-text`) does not carry over: its two sets are compared inside
+  one unit's Reading, and an Anchor Word's evidence lies in other units.
+- `english.fug` licenses `choose A or B` through `AnchorChoice`, a dedicated binary
+  `or`-coordination whose arms are both Anchor Word leaves, standing as the `Mention` that
+  `choose` already takes (1 Derivation on the five `choose Khans or Dragons` Sieges).
+- Standalone judgment entries, `english parse` and `english forestwalk` state anchor context with
+  `<anchor=Khans>` / `--anchor Khans`, once per word, with or without `<card=NAME>`.
 - `anchor_words.ron`, `schema::AnchorWord`, and the `anchor_name:` and `anchor_word:` loader paths
   are deleted.
 
@@ -83,10 +89,11 @@ holds the label.
 
 - `crates/vocabulary/catalogs/anchor_words.ron`, `crates/vocabulary/src/lib.rs`,
   `crates/vocabulary/src/schema.rs`.
-- `crates/lexicon/src/analysis.rs` (`ItalicHead`, `stands_in`, `flavor_word_matches`),
-  `crates/lexicon/src/scope.rs` (`CardScope`).
-- `crates/english/grammar/english.fug` (`AnchorWord`, `AnchoredAbility`, `FlavorLabeledAbility`,
-  `ModeBullet`), `crates/english/src/census.rs` (`run`),
+- `crates/lexicon/src/analysis.rs` (`ItalicHead`, `stands_in`, `flavor_word_matches`,
+  `anchor_word_matches`, `bulleted_label`), `crates/lexicon/src/scope.rs` (`CardScope`).
+- `crates/english/src/anchors.rs`, `crates/english/src/corpus.rs` (`Face::scope`).
+- `crates/english/grammar/english.fug` (`AnchoredAbility`, `AnchorWordChoice`,
+  `FlavorLabeledAbility`, `ModeBullet`), `crates/english/src/census.rs` (`run`),
   `crates/english/src/profile.rs`, `crates/english/src/judgment.rs`,
   `crates/english/judgments/anchored_abilities.txt`.
 - `crates/xtask/src/english.rs`, `crates/xtask/src/english/forests.rs`.
