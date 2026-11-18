@@ -185,6 +185,10 @@ feature ClauseShape = SubjectInitial { local }
 // the relative, every determined temporal nominal is a temporal Adjunct too
 // (*End [the turn]*, Time Stop).
 feature RelativeBound = Bound { local }
+// Privative and local: a Noun Phrase whose comparative or equative
+// determiner's Complement follows its head (*more lands than you*, *as many
+// cards as they discarded*).
+feature Comparison = Compared { local }
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
@@ -316,6 +320,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 category NounPhrase [
     Periphery, Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution, Postmodification,
+    Comparison,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
 // (*three times*; 8§9:713–716).
@@ -1612,34 +1617,20 @@ SerialTemporal: TemporalNounPhrase -> determiner:DeterminerPhrase BareNominal
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// A comparative count of *times*, its *than* Complement after the head
-// (*Activate no more times each turn than the number of snow Swamps you
-// control*; CGEL 8§9:715).
-ComparativeFrequency: TemporalNounPhrase ->
-    determiner:Class(ComparativeQuantifier) Nominal complement:Selected(PrepositionPhrase, Than)
-    where head.NounDistribution = Serial,
-          head.Number = Plural,
-          determiner.Number = head.Number,
-          determiner.Countability = head.Countability,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
+// A comparative or equative count of *times* with its Complement after the
+// head (*more times than ...*; *as many times as you choose*; CGEL
+// 8§9:715): the Noun Phrase ComparativeCountDetermined or
+// EquativeCountDetermined builds, as a frequency Adjunct.
+ComparedFrequency: TemporalNounPhrase -> NounPhrase
+    where head.NounDistribution := Serial,
+          head.Comparison := Compared
+// The same under a determinative modifier (*Activate no more times each turn
+// than the number of snow Swamps you control*, Withering Wisps), which no
+// Noun Phrase Production builds.
 ModifiedComparativeFrequency: TemporalNounPhrase ->
     modifier:Lex(Determinative) determiner:Class(ComparativeQuantifier) Nominal
     complement:Selected(PrepositionPhrase, Than)
     where head.NounDistribution = Serial,
-          head.Number = Plural,
-          determiner.Number = head.Number,
-          determiner.Countability = head.Countability,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-// *As many times as you choose*.
-EquativeFrequency: TemporalNounPhrase ->
-    determiner:DeterminerPhrase Nominal complement:Selected(PrepositionPhrase, As)
-    where determiner.Grade := Equative,
-          complement.ComplementKind = ComparativeClause,
-          head.NounDistribution = Serial,
           head.Number = Plural,
           determiner.Number = head.Number,
           determiner.Countability = head.Countability,
@@ -2034,6 +2025,7 @@ ComparativeCountDetermined: NounPhrase ->
           head.Countability = Count,
           determiner.Number = head.Number,
           determiner.Countability = head.Countability,
+          $.Comparison = Compared,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -2047,13 +2039,12 @@ ComparativeMassDetermined: NounPhrase ->
           $.Case = Plain,
           $.Person = Third
 // The comparative clause after an equative head (*draws as many cards as
-// they discarded this way*, Forget; CGEL 13§2.1:1108). Twin:
-// EquativeFrequency.
+// they discarded this way*, Forget; CGEL 13§2.1:1108).
 EquativeCountDetermined: NounPhrase ->
     determiner:DeterminerPhrase Nominal complement:Selected(PrepositionPhrase, As)
     where determiner.Grade := Equative,
           complement.ComplementKind = ComparativeClause,
-          head.NounDistribution != Serial,
+          $.Comparison = Compared,
           head.Number = Plural,
           head.Countability = Count,
           determiner.Number = head.Number,
