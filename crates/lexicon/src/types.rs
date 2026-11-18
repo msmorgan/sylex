@@ -33,6 +33,8 @@ pub enum Category {
     FlavorWord,
     /// Open name of an expansion, cited before the noun *expansion*.
     SetName,
+    /// Open Anchor Word [CR#614.12c], which the Card Scope holds.
+    AnchorWord,
     Symbol,
 }
 
@@ -159,6 +161,14 @@ pub enum LexicalReading {
     /// ([`crate::Lexicon::analyze`]).
     SetName {
         name: String,
+    },
+    /// An Anchor Word [CR#614.12c]: one of the two words a face's text
+    /// offers as its permanent enters, each heading the bulleted ability
+    /// linked to that choice [CR#607.2m]. No inventory lists it: it is read
+    /// from the face's text, and stands where the Card Scope holds it
+    /// ([`crate::Lexicon::stands_in`]). It is spelled as the word.
+    AnchorWord {
+        word: String,
     },
     Numeral {
         value: i32,

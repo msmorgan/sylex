@@ -34,10 +34,6 @@ pub enum LexicalError {
 pub enum ItalicHead {
     /// The run is spelled by a declared Ability Word [CR#207.2c].
     AbilityWord(LexicalValue),
-    /// A declared Anchor Word spells the run [CR#614.12c]. Printed in roman
-    /// type, it is no Italic Head, but like an Ability Word it is a registered
-    /// label, never a Flavor Word.
-    AnchorWord(LexicalValue),
     /// A declared Keyword Ability spells the run [CR#702.1]. It is neither an
     /// Ability Word nor a Flavor Word.
     Keyword(LexicalValue),
@@ -138,6 +134,7 @@ impl AnalyzedText {
             | LexicalReading::OwnName { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
+            | LexicalReading::AnchorWord { .. }
             | LexicalReading::Numeral { .. } => true,
         };
         self.words()
@@ -404,6 +401,7 @@ impl Lexicon {
             | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
+            | LexicalReading::AnchorWord { .. }
             | LexicalReading::SetName { .. } => {
                 self.realize(reading)?;
                 crate::Edges::non_word(reading).ok_or(LexicalError::UnlicensedValue)
@@ -458,6 +456,14 @@ impl Lexicon {
                     return Err(LexicalError::UnlicensedValue);
                 }
                 Ok(name.clone())
+            }
+            // An Anchor Word is spelled exactly, as the label it heads its
+            // ability with.
+            LexicalReading::AnchorWord { word } => {
+                if !valid_anchor_word(word) {
+                    return Err(LexicalError::UnlicensedValue);
+                }
+                Ok(word.clone())
             }
             // An Introduced Name is spelled exactly, as the title run it is,
             // and is never a card's name.
@@ -539,7 +545,6 @@ impl Lexicon {
         match self.registered_label(run, None) {
             Some(value) => match self.label_kind(&value) {
                 Some("AbilityWord") => ItalicHead::AbilityWord(value),
-                Some("AnchorWord") => ItalicHead::AnchorWord(value),
                 _ => ItalicHead::Keyword(value),
             },
             None => ItalicHead::FlavorWord {
@@ -548,8 +553,8 @@ impl Lexicon {
         }
     }
 
-    /// The `LabelKind` a registered label declares: `AbilityWord` or
-    /// `AnchorWord`; a Keyword Ability declares none.
+    /// The `LabelKind` a registered label declares: `AbilityWord`; a Keyword
+    /// Ability declares none.
     fn label_kind(&self, value: &LexicalValue) -> Option<&str> {
         self.lexemes[&value.lexeme]
             .properties
@@ -559,8 +564,8 @@ impl Lexicon {
     }
 
     /// The registered label that spells all of `label`: a Keyword-category
-    /// Lexeme, which is an Ability Word [CR#207.2c], an Anchor Word
-    /// [CR#614.12c] or a Keyword Ability [CR#702.1]. A declared label kind is
+    /// Lexeme, which is an Ability Word [CR#207.2c] or a Keyword Ability
+    /// [CR#702.1]. A declared label kind is
     /// preferred to a Keyword Ability. A registered label is never also an
     /// open Flavor Word. With a `scope`, a label registers only where it
     /// stands ([`Lexicon::stands_in`]); without one, every label registers.
@@ -627,11 +632,13 @@ impl Lexicon {
     ///   [CR#201.5,201.5c].
     /// - A card name's Lexeme, another card's name, stands everywhere but where
     ///   the scope holds its name, which is the card's own there.
-    /// - A card-scoped Lexeme, an Anchor Word or a vote option, stands only
-    ///   where the scope holds one of its cards.
+    /// - A card-scoped Lexeme, a vote option, stands only where the scope holds
+    ///   one of its cards.
+    /// - An Anchor Word stands only where the scope holds it [CR#614.12c].
     /// - An Introduced Name stands everywhere but where the scope holds its
     ///   spelling as the card's full name.
-    /// - A Flavor Word stands only where no label registered there spells it.
+    /// - A Flavor Word stands only where no label registered there spells it
+    ///   and the scope holds no Anchor Word of its spelling.
     /// - Every other value, a Set Name included, stands everywhere.
     ///
     /// It checks scope alone: whether the lexicon licenses the value is
@@ -647,7 +654,9 @@ impl Lexicon {
             LexicalReading::IntroducedName { name } => !scope.holds(name, crate::NameForm::Full),
             LexicalReading::FlavorWord { label } => {
                 self.registered_label(label, Some(scope)).is_none()
+                    && !scope.holds_anchor_word(label)
             }
+            LexicalReading::AnchorWord { word } => scope.holds_anchor_word(word),
             LexicalReading::Numeral { .. } | LexicalReading::SetName { .. } => true,
         }
     }
@@ -864,45 +873,9 @@ impl Lexicon {
                 (left && right).then_some(found)
             })
             .collect::<Vec<_>>();
-        // The full name written out is the name: its Shortened form is no
-        // name of its own inside it (*Instrument* in *Instrument of the
-        // Bards*).
-        let full_names: Vec<(usize, usize, String)> = matches
-            .iter()
-            .filter_map(|found| match &found.reading {
-                LexicalReading::OwnName {
-                    name,
-                    form: crate::NameForm::Full,
-                } => Some((found.start, found.end, name.clone())),
-                LexicalReading::OwnName {
-                    form: crate::NameForm::Shortened,
-                    ..
-                }
-                | LexicalReading::Word(_)
-                | LexicalReading::IntroducedName { .. }
-                | LexicalReading::Numeral { .. }
-                | LexicalReading::FlavorWord { .. }
-                | LexicalReading::SetName { .. } => None,
-            })
-            .collect();
-        matches.retain(|found| match &found.reading {
-            LexicalReading::OwnName {
-                name,
-                form: crate::NameForm::Shortened,
-            } => !full_names.iter().any(|(start, end, full)| {
-                full == name && *start <= found.start && found.end <= *end
-            }),
-            LexicalReading::OwnName {
-                form: crate::NameForm::Full,
-                ..
-            }
-            | LexicalReading::Word(_)
-            | LexicalReading::IntroducedName { .. }
-            | LexicalReading::Numeral { .. }
-            | LexicalReading::FlavorWord { .. }
-            | LexicalReading::SetName { .. } => true,
-        });
+        drop_shortened_inside_full(&mut matches);
         self.introduced_name_matches(&tokens, scope, &mut matches);
+        anchor_word_matches(&tokens, scope, &mut matches);
         numeral_matches(&tokens, &mut matches);
         flavor_word_matches(&tokens, &mut matches);
         let hosts = matches
@@ -913,6 +886,7 @@ impl Lexicon {
                 | LexicalReading::IntroducedName { .. }
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. }
+                | LexicalReading::AnchorWord { .. }
                 | LexicalReading::Numeral { .. } => false,
             })
             .map(|found| found.start)
@@ -926,6 +900,7 @@ impl Lexicon {
             | LexicalReading::OwnName { .. }
             | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
+            | LexicalReading::AnchorWord { .. }
             | LexicalReading::SetName { .. } => true,
         });
         AnalyzedText {
@@ -936,6 +911,50 @@ impl Lexicon {
             scope: scope.clone(),
         }
     }
+}
+
+/// Drops each Shortened form of an own name written inside that name's
+/// Full form: the full name written out is the name, and its Shortened form
+/// is no name of its own inside it (*Instrument* in *Instrument of the
+/// Bards*).
+fn drop_shortened_inside_full(matches: &mut Vec<LexicalMatch>) {
+    let full_names: Vec<(usize, usize, String)> = matches
+        .iter()
+        .filter_map(|found| match &found.reading {
+            LexicalReading::OwnName {
+                name,
+                form: crate::NameForm::Full,
+            } => Some((found.start, found.end, name.clone())),
+            LexicalReading::OwnName {
+                form: crate::NameForm::Shortened,
+                ..
+            }
+            | LexicalReading::Word(_)
+            | LexicalReading::IntroducedName { .. }
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::AnchorWord { .. }
+            | LexicalReading::SetName { .. } => None,
+        })
+        .collect();
+    matches.retain(|found| match &found.reading {
+        LexicalReading::OwnName {
+            name,
+            form: crate::NameForm::Shortened,
+        } => !full_names
+            .iter()
+            .any(|(start, end, full)| full == name && *start <= found.start && found.end <= *end),
+        LexicalReading::OwnName {
+            form: crate::NameForm::Full,
+            ..
+        }
+        | LexicalReading::Word(_)
+        | LexicalReading::IntroducedName { .. }
+        | LexicalReading::Numeral { .. }
+        | LexicalReading::FlavorWord { .. }
+        | LexicalReading::AnchorWord { .. }
+        | LexicalReading::SetName { .. } => true,
+    });
 }
 
 /// Why a card name's Lexeme is malformed: it is scoped to cards, has a
@@ -1011,6 +1030,49 @@ fn valid_flavor_label(label: &str) -> bool {
         && !label.starts_with('•')
         && !label.chars().any(char::is_control)
         && !label.contains(" —")
+}
+
+/// Whether `word` has the shape of an Anchor Word: a label an ability may
+/// be headed with ([`valid_flavor_label`]), written without edge spaces.
+#[must_use]
+pub fn valid_anchor_word(word: &str) -> bool {
+    valid_flavor_label(word) && word.trim() == word
+}
+
+/// The label a bulleted line opens with (*• Khans — ...*), where it has the
+/// shape of an Anchor Word: what stands between the bullet and the line's
+/// first em dash. A flavor-labeled mode opens the same way [CR#207.2d], so
+/// the label alone is no Anchor Word: a face's text has to offer it too
+/// [CR#614.12c].
+#[must_use]
+pub fn bulleted_label(line: &str) -> Option<&str> {
+    let after = line.strip_prefix("• ")?;
+    let label = &after[..after.find(" —")?];
+    valid_anchor_word(label).then_some(label)
+}
+
+/// Each Anchor Word the scope holds, wherever its spelling is written as
+/// whole words: heading its bulleted ability, and where the text offers it
+/// (*choose Khans or Dragons*).
+fn anchor_word_matches(tokens: &[char], scope: &crate::CardScope, matches: &mut Vec<LexicalMatch>) {
+    for word in scope.anchor_words() {
+        let spelling: Vec<char> = word.chars().collect();
+        for start in 0..tokens.len().saturating_sub(spelling.len() - 1) {
+            let end = start + spelling.len();
+            if tokens[start..].starts_with(&spelling)
+                && edges_match(tokens, start, end, Binding::Free)
+            {
+                matches.push(LexicalMatch {
+                    start,
+                    end,
+                    reading: LexicalReading::AnchorWord {
+                        word: word.to_owned(),
+                    },
+                    case: None,
+                });
+            }
+        }
+    }
 }
 
 fn missing_explicit_spelling(slot: &crate::FormDeclaration) -> Option<&'static str> {

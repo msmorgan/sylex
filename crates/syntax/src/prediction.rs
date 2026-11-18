@@ -147,10 +147,15 @@ impl Prediction {
                 *word |= mask;
             }
         } else {
-            // An own name, an Introduced Name, a numeral or a Flavor Word.
+            // An own name, an Introduced Name, a numeral, a Flavor Word, a Set
+            // Name or an Anchor Word.
             debug_assert!(matches!(
                 leaf.category,
-                Category::Catalog | Category::Numeral | Category::FlavorWord | Category::SetName
+                Category::Catalog
+                    | Category::Numeral
+                    | Category::FlavorWord
+                    | Category::SetName
+                    | Category::AnchorWord
             ));
             self.add_tests(grammar, leaf, None, active);
         }

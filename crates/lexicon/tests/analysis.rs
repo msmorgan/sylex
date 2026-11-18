@@ -1138,38 +1138,52 @@ fn a_registered_label_is_never_also_a_flavor_word() {
     }
 }
 
+/// Citadel Siege: *• Khans — ...*. No Lexeme declares an Anchor Word
+/// [CR#614.12c]: it stands where the Card Scope holds it, and there the
+/// label is never a Flavor Word; elsewhere the label is an open Flavor Word
+/// and no Anchor Word.
 #[test]
-fn an_anchor_word_is_a_registered_label_on_the_cards_that_admit_it() {
-    let mut khans = invariant("anchor_word:Khans", "Khans", Category::Keyword);
-    khans.capitalization = Capitalization::Exact;
-    khans
-        .properties
-        .features
-        .insert("LabelKind".into(), "AnchorWord".into());
-    khans.card_scope = BTreeSet::from([LexemeId::new("name:Citadel Siege")]);
-    let lexicon = Lexicon::new([khans]).unwrap();
-    assert!(matches!(
-        lexicon.analyze_italic_head("Khans"),
-        ItalicHead::AnchorWord(_)
-    ));
+fn an_anchor_word_stands_where_the_scope_holds_it_and_a_flavor_word_elsewhere() {
+    let lexicon = Lexicon::new([noun("anchor/card", "card")]).unwrap();
     let text = "• Khans — At the beginning of combat on your turn, draw a card.";
-    let readings = |scope: &[&str]| {
-        let scope = CardScope::full_names(scope.iter().copied());
-        let analyzed = lexicon.analyze_source_scoped(text, None, &scope);
+    assert_eq!(sylex_lexicon::bulleted_label(text), Some("Khans"));
+    assert_eq!(sylex_lexicon::bulleted_label("Khans — Draw a card."), None);
+    let anchor = LexicalReading::AnchorWord {
+        word: "Khans".into(),
+    };
+    let flavor = LexicalReading::FlavorWord {
+        label: "Khans".into(),
+    };
+    let mut on = CardScope::full_names(["Citadel Siege"]);
+    on.insert_anchor_word("Khans");
+    let off = CardScope::full_names(["Citadel Siege"]);
+    let readings = |scope: &CardScope| {
+        let analyzed = lexicon.analyze_source_scoped(text, None, scope);
         (
-            at(&analyzed, 2, 7)
-                .iter()
-                .any(|reading| matches!(reading, LexicalReading::Word(_))),
-            analyzed
-                .matches
-                .iter()
-                .any(|found| matches!(found.reading, LexicalReading::FlavorWord { .. })),
+            at(&analyzed, 2, 7).contains(&anchor),
+            analyzed.matches.iter().any(|found| found.reading == flavor),
         )
     };
-    // On its own card, the anchor word is the label and never a Flavor Word.
-    assert_eq!(readings(&["Citadel Siege"]), (true, false));
-    // Elsewhere nothing declares the run, so it is an open Flavor Word.
-    assert_eq!(readings(&[]), (false, true));
+    assert_eq!(readings(&on), (true, false));
+    assert_eq!(readings(&off), (false, true));
+    assert!(lexicon.stands_in(&anchor, &on));
+    assert!(!lexicon.stands_in(&flavor, &on));
+    assert!(!lexicon.stands_in(&anchor, &off));
+    assert!(lexicon.stands_in(&flavor, &off));
+    // It is spelled as the word, and found where the text offers it too.
+    assert_eq!(lexicon.realize(&anchor).unwrap(), "Khans");
+    assert!(lexicon.edges(&anchor).is_ok());
+    let offer = "As this enchantment enters, choose Khans or Dragons.";
+    let analyzed = lexicon.analyze_source_scoped(offer, None, &on);
+    assert!(at(&analyzed, 35, 40).contains(&anchor));
+    assert!(analyzed.unknown_words().iter().all(|word| word.start != 35));
+    // Only whole words spell it.
+    let inside = lexicon.analyze_source_scoped("Khanste", None, &on);
+    assert!(inside.matches.iter().all(|found| found.reading != anchor));
+    for word in ["", " Khans", "Khans —", "{G}"] {
+        let reading = LexicalReading::AnchorWord { word: word.into() };
+        assert!(lexicon.realize(&reading).is_err(), "{word:?}");
+    }
 }
 
 #[test]

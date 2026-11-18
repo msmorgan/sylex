@@ -250,7 +250,8 @@ fn every_homograph_reaches_every_production_accepting_it() {
                     LexicalReading::IntroducedName { .. } => return None,
                     LexicalReading::OwnName { .. }
                     | LexicalReading::FlavorWord { .. }
-                    | LexicalReading::SetName { .. } => {
+                    | LexicalReading::SetName { .. }
+                    | LexicalReading::AnchorWord { .. } => {
                         unreachable!("the text has no name in scope, label or set name")
                     }
                 };

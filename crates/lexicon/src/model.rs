@@ -114,7 +114,7 @@ pub struct Lexeme {
     #[serde(default)]
     pub surface_structure: SurfaceStructure,
     /// The cards whose own text alone admits the Lexeme: the cards that
-    /// print an Anchor Word or a vote option. Empty means the
+    /// print a vote option. Empty means the
     /// Lexeme is admitted everywhere, but for a card name on its own card,
     /// where the name is the card's own ([`crate::LexicalReading::OwnName`]).
     #[serde(default)]

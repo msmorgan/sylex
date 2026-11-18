@@ -2806,7 +2806,8 @@ impl CompiledGrammar {
             | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
-            | LexicalReading::SetName { .. } => sylex_lexicon::Edges::non_word(reading),
+            | LexicalReading::SetName { .. }
+            | LexicalReading::AnchorWord { .. } => sylex_lexicon::Edges::non_word(reading),
         }
     }
 
@@ -2906,6 +2907,17 @@ impl CompiledGrammar {
                 notation: None,
                 lexeme: None,
                 category: LexicalCategory::SetName,
+                features: [None; MAX_FEATURES],
+                forms: 0,
+                other_card_name: false,
+                introduced_name: None,
+            }),
+            LexicalReading::AnchorWord { .. } => Some(LeafFacts {
+                binding: sylex_lexicon::Binding::Free,
+                integer: None,
+                notation: None,
+                lexeme: None,
+                category: LexicalCategory::AnchorWord,
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,
