@@ -139,9 +139,9 @@ feature DeterminerNeed = Required
 // (15§1.3.4:1286).
 feature Postmodification = Closed
 // Privative and local: a Noun Phrase with a dependent outside its own
-// determiner, a predeterminer, a multiplier or a focusing or multiplying
-// adverb (*all three cards*, *half the creature*, *three times this
-// creature*, *only this creature*). Being local it is the outermost such
+// determiner, a predeterminer, a multiplier or a focusing adverb (*all three
+// cards*, *half the creature*, *three times this creature*, *only this
+// creature*). Being local it is the outermost such
 // phrase's alone. HeadFinalPossessor excludes it.
 feature Periphery = External { local }
 // The DeterminativeDistribution of a determinative's Complement's
@@ -1631,9 +1631,9 @@ FusedQuantityCoordination: FusedNounPhrase -> FusedQuantity
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
-// A focusing or multiplying adverb modifies a Noun Phrase (*only one
-// target*, *twice its power*); a bounding one, its quantity (*at least one
-// creature*). A focusing modifier precedes a determined Noun Phrase
+// A focusing adverb modifies a Noun Phrase (*only one target*), as a
+// multiplier does in MultipliedNounPhrase; a bounding one, its quantity (*at
+// least one creature*). A focusing modifier precedes a determined Noun Phrase
 // (*exactly those colors*; CGEL 6§7.3.1:587); numerical determination is
 // AdverbModifiedDeterminerPhrase's, and an equative determinative's bound
 // BoundedEquativeDeterminer's.
@@ -1650,14 +1650,6 @@ BoundingNounPhrase: NounPhrase -> modifier:AdverbPhrase determiner:DeterminerPhr
           $.Person = Third
 AdverbModifiedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
     where modifier.AdjunctPosition = Phrasal,
-          $.Periphery = External
-// *Twice its power*. A head determined by a number or degree determinative
-// is excluded: *twice X damage* (Stonesplitter Bolt) is MultipliedNumber's
-// *[twice X] damage*, and *twice that many cards* (Bruvac the Grandiloquent)
-// MultipliedDegree's *[twice that many] cards*.
-AdverbMultipliedNounPhrase: NounPhrase -> modifier:AdverbPhrase NounPhrase
-    where modifier.AdjunctPosition = Multiplying,
-          head.DeterminativeDistribution != Numerical | Degree,
           $.Periphery = External
 // *Both* floated after a plural Object (*put two cards from your hand both
 // on top of your library or both on the bottom of your library*, Dream
@@ -2183,20 +2175,31 @@ MultipliedNumber: NumericalDeterminer -> multiplier:Multiplier NumericalDetermin
 MultipliedDegree: DeterminerPhrase -> multiplier:Multiplier DeterminerPhrase
     where head.DeterminativeDistribution := Degree,
           head.TargetMarked != Marked
-// *three times this creature's power*. A head determined by a number or
-// degree determinative is excluded: *five times X damage* (Crackle with
-// Power) is MultipliedNumber's *[five times X] damage*, and *three times
-// that many of those tokens* (Ojer Taq, Deepest Foundation) MultipliedDegree's
-// *[three times that many] of those tokens*.
-MultipliedNounPhrase: NounPhrase -> factor:Numeral(Cardinal) multiplier:BareNominal NounPhrase
-    where multiplier.NounDistribution = Serial,
-          multiplier.Number = Plural,
-          head.DeterminativeDistribution != Numerical | Degree,
-          head.Determination = Overt,
+// A multiplier before a Noun Phrase (*twice its power*, *half their life*,
+// *three times this creature's power*). A head determined by a number or
+// degree determinative is excluded: *twice X damage* (Stonesplitter Bolt) is
+// MultipliedNumber's *[twice X] damage*, and *half that many +1/+1 counters*
+// (Ochre Jelly) MultipliedDegree's *[half that many] +1/+1 counters*. The
+// rest are admission gates. Multipliers occur only with definite Noun Phrases
+// (CGEL 5§12:434), and a distributive head is no definite one, which keeps
+// *This ability triggers only [twice [each turn]]* (Nadu, Winged Wisdom) from
+// an Object of *triggers*. An overt, plain head keeps a genitive
+// determiner from the multiplied phrase (*[twice [that card's]] power*,
+// Amplifire), and so does a coordination of differing determination
+// (*twice [the number of white] and/or [blue permanents]*, Chaotic Backlash).
+MultipliedNounPhrase: NounPhrase -> multiplier:Multiplier NounPhrase
+    where head.Determination = Overt,
+          head.Case = Plain,
+          head.DeterminativeDistribution != Numerical | Degree | Distributive,
           $.Periphery = External
-MultipliedAmount: Amount -> factor:Numeral(Cardinal) multiplier:BareNominal Amount
-    where multiplier.NounDistribution = Serial,
-          multiplier.Number = Plural
+// A multiplier before a symbol sequence, a bare quantity of mana (*unless its
+// controller pays twice {X}*, Thassa's Intervention).
+MultipliedSymbols: FusedNounPhrase -> multiplier:Multiplier Symbols
+    where $.NounKind = Resource,
+          $.Determination = Bare,
+          $.Case = Plain,
+          $.Number = Singular,
+          $.Person = Third
 NumericArithmetic: NounPhrase -> Amount modifier:Selected(PrepositionPhrase, Plus, Minus)
     where modifier.ComplementKind = NP,
           modifier.Determination = Overt,
@@ -2226,16 +2229,6 @@ DegreeArithmetic: DeterminerPhrase ->
     where head.ComplementKind = Intransitive,
           head.TargetMarked != Marked,
           modifier.NounKind != Ordinary | Temporal | Manner | Resource
-// *Half their life*, *double that damage*. A head determined by a number or
-// degree determinative is excluded: *half X damage* (Banshee) is
-// MultipliedNumber's *[half X] damage*, and *half that many +1/+1 counters*
-// (Ochre Jelly) MultipliedDegree's *[half that many] +1/+1 counters*.
-MultiplierPredetermination: NounPhrase -> determiner:DeterminerPhrase NounPhrase
-    where determiner.DeterminativeDistribution = Multiplier,
-          determiner.TargetMarked != Marked,
-          head.DeterminativeDistribution != Numerical | Degree,
-          head.Determination = Overt,
-          $.Periphery = External
 AdverbAdverbial: Adverbial -> AdverbPhrase where head.AdjunctPosition = End
 FrequencyAdverbial: Adverbial -> TemporalNounPhrase
 // *Choose the same mode more than once*: the standard is a bounding
