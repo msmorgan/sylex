@@ -20,20 +20,27 @@ time.
 
 ## Design
 
-- Keep `BareInf` in `dependents TimeGiving` (documenting modals, supportive *do*, causative *have*
-  [CGEL, Ch. 14, §5.4, p. 1236; §5.6.2, p. 1244], *rather than* [Ch. 15, §2.8, p. 1317], and cost
-  *plus*), and add `PastPart` (`have + NP + PastPart`) to `dependents TimeGiving` with `Time`.
-- Collapse `PastTime` and `NonPastTime` into a single `feature Time = Past | Mixed | NonPast` with
-  `resolve: [Time -> Mixed]` on coordinations, so non-coordination `TimeGiving` unifies `$.Time`
-  across any number of dependents without pairwise `ExcludeTogether` negations.
+- Keep `BareInf` in `dependents TimeGiving` (documenting modals, supportive *do*, causative *have*,
+  *rather than* and cost *plus*), and add `PastPart` (`have + NP + PastPart`) to
+  `dependents TimeGiving` with `Time`. CGEL places causative *have*'s bare-infinitival and
+  past-participial Complements (Ch. 14, §5.4, p. 1236; §5.6.2, pp. 1244–1245) and the
+  non-coordinative *rather than* with a bare infinitival (Ch. 15, §2.8, p. 1317), but states no
+  time relation for them, nor for *plus*: the shared time of those three is the grammar's own
+  claim, and the comment says so.
+- Collapse `PastTime` and `NonPastTime` into a single `feature Time = Past | Mixed | NonPast`, so
+  non-coordination `TimeGiving` unifies `$.Time` across any number of dependents without pairwise
+  `ExcludeTogether` negations. A coordination is `Mixed` when any two conjuncts differ in time,
+  whatever their order; a schema's `resolve` cannot say that, since every conjunct but the last
+  shares a resolved feature (*that attacked this turn, is tapped, or has flying* would have no
+  Reading), so the feature declares it once for every coordination: `{ mixed: Mixed }`.
 
 ## Done when
 
 - `BareInf` and `PastPart` share time through `dependents TimeGiving` with their comment citing all
   governors, and judgments pin causative *have* (`BareInf` and `PastPart`) and *rather than*.
-- `PastTime` and `NonPastTime` are replaced by `feature Time = Past | Mixed | NonPast` with
-  `resolve: [Time -> Mixed]`, and two time-giving dependents of one head that differ in time have no
-  Reading together whatever the head carries.
+- `PastTime` and `NonPastTime` are replaced by `feature Time = Past | Mixed | NonPast { mixed:
+  Mixed }`, and two time-giving dependents of one head that differ in time have no Reading together
+  whatever the head carries.
 - `cargo xtask english strata --check` passes, and `cargo test` and
   `cargo clippy --tests -- -D warnings` pass for each changed crate.
 
@@ -42,4 +49,4 @@ time.
 - `crates/english/grammar/english.fug` (`feature PastTime`, `feature NonPastTime`,
   `dependents TimeGiving`, `BareInf`, `PastPart`, `PastParticipial`, time-bearing `coordination`
   schemas).
-- `crates/syntax/src/compile.rs` (`dependents`, `resolve`).
+- `crates/syntax/src/compile.rs` (`dependents`, Coordination `resolve`).
