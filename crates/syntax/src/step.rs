@@ -19,7 +19,7 @@ pub(crate) const MAX_CATEGORY_FEATURES: usize = 16;
 /// The most feature variables one Production may unify, so a State is inline.
 pub(crate) const MAX_PRODUCTION_VARS: usize = 24;
 /// The most features a grammar may declare, so a leaf indexes its values.
-pub(crate) const MAX_FEATURES: usize = 48;
+pub(crate) const MAX_FEATURES: usize = 64;
 /// The most conjuncts one coordination Production may mark distinct.
 pub(crate) const MAX_DISTINCT_COORDINATORS: usize = 2;
 /// The most features one coordination Production may resolve.
