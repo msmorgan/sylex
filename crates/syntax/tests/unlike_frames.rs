@@ -65,13 +65,13 @@ const GRAMMAR: &str = r#"
     root Sentence
     feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
     feature Voice = Active | Passive
-    feature ComplementKind = NP | KeywordPhrase | Amount
+    feature ConjunctKind = NP | KeywordPhrase | Amount
     category AmountPhrase
     category KeywordPhrase
     category Nominal
     category NounPhrase
-    category ObjectConjunct [ComplementKind]
-    category ObjectCoordination [ComplementKind]
+    category ObjectConjunct [ConjunctKind]
+    category ObjectCoordination [ConjunctKind]
     category Sentence
     category VerbPhrase [VerbForm, Voice] { gap }
     word And = "c:and"
@@ -84,15 +84,15 @@ const GRAMMAR: &str = r#"
     Numeral: AmountPhrase -> Lex(Numeral)
     Keyword: KeywordPhrase -> Lex(Keyword)
     Bare: NounPhrase -> Nominal
-    NominalConjunct: ObjectConjunct -> NounPhrase where $.ComplementKind = NP
-    KeywordConjunct: ObjectConjunct -> KeywordPhrase where $.ComplementKind = KeywordPhrase
-    AmountConjunct: ObjectConjunct -> AmountPhrase where $.ComplementKind = Amount
+    NominalConjunct: ObjectConjunct -> NounPhrase where $.ConjunctKind = NP
+    KeywordConjunct: ObjectConjunct -> KeywordPhrase where $.ConjunctKind = KeywordPhrase
+    AmountConjunct: ObjectConjunct -> AmountPhrase where $.ConjunctKind = Amount
     coordination ObjectCoordination {
         coordinators: And,
-        unshared: [ComplementKind],
+        unshared: [ConjunctKind],
         serial: true,
         conjunct: ObjectConjunct,
-        unlike: ComplementKind,
+        unlike: ConjunctKind,
     }
     valence VerbPhrase { head: Verb, active: [$.Voice = Active] }
     valence Nominal { head: Noun }
@@ -191,7 +191,7 @@ fn a_conjunct_with_no_value_of_the_unlike_feature_is_of_no_selected_kind() {
     // An Amount conjunct left unvalued: its coordination with a keyword and a
     // Noun Phrase still has unlike conjuncts, but fills no derived slot.
     let unvalued = GRAMMAR.replacen(
-        "AmountConjunct: ObjectConjunct -> AmountPhrase where $.ComplementKind = Amount",
+        "AmountConjunct: ObjectConjunct -> AmountPhrase where $.ConjunctKind = Amount",
         "AmountConjunct: ObjectConjunct -> AmountPhrase",
         1,
     );
@@ -240,15 +240,15 @@ fn a_central_adjunct_shifts_an_unlike_slot() {
     let grammar_src = r#"
         root Sentence
         feature VerbForm = Plain | Finite | GerundParticiple | PastParticiple
-        feature ComplementKind = NP | KeywordPhrase | Amount
+        feature ConjunctKind = NP | KeywordPhrase | Amount
         category AdverbPhrase
         category AmountPhrase
         category CentralAdjunct { function }
         category KeywordPhrase
         category Nominal
         category NounPhrase
-        category ObjectConjunct [ComplementKind]
-        category ObjectCoordination [ComplementKind]
+        category ObjectConjunct [ConjunctKind]
+        category ObjectCoordination [ConjunctKind]
         category Sentence
         category VerbPhrase [VerbForm]
         class HaveVerb = ["v:have"]
@@ -263,15 +263,15 @@ fn a_central_adjunct_shifts_an_unlike_slot() {
         Adverb: AdverbPhrase -> Lex(Adverb)
         CentralAdverb: CentralAdjunct -> AdverbPhrase
         Bare: NounPhrase -> Nominal
-        NominalConjunct: ObjectConjunct -> NounPhrase where $.ComplementKind = NP
-        KeywordConjunct: ObjectConjunct -> KeywordPhrase where $.ComplementKind = KeywordPhrase
-        AmountConjunct: ObjectConjunct -> AmountPhrase where $.ComplementKind = Amount
+        NominalConjunct: ObjectConjunct -> NounPhrase where $.ConjunctKind = NP
+        KeywordConjunct: ObjectConjunct -> KeywordPhrase where $.ConjunctKind = KeywordPhrase
+        AmountConjunct: ObjectConjunct -> AmountPhrase where $.ConjunctKind = Amount
         coordination ObjectCoordination {
             coordinators: And,
-            unshared: [ComplementKind],
+            unshared: [ConjunctKind],
             serial: true,
             conjunct: ObjectConjunct,
-            unlike: ComplementKind,
+            unlike: ConjunctKind,
         }
         valence VerbPhrase {
             head: Verb,

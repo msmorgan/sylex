@@ -55,10 +55,17 @@ feature VerbKind = Lexical | Auxiliary | Modal | Mixed
 // (TimeGiving), and a coordination every time any conjunct carries.
 feature PastTime = Past
 feature NonPastTime = NonPast
-// Of an auxiliary (*can*, *can't*). Of a premodifier: `Negative` for
-// *non-*, otherwise unvalued.
+// A prefixed negative premodifier's (*nonland*, *nonattacking*, *non-Aura*):
+// `Negative` on an Adjective Phrase, a participle or a noun premodifier under
+// a negative prefix, and on an Attribute over one; otherwise unvalued. The
+// lexicon also values it on an auxiliary's forms (*can*, *can't*); of the
+// phrases a verb heads, only a Participle carries it.
 feature Polarity = Affirmative | Negative
-// A Preposition Phrase's Complement's Slot Kind. `MeasureNP`: only *of*
+// The Slot Kind of the Complement a phrase's head selects (`Intransitive`:
+// none), on a Preposition, Adjective or Determiner Phrase and a nominal. An
+// Amount's names a comparative bound's Complement, and `Amount` on an
+// Adjective Phrase marks a number with its comparative bound
+// (ComparativeBoundedAlternative). `MeasureNP`: only *of*
 // (*your choice of 5/1 or 1/5*) and *among* (*from among flying, ..., and
 // +1/+1*). `QuotedAbility`: only Nominal-hosted
 // *with* (*a token with "This token can't block."*; [CR#113.1a]). `Name`:
@@ -69,6 +76,20 @@ feature ComplementKind =
     | ComparativeClause | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf
     | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
     | UnlikeObject | Name
+// What an unlike coordination's conjunct is, which no other conjunct of it
+// shares (`unlike: ConjunctKind`): the Category of its filler. A conjunct of
+// a derived unlike Frame Slot takes the name of the Slot Kind its filler
+// fills (`NP`, `MeasureNP`, `Amount`, `KeywordPhrase`, `QuotedAbility`), so
+// the slot admits only conjuncts of the kinds its head selects (slots
+// `AmountOrNP` and `UnlikeObject`). `NounPremodifier` and `Participial` name
+// a noun premodifier and a participial Verb Phrase.
+feature ConjunctKind =
+    | NP | MeasureNP | PP | AdjP | AdvP | NounPremodifier | Amount | Participial | KeywordPhrase
+    | QuotedAbility
+// What a nominal's Premodifier is, which before *counter* may be its kind
+// (KindPremodifier): an Adjective Phrase, a slash measure or a bare keyword.
+// A participle or Attributes premodifier leaves it unvalued.
+feature PremodifierKind = Adjectival | Measure | Keyword
 // The Slot Kind of a determinative's Preposition Phrase's Complement: the
 // values of ComplementKind, which it agrees with.
 feature ObliqueKind =
@@ -150,10 +171,14 @@ feature DeterminativeDistribution =
     | SingularOrQuantified | FreeChoice | Multiplier | Targeting | Degree
 feature Case = Plain | Nominative | Accusative | Genitive
 feature Countability = Count | Mass
-// `Linking`: a connective initial in its Linked Conjunct. `Multiplying`: a
-// multiplier (*twice the damage*), also a frequency adverb (*draw a card
-// twice*); it modifies a Noun Phrase or measure, never a Preposition Phrase
-// or temporal Noun Phrase (one tree, english.md §8).
+// Where an Adverb Phrase stands, its head's position class (the lexicon's
+// `AdverbPosition`): `Front`, `Central` and `End` in a clause; `Phrasal`
+// inside a phrase it focuses (*only one target*); `Bounding` on a quantity's
+// determinative or numeral (*at least two*); `Linking`, a connective initial
+// in its Linked Conjunct; `Multiplying`, a multiplier (*twice the damage*),
+// also a frequency adverb (*draw a card twice*), which modifies a Noun Phrase
+// or measure, never a Preposition Phrase or temporal Noun Phrase (one tree,
+// english.md §8).
 feature AdjunctPosition = Front | Central | End | Phrasal | Multiplying | Bounding | Linking
 // A Clause whose front position holds a comma-set dependent (*If you do,
 // ...*). Dependents sharing one comma are siblings in one Production (*Then
@@ -197,6 +222,10 @@ feature RelativeBound = Bound { local }
 // determiner's Complement follows its head (*more lands than you*, *as many
 // cards as they discarded*).
 feature Comparison = Compared { local }
+// Privative: an existential predicate with its locative or temporal
+// Complement (LocatedExistentialBe), which alone takes a Preposition Phrase
+// Adjunct after it: one right after the displaced subject is that Complement.
+feature ExistentialLocation = Located
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
@@ -309,7 +338,7 @@ category LinkedVerbPhrase : VerbPhrase [
 // Existential *there*, and the predicate it is subject of.
 category DummyPronoun : NounPhrase [Number, Person]
 category ExistentialPredicate : VerbPhrase [
-    Number, Person, VerbForm, Inflection, ComplementKind, PastTime, NonPastTime,
+    Number, Person, VerbForm, Inflection, ExistentialLocation, PastTime, NonPastTime,
 ]
 category DisplacedSubject : NounPhrase [Number, Case] { gap }
 category FusedNounPhrase : NounPhrase [
@@ -412,11 +441,9 @@ category FusedQuantity : DeterminerPhrase [Number, Countability]
 // Premodifier is the premodifier function of a nominal for every premodifier
 // but a noun: an Adjective Phrase, a participle, coordinated or asyndetic
 // Attributes, a slash measure or a bare keyword. A bare nominal and a
-// determiner's Cluster take it alike. ComplementKind names an Adjective
-// Phrase (`AdjP`), and a measure (`MeasureNP`) and a keyword
-// (`KeywordPhrase`), which before *counter* are its kind; DeterminerNeed is an
-// adjective's.
-category Premodifier [ComplementKind, DeterminerNeed] { function }
+// determiner's Cluster take it alike. PremodifierKind names an Adjective
+// Phrase, a measure and a keyword; DeterminerNeed is an adjective's.
+category Premodifier [PremodifierKind, DeterminerNeed] { function }
 category NominalCluster [
     Number, Countability, DeterminativeDistribution,
 ] { cluster }
@@ -458,11 +485,11 @@ category Predicative { gap, function }
 // Unlike categories coordinated as a depictive Adjunct (*onto the
 // battlefield tapped and attacking*; CGEL 15§3.2:1326–1329), and each
 // conjunct.
-category Depictive : Predicative [ComplementKind] { function }
-category DepictiveCoordination : Predicative [ComplementKind] { function }
+category Depictive : Predicative [ConjunctKind] { function }
+category DepictiveCoordination : Predicative [ConjunctKind] { function }
 // Unlike categories coordinated as a predicate Adjunct (*only during your
 // turn and only once each turn*), and each conjunct.
-category PredicateAdjunct [ComplementKind, PastTime, NonPastTime] { function }
+category PredicateAdjunct [ConjunctKind, PastTime, NonPastTime] { function }
 // A verb's Complements, each with an optional Adjunct, coordinated after
 // the shared verb (*put [one of them into your hand] and [the rest into
 // your graveyard]*; CGEL 15§4.3:1341–1343).
@@ -498,25 +525,25 @@ category ClauseFragment
 category QualifyingFragment
 // Unlike premodifiers coordinated, with a coordinator or asyndetically
 // (*noncreature, nonland card*), and each premodifier.
-category Attributes [ComplementKind] { function }
+category Attributes [ConjunctKind] { function }
 // Unlike categories coordinated as an Object or a preposition's Complement
 // where the head selects each of them there (*has base power and toughness
 // 5/5 and vigilance*; slot `UnlikeObject`), and each conjunct.
-category ObjectConjunct : NounPhrase [ComplementKind] { function }
-category ObjectCoordination : NounPhrase [ComplementKind] { function }
+category ObjectConjunct : NounPhrase [ConjunctKind] { function }
+category ObjectCoordination : NounPhrase [ConjunctKind] { function }
 // An Amount and a Noun Phrase coordinated where a head selects both (*equal
 // to [2] or [the greatest power among Dinosaurs you control]*), and each
 // conjunct.
-category AmountOrNounConjunct : NounPhrase [ComplementKind] { function }
-category AmountOrNounPhrase : NounPhrase [ComplementKind] { function }
+category AmountOrNounConjunct : NounPhrase [ConjunctKind] { function }
+category AmountOrNounPhrase : NounPhrase [ConjunctKind] { function }
 // Unlike postmodifiers coordinated (*the player with the most life or tied
 // for most life*), and each.
-category PostmodifierConjunct : Postmodifier [ComplementKind] { function }
-category PostmodifierCoordination : Postmodifier [ComplementKind] { function }
-category Attribute : Attributes [ComplementKind, Polarity] { function }
+category PostmodifierConjunct : Postmodifier [ConjunctKind] { function }
+category PostmodifierCoordination : Postmodifier [ConjunctKind] { function }
+category Attribute : Attributes [ConjunctKind, Polarity] { function }
 // The premodifiers of an asyndetic chain after its first.
-category AttributeChain : Attributes [ComplementKind] { function }
-category AdjunctCoordination : PredicateAdjunct [ComplementKind, PastTime, NonPastTime] {
+category AttributeChain : Attributes [ConjunctKind] { function }
+category AdjunctCoordination : PredicateAdjunct [ConjunctKind, PastTime, NonPastTime] {
     function,
 }
 // An Adverb Phrase or a frequency Noun Phrase as Complement (*more than
@@ -835,7 +862,7 @@ IndexedCostHeader: Header -> cost:Cost ':' IndexedNominal { capital: [head] }
 // KeywordForm unvalued, passes (*an eternalize or embalm ability*).
 KeywordPremodifier: Premodifier -> KeywordPhrase { cost: 0 }
     where head.KeywordForm = Bare,
-          $.ComplementKind = KeywordPhrase
+          $.PremodifierKind = Keyword
 // Quoted wording mentioned as a term: a cited-word premodifier (*a "left"
 // pile*), a cited word (*choose "left" or "right."*) or a singular nominal
 // (*the "legend rule"*, [CR#704.5j]), with no period of its own. A quoted
@@ -1142,8 +1169,7 @@ ExistentialBe: ExistentialPredicate -> Class(BeVerb) displaced_subject:Displaced
     unextended: [displaced_subject],
 }
     where $.Number = displaced_subject.Number,
-          displaced_subject.Case != Accusative,
-          $.ComplementKind = NP
+          displaced_subject.Case != Accusative
 // The Complement is the one *be*'s prepositional frame selects.
 LocatedExistentialBe: ExistentialPredicate ->
     Class(BeVerb) displaced_subject:DisplacedSubject
@@ -1152,7 +1178,7 @@ LocatedExistentialBe: ExistentialPredicate ->
 }
     where $.Number = displaced_subject.Number,
           displaced_subject.Case != Accusative,
-          $.ComplementKind = PP
+          $.ExistentialLocation = Located
 // Existential *be* agrees with its displaced subject as a whole, or by
 // proximity with a singular first conjunct of an *and*-coordination (*If
 // there is an instant card and a sorcery card in your graveyard*, Flow
@@ -1334,7 +1360,7 @@ HollowInfinitival: HollowInf -> marker:Word(To) VerbPhrase
 // suspected*.
 CentralAdverbAdjunct: CentralAdjunct -> AdverbPhrase { cost: 0 } where head.AdjunctPosition = Central
 
-MeasurePremodifier: Premodifier -> Measure { cost: 0 } where $.ComplementKind = MeasureNP
+MeasurePremodifier: Premodifier -> Measure { cost: 0 } where $.PremodifierKind = Measure
 // A counter's kind premodifies the noun *counter*: a slash measure for a
 // +X/+Y counter [CR#122.1a], a keyword for a keyword counter [CR#122.1b], or
 // a kind name. Only *counter* takes it (`:= Head`), an admission gate
@@ -1394,7 +1420,7 @@ OrdinalAdjective: AdjectivePhrase -> Numeral(Ordinal)
 // *Third from the top*.
 OrdinalFromEnd: PositionPhrase -> Numeral(Ordinal) complement:Selected(PrepositionPhrase, From)
 PositionDepictive: VerbPhrase -> VerbPhrase adjunct:PositionPhrase { cost: 2, transparent: [head] }
-PositionAdjunct: PredicateAdjunct -> filler:PositionPhrase where $.ComplementKind = AdjP
+PositionAdjunct: PredicateAdjunct -> filler:PositionPhrase where $.ConjunctKind = AdjP
 InterleavedRelative: InterleavedModifier -> RelativeClause { cost: 0 }
 InterleavedPreposition: Interleaved -> PrepositionPhrase { cost: 0 }
 InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
@@ -1429,8 +1455,8 @@ AdjectivalDepictive: Depictive -> filler:AdjectivePhrase
           filler.ComplementKind = Intransitive,
           filler.AdjectivePosition != Attributive,
           filler.Grade != Equative | Comparative | NonScalarInequality | Mixed,
-          $.ComplementKind = AdjP
-GerundDepictive: Depictive -> filler:Gerund where $.ComplementKind = Gerund
+          $.ConjunctKind = AdjP
+GerundDepictive: Depictive -> filler:Gerund where $.ConjunctKind = Participial
 // *A token that's tapped and attacking*.
 CoordinatedPredicative: Predicative -> DepictiveCoordination
 CoordinatedDepictive: VerbPhrase -> VerbPhrase adjunct:DepictiveCoordination {
@@ -1439,13 +1465,13 @@ CoordinatedDepictive: VerbPhrase -> VerbPhrase adjunct:DepictiveCoordination {
 }
     where head.VerbKind != Auxiliary | Modal
 PrepositionalAdjunct: PredicateAdjunct -> filler:Hosted(PrepositionPhrase, Predicate)
-    where $.ComplementKind = PP
+    where $.ConjunctKind = PP
 DepictiveAdjunct: PredicateAdjunct -> filler:AdjectivePhrase
     where filler.Voice != Passive,
           filler.ComplementKind = Intransitive,
           filler.AdjectivePosition != Attributive,
           filler.Grade != Equative | Comparative | NonScalarInequality | Mixed,
-          $.ComplementKind = AdjP
+          $.ConjunctKind = AdjP
 // A trailing Preposition Phrase Adjunct scopes over every conjunct of a
 // Clause coordination (*[untap target creature and gain control of it]
 // until end of turn*; CGEL 15§1.3.4:1285–1286). Never the Verb Phrase
@@ -1454,10 +1480,10 @@ CoordinatedClauseAdjunct: Clause -> Clause adjunct:Hosted(PrepositionPhrase, Pre
     coordinated: [head],
 }
 // *Flip a coin [that many times] or [until you lose a flip]*.
-TemporalNounAdjunct: PredicateAdjunct -> filler:TemporalNounPhrase where $.ComplementKind = NP
+TemporalNounAdjunct: PredicateAdjunct -> filler:TemporalNounPhrase where $.ConjunctKind = NP
 AdverbialAdjunct: PredicateAdjunct -> filler:AdverbPhrase
     where filler.AdjunctPosition = End,
-          $.ComplementKind = AdvP
+          $.ConjunctKind = AdvP
 CoordinatedAdjunct: VerbPhrase -> VerbPhrase adjunct:AdjunctCoordination {
     cost: 2,
     transparent: [head],
@@ -2543,7 +2569,7 @@ NounConjunct: NounPremodifierConjunct -> NounPremodifier { cost: 0 }
 // A noun premodifier sits inside determinative and adjectival ones,
 // never outside them or on a determined symbol (*amount {G}*).
 NounAttribute: Attribute -> filler:NounPremodifier
-    where $.ComplementKind = Nominal,
+    where $.ConjunctKind = NounPremodifier,
           $.Polarity = filler.Polarity
 // A gerund-participle as an unlike conjunct of an adjective (*tapped and
 // attacking token*, Altaïr Ibn-La'Ahad). `Carry`, since a coordination of
@@ -2551,12 +2577,12 @@ NounAttribute: Attribute -> filler:NounPremodifier
 // would pass a `Require`.
 ParticipialAttribute: Attribute -> filler:Participle
     where filler.Inflection := GerundParticiple,
-          $.ComplementKind = Gerund,
+          $.ConjunctKind = Participial,
           $.Polarity = filler.Polarity
 AdjectivalAttribute: Attribute -> filler:AdjectivePhrase
     where filler.ComplementKind = Intransitive,
           filler.AdjectivePosition != Predicative,
-          $.ComplementKind = AdjP,
+          $.ConjunctKind = AdjP,
           $.Polarity = filler.Polarity
 // Oracle sets off with commas only independent negative modifiers of one
 // head, so each premodifier of an asyndetic chain is `Polarity: Negative`
@@ -2572,7 +2598,7 @@ AsyndeticAttributes: Attributes -> first:Attribute ',' rest:AttributeChain
 AttributeSequence: AttributeChain -> first:Attribute ',' rest:AttributeChain
     where first.Polarity := Negative
 FinalAttribute: AttributeChain -> last:Attribute where last.Polarity := Negative
-AttributedPremodifier: Premodifier -> Attributes { cost: 0, unshared: [ComplementKind] }
+AttributedPremodifier: Premodifier -> Attributes { cost: 0 }
 // *Counter* takes no noun premodifier but its kind: an admission gate
 // (english.md §3, §6) that keeps the noun *loyalty* from premodifying
 // *counter* beside the kind name in *Put a loyalty counter on target Gideon
@@ -3032,10 +3058,10 @@ MarkedMaximum: DeterminerPhrase -> determiner:Selected(PrepositionPhrase, Up) Ta
 }
     where determiner.Determination = Bare,
           $.Number = determiner.Number
-AdjectivalPremodifier: Premodifier -> AdjectivePhrase { cost: 0, unshared: [ComplementKind] }
+AdjectivalPremodifier: Premodifier -> AdjectivePhrase { cost: 0 }
     where head.ComplementKind = Intransitive,
           head.AdjectivePosition != Predicative,
-          $.ComplementKind = AdjP
+          $.PremodifierKind = Adjectival
 ParticipialPremodifier: Premodifier -> Participle { cost: 0 }
 // An adjective that needs an overt determiner passes the need to its
 // nominal (*the first creature*). Like an adjective, any premodifier stands
@@ -3047,14 +3073,14 @@ ParticipialPremodifier: Premodifier -> Participle { cost: 0 }
 // Preparations) and *Put a double strike counter on Mai* (Mai, Jaded Edge).
 Premodifier: BareNominal -> modifier:Premodifier BareNominal { transparent: [head] }
     where modifier.DeterminerNeed = $.DeterminerNeed,
-          !(modifier.ComplementKind = MeasureNP & head.KindLicense = Head),
-          !(modifier.ComplementKind = KeywordPhrase & head.KindLicense = Head)
+          !(modifier.PremodifierKind = Measure & head.KindLicense = Head),
+          !(modifier.PremodifierKind = Keyword & head.KindLicense = Head)
 // An attributive adjective over a whole *and*-coordination of singular
 // nominals, not only its first conjunct (*[total [power and toughness 5 or
 // less]]*; CGEL 15§1.3.4:1285–1286). A nominal's Complement is inside its
 // premodifiers, so a shared Amount is too.
 CoordinationPremodifier: Nominal -> modifier:Premodifier Nominal
-    where modifier.ComplementKind := AdjP,
+    where modifier.PremodifierKind := Adjectival,
           modifier.DeterminerNeed = $.DeterminerNeed,
           head.Number = Plural,
           head.ConjunctNumber := Singular
@@ -3092,30 +3118,30 @@ FusedParticipialPostmodifier: FusedNounPhrase -> FusedNounPhrase modifier:VerbPh
           modifier.Voice = Passive,
           modifier.VerbKind != Auxiliary
 PrepositionalConjunct: PostmodifierConjunct -> filler:Hosted(PrepositionPhrase, Nominal)
-    where $.ComplementKind = PP
-NominalObjectConjunct: ObjectConjunct -> filler:ComplementNounPhrase where $.ComplementKind = NP
-KeywordObjectConjunct: ObjectConjunct -> filler:KeywordPhrase where $.ComplementKind = KeywordPhrase
+    where $.ConjunctKind = PP
+NominalObjectConjunct: ObjectConjunct -> filler:ComplementNounPhrase where $.ConjunctKind = NP
+KeywordObjectConjunct: ObjectConjunct -> filler:KeywordPhrase where $.ConjunctKind = KeywordPhrase
 // A slash measure is a conjunct only where the head selects a measure, as
 // *among* does a +X/+Y counter's kind beside keyword counters' kinds
 // [CR#122.1a,122.1b] (*a kind of counter ... from among flying, first
 // strike, ..., and +1/+1*).
-MeasureObjectConjunct: ObjectConjunct -> filler:MeasureNounPhrase where $.ComplementKind = MeasureNP
+MeasureObjectConjunct: ObjectConjunct -> filler:MeasureNounPhrase where $.ConjunctKind = MeasureNP
 // *Has reach and "…"*.
-QuotedObjectConjunct: ObjectConjunct -> filler:QuotedAbility where $.ComplementKind = QuotedAbility
-AmountConjunct: AmountOrNounConjunct -> filler:Amount where $.ComplementKind = Amount
-NounPhraseConjunct: AmountOrNounConjunct -> filler:ComplementNounPhrase where $.ComplementKind = NP
+QuotedObjectConjunct: ObjectConjunct -> filler:QuotedAbility where $.ConjunctKind = QuotedAbility
+AmountConjunct: AmountOrNounConjunct -> filler:Amount where $.ConjunctKind = Amount
+NounPhraseConjunct: AmountOrNounConjunct -> filler:ComplementNounPhrase where $.ConjunctKind = NP
 AdjectivalConjunct: PostmodifierConjunct -> filler:AdjectivePhrase { heavy: [filler] }
     where filler.Voice != Passive,
-          $.ComplementKind = AdjP
+          $.ConjunctKind = AdjP
 // A lexical passive participle clause, never one headed by *been*.
 PastParticipialConjunct: PostmodifierConjunct -> filler:VerbPhrase { heavy: [filler] }
     where filler.VerbForm = PastParticiple,
           filler.Voice = Passive,
           filler.VerbKind != Auxiliary,
-          $.ComplementKind = Gerund
+          $.ConjunctKind = Participial
 GerundParticipialConjunct: PostmodifierConjunct -> filler:VerbPhrase { heavy: [filler] }
     where filler.VerbForm = GerundParticiple,
-          $.ComplementKind = Gerund
+          $.ConjunctKind = Participial
 CoordinatedPostmodifier: Nominal -> Nominal modifier:PostmodifierCoordination
 RelativePostmodifier: Postmodifier -> RelativeClause where $.RelativeBound = Bound
 // A participial clause with dependents (*each creature tapped this way*): a
@@ -3583,7 +3609,7 @@ adjunct PrepositionPhrase { host: SymbolHead, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: Nominal, side: After, host_kind: Nominal }
 adjunct PrepositionPhrase { host: VerbPhrase, side: After, host_kind: Predicate }
 adjunct PrepositionPhrase { host: ExistentialPredicate, side: After, host_kind: Predicate }
-    where head.ComplementKind != NP
+    where head.ExistentialLocation := Located
 adjunct PrepositionPhrase { host: Clause, side: Before, host_kind: Predicate, delimiter: ',' }
     where $.FrontPosition = Occupied
 // A front Adverb Phrase without a comma (*Then draw a card*). Before a
@@ -3993,33 +4019,33 @@ coordination PrepositionPhrase {
 }
 coordination DepictiveCoordination {
     coordinators: Coordinator,
-    unshared: [ComplementKind],
+    unshared: [ConjunctKind],
     conjunct: Depictive,
-    unlike: ComplementKind,
+    unlike: ConjunctKind,
 }
 // *Attacking, blocking, or tapped creature*; *the basic, Sphere, and Locus
 // lands*.
 coordination Attributes {
     coordinators: Coordinator,
-    unshared: [ComplementKind],
+    unshared: [ConjunctKind],
     serial: true,
     conjunct: Attribute,
-    unlike: ComplementKind,
+    unlike: ConjunctKind,
 }
 coordination PostmodifierCoordination {
     coordinators: Coordinator,
-    unshared: [ComplementKind],
+    unshared: [ConjunctKind],
     conjunct: PostmodifierConjunct,
-    unlike: ComplementKind,
+    unlike: ConjunctKind,
 }
 // Its conjuncts' kinds are those the selecting head takes (slot
 // `UnlikeObject`).
 coordination ObjectCoordination {
     coordinators: And,
-    unshared: [ComplementKind],
+    unshared: [ConjunctKind],
     serial: true,
     conjunct: ObjectConjunct,
-    unlike: ComplementKind,
+    unlike: ConjunctKind,
 }
 // A comma may set off a binary coordination's second Cluster (*deals half X
 // damage, rounded down, to any target, and half X damage, rounded up, to
@@ -4052,16 +4078,16 @@ coordination over [ComplementNounPhrase, PrepositionPhrase] {
 // turn*.
 coordination AdjunctCoordination {
     coordinators: Coordinator,
-    unshared: [ComplementKind],
+    unshared: [ConjunctKind],
     serial: true,
     conjunct: PredicateAdjunct,
-    unlike: ComplementKind,
+    unlike: ConjunctKind,
 }
 coordination AmountOrNounPhrase {
     coordinators: Coordinator,
-    unshared: [ComplementKind],
+    unshared: [ConjunctKind],
     conjunct: AmountOrNounConjunct,
-    unlike: ComplementKind,
+    unlike: ConjunctKind,
 }
 coordination Amount { coordinators: Coordinator, proximate: [QuantityNumber, Sign] }
 // It determines as its last conjunct does (*one or more cards*). No

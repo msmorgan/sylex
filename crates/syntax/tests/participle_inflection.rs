@@ -48,13 +48,13 @@ const FRAMES: &str = r#"(
 const GRAMMAR: &str = r#"
     root Sentence
     feature Inflection = Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis | GerundParticiple | PastParticiple
-    feature ComplementKind = AdjP | Gerund
+    feature ConjunctKind = AdjP | Participial
     category Nominal
     category NounPhrase
     category AdjectivePhrase
     category Participle [Inflection]
-    category Attributes [ComplementKind]
-    category Attribute : Attributes [ComplementKind]
+    category Attributes [ConjunctKind]
+    category Attribute : Attributes [ConjunctKind]
     category Sentence
     slot NP = NounPhrase
     word Or = "c:or"
@@ -63,8 +63,8 @@ const GRAMMAR: &str = r#"
     Adjective: AdjectivePhrase -> Lex(Adjective)
     ParticipialAttribute: Attribute -> filler:Participle
         where filler.Inflection := GerundParticiple,
-              $.ComplementKind = Gerund
-    AdjectivalAttribute: Attribute -> filler:AdjectivePhrase where $.ComplementKind = AdjP
+              $.ConjunctKind = Participial
+    AdjectivalAttribute: Attribute -> filler:AdjectivePhrase where $.ConjunctKind = AdjP
     AttributedNominal: Nominal -> modifier:Attributes Nominal
     premodification Participle {
         head: Verb,
@@ -74,10 +74,10 @@ const GRAMMAR: &str = r#"
     valence Nominal { head: Noun }
     coordination Attributes {
         coordinators: Or,
-        unshared: [ComplementKind],
+        unshared: [ConjunctKind],
         serial: true,
         conjunct: Attribute,
-        unlike: ComplementKind,
+        unlike: ConjunctKind,
     }
     coordination Participle { coordinators: Or }
     coordination Participle {
