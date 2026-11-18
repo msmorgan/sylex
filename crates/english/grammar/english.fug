@@ -295,15 +295,13 @@ feature Adjustment = Signed
 // other target*), which determines a nominal and never nests inside another
 // determiner, quantity or partitive.
 feature TargetMarked = Marked
-// A license feature (english.md §3), which the counter catalog declares:
-// `Kind` on a counter's kind name (*charge*, *time*), which stands only as
-// the kind of the noun *counter*, and on a keyword a keyword counter can be
-// [CR#122.1b]; `Head` on *counter*, the one noun a kind premodifies. A kind
-// word before *counter* keeps its other analyses only where the two straddle
-// a constituent boundary (`head: Head`, docs/design/lexicon.md §5): *five or
-// more [plot counters]* is no verb and its Object (Deadly Designs), while
-// *the first time [counters have been put on that creature]* stands
-// (Stalwart Successor).
+// A license feature (english.md §3), which the vocabulary declares: `Kind`
+// on a keyword a keyword counter can be [CR#122.1b], and `Head` on
+// *counter*, the one noun a kind premodifies. Such a keyword before
+// *counter* keeps its other analyses only where the two straddle a
+// constituent boundary (`head: Head`, docs/design/lexicon.md §5), and no
+// Kind Name, the open word read before *counter* (*charge*, *time*), stands
+// where it ends. A Kind Name holds no license.
 feature KindLicense = Kind | Head { head: Head }
 // A license feature (english.md §3), which a noun's parameter pattern
 // declares: `Head` on a noun a cited option word premodifies (*each numbers
@@ -1211,10 +1209,7 @@ NominalPhraseQuality: Quality -> NounPhrase
 // *protection from snow*, [CR#205.4a]). Never a color word, whose noun
 // conversion is the Quality (*protection from red*; one tree, english.md §8).
 AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
-// A counter's kind name names nothing: an admission gate (english.md §3,
-// §6) that keeps the kind name *dread* from a Name Complement of *manifest*
-// in *Manifest dread* (Under the Skin).
-NamedParameter: Name -> Lex(Catalog) where head.KindLicense != Kind
+NamedParameter: Name -> Lex(Catalog)
 SetNameWord: SetName -> Lex(SetName)
 // An Introduced Name named again: the Reading introduces it elsewhere
 // (*create Ragavan, ... Ragavan enters tapped and attacking*; a token's own
@@ -1576,7 +1571,7 @@ CentralAdverbAdjunct: CentralAdjunct -> AdverbPhrase { cost: 0 } where head.Adju
 MeasurePremodifier: Premodifier -> Measure { cost: 0 } where $.PremodifierKind = Measure
 // A counter's kind premodifies the noun *counter*: a slash measure for a
 // +X/+Y counter [CR#122.1a], a keyword for a keyword counter [CR#122.1b], or
-// a kind name. Only *counter* takes it (`:= Head`), an admission gate
+// a Kind Name. Only *counter* takes it (`:= Head`), an admission gate
 // (english.md §3, §6) that keeps the kind name *treasure* from premodifying
 // *token* beside the subtype in *Create a Treasure token* (Craft with Pride).
 KindPremodifier: BareNominal -> modifier:Kind BareNominal
@@ -1592,8 +1587,8 @@ MeasureKind: Kind -> Measure
 KeywordKind: Kind -> KeywordPhrase
     where head.KeywordForm := Bare,
           head.KindLicense := Kind
-// *A charge counter*.
-KindName: Kind -> Lex(Catalog)
+// A Kind Name, the open word read before *counter* (*a charge counter*).
+KindName: Kind -> Lex(KindName)
 // *five {P} worth of modes*.
 PawprintPremodifier: BareNominal -> modifier:Pawprints BareNominal
 // *its {1}{G} kicker*.
@@ -3338,6 +3333,11 @@ ParticipialPremodifier: Premodifier -> Participle { cost: 0 } where $.Premodifie
 // second tree, the measure or keyword as a general premodifier of *counter*,
 // off *Put a +1/+1 counter on each of up to two target creatures* (Travel
 // Preparations) and *Put a double strike counter on Mai* (Mai, Jaded Edge).
+// Nor does a participle premodify *counter*: every word in *-ing* or *-ed*
+// a card prints before *counter* is its kind (*a training counter*, Sensei
+// Golden-Tail; *healing*, *hatchling*, *contested*), an admission gate
+// (english.md §6) that keeps the participle from a second tree beside the
+// Kind Name.
 // A keyword or participle premodifies no nominal that needs a determiner
 // (NumeralNominal, SymbolNominal, LoyaltyNominal, CardinalNominal, or one an
 // adjective passes the need to): an admission gate (english.md §6), which
@@ -3349,6 +3349,7 @@ Premodifier: BareNominal -> modifier:Premodifier BareNominal { transparent: [hea
     where modifier.DeterminerNeed = $.DeterminerNeed,
           !(modifier.PremodifierKind = Measure & head.KindLicense = Head),
           !(modifier.PremodifierKind = Keyword & head.KindLicense = Head),
+          !(modifier.PremodifierKind = Participial & head.KindLicense = Head),
           !(modifier.PremodifierKind = Keyword & head.DeterminerNeed = Required),
           !(modifier.PremodifierKind = Participial & head.DeterminerNeed = Required)
 // A premodifier over a whole coordination of nominals, beside the reading

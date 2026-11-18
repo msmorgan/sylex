@@ -58,11 +58,10 @@ pub fn stated_scope(name: &str, legendary_permanent: bool, lexicon: &Lexicon) ->
 ///
 /// The spelling is dropped where the rest of the vocabulary in scope on that
 /// card already spells it (*Sliver* in *Sliver Queen*): a Catalog item such
-/// as a token name always, any other word, a counter's
-/// kind name among them, unless the spelling is the explicit name before a
-/// comma or a planeswalker type, which is the name of the character the card
-/// is (*Jace* in *Jace, the Mind Sculptor*; *Loot* in *Loot, the
-/// Pathfinder*). Another card's name is no such vocabulary: only a position
+/// as a token name always, any other word unless the spelling is the explicit
+/// name before a comma or a planeswalker type, which is the name of the
+/// character the card is (*Jace* in *Jace, the Mind Sculptor*; *Loot* in *Loot,
+/// the Pathfinder*). Another card's name is no such vocabulary: only a position
 /// that opts in admits it, so it competes with the Shortened Name nowhere
 /// else (*Nicol Bolas* on *Nicol Bolas, the Deceiver*).
 #[must_use]
@@ -94,7 +93,7 @@ fn spelled_by_other_vocabulary(
         found.start == 0
             && found.end == whole
             && !lexeme.card_name
-            && (lexeme.category == Category::Catalog && !crate::is_counter_kind_name(lexeme)
+            && (lexeme.category == Category::Catalog
                 || !explicit
                     && lexeme.binding == Binding::Free
                     && !lexeme.properties.classes.contains("PlaneswalkerType"))

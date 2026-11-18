@@ -758,6 +758,7 @@ fn lexical(reading: &LexicalReading) -> String {
         LexicalReading::IntroducedName { name } => format!("introduced name {name:?}"),
         LexicalReading::FlavorWord { label } => format!("flavor word {label:?}"),
         LexicalReading::SetName { name } => format!("set name {name:?}"),
+        LexicalReading::KindName { kind, .. } => format!("kind name {kind:?}"),
         LexicalReading::AnchorWord { word } => format!("anchor word {word:?}"),
         LexicalReading::VoteOption { word } => format!("vote option {word:?}"),
         LexicalReading::Numeral {

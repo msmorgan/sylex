@@ -434,6 +434,7 @@ fn unit_rows(
                     | LexicalReading::IntroducedName { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. }
+                    | LexicalReading::KindName { .. }
                     | LexicalReading::AnchorWord { .. }
                     | LexicalReading::VoteOption { .. }
                     | LexicalReading::Numeral { .. } => None,
@@ -949,6 +950,9 @@ fn write_leaves(
             }
             LexicalReading::SetName { .. } => {
                 (Val::Static("set name"), Val::Null, Val::Null, Val::Null)
+            }
+            LexicalReading::KindName { .. } => {
+                (Val::Static("kind name"), Val::Null, Val::Null, Val::Null)
             }
             LexicalReading::AnchorWord { .. } => {
                 (Val::Static("anchor word"), Val::Null, Val::Null, Val::Null)

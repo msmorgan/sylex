@@ -571,6 +571,7 @@ fn dump_reading(
                 sylex_lexicon::LexicalReading::Numeral { .. }
                 | sylex_lexicon::LexicalReading::FlavorWord { .. }
                 | sylex_lexicon::LexicalReading::SetName { .. }
+                | sylex_lexicon::LexicalReading::KindName { .. }
                 | sylex_lexicon::LexicalReading::AnchorWord { .. }
                 | sylex_lexicon::LexicalReading::VoteOption { .. },
             )

@@ -195,7 +195,7 @@ Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
   settled); `alternatives` (Production, completed item); `items` (Production,
   dot, span); `families` (previous item, child node or leaf); `leaves` (a
   word with its lexeme, the face's own name with its name form, an Introduced
-  Name, a Flavor Word, a Set Name, an Anchor Word, a Vote Option or a
+  Name, a Flavor Word, a Set Name, a Kind Name, an Anchor Word, a Vote Option or a
   numeral);
 - per alternative: `heads` (head leaf, lexeme and form),
   `alternative_embeddings` (the Embedding it stands under: `embeddings`, with

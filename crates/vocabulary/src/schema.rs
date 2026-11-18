@@ -808,6 +808,10 @@ pub struct KeywordAbility {
     /// cleave cost does [CR#702.148a]; the brackets mark that text.
     #[serde(default)]
     pub bracketed_text_removable: bool,
+    /// Whether a keyword counter can be this keyword [CR#122.1b]: before
+    /// *counter*, the keyword is the counter's kind (*a flying counter*).
+    #[serde(default)]
+    pub counter: bool,
     /// Keywords the rule defines as variants, each its own Keyword Lexeme:
     /// *megamorph* [CR#702.37b], *partner—Friends forever* [CR#702.124i].
     #[serde(default)]
@@ -844,19 +848,6 @@ pub enum AbilityWordListing {
 pub struct AbilityWord {
     pub lemma: String,
     pub listed: AbilityWordListing,
-}
-
-/// A named kind of counter; its Lexeme is the compound noun `<kind> counter`.
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct CounterKind {
-    pub kind: String,
-    /// The rule that names it, when the CR does.
-    #[serde(default)]
-    pub rule: Option<Rule>,
-    /// Its Onset, where its first letter's is not it (*an hour counter*).
-    #[serde(default)]
-    pub onset: Option<sylex_lexicon::Onset>,
 }
 
 /// A designation and the nouns and adjectives that name it.

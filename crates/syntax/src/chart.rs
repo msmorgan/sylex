@@ -898,11 +898,15 @@ impl CompiledGrammar {
             .collect()
     }
 
-    /// The spans of the licensed terms of `analyzed`, each with its license
-    /// (`Grammar::licenses`): a word that carries a value of a license
-    /// feature other than its head's, then, after one space, a word that
-    /// carries the head value (*time counters*, `docs/design/lexicon.md` §5).
-    pub(crate) fn licensed_terms(&self, analyzed: &AnalyzedText) -> Vec<(Range<usize>, License)> {
+    /// The words of `analyzed` that hold a license, each as its own span and
+    /// its licensed term's, with the license (`Grammar::licenses`): a word
+    /// that carries a value of a license feature other than its head's,
+    /// then, after one space, a word that carries the head value (*time
+    /// counters*, `docs/design/lexicon.md` §5).
+    pub(crate) fn license_holders(
+        &self,
+        analyzed: &AnalyzedText,
+    ) -> Vec<(Range<usize>, Range<usize>, License)> {
         let words: Vec<(&LexicalMatch, LeafFacts)> = analyzed
             .matches
             .iter()
@@ -914,7 +918,7 @@ impl CompiledGrammar {
                 (m, facts)
             })
             .collect();
-        let mut terms = Vec::new();
+        let mut holders = Vec::new();
         for &(feature, head) in &self.licenses {
             for (holder, facts) in &words {
                 if facts.features[feature].is_none_or(|value| value == head)
@@ -924,12 +928,38 @@ impl CompiledGrammar {
                 }
                 for (last, facts) in &words {
                     if last.start == holder.end + 1 && facts.features[feature] == Some(head) {
-                        terms.push((holder.start..last.end, (feature, head)));
+                        holders.push((
+                            holder.start..holder.end,
+                            holder.start..last.end,
+                            (feature, head),
+                        ));
                     }
                 }
             }
         }
-        terms
+        holders
+    }
+
+    /// Whether a Kind Name stands at `found`: no word that holds a license
+    /// ends where it ends, as a keyword a keyword counter can be does
+    /// [CR#122.1b] (*a flying counter*, *a first strike counter*). Such a
+    /// word is the counter's kind itself, never an open Kind Name, and no
+    /// word inside it is one.
+    pub(crate) fn kind_name_stands(
+        found: &LexicalMatch,
+        holders: &[(Range<usize>, Range<usize>, License)],
+    ) -> bool {
+        !matches!(found.reading, LexicalReading::KindName { .. })
+            || !holders.iter().any(|(holder, _, _)| holder.end == found.end)
+    }
+
+    /// The spans of the licensed terms of `analyzed`, each with its license
+    /// ([`Self::license_holders`]).
+    pub(crate) fn licensed_terms(&self, analyzed: &AnalyzedText) -> Vec<(Range<usize>, License)> {
+        self.license_holders(analyzed)
+            .into_iter()
+            .map(|(_, term, license)| (term, license))
+            .collect()
     }
 
     /// Parses an analyzed text as Category `root`.
@@ -965,7 +995,11 @@ impl CompiledGrammar {
         let mut forest = PackedForest::default();
         let mut by_start: Vec<Vec<usize>> = vec![Vec::new(); n + 1];
         let atomic = self.atomic_spans(analyzed);
+        let holders = self.license_holders(analyzed);
         for found in analyzed.matches.iter().chain(&analyzed.open_words) {
+            if !Self::kind_name_stands(found, &holders) {
+                continue;
+            }
             // No Constituent spans nothing: it has a child
             // (`Binder::every_production_has_a_child`), and no leaf does.
             assert!(

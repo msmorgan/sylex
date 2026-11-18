@@ -1,13 +1,14 @@
 // Keyword abilities [CR#702.1], their parameters on a keyword line, the variants each rule
 // defines, and the verbs each rule defines, in CR order, then the keyword abilities the CR defines
-// outside the keyword-ability rules [CR#702].
+// outside the keyword-ability rules [CR#702]. `counter: true` marks the keywords a keyword counter
+// can be [CR#122.1b].
 //
 // Left out: Hidden Agenda [CR#702.106] (Conspiracy cards only), Space Sculptor [CR#702.158] and
 // Visit [CR#702.159] (Un-set cards only).
 [
-    (rule: "[CR#702.2]", name: "Deathtouch", lemma: "deathtouch"),
+    (rule: "[CR#702.2]", name: "Deathtouch", lemma: "deathtouch", counter: true),
     (rule: "[CR#702.3]", name: "Defender", lemma: "defender"),
-    (rule: "[CR#702.4]", name: "Double Strike", lemma: "double strike"),
+    (rule: "[CR#702.4]", name: "Double Strike", lemma: "double strike", counter: true),
     // *Enchanted*, *equipped* and *fortified* name one host, so each determines a singular
     // count noun (see the combat-role determinatives in closed_class.ron).
     (rule: "[CR#702.5]", name: "Enchant", lemma: "enchant", parameters: [[Quality(None)]],
@@ -26,25 +27,25 @@
             (lemma: "equip", past: "equipped", gerund: "equipping", frames: [PassiveOnly(Monotransitive)]),
         ],
     ),
-    (rule: "[CR#702.7]", name: "First Strike", lemma: "first strike"),
+    (rule: "[CR#702.7]", name: "First Strike", lemma: "first strike", counter: true),
     (rule: "[CR#702.8]", name: "Flash", lemma: "flash"),
-    (rule: "[CR#702.9]", name: "Flying", lemma: "flying"),
-    (rule: "[CR#702.10]", name: "Haste", lemma: "haste"),
+    (rule: "[CR#702.9]", name: "Flying", lemma: "flying", counter: true),
+    (rule: "[CR#702.10]", name: "Haste", lemma: "haste", counter: true),
     // [CR#702.11d]
-    (rule: "[CR#702.11]", name: "Hexproof", lemma: "hexproof", parameters: [[], [Quality(Some("from"))]]),
-    (rule: "[CR#702.12]", name: "Indestructible", lemma: "indestructible"),
+    (rule: "[CR#702.11]", name: "Hexproof", lemma: "hexproof", counter: true, parameters: [[], [Quality(Some("from"))]]),
+    (rule: "[CR#702.12]", name: "Indestructible", lemma: "indestructible", counter: true),
     (rule: "[CR#702.13]", name: "Intimidate", lemma: "intimidate"),
     // "islandwalk", and "land" in "nonbasic landwalk" [CR#702.14a,702.14c]; "landwalk of the
     // chosen type" names its land type as a Keyword Quality after "of"
     (rule: "[CR#702.14]", name: "Landwalk", lemma: "landwalk", parameters: [[], [Quality(Some("of"))]],
         bound: (surface: "walk", stems: [LandType, CardType])),
-    (rule: "[CR#702.15]", name: "Lifelink", lemma: "lifelink"),
+    (rule: "[CR#702.15]", name: "Lifelink", lemma: "lifelink", counter: true),
     (rule: "[CR#702.16]", name: "Protection", lemma: "protection", parameters: [[Quality(Some("from"))]]),
-    (rule: "[CR#702.17]", name: "Reach", lemma: "reach"),
+    (rule: "[CR#702.17]", name: "Reach", lemma: "reach", counter: true),
     (rule: "[CR#702.18]", name: "Shroud", lemma: "shroud"),
     // "trample over planeswalkers" [CR#702.19c]
-    (rule: "[CR#702.19]", name: "Trample", lemma: "trample", parameters: [[], [Quality(Some("over"))]]),
-    (rule: "[CR#702.20]", name: "Vigilance", lemma: "vigilance"),
+    (rule: "[CR#702.19]", name: "Trample", lemma: "trample", counter: true, parameters: [[], [Quality(Some("over"))]]),
+    (rule: "[CR#702.20]", name: "Vigilance", lemma: "vigilance", counter: true),
     (rule: "[CR#702.21]", name: "Ward", lemma: "ward", parameters: [[Cost]]),
     (rule: "[CR#702.22]", name: "Banding", lemma: "banding",
         variants: [
@@ -63,7 +64,7 @@
     (rule: "[CR#702.25]", name: "Flanking", lemma: "flanking"),
     (rule: "[CR#702.26]", name: "Phasing", lemma: "phasing"),
     (rule: "[CR#702.27]", name: "Buyback", lemma: "buyback", parameters: [[Cost]]),
-    (rule: "[CR#702.28]", name: "Shadow", lemma: "shadow"),
+    (rule: "[CR#702.28]", name: "Shadow", lemma: "shadow", counter: true),
     // Typecycling: "mountaincycling", "basic landcycling" [CR#702.29e]
     (rule: "[CR#702.29]", name: "Cycling", lemma: "cycling", parameters: [[Cost]], bound: (surface: "cycling", stems: [Subtype, CardType, Supertype]),
         verbs: [
@@ -178,7 +179,7 @@
             (lemma: "devour", frames: [Monotransitive]),
         ],
     ),
-    (rule: "[CR#702.83]", name: "Exalted", lemma: "exalted"),
+    (rule: "[CR#702.83]", name: "Exalted", lemma: "exalted", counter: true),
     (rule: "[CR#702.84]", name: "Unearth", lemma: "unearth", parameters: [[Cost]]),
     // "as you cascade" [CR#702.85b]
     (rule: "[CR#702.85]", name: "Cascade", lemma: "cascade",
@@ -220,7 +221,7 @@
             (lemma: "exploit", frames: [Monotransitive]),
         ],
     ),
-    (rule: "[CR#702.111]", name: "Menace", lemma: "menace"),
+    (rule: "[CR#702.111]", name: "Menace", lemma: "menace", counter: true),
     (rule: "[CR#702.112]", name: "Renown", lemma: "renown", parameters: [[Amount]]),
     // "Awaken 4—{4}{W}"
     (rule: "[CR#702.113]", name: "Awaken", lemma: "awaken", parameters: [[Amount, DashCost]]),
@@ -299,7 +300,7 @@
     (rule: "[CR#702.145]", name: "Daybound and Nightbound", lemma: "daybound"),
     (rule: "[CR#702.145e]", name: "Nightbound", lemma: "nightbound"),
     (rule: "[CR#702.146]", name: "Disturb", lemma: "disturb", parameters: [[Cost]]),
-    (rule: "[CR#702.147]", name: "Decayed", lemma: "decayed"),
+    (rule: "[CR#702.147]", name: "Decayed", lemma: "decayed", counter: true),
     (rule: "[CR#702.148]", name: "Cleave", lemma: "cleave", parameters: [[Cost]], bracketed_text_removable: true),
     (rule: "[CR#702.149]", name: "Training", lemma: "training",
         verbs: [

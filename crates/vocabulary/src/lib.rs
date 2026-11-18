@@ -41,7 +41,6 @@ use crate::schema::AbilityWord;
 use crate::schema::AdjectiveDecl;
 use crate::schema::AdverbEntry;
 use crate::schema::ClosedClass;
-use crate::schema::CounterKind;
 use crate::schema::Designation;
 use crate::schema::KeywordAbility;
 use crate::schema::KeywordAction;
@@ -59,18 +58,41 @@ pub use crate::shortening::legendary_permanent;
 pub use crate::shortening::parse_type_line;
 pub use crate::shortening::short_name;
 
-/// The license feature of a counter's kind name and of the noun *counter*
-/// (`Sources::counter_kinds`).
+/// The license feature of a keyword a keyword counter can be and of the
+/// noun *counter* (`Sources::counter_kinds`).
 const KIND_LICENSE: &str = "KindLicense";
 
-/// Whether `lexeme` is a counter's kind name, which stands only before the
-/// noun *counter*.
-pub(crate) fn is_counter_kind_name(lexeme: &Lexeme) -> bool {
-    lexeme
-        .properties
-        .features
-        .get(KIND_LICENSE)
-        .is_some_and(|value| value.as_str() == "Kind")
+/// Marks each word of a closed class that stands before a noun or heads its
+/// own phrase there ([`sylex_lexicon::LexicalProperties::closed_class`]): a
+/// determinative but one that is a fused head alone (*everything*, *anywhere*:
+/// `Independent`), a pronoun, a preposition, a coordinator, a subordinator, and
+/// an auxiliary verb, modals among them.
+fn mark_closed_class(lexemes: &mut [Lexeme]) {
+    for lexeme in lexemes {
+        let feature = |name: &str| lexeme.properties.features.get(name).map(Ident::as_str);
+        lexeme.properties.closed_class = match lexeme.category {
+            Category::Determinative => feature("DeterminativeDistribution") != Some("Independent"),
+            Category::Pronoun
+            | Category::Preposition
+            | Category::Coordinator
+            | Category::Subordinator => true,
+            Category::Verb => matches!(feature("VerbKind"), Some("Auxiliary" | "Modal")),
+            Category::Noun
+            | Category::Adjective
+            | Category::Adverb
+            | Category::Affix
+            | Category::Clitic
+            | Category::Numeral
+            | Category::Catalog
+            | Category::Keyword
+            | Category::FlavorWord
+            | Category::SetName
+            | Category::KindName
+            | Category::AnchorWord
+            | Category::OptionWord
+            | Category::Symbol => false,
+        };
+    }
 }
 
 /// Why the lexicon or a catalog cannot be loaded.
@@ -88,7 +110,7 @@ pub enum SourceError {
 
 /// Every data file of this crate, by path: embedded at build time in release
 /// and wasm builds, read at run time in dev builds ([`data_text!`]).
-static FILES: [(&str, LazyLock<String>); 17] = [
+static FILES: [(&str, LazyLock<String>); 16] = [
     (CLOSED_CLASS, data_text!("lexicon/english/closed_class.ron")),
     (PREPOSITIONS, data_text!("lexicon/english/prepositions.ron")),
     (VERBS, data_text!("lexicon/english/verbs.ron")),
@@ -104,7 +126,6 @@ static FILES: [(&str, LazyLock<String>); 17] = [
         data_text!("catalogs/keyword_abilities.ron"),
     ),
     (ABILITY_WORDS, data_text!("catalogs/ability_words.ron")),
-    (COUNTERS, data_text!("catalogs/counters.ron")),
     (DESIGNATIONS, data_text!("catalogs/designations.ron")),
     (STATUSES, data_text!("catalogs/statuses.ron")),
     (TURN_PARTS, data_text!("catalogs/turn_parts.ron")),
@@ -126,7 +147,6 @@ const KEYWORD_ACTIONS: &str = "catalogs/keyword_actions.ron";
 pub const BRACKETED_TEXT_REMOVABLE: &str = "BracketedTextRemovable";
 const KEYWORD_ABILITIES: &str = "catalogs/keyword_abilities.ron";
 const ABILITY_WORDS: &str = "catalogs/ability_words.ron";
-const COUNTERS: &str = "catalogs/counters.ron";
 const DESIGNATIONS: &str = "catalogs/designations.ron";
 const STATUSES: &str = "catalogs/statuses.ron";
 const TURN_PARTS: &str = "catalogs/turn_parts.ron";
@@ -166,7 +186,6 @@ pub struct Sources {
     pub keyword_actions: Vec<KeywordAction>,
     pub keyword_abilities: Vec<KeywordAbility>,
     pub ability_words: Vec<AbilityWord>,
-    pub counters: Vec<CounterKind>,
     pub designations: Vec<Designation>,
     pub turn_parts: Vec<TurnPart>,
     pub statuses: Vec<schema::Status>,
@@ -256,7 +275,6 @@ impl Sources {
             keyword_actions: parse(KEYWORD_ACTIONS)?,
             keyword_abilities: parse(KEYWORD_ABILITIES)?,
             ability_words: parse(ABILITY_WORDS)?,
-            counters: parse(COUNTERS)?,
             designations: parse(DESIGNATIONS)?,
             turn_parts: parse(TURN_PARTS)?,
             statuses: parse(STATUSES)?,
@@ -279,6 +297,7 @@ impl Sources {
         self.parameter_patterns(&mut frames);
         check_core_and_catalogs_disjoint(&lexemes)?;
         mark_lexical_adjectival_passives(&mut lexemes)?;
+        mark_closed_class(&mut lexemes);
         Ok((lexemes, frames))
     }
 
@@ -623,62 +642,44 @@ impl Sources {
         self.counter_kinds(builder)
     }
 
-    /// The kind names of counters, and the license of the noun *counter*. A
-    /// counter's kind premodifies *counter* [CR#122.1]: a slash measure for
-    /// a +X/+Y counter [CR#122.1a], a keyword for a keyword counter
-    /// [CR#122.1b], and any other kind its kind name, a word of its own (*a
-    /// charge counter*). A kind name stands only there: it is a catalog word,
-    /// never a noun. The kind names, the keywords a keyword counter can be
-    /// and *counter*, the one noun that takes a kind, carry the license
-    /// feature `KindLicense` (`docs/design/english.md` §3).
+    /// The license of a counter's kind (`KindLicense`, `docs/design/english.md`
+    /// §3). A counter's kind premodifies the noun *counter* [CR#122.1]: a
+    /// slash measure for a +X/+Y counter [CR#122.1a], a keyword for a keyword
+    /// counter [CR#122.1b], and any other kind its Kind Name, read from the
+    /// text (*a charge counter*). The keywords a keyword counter can be hold
+    /// the license, and *counter*, the one noun that takes a kind, carries
+    /// its head and is where analysis reads a Kind Name.
     fn counter_kinds(&self, builder: &mut Builder) -> Result<(), SourceError> {
-        let keyword_counters = schema::Rule::try_from("[CR#122.1b]".to_owned())
-            .expect("a bracketed CR citation is a rule");
-        for counter in &self.counters {
-            let kind = counter.kind.as_str();
-            if kind.starts_with(['+', '-']) || kind.starts_with(|c: char| c.is_ascii_digit()) {
-                continue;
-            }
-            if counter.rule.as_ref() == Some(&keyword_counters) {
-                let id = format!("keyword:{kind}");
-                let keyword = builder
-                    .lexemes
-                    .iter_mut()
-                    .find(|lexeme| lexeme.id.as_str() == id)
-                    .ok_or_else(|| {
-                        SourceError::Invalid(format!(
-                            "keyword counter `{kind}` names no declared keyword ability"
-                        ))
-                    })?;
-                keyword
-                    .properties
-                    .features
-                    .insert(KIND_LICENSE.into(), Ident::new("Kind"));
-                continue;
-            }
-            let id = format!("counter:{kind}");
-            let mut lexeme = Lexeme::invariant(
-                &id,
-                kind,
-                Category::Catalog,
-                source(SourceKind::Catalog, COUNTERS, &id),
-            );
-            lexeme.onset = counter.onset;
-            lexeme
+        for keyword in self
+            .keyword_abilities
+            .iter()
+            .filter(|keyword| keyword.counter)
+        {
+            let id = format!("keyword:{}", keyword.lemma);
+            builder
+                .lexemes
+                .iter_mut()
+                .find(|lexeme| lexeme.id.as_str() == id)
+                .ok_or_else(|| {
+                    SourceError::Invalid(format!(
+                        "keyword counter `{}` names no declared keyword ability",
+                        keyword.lemma
+                    ))
+                })?
                 .properties
                 .features
                 .insert(KIND_LICENSE.into(), Ident::new("Kind"));
-            builder.push(lexeme);
         }
         let head = builder
             .lexemes
             .iter_mut()
             .find(|lexeme| lexeme.id.as_str() == "noun:counter")
             .ok_or_else(|| {
-                SourceError::Invalid(format!(
-                    "{COUNTERS} licenses the noun `counter`, which the core lexicon does not declare"
-                ))
+                SourceError::Invalid(
+                    "a counter's kind premodifies the noun `counter`, which the core lexicon does not declare".to_owned(),
+                )
             })?;
+        head.kind_name_host = true;
         head.properties
             .features
             .insert(KIND_LICENSE.into(), Ident::new("Head"));

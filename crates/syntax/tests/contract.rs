@@ -251,6 +251,7 @@ fn every_homograph_reaches_every_production_accepting_it() {
                     LexicalReading::OwnName { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. }
+                    | LexicalReading::KindName { .. }
                     | LexicalReading::AnchorWord { .. }
                     | LexicalReading::VoteOption { .. } => {
                         unreachable!("the text has no name in scope, label or set name")
@@ -459,11 +460,12 @@ fn multiword_lexeme_words_straddle_but_never_rebuild_it() {
 
 /// A licensed term's words, a holder of a license feature directly before its
 /// head, stand apart as a catalog term's do: only where they straddle a
-/// constituent boundary, as in *[big time] [counter damage]*, and never
-/// where another analysis rebuilds them, as the homograph noun *time*
+/// constituent boundary, as in *[big reach] [counter damage]*, and never
+/// where another analysis rebuilds them, as the homograph noun *reach*
 /// premodifying *counter* would. The term's own analysis, the Production that
-/// admits the head, builds it from its words (`docs/design/lexicon.md` §5;
-/// Sibylline Soothsayer's *time counters*).
+/// admits the head, builds it from its words (`docs/design/lexicon.md` §5; a
+/// keyword a keyword counter can be [CR#122.1b], *a reach counter*,
+/// Flycatcher Giraffid).
 #[test]
 fn licensed_term_words_straddle_but_only_its_own_analysis_rebuilds_it() {
     let license = |mut lexeme: Lexeme, value: &str| {
@@ -473,12 +475,12 @@ fn licensed_term_words_straddle_but_only_its_own_analysis_rebuilds_it() {
             .insert("KindLicense".into(), Ident::new(value));
         lexeme
     };
-    let mut kind = word("counter:time", "time", Category::Catalog);
-    kind.source.kind = SourceKind::Catalog;
+    let mut kind = word("keyword:reach", "reach", Category::Keyword);
+    kind.source.kind = SourceKind::Keyword;
     let lexicon = Lexicon::new([
         license(kind, "Kind"),
         license(noun("counter"), "Head"),
-        noun("time"),
+        noun("reach"),
         noun("damage"),
         word("a:big", "big", Category::Adjective),
     ])
@@ -496,7 +498,7 @@ fn licensed_term_words_straddle_but_only_its_own_analysis_rebuilds_it() {
             Split: Sentence -> modifier:Phrase Nominal '.' {{ capital: [modifier] }}
             Phrase: Phrase -> modifier:Lex(Adjective) Lex(Noun)
             Noun: Nominal -> Lex(Noun)
-            KindName: Kind -> Lex(Catalog)
+            KindName: Kind -> Lex(Keyword)
             KindPremodifier: Nominal -> modifier:Kind Nominal
                 where head.KindLicense := Head
             Compound: Nominal -> modifier:Lex(Noun) Nominal
@@ -518,30 +520,30 @@ fn licensed_term_words_straddle_but_only_its_own_analysis_rebuilds_it() {
     };
     let words = |ids: &[&str]| ids.iter().map(|&id| id.to_owned()).collect::<Vec<_>>();
     assert_eq!(
-        found(&unlicensed, "Time counter."),
+        found(&unlicensed, "Reach counter."),
         BTreeSet::from([
-            words(&["counter:time", "n:counter"]),
-            words(&["n:time", "n:counter"]),
+            words(&["keyword:reach", "n:counter"]),
+            words(&["n:reach", "n:counter"]),
         ])
     );
     assert_eq!(
-        found(&licensed, "Time counter."),
-        BTreeSet::from([words(&["counter:time", "n:counter"])])
+        found(&licensed, "Reach counter."),
+        BTreeSet::from([words(&["keyword:reach", "n:counter"])])
     );
-    // *[Big time] [counter damage]* straddles the boundary; *big [time
+    // *[Big reach] [counter damage]* straddles the boundary; *big [reach
     // [counter damage]]* rebuilds the term with the noun and a dependent of
     // *counter*.
-    let damage = ["a:big", "n:time", "n:counter", "n:damage"];
+    let damage = ["a:big", "n:reach", "n:counter", "n:damage"];
     assert_eq!(
         unlicensed
-            .parse(&lexicon, "Big time counter damage.")
+            .parse(&lexicon, "Big reach counter damage.")
             .readings()
             .filter(|reading| lexemes(reading) == damage)
             .count(),
         2
     );
     assert_eq!(
-        found(&licensed, "Big time counter damage."),
+        found(&licensed, "Big reach counter damage."),
         BTreeSet::from([words(&damage)])
     );
     let split = |reading: &Reading| {
@@ -551,15 +553,15 @@ fn licensed_term_words_straddle_but_only_its_own_analysis_rebuilds_it() {
     };
     assert!(
         licensed
-            .parse(&lexicon, "Big time counter damage.")
+            .parse(&lexicon, "Big reach counter damage.")
             .readings()
             .all(|reading| split(&reading))
     );
     // Admission decides the same on the Reading's own structure.
     let scope = sylex_lexicon::CardScope::default();
-    for text in ["Time counter.", "Big time counter damage."] {
+    for text in ["Reach counter.", "Big reach counter damage."] {
         for reading in unlicensed.parse(&lexicon, text).readings() {
-            let rebuilds = lexemes(&reading).contains(&"n:time".to_owned()) && !split(&reading);
+            let rebuilds = lexemes(&reading).contains(&"n:reach".to_owned()) && !split(&reading);
             let admitted = licensed.admit(&reading, &lexicon, &scope);
             if rebuilds {
                 assert!(

@@ -471,8 +471,11 @@ fn materials(lexicon: &Lexicon, reading: &LexicalReading) -> Result<BTreeSet<Mat
         LexicalReading::Word(value) => value,
         LexicalReading::Numeral { .. } => return Ok(BTreeSet::from([Material::Numeral])),
         // A card's own name is a Proper Name, as a card name's Lexeme is, and
-        // so is the name of a set.
-        LexicalReading::OwnName { .. } | LexicalReading::SetName { .. } => {
+        // so is the name of a set; a Kind Name names a counter's kind, a game
+        // word as a Catalog's are.
+        LexicalReading::OwnName { .. }
+        | LexicalReading::SetName { .. }
+        | LexicalReading::KindName { .. } => {
             return Ok(BTreeSet::from([Material::Catalog]));
         }
         // A Flavor Word is a label, as an ability word is, and so are an

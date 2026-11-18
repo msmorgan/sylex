@@ -148,13 +148,14 @@ impl Prediction {
             }
         } else {
             // An own name, an Introduced Name, a numeral, a Flavor Word, a Set
-            // Name, an Anchor Word or a Vote Option.
+            // Name, a Kind Name, an Anchor Word or a Vote Option.
             debug_assert!(matches!(
                 leaf.category,
                 Category::Catalog
                     | Category::Numeral
                     | Category::FlavorWord
                     | Category::SetName
+                    | Category::KindName
                     | Category::AnchorWord
                     | Category::OptionWord
             ));

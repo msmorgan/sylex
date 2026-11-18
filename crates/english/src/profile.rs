@@ -144,6 +144,7 @@ impl Class {
                 Self::CardName
             }
             LexicalReading::SetName { .. } => Self::SetName,
+            LexicalReading::KindName { .. } => Self::CounterKind,
             LexicalReading::AnchorWord { .. } => Self::AnchorWord,
             LexicalReading::VoteOption { .. } => Self::VoteOption,
             LexicalReading::Word(value) => {
@@ -153,7 +154,6 @@ impl Class {
                     "name" => Self::CardName,
                     "type" | "supertype" => Self::CardType,
                     "subtype" => Self::Subtype,
-                    "counter" => Self::CounterKind,
                     "catalog_verb" => Self::CatalogVerb,
                     "action" | "action_adj" => Self::KeywordAction,
                     "keyword" | "keyword_verb" | "keyword_det" => Self::KeywordAbility,

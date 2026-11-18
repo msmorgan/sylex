@@ -450,59 +450,29 @@ fn ability_words() {
     }
 }
 
+/// The keywords marked as ones a keyword counter can be are the CR's list of
+/// them [CR#122.1b]. Every other kind is read from the text: a slash
+/// measure [CR#122.1a], or a Kind Name before *counter*.
 #[test]
-fn named_counter_kinds() {
+fn keyword_counters() {
     let rules = rules();
     let sources = Sources::load().unwrap();
-    let declared: BTreeMap<String, Option<String>> = sources
-        .counters
+    let declared: BTreeSet<String> = sources
+        .keyword_abilities
         .iter()
-        .map(|counter| {
-            let rule = counter.rule.as_ref().map(|rule| rule.number().to_owned());
-            (counter.kind.to_lowercase(), rule)
-        })
+        .filter(|keyword| keyword.counter)
+        .map(|keyword| keyword.lemma.to_lowercase())
         .collect();
-    assert_eq!(
-        declared.len(),
-        sources.counters.len(),
-        "a counter kind declared twice"
-    );
-    // Keyword counters, less the closing "as well as any variants" clause.
-    let mut named: Vec<(String, &str)> = list(
+    // Less the closing "as well as any variants" clause.
+    let named: BTreeSet<String> = list(
         &rules,
         "[CR#122.1b]",
         "The keywords that a keyword counter can be are ",
     )
     .into_iter()
     .filter(|keyword| !keyword.starts_with("as well as"))
-    .map(|keyword| (keyword, "[CR#122.1b]"))
     .collect();
-    for rule in [
-        "[CR#122.1c]",
-        "[CR#122.1d]",
-        "[CR#122.1e]",
-        "[CR#122.1f]",
-        "[CR#122.1g]",
-        "[CR#122.1h]",
-        "[CR#122.1i]",
-        "[CR#122.1j]",
-    ] {
-        let text = &rules[number(rule)];
-        let end = text
-            .find(" counter")
-            .unwrap_or_else(|| panic!("{rule} names no counter"));
-        let kind = text[..end].rsplit(' ').next().unwrap();
-        named.push((kind.to_lowercase(), rule));
-    }
-    named.push(("+1/+1".to_owned(), "[CR#122.1a]"));
-    named.push(("-1/-1".to_owned(), "[CR#122.1a]"));
-    for (kind, rule) in &named {
-        assert_eq!(
-            declared.get(kind),
-            Some(&Some(number(rule).to_owned())),
-            "counter kind `{kind}` named by {rule}"
-        );
-    }
+    assert_eq!(declared, named);
 }
 
 #[test]

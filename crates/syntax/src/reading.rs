@@ -882,10 +882,12 @@ fn least(a: Tier, b: Tier) -> Tier {
 }
 
 /// A text's multiword nouns, each with whether its words may stand apart,
-/// and its licensed terms, each with its license.
+/// its licensed terms, each with its license, and the words that hold a
+/// license ([`CompiledGrammar::license_holders`]).
 type Terms<'a> = (
     &'a [(Range<usize>, bool)],
     &'a [(Range<usize>, crate::compile::License)],
+    &'a [(Range<usize>, Range<usize>, crate::compile::License)],
 );
 
 impl CompiledGrammar {
@@ -1060,6 +1062,7 @@ impl CompiledGrammar {
         let analyzed = lexicon.analyze_source_scoped(&text, None, scope);
         let atomic = self.atomic_spans(&analyzed);
         let licensed = self.licensed_terms(&analyzed);
+        let holders = self.license_holders(&analyzed);
         // A name is checked against the analysis of its text.
         if atomic.is_empty()
             && licensed.is_empty()
@@ -1080,7 +1083,13 @@ impl CompiledGrammar {
             .collect();
         let mut next = 0;
         if self
-            .atomic_reading(reading, &atoms, (&atomic, &licensed), &analyzed, &mut next)?
+            .atomic_reading(
+                reading,
+                &atoms,
+                (&atomic, &licensed, &holders),
+                &analyzed,
+                &mut next,
+            )?
             .is_none()
         {
             return Err(AdmissionError::Rejected {
@@ -1111,7 +1120,7 @@ impl CompiledGrammar {
         analyzed: &sylex_lexicon::AnalyzedText,
         next: &mut usize,
     ) -> Result<Option<Range<usize>>, AdmissionError> {
-        let (atomic, licensed) = terms;
+        let (atomic, licensed, holders) = terms;
         let inside = |at: usize, span: &Range<usize>| span.start < at && at < span.end;
         let node = match reading {
             Reading::Leaf(value) => {
@@ -1121,14 +1130,23 @@ impl CompiledGrammar {
                 // Shortened form is no name inside the full name written
                 // out, and an Introduced Name is the whole title run there.
                 // So does an Anchor Word or a Vote Option, a spelling of
-                // its shape.
-                if (matches!(value, LexicalReading::OwnName { .. })
-                    || crate::introductions::introducible(value))
+                // its shape. A Kind Name stands only right before the word
+                // it premodifies, and never where a word holding its
+                // license ends ([`CompiledGrammar::kind_name_stands`]).
+                if (matches!(
+                    value,
+                    LexicalReading::OwnName { .. } | LexicalReading::KindName { .. }
+                ) || crate::introductions::introducible(value))
                     && !analyzed
                         .matches
                         .iter()
                         .chain(&analyzed.open_words)
-                        .any(|m| m.start == at.start && m.end == at.end && m.reading == *value)
+                        .any(|m| {
+                            m.start == at.start
+                                && m.end == at.end
+                                && m.reading == *value
+                                && CompiledGrammar::kind_name_stands(m, holders)
+                        })
                 {
                     return Err(AdmissionError::OutOfScope);
                 }
@@ -1554,6 +1572,7 @@ impl CompiledGrammar {
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
+            | LexicalReading::KindName { .. }
             | LexicalReading::AnchorWord { .. }
             | LexicalReading::VoteOption { .. } => None,
         }
@@ -1634,6 +1653,7 @@ impl CompiledGrammar {
                     | LexicalReading::Numeral { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. }
+                    | LexicalReading::KindName { .. }
                     | LexicalReading::AnchorWord { .. }
                     | LexicalReading::VoteOption { .. } => Binding::Free,
                 };

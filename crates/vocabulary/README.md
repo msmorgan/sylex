@@ -33,7 +33,6 @@ vocabulary, all hand-authored RON embedded at build time.
 | `catalogs/keyword_actions.ron` | `action:`, `action_adj:` |
 | `catalogs/keyword_abilities.ron` | `keyword:`, `keyword:…:bound`, `stem:`, `keyword_verb:`, `keyword_det:`, `keyword_noun:` |
 | `catalogs/ability_words.ron` | `ability_word:` |
-| `catalogs/counters.ron` | `counter:` |
 | `catalogs/designations.ron` | `designation:` |
 | `catalogs/statuses.ron` | `status_adj:`, `prep:` |
 | `catalogs/turn_parts.ron` | `turn_part:` |
@@ -70,7 +69,11 @@ a card of a stated name).
   [Lexicon](../../docs/design/lexicon.md) §6. No catalog is scoped to the
   cards that print its words. An expansion a card's text cites
   (*the Antiquities expansion*) is in no list: it is a Set Name, read from
-  the text ([Lexicon](../../docs/design/lexicon.md) §2). Nor is a name a
+  the text ([Lexicon](../../docs/design/lexicon.md) §2). Nor is a counter's
+  kind (*a charge counter*): a slash measure and a keyword a keyword counter
+  can be (`counter: true` in `keyword_abilities.ron` [CR#122.1b]) are
+  themselves, and any other kind is a Kind Name, read from the text (Lexicon
+  §2). Nor is a name a
   card's text introduces, as the name of a token it creates: it is an
   Introduced Name, read from the text (Lexicon §6). Nor is an Anchor Word
   [CR#614.12c] or a Vote Option [CR#701.38b]: each is read from the face's

@@ -112,7 +112,7 @@ CREATE TABLE families (
 -- lexeme and Word Form), `own name` (the face's own name, declared by no
 -- lexeme, with its name form `Full` or `Shortened` as `form`), `introduced
 -- name` (a name the text itself gives an object, spelled as its `surface`),
--- `flavor word`, `set name`, `anchor word`, `vote option` or `numeral`
+-- `flavor word`, `set name`, `kind name`, `anchor word`, `vote option` or `numeral`
 -- (with `value`).
 CREATE TABLE leaves (
     unit INTEGER NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE leaves (
     start INTEGER NOT NULL,
     end INTEGER NOT NULL,
     surface TEXT NOT NULL,
-    kind TEXT NOT NULL CHECK (kind IN ('word', 'own name', 'introduced name', 'flavor word', 'set name', 'anchor word', 'vote option', 'numeral')),
+    kind TEXT NOT NULL CHECK (kind IN ('word', 'own name', 'introduced name', 'flavor word', 'set name', 'kind name', 'anchor word', 'vote option', 'numeral')),
     lexeme TEXT REFERENCES lexemes,
     form TEXT,
     value INTEGER,

@@ -1,0 +1,14 @@
+# A counter's kind before *counter* [CR#122.1]: a slash measure [CR#122.1a] and a keyword a keyword counter can be [CR#122.1b] are themselves, and any other word is a Kind Name, read from the text with no list of kinds
+# Bomb Squad's "{T}: Put a fuse counter on target creature." with an unlisted word for its kind.
++ <card=Bomb Squad> {T}: Put a goddamn counter on target creature. => Kind "goddamn"; NounPhrase "a goddamn counter" as Object of put; readings 1
++ <card=Bomb Squad> {T}: Put a fuse counter on target creature. => Kind "fuse"; readings 1
++ <card=Travel Preparations> Put a +1/+1 counter on each of up to two target creatures. => Kind "+1/+1"; Measure "+1/+1"; readings 1
++ <card=Spontaneous Flight> Target creature gets +2/+2 until end of turn. Put a flying counter on it. => Kind "flying"; KeywordPhrase "flying"; readings 1
++ <card=Mai, Jaded Edge> <legendary> Exhaust — {3}: Put a double strike counter on Mai. => Kind "double strike"; KeywordPhrase "double strike"; !Kind "strike"; readings 1
+# The article before an unlisted word records its Onset.
++ <card=Midnight Clock> {2}{U}: Put an hour counter on this artifact. => Kind "hour"; readings 1
++ <card=Omo, Queen of Vesuva> <legendary> Each land with an everything counter on it is every land type in addition to its other types. => Kind "everything"
+# A word of a closed class or an adjective before *counter* is itself, and no Kind Name.
++ <card=Suncleanser> Remove all counters from target creature. => !Kind "all"
++ <card=Ichormoon Gauntlet> Put an additional counter of that kind on that permanent. => !Kind "additional"
++ <card=Solemnity> Players can't get counters. => !Kind "get"; readings 1
