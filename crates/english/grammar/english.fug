@@ -736,7 +736,7 @@ class StrandableHave = ["verb:have", "verb:haven't"]
 class StrandableBe = ["verb:be", "verb:aren't"]
 class StrandableDo = ["verb:do", "verb:don't"]
 // They float as an Adjunct after a plural Subject or an auxiliary (CGEL
-// 5§9.2:413). *All* floats after a personal pronoun only (FloatedAll).
+// 5§9.2:413). *All* floats in FloatedAll.
 class FloatingQuantifier = ["det:each", "det:both"]
 class SuperlativeQuantifier = ["det:most", "det:least", "det:fewest"]
 // The determinatives that modify a comparative of inequality (*no more
@@ -1641,8 +1641,11 @@ BoundedEquativeDeterminer: DeterminerPhrase -> modifier:AdverbPhrase DeterminerP
     where modifier.AdjunctPosition = Bounding,
           head.Grade := Equative
 // A modified degree determinative as a fused head (*that many*, *tied for
-// the most*); a coordination fuses only as a FusedQuantity. Count only:
-// never *that much*.
+// the most*); a coordination fuses only as a FusedQuantity. A non-count one
+// is English too (*It didn't cost [that much]*; CGEL 17§5.1:1504, [2i]),
+// but `$.Countability = Count` is an admission gate (english.md §6): it
+// keeps a second, non-count tree of the fused *the most* off *is tied for
+// the most* (Hooded Horror), where *most* counts creatures.
 FusedDegreeDeterminer: FusedNounPhrase -> DeterminerPhrase { heavy: [head], uncoordinated: [head] }
     where head.ComplementKind = Intransitive,
           head.TargetMarked != Marked,
@@ -2585,10 +2588,13 @@ FloatedEach: Clause -> subject:NounPhrase adjunct:Class(FloatingQuantifier) Verb
           head.VerbForm = Finite,
           $.ClauseMarking = Unmarked,
           $.ClauseShape = SubjectInitial
-// *They all share a color*: after a personal pronoun Subject only.
+// *They all share a color* (Common Cause): *all* floats as an Adjunct after
+// a pronoun or a full Noun Phrase Subject, as *both* and *each* do (CGEL
+// 5§9.2:413, [13]). `subject.Number = Plural` is an admission gate
+// (english.md §6): it keeps the noun *exile* from a Subject that *all*
+// floats after, *[Exile] all [untapped creatures]* (False Floor).
 FloatedAll: Clause -> subject:NounPhrase adjunct:Word(All) VerbPhrase { transparent: [head] }
     where subject.Number = Plural,
-          subject.Case = Nominative,
           subject.Number = head.Number,
           subject.Person = head.Person,
           head.VerbForm = Finite,
@@ -2672,8 +2678,8 @@ AdverbModifiedParticiple: Participle -> modifier:AdverbPhrase Participle { cost:
 PrefixedParticiple: Participle -> prefix:Lex(Affix) Participle { cost: 0 }
     where $.Polarity = Negative
 NounConjunct: NounPremodifierConjunct -> NounPremodifier { cost: 0 }
-// A noun premodifier sits inside determinative and adjectival ones,
-// never outside them or on a determined symbol (*amount {G}*).
+// A noun as one Attribute of a coordinated premodifier (*the basic, Sphere,
+// and Locus lands*, Monument to Perfection).
 NounAttribute: Attribute -> filler:NounPremodifier
     where $.ConjunctKind = NounPremodifier,
           $.Polarity = filler.Polarity
@@ -2690,15 +2696,16 @@ AdjectivalAttribute: Attribute -> filler:AdjectivePhrase
           filler.AdjectivePosition != Predicative,
           $.ConjunctKind = AdjP,
           $.Polarity = filler.Polarity
-// Oracle sets off with commas only independent negative modifiers of one
-// head, so each premodifier of an asyndetic chain is `Polarity: Negative`
-// (OSG §6, Determiners and modifier order). Any other comma is a serial
-// coordination's (*a Swamp, Mountain, black permanent, or red permanent*).
-// The `Polarity := Negative` carries here and in AttributeSequence and
-// FinalAttribute are one admission gate (english.md §6), with no effect apart: they
-// keep *Plains* from an asyndetic premodifier before the coordination
-// *Island, Swamp, or Mountain* (*a Plains, Island, Swamp, or Mountain card*,
-// Farseek).
+// Premodifiers separated by commas alone are an asyndetic coordination,
+// where without the comma they would stack (CGEL 20§3.2.1:1739, [10v]):
+// *noncreature, nonland card*. The `Polarity := Negative` carries here and
+// in AttributeSequence and FinalAttribute make every premodifier of the
+// chain negative. They are one admission gate (english.md §6), each with no
+// effect without the others: they keep *Plains* from an asyndetic
+// premodifier before the coordination *Island, Swamp, or Mountain* (*a
+// Plains, Island, Swamp, or Mountain card*, Farseek), leaving that comma a
+// serial coordination's. The chains Oracle prints are of independent
+// negative modifiers (OSG §6, Determiners and modifier order).
 AsyndeticAttributes: Attributes -> first:Attribute ',' rest:AttributeChain
     where first.Polarity := Negative
 AttributeSequence: AttributeChain -> first:Attribute ',' rest:AttributeChain
@@ -2713,6 +2720,15 @@ AttributedPremodifier: Premodifier -> Attributes { cost: 0 }
 // admission gate that keeps the subtypes *Urza's* and *Saga* from
 // premodifying it in Golgothian Sylex's wording citing Urza's Saga (*the
 // Urza's Saga expansion*, tests/set_names.rs).
+// A noun's default place is next to the head, inside adjectives (CGEL
+// 5§15:453–454, [10]–[11]), but that order is labile and no equation keeps
+// it: *a Goblin red creature token* parses. `head.DeterminerNeed !=
+// Required` is an admission gate (english.md §6): a noun premodifies no
+// nominal that needs a determiner (a numeral, a symbol, or one an
+// adjective passes the need to), which keeps *mana value* from premodifying
+// the numeral *3 or greater* in *protection from mana value 3 or greater*
+// (Mistmeadow Skulk) and *creature* and *cost* from premodifying *{2}* in
+// *target this creature cost {2} less* (Dwarven Mauler).
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
     where head.DeterminerNeed != Required,
           head.KindLicense != Head,
@@ -3227,8 +3243,13 @@ ModifiedQuantifiedPostmodifier: ModifiedQuantifiedNominal ->
     ModifiedQuantifiedNominal modifier:Postmodifier
     where head.QuantityNumber = modifier.Number,
           head.NounKind = modifier.NounKind
-// Only a marked relative follows a fused head (*one that hasn't been
-// chosen*).
+// A relative clause after a fused head (*one that hasn't been chosen*);
+// FusedParticipialPostmodifier adds a passive participle. A bare relative
+// follows a fused head in English too (*someone I know*; CGEL 5§9.1:412,
+// [7b]), but `modifier.ClauseMarking = Relative` is an admission gate
+// (english.md §6): it keeps a fused numeral from taking a bare relative
+// whose Subject is a coordination, *draw [two [[cards and you] lose 2
+// life]]* (Abzan Charm).
 FusedPostmodifier: FusedNounPhrase -> FusedNounPhrase modifier:RelativeClause
     where modifier.ClauseMarking = Relative,
           head.Number = modifier.Number
@@ -3405,10 +3426,12 @@ PostposedAdjective: PostposedModifier -> AdjectivePhrase { cost: 5, heavy: [head
           head.Grade := Equative,
           head.Voice != Passive
 
-// A Preposition's Clause Complement: finite (*when this creature enters*)
-// or verbless (*if able*). `unlinked`: a sole connective never links
-// subordinate clauses, so never *until [they exile a nonland card, then you
-// may cast it]*.
+// A Preposition's finite Clause Complement (*when this creature enters*);
+// a verbless one is VerblessComplementClause's (*if able*). `unlinked` is an
+// admission gate (english.md §6) that settles the scope of a comma-plus-*then*
+// link outside the Complement: it keeps *until you exile a nonland card,
+// then put that card into your hand* (Demonlord Belzenlok) from a second
+// tree that links *then put …* inside the *until* Clause.
 FiniteComplementClause: FiniteClause -> Clause { unlinked: [head] } where head.VerbForm = Finite
 // A comparative clause has a gap where its comparative governor
 // corresponds (CGEL 13§2.1:1108): a Gap (*as many cards as they discarded
@@ -3538,8 +3561,13 @@ parameters BoundKeyword { head: Keyword, binding: Suffix }
 // Readings stand, and semantics rejects the agent one (english.md §4). An
 // auxiliary has no prepositional or adjectival passive, nor has a verb with
 // a declared Adjectival Passive (*tapped*) an adjectival one; an Adjectival
-// Passive is predicative. A shifted heavy Object is determined (*chooses
-// from among them [an artifact, a creature, …]*).
+// Passive is predicative. An Object shifts past an Adjunct or Complement
+// (*chooses from among them [a creature card, a land card, and …]*, Guided
+// Passage), which CGEL conditions on relative weight and newness, not
+// determination (16§4:1382–1384). `shifted_object`'s `Determination :=
+// Overt` is an admission gate (english.md §6): it keeps a bare plural from
+// shifting past a Preposition Phrase whose Object is a numeral, *enters
+// [with three] [+1/+1 counters on it]* (Adaptive Shimmerer).
 valence VerbPhrase {
     head: Verb,
     active: [$.Voice = Active],
