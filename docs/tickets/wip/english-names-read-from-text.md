@@ -11,10 +11,11 @@ individual cards before parsing: each name, and the cards on which it stands. A 
 the name of a token it creates [CR#111.4], so the name is a string read from that text (*Rinoa
 Heartilly*'s "create Angelo, a legendary 1/1 green and white Dog creature token"). The list goes.
 
-The list also misses names. Nine in-scope cards create "a tapped Planet land token named New
-Planet" (*Genesis Effect*, *Artificial Anomaly*, ...). "New Planet" is not listed, and each line's
-only Reading today reads "named New Planet" as a participle premodifying the nominal "New Planet"
-(adjective *new* and subtype *Planet*).
+A list also misses names until someone adds them. Nine in-scope cards create "a tapped Planet
+land token named New Planet" (*Genesis Effect*, *Artificial Anomaly*, ...). When the evidence
+below was gathered "New Planet" was not listed, and each line's only Reading read "named New
+Planet" as a participle premodifying the nominal "New Planet" (adjective *new* and subtype
+*Planet*). The list has held it since (103 names), so those lines already read the name.
 
 Evidence (gitignored), all from `data/mtgjson/AllPrintings.sqlite` (in-scope faces, reminder
 text removed): `docs/evidence/names-read-from-text/`.
@@ -102,17 +103,28 @@ in the middle of a sentence at several positions. And it is used again after its
   Frost Tongue"`), computing phonological `Edges` for genitive `'s` and `a`/`an`, and `english.fug`
   admits the read-name leaf only at the introducing positions: the complement of *named*, the Object
   of *create* before a token-description Supplement, and the complement of `its name is` in a copy's
-  exception.
-- Reuse is unit-local in two passes: Pass 1 harvests names licensed by completed introducing
-  constituents on the unit (even when a later sentence in the unit cannot yet parse), and Pass 2
-  admits those names across `Name` positions of that unit, verifying in both Pass 2 and
-  `CompiledGrammar::admit` (`docs/design/english.md` §7, round-trip law 2) that any non-licensing
-  read-name leaf co-occurs with a licensing introduction of that exact name in the same `Reading`.
+  exception. No run starts inside a card name written out, and a genitive mark that ends a run is
+  no part of it (*Beau's power*).
+- The grammar names no Catalog item (`docs/design/english.md` §2), so *create*, *token* and
+  *name* join the Lexical Classes `NamingVerb`, `TokenNoun` and `NameNoun` in their own
+  declarations, and a Production states which head its phrase is a Complement of
+  (`complement_of`, `within`, `not_complement_of`) or which word heads a child (`headed_by`).
+- Reuse is unit-local: a title run the unit writes at more than one place is admitted across
+  `Name` positions of that unit, and both the parse and `CompiledGrammar::admit`
+  (`docs/design/english.md` §7, round-trip law 2) verify that any non-licensing read-name leaf
+  co-occurs with a licensing introduction of that exact name in the same `Reading`: each
+  Constituent's summary records the names it introduces and the names it names again, and a root
+  holds the second set within the first. (A first pass that harvests names and a second that
+  admits them cannot read a name named before its introduction, which admission, having no
+  order to check, would still admit: the two would disagree, against law 2.)
+  A name named again is never the Object of *create*, which offers the name anew (*Jiang
+  Yanggu*'s "If you don't control a creature named Mowu, create Mowu, a legendary ... token").
 - `<OtherCardName>` premodifying the head *token(s)* inside a modifiable `Nominal` in the Object of
   *create* (*Disa the Restless*'s `"create a Tarmogoyf token"`, *Mutable Explorer*'s `"create a
-  tapped Mutavault token"` [CR#111.11]) opts in to `OtherCardName()` (`docs/design/lexicon.md` §6),
-  refused where a predefined token or a subtype spells the name (*Blood Fountain*'s `"create a Blood
-  token"` keeps its single Reading).
+  tapped Mutavault token"` [CR#111.11]) opts in through `DistinctOtherCardName()`
+  (`docs/design/lexicon.md` §6), which refuses a card name any other word is spelled like, a
+  predefined token's name or a subtype among them (*Blood Fountain*'s `"create a Blood token"`
+  keeps its single Reading).
 - A read name is a Proper Name, unmarked for Number (`lexicon.md` §6). Its genitive is formed as a
   card name's is (*Beau's power*).
 - `introduced_names.ron`, the `IntroducedName` schema type, its loader path and the
@@ -122,9 +134,11 @@ in the middle of a sentence at several positions. And it is used again after its
 
 - `introduced_names.ron` is deleted, with its loader path, the `IntroducedName` schema type and its
   README row. No card-scoped Catalog remains for introduced names.
-- Every line in `docs/evidence/names-read-from-text/inputs.bin` has the same derivation count as
-  in `parse-lists.txt`. The exceptions are the nine New Planet lines, which have a Reading with
-  "New Planet" as the complement of *named*.
+- No Corpus Unit's Derivation count changes, by SQL over the forest database before and after
+  (`units.derivations`), and each unit's Introduced Name leaves are the listed names it had, the
+  five card-named tokens apart. (`inputs.bin` and `parse-lists.txt` predate the stated
+  `<legendary>` flag, so 74 of their lines no longer parse as written; the forest database reads
+  every face with its own type line.)
 - Grammar or judgment tests, each on the real card's line, pin one example per construction in
   the table. They also pin a reuse after *named* on another line (*The Curse of Fenric* III), one
   with no introduction on the face (*Hand of Vecna*), a reuse in a quoted ability (*The Coming
@@ -158,8 +172,9 @@ in the middle of a sentence at several positions. And it is used again after its
     example. Flavor Word is no longer "the one open lexical slot". Card Scope drops "an Introduced
     Name … only where it holds one of its cards".
   - `crates/vocabulary/README.md` no longer lists `introduced_names.ron`.
-- `cargo xtask english strata --check` passes, and the census changes only on the New Planet
-  units. `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_lexicon`,
+- `cargo xtask english strata --check` passes, and no stratum's census row changes. One unit's
+  skeleton does: *Rinoa Heartilly*'s second line opens with the Flavor Word "Angelo Cannon —",
+  whose first word the list read as the name. `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_lexicon`,
   `sylex_vocabulary`, `sylex_syntax`, `sylex_english` and `xtask`.
 
 ## Not in scope
