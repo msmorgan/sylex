@@ -257,8 +257,8 @@ Catalog.
 
 **Proper Name**:
 The lexical Category of an opaque name: a card name or Shortened Name, a
-dungeon name, a predefined token name, an Introduced Name, a vote option or an
-Anchor Word. The code calls it `Category::Catalog`.
+dungeon name, a predefined token name, an Introduced Name or a vote option.
+The code calls it `Category::Catalog`.
 _Avoid_: Catalog for this Category
 
 **Document**:
@@ -305,9 +305,9 @@ The CR term [CR#207.2c], here also covering ability words printed on
 Vintage-legal cards that the CR's list omits.
 
 **Flavor Word**:
-The CR term [CR#207.2d]. It is an open lexical slot, as a Set Name and an
-Introduced Name are: no inventory lists Flavor Words, so the italic run is
-captured verbatim.
+The CR term [CR#207.2d]. It is an open lexical slot, as a Set Name, an
+Introduced Name and an Anchor Word are: no inventory lists Flavor Words, so
+the italic run is captured verbatim.
 _Avoid_: flavor text
 
 **Set Name**:
@@ -318,7 +318,16 @@ its noun.
 _Avoid_: cited name
 
 **Anchor Word**:
-The CR term [CR#614.12c]. It is in scope only on the cards that print it.
+The CR term [CR#614.12c]: one of the two words a face's text offers as its
+permanent enters, each heading the bulleted ability linked to that choice. It
+is an open lexical slot and no Proper Name: no inventory lists it, and it is
+read from a face's text across its units, as a label of a bulleted line that
+an Anchor Choice of another line offers. It stands only where the Card Scope
+holds it, heading its ability or in an Anchor Choice.
+
+**Anchor Choice**:
+The two Anchor Words an ability offers, joined by *or* (*choose Khans or
+Dragons*). The words are cited, so it stands where a cited word does.
 
 **Shortened Name**:
 A shortened card name [CR#201.5c]: the Shortened form of a card's Own Name,
@@ -328,11 +337,12 @@ whether or not its own text uses it.
 
 **Card Scope**:
 The card names a text is in the scope of, each with the forms of it that the
-text admits. A face's text holds its own name in its Full form and, where the
-card has a Shortened Name, in its Shortened form [CR#201.5c]; a face's Card
-Scope is derived from its name and type line when its text is parsed. An Own
-Name stands only where the Card Scope holds that form of it, and an Anchor
-Word only where it holds one of its cards.
+text admits, and the Anchor Words of that text. A face's text holds its own
+name in its Full form and, where the card has a Shortened Name, in its
+Shortened form [CR#201.5c]; a face's Card Scope is derived from its name and
+type line, and its Anchor Words from its rules text, when its text is parsed.
+An Own Name stands only where the Card Scope holds that form of it, and an
+Anchor Word only where it holds that word.
 
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5]. It

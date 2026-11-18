@@ -316,11 +316,11 @@ Adding or retiring a gate follows this section and needs no ruling.
 production-directed scanning. Every alternative names a declared Lexeme with
 its lexical Category, Word Form, features and Provenance, or is one of the
 leaves no Lexeme declares: a numeral, a card's own name, and the open slots
-read by their shape, a Flavor Word, a Set Name and an Introduced Name
-([Lexicon](lexicon.md) §2, §6). An unknown word is reported as a vocabulary
-gap, never guessed; a title run is one unless the parse takes it as an
-Introduced Name. Analysis and realization share
-the same inflection rules. Why: the parser then sees every lexical
+read by their shape, a Flavor Word, a Set Name and an Introduced Name, and
+an Anchor Word the parse context holds ([Lexicon](lexicon.md) §2, §6). An
+unknown word is reported as a vocabulary gap, never guessed; a title run is
+one unless the parse takes it as an Introduced Name. Analysis and realization
+share the same inflection rules. Why: the parser then sees every lexical
 alternative, so no choice is hidden in a scanner, and a word is spelled the
 way it is read.
 
@@ -335,7 +335,11 @@ values grow with the number of trees, which is exponential, while the forest
 stays polynomial.
 
 **Both round-trip laws hold**, under the same parse context and Lexical
-Environment:
+Environment. The parse context is the Card Scope: the card names and the
+Anchor Words a text is read with. What decides a face's Anchor Words lies in
+several of its units, so it is decided before any unit's Readings are taken,
+and each unit is then parsed and admitted with the one scope; neither looks
+at another unit.
 
 ```
 v is an admitted Reading of s                      =>  render(v) = s

@@ -31,11 +31,24 @@ a multiword term and its words, or a host and its bound affix, stand as
 alternatives, and the chart decides between them (§5).
 
 **Nothing is guessed.** An unknown word is a vocabulary gap, and no Category is
-inferred from spelling: braces do not license an unknown symbol. Three slots
+inferred from spelling: braces do not license an unknown symbol. Four slots
 are open, each read from the text at its own positions because nothing
 enumerates what fills it. A Flavor Word is the italic run before an ability's
 em dash [CR#207.2d]. An Introduced Name is a name the text itself gives an
 object [CR#111.4], the title run written where the text introduces it (§6).
+An Anchor Word is one of the two words a face's text offers as its permanent
+enters, each heading the bulleted ability linked to that choice
+[CR#614.12c,607.2m] (*choose Khans or Dragons*; *• Khans — ...*). No one line
+settles it: a bulleted line that opens with a label may be a flavor-labeled
+mode (*• Thay — ...*, Cult of Skaro), and a line that offers two capitalized
+words may offer two subtypes (*choose Island or Swamp*, Roots of Life
+[CR#607.2d]). So it is read across a face's lines: they are parsed with the
+label of every bulleted line in scope as an Anchor Word, and the labels that
+an Anchor Choice in some Derivation of a line offers are the face's Anchor
+Words. Its Card Scope holds them (§6), and an Anchor Word leaf stands only
+where the scope holds its word, at the head of a bulleted ability and in an
+Anchor Choice; there the label is no Flavor Word. A text read alone states
+its Anchor Words as it states its card's name.
 A Set Name is the name of an expansion a card's text cites before the noun *expansion* [CR#206.3a..206.3c] (*a name originally printed in the
 Antiquities expansion*): no card-scoped list or catalog of printed sets is
 consulted. It is read by title shape alone, right before a noun whose parameter
@@ -121,7 +134,7 @@ vocabulary, so a finer split of either side adds nothing.
 
 **Every game word is a `.syl` declaration** of its own sort under `plugins/`,
 its `lexical` field beside its spelling and meaning ([Syl](syl.md) §1–2):
-*Khans* is `khans.syl`, of the AnchorWord sort. A Catalog verb that means
+*creature* is `creature.syl`, of the `card_type` sort. A Catalog verb that means
 nothing on its own and is shared across phrases (*face* [CR#700.17,701.55],
 *beam* [CR#702.196]) is a `verb` declaration (`Verb`) carrying only `lexical`,
 which each declaration using the verb names in its `lexical`. Why: a word's
@@ -183,8 +196,9 @@ way, as a Catalog term's words are.
 
 **Names are scoped.** A card's own name, full or Shortened, is its own only in
 the text of its own face [CR#201.5,201.5c,712.6], and everywhere in
-that text. A face's Card Scope is its own name and nothing else, in its Full
-form and, where the card has a Shortened Name, in its Shortened form. The name
+that text. A face's Card Scope holds, of card names, its own name and nothing
+else, in its Full form and, where the card has a Shortened Name, in its
+Shortened form; beside the name it holds the face's Anchor Words (§2). The name
 of a meld result is the name of neither card of its meld pair, so it is another
 card's name on both, and neither card's text shortens it: *Mishra* on
 Phyrexian Dragon Engine is no name.
