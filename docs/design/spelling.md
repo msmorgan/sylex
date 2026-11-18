@@ -81,8 +81,8 @@ Why substitution only:
   stands in the Reading.
 - **`.syl` sorts line up with English constituents.** A Hole is one constituent, or a run of
   sentences (below), so a parameter's sort is the sort of one phrase of the Reading. That is what
-  lets the sort of a slot decide a word's coercion ([`.syl`](syl.md) §3): "creature" is a noun
-  phrase's head at one sort and a modifier at another, and the slot it fills says which.
+  lets the sort of a slot decide what a word is there ([`.syl`](syl.md) §3): "creature" is a noun
+  phrase's head at one slot and a modifier at another, one word of one sort in both.
 
 Substitution is in no lower complexity class than one-sided adjunction, which is context-free
 and cubic too (§8). What it buys is the shape of what recovery searches and of what the term
@@ -134,17 +134,19 @@ has, or a Template holds the word in its one fixed fragment:
   nominal has one tree; a coordinated head is allowed, as "target
   white creature or black Zombie you control" writes
   `nominal(or([nominal(pre = [white], creature), nominal(pre = [black], zombie)]), post =
-  [youControl])`. Inside a `PreModifier` coordination, a stacked arm of two or more premodifiers is
-  `stacked([…])` (`"$modifiers#<>"`, *Acclaimed Contender*'s "Knight, Aura, Equipment, or legendary
-  artifact card"), refused with fewer than two elements, and refused, as is any `PreModifier`
-  `and` coordination, outside an item of an "or" or "and/or" coordination. An Agreement phrase
+  [youControl])`. An arm of a coordination in `pre` that has a modifier of its own is a
+  nominal: *Acclaimed Contender*'s "Knight, Aura, Equipment, or legendary artifact card" is
+  `nominal(pre = [or([knight, aura, equipment, nominal(pre = [legendary], artifact)])], card)`,
+  its `or` standing at `Nominal`. Outside a coordination's arm a `nominal` with modifiers of its
+  own is refused in `pre`. An Agreement phrase
   printed among postmodifiers (`withDifferentNames`, `withTheSameName`) stands in `post` in its
   printed place (*Eerie Ultimatum*'s "permanent cards with different names from your graveyard") and
   is refused when its enclosing consumer forms no plural group. A copular relative after the head
-  ("that's <predicative>") is `thatIs(predicative)`, its complement a `Predicative` as the copula's
-  is: *Battlegate Mimic*'s "a spell that's both red and white" is `nominal(spell, post =
-  [thatIs(both(red, white))])`, a color standing at `Predicative` through its coercion and the
-  correlative "both" being `both`. Where one construction prints its own words on both sides of the
+  ("that's <predicative>") is `thatIs(predicative)` at `RelativeClause`, its complement a
+  `Predicative` as the copula's is: *Battlegate Mimic*'s "a spell that's both red and white" is
+  `nominal(spell, post = [thatIs(both(red, white))])`, a color standing at `Predicative` as a
+  member of `AdjectivePhrase` and the correlative "both" being `both`, there at
+  `AdjectivePhrase`. Where one construction prints its own words on both sides of the
   head, it is a Template at `Nominal` with Holes on both sides of `$head` (`ordinalRelative`,
   *Highspire Bell-Ringer*'s "second spell you cast each turn").
 - **A word printed in several places is a Template per placement.** "Also" stands between a
@@ -470,10 +472,8 @@ it is printed or used ([`.syl`](syl.md) §4). A value the text prints once is wr
 ([`.syl`](syl.md) §2). A Hole that a wording prints twice is the same argument both times, and
 recovery admits the wording only when the two printings agree.
 
-One wording recovers one written form. Where `.syl` admits two written forms of one term, the
-bare word a coercion wraps and the written call of the primitive it wraps through, recovery
-yields the bare form, which is the corpus's ([`.syl`](syl.md) §2;
-`docs/specs/kind-sorts-and-position-unions.md` leaves the bare word the only form). Likewise, when a Template's
+One wording recovers one written form. A word that stands at a sort through membership is
+written bare and has no wrapped form ([`.syl`](syl.md) §2). When a Template's
 expansion is a call that could also be written directly, the written form is the Template: a
 one-condition trigger is the Ability `when`, `whenever` or `at`, and `triggered` is written only
 over a disjunction of trigger conditions. And when a Tail's host has no other trailing dependent,
@@ -643,8 +643,8 @@ element as a run of sentences (`*`, below) after the one before, so such a list 
 each element on a line of its own, as the modes of a modal ability are printed. A mode's bullet is
 the mode's own wording, "• $action", so it prints before the first mode too. No parameter chooses a
 join: a coordinator is printed by the Template that names it, as the Templates `and`, `or` and
-`andOr` print "and", "or" and "and/or" over the `coord` primitives (at `NounPhrase`, `Nominal`,
-`PreModifier`, `PostModifier`, `Predicative`, `Predicate` and `Location`), which have no `spelling`. The commas of a coordination of three or
+`andOr` print "and", "or" and "and/or" over the `coord` primitives (one for the sorts of
+describing phrases, nominals and noun phrases, and one each at `Predicate` and `Location`), which have no `spelling`. The commas of a coordination of three or
 more are the English layer's and are never written. One element prints alone, with no join; where
 the `spelling` outside optional parts is one list Hole and an element can stand at the result sort,
 a list of one words as its element, so that declaration spells lists of two or more only. An
@@ -737,14 +737,14 @@ are never markup. `+` is Oracle's too ("+1/+1", Will Kenrith's "[+2]"), and is n
   grammar: its in-place part at a Category its result sort is spelled as, and each Tail as a
   trailing dependent of a host of its named Category, each Hole standing for a phrase of any
   Category that its own sort's Constructions spell, with the features agreement will fix left
-  unmarked. A sort is not one Category (`docs/specs/kind-sorts-and-position-unions.md` makes
-  each kind of phrase a sort and these positions sorts over them): a `PreModifier` is a noun in "creature card" and an
-  adjective in "tapped creature", and a `PostModifier` is a preposition phrase in "with flying" and
-  a relative clause in "you control". A `spelling` whose in-place part parses in several ways names
+  unmarked. A kind sort is one Category and a position sort a function
+  ([Surface](surface.md) §1): a `PreModifier` Hole is filled by a nominal in "creature card" and an
+  adjective phrase in "tapped creature", and a `PostModifier` Hole by a preposition phrase in
+  "with flying" and a relative clause in "you control". A `spelling` whose in-place part parses in several ways names
   no one fragment, and which of them spelling prints is open (§10).
 - **Its skeleton is ambiguous.** Replace each Hole by its parameter's sort, with a tie's affix as
-  a word on its side of the sort, counting two sorts as one when a coercion or `Option` takes one
-  to the other, each optional part by an optional, each list Hole by one or more of its element's
+  a word on its side of the sort, counting two sorts as one when `Option` takes one to the other or
+  when some sort is in the surface Reaches of both ([`.syl`](syl.md) §3), each optional part by an optional, each list Hole by one or more of its element's
   sort with its join between, each Tail by a bracketed section keyed by its placement and host
   Category around its own parts, and a Gap or own-name token by its own single atom. The result is a regular
   expression over words, sorts and markers, and no sequence may match it in two ways. Two optional

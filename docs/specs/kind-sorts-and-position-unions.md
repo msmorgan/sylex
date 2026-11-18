@@ -2,14 +2,15 @@
 
 ## Status: DRAFT
 
-This spec gives direction, not a settled design. It has been reviewed against the declarations
-and simulated over them (`docs/evidence/syl-kind-sorts/`), and no part of it has been built or
-run through `cargo xtask dsl check`. Where building it shows a rule here to be wrong or
-incomplete, the finding stands and this text is revised; a builder reports the conflict and does
-not bend the code to fit the spec. Known to be unsettled: how the lookback and the passive stand
-after a head once a participle is its own sort, and negation over "be" (§8); the per-word unit
-counts, which are upper bounds; and §4's coordinator rule, which is simulated over 165 calls of
-which only three land at a position sort.
+This spec gives direction, not a settled design. §1 to §5 are built: `sylex_syl` parses
+`member`, `denotes` and the `at` list, `cargo xtask dsl check` resolves in the two modes and
+enforces the load rules, and `plugins/` is declared as §5 says; `syl.md` §2 and §3 and
+`surface.md` §1 state what is built, and where they and this text differ they hold. §6 to §9 are
+still to build. Where building shows a rule here to be wrong or incomplete, the finding stands
+and this text is revised; a builder reports the conflict and does not bend the code to fit the
+spec. Known to be unsettled: how the lookback and the passive stand after a head once a
+participle is its own sort, and negation over "be" (§8); and the per-word unit counts, which are
+upper bounds.
 
 A phrase that describes something is declared at the sort that names its kind: an adjective
 phrase, a preposition phrase, a relative clause, a participle, a nominal or a noun phrase. The
@@ -19,7 +20,6 @@ coercion. What a describing phrase means is an unspelled test at a sort of its o
 card's term cannot reach and a Template's body can. A coordinator is declared once for the sorts
 it coordinates and stands at the lowest sort that holds its arms.
 
-The `.syl` below is the shape of the design. It has not been run through `cargo xtask dsl check`.
 Counts are Corpus Units of Vintage-legal cards in `data/derived/english-forests.sqlite` in which
 some Derivation has the phrase in that function; they are upper bounds. Site counts are the call
 sites the checker resolves to a declaration, builtin / canon.
@@ -114,8 +114,11 @@ the only written form.
 - `Status` is a member of nothing. It stays the sort of the game's statuses, which `setStatus`,
   `becomeStatus`, `entersAs` and the test `hasStatus` take, and its words carry no spelling. Each
   wording is a Template at its kind over `hasStatus`: `tapped` and `untapped` at
-  `AdjectivePhrase`; `faceDown`, `faceUp`, `phasedIn` and `phasedOut` at `PrepositionPhrase`,
-  spelled "face down", "face up", "phased in" and "phased out". The hyphenated "face-down" (60
+  `AdjectivePhrase`; `faceDown` and `phasedOut` at `PrepositionPhrase`,
+  spelled "face down" and "phased out". The pool prints "face up" only as a verb's dependent
+  ("turn it face up", "exiles that card face up") and never prints "phased in", so neither has a
+  describing phrase to declare; `syl-verb-phrase-dependents` declares "face up" where a verb
+  phrase takes it. The hyphenated "face-down" (60
   units), "face-up" (17) and "phased-out" (1) stand only before a head and are `PreModifier`
   Templates, `faceDown`, `faceUp` and `phasedOut`; `PrepositionPhrase` is no member of
   `PreModifier`, so the two `faceDown`s share no position. When `syl-become-replaces-types` gives
@@ -178,8 +181,10 @@ with an `at` list (§4) is one declaration at all its sorts and is not such a pa
 3. if `T` is `Option(U)`, the value at `U`, by steps 2 and 4;
 4. at the one sort in the mode's Reaches(`T`) that the value stands at.
 
-**A position sort's own declarations** are Templates or primitives for wordings bound to that
-position:
+**A position sort** is a sort that is no kind of phrase itself and has a member kind that
+denotes `Test`; the checker derives the three from the declarations. **A position sort's own
+declarations** are Templates or primitives for wordings bound to that position, which the check
+names (`schema::POSITION_OWN`):
 "face-down" before a head; `withMostVotes`, "with the most votes or tied for most votes", a
 coordination of unlike kinds fixed in one wording. Anything else at a position sort is refused at
 load, except the declarations §5 lists as staying, which the check names with their tickets.
@@ -188,10 +193,12 @@ load, except the declarations §5 lists as staying, which the check names with t
 used; load refuses one, apart from the words of §4, which stand at `Test` as one of several
 sorts.
 
-**Calls of a test in a card.** Forty-nine calls in 44 canon files write a test bare where the
+**Calls of a test in a card.** Forty-nine calls in 44 canon files wrote a test bare where the
 card prints a phrase no declaration spells. Surface mode refuses each. Four take a spelled phrase
-that this design gives them (§5); the rest are named in the check as exceptions until
-`syl-spelled-test-phrases` writes their phrases. An exception covers the smallest argument of a
+that this design gives them (§5); the other 45, in 40 pairs of a card and a test, are named in
+the check as exceptions (`schema::TEST_EXCEPTIONS`) until `syl-spelled-test-phrases` writes their
+phrases. An exception applies where the argument's own word is the test, or an arm of a word
+with an `at` list is. It covers the smallest argument of a
 slot typed by a position sort that contains the call, and that argument resolves in body mode,
 so *Glaring Spotlight*'s `is(…, not(hasKeyword(…)))` keeps its `not` at `Test`.
 
@@ -209,8 +216,9 @@ for the sort it stands at:
       body = coord(or, $items)
     }
 
-`and`, `andOr`, `both` and the primitive `coord` are declared the same way, each with the sorts
-the pool coordinates with it, and `andOr`'s body is `coord(andOr, $items)` at every sort. A
+`and`, `andOr` and the primitive `coord` are declared the same way at the same ten sorts, `both`
+at `AdjectivePhrase` and `NounPhrase` (*Battlegate Mimic*'s "both red and white"), and `andOr`'s
+body is `coord(andOr, $items)` at every sort. A
 declaration with an `at` list is checked once for each sort in it, with `Self` that sort; a
 primitive with one builds its constructor at each. The coordinators at `Cost`, `Condition`, `Timing`, `Location`,
 `GameEvent`, `TriggerCondition`, `ProducedMana` and `Predicate` stay separate declarations;
@@ -259,7 +267,7 @@ card".
 - **The prefix "non-"** attaches to a nominal ("nonland", 1,813 units), an adjective ("nonbasic",
   245) or a participle ("nonattacking", 5), and the result is of the same kind: `non` is a
   primitive declared once `at = [AdjectivePhrase, Nominal, Participle]`, with a constructor of
-  its own that semantics reads where it stands; it is no longer a Template over `not`. So "If that land was nonbasic" (*Molten
+  its own, `Non`, that semantics reads where it stands; it is no longer a Template over `not`. So "If that land was nonbasic" (*Molten
   Rain*) and "nonlands" as a head have terms, which `non` at `PreModifier` did not give them.
 - **"Not" before a phrase** stands before an adjective phrase ("that's not historic",
   *Desynchronization*), a preposition phrase ("card not on the battlefield", *Anafenza, the
@@ -272,7 +280,8 @@ card".
   `is(it, not(a(kree)))`.
 - **"Isn't" and "aren't"** negate the copula, not its complement: "Creatures that aren't of the
   chosen type" (*Crippling Fear*) parses with the verb "aren't" over "of the chosen type". They
-  are `isnt` and `thatIsnt` (NEW) beside `is` and `thatIs`, for a copula with a `Predicative`.
+  are `isnt` and `thatIsnt` (NEW) beside `is` and `thatIs`, for a copula with a `Predicative`,
+  each a Template over `not` of the other (`thatIsnt`'s `not` standing at `Test`).
   "Isn't blocked" and "wasn't cast", a negated `be` over a participle (about 85 lines), are
   `syl-passive-participle-and-trigger-events`'s.
 
@@ -289,11 +298,15 @@ Reading was checked.
 | Kind | Declarations | Decided by |
 |---|---|---|
 | `AdjectivePhrase` | `other`, `otherThan`, `split`, `colorless`, `multicolored`, `historic`, `unblocked`, `transformed`, `tiedFor`, `plotted`; the new `tapped` and `untapped`; the color and supertype words by membership | "red" 496 before a head, 21 after a copula (*Fry*); "legendary" 334 / 74; "colorless" 539 / 15; "multicolored" 64 / 1; "historic" 60 / 2 (*Curator's Ward*'s "if it was historic"); "unblocked" 13 / 4; "other" 1,567 before a head; "other than" 167 after a head; "tied" 34 after a copula; "tapped" 353 / 230; "plotted" only after "becomes" (7 units, *Aven Interrupter*) |
-| `PrepositionPhrase` | `in`, `inPile`, `of`, `fromSource`, `ofChosen`, `ofYourChoice`, `ofTheLastChosen`, `hasPower`, `hasManaValue`, `hasLesserManaValueThan`, `activationCostHas`, `manaCostHas`, `withDifferentNames`, `withTheSameName`, `outsideTheGame`; `withCounter` and `withKeyword` (below); the new `faceDown`, `faceUp`, `phasedIn`, `phasedOut` | "in" 1,624 after a head, 313 after a copula; *Aerial Volley* "with flying"; *Abrupt Decay* "with mana value 3 or less"; *Cursed Totem* "of creatures"; *Gaea's Revenge* "from nongreen sources"; *Adaptive Automaton* and *Crippling Fear* "of the chosen type"; *Unable to Scream* "is face down" |
+| `PrepositionPhrase` | `in`, `inPile`, `of`, `fromSource`, `ofChosen`, `ofYourChoice`, `ofTheLastChosen`, `hasPower`, `hasManaValue`, `hasLesserManaValueThan`, `activationCostHas`, `manaCostHas`, `withDifferentNames`, `withTheSameName`, `outsideTheGame`; `withCounter` and `withKeyword` (below); the new `faceDown` and `phasedOut` | "in" 1,624 after a head, 313 after a copula; *Aerial Volley* "with flying"; *Abrupt Decay* "with mana value 3 or less"; *Cursed Totem* "of creatures"; *Gaea's Revenge* "from nongreen sources"; *Adaptive Automaton* and *Crippling Fear* "of the chosen type"; *Unable to Scream* "is face down" |
 | `RelativeClause` | `youControl`, `youDontControl`, `youOwn`, `opponentsControl`, `anOpponentControls`, `controls` (below), `ownedBy`, `actorControls`; `thatIs`, `couldEnchant`, `triggeredNotLeftStack`; `did` | *Glorious Anthem* "you control"; *Academy Journeymage* "an opponent controls"; *Fry* "that's white or blue"; *Bruna, Light of Alabaster* "that could enchant it" |
 | `Participle` | `attacking`, `blocking`, `blocked`, `chosen`, `equipped`, `foretold`, `attachedTo`, `named`, `notChosen`; `was`, one Template for its `PreModifier` and `PostModifier` copies; the new `controlledBy` ("controlled by $who") | *Smite* "blocked", *Stone Haven Outfitter* "Equipped", *Bioplasm* "exiled"; "attach" passive 178 after a head; "name" passive 333; *Burn at the Stake* "tapped this way"; "controlled" 32 after a head (*Balance*) |
 
-- **Three renames, each one name for two wordings today.** `controlledBy` at `PostModifier`
+- **`controlledBy` at `Participle` has no caller.** No canon card prints "controlled by", and
+  each pool card that does needs a phrase with no declaration: "the same player" (*Incriminate*,
+  *Cannibalize*), "different players" (*Run Away Together*, *Modify Memory*), "or by that
+  planeswalker's controller" (*Concussive Bolt*).
+- **Three renames, each one name for two wordings.** `controlledBy` at `PostModifier`
   spells "$who control" and at `Predicative` "controlled by $who": the relative is `controls`,
   and `controlledBy` names the participle. `hasCounter` and `hasKeyword` at `PostModifier` spell
   "with a counter on it" and "with $keyword" and at `Predicative` are the unspelled tests: the
@@ -335,9 +348,14 @@ and `attachment` with `word` passed by name), so every call resolves unchanged.
   `coord`, `non`, `not`), those of `Nominal` and `NounPhrase`, `stacked`, and the `PreModifier`
   copy of `was`: §4's declarations stand in their place. Each caller of `not` at `PostModifier`
   writes what its card prints: `not` before a preposition phrase or a participle; `thatIsnt`;
-  `withoutKeyword` (NEW, "without $keyword") or `withNoCounters` (NEW, "with no counters on it",
-  *Damning Verdict*), each a `PrepositionPhrase`. *Containment Priest* and *Hallowed Moonlight*
-  print a clause, "and it wasn't cast", and are among the exceptions of §3.
+  `withoutKeyword` (NEW, "without $keyword"), `withNoCounters` (NEW, "with no counters on it",
+  *Damning Verdict*) or `withoutCounter` (NEW, "without a $kind counter on it", *Oblivion
+  Stone*), each a `PrepositionPhrase`. *Containment Priest* and *Hallowed Moonlight*
+  print a clause, "and it wasn't cast", and keep `not(was(…))` in `post`, which types as "not"
+  before a participle and is no wording of theirs; they call no test, so they are no exception
+  of §3, and `syl-passive-participle-and-trigger-events` writes the clause. Split second's rule
+  body writes [CR#702.61a]'s "abilities that aren't mana abilities" with `thatIsnt`, where it
+  wrote `non` over `hasQuality`.
 
 ### The position sort's own
 

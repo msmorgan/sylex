@@ -19,8 +19,8 @@ reads the expanded term and gives the primitives and the places a clause stands 
 
 The words a surface term is built from are designed in `docs/specs/voice-and-object-phrases.md`
 (the clause, the verb phrase and its operators, the object phrases), in
-`docs/specs/kind-sorts-and-position-unions.md` (the sorts a describing phrase is declared at and
-the positions that admit them) and in the planned tickets that build them. §6 and §7 say what Definitions, Templates and the action-clause spine are in
+`docs/specs/kind-sorts-and-position-unions.md` (what is still to build of the sorts a
+describing phrase is declared at) and in the planned tickets that build them. §6 and §7 say what Definitions, Templates and the action-clause spine are in
 today's term language, where the sorts that say what a clause means are still in it (§2). They
 were written when the term classified its own clauses, so they still say what some statements
 mean beside how they are written, and the tickets that build the clause and voice words
@@ -28,16 +28,62 @@ rewrite them.
 
 ## 1. A Sort Names a Kind of Phrase
 
-**A sort names a kind of phrase.** `Clause`, `VerbPhrase`, `NounPhrase`, `Nominal` and its
-modifier sorts, `Amount`, a determiner, a duration phrase, a Turn Point are kinds of phrase. So
+**A sort names a kind of phrase.** `Clause`, `VerbPhrase`, `NounPhrase`, `Nominal`, `Amount`, a
+determiner, a duration phrase, a Turn Point are kinds of phrase. So
 are the sorts of words and symbols a card prints: a card type, a color, a mana symbol, a counter
 kind. A sort that says what a phrase does in the game is no kind of phrase and is not a sort of
 the term language.
 
+**A phrase that describes something is declared once, at its kind.** The kind sorts are named for
+the English grammar's Categories (`crates/english/grammar/english.fug`):
+
+| Sort | A phrase of it | Stands |
+|---|---|---|
+| `AdjectivePhrase` | "red", "legendary", "tapped", "other", "other than X", "tied for …" | bare: before a head and after a copula; with a complement: after a head and after a copula |
+| `PrepositionPhrase` | "in your graveyard", "with flying", "of the chosen type", "face down" | after a head; after a copula for some |
+| `RelativeClause` | "you control", "that's white or blue", "that could enchant it" | after a head only |
+| `Participle` | "attacking", "blocked", "named X", "attached to it", "controlled by X" | a verb phrase in a participle form: bare before a head, with dependents after it |
+| `Nominal` | "creature", "Goblin", "token", "permanent" | before a head, and as a head |
+| `NounPhrase` | "the monarch", "a Kree" | after a copula |
+
+**A position sort names a place, and its members are the kinds that stand there**
+([`syl.md`](./syl.md) §2). `PreModifier` and `PostModifier` type the `pre` and `post` lists of
+`nominal`, and `Predicative` the complement of `is`, `isnt`, `thatIs` and `thatIsnt`. `post` holds
+every dependent printed after the head, in printed order, a complement the head selects ("half of
+this split card") and a modifier ("you control") alike. Membership is by kind: a position sort
+admits every phrase of a member kind, including wordings English does not print there ("is
+other", "legendary" after a head); no finer sort refuses them, and semantics rejects what means
+nothing. A verb phrase is never a member of a position sort; a participle, a form of a verb
+phrase, is. A position sort's own declarations are wordings bound to that one position:
+"face-down", "face-up" and "phased-out" before a head (`faceDown`, `faceUp`, `phasedOut` at
+`PreModifier`, where the `PrepositionPhrase` Templates `faceDown` and `phasedOut` spell "face
+down" and "phased out"), `withMostVotes` after one, a coordination of unlike kinds fixed in one
+wording, and `hasTypeIgnoringTypeChanges` after a copula. `cargo xtask dsl check` refuses any
+other declaration at a position sort, except the ones it names with the ticket that composes each
+at its kind (`schema::POSITION_STAYING`).
+
+**What a describing phrase means is a test.** The unspelled primitives that say what a phrase
+tests (`hasPossessor`, `inCombat`, `compare`, `shares`, `superlative`, `hasStatus`) are declared
+once, at `Test`, which is a member of nothing: a card's term cannot reach it, and a body can
+([`syl.md`](./syl.md) §3). A wording is a Template at its kind over a test: "you control" is
+`controls(you)`, a `RelativeClause` over `hasPossessor`.
+
+**A coordinator and a negation are declared once for the sorts they stand at**
+([`syl.md`](./syl.md) §2, §3). Negation is three constructions. The prefix "non-" attaches to a
+nominal ("nonland"), an adjective ("nonbasic") or a participle ("nonattacking"), and the result
+is of the same kind: `non`. "Not" before a phrase stands before an adjective phrase ("that's not
+historic"), a preposition phrase ("card not on the battlefield"), a noun phrase ("if it's not a
+Kree") or a participle ("not named …"): `not`; English does not print it before a head. "Isn't"
+and "aren't" negate the copula, not its complement: `isnt` and `thatIsnt` beside `is` and
+`thatIs` ("Creatures that aren't of the chosen type", *Crippling Fear*). A nominal in `pre` is a
+bare head word (`creature`, `goblin`, `token`) or a coordination; `nominal(…)` with modifiers of
+its own is refused there except as an arm of a coordination, since its modifiers would otherwise
+have two written places.
+
 The test is put to a pair of sorts: where two terms differ only in which of the two they stand
 at and print the same words in the same structure, the sort that names a role in the game is the
-one that goes. The sorts of the words a coercion wraps (`CardType` under `Nominal`) name kinds
-of word and are not such a pair. `clause(you, did(attack, within = thisTurn))` prints "you
+one that goes. A word sort that is a member of its kind (`CardType` of `Nominal`) names a kind
+of word and is not such a pair. `clause(you, did(attack, within = thisTurn))` prints "you
 attacked this turn" whether it stands where a condition or an event is wanted, so `Condition`
 and `GameEvent` go and `Clause` stays. `VerbPhrase` and `Clause` are no such pair: one prints a
 subject and the other does not.
@@ -52,9 +98,9 @@ surrounding construction takes the clause:
 |---|---|---|---|
 | *Grollub* | "Whenever this creature is dealt damage, …" | `whenever(does(this(creature), be(done(…))), …)` | `whenever(clause(this(creature), be(done(…))), …)` |
 | *Mardu Hordechief* | "if you attacked this turn" | `holds(you, did(attack, within = thisTurn))` | `clause(you, did(attack, within = thisTurn))` |
-| *Glorious Anthem* | "Creatures you control get +1/+1." | `static(clause(…, getsPt(…)))`, through a coercion from `Clause` to `StaticSpec` | `static(clause(…, getsPt(…)))`, `static` taking a `Clause` |
+| *Glorious Anthem* | "Creatures you control get +1/+1." | `static(clause(…, getsPt(…)))`, through a membership of `Clause` in `StaticSpec` | `static(clause(…, getsPt(…)))`, `static` taking a `Clause` |
 
-So `does`, `holds` and the coercion from `Clause` to `StaticSpec` are scaffolding: the planned
+So `does`, `holds` and the membership of `Clause` in `StaticSpec` are scaffolding: the planned
 tickets build them as `voice-and-object-phrases.md` states, and they come out when semantics
 exists. `StaticSpec`, `GameEvent`, `Condition` and `Replacement` are
 types of the meaning ([`semantics.md`](./semantics.md) §4).
@@ -75,8 +121,9 @@ types of the meaning ([`semantics.md`](./semantics.md) §4).
 
 ## 4. Templates, Definitions and Rules Data
 
-**Templates and Definitions are surface to surface.** A body is a surface term over the
-declaration's parameters. Expansion is unchanged: it substitutes a Template's parameters, wraps
+**Templates and Definitions are surface to surface in their signatures and spellings.** A body
+is a term over the declaration's parameters resolved in body mode ([`syl.md`](./syl.md) §3), so
+it may hold a test where a card's term holds a describing phrase. Expansion is unchanged: it substitutes a Template's parameters, wraps
 a Definition's body in its Reference Scope under its Deed, keeps every call and parameter
 boundary, and reads each argument once, in printed order ([`syl.md`](./syl.md) §4, §5).
 

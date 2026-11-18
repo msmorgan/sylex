@@ -183,21 +183,22 @@ endophora. Whatever the technique, a referent is accessible to an anaphor only i
    cannot be sacrificed or have counters put on it as a permanent.
 
 A description is a `Nominal`, `nominal(pre, head, post)`, and its head sets the domain it ranges
-over. A card type or subtype at `Nominal` means a permanent of that card type or subtype on the
-battlefield ([CR#109.2,110.1]); at `PreModifier` it tests the characteristic alone, with no zone
-implied (one word read by position, once `docs/specs/kind-sorts-and-position-unions.md` is built). `permanent` means a card or token on the battlefield ([CR#110.1]); a printed "on the
+over. A card type or subtype word is one word wherever it stands, and what it means is read from its
+position: as the head it means a permanent of that card type or subtype on the
+battlefield ([CR#109.2,110.1]); in `pre` it tests the characteristic alone, with no zone
+implied. `token`, `permanent` and `outlaw` are read by position the same way. `permanent` means a card or token on the battlefield ([CR#110.1]); a printed "on the
 battlefield" stays the postmodifier `in(battlefield)`. `card` means a Magic card or an object
 represented by one, never a token ([CR#108.2,108.2b]), and carries no zone of its own: a stated
 zone comes from its postmodifiers or its verb ([CR#109.2a]). `spell` means a spell on the stack
 ([CR#109.2b,112.1]), `source` a source in any zone ([CR#109.2c,113.7]), `token` the token test
 alone ([CR#111.1,111.7]), and `player` and `opponent` a player ([CR#102.1..102.3]). Under the
-copula `is(subject, predicative)`, `Predicative`'s noun-phrase form `noun(phrase)` tests its
+copula `is(subject, predicative)`, a noun phrase, a member of `Predicative`, tests its
 subject in that subject's own zone ("If it's a land", of a card in a library; "if it's a creature
 card" adds the card class through `card`). [CR#109.2] gives a type word in a description of an
 object the battlefield reading and says nothing of a predicative noun phrase; reading one as a test
 of the subject, with no battlefield restriction, is this design's choice. A
 coordination at `Nominal` is a union of the domains its arms describe ("artifacts and creatures"),
-whereas modifiers in `pre` and `post` intersect with the head; an Agreement `PostModifier` (`agree`)
+whereas modifiers in `pre` and `post` intersect with the head; an Agreement (the test `agree`, worded by `withTheSameName` and `withDifferentNames`)
 constrains the enclosing plural determiner's group rather than each member alone. A copular relative
 after the head (`thatIs`, "a spell that's both red and white") holds of a member exactly when its
 `Predicative` would under the copula. A possessive determiner (`possessive(owner)`, "its activated
@@ -212,7 +213,7 @@ where the phrase stands, and the term never writes it. The readings the corpus s
 - The subject a rule or effect is said of is the universal over its description, and exports the
   plural domain "all" does (§2.2 item 2): *Glorious Anthem*'s "Creatures you control get +1/+1",
   *Everlasting Torment*'s "Players can't gain life".
-- The copula's complement (`noun(bare(…))`) tests each member of its subject, as `a` tests one,
+- The copula's complement (`bare(…)`) tests each member of its subject, as `a` tests one,
   and introduces no referent: *Pithing Needle*'s "unless they're mana abilities" (§3.3).
 - The object of an action is a plural indefinite: *Aggressive Mining*'s "You can't play lands",
   *Grand Abolisher*'s "can't cast spells". Under `cant` it has a hypothetical indefinite's
@@ -363,7 +364,7 @@ since a "can't" outranks anything that allows the thing ([CR#101.2]).
   condition does not hold of. *Suppression Field*'s "Activated abilities cost {2} more to activate
   unless they're mana abilities" leaves alone the cost of each ability that is a mana ability, as
   [CR#605.1a] defines one. A bare plural as the copula's complement ("they're mana abilities",
-  `noun(bare(manaAbility))`) tests each member as `a` tests one (§2.4).
+  `bare(manaAbility)`) tests each member as `a` tests one (§2.4).
 - **Host legality is one relation.** An Aura, Equipment or Fortification may be attached to a host
   when a `mayBeAttachedTo` permission allows it (enchant [CR#702.5a], [CR#301.5,301.6]) and no
   `cantBeAttached` limit excludes it ("can't be enchanted", "can't be equipped by …"): "Other

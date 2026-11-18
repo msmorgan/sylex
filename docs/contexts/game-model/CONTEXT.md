@@ -23,12 +23,20 @@ Scope; a keyword action's Definition also carries a Deed, as does a keyword abil
 can ask who did it (crewing, [CR#702.122b]). A Counter's, Designation's or Defined Token's
 carries none. A Defined Token's takes no arguments, so its scope holds nothing of its caller's.
 
-**Coercion**:
-A nameless `.syl` declaration through which a value of one sort stands at another by way of an
-existing Primitive: a Card Type or Subtype as a Nominal, a Card Type, Subtype, Supertype or Color
-as a PreModifier, a Status or Color as a Predicative, an integer as an Amount. It applies only where the
-value does not stand at the expected sort itself, and never twice in a row.
-`docs/specs/kind-sorts-and-position-unions.md` replaces it with membership between sorts.
+**Membership**:
+A nameless `.syl` declaration, `member(S): T`, by which every value of sort `S` is also a value
+of sort `T`, written as itself: a Card Type or Subtype is a Nominal, a Color or Supertype an
+adjective phrase, an integer an Amount, and each kind of describing phrase a member of the
+position sorts it stands at. It is transitive, has no body and builds nothing.
+
+**Surface mode**:
+How a card's term is resolved: a value stands at the expected sort or at a sort that reaches it
+through Membership, so a card cannot write a Test.
+
+**Body mode**:
+How the body of a Template, a Definition or a rule, and a parameter's default, is resolved: as
+Surface mode, and a Test may stand where a describing phrase is expected and such a phrase where
+a Test is.
 
 **Defined Token**:
 A token whose characteristics the rules define in full: a predefined token ([CR#111.10]) or one
@@ -232,22 +240,29 @@ A Player or an Object ([CR#102.1,109.1]).
 
 **Nominal**:
 The sort `Nominal`, named for the English grammar's Category of the same name: an Entity
-description's Head Noun, alone or combined with its `PreModifier`s and `PostModifier`s
+description's Head Noun, alone or combined with the modifiers before and after it
 (`nominal(pre, head, post)`), or a coordination of Nominals.
 
 **PreModifier**:
-The sort `PreModifier`: a modifier printed before a Nominal's head ("other", "nonland", "legendary",
-"tapped", an attributive Card Type, Subtype or Color).
-`docs/specs/kind-sorts-and-position-unions.md` makes it, **PostModifier** and **Predicative**
-position sorts whose members are kinds of phrase.
+The position sort `PreModifier`: what stands before a Nominal's head, the `pre` list of `nominal`.
+Its members are the adjective phrase ("other", "legendary", "tapped", a Color), the Nominal (an
+attributive Card Type or Subtype, "token") and the participle ("attacking", "exiled").
 
 **PostModifier**:
-The sort `PostModifier`: a modifier printed after a Nominal's head ("with flying", "you control",
-"in your graveyard", a relative or participial clause).
+The position sort `PostModifier`: what stands after a Nominal's head, the `post` list of
+`nominal`. Its members are the preposition phrase ("with flying", "in your graveyard"), the
+relative clause ("you control"), the adjective phrase ("other than this creature") and the
+participle ("attached to it").
 
 **Predicative**:
-The sort `Predicative`, named for the English grammar's Category of the same name: the complement
-of the copula `is` ("is a land", "is tapped", "is in your graveyard").
+The position sort `Predicative`, named for the English grammar's Category of the same name: the
+complement of the copula `is` ("is a land", "is tapped", "is in your graveyard"). Its members are
+the adjective phrase, the preposition phrase and the noun phrase.
+
+**Test**:
+The sort `Test`: an unspelled Primitive that says what a describing phrase means (`hasPossessor`,
+`inCombat`, `compare`). A wording is a Template over one at its kind of phrase. `Test` is a
+member of no sort, so only Body mode reaches it.
 
 **Predicate**:
 A truth condition tested against a candidate where a phrase is neither a Nominal nor a Predicative,
@@ -258,7 +273,7 @@ In core, a resolution-time group or query over Objects, such as all matching Obj
 group held in a register.
 
 **Sharing**:
-A PostModifier or Predicative true of an Object that has a value in common with another on one
+A Test true of an Object that has a value in common with another on one
 characteristic (`shares`: "a creature that shares a color with it") ([CR#105.2,205.3m]).
 
 **Agreement**:
