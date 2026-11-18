@@ -23,6 +23,13 @@ host's dependent, so with the frame *of the chosen type* in *The next spell you 
 the chosen type* (Apex Observatory line 2) can no longer modify *spell*, and the unit has no
 Reading.
 
+*Choice* shows the cost on a card with no correct Reading. In *Each player sacrifices one
+permanent of their choice of the first type* (Rite of Ruin), *of the first type* describes the
+permanent, a modifier beside *of their choice*; *choice* declares an *of* frame, so the phrase
+right after it is read as its Complement, *their choice of the first type*, in the unit's one
+Derivation, and the other two clauses read *two of [their choice of the second type]* as a
+partitive of the choice.
+
 A frame cannot tell these apart: each oblique is a determined Noun Phrase. What does is a semantic
 selection restriction on the Complement (§14.1(g), p. 443): a choice bears no color, and a type is
 no game a turn is part of.
@@ -33,6 +40,8 @@ no game a turn is part of.
   *source*, *of the game* is *turn*'s, and *of your choice* and *of the chosen type* stay
   modifiers, on every unit that prints them, by a rule whose comment cites CGEL; or the
   ticket states, with evidence, why the grammar cannot draw the line.
+- Rite of Ruin line 1 has a Reading in which *of the first type*, *of the second type* and *of
+  the third type* each modify what is sacrificed, with *of their choice* beside it.
 - The census shows which Readings changed and why, and `cargo xtask english strata --check`,
   `cargo test` and `cargo clippy --tests -- -D warnings` pass for every changed crate.
 
