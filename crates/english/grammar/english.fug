@@ -75,7 +75,7 @@ feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | TemporalClause
     | ComparativeClause | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf
     | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
-    | UnlikeObject | Name
+    | UnlikeObject | Name | OptionChoice
 // What an unlike coordination's conjunct is, which no other conjunct of it
 // shares (`unlike: ConjunctKind`): the Category of its filler. A conjunct of
 // a derived unlike Frame Slot takes the name of the Slot Kind its filler
@@ -98,7 +98,7 @@ feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | TemporalClause
     | ComparativeClause | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf
     | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
-    | UnlikeObject | Name
+    | UnlikeObject | Name | OptionChoice
 // `Quantity`: only *number*, the number-transparent noun (*any number
 // of target creatures*; CGEL 5§3.3:349–351). `Serial`: only *time*, a
 // frequency or multiplier head (*three times*; CGEL 8§9:715).
@@ -296,6 +296,12 @@ feature KindLicense = Kind | Head { head: Head }
 // declares: `Head` on a noun a Set Name premodifies (*expansion*), which
 // takes no other premodifier there.
 feature SetNameLicense = Head
+// A license feature (english.md §3), which a noun's parameter pattern
+// declares: `Head` on a noun a cited option word premodifies (*each numbers
+// vote* [CR#701.38b]), which takes no noun premodifier there. A phrase
+// carries its head noun's, and a Verb Phrase its Complement's, so a clause
+// that counts such a noun is told from any other (OptionTally).
+feature OptionLicense = Head
 feature Inflection =
     | Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis
     | GerundParticiple | PastParticiple
@@ -377,7 +383,7 @@ category AdjunctGapClause : Clause [VerbForm, ClauseShape] { gap }
 category Participle : VerbPhrase [Inflection, Polarity]
 category VerbPhrase [
     Number, Person, VerbForm, Voice, VerbKind, Inflection, AdjectivalPassive, CentralPosition,
-    PastTime, NonPastTime, Ellipsis, OuterAdjunct,
+    PastTime, NonPastTime, Ellipsis, OuterAdjunct, OptionLicense,
 ] { gap }
 // A Linked Conjunct: a Clause or Verb Phrase opened by its linking
 // connective (*Each player discards a card, [then draws a card]*), as *so*
@@ -427,7 +433,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 category NounPhrase [
     Periphery, Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution, Postmodification,
-    Comparison, OuterOperation, RelativeGender,
+    Comparison, OuterOperation, RelativeGender, OptionLicense,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
 // (*three times*; 8§9:713–716). NounDistribution is `Serial` on one headed
@@ -437,14 +443,14 @@ category TemporalNounPhrase : NounPhrase [
 ]
 category ComplementNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
-    Postmodification, RelativeGender,
+    Postmodification, RelativeGender, OptionLicense,
 ] { gap }
 // A nominal's ComplementKind and ObliqueNumber are its head noun's
 // Complement's.
 category Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, BareMass, BareMassHead,
-    RelativeBound, GenitiveAlternant, OuterModifier, RelativeGender,
+    ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, OptionLicense, BareMass,
+    BareMassHead, RelativeBound, GenitiveAlternant, OuterModifier, RelativeGender,
 ] { gap }
 category QuantifiedNominal : Nominal [
     QuantityNumber, NounKind, DeterminerNeed, NounDistribution, RelativeGender,
@@ -454,8 +460,8 @@ category ModifiedQuantifiedNominal : Nominal [
 ]
 category BareNominal : Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, SetNameLicense, BareMass,
-    GenitiveAlternant, RelativeGender,
+    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, SetNameLicense, OptionLicense,
+    BareMass, GenitiveAlternant, RelativeGender,
 ] { gap }
 // The singular count nominals that share a determiner before the
 // final, determined conjunct of a SharedDeterminerCoordination.
@@ -699,6 +705,14 @@ category MentionModifier
 // (*choose Khans or Dragons*): one of two abilities, each marked with its
 // word [CR#614.12c]. The words are cited, so it stands as a Mention.
 category AnchorChoice
+// A word a vote offers, cited: one of the "words with no rules meaning that
+// are each connected to a different effect" [CR#701.38b]. It is no declared
+// word: it is read from the face's text, and stands where the Card Scope
+// holds it (`docs/design/lexicon.md` §2), in the three positions that take
+// one. OptionChoice is the two a vote offers (*votes for sickness or
+// psychosis*), which only a frame that names it selects.
+category OptionMention
+category OptionChoice
 // A singular subtype name or coordination of them as the value of a
 // specifying copular *be* (*the new creature type can't be Wall*, Artificial
 // Evolution; CGEL 4§5.5:266–269). Distinct from Predicative so coordination
@@ -894,6 +908,8 @@ slot Gerund = Gerund
 slot PastPart = PastPart
 slot QuotedAbility = QuotedAbility
 slot Mention = Mention
+slot OptionChoice = OptionChoice
+slot OptionMention = OptionMention
 
 // Complement Constraints, which a Preposition Frame of the lexicon names.
 //
@@ -1227,6 +1243,21 @@ SubjectPredicate: Clause -> subject:NounPhrase Free(VerbPhrase) { transparent: [
           subject.Person = head.Person,
           head.VerbForm = Finite,
           subject.Case != Accusative | Genitive,
+          $.ClauseMarking = Unmarked,
+          $.ClauseShape = SubjectInitial
+// A cited option word as the Subject of a clause that counts the votes for
+// it (*If psychosis gets more votes*, Bite of the Black Rose): the Verb
+// Phrase's Complement is headed by the noun the word premodifies
+// (`OptionLicense`). An admission gate (english.md §3, §6) that keeps the
+// option *chaos* from a second tree as the Subject of *chaos ensues* (Path
+// of the Enigma), where the noun is used and nothing is counted. The cited
+// word agrees as a singular whatever it spells (*If guilty gets more votes*,
+// Trial of a Time Lord; *If planeswalk gets more votes*).
+OptionTally: Clause -> subject:OptionMention Free(VerbPhrase) { transparent: [head] }
+    where head.Number = Singular,
+          head.Person = Third,
+          head.VerbForm = Finite,
+          head.OptionLicense := Head,
           $.ClauseMarking = Unmarked,
           $.ClauseShape = SubjectInitial
 // A specifying copular Verb Phrase, whose value is a singular subtype name
@@ -2698,6 +2729,8 @@ FusedLocative: LocativeHead -> Word(Anywhere)
 WordMention: Mention -> FreeLex(Noun) where head.Inflection = Singular
 AnchorWordChoice: AnchorChoice -> first:Lex(AnchorWord) coordinator:Word(Or) last:Lex(AnchorWord)
 AnchorChoiceMention: Mention -> AnchorChoice
+OptionWordMention: OptionMention -> Lex(OptionWord)
+OptionWordChoice: OptionChoice -> first:Lex(OptionWord) coordinator:Word(Or) last:Lex(OptionWord)
 NegativeMention: Mention -> prefix:Lex(Affix) Mention { light: [head], uncoordinated: [head] }
 // A cited adjective that names a Quality (*choose odd or even*, Extinction
 // Event), as AdjectivalQuality's does after *protection from*.
@@ -2778,6 +2811,9 @@ AttributedPremodifier: Premodifier -> Attributes { cost: 0 }
 // admission gate that keeps the subtypes *Urza's* and *Saga* from
 // premodifying it in Golgothian Sylex's wording citing Urza's Saga (*the
 // Urza's Saga expansion*, tests/set_names.rs).
+// Nor does *vote* take one beside the option it is counted by: an admission
+// gate that keeps the noun *money* from premodifying it beside the cited
+// option in *For each money vote* (Expropriate).
 // A noun's default place is next to the head, inside adjectives (CGEL
 // 5§15:453–454, [10]–[11]), but that order is labile and no equation keeps
 // it: *a Goblin red creature token* parses. `head.DeterminerNeed !=
@@ -2790,7 +2826,8 @@ AttributedPremodifier: Premodifier -> Attributes { cost: 0 }
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
     where head.DeterminerNeed != Required,
           head.KindLicense != Head,
-          head.SetNameLicense != Head
+          head.SetNameLicense != Head,
+          head.OptionLicense != Head
 QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier QuantifiedNominal
 // A bare count singular nominal that a preposition's frame selects (*until
 // end of turn*).
@@ -3657,6 +3694,7 @@ valence VerbPhrase {
     central_heads: BeVerb,
     central_families: [Copular],
     heavy_shift,
+    agree: [OptionLicense -> OptionLicense],
     shifted_object: [object.Determination := Overt],
     // `object.Postmodification != Closed`: an admission gate (english.md §6)
     // against postposing a Modifier out of a personal pronoun or proper name,

@@ -168,17 +168,18 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
     let cleaves = cleave_texts(corpus, &env.lexicon);
     let grammar = grammar.as_ref().ok();
     let profiler = Profiler::new(env);
+    let scopes = grammar.map(|(grammar, _)| corpus.scopes(&env.lexicon, grammar));
     let units = corpus
         .units
         .par_iter()
         .zip(&cleaves)
         .map(|(unit, cleave)| {
             let face = &corpus.faces[unit.face];
-            let scope = match grammar {
-                Some((grammar, _)) => face.scope(&env.lexicon, grammar),
-                None => face.name_scope(&env.lexicon),
+            let scope = match &scopes {
+                Some(scopes) => &scopes[unit.face],
+                None => &face.name_scope(&env.lexicon),
             };
-            let analyzed = env.lexicon.analyze_source_scoped(&unit.text, None, &scope);
+            let analyzed = env.lexicon.analyze_source_scoped(&unit.text, None, scope);
             let profile = profiler.profile(unit.kind, &analyzed);
             let entries = |text: &str| -> Vec<&Judgment> {
                 by_text
@@ -203,7 +204,7 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
                     match cleave {
                         None => judge(&unit.text, &analyzed),
                         Some(cleave) => judge_cleave(cleave, |text| {
-                            let analyzed = env.lexicon.analyze_source_scoped(text, None, &scope);
+                            let analyzed = env.lexicon.analyze_source_scoped(text, None, scope);
                             judge(text, &analyzed)
                         }),
                     }

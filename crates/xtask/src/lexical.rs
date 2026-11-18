@@ -270,10 +270,9 @@ pub fn run(args: &LexicalArgs, output: &mut dyn Write) -> Result<()> {
     Ok(())
 }
 
-/// Every value realizes to a spelling that analyzes back to it on the cards
-/// whose scope admits it: the introducing cards for a card-scoped Catalog
-/// item, and any card for another value. So does each form of every card
-/// name as its card's own name, in a scope that holds it.
+/// Every value realizes to a spelling that analyzes back to it on any card.
+/// So does each form of every card name as its card's own name, in a scope
+/// that holds it.
 fn check_independent_values(lexicon: &Lexicon) -> Result<usize> {
     let mut checked = 0;
     let mut check = |reading: LexicalReading, scope: &CardScope| -> Result<()> {
@@ -290,8 +289,7 @@ fn check_independent_values(lexicon: &Lexicon) -> Result<usize> {
     };
     for value in lexicon.values() {
         let lexeme = &lexicon.lexemes()[&value.lexeme];
-        let scope = CardScope::of_cards(lexeme.card_scope.iter().copied());
-        check(LexicalReading::Word(value.clone()), &scope)?;
+        check(LexicalReading::Word(value.clone()), &CardScope::default())?;
         if lexeme.card_name {
             let name = &lexeme.lemma;
             let scope = CardScope::every_form([name.as_str()]);
@@ -477,9 +475,11 @@ fn materials(lexicon: &Lexicon, reading: &LexicalReading) -> Result<BTreeSet<Mat
         LexicalReading::OwnName { .. } | LexicalReading::SetName { .. } => {
             return Ok(BTreeSet::from([Material::Catalog]));
         }
-        // A Flavor Word is a label, as an ability word is, and so is an
-        // Anchor Word.
-        LexicalReading::FlavorWord { .. } | LexicalReading::AnchorWord { .. } => {
+        // A Flavor Word is a label, as an ability word is, and so are an
+        // Anchor Word and a Vote Option, each the label of an effect.
+        LexicalReading::FlavorWord { .. }
+        | LexicalReading::AnchorWord { .. }
+        | LexicalReading::VoteOption { .. } => {
             return Ok(BTreeSet::from([Material::Keyword]));
         }
         // A title run is a name only where a parse introduces it: alone it

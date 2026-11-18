@@ -132,6 +132,7 @@ pub enum Class {
     FlavorWord,
     SetName,
     AnchorWord,
+    VoteOption,
 }
 
 impl Class {
@@ -144,6 +145,7 @@ impl Class {
             }
             LexicalReading::SetName { .. } => Self::SetName,
             LexicalReading::AnchorWord { .. } => Self::AnchorWord,
+            LexicalReading::VoteOption { .. } => Self::VoteOption,
             LexicalReading::Word(value) => {
                 let id = value.lexeme.as_str();
                 let prefix = id.split(':').next().unwrap_or("");
@@ -186,6 +188,7 @@ impl Class {
             Self::FlavorWord => "<FlavorWord>",
             Self::SetName => "<SetName>",
             Self::AnchorWord => "<AnchorWord>",
+            Self::VoteOption => "<VoteOption>",
         })
     }
 }
@@ -324,6 +327,7 @@ impl Tok<'_> {
                         | Class::Token
                         | Class::CardName
                         | Class::AnchorWord
+                        | Class::VoteOption
                         | Class::Designation
                         | Class::TurnPart
                 )

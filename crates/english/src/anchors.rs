@@ -66,6 +66,7 @@ pub fn anchor_words(
                 | LexicalReading::IntroducedName { .. }
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. }
+                | LexicalReading::VoteOption { .. }
                 | LexicalReading::Numeral { .. } => None,
             })
             .collect();
@@ -107,6 +108,7 @@ fn offered_words(parse: &Parse<'_>, offered: &mut BTreeSet<String>) {
                         | LexicalReading::IntroducedName { .. }
                         | LexicalReading::FlavorWord { .. }
                         | LexicalReading::SetName { .. }
+                        | LexicalReading::VoteOption { .. }
                         | LexicalReading::Numeral { .. } => {}
                     },
                     ChildRef::Node(inner) => {

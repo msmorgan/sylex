@@ -23,6 +23,6 @@
 + <card=Under the Skin> Manifest dread. => !Name "dread"; readings 1
 # A slash measure after *of* is a choice's option only, never the counted set of *number* standing apart from *counter*.
 + <card=Molten Hydra> {T}, Remove all +1/+1 counters from this creature: It deals damage to any target equal to the number of +1/+1 counters removed this way. => NounPhrase "the number of +1/+1 counters removed this way"; !MeasureNounPhrase "+1/+1"#2
-# Serial *time* is count-only: *three time counters* has no bare-relative Reading where mass *time* is the Subject of *counters*, and *votes for time* reads only the vote option.
+# Serial *time* is count-only: *three time counters* has no bare-relative Reading where mass *time* is the Subject of *counters*, and *votes for time or knowledge* reads only the Vote Options.
 + <card=Ojer Pakpatiq, Deepest Epoch> <legendary> When Ojer Pakpatiq dies, return it to the battlefield tapped and transformed under its owner's control with three time counters on it. => Kind "time" as Modifier of counter; !NounPhrase "time"
-+ <card=Plea for Power> Will of the council — Starting with you, each player votes for time or knowledge. If time gets more votes, take an extra turn after this one. If knowledge gets more votes or the vote is tied, draw three cards. => Name "time"#1; readings 2
++ <card=Plea for Power> <vote=time> <vote=knowledge> Will of the council — Starting with you, each player votes for time or knowledge. If time gets more votes, take an extra turn after this one. If knowledge gets more votes or the vote is tied, draw three cards. => OptionChoice "time or knowledge"; OptionMention "time"#2 as Subject of get; readings 2

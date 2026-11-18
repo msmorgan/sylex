@@ -45,7 +45,6 @@
 +Nominal <card=Narci, Fable Singer> chapter ability of a Saga you control => Nominal "chapter"
 +NounPhrase <card=Mystic Barrier> the nearest opponent => AdjectivePhrase "nearest"
 + <card=Master of Ceremonies> For each player who chose money, you and that player each create a Treasure token. => NounPhrase "money"
-+PrepositionPhrase <card=Expropriate> for time or money => NounPhrase "money"
 +Clause <card=Elrond of the White Council> the voter chooses a creature they control => NounPhrase "the voter"
 +Clause <card=Expropriate> choose a permanent owned by the voter and gain control of it => NounPhrase "the voter"
 +NounPhrase <card=Narci, Fable Singer> the final chapter ability of a Saga you control => AdjectivePhrase "final"
@@ -92,8 +91,7 @@
 + <card=Windcrag Siege> <anchor=Mardu> <anchor=Jeskai> As this enchantment enters, choose Mardu or Jeskai. => AnchorChoice "Mardu or Jeskai"
 + <card=Hollowmurk Siege> <anchor=Sultai> <anchor=Abzan> As this enchantment enters, choose Sultai or Abzan. => AnchorChoice "Sultai or Abzan"
 + <card=Glacierwood Siege> <anchor=Temur> <anchor=Sultai> As this enchantment enters, choose Temur or Sultai. => AnchorChoice "Temur or Sultai"
-+PrepositionPhrase <card=Travel Through Caradhras> for Redhorn Pass or Mines of Moria => NounPhrase "Redhorn Pass"
-+NounPhrase <card=Travel Through Caradhras> Redhorn Pass
++Clause <card=Travel Through Caradhras> <vote=Redhorn Pass> <vote=Mines of Moria> each player votes for Redhorn Pass or Mines of Moria => OptionChoice "Redhorn Pass or Mines of Moria"
 +NounPhrase <card=Jace, Multiverse Architect> Jaces you control => Nominal "Jaces you control"
 +PrepositionPhrase <card=Jace, Reality Sculptor> among Jaces you control => NounPhrase "Jaces you control"
 +NounPhrase <card=Kibo, Uktabi Prince> a colorless artifact token named Banana => Name "Banana"

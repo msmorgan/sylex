@@ -149,6 +149,9 @@ pub struct Judgment {
     /// The Anchor Words the text is read with in scope (`<anchor=WORD>`,
     /// once per word) [CR#614.12c].
     pub anchors: Vec<String>,
+    /// The Vote Options the text is read with in scope (`<vote=WORD>`, once
+    /// per word) [CR#701.38b].
+    pub votes: Vec<String>,
     pub text: String,
     /// Alternative groups; each must be satisfied by some one Reading.
     pub groups: Vec<Vec<Assertion>>,
@@ -259,6 +262,16 @@ fn parse_entry(line: &str, location: &str) -> Result<Judgment, String> {
         anchors.push(word.to_owned());
         rest = after[end + 1..].trim_start();
     }
+    let mut votes = Vec::new();
+    while let Some(after) = rest.strip_prefix("<vote=") {
+        let end = after.find('>').ok_or("unclosed `<vote=`")?;
+        let word = &after[..end];
+        if !sylex_lexicon::valid_vote_option(word) {
+            return Err(format!("`<vote={word}>` states no word a vote may offer"));
+        }
+        votes.push(word.to_owned());
+        rest = after[end + 1..].trim_start();
+    }
     let (text, assertions) = match rest.find(" => ") {
         Some(at) => (rest[..at].trim(), Some(rest[at + 4..].trim())),
         None => (rest.trim_end_matches("=>").trim(), None),
@@ -273,6 +286,7 @@ fn parse_entry(line: &str, location: &str) -> Result<Judgment, String> {
         card,
         legendary,
         anchors,
+        votes,
         text: text.to_owned(),
         groups: Vec::new(),
         negated: Vec::new(),
@@ -432,8 +446,9 @@ impl Judgment {
     /// (`sylex_vocabulary::stated_scope`): the name it states with
     /// `<card=NAME>` as the card's own, in its Full form and, when the entry
     /// also states `<legendary>` and the name has one, in its Shortened form
-    /// [CR#201.5c]; and each Anchor Word it states with `<anchor=WORD>`
-    /// [CR#614.12c]. The name, the flag and the words are inputs like the
+    /// [CR#201.5c]; each Anchor Word it states with `<anchor=WORD>`
+    /// [CR#614.12c]; and each Vote Option it states with `<vote=WORD>`
+    /// [CR#701.38b]. The name, the flag and the words are inputs like the
     /// text: no card is looked up, the name need be no printed card's, and
     /// no other text confirms the words as a face's units do
     /// ([`crate::corpus::Face::scope`]).
@@ -445,6 +460,9 @@ impl Judgment {
         };
         for word in &self.anchors {
             scope.insert_anchor_word(word);
+        }
+        for word in &self.votes {
+            scope.insert_vote_option(word);
         }
         scope
     }

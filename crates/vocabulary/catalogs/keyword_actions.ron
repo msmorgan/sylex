@@ -119,7 +119,13 @@
         (lemma: "monstrosity", frames: [Complement(Amount)], parameters: [[Head, Slot(Amount)]]),
     ]),
     (rule: "[CR#701.38]", name: "Vote", verbs: [
-        (lemma: "vote", frames: [Prepositional(["for"]), Intransitive]),
+        // *votes for a player*; *votes for sickness or psychosis*, the two
+        // words the vote offers [CR#701.38b].
+        (lemma: "vote", frames: [
+            Prepositional(["for"]),
+            PrepositionalComplement(PPWith(["for"], OptionChoice)),
+            Intransitive,
+        ]),
     ]),
     (rule: "[CR#701.39]", name: "Bolster", verbs: [
         (lemma: "bolster", frames: [Amount]),

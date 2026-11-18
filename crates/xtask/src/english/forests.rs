@@ -217,6 +217,7 @@ pub(crate) fn write(
     db.execute_batch(VIEWS)?;
     let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
     let reader = context::Reader::new(grammar, &env.lexicon);
+    let scopes = corpus.scopes(&env.lexicon, grammar);
     // `lexemes` and `embeddings` are written after the unit rows that reference
     // them so each table grows in key order in one pass;
     // `pragma_foreign_key_check` verifies every foreign key once the
@@ -228,7 +229,18 @@ pub(crate) fn write(
         corpus.units.len(),
         WINDOW,
         |unit| describe(corpus, unit),
-        |unit| unit_rows(corpus, unit, cleaves[unit].as_ref(), env, grammar, &reader),
+        |unit| {
+            let scope = &scopes[corpus.units[unit].face];
+            unit_rows(
+                corpus,
+                unit,
+                scope,
+                cleaves[unit].as_ref(),
+                env,
+                grammar,
+                &reader,
+            )
+        },
         |units| {
             let tx = db.transaction()?;
             let mut state = WriterState {
@@ -325,17 +337,15 @@ fn describe(corpus: &Corpus, unit: usize) -> String {
 fn unit_rows(
     corpus: &Corpus,
     unit: usize,
+    scope: &sylex_lexicon::CardScope,
     cleave: Option<&sylex_english::cleave::CleaveText>,
     env: &LexicalEnvironment,
     grammar: &CompiledGrammar,
     reader: &context::Reader<'_>,
 ) -> Result<UnitRows> {
     let u = &corpus.units[unit];
-    let face = &corpus.faces[u.face];
     let parsed = cleave.map_or_else(|| u.text.clone(), |c| c.uncleaved.clone());
-    let analyzed =
-        env.lexicon
-            .analyze_source_scoped(&parsed, None, &face.scope(&env.lexicon, grammar));
+    let analyzed = env.lexicon.analyze_source_scoped(&parsed, None, scope);
     let parse = grammar.parse_analyzed(&analyzed);
     let counts = parse.counts()?;
     let heads = parse.alternative_heads()?;
@@ -378,6 +388,7 @@ fn unit_rows(
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. }
                     | LexicalReading::AnchorWord { .. }
+                    | LexicalReading::VoteOption { .. }
                     | LexicalReading::Numeral { .. } => None,
                 };
                 Ok(AlternativeRow {
@@ -894,6 +905,9 @@ fn write_leaves(
             }
             LexicalReading::AnchorWord { .. } => {
                 (Val::Static("anchor word"), Val::Null, Val::Null, Val::Null)
+            }
+            LexicalReading::VoteOption { .. } => {
+                (Val::Static("vote option"), Val::Null, Val::Null, Val::Null)
             }
             LexicalReading::Numeral { value, .. } => (
                 Val::Static("numeral"),

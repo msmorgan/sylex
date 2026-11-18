@@ -111,6 +111,9 @@ pub enum FillSpec {
     /// Wall*): a metalinguistic Noun Phrase (CGEL, Ch. 5 §8.2, p. 401), only
     /// where a head's frame selects one.
     Mention,
+    /// The two words a vote offers (*votes for sickness or psychosis*
+    /// [CR#701.38a,701.38b]), only where a head's frame selects them.
+    OptionChoice,
     Nominal,
     Amount,
     Cost,
@@ -138,6 +141,10 @@ pub enum FrameSpec {
     TransitiveWithPP(Vec<String>),
     TransitiveWithComplement(FillSpec),
     Prepositional(Vec<String>),
+    /// A verb's one Complement, a Preposition Phrase whose own Complement is
+    /// of a named kind: `PPWith(["for"], OptionChoice)` in *votes for
+    /// sickness or psychosis*.
+    PrepositionalComplement(FillSpec),
     Copular,
     Catenative(Catenation),
     /// An object and a predicative complement of the given kind: `Pred` in
@@ -875,15 +882,6 @@ pub struct Token {
     pub subtype: String,
     #[serde(default)]
     pub names: Vec<String>,
-}
-
-/// A name in scope only on the cards that print it: a vote option
-/// (`catalogs/vote_options.ron`).
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct ScopedName {
-    pub name: String,
-    pub cards: Vec<String>,
 }
 
 /// A notation symbol with catalog-declared lexical classes.

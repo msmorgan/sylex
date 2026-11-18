@@ -168,6 +168,10 @@ struct ParseArgs {
     /// word. A fetched card's Anchor Words are read from its own text.
     #[arg(long, value_name = "WORD", conflicts_with = "card")]
     anchor: Vec<String>,
+    /// Parse each input with this Vote Option in scope; repeat it for each
+    /// word. A fetched card's Vote Options are read from its own text.
+    #[arg(long, value_name = "WORD", conflicts_with = "card")]
+    vote: Vec<String>,
     /// Fetch the faces so named (a face's name, or its whole card's) from
     /// the supported corpus and parse their own type lines and rules-text
     /// lines. Takes no text.
@@ -189,38 +193,40 @@ struct ParseItem {
     /// Whether to print the entry's outcome.
     evaluate: bool,
     /// The rules-text lines of the face a fetched unit is of, which its
-    /// Anchor Words are read from ([`ParseItem::read_anchor_words`]).
+    /// Anchor Words and Vote Options are read from
+    /// ([`ParseItem::read_scope`]).
     face_lines: Option<Vec<String>>,
 }
 
 impl ParseItem {
-    /// Puts the Anchor Words of a fetched unit's face in its entry's scope,
-    /// as the census reads them (`sylex_english::corpus::Face::scope`). A
-    /// stated text keeps the words it states.
-    fn read_anchor_words(
+    /// Puts the Anchor Words and Vote Options of a fetched unit's face in
+    /// its entry's scope, as the census reads them
+    /// (`sylex_english::corpus::Face::scope`). A stated text keeps the
+    /// words it states.
+    fn read_scope(
         &mut self,
         lexicon: &sylex_lexicon::Lexicon,
         grammar: &sylex_syntax::CompiledGrammar,
     ) {
         if let Some(lines) = &self.face_lines {
-            let names = self.entry.scope(lexicon);
-            self.entry.anchors =
-                sylex_english::anchors::anchor_words(lines, &names, lexicon, grammar)
-                    .into_iter()
-                    .collect();
+            let mut scope = self.entry.scope(lexicon);
+            sylex_english::corpus::read_scope(lines, &mut scope, lexicon, grammar);
+            self.entry.anchors = scope.anchor_words().map(str::to_owned).collect();
+            self.entry.votes = scope.vote_options().map(str::to_owned).collect();
         }
     }
 }
 
 /// The texts the inputs state, each as a judgment entry, with `as_card` the
 /// card of every entry, `legendary` whether that card is a legendary
-/// permanent, and `anchors` the Anchor Words in scope of every entry beside
-/// those it states.
+/// permanent, and `anchors` and `votes` the Anchor Words and Vote Options in
+/// scope of every entry beside those it states.
 fn stated_items(
     inputs: &[String],
     as_card: Option<&str>,
     legendary: bool,
     anchors: &[String],
+    votes: &[String],
 ) -> Result<Vec<ParseItem>> {
     use sylex_english::corpus::UnitKind;
     use sylex_english::judgment;
@@ -254,6 +260,13 @@ fn stated_items(
                     "`--anchor {word:?}` states no word an ability may be headed with"
                 );
                 entry.anchors.push(word.clone());
+            }
+            for word in votes {
+                anyhow::ensure!(
+                    sylex_lexicon::valid_vote_option(word),
+                    "`--vote {word:?}` states no word a vote may offer"
+                );
+                entry.votes.push(word.clone());
             }
             let kind = if entry.category.as_deref() == Some("TypeLine") {
                 UnitKind::TypeLine
@@ -301,7 +314,8 @@ impl FetchedUnit {
     /// name in scope as its type line gives it
     /// ([`sylex_english::judgment::Judgment::scope`],
     /// [`sylex_english::corpus::Face::scope`]); its face's Anchor Words
-    /// join it once a grammar is bound ([`ParseItem::read_anchor_words`]).
+    /// and Vote Options join it once a grammar is bound
+    /// ([`ParseItem::read_scope`]).
     fn item(&self, header: Option<String>) -> ParseItem {
         ParseItem {
             header,
@@ -312,6 +326,7 @@ impl FetchedUnit {
                 card: Some(self.face.clone()),
                 legendary: self.legendary,
                 anchors: Vec::new(),
+                votes: Vec::new(),
                 text: self.text.clone(),
                 groups: Vec::new(),
                 negated: Vec::new(),
@@ -397,6 +412,7 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
             as_card.as_deref(),
             args.legendary,
             &args.anchor,
+            &args.vote,
         )?,
     };
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
@@ -408,7 +424,7 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
     };
     let profiler = Profiler::new(&env);
     for mut item in items {
-        item.read_anchor_words(&env.lexicon, &grammar);
+        item.read_scope(&env.lexicon, &grammar);
         let ParseItem {
             header,
             entry,
@@ -516,7 +532,8 @@ fn dump_reading(
                 sylex_lexicon::LexicalReading::Numeral { .. }
                 | sylex_lexicon::LexicalReading::FlavorWord { .. }
                 | sylex_lexicon::LexicalReading::SetName { .. }
-                | sylex_lexicon::LexicalReading::AnchorWord { .. },
+                | sylex_lexicon::LexicalReading::AnchorWord { .. }
+                | sylex_lexicon::LexicalReading::VoteOption { .. },
             )
             | None => "-".to_owned(),
         };
@@ -695,6 +712,54 @@ mod tests {
         );
     }
 
+    /// Bite of the Black Rose: `--vote` puts a Vote Option in scope as
+    /// `<vote=…>` does, and `--card` reads the face's Vote Options from its
+    /// own text. With neither, *psychosis* is an unknown word.
+    #[test]
+    fn vote_options_are_stated_for_text_and_read_for_a_fetched_card() {
+        let effect =
+            "If psychosis gets more votes or the vote is tied, each opponent discards two cards.";
+        let stated = dump(&["parse", "--vote", "sickness", "--vote", "psychosis", effect]);
+        let entry = dump(&[
+            "parse",
+            &format!("<vote=sickness> <vote=psychosis> {effect}"),
+        ]);
+        assert_eq!(stated, entry);
+        assert!(stated.contains("Packed Forest derivations: 1"), "{stated}");
+        assert!(stated.contains("OptionTally\tClause"), "{stated}");
+        let bare = dump(&["parse", effect]);
+        assert!(bare.contains("Vocabulary gaps: [3..12]"), "{bare}");
+        // A malformed word is refused, stated either way.
+        for inputs in [
+            vec!["parse", "--vote", "aid or", effect],
+            vec!["parse", "<vote=> Draw a card."],
+        ] {
+            let cli = Cli::try_parse_from(std::iter::once("english").chain(inputs)).unwrap();
+            assert!(run(&cli.args, &mut Vec::new()).is_err());
+        }
+        let fetched = dump(&["parse", "--card", "Bite of the Black Rose"]);
+        assert!(
+            fetched.contains("Packed Forest derivations: 1"),
+            "{fetched}"
+        );
+        assert!(
+            fetched.contains("OptionWordChoice\tOptionChoice"),
+            "{fetched}"
+        );
+        assert_eq!(fetched.matches("OptionTally\tClause").count(), 2);
+        assert!(
+            Cli::try_parse_from([
+                "english",
+                "parse",
+                "--card",
+                "Bite of the Black Rose",
+                "--vote",
+                "psychosis"
+            ])
+            .is_err()
+        );
+    }
+
     /// *Jace, Cunning Castaway* is a legendary planeswalker, whose name
     /// shortens: `--as-card` with `--legendary` puts the name in scope in
     /// both forms as `<card=…> <legendary>` does, and without `--legendary`
@@ -851,6 +916,7 @@ mod tests {
                 as_card: None,
                 legendary: false,
                 anchor: Vec::new(),
+                vote: Vec::new(),
                 card: None,
                 limit: 8,
             };

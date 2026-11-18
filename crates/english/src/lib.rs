@@ -67,6 +67,7 @@ pub mod anchors;
 pub mod cleave;
 pub mod corpus;
 pub mod judgment;
+pub mod options;
 pub mod profile;
 pub mod segments;
 

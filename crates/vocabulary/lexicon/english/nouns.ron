@@ -211,7 +211,9 @@
     (lemma: "value", frames: [Complement(PP(["of"]))]),
     // *the total of those results*; the attributive word is the adjective.
     (lemma: "total", distribution: HeadOnly, frames: [Complement(PP(["of"]))], distinct_genitive: true),
-    "vote",
+    // A vote is counted by the option it is for, cited before the noun
+    // [CR#701.38b] (*each numbers vote*, *the number of profit votes*).
+    (lemma: "vote", parameters: [[Slot(OptionMention), Head]]),
     (lemma: "voter", relative_gender: Personal),
     (lemma: "way", kind: Manner),
     "word",
@@ -255,8 +257,8 @@
     "unlock cost",
 
     // Ordinary nouns that cards name as choice options (*chooses war or
-    // peace*) or that their text also uses. A vote option is a Name in
-    // `catalogs/vote_options.ron` [CR#701.38b].
+    // peace*) or that their text also uses. A Vote Option is no declared
+    // word: it is read from its face's text [CR#701.38b].
     (lemma: "chaos", countability: [Mass]),
     (lemma: "evidence", countability: [Mass]),
     (lemma: "fame", countability: [Mass]),

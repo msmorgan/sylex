@@ -63,6 +63,10 @@ pub(super) struct ForestwalkArgs {
     /// word. A fetched card's Anchor Words are read from its own text.
     #[arg(long, value_name = "WORD", conflicts_with = "card")]
     anchor: Vec<String>,
+    /// Survey the text with this Vote Option in scope; repeat it for each
+    /// word. A fetched card's Vote Options are read from its own text.
+    #[arg(long, value_name = "WORD", conflicts_with = "card")]
+    vote: Vec<String>,
     /// Fetch the faces so named (a face's name, or its whole card's) from the
     /// supported corpus: alone, list their units; with `--line` or
     /// `--type-line`, survey that unit (then `NAME` must name one face). Takes
@@ -107,7 +111,7 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
         grammar: &grammar,
         lexicon: &env.lexicon,
     };
-    item.read_anchor_words(&env.lexicon, &grammar);
+    item.read_scope(&env.lexicon, &grammar);
     let entry = &item.entry;
     let scope = entry.scope(&env.lexicon);
     let parse = judge
@@ -344,6 +348,7 @@ fn target(args: &ForestwalkArgs, selectors: &[Selector]) -> Result<Target> {
                 args.as_card.as_deref(),
                 args.legendary,
                 &args.anchor,
+                &args.vote,
             )?;
             let item = items.remove(0);
             let entry = &item.entry;
@@ -755,6 +760,7 @@ fn lexical(reading: &LexicalReading) -> String {
         LexicalReading::FlavorWord { label } => format!("flavor word {label:?}"),
         LexicalReading::SetName { name } => format!("set name {name:?}"),
         LexicalReading::AnchorWord { word } => format!("anchor word {word:?}"),
+        LexicalReading::VoteOption { word } => format!("vote option {word:?}"),
         LexicalReading::Numeral {
             value, notation, ..
         } => format!("numeral {value} {notation:?}"),

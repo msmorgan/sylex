@@ -358,23 +358,21 @@ impl Builder {
         // A noun whose pattern takes a Set Name before it is where analysis
         // reads one, and takes no other premodifier: its license
         // (`SetNameLicense`, english.md §3).
-        let set_name = ParameterPart::Slot(SlotKind::SetName);
-        if entry.parameters.iter().any(|parts| {
-            parts.contains(&set_name) && parts.as_slice() != [set_name.clone(), ParameterPart::Head]
-        }) {
-            return Err(SourceError::Invalid(format!(
-                "noun `{id}`: a Set Name is a whole pattern's one parameter, right before its head"
-            )));
-        }
-        lexeme.set_name_host = entry
-            .parameters
-            .iter()
-            .any(|parts| parts.contains(&set_name));
+        lexeme.set_name_host = licensed_host(id, entry, SlotKind::SetName, "a Set Name")?;
         if lexeme.set_name_host {
             lexeme
                 .properties
                 .features
                 .insert("SetNameLicense".into(), Ident::new("Head"));
+        }
+        // A noun whose pattern takes a cited Vote Option before it (*each
+        // numbers vote*) takes no noun premodifier there: its license
+        // (`OptionLicense`, english.md §3).
+        if licensed_host(id, entry, SlotKind::OptionMention, "a cited option")? {
+            lexeme
+                .properties
+                .features
+                .insert("OptionLicense".into(), Ident::new("Head"));
         }
         if entry.distinct_genitive && !entry.frames.iter().any(selects_of) {
             return Err(SourceError::Invalid(format!(
@@ -611,6 +609,7 @@ impl Resolver<'_> {
             FillSpec::KeywordPhrase => SlotFill::KeywordPhrase,
             FillSpec::QuotedAbility => SlotFill::QuotedAbility,
             FillSpec::Mention => SlotFill::Mention,
+            FillSpec::OptionChoice => SlotFill::OptionChoice,
             FillSpec::Nominal => SlotFill::Nominal,
             FillSpec::Amount => SlotFill::Amount,
             FillSpec::Cost => SlotFill::Cost,
@@ -686,6 +685,15 @@ impl Resolver<'_> {
                 FrameFamily::Prepositional,
                 vec![slot(Complement, self.pp(lemmas, owner)?)],
             ),
+            FrameSpec::PrepositionalComplement(fill) => {
+                let fill = self.fill(fill, owner)?;
+                if !matches!(fill, SlotFill::PP(..)) {
+                    return Err(SourceError::Invalid(format!(
+                        "`{owner}`: {spec:?} names no Preposition Phrase"
+                    )));
+                }
+                (FrameFamily::Prepositional, vec![slot(Complement, fill)])
+            }
             FrameSpec::Copular => (
                 FrameFamily::Copular,
                 vec![slot(PredicativeComplement, SlotFill::Pred)],
@@ -815,13 +823,30 @@ pub(crate) fn exact(id: &str, lemma: &str, category: Category, source: Source) -
     lexeme
 }
 
-/// A Lexeme in scope only on `cards`.
-pub(crate) fn card_scoped(mut lexeme: Lexeme, cards: &[String]) -> Lexeme {
-    lexeme.card_scope = cards
+/// Whether a noun's parameter patterns take a parameter of `kind` before
+/// the noun: a license feature's head (english.md §3).
+///
+/// # Errors
+/// A pattern that takes one beside another parameter, or anywhere but right
+/// before its head.
+fn licensed_host(
+    id: &str,
+    entry: &NounEntry,
+    kind: SlotKind,
+    what: &str,
+) -> Result<bool, SourceError> {
+    let parameter = ParameterPart::Slot(kind);
+    if entry.parameters.iter().any(|parts| {
+        parts.contains(&parameter) && parts.as_slice() != [parameter.clone(), ParameterPart::Head]
+    }) {
+        return Err(SourceError::Invalid(format!(
+            "noun `{id}`: {what} is a whole pattern's one parameter, right before its head"
+        )));
+    }
+    Ok(entry
+        .parameters
         .iter()
-        .map(|card| crate::names::card_name_id(card))
-        .collect();
-    lexeme
+        .any(|parts| parts.contains(&parameter)))
 }
 
 /// A bound Lexeme spelled exactly.

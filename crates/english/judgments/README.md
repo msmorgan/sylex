@@ -28,7 +28,7 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
 
 ```
 # a comment
-<mark> [<card=NAME> [<legendary>]] [<anchor=WORD>]... <text> [=> <assertions>]
+<mark> [<card=NAME> [<legendary>]] [<anchor=WORD>]... [<vote=WORD>]... <text> [=> <assertions>]
 ```
 
 - **Mark.** `+` the text is grammatical; `*` it has no Reading at all (see
@@ -47,6 +47,12 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
   enchantment enters, choose Khans or Dragons.` A face's Anchor Words are read
   from its text across its units (`Face::scope`); an entry is one unit, so it
   states the words its text is read with.
+- **Vote.** `<vote=psychosis>` reads the text with that Vote Option in scope
+  ([CR#701.38b]), once per word, after any `<anchor=…>`: `<vote=sickness>
+  <vote=psychosis> If psychosis gets more votes, each opponent discards two
+  cards.` A face's Vote Options are read from its text as its Anchor Words
+  are, from where a vote offers them and where the text then cites them; an
+  entry states them, whether or not its text offers them.
 - **Text.** The exact expression, with its final punctuation; it runs to the
   end of the line or to `=>`.
 - **Assertions** follow `=>`, separated by `;`. `||` separates alternative

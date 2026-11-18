@@ -16,6 +16,7 @@
 use std::collections::BTreeSet;
 use std::io::BufRead;
 
+use rayon::prelude::*;
 use sylex_lexicon::CardScope;
 use sylex_lexicon::Lexicon;
 use sylex_syntax::CompiledGrammar;
@@ -42,9 +43,11 @@ impl Face {
     /// The Card Scope the face's text is read in: its own name in its Full
     /// form and, for a legendary permanent whose name has one, in its
     /// Shortened form [CR#201.5c], derived from the face's name and type
-    /// line as its text is parsed (`sylex_vocabulary::face_scope`); and its
+    /// line as its text is parsed (`sylex_vocabulary::face_scope`); its
     /// Anchor Words [CR#614.12c], read from its rules text across its lines
-    /// ([`crate::anchors::anchor_words`]). Nothing else of the card is in
+    /// ([`crate::anchors::anchor_words`]); and its Vote Options
+    /// [CR#701.38b], read from that text likewise
+    /// ([`crate::options::vote_options`]). Nothing else of the card is in
     /// it.
     ///
     /// Each face of a double-faced card has its own name [CR#712.6], and two
@@ -59,12 +62,9 @@ impl Face {
     #[must_use]
     pub fn scope(&self, lexicon: &Lexicon, grammar: &CompiledGrammar) -> CardScope {
         let mut scope = self.name_scope(lexicon);
-        // A face with no rules text has no Anchor Words.
+        // A face with no rules text has no Anchor Words or Vote Options.
         if let Some(text) = &self.oracle_text {
-            let lines = split_lines(text);
-            for word in crate::anchors::anchor_words(&lines, &scope, lexicon, grammar) {
-                scope.insert_anchor_word(&word);
-            }
+            read_scope(&split_lines(text), &mut scope, lexicon, grammar);
         }
         scope
     }
@@ -97,6 +97,24 @@ impl Face {
             .flat_map(|text| split_lines(text).into_iter().enumerate())
             .map(|(line, text)| (UnitKind::Line, line, text));
         type_line.chain(lines)
+    }
+}
+
+/// Adds to `scope`, the card names of a face, what its rules-text lines
+/// `lines` put in its Card Scope: its Anchor Words
+/// ([`crate::anchors::anchor_words`]), then its Vote Options
+/// ([`crate::options::vote_options`]).
+pub fn read_scope(
+    lines: &[String],
+    scope: &mut CardScope,
+    lexicon: &Lexicon,
+    grammar: &CompiledGrammar,
+) {
+    for word in crate::anchors::anchor_words(lines, scope, lexicon, grammar) {
+        scope.insert_anchor_word(&word);
+    }
+    for word in crate::options::vote_options(lines, scope, lexicon, grammar) {
+        scope.insert_vote_option(&word);
     }
 }
 
@@ -294,6 +312,20 @@ impl Corpus {
             builder.card(card, &keep);
         }
         Ok(builder.finish())
+    }
+
+    /// The Card Scope of each face ([`Face::scope`]), by its index in
+    /// [`Corpus::faces`]: a face's scope is read once, from all its lines,
+    /// for every unit of it.
+    ///
+    /// # Panics
+    /// As [`Face::scope`].
+    #[must_use]
+    pub fn scopes(&self, lexicon: &Lexicon, grammar: &CompiledGrammar) -> Vec<CardScope> {
+        self.faces
+            .par_iter()
+            .map(|face| face.scope(lexicon, grammar))
+            .collect()
     }
 
     /// Adds a face and its units.
