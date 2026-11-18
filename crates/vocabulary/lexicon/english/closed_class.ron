@@ -36,7 +36,8 @@
         (number: Singular, countability: Count, lemma: "each", distribution: Distributive, frames: [Complement(PP(["of"]))]),
         (number: Singular, countability: Count, lemma: "either", distribution: Distributive, frames: [Complement(PP(["of"]))]),
         (number: Singular, countability: Count, lemma: "every", distribution: Distributive),
-        (number: Singular, countability: Count, lemma: "everything"),
+        // A fused determiner-head alone, as *anywhere* is (CGEL, Ch. 5 §9.6, p. 423).
+        (lemma: "everything", distribution: Independent),
         (number: Plural, countability: Count, lemma: "fewer", frames: [Complement(PP(["of"])), Complement(PP(["than"]))]),
         (number: Plural, countability: Count, lemma: "fewest"),
         // Fraction and multiplier predeterminers (*half their life*, *double
