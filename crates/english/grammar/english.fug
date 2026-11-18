@@ -203,8 +203,13 @@ feature TargetMarked = Marked
 // A license feature (english.md §3), which the counter catalog declares:
 // `Kind` on a counter's kind name (*charge*, *time*), which stands only as
 // the kind of the noun *counter*, and on a keyword a keyword counter can be
-// [CR#122.1b]; `Head` on *counter*, the one noun a kind premodifies.
-feature KindLicense = Kind | Head
+// [CR#122.1b]; `Head` on *counter*, the one noun a kind premodifies. A kind
+// word before *counter* keeps its other analyses only where the two straddle
+// a constituent boundary (`head: Head`, docs/design/lexicon.md §5): *five or
+// more [plot counters]* is no verb and its Object (Deadly Designs), while
+// *the first time [counters have been put on that creature]* stands
+// (Stalwart Successor).
+feature KindLicense = Kind | Head { head: Head }
 // A license feature (english.md §3), which a noun's parameter pattern
 // declares: `Head` on a noun a Set Name premodifies (*expansion*), which
 // takes no other premodifier there.

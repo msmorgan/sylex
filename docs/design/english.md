@@ -197,6 +197,10 @@ before it (*time*, *loyalty*) is no premodifier of it. A slash measure and a
 keyword are no Catalog words, so the license reaches them only through the
 head. `Head` has one holder, *counter*, which binding reports as a value with
 fewer than two holders ([Lexicon](lexicon.md) §4): the position has one head.
+The grammar names its head value (`feature KindLicense = Kind | Head { head:
+Head }`), so a `Kind` word directly before *counter* is a licensed term, whose
+words stand apart as a multiword term's do ([Lexicon](lexicon.md) §5): a kind
+name's homograph and *counter* form no constituent of their own.
 Why: as ordinary nouns the kind names would head nominals and premodify any
 noun, and many are homographs of other words (*Treasure*, *time*). The kinds
 are open, as every Catalog is; a license states their one position as a

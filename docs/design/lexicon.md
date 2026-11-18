@@ -165,6 +165,19 @@ Phrase, never the noun's own analysis. Why: words that meet by accident are a
 different analysis from the term coined from them, while words that rebuild the
 term are a second tree of its analysis ([English](english.md) §8).
 
+A licensed term is two words, a word that holds a license feature directly
+before the word that carries its head value ([English](english.md) §3): a
+counter's kind and *counter* (*time counters*). It is no leaf: its own
+analysis is the Production that admits the head (`:= Head`), built from its
+words. Its words keep their other analyses as a Catalog term's do, only where
+they straddle a constituent boundary, and only its own analysis may rebuild
+them. So *five or more plot counters* reads no verb *plot* with *counters* its
+Object (Deadly Designs) and *a training counter* no participle premodifying
+*counter* (Sensei Golden-Tail), while *the first time [counters have been put
+on that creature]* stands (Stalwart Successor). Why: a kind name's homograph
+and its head that form one constituent are the kind's analysis built a second
+way, as a Catalog term's words are.
+
 ## 6. Names and notation
 
 **Names are scoped.** A card's own name, full or Shortened, is its own only in

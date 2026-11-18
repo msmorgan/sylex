@@ -221,6 +221,11 @@ words that stand only there and the one head whose position it is.
 `KindLicense` marks each counter's kind name, each keyword a keyword counter
 can be, and the noun *counter* (english.md §3).
 
+**Licensed Term**:
+Two words: one that holds a License Feature, directly before one that carries
+its head value (*time counters*). Its words keep their other analyses only where
+they straddle a constituent boundary, as a multiword term's do (lexicon.md §5).
+
 **Local Feature**:
 A grammar feature that is a fact of the phrase's own Production: no mother
 shares it with its head implicitly and no coordination's conjuncts share it,
