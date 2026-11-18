@@ -142,7 +142,10 @@ fn an_adjectival_passive_without_its_equations_is_a_load_error() {
 fn a_complement_kind_the_phrase_does_not_carry_is_a_load_error() {
     let valence = format!("{VOICES}, complement_kind: ComplementKind");
     let error = load_error(&grammar(&valence, "", "", ""));
-    assert!(error.contains("is not a feature the phrase carries"), "{error}");
+    assert!(
+        error.contains("is not a feature the phrase carries"),
+        "{error}"
+    );
 }
 
 #[test]
