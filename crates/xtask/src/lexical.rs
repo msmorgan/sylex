@@ -469,8 +469,19 @@ fn lexeme_inventory(lexicon: &Lexicon) -> BTreeMap<sylex_lexicon::LexemeId, Lexe
 }
 
 fn materials(lexicon: &Lexicon, reading: &LexicalReading) -> Result<BTreeSet<Material>> {
-    let LexicalReading::Word(value) = reading else {
-        return Ok(BTreeSet::from([Material::Numeral]));
+    let value = match reading {
+        LexicalReading::Word(value) => value,
+        LexicalReading::Numeral { .. } => return Ok(BTreeSet::from([Material::Numeral])),
+        // A card's own name is a Proper Name, as a card name's Lexeme is, and
+        // so is the name of a set.
+        LexicalReading::OwnName { .. } | LexicalReading::SetName { .. } => {
+            return Ok(BTreeSet::from([Material::Catalog]));
+        }
+        // A Flavor Word is a label, as an ability word is.
+        LexicalReading::FlavorWord { .. } => return Ok(BTreeSet::from([Material::Keyword])),
+        // A title run is a name only where a parse introduces it: alone it
+        // is no material.
+        LexicalReading::IntroducedName { .. } => return Ok(BTreeSet::new()),
     };
     let lexeme = lexicon
         .lexemes()
