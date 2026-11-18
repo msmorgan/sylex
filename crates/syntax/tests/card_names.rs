@@ -8,7 +8,6 @@
 use sylex_lexicon::CardScope;
 use sylex_lexicon::Category;
 use sylex_lexicon::Lexeme;
-use sylex_lexicon::LexemeId;
 use sylex_lexicon::Lexicon;
 use sylex_lexicon::NameForm;
 use sylex_lexicon::Source;
@@ -97,7 +96,7 @@ fn admission_reads_a_card_name_in_the_scope_it_is_given() {
 }
 
 /// Chandra, Pyromaster, a legendary planeswalker, whose name shortens to
-/// *Chandra* [CR#201.5c], and Marit Lage, the Introduced Name of Dark Depths.
+/// *Chandra* [CR#201.5c], and Dark Depths.
 fn scoped_lexicon() -> Lexicon {
     let catalog = Source {
         kind: SourceKind::Catalog,
@@ -105,16 +104,8 @@ fn scoped_lexicon() -> Lexicon {
         owner: "test".to_owned(),
     };
     let chandra = Lexeme::card_name("Chandra, Pyromaster", catalog.clone());
-    let depths = Lexeme::card_name("Dark Depths", catalog.clone());
-    let mut marit_lage = Lexeme::invariant(
-        "introduced_name:Marit Lage",
-        "Marit Lage",
-        Category::Catalog,
-        catalog,
-    );
-    marit_lage.capitalization = sylex_lexicon::Capitalization::Exact;
-    marit_lage.card_scope = [LexemeId::new("name:Dark Depths")].into();
-    Lexicon::new([chandra, depths, marit_lage]).unwrap()
+    let depths = Lexeme::card_name("Dark Depths", catalog);
+    Lexicon::new([chandra, depths]).unwrap()
 }
 
 /// The one Reading of `text` in `scope`.
@@ -138,20 +129,6 @@ fn admission_refuses_a_shortened_name_off_its_own_card() {
     let elsewhere = CardScope::full_names(["Dark Depths"]);
     let reading = only_reading(&grammar, &lexicon, "Chandra.", &own);
     assert_eq!(grammar.admit(&reading, &lexicon, &own), Ok(()));
-    assert_eq!(
-        grammar.admit(&reading, &lexicon, &elsewhere),
-        Err(AdmissionError::OutOfScope)
-    );
-}
-
-#[test]
-fn admission_refuses_an_introduced_name_off_the_cards_that_introduce_it() {
-    let lexicon = scoped_lexicon();
-    let grammar = grammar(&lexicon);
-    let depths = CardScope::full_names(["Dark Depths"]);
-    let elsewhere = CardScope::every_form(["Chandra, Pyromaster"]);
-    let reading = only_reading(&grammar, &lexicon, "Marit Lage.", &depths);
-    assert_eq!(grammar.admit(&reading, &lexicon, &depths), Ok(()));
     assert_eq!(
         grammar.admit(&reading, &lexicon, &elsewhere),
         Err(AdmissionError::OutOfScope)

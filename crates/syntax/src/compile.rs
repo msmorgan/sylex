@@ -58,6 +58,7 @@ struct PatternSelection {
 
 /// The lexical facts a bound grammar keeps about one lexeme.
 #[derive(Debug, Clone)]
+#[expect(clippy::struct_excessive_bools, reason = "independent lexical facts")]
 pub(crate) struct LexemeFacts {
     pub features: Vec<(usize, u16)>,
     pub category: LexicalCategory,
@@ -76,6 +77,10 @@ pub(crate) struct LexemeFacts {
     /// It is a card name [CR#201.1]: its leaf is another card's name
     /// (`LeafFacts::other_card_name`).
     pub card_name: bool,
+    /// It is a card name that another Lexeme spells too, ignoring case
+    /// (*Blood*, a card and a predefined token): no
+    /// `Test::DistinctOtherCardName` admits it.
+    pub homograph: bool,
 }
 
 /// A lexical value the lexicon licenses, less its Lexeme, with what a bound
@@ -139,6 +144,11 @@ pub struct CompiledGrammar {
     pub(crate) own_name_features: Vec<(usize, u16)>,
     /// Each license feature (`Grammar::licenses`) and its head value.
     pub(crate) licenses: Vec<License>,
+    /// The Closed Words and Lexical Classes some Production's
+    /// `complement_of`, `within` or `headed_by` names: a summary records
+    /// which of them heads its phrase, and no other head
+    /// (`Names::headed_by`).
+    pub(crate) name_heads: Vec<Test>,
     pub(crate) frames: Vec<Frame>,
     /// Each frame's shape for Complement Clusters, as the index of the first
     /// frame with the same: the relation of each Frame Slot, and what fills
@@ -465,11 +475,26 @@ fn word_values(
     Ok((table, by_spelling))
 }
 
+/// The Complements a phrase omits at its right edge: those of an ellipsis
+/// site whose omitted Complement takes the word forms `elliptical`, or those
+/// its head selects.
+fn omission(elliptical: Option<u16>, omits_complement: bool) -> crate::step::Omission {
+    if let Some(forms) = elliptical {
+        crate::step::Omission::Ellipsis(forms)
+    } else if omits_complement {
+        crate::step::Omission::Selected
+    } else {
+        crate::step::Omission::None
+    }
+}
+
 fn invalid(message: impl Into<String>) -> LoadError {
     LoadError::Invalid(message.into())
 }
 
 struct Binder<'a> {
+    /// `CompiledGrammar::name_heads`, as Productions name them.
+    name_heads: std::cell::RefCell<Vec<Test>>,
     grammar: &'a Grammar,
     catalog: &'a FrameCatalog,
     out: CompiledGrammar,
@@ -594,6 +619,8 @@ struct Draft {
     /// It opens with a dash only its sentence's end closes
     /// (`ProductionDecl::unclosed`).
     unclosed: bool,
+    /// What it says about Introduced Names.
+    name_rules: crate::names::NameRules,
     /// Its phrase is only a non-final conjunct (`Production::nonfinal`).
     nonfinal: bool,
     /// Its coordination's conjuncts other than the last
@@ -734,6 +761,7 @@ impl Draft {
             omits_complement: false,
             elliptical: None,
             unclosed: false,
+            name_rules: crate::names::NameRules::default(),
             nonfinal: false,
             nonfinal_conjuncts: Vec::new(),
             link: None,
@@ -910,6 +938,17 @@ impl<'a> Binder<'a> {
         let mut frames: Vec<Frame> = Vec::new();
         let mut preposition_frames: Vec<PrepositionFrame> = Vec::new();
         let lexeme_ids = Lexemes::new(lexicon.lexemes().keys().copied());
+        // What every word that is no card name is spelled like.
+        let spellings: BTreeSet<String> = lexicon
+            .values()
+            .filter(|value| !lexicon.lexemes()[&value.lexeme].card_name)
+            .filter_map(|value| {
+                lexicon
+                    .realize(&sylex_lexicon::LexicalReading::Word(value.clone()))
+                    .ok()
+            })
+            .map(|spelling| spelling.to_lowercase())
+            .collect();
         let mut lexemes = Vec::with_capacity(lexicon.lexemes().len());
         for (id, lexeme) in lexicon.lexemes() {
             lexemes.push(LexemeFacts {
@@ -940,6 +979,7 @@ impl<'a> Binder<'a> {
                 preposition_frames: BTreeSet::new(),
                 source: lexeme.source.kind,
                 card_name: lexeme.card_name,
+                homograph: lexeme.card_name && spellings.contains(&lexeme.lemma.to_lowercase()),
             });
         }
         for (id, list) in &catalog.frames {
@@ -1176,6 +1216,7 @@ impl<'a> Binder<'a> {
             "a card's own name",
         )?;
         Ok(Self {
+            name_heads: std::cell::RefCell::default(),
             grammar,
             catalog,
             out: CompiledGrammar {
@@ -1200,6 +1241,7 @@ impl<'a> Binder<'a> {
                 spelled_forms,
                 own_name_features,
                 licenses,
+                name_heads: Vec::new(),
                 lexeme_ids,
                 lexemes,
                 frames,
@@ -1266,6 +1308,97 @@ impl<'a> Binder<'a> {
                 ))
             })?;
         Ok(u16::try_from(index).expect("feature domains are small"))
+    }
+
+    /// What a Production declares about Introduced Names
+    /// (`ProductionDecl::undescribed` and the fields after it).
+    fn name_rules(
+        &self,
+        declaration: &crate::grammar::ProductionDecl,
+        draft: &Draft,
+    ) -> Result<crate::names::NameRules, LoadError> {
+        let child = |name: &Ident| {
+            draft
+                .children
+                .iter()
+                .position(|c| c.name == *name)
+                .ok_or_else(|| invalid(format!("unknown child `{name}`")))
+        };
+        if declaration.undescribed
+            && !matches!(
+                declaration.rhs.as_slice(),
+                [crate::grammar::SymbolDecl::IntroducedName(_)]
+            )
+        {
+            return Err(invalid(
+                "an undescribed Production is one `IntroducedName()` child",
+            ));
+        }
+        let describes = declaration.describes.as_ref().map(&child).transpose()?;
+        if describes.is_some_and(|at| {
+            declaration.rhs[at + 1..].iter().all(|symbol| {
+                matches!(
+                    symbol,
+                    crate::grammar::SymbolDecl::Punct(_)
+                        | crate::grammar::SymbolDecl::Mark(..)
+                        | crate::grammar::SymbolDecl::SpokenMark(..)
+                )
+            })
+        }) {
+            return Err(invalid("no child follows the described one"));
+        }
+        let mut headed_by = Vec::new();
+        for (name, word) in &declaration.headed_by {
+            headed_by.push((child(name)?, self.name_head(word)?));
+        }
+        let selection = match (
+            &declaration.complement_of,
+            &declaration.within,
+            &declaration.not_complement_of,
+        ) {
+            (Some(word), None, None) => Some((word, true, false)),
+            (None, Some(word), None) => Some((word, false, false)),
+            (None, None, Some(word)) => Some((word, true, true)),
+            (None, None, None) => None,
+            _ => {
+                return Err(invalid(
+                    "a Production declares one of `complement_of`, `within` and \
+                     `not_complement_of`",
+                ));
+            }
+        }
+        .map(|(word, direct, refused)| {
+            Ok::<_, LoadError>(crate::names::Selection {
+                head: self.name_head(word)?,
+                direct,
+                refused,
+            })
+        })
+        .transpose()?;
+        Ok(crate::names::NameRules {
+            undescribed: declaration.undescribed,
+            describes,
+            headed_by,
+            selection,
+        })
+    }
+
+    /// The index, in `CompiledGrammar::name_heads`, of the Closed Word or
+    /// Lexical Class a Production names as a head.
+    fn name_head(&self, name: &str) -> Result<u8, LoadError> {
+        let test = self.coordinator_test(name)?;
+        let mut heads = self.name_heads.borrow_mut();
+        let index = heads
+            .iter()
+            .position(|head| *head == test)
+            .unwrap_or_else(|| {
+                heads.push(test);
+                heads.len() - 1
+            });
+        u8::try_from(index)
+            .ok()
+            .filter(|&index| index < 16)
+            .ok_or_else(|| invalid("more than 16 words named as the heads of name constructions"))
     }
 
     fn word(&self, name: &str) -> Result<Lexeme, LoadError> {
@@ -1463,6 +1596,7 @@ impl<'a> Binder<'a> {
         }
         self.out.normal_forms =
             crate::normal_form::NormalForms::compile(&self.out, &self.tail_bases);
+        self.out.name_heads = self.name_heads.take();
         self.out.cluster_shapes = cluster_shapes(&self.out.frames);
         self.out.prediction = crate::prediction::Prediction::compile(&self.out);
         Ok(self.out)
@@ -1777,6 +1911,7 @@ impl<'a> Binder<'a> {
             draft.coordinated.push(child);
         }
         draft.unclosed = declaration.unclosed;
+        draft.name_rules = self.name_rules(declaration, &draft).map_err(context)?;
         if let Some(forms) = &declaration.elliptical {
             if forms.is_empty() {
                 return Err(context(invalid(
@@ -1978,6 +2113,11 @@ impl<'a> Binder<'a> {
                 (name.as_str(), Symbol::Leaf(Test::Lexical(*category)))
             }
             SymbolDecl::OtherCardName(name) => (name.as_str(), Symbol::Leaf(Test::OtherCardName)),
+            SymbolDecl::DistinctOtherCardName(name) => {
+                (name.as_str(), Symbol::Leaf(Test::DistinctOtherCardName))
+            }
+            SymbolDecl::IntroducedName(name) => (name.as_str(), Symbol::Leaf(Test::IntroducedName)),
+            SymbolDecl::RepeatedName(name) => (name.as_str(), Symbol::Leaf(Test::RepeatedName)),
             SymbolDecl::Word(name, word) => {
                 (name.as_str(), Symbol::Leaf(Test::Word(self.word(word)?)))
             }
@@ -2557,15 +2697,10 @@ impl<'a> Binder<'a> {
             .foreign_coordinators
             .clone_from(&draft.foreign_coordinators);
         production.unlike = draft.unlike;
-        production.omission = if let Some(forms) = draft.elliptical {
-            crate::step::Omission::Ellipsis(forms)
-        } else if draft.omits_complement {
-            crate::step::Omission::Selected
-        } else {
-            crate::step::Omission::None
-        };
+        production.omission = omission(draft.elliptical, draft.omits_complement);
         production.link = draft.link;
         production.unclosed = draft.unclosed;
+        production.name_rules.clone_from(&draft.name_rules);
         production.nonfinal = draft.nonfinal;
         production.cluster = draft
             .cluster
@@ -6558,6 +6693,7 @@ fn remap_draft(draft: &mut Draft, map: impl Fn(usize) -> usize) {
         omits_complement: _,
         elliptical: _,
         unclosed: _,
+        name_rules: _,
         nonfinal: _,
         nonfinal_conjuncts,
         link: _,

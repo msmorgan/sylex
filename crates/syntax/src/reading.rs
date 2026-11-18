@@ -22,6 +22,7 @@ use crate::chart::QUOTATION_MARK;
 use crate::chart::quotation_mark;
 use crate::compile::CompiledGrammar;
 use crate::frames::Frame;
+use crate::names::NameBits;
 use crate::step::Anchor;
 use crate::step::ChildRole;
 use crate::step::ChildView;
@@ -112,6 +113,10 @@ pub enum AdmissionError {
     /// ([`sylex_lexicon::Lexicon::stands_in`]).
     #[error("a leaf does not stand in this card scope")]
     OutOfScope,
+    /// An Introduced Name that is left undescribed or unselected, or that
+    /// is named again in a Reading that does not introduce it.
+    #[error("an Introduced Name is not introduced")]
+    NotIntroduced,
 }
 
 impl Parse<'_> {
@@ -1026,9 +1031,18 @@ impl CompiledGrammar {
         root: usize,
         scope: &CardScope,
     ) -> Result<(), AdmissionError> {
-        let (category, summary) = self.summarize(reading, lexicon, scope)?;
+        let mut names = Vec::new();
+        crate::names::introduced_names(reading, &mut names);
+        let bits = NameBits::tracking(names.iter().copied()).ok_or(AdmissionError::Rejected {
+            production: "Introduced Names".into(),
+            reason: "more than 32 names in one Reading".into(),
+        })?;
+        let (category, summary) = self.summarize(reading, lexicon, scope, &bits, &mut 0)?;
         if category != root || summary.gap != Gap::None {
             return Err(AdmissionError::Root(self.categories[category].to_string()));
+        }
+        if !summary.names.complete() {
+            return Err(AdmissionError::NotIntroduced);
         }
         let mut atoms = Vec::new();
         self.atoms(reading, lexicon, &mut atoms, &mut |_, _| {})?;
@@ -1036,10 +1050,15 @@ impl CompiledGrammar {
         let analyzed = lexicon.analyze_source_scoped(&text, None, scope);
         let atomic = self.atomic_spans(&analyzed);
         let licensed = self.licensed_terms(&analyzed);
-        // An own name is checked against the analysis of its text.
-        if atomic.is_empty() && licensed.is_empty() && scope.forms().next().is_none() {
+        // A name is checked against the analysis of its text.
+        if atomic.is_empty()
+            && licensed.is_empty()
+            && scope.forms().next().is_none()
+            && names.is_empty()
+        {
             return Ok(());
         }
+
         let mut chars = vec![0; text.len() + 1];
         for (count, (at, c)) in text.char_indices().enumerate() {
             chars[at] = count;
@@ -1088,19 +1107,24 @@ impl CompiledGrammar {
             Reading::Leaf(value) => {
                 let at = atoms[*next].clone();
                 *next += 1;
-                // An own name stands only where analysis finds it: its
-                // Shortened form is no name inside the full name written out.
-                if matches!(value, LexicalReading::OwnName { .. })
-                    && !analyzed
-                        .matches
-                        .iter()
-                        .any(|m| m.start == at.start && m.end == at.end && m.reading == *value)
+                // A name stands only where analysis finds it: an own name's
+                // Shortened form is no name inside the full name written
+                // out, and an Introduced Name is the whole title run there.
+                if matches!(
+                    value,
+                    LexicalReading::OwnName { .. } | LexicalReading::IntroducedName { .. }
+                ) && !analyzed
+                    .matches
+                    .iter()
+                    .any(|m| m.start == at.start && m.end == at.end && m.reading == *value)
                 {
                     return Err(AdmissionError::OutOfScope);
                 }
                 let word = matches!(
                     value,
-                    LexicalReading::Word(_) | LexicalReading::OwnName { .. }
+                    LexicalReading::Word(_)
+                        | LexicalReading::OwnName { .. }
+                        | LexicalReading::IntroducedName { .. }
                 );
                 let parted = atomic.iter().any(|(span, splits)| {
                     (inside(at.start, span) || inside(at.end, span)) && !(*splits && word)
@@ -1157,11 +1181,15 @@ impl CompiledGrammar {
         Ok((!rebuilt).then_some(whole))
     }
 
+    /// The Category and summary of a Reading, each leaf of an Introduced
+    /// Name numbered from `leaf` on and carrying its name's bit of `bits`.
     fn summarize(
         &self,
         reading: &Reading,
         lexicon: &Lexicon,
         scope: &CardScope,
+        bits: &NameBits,
+        leaf: &mut u32,
     ) -> Result<(usize, Summary), AdmissionError> {
         let Reading::Node(node) = reading else {
             return Err(AdmissionError::Leaf);
@@ -1188,7 +1216,16 @@ impl CompiledGrammar {
                     if !lexicon.stands_in(value, scope) {
                         return Err(AdmissionError::OutOfScope);
                     }
-                    let facts = self.leaf_facts(value).ok_or(AdmissionError::Leaf)?;
+                    let mut facts = self.leaf_facts(value).ok_or(AdmissionError::Leaf)?;
+                    if let LexicalReading::IntroducedName { name } = value {
+                        // The root holds a name named again to an
+                        // introduction.
+                        facts.introduced_name = Some(crate::names::NameLeaf {
+                            leaf: *leaf,
+                            bit: bits.bit(name),
+                        });
+                        *leaf += 1;
+                    }
                     let edges = self.leaf_edges(value).ok_or(AdmissionError::Leaf)?;
                     if !self.leaf_matches(test, &facts) {
                         return Err(reject("leaf does not satisfy its symbol"));
@@ -1207,7 +1244,8 @@ impl CompiledGrammar {
                     let Some(child) = children.next() else {
                         return Err(reject("missing child"));
                     };
-                    let (child_category, summary) = self.summarize(child, lexicon, scope)?;
+                    let (child_category, summary) =
+                        self.summarize(child, lexicon, scope, bits, leaf)?;
                     if child_category != *category {
                         return Err(reject("child has the wrong category"));
                     }
@@ -1477,13 +1515,15 @@ impl CompiledGrammar {
     /// its lexeme, Word Form and features. Two Readings that differ only in
     /// the form of a syncretic head (*cast* as present or preterite) differ
     /// here.
-    /// `None` where that leaf is no declared word: a card's own name, a
-    /// numeral, a Flavor Word or a Set Name ([`Self::head_leaf`]).
+    /// `None` where that leaf is no declared word: a card's own name, an
+    /// Introduced Name, a numeral, a Flavor Word or a Set Name
+    /// ([`Self::head_leaf`]).
     #[must_use]
     pub fn head_word<'r>(&self, reading: &'r Reading) -> Option<&'r LexicalValue> {
         match self.head_leaf(reading)? {
             LexicalReading::Word(value) => Some(value),
             LexicalReading::OwnName { .. }
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. } => None,
@@ -1561,6 +1601,7 @@ impl CompiledGrammar {
                         self.facts(lexeme).binding
                     }
                     LexicalReading::OwnName { .. }
+                    | LexicalReading::IntroducedName { .. }
                     | LexicalReading::Numeral { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. } => Binding::Free,

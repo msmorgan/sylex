@@ -269,6 +269,7 @@ impl Parse<'_> {
         match &self.forest.leaves[leaf?].reading {
             LexicalReading::Word(value) => Some((value.lexeme, value.form)),
             LexicalReading::OwnName { .. }
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
             | LexicalReading::Numeral { .. } => None,

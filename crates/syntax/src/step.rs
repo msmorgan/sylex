@@ -198,8 +198,18 @@ pub(crate) enum Test {
     /// A preposition that declares this complement frame.
     PrepositionFrame(usize),
     /// Another card's name (`LeafFacts::other_card_name`), which no other
-    /// test admits.
+    /// test but the next admits.
     OtherCardName,
+    /// Another card's name that no other word is spelled like
+    /// (`LexemeFacts::homograph`).
+    DistinctOtherCardName,
+    /// An Introduced Name where the text introduces it
+    /// (`LeafFacts::introduced_name`), which no other test but the next
+    /// admits.
+    IntroducedName,
+    /// An Introduced Name named again: one its text writes at more than one
+    /// place (`NameLeaf::bit`).
+    RepeatedName,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -603,6 +613,8 @@ pub(crate) struct Production {
     /// It opens with a dash only its sentence's end closes
     /// (`Summary::unclosed`).
     pub unclosed: bool,
+    /// What it says about Introduced Names.
+    pub name_rules: crate::names::NameRules,
     /// Its phrase is only a conjunct of a coordination other than the last
     /// (`Summary::nonfinal`).
     pub nonfinal: bool,
@@ -850,6 +862,7 @@ pub(crate) fn resolve(
         auxiliary: None,
         omission: Omission::None,
         unclosed: false,
+        name_rules: crate::names::NameRules::default(),
         nonfinal: false,
         lexical_head,
         link: None,
@@ -923,6 +936,7 @@ pub(crate) fn resolve(
             forced: false,
             unwritten_period: false,
             unclosed: false,
+            names: crate::names::Names::default(),
             headed_link: None,
             cluster: None,
             bare: Bare::NONE,
@@ -1108,6 +1122,8 @@ pub(crate) struct Summary {
     /// only its sentence's end closes (`ProductionDecl::unclosed`): nothing
     /// but a period follows it.
     pub unclosed: bool,
+    /// Its Introduced Names.
+    pub names: crate::names::Names,
     /// It is only a conjunct of a coordination other than the last
     /// (`SchemaDecl::Adjunct::nonfinal`): no other position takes it.
     pub nonfinal: bool,
@@ -1234,8 +1250,12 @@ pub(crate) struct LeafFacts {
     pub forms: u16,
     /// It is another card's name: a card name [CR#201.1] the scope of the
     /// face whose text is parsed does not hold [CR#201.5]. Only
-    /// [`Test::OtherCardName`] admits it, and that admits nothing else.
+    /// [`Test::OtherCardName`] and [`Test::DistinctOtherCardName`] admit it,
+    /// and they admit nothing else.
     pub other_card_name: bool,
+    /// It is an Introduced Name: only [`Test::IntroducedName`] and
+    /// [`Test::RepeatedName`] admit it, and they admit nothing else.
+    pub introduced_name: Option<crate::names::NameLeaf>,
 }
 
 pub(crate) enum ChildView<'a> {
@@ -1390,6 +1410,8 @@ pub(crate) struct State {
     /// The last child so far ends in an unclosed dash phrase
     /// (`Summary::unclosed`).
     unclosed: bool,
+    /// The Introduced Names of the children so far (`Summary::names`).
+    pub names: crate::names::Names,
     /// The `head` child's `Summary::link`.
     headed_link: Option<LinkedCoordination>,
     /// The `Summary::cluster` and `Summary::cluster_other` of the head-line
@@ -2388,6 +2410,7 @@ impl Production {
             return None;
         }
         next.unclosed = matches!(child, ChildView::Node(summary) if summary.unclosed);
+        next.names = state.names.accept(grammar, self, position, child)?;
         let (first, last) = self.boundaries(position, child);
         // A comma that sets off a post-dependent is closed by the mark after
         // it, a comma or a stronger indicator (*choose up to X, where X is
@@ -2654,6 +2677,7 @@ impl Production {
             auxiliary: self.auxiliary.is_some(),
             unwritten_period: state.unwritten_period,
             unclosed: self.unclosed || state.unclosed,
+            names: state.names.finish(self)?,
             nonfinal: self.nonfinal,
             link: self.link.or(state.headed_link),
             cluster: self
@@ -2720,12 +2744,18 @@ impl CompiledGrammar {
         leaf: &LeafFacts,
         facts: Option<&LexemeFacts>,
     ) -> bool {
-        // Another card's name fills only a position that opts in to it.
-        if leaf.other_card_name != (*test == Test::OtherCardName) {
+        // Another card's name fills only a position that opts in to it, and
+        // so does an Introduced Name.
+        if leaf.other_card_name != matches!(test, Test::OtherCardName | Test::DistinctOtherCardName)
+            || leaf.introduced_name.is_some()
+                != matches!(test, Test::IntroducedName | Test::RepeatedName)
+        {
             return false;
         }
         match test {
-            Test::OtherCardName => true,
+            Test::OtherCardName | Test::IntroducedName => true,
+            Test::DistinctOtherCardName => facts.is_some_and(|f| !f.homograph),
+            Test::RepeatedName => leaf.introduced_name.is_some_and(|name| name.bit != 0),
             Test::Lexical(category) => leaf.category == *category,
             Test::FreeLexical(category) => {
                 leaf.category == *category
@@ -2773,6 +2803,7 @@ impl CompiledGrammar {
         match reading {
             LexicalReading::Word(value) => self.value_facts(value).map(|v| v.edges),
             LexicalReading::OwnName { .. }
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. } => sylex_lexicon::Edges::non_word(reading),
@@ -2781,7 +2812,9 @@ impl CompiledGrammar {
 
     /// Projects a lexical alternative into the leaf a Production sees, or
     /// `None` if the lexicon licenses no such value. Its features were
-    /// resolved at bind time (`crate::projection`).
+    /// resolved at bind time (`crate::projection`). What the leaf of an
+    /// Introduced Name carries about its text (`LeafFacts::introduced_name`)
+    /// is its caller's to fill in.
     pub(crate) fn leaf_facts(&self, reading: &LexicalReading) -> Option<LeafFacts> {
         match reading {
             // A card's own name is a Catalog word no Lexeme declares, as a
@@ -2802,6 +2835,25 @@ impl CompiledGrammar {
                     forms: self.spelled_forms(&spelling)
                         | form_bit(sylex_lexicon::WordForm::Invariant),
                     other_card_name: false,
+                    introduced_name: None,
+                })
+            }
+            // An Introduced Name is a Proper Name too, unmarked for Number.
+            LexicalReading::IntroducedName { name } => {
+                let mut features = [None; MAX_FEATURES];
+                for &(feature, value) in &self.own_name_features {
+                    features[feature] = Some(value);
+                }
+                Some(LeafFacts {
+                    binding: sylex_lexicon::Binding::Free,
+                    integer: None,
+                    notation: None,
+                    lexeme: None,
+                    category: LexicalCategory::Catalog,
+                    features,
+                    forms: self.spelled_forms(name) | form_bit(sylex_lexicon::WordForm::Invariant),
+                    other_card_name: false,
+                    introduced_name: Some(crate::names::NameLeaf { leaf: 0, bit: 0 }),
                 })
             }
             LexicalReading::Word(value) => {
@@ -2821,6 +2873,7 @@ impl CompiledGrammar {
                     features,
                     forms: licensed.forms,
                     other_card_name: facts.card_name,
+                    introduced_name: None,
                 })
             }
             LexicalReading::Numeral {
@@ -2834,6 +2887,7 @@ impl CompiledGrammar {
                 features: self.projection.numeral_features(*value, *notation),
                 forms: 0,
                 other_card_name: false,
+                introduced_name: None,
             }),
             LexicalReading::FlavorWord { .. } => Some(LeafFacts {
                 binding: sylex_lexicon::Binding::Free,
@@ -2844,6 +2898,7 @@ impl CompiledGrammar {
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,
+                introduced_name: None,
             }),
             LexicalReading::SetName { .. } => Some(LeafFacts {
                 binding: sylex_lexicon::Binding::Free,
@@ -2854,6 +2909,7 @@ impl CompiledGrammar {
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,
+                introduced_name: None,
             }),
         }
     }

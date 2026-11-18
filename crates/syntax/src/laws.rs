@@ -428,6 +428,7 @@ impl Parse<'_> {
                 self.grammar.facts(lexeme).binding
             }
             LexicalReading::OwnName { .. }
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. } => Binding::Free,

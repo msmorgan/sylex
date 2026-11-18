@@ -19,6 +19,7 @@ pub mod grammar;
 mod hash;
 mod laws;
 mod lexeme;
+mod names;
 mod normal_form;
 mod prediction;
 mod projection;

@@ -307,6 +307,40 @@ pub struct ProductionDecl {
     /// ends in one is followed by nothing but a period.
     #[serde(default)]
     pub unclosed: bool,
+    /// The phrase is an Introduced Name that nothing has yet introduced: its
+    /// one child is an `IntroducedName` symbol, and a Constituent that ends
+    /// in it is followed only by the Supplement of a Production that
+    /// `describes` it (*create Angelo, a legendary 1/1 green and white Dog
+    /// creature token*). No Reading holds one left undescribed.
+    #[serde(default)]
+    pub undescribed: bool,
+    /// The child whose `undescribed` name the Production introduces: the
+    /// children after it describe what the name names. A child that ends in
+    /// no such name stands there too.
+    #[serde(default)]
+    pub describes: Option<Ident>,
+    /// `(child, word)` pairs, each word a Closed Word or a Lexical Class: the
+    /// child's lexical head, reached through its head or a coordination's
+    /// first conjunct, is that word or a member of that class (a named
+    /// token's description is headed by *token*).
+    #[serde(default)]
+    pub headed_by: Vec<(Ident, Ident)>,
+    /// The phrase stands only as the Object or Complement of a phrase headed
+    /// by this Closed Word or a member of this Lexical Class, alone or under
+    /// Productions of one child (a name only *create*'s Object offers).
+    #[serde(default)]
+    pub complement_of: Option<Ident>,
+    /// The phrase stands only inside the Object or Complement of a phrase
+    /// headed by this Closed Word or a member of this Lexical Class, at any
+    /// depth (*its name is Mishra's Warform* under *except*).
+    #[serde(default)]
+    pub within: Option<Ident>,
+    /// The phrase is never the Object or Complement of a phrase headed by
+    /// this Closed Word or a member of this Lexical Class, alone or under
+    /// Productions of one child (a name named again is never *create*'s
+    /// Object, which offers a name for a new token).
+    #[serde(default)]
+    pub not_complement_of: Option<Ident>,
     /// Children that are not themselves a coordination, where a coordination
     /// one level up is the same analysis (a chain of bare imperatives).
     #[serde(default)]
@@ -364,6 +398,19 @@ pub enum SymbolDecl {
     /// that is not that card's [CR#201.5]. No other symbol admits one, so a
     /// position opts in to another card's name by naming this symbol.
     OtherCardName(Ident),
+    /// Another card's name that no other word is spelled like: a name that
+    /// a subtype or a predefined token's name also spells is that word, and
+    /// this symbol refuses it (*a Blood token* is the predefined token,
+    /// *a Tarmogoyf token* a token named for the card [CR#111.11]).
+    DistinctOtherCardName(Ident),
+    /// An Introduced Name where the text introduces it: the title run
+    /// written there is the name [CR#111.4]. A Production marked
+    /// `undescribed` only offers the name, which the Supplement that
+    /// describes it introduces (`ProductionDecl::describes`).
+    IntroducedName(Ident),
+    /// An Introduced Name named again: it stands only in a Reading that
+    /// also introduces that name, by an `IntroducedName` symbol.
+    RepeatedName(Ident),
     /// The Closed Word of that grammar name.
     Word(Ident, Ident),
     /// Any member of the Lexical Class of that grammar name.

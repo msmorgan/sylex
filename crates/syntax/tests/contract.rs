@@ -241,17 +241,20 @@ fn every_homograph_reaches_every_production_accepting_it() {
             .matches
             .iter()
             .filter(|m| m.start == 0 && m.end == word_end)
-            .map(|m| {
+            .filter_map(|m| {
                 let category = match &m.reading {
                     LexicalReading::Word(value) => lexicon.lexemes()[&value.lexeme].category,
                     LexicalReading::Numeral { .. } => Category::Numeral,
+                    // The title run of the capitalized word: the grammar has
+                    // no position that introduces a name.
+                    LexicalReading::IntroducedName { .. } => return None,
                     LexicalReading::OwnName { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. } => {
                         unreachable!("the text has no name in scope, label or set name")
                     }
                 };
-                word_reading(production_for(category), m.reading.clone())
+                Some(word_reading(production_for(category), m.reading.clone()))
             })
             .collect();
         // Every form of the verb spelled `cast` (plain, five present, six
@@ -270,6 +273,11 @@ fn duplicate_derivations_of_one_tree_are_one_reading() {
     let lexicon = Lexicon::new([noun("card")]).unwrap();
     let grammar = bind(WORD, &lexicon, NO_FRAMES).unwrap();
     let mut analyzed = lexicon.analyze("Card.");
+    // Beside the noun stands the word's title run, which no Production of
+    // this grammar takes.
+    analyzed
+        .matches
+        .retain(|m| matches!(m.reading, LexicalReading::Word(_)));
     assert_eq!(analyzed.matches.len(), 1);
     analyzed.matches.push(analyzed.matches[0].clone());
     let parse = grammar.parse_analyzed(&analyzed);
@@ -721,7 +729,8 @@ fn homograph_choices_do_not_multiply_the_chart() {
         });
         assert_eq!(one.1, 1);
         assert_eq!(three.1, 3u128.pow(u32::try_from(n).unwrap()));
-        assert_eq!(three.0.leaves, 3 * one.0.leaves);
+        // Beside the homographs, the capitalized first word's title run.
+        assert_eq!(three.0.leaves - 1, 3 * (one.0.leaves - 1));
         assert_eq!(three.0.chart_items, one.0.chart_items, "n = {n}");
         assert_eq!(three.0.completed_nodes, one.0.completed_nodes, "n = {n}");
         items.push(one.0.chart_items);

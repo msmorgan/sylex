@@ -19,6 +19,8 @@ use crate::compile::License;
 use crate::counts::ForestCycle;
 use crate::counts::Vertex;
 use crate::hash::ChartHasher;
+use crate::names::NameBits;
+use crate::names::NameLeaf;
 use crate::reading::glues_after;
 use crate::step::ChildView;
 use crate::step::CoordinatorId;
@@ -29,6 +31,7 @@ use crate::step::Production;
 use crate::step::State;
 use crate::step::Summary;
 use crate::step::Symbol;
+use crate::step::Test;
 
 /// The hasher of the chart's indexes, which hold indices into
 /// [`PackedForest`] and hash the key each index names.
@@ -242,7 +245,8 @@ pub struct Parse<'g> {
     pub(crate) source: String,
     /// Immutable once parsed: the walks below are memoized over it.
     pub(crate) forest: PackedForest,
-    /// Words no declared lexeme spells, as char ranges.
+    /// Words that no declared lexeme spells, and that no partial Production
+    /// takes as an Introduced Name, as char ranges.
     pub vocabulary_gaps: Vec<Range<usize>>,
     /// The card names the text was analyzed in the scope of.
     pub(crate) scope: sylex_lexicon::CardScope,
@@ -642,6 +646,59 @@ impl CompiledGrammar {
         Some(self.run(analyzed, root))
     }
 
+    /// The leaves of the Introduced Names that some partial Production of
+    /// the forest introduces, or names again where another introduces the
+    /// name: a title run is a name there, and a vocabulary gap where no
+    /// Production takes it as one. An `undescribed` name is introduced once
+    /// a Production that `describes` it has taken a child after it.
+    fn introduced_leaves(&self, forest: &PackedForest) -> Vec<usize> {
+        let mut leaves = Vec::new();
+        let mut repeated = Vec::new();
+        let mut introduced = 0;
+        for item in &forest.items {
+            introduced |= item.state.names.introduced;
+            let production = &self.productions[item.production];
+            let Some(position) = production.child_before(item.dot) else {
+                continue;
+            };
+            let rules = &production.name_rules;
+            let described = rules
+                .describes
+                .filter(|&at| production.child_before(position) == Some(at));
+            for &(previous, child) in &item.families {
+                match (&production.rhs[position], child) {
+                    (Symbol::Leaf(Test::IntroducedName), ChildRef::Leaf(leaf))
+                        if !rules.undescribed =>
+                    {
+                        leaves.push(leaf);
+                    }
+                    (Symbol::Leaf(Test::RepeatedName), ChildRef::Leaf(leaf)) => repeated.push(leaf),
+                    _ => {}
+                }
+                let Some((_, previous)) = described.zip(previous) else {
+                    continue;
+                };
+                for &(_, child) in &forest.items[previous].families {
+                    if let ChildRef::Node(node) = child
+                        && let names = forest.nodes[node].summary.names
+                        && names.selection.is_none()
+                    {
+                        leaves.extend(names.undescribed.map(|(leaf, _)| leaf as usize));
+                    }
+                }
+            }
+        }
+        leaves.extend(repeated.into_iter().filter(|&leaf| {
+            forest.leaves[leaf]
+                .facts
+                .introduced_name
+                .is_some_and(|name| name.bit & introduced != 0)
+        }));
+        leaves.sort_unstable();
+        leaves.dedup();
+        leaves
+    }
+
     /// The spans of the multiword nouns of `analyzed`, each with whether its
     /// words may stand apart where they straddle a constituent boundary:
     /// those of a term declared outside the core lexicon may
@@ -712,8 +769,15 @@ impl CompiledGrammar {
         terms
     }
 
+    /// Parses an analyzed text as Category `root`.
+    ///
+    /// A title run written at more than one place may be an Introduced Name
+    /// named again at any of them (`docs/design/lexicon.md` §6), before or
+    /// after the place that introduces it: a root holds each name it names
+    /// again to an introduction (`Names::complete`).
     #[expect(clippy::too_many_lines, reason = "one Earley loop reads best whole")]
     pub(crate) fn run<'g>(&'g self, analyzed: &AnalyzedText, root: usize) -> Parse<'g> {
+        let bits = NameBits::of(analyzed);
         let n = analyzed.tokens.len();
         let mut covered = vec![false; n];
         // A word spelled by a quotation mark alone (the genitive apostrophe
@@ -722,7 +786,9 @@ impl CompiledGrammar {
         for found in analyzed.matches.iter().filter(|m| {
             matches!(
                 m.reading,
-                LexicalReading::Word(_) | LexicalReading::OwnName { .. }
+                LexicalReading::Word(_)
+                    | LexicalReading::OwnName { .. }
+                    | LexicalReading::IntroducedName { .. }
             ) && m.end - m.start > 1
         }) {
             covered[found.start..found.end].fill(true);
@@ -745,7 +811,9 @@ impl CompiledGrammar {
             // words may stand apart reaches the chart.
             let word = matches!(
                 found.reading,
-                LexicalReading::Word(_) | LexicalReading::OwnName { .. }
+                LexicalReading::Word(_)
+                    | LexicalReading::OwnName { .. }
+                    | LexicalReading::IntroducedName { .. }
             );
             if atomic.iter().any(|(span, splits)| {
                 ((span.start < found.start && found.start < span.end)
@@ -755,7 +823,14 @@ impl CompiledGrammar {
                 continue;
             }
             let licensed = "an analyzed lexical match is licensed by the grammar's lexicon";
-            let facts = self.leaf_facts(&found.reading).expect(licensed);
+            let mut facts = self.leaf_facts(&found.reading).expect(licensed);
+            if let LexicalReading::IntroducedName { name } = &found.reading {
+                let bit = bits.bit(name);
+                facts.introduced_name = Some(NameLeaf {
+                    leaf: u32::try_from(forest.leaves.len()).expect("fewer than u32::MAX leaves"),
+                    bit,
+                });
+            }
             let edges = self.leaf_edges(&found.reading).expect(licensed);
             by_start[found.start].push(forest.leaves.len());
             forest.leaves.push(Leaf {
@@ -1063,15 +1138,23 @@ impl CompiledGrammar {
                     // with a capital, so it opens as a Constituent inside a
                     // sentence does, where none states one.
                     && node.summary.opening != Opening::Capital
+                    && node.summary.names.complete()
             })
             .collect();
+        let introduced = self.introduced_leaves(&forest);
+        let vocabulary_gaps = analyzed.unknown_words_given(|found| {
+            introduced.iter().any(|&leaf| {
+                let leaf = &forest.leaves[leaf];
+                (leaf.start, leaf.end) == (found.start, found.end) && leaf.reading == found.reading
+            })
+        });
         Parse {
             grammar: self,
             root,
             source: analyzed.tokens.iter().collect(),
             tokens: logical,
             forest,
-            vocabulary_gaps: analyzed.unknown_words(),
+            vocabulary_gaps,
             scope: analyzed.scope.clone(),
             children_first: OnceLock::new(),
             head_inside: OnceLock::new(),
