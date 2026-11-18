@@ -9,9 +9,14 @@ root Document
 // Whether a keyword phrase carries a Keyword Parameter (*protection from
 // red*) or none (*flying*; a Keyword Mention, *with flashback*).
 feature KeywordForm = Bare | Parametric
-// `SetOff` kinds follow an em dash: a set-off cost ends in its own period,
-// a set-off ability runs to the end of the line (OSG §3, Periods).
+// `SetOff` kinds follow an em dash: a set-off cost (a verbal cost, or a
+// condition) ends in its own period, a set-off ability runs to the end of the
+// line (OSG §3, Periods). Any other final parameter ends in no period of its
+// own, an em-dash mana cost included (*Suspend 4—{1}{U}*).
 feature FinalParameter = Cost | SetOffCost | SetOffAbility
+// A Keyword Line Item whose own Production adds a comma-set Supplement after
+// it (*Firebending X, where X is this creature's power.*).
+feature KeywordItemEnd = Supplement { local }
 feature Number = Singular | Plural
 // The Number of a noun's *of* oblique or a determinative's Complement (*all
 // but one*).
@@ -654,7 +659,7 @@ category KeywordPhrase [KeywordForm, FinalParameter, KindLicense]
 // (*has enchant creature and "…"*, The Rani), where a quoted ability opens
 // with a capital, so no text is both.
 category QuotedKeywordPhrase [KeywordForm, FinalParameter, KindLicense]
-category KeywordLineItem [KeywordForm, FinalParameter]
+category KeywordLineItem [KeywordForm, FinalParameter, KeywordItemEnd]
 category KeywordParameters [KeywordForm, FinalParameter, KindLicense]
 category BoundKeyword [KeywordForm, FinalParameter]
 // QuantityNumber agrees with a counted noun (*two cards*); as a Noun Phrase
@@ -1146,11 +1151,23 @@ AnchoredAbility: Ability -> '•':Free label:Lex(AnchorWord) '—':Free Ability 
 FlavorLabeledAbility: Ability -> label:Lex(FlavorWord) Ability { capital: [head] }
 NominalMode: Mode -> '•':Free Nominal '.' { capital: [head] }
 NounPhraseMode: Mode -> '•':Free NounPhrase '.' { capital: [head] }
-// A keyword whose em-dash cost ends in its own period, then its instruction
-// (*Equip— Sacrifice another nonland permanent. Activate only once each
-// turn.*). No other keyword form is followed by a sentence on its line.
+// A keyword whose em-dash cost or condition ends in its own period, then
+// its instruction (*Equip— Sacrifice another nonland permanent. Activate
+// only once each turn.*).
 KeywordFollowedBySentences: Ability -> first:KeywordLineItem rest:Sentences
     where first.FinalParameter := SetOffCost
+// A keyword with a parameter ending in no period of its own takes one before
+// a sentence on its line (*Suspend X—{X}{3}{U}. X can't be 0.*; *Equip {0}.
+// Activate only once each turn.*). A bare keyword is never followed by a
+// sentence, and an em-dash ability runs to the end of its line.
+KeywordPeriodSentences: Ability -> first:KeywordLineItem '.' rest:Sentences
+    where first.KeywordForm = Parametric,
+          first.FinalParameter != SetOffCost,
+          first.FinalParameter != SetOffAbility
+// A keyword line ends in no period (OSG §14, Keyword abilities) unless its
+// item ends in a Supplement, a clause (*Firebending X, where X is this
+// creature's power.*), or in a parameter with a period of its own.
+SupplementedKeywordLine: Ability -> KeywordLineItem '.' where head.KeywordItemEnd := Supplement
 // *Expansion* takes its Set Name as its premodifier, and no Name: an
 // admission gate (english.md §3, §6) that keeps a second tree, a card's own
 // name premodifying *expansion*, off Golgothian Sylex's wording citing a set
@@ -2689,7 +2706,6 @@ SequentialVerbalCosts: NonManaCost -> first:VerbPhrase ',' rest:Cost { capital: 
 DeclarativeCost: NonManaCost -> Clause { capital: [head] }
     where head.VerbForm = Finite, head.Inflection != Irrealis
 ClauseCondition: Condition -> Clause
-KeywordInstruction: Sentence -> KeywordLineItem '.' { capital: [head] } where head.KeywordForm = Parametric
 // A floating quantifier after a plural Subject (*they each*) or *you*,
 // singular in Oracle but with plural verb forms (*You each lose life*).
 // `!(adjunct.Number = Plural & subject.Number = Singular)`: an admission gate
@@ -4006,6 +4022,7 @@ adjunct PrepositionPhrase {
     delimiter: ',',
     cost: 2,
 }
+    where $.KeywordItemEnd = Supplement
 adjunct PrepositionPhrase {
     host: IndexedNominal,
     side: After,

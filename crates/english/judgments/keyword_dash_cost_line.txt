@@ -9,7 +9,7 @@
 + Eternalize—{2}{W}{W}, Discard a card.
 + {2}, Pay 2 life: Draw a card.
 + Landfall — Whenever a land you control enters, you gain 1 life.
-# Only a keyword whose em-dash cost ends in its own period is followed by a sentence on its line
+# A keyword whose em-dash cost ends in its own period is followed by a sentence on its line
 + <card=Light Up the Night> Flashback—{3}{R}, Remove X loyalty counters from among planeswalkers you control. If you cast this spell this way, X can't be 0. => KeywordParameters "Flashback—{3}{R}, Remove X loyalty counters from among planeswalkers you control."; Sentence "If you cast this spell this way, X can't be 0."
 + <card=Storm Seeker> Storm Seeker deals damage to target player equal to the number of cards in that player's hand. => NounPhrase "Storm Seeker" as Subject of deal; !Sentence "Seeker deals damage to target player equal to the number of cards in that player's hand."
 # Cost spelling is selected by its contents (style guide §3, Periods and Em dashes)
@@ -22,3 +22,8 @@
 +KeywordParameters <card=Errant Ephemeron> suspend 4—{1}{U}
 # from: Errant Ephemeron
 *KeywordParameters Suspend 4—Pay 3 life.
+# A keyword whose parameter ends in no period of its own takes one before a sentence on its line, and the keyword line is no Sentence
++ <card=Aeon Chronicler> Suspend X—{X}{3}{U}. X can't be 0. => KeywordParameters "Suspend X—{X}{3}{U}"; Sentence "X can't be 0."; !Sentence "Suspend X—{X}{3}{U}."; readings 1
++ <card=Ob Nixilis, the Adversary> <legendary> Casualty X. The copy isn't legendary and has starting loyalty X. => KeywordParameters "Casualty X"; Sentence "The copy isn't legendary and has starting loyalty X."; !Sentence "Casualty X."; readings 1
+# An em-dash condition is a sentence ending in its own period, part of the keyword's parameters; the keyword line is no Sentence
++ <card=Lutri, the Spellchaser> <legendary> Companion — Each nonland card in your starting deck has a different name. => KeywordParameters "Companion — Each nonland card in your starting deck has a different name." head companion; !Sentence "Companion — Each nonland card in your starting deck has a different name."

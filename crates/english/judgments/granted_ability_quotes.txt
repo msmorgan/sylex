@@ -18,3 +18,5 @@
 + <card=Zhulodok, Void Gorger> Colorless spells you cast from your hand with mana value 7 or greater have "Cascade, cascade." => QuotedAbility "\"Cascade, cascade.\"" as Object of have
 + −5: You get an emblem with "Mountains you control have '{T}: This land deals 1 damage to any target.'" => QuotedAbility "\"Mountains you control have '{T}: This land deals 1 damage to any target.'\"" as Complement of with; QuotedAbility "'{T}: This land deals 1 damage to any target.'" as Object of have; Ability "{T}: This land deals 1 damage to any target"
 + II — This Saga gains "Landfall — Whenever a land you control enters, create a 1/1 green Elf creature token." => Ability "Landfall — Whenever a land you control enters, create a 1/1 green Elf creature token"
+# A quoted keyword ability is a keyword line, its period the quotation's; it is no Sentence
++ <card=Mana Chains> Enchanted creature has "Cumulative upkeep {1}." => KeywordParameters "Cumulative upkeep {1}"; !Sentence "Cumulative upkeep {1}"; readings 1
