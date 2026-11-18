@@ -2947,12 +2947,21 @@ ProperName: NounPhrase -> Name
 // head *number* beside TransparentQuantity's. *A* before *number of* is
 // TransparentQuantity's for the same reason (*a number of Blood tokens*,
 // Lacerate Flesh).
+// Never an equative determiner, an admission gate: on a card an equative
+// stands only with its comparative clause (EquativeCountDetermined) or its
+// *of* phrase (DegreePartitive), and a bare one leaves that clause to attach
+// elsewhere, as a manner Adjunct in *repeat this process [as many times] [as
+// they choose]* (Trade Secrets) or a Modifier of the head in *draws as many
+// [cards [as they discarded this way]]* (Forget). English also has a bare
+// equative whose secondary term is recovered from context (*four times in
+// as many years*, CGEL 13§1.2:1102), which no card prints.
 Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [head] }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third,
           determiner.DeterminativeDistribution != Independent | FreeChoice,
+          determiner.Grade != Equative,
           !(
               determiner.DeterminativeDistribution = IndefiniteArticle
               & head.NounDistribution = Quantity
