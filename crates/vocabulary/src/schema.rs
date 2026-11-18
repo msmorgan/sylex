@@ -549,7 +549,7 @@ pub enum DeterminativeDistribution {
     /// (`docs/design/english.md` §8).
     FreeChoice,
     /// A fraction or multiplier before a determined Noun Phrase (*half their
-    /// life*, *double that damage*; CGEL, Ch. 5 §7.3, p. 434).
+    /// life*, *double that damage*; CGEL, Ch. 5 §12, p. 434).
     Multiplier,
     /// The Targeting Marker, a determiner on its own or the last word of
     /// one (*target creature*, *two target creatures*). It has one holder,

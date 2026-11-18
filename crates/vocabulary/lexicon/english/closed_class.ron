@@ -40,7 +40,7 @@
         (number: Plural, countability: Count, lemma: "fewer", frames: [Complement(PP(["of"])), Complement(PP(["than"]))]),
         (number: Plural, countability: Count, lemma: "fewest"),
         // Fraction and multiplier predeterminers (*half their life*, *double
-        // that damage*; CGEL, Ch. 5 §7.3, p. 434); the verb is a keyword action.
+        // that damage*; CGEL, Ch. 5 §12, p. 434); the verb is a keyword action.
         (lemma: "half", distribution: Multiplier),
         (lemma: "double", distribution: Multiplier),
         (lemma: "triple", distribution: Multiplier),
