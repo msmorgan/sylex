@@ -550,19 +550,20 @@ mod tests {
     /// Verb Phrase *gain* of its last conjunct (*Lisette, Dean of the Root*),
     /// a trigger and *in any order* over a Linked Coordination (*look …, then
     /// put …*) or inside one of its conjuncts (*Sage Owl*), and premodifiers
-    /// over a serial coordination or on its first conjunct (*Sands of
-    /// Time*). *Court Hussar*'s *in any order* and *on the bottom* attach
-    /// over *look …, then put …* or inside its last conjunct, among them on
-    /// the Complement Cluster *the rest on the bottom*, whose Head Line ends
-    /// in *rest* though no `head` child leads there; each also attaches over
-    /// the noun phrase coordination *one of them … and the rest* or inside its
-    /// last conjunct. Not *Kessig Naturalist*'s
-    /// *Until end of turn, you don't lose this mana as steps and phases end*:
-    /// every Clause headed by *don't* that holds *Until* also holds *and*,
-    /// which there joins only *steps and phases*; the options differ in what is
-    /// coordinated. Its back face, *Lord of the Ulvenwald*, has *you control*
-    /// over *Wolves and Werewolves* or on *Werewolves*. *Crook of
-    /// Condemnation*'s one dependency fork has no coordination.
+    /// over a serial coordination or on its first conjunct, the relative
+    /// *they control* over it or on its last, and *simultaneously* over
+    /// *untaps … and taps …* or on *untaps* (*Sands of Time*). *Court Hussar*'s
+    /// *in any order* and *on the bottom* attach over *look …, then put …* or
+    /// inside its last conjunct, among them on the Complement Cluster *the rest
+    /// on the bottom*, whose Head Line ends in *rest* though no `head` child
+    /// leads there; each also attaches over the noun phrase coordination *one
+    /// of them … and the rest* or inside its last conjunct. Not *Kessig
+    /// Naturalist*'s *Until end of turn, you don't lose this mana as steps and
+    /// phases end*: every Clause headed by *don't* that holds *Until* also
+    /// holds *and*, which there joins only *steps and phases*; the options
+    /// differ in what is coordinated. Its back face, *Lord of the Ulvenwald*,
+    /// has *you control* over *Wolves and Werewolves* or on *Werewolves*.
+    /// *Crook of Condemnation*'s one dependency fork has no coordination.
     #[test]
     fn wide_and_narrow_attachments_over_a_coordination() {
         let (_dir, path, _) = super::super::tests::database(&[
@@ -668,13 +669,13 @@ mod tests {
                 "Sage Owl | When | adjunct | Clause | then | adjunct | Clause | look | 2 | 2 | 4",
                 "Sage Owl | in | adjunct | Clause | then | adjunct | VerbPhrase | put | 2 | 2 | 4",
                 "Sands of Time | control | modifier | Nominal | and | modifier | Nominal | land | \
-                 60 | 40 | 100",
+                 30 | 20 | 50",
                 "Sands of Time | simultaneously | adjunct | VerbPhrase | and | adjunct | \
-                 VerbPhrase | untaps | 50 | 50 | 100",
+                 VerbPhrase | untaps | 25 | 25 | 50",
                 "Sands of Time | tapped | modifier | Nominal | and | modifier | Nominal | artifact \
-                 | 60 | 40 | 100",
+                 | 30 | 20 | 50",
                 "Sands of Time | untapped | modifier | Nominal | and | modifier | Nominal | \
-                 artifact | 60 | 40 | 100",
+                 artifact | 30 | 20 | 50",
             ]
         );
     }

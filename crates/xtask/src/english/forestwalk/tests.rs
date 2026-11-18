@@ -526,7 +526,9 @@ fn a_limit_prints_each_remaining_reading_at_the_spines_stops() {
 /// On *Remove Enchantments* narrowed to two Derivations in its final
 /// conjunct, `Settled spine:` folds the settled first sentence and earlier
 /// conjuncts to single lines, and `--limit 2` prints only the stopped
-/// `Nominal` under each Reading.
+/// conjunct under each Reading. The conjunct stops at its own Noun Phrase:
+/// its head `Nominal` is two nodes, as only the one whose last postmodifier
+/// is the relative *your opponents control* is `RelativeBound`.
 #[test]
 fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
     let output = survey(&[
@@ -582,20 +584,32 @@ fn settled_siblings_fold_as_a_large_forest_narrows_and_under_limit() {
     );
     assert!(
         spine.contains(
-            "head: Nominal \"other Auras attached to attacking creatures your opponents \
-             control\": 2 alternatives"
+            "last: NounPhrase [Determined] \"all other Auras attached to attacking creatures \
+             your opponents control\": its children differ between Derivations"
         ),
         "{spine}"
     );
     let (first, second) = readings.split_once("\nReading 2:\n").unwrap();
     assert!(
-        first.starts_with("Reading 1:\n  head: Nominal ["),
+        first.starts_with("Reading 1:\n  last: NounPhrase [Determined]\n"),
         "{readings}"
     );
-    assert!(second.starts_with("  head: Nominal ["), "{readings}");
+    assert!(
+        second.starts_with("  last: NounPhrase [Determined]\n"),
+        "{readings}"
+    );
     assert!(!readings.contains("\"destroy\"#1"), "{readings}");
     assert!(first.contains("\"Auras\"#4"), "{first}");
     assert!(second.contains("\"Auras\"#4"), "{second}");
+    // The relative modifies *Auras* in one Reading and *creatures* in the
+    // other.
+    let relative_on_auras = "\n      modifier: Postmodifier [RelativePostmodifier]";
+    assert!(first.contains(relative_on_auras), "{first}");
+    assert!(!second.contains(relative_on_auras), "{second}");
+    assert!(
+        second.contains("\n            modifier: Postmodifier [RelativePostmodifier]"),
+        "{second}"
+    );
 }
 
 /// `--limit 0` folds closed subtrees with or without `--assertions` (folding a
