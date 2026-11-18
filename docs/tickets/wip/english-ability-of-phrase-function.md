@@ -22,9 +22,13 @@ alternates with a genitive (*a creature's abilities*), as Complements do (§16.5
 
 - Every *of* phrase the before-forest attaches as a Nominal's modifier is classified by its head
   noun as a genuine modifier (CGEL §14.2 [14i], p. 446: *a woman of great wisdom*, *a school of
-  this type*) or a missed Complement, with the units that show each.
-- Each noun with a missed Complement gets its `Complement(PP(["of"]))` frame, and the frame
-  decision for *ability* is recorded with its CGEL citation where the frame is declared.
+  this type*), a missed Complement, or the set *top* or *bottom* ranks (*the top card of your
+  library*; `english-set-comparison-of-phrase`), with the units that show each.
+- Each noun with a missed Complement gets its *of* frame, and the frame decision for *ability* is
+  recorded with its CGEL citation where the frame is declared. *Color*, *type*, *source* and *turn*
+  keep none: under same-head complement priority their frame would take an *of* phrase that is a
+  modifier (*a color of your choice*, *the next spell you cast this turn of the chosen type*) as
+  their Complement (`english-of-complement-beside-of-modifier`).
 - The same test is applied to the other nouns in `nouns.ron` whose only frame is
   `Complement(PP(["of"]))` (the quantity and partitive nouns against CGEL Ch. 5 §3), and each
   that fails it is listed and changed, or ticketed.
