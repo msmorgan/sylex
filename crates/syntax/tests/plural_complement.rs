@@ -1,7 +1,7 @@
 //! A preposition whose frames name a plural-Complement constraint takes a
-//! plural Complement (*among*; CGEL, Ch. 7 §5.1(a), p. 636): a coordination itself,
-//! or else a Noun Phrase that is not Singular. A singular Noun Phrase is
-//! refused even over a coordinated Nominal, and a keyword phrase, which has
+//! plural Complement (*among*; CGEL, Ch. 7 §5.1(a), p. 636): a coordination
+//! itself, or else a Noun Phrase that is not Singular. A singular Noun Phrase
+//! is refused even over a coordinated Nominal, and a keyword phrase, which has
 //! no Number, only as a coordination. Grounded in Abzan Charm's *distribute
 //! two +1/+1 counters among one or two target creatures*, Tsabo's Assassin's
 //! *among all permanents or a color tied for most common* and Elspeth

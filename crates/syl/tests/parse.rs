@@ -240,7 +240,8 @@ fn a_relation_has_one_subject_a_sort_and_nothing_else() {
     );
 }
 
-// --- the `at` list --------------------------------------------------------------
+// --- the `at` list
+// --------------------------------------------------------------
 
 #[test]
 fn a_block_may_list_the_sorts_its_declaration_stands_at() {

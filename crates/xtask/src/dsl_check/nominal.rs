@@ -568,8 +568,8 @@ impl<'a> NominalChecker<'a, '_> {
         }
     }
 
-    /// Returns the span of the first Agreement (`Test = Agree`) inside `term`'s own
-    /// `Nominal` structure (without crossing into nested `NounPhrase` or
+    /// Returns the span of the first Agreement (`Test = Agree`) inside `term`'s
+    /// own `Nominal` structure (without crossing into nested `NounPhrase` or
     /// sub-domain arguments).
     fn nominal_agree_span(&self, term: &Term<'a>) -> Option<Span> {
         match term {

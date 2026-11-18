@@ -14,8 +14,8 @@ use crate::step::Gap;
 /// phrase. A frame's Complement satisfies one alternative of each constraint
 /// it names, `coordination` or `otherwise`, which never both hold of one
 /// phrase, so every constraint's alternative is the same one; a constraint
-/// with neither leaves the Complement as its kind has it. A frame whose kind no alternative of a constraint with alternatives
-/// lists is a load error.
+/// with neither leaves the Complement as its kind has it. A frame whose kind no
+/// alternative of a constraint with alternatives lists is a load error.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ConstraintDecl {
