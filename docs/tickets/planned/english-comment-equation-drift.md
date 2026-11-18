@@ -23,11 +23,6 @@ implement, or state a corpus or style observation as a fact of English (`docs/de
 - `NounAttribute` and `NominalPremodifier`: "A noun premodifier sits inside determinative and
   adjectival ones, never outside them", while `NominalPremodifier` checks only
   `head.DeterminerNeed != Required`.
-- `TransparentQuantity` and `feature DeterminativeDistribution` (`FreeChoice`): number transparency
-  is a property of *number* under indefinite/imprecise determiners generally (CGEL, Ch. 5, §3.3(a),
-  p. 350), whereas in Oracle only `any number of …` ever governs finite verb or relative number
-  agreement (all 391 non-`any`, non-`the` `number of` spans stand in number-indifferent object or
-  PP-complement positions).
 - `FiniteComplementClause` (`{ unlinked: [head] }`): states "a sole connective never links
   subordinate clauses" without naming the Oracle `, then` `LinkedClause` scope gate or the 3 real
   cards whose spurious `, then` capture it prevents (*Ensnared by the Mara*, *Transforming
@@ -45,7 +40,7 @@ implement, or state a corpus or style observation as a fact of English (`docs/de
 ## Pointers
 
 - `crates/english/grammar/english.fug`: the declarations above, `RelativeTemporalLocation`,
-  `TransparentQuantity`, `FiniteComplementClause`.
+  `FiniteComplementClause`.
 - `docs/design/english.md` §6.
 - Local evidence (gitignored): `docs/evidence/english-fug-hax-check/fable.md` (F5, F10),
   `docs/evidence/english-fug-hax-check/gemini.md` (E1, E3).

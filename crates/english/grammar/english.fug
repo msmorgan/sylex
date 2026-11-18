@@ -2710,13 +2710,20 @@ ProperName: NounPhrase -> Name
           $.Person = Third
 // Excluding `FreeChoice` is an admission gate (english.md §6): it keeps *any number
 // of Ally cards* (Munda, Ambush Leader) from a second tree with the singular
-// head *number* beside TransparentQuantity's.
+// head *number* beside TransparentQuantity's. *A* before *number of* is
+// TransparentQuantity's for the same reason (*a number of Blood tokens*,
+// Lacerate Flesh).
 Determined: NounPhrase -> determiner:DeterminerPhrase Nominal { transparent: [head] }
     where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third,
           determiner.DeterminativeDistribution != Independent | FreeChoice,
+          !(
+              determiner.DeterminativeDistribution = IndefiniteArticle
+              & head.NounDistribution = Quantity
+              & head.ComplementKind = PP
+          ),
           determiner.ComplementKind != PP,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
@@ -2856,19 +2863,24 @@ FreeChoiceQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal
           $.Person = Third,
           determiner.Countability = head.Countability,
           determiner.Number = head.Number
-// *Any number of target creatures*: number-transparent *number* heads the
-// Noun Phrase, whose Number and NounKind are its oblique's (CGEL
-// 5§3.3:349–350). Countability is unshared too: the transparent
+// *Any number of target creatures*, *a number of Blood tokens*:
+// number-transparent *number* heads the Noun Phrase, whose Number and
+// NounKind are its oblique's (CGEL 5§3.3:349–350). Its determiner is the
+// card text's *any* or *a* (CGEL also gives *this*), never *the*, with which
+// *number* is a precise, singular number (5§3.3:350; Determined).
+// Countability is unshared too: the transparent
 // quantificational noun is non-count (5§3.3:349). The oblique carries
-// `Plural`: a bare Nominal *of* Complement has no ObliqueNumber and fails
-// it, which keeps Fire Covenant's *any number of target creatures* from
-// *any number of [target]*, *target* a singular noun and *creatures* a
-// separate Object. TemporalQuantity and DeterminedTemporalQuantity carry it
-// for the same reason.
+// `Plural`, since *number* takes only a plural oblique (5§3.3:350): a bare
+// Nominal *of* Complement has no ObliqueNumber and fails it, which keeps Fire
+// Covenant's *any number of target creatures* from *any number of [target]*,
+// *target* a singular noun and *creatures* a separate Object, and Lacerate
+// Flesh's *a number of Blood tokens equal to ...* from *a number of [Blood]*.
 TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal {
     unshared: [Number, NounKind, Countability],
 }
-    where determiner.DeterminativeDistribution = FreeChoice,
+    where determiner.DeterminativeDistribution
+              != Dependent | Independent | Numerical | Distributive | Deictic
+              | SingularOrQuantified | Multiplier | Targeting | Degree,
           head.NounDistribution = Quantity,
           head.ComplementKind = PP,
           head.ObliqueNumber := Plural,
@@ -2894,30 +2906,14 @@ TargetedOblique: TargetedOblique -> Word(Of) complement:TargetedNounPhrase
 TargetedNounPhrase: TargetedNounPhrase -> determiner:TargetingMarker Nominal
     where head.Number = Plural,
           determiner.Countability = head.Countability
-// *Pay {1}{G} any number of times*: TransparentQuantity's Noun Phrase, a
-// plural one headed by *number* with NounKind `Temporal` from its oblique, as
-// a frequency Adjunct.
+// *Pay {1}{G} any number of times*, *a number of times equal to the
+// difference*: TransparentQuantity's Noun Phrase, a plural one headed by
+// *number* with NounKind `Temporal` from its oblique, as a frequency Adjunct
+// (CGEL 8§9:715 n. 19).
 TemporalQuantity: TemporalNounPhrase -> NounPhrase
     where head.NounDistribution := Quantity,
           head.NounKind := Temporal,
           head.Number := Plural
-// A quantified *number of times*, postmodifiers included (CGEL 8§9:715 n.
-// 19); Number, NounKind and Countability as in TemporalQuantity.
-DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase Nominal {
-    unshared: [Number, NounKind, Countability],
-}
-    where determiner.DeterminativeDistribution != FreeChoice,
-          determiner.TargetMarked != Marked,
-          head.NounDistribution = Quantity,
-          head.ComplementKind = PP,
-          head.ObliqueNumber := Plural,
-          head.ObliqueNounKind := Temporal,
-          determiner.Number = head.Number,
-          $.Number = head.ObliqueNumber,
-          $.NounKind = Temporal,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
 // A plural count head, not just the plural of a coordination of singular
 // count nominals: a shared determiner belongs outside that coordination and
 // cannot be left behind when its tail becomes a Supplement (CGEL
