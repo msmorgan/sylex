@@ -145,6 +145,7 @@ fn a_frame_belongs_to_its_head_category() {
         .push(NounDecl::Entry(sylex_vocabulary::schema::NounEntry {
             distribution: sylex_vocabulary::schema::NounDistribution::Ordinary,
             kind: sylex_vocabulary::schema::NounKind::Ordinary,
+            relative_gender: None,
             parameters: Vec::new(),
             lemma: "frobnication".to_owned(),
             countability: vec![sylex_lexicon::Countability::Count],
@@ -312,6 +313,7 @@ fn bare_mass_modified_requires_mass_countability() {
         .push(NounDecl::Entry(sylex_vocabulary::schema::NounEntry {
             distribution: sylex_vocabulary::schema::NounDistribution::Ordinary,
             kind: sylex_vocabulary::schema::NounKind::Ordinary,
+            relative_gender: None,
             parameters: Vec::new(),
             lemma: "frobnication".to_owned(),
             countability: vec![sylex_lexicon::Countability::Count],
@@ -392,6 +394,7 @@ fn only_a_noun_with_an_of_frame_has_a_distinct_genitive() {
         .push(NounDecl::Entry(sylex_vocabulary::schema::NounEntry {
             distribution: sylex_vocabulary::schema::NounDistribution::Ordinary,
             kind: sylex_vocabulary::schema::NounKind::Ordinary,
+            relative_gender: None,
             parameters: Vec::new(),
             lemma: "frobnication".to_owned(),
             countability: vec![sylex_lexicon::Countability::Count],
@@ -409,4 +412,78 @@ fn only_a_noun_with_an_of_frame_has_a_distinct_genitive() {
         &sources,
         "only a noun with an *of* Complement frame has a distinct genitive",
     );
+}
+
+/// A noun's relative gender is its lexeme's: a player is personal (*each
+/// player who*), a card non-personal, and a creature, a creature type and a
+/// planeswalker type carry none, since a being takes *who* or *which* (CGEL,
+/// Ch. 5 §17.3, p. 498); another subtype names a thing. Relative *who* is
+/// personal and *which* non-personal (Ch. 12 §3.5.1, p. 1048).
+#[test]
+fn a_relative_gender_is_declared_on_nouns_and_relative_pronouns() {
+    let env = LexicalEnvironment::load().unwrap();
+    let gender = |id: &str| {
+        let lexeme = env
+            .lexicon
+            .lexemes()
+            .values()
+            .find(|lexeme| lexeme.id.as_str() == id)
+            .unwrap_or_else(|| panic!("no lexeme `{id}`"));
+        lexeme
+            .properties
+            .features
+            .get("RelativeGender")
+            .map(|value| value.as_str().to_owned())
+    };
+    let personal = Some("Personal".to_owned());
+    let non_personal = Some("NonPersonal".to_owned());
+    assert_eq!(gender("noun:player"), personal);
+    assert_eq!(gender("noun:opponent"), personal);
+    assert_eq!(gender("noun:card"), non_personal);
+    assert_eq!(gender("noun:damage"), non_personal);
+    assert_eq!(gender("type:creature"), None);
+    assert_eq!(gender("type:artifact"), non_personal);
+    assert_eq!(gender("subtype:Goblin"), None);
+    assert_eq!(gender("subtype:Ajani"), None);
+    assert_eq!(gender("subtype:Equipment"), non_personal);
+    assert_eq!(gender("pronoun:who"), personal);
+    assert_eq!(gender("pronoun:which"), non_personal);
+    assert_eq!(gender("pronoun:it"), None);
+}
+
+#[test]
+fn a_subtype_s_family_decides_its_relative_gender() {
+    let mut sources = Sources::load().unwrap();
+    let decls = sources
+        .subtypes
+        .get_mut(&sylex_vocabulary::schema::SubtypeFamily::Artifact)
+        .unwrap();
+    let mut entry = decls[0].entry();
+    entry.relative_gender = Some(sylex_vocabulary::schema::RelativeGender::NonPersonal);
+    decls[0] = NounDecl::Entry(entry);
+    rejects(
+        &sources,
+        "declares a relative gender, which its family decides",
+    );
+}
+
+#[test]
+fn only_a_relative_pronoun_has_a_relative_gender_and_never_dual() {
+    use sylex_vocabulary::schema::RelativeGender;
+    let at = |sources: &Sources, lemma: &str| {
+        sources
+            .closed_class
+            .pronouns
+            .iter()
+            .position(|entry| entry.lemma == lemma)
+            .unwrap()
+    };
+    let mut personal = Sources::load().unwrap();
+    let it = at(&personal, "it");
+    personal.closed_class.pronouns[it].relative_gender = Some(RelativeGender::NonPersonal);
+    rejects(&personal, "only a relative pronoun has one");
+    let mut dual = Sources::load().unwrap();
+    let who = at(&dual, "who");
+    dual.closed_class.pronouns[who].relative_gender = Some(RelativeGender::Dual);
+    rejects(&dual, "only a relative pronoun has one");
 }

@@ -329,6 +329,27 @@ impl Sources {
                 "PronounKind".into(),
                 Ident::new(&format!("{:?}", entry.kind)),
             );
+            match (entry.kind, entry.relative_gender) {
+                (_, None) => {}
+                (
+                    schema::PronounKind::Relative,
+                    Some(
+                        gender @ (schema::RelativeGender::Personal
+                        | schema::RelativeGender::NonPersonal),
+                    ),
+                ) => {
+                    lexeme
+                        .properties
+                        .features
+                        .insert("RelativeGender".into(), Ident::new(&format!("{gender:?}")));
+                }
+                (kind, Some(gender)) => {
+                    return Err(SourceError::Invalid(format!(
+                        "pronoun `{id}`: a {kind:?} pronoun with relative gender {gender:?}; only a \
+                         relative pronoun has one, personal or non-personal"
+                    )));
+                }
+            }
             lexeme.forms = entry
                 .forms
                 .iter()
@@ -538,6 +559,23 @@ impl Sources {
                 )));
             }
             entry.prefix_hyphenation = Some(sylex_lexicon::Hyphenation::Hyphenated);
+            // A creature or planeswalker type names a being, which takes *who*
+            // or *which* as an animal does (CGEL, Ch. 5 §17.3, p. 498, [47i]);
+            // every other subtype names a thing, which takes *which* ([48]). So
+            // its family decides, and no subtype declares a gender.
+            if entry.relative_gender.is_some() {
+                return Err(SourceError::Invalid(format!(
+                    "subtype `{lemma}` declares a relative gender, which its family decides"
+                )));
+            }
+            if families.iter().any(|family| {
+                matches!(
+                    family,
+                    SubtypeFamily::Creature | SubtypeFamily::Planeswalker
+                )
+            }) {
+                entry.relative_gender = Some(schema::RelativeGender::Dual);
+            }
             builder.noun(&id, &entry, catalog(SUBTYPES, &id))?;
             let lexeme = builder.lexemes.last_mut().expect("just pushed");
             lexeme.properties.classes = families

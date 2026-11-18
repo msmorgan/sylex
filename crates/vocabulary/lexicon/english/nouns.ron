@@ -11,6 +11,10 @@
 // has a `distinct_genitive`: a second argument the genitive names (*your choice
 // of*), or an *of* relation with no genitive counterpart, a quantity, type,
 // collection or part (*a pair of*, *each kind of*; p. 477, [60]).
+// A noun names a thing, which takes relative *which*, unless it declares a
+// `relative_gender`: `Personal` for a player, who takes *who*, `Dual` for a
+// creature or a group of them, which takes either (CGEL, Ch. 5 §17.3,
+// pp. 497–498).
 [
     (lemma: "bidding", countability: [Mass], bare_mass_modified: true),
     // Game nouns.
@@ -27,7 +31,7 @@
     // *half*, *instance*, *kind*, *maximum*, *number*, *pair*, *part*,
     // *point*, *rest*, *total* and *worth*.
     (lemma: "amount", distribution: HeadOnly, frames: [Complement(PP(["of"]))], distinct_genitive: true),
-    "attacker",
+    (lemma: "attacker", relative_gender: Dual),
     // Pre-head dependent in "base power and toughness"; a noun, so that it
     // scopes over the coordination.
     "base",
@@ -36,8 +40,8 @@
     // *a bid of 1*: its size, which no genitive names (CGEL, Ch. 5, §16.5.3,
     // p. 477, [60xi]).
     (lemma: "bid", frames: [Complement(PP(["of"]))], distinct_genitive: true),
-    "bidder",
-    "blocker",
+    (lemma: "bidder", relative_gender: Personal),
+    (lemma: "blocker", relative_gender: Dual),
     "booster",
     "box",
     // *on the bottom of*; prenominal *bottom* is the adjective.
@@ -59,7 +63,7 @@
     // The controller and what is controlled, as in *Alexander the Great's
     // conquest of Persia* (CGEL, Ch. 5, §16.5.3, p. 476, [57i]).
     (lemma: "control", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))], distinct_genitive: true),
-    (lemma: "controller", frames: [Complement(PP(["of"]))]),
+    (lemma: "controller", relative_gender: Personal, frames: [Complement(PP(["of"]))]),
     // The original, beside an owner or maker a genitive names, as in *Van
     // Dyck's portrait of Charles I* (CGEL, Ch. 5, §16.5.3, p. 475, [56i]).
     (lemma: "copy", frames: [Complement(PP(["of"]))], distinct_genitive: true),
@@ -105,8 +109,8 @@
     (lemma: "expansion", parameters: [[Slot(SetName), Head]]),
     "face",
     "flip",
-    "foe",
-    "friend",
+    (lemma: "foe", relative_gender: Personal),
+    (lemma: "friend", relative_gender: Personal),
     (lemma: "game", kind: Temporal),
     // Each player has their own library, hand and graveyard [CR#400.1]: the
     // of-phrase names the player whose zone it is (*the graveyard of the
@@ -141,20 +145,20 @@
     (lemma: "number", distribution: Quantity, frames: [Complement(PP(["of"])), Complement(Amount)], distinct_genitive: true),
     "offer",
     // *the opponent to your left*
-    (lemma: "opponent", frames: [Complement(PP(["to"]))]),
+    (lemma: "opponent", relative_gender: Personal, frames: [Complement(PP(["to"]))]),
     (lemma: "order", countability: [Count, Mass], bare_mass_modified: true),
     // A prefix joins it with a hyphen, as a subtype (*non-outlaw*).
-    (lemma: "outlaw", prefix_hyphenation: Hyphenated),
-    (lemma: "owner", frames: [Complement(PP(["of"]))]),
+    (lemma: "outlaw", relative_gender: Dual, prefix_hyphenation: Hyphenated),
+    (lemma: "owner", relative_gender: Personal, frames: [Complement(PP(["of"]))]),
     "pack",
     (lemma: "pair", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     (lemma: "part", frames: [Complement(PP(["of"]))], distinct_genitive: true),
-    "party",
+    (lemma: "party", relative_gender: Dual),
     "permanent",
     (lemma: "phase", kind: Temporal),
     "pile",
     // *the player to your right*
-    (lemma: "player", frames: [Complement(PP(["to"]))]),
+    (lemma: "player", relative_gender: Personal, frames: [Complement(PP(["to"]))]),
     // "each point of bushido it has".
     (lemma: "point", frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "pool",
@@ -186,8 +190,8 @@
     // it is [CR#115.1], a term in the relation the noun denotes (CGEL, Ch. 5,
     // §14.1, pp. 441–442).
     (lemma: "target", distribution: HeadOnly, frames: [Complement(PPWith(["of"], NP))]),
-    "team",
-    "teammate",
+    (lemma: "team", relative_gender: Dual),
+    (lemma: "teammate", relative_gender: Personal),
     // A quoted ability follows *text* as its apposition (*has the text
     // "{2}: Discard a card."*; CGEL, Ch. 5 §14.3, p. 447).
     (lemma: "text", countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"])), Complement(QuotedAbility)]),
@@ -208,7 +212,7 @@
     // *the total of those results*; the attributive word is the adjective.
     (lemma: "total", distribution: HeadOnly, frames: [Complement(PP(["of"]))], distinct_genitive: true),
     "vote",
-    "voter",
+    (lemma: "voter", relative_gender: Personal),
     (lemma: "way", kind: Manner),
     "word",
     "zone",
@@ -261,7 +265,7 @@
     (lemma: "peace", countability: [Mass]),
     "secret",
     (lemma: "silence", countability: [Mass]),
-    "snitch",
+    (lemma: "snitch", relative_gender: Personal),
     (lemma: "war", countability: [Count, Mass]),
     // A measure noun: *five {P} worth of modes* (CGEL Ch. 5, p. 470).
     (lemma: "worth", distribution: DirectMeasure, countability: [Mass], bare_mass_modified: true, frames: [Complement(PP(["of"]))], distinct_genitive: true),

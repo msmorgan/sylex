@@ -118,14 +118,16 @@
             (person: Third, number: Plural, case: Accusative, surface: "them"),
             (person: Third, number: Plural, case: Genitive, surface: "their"),
         ]),
-        // Relative *which* does not inflect for case.
-        (lemma: "which", kind: Relative, forms: [
+        // Relative *which* does not inflect for case. It is non-personal, *who*
+        // personal, and the antecedent agrees (CGEL, Ch. 12 §3.5.1, p. 1048).
+        (lemma: "which", kind: Relative, relative_gender: NonPersonal, forms: [
             (person: Third, number: Singular, surface: "which"),
             (person: Third, number: Plural, surface: "which"),
         ]),
-        // *Whose* is the genitive of relative *who* and *which* alike (CGEL p. 1050).
+        // *Whose* is the genitive of relative *who* and *which* alike (CGEL p. 1050),
+        // so no genitive relative reads the gender.
         // Only subject *who* agrees with a verb, so only it varies in number.
-        (lemma: "who", kind: Relative, forms: [
+        (lemma: "who", kind: Relative, relative_gender: Personal, forms: [
             (person: Third, number: Singular, case: Nominative, surface: "who"),
             (person: Third, number: Plural, case: Nominative, surface: "who"),
             (person: Third, number: Singular, case: Accusative, surface: "whom"),

@@ -332,6 +332,18 @@ impl Builder {
             .properties
             .features
             .insert("NounKind".into(), Ident::new(&format!("{:?}", entry.kind)));
+        // An undeclared gender is a thing's: most nouns name one.
+        let gender = match entry.relative_gender {
+            None | Some(crate::schema::RelativeGender::NonPersonal) => Some("NonPersonal"),
+            Some(crate::schema::RelativeGender::Personal) => Some("Personal"),
+            Some(crate::schema::RelativeGender::Dual) => None,
+        };
+        if let Some(gender) = gender {
+            lexeme
+                .properties
+                .features
+                .insert("RelativeGender".into(), Ident::new(gender));
+        }
         if entry.bare_mass_modified {
             lexeme
                 .properties

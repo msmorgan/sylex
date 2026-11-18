@@ -252,6 +252,22 @@ pub enum NounKind {
     Manner,
 }
 
+/// A noun's gender in the system relative *who* and *which* contrast in:
+/// personal *who* and non-personal *which* agree with the antecedent's head
+/// noun (CGEL, Ch. 5 §17.3, pp. 497–498; Ch. 12 §3.5.1, p. 1048).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
+pub enum RelativeGender {
+    /// An inanimate, which always takes *which* (*the ship, which*; p. 498,
+    /// [48]): most nouns, and a noun that declares no gender.
+    NonPersonal,
+    /// A person, who takes *who* (*the boy who*/∗*which*; p. 498, [46ii]).
+    Personal,
+    /// An animal or another being that takes either (*the dog who*/*which*;
+    /// p. 498, [47i]), as a human collective does (*the committee, who*/
+    /// *which*; [49]). It carries no gender value.
+    Dual,
+}
+
 /// A noun with its number paradigm and optional Complement frames.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -260,6 +276,10 @@ pub struct NounEntry {
     pub distribution: NounDistribution,
     #[serde(default)]
     pub kind: NounKind,
+    /// Its gender, where it is not `NonPersonal`, the default. A subtype
+    /// declares none: its family decides.
+    #[serde(default)]
+    pub relative_gender: Option<RelativeGender>,
     /// Ordered notation parameters, for indexed headings.
     #[serde(default)]
     pub parameters: Vec<Vec<sylex_syntax::frames::ParameterPart>>,
@@ -322,6 +342,7 @@ impl NounDecl {
             Self::Lemma(lemma) => NounEntry {
                 distribution: NounDistribution::Ordinary,
                 kind: NounKind::Ordinary,
+                relative_gender: None,
                 parameters: Vec::new(),
                 lemma: lemma.clone(),
                 countability: count(),
@@ -599,6 +620,11 @@ fn invariant() -> WordForm {
 pub struct PronounEntry {
     #[serde(default)]
     pub kind: PronounKind,
+    /// A relative pronoun's gender, which its antecedent agrees with:
+    /// personal *who*, non-personal *which* (CGEL, Ch. 12 §3.5.1, p. 1048).
+    /// Only a relative pronoun has one, and never `Dual`.
+    #[serde(default)]
+    pub relative_gender: Option<RelativeGender>,
     pub lemma: String,
     pub forms: Vec<PronounForm>,
 }
