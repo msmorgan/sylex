@@ -1761,7 +1761,9 @@ impl Production {
     /// The Complements omitted by the bare non-verbal phrase the phrase so
     /// far ends in, or `None` if the child is a Preposition Phrase right after
     /// one and headed by a preposition it omits: that phrase is the bare
-    /// head's own Complement, which no other host may take. Only a coordination
+    /// head's own Complement, which no other host may take. A Production
+    /// takes it as a selected Complement right after its own head, when that
+    /// head ends in the bare head. Only a coordination
     /// whose conjuncts omit unlike Complements may take it as its own
     /// dependent.
     fn track_omitted_complement(
@@ -1780,7 +1782,21 @@ impl Production {
                     next.unlike_omissions |= summary.unlike_omissions
                         || !grammar.like_omissions(first, summary.omitted_complement);
                 }
-                if next.omitted_complement != 0 && !next.after_unlike_omissions {
+                // A selected Preposition Phrase right after the Production's
+                // own head, which ends in its bare lexical head, is that
+                // head's Complement in this phrase (*[that many] [of those
+                // tokens]*).
+                let own_complement = position > 0
+                    && self.head == Some(position - 1)
+                    && next.head_final
+                    && matches!(
+                        self.rhs[position],
+                        Symbol::Cat {
+                            prepositions: Some(_),
+                            ..
+                        }
+                    );
+                if next.omitted_complement != 0 && !next.after_unlike_omissions && !own_complement {
                     let omitted = grammar.extension_set(next.omitted_complement);
                     let heads = [
                         summary.preposition.map(|(p, frame)| {
@@ -2050,6 +2066,14 @@ impl Production {
                 ),
                 Some(lexeme),
             ) => Some((lexeme, None)),
+            // An authored Production's lexical head, which stands bare
+            // where the phrase ends in it.
+            (
+                Symbol::Leaf(Test::Lexical(_) | Test::Word(_) | Test::Class(_) | Test::Words(_)),
+                Some(lexeme),
+            ) if self.head == Some(position) && self.omission == Omission::Selected => {
+                Some((lexeme, None))
+            }
             _ => None,
         };
         if let Some(key) = key {

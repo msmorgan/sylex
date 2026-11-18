@@ -579,7 +579,9 @@ struct Draft {
     foreign_coordinators: Vec<Lexeme>,
     /// A derived passive's Internalized Complement.
     internalized: Option<usize>,
-    /// A non-verbal head's bare phrase, which omits its head's Complements.
+    /// A non-verbal head's bare phrase, which omits its head's Complements:
+    /// a Valence schema's, or an authored Production that ends in its
+    /// lexical head.
     omits_complement: bool,
     /// It ends in an ellipsis site whose omitted Complement takes these word
     /// forms, as a mask (`ProductionDecl::elliptical`).
@@ -626,6 +628,16 @@ struct Derivations<'d> {
     /// The Adjectival Passive's Category and its equations.
     adjectival: Option<(&'d str, &'d [Equation])>,
     central: Option<CentralDecl<'d>>,
+    /// The schema's name among those of its phrase
+    /// (`SchemaDecl::Valence::variant`).
+    variant: Option<&'d str>,
+    /// The prepositions of the frames it takes; empty, every frame
+    /// (`SchemaDecl::Valence::selects`).
+    selects: Vec<LexemeId>,
+    /// It derives no bare phrase.
+    complemented: bool,
+    /// Features no frame phrase's mother shares with its head.
+    unshared: Vec<usize>,
 }
 
 /// A Valence schema's central Adjunct (`SchemaDecl::Valence::central`).
@@ -1752,6 +1764,23 @@ impl<'a> Binder<'a> {
                     .fold(0, |mask, form| mask | crate::step::form_bit(*form)),
             );
         }
+        // A phrase that ends in its lexical head has that head standing
+        // bare, its Complements omitted, as a Valence schema's bare phrase
+        // has (`valence`): a Preposition Phrase right after it that one of
+        // the head's frames selects is its Complement.
+        draft.omits_complement = draft.children.last().is_some_and(|last| {
+            last.name == "head"
+                && matches!(
+                    last.symbol,
+                    Symbol::Leaf(
+                        Test::Lexical(_)
+                            | Test::FreeLexical(_)
+                            | Test::Word(_)
+                            | Test::Class(_)
+                            | Test::Words(_)
+                    )
+                )
+        });
         self.equations(&mut draft, &declaration.equations)
             .map_err(context)?;
         Ok(draft)
@@ -1951,6 +1980,19 @@ impl<'a> Binder<'a> {
                     host: None,
                 },
             ),
+            SymbolDecl::SelectedBy(name, category, class) => (
+                name.as_str(),
+                Symbol::Cat {
+                    binding: None,
+                    category: self.category(category)?,
+                    prepositions: Some((self.class_prepositions(class)?, None)),
+                    host: None,
+                },
+            ),
+            SymbolDecl::Selecting(name, category, words) => (
+                name.as_str(),
+                Symbol::Leaf(Test::Words(self.selecting(*category, words)?)),
+            ),
             SymbolDecl::Class(name, class) => (
                 name.as_str(),
                 Symbol::Leaf(Test::Class(
@@ -1978,6 +2020,96 @@ impl<'a> Binder<'a> {
             }
             SymbolDecl::Punct(c) => ("", Symbol::Punct(*c, Binding::Suffix, None)),
         })
+    }
+
+    /// The prepositions of the Preposition Phrase a frame selects as its
+    /// only Complement, with the kind it names for that phrase's Complement.
+    fn sole_preposition_phrase(&self, frame: usize) -> Option<(&[LexemeId], Option<SlotKind>)> {
+        match self.out.frames[frame].slots.as_slice() {
+            [slot] => match &slot.fill {
+                SlotFill::PP(list, kind) => Some((list, *kind)),
+                _ => None,
+            },
+            _ => None,
+        }
+    }
+
+    /// The prepositions `SymbolDecl::SelectedBy` takes from the frames of
+    /// the Lexical Class `class`.
+    fn class_prepositions(&self, class: &Ident) -> Result<Vec<Lexeme>, LoadError> {
+        let index = *self
+            .class_names
+            .get(class)
+            .ok_or_else(|| invalid(format!("unknown class `{class}`")))?;
+        let mut selected: Option<BTreeSet<Lexeme>> = None;
+        for &member in &self.out.classes[index] {
+            let id = self.out.lexeme_id(member);
+            let mut prepositions = BTreeSet::new();
+            for &frame in &self.out.facts(member).frames {
+                let Some((list, kind)) = self.sole_preposition_phrase(frame) else {
+                    continue;
+                };
+                if let Some(kind) = kind {
+                    return Err(invalid(format!(
+                        "`SelectedBy`: `{id}` of class `{class}` selects a Preposition Phrase \
+                         with a {kind:?} Complement, which `SelectedBy` cannot name"
+                    )));
+                }
+                prepositions.extend(list.iter().map(|p| dense(&self.out.lexeme_ids, p)));
+            }
+            if prepositions.is_empty() {
+                return Err(invalid(format!(
+                    "`SelectedBy`: `{id}` of class `{class}` has no frame whose only \
+                     Complement is a Preposition Phrase"
+                )));
+            }
+            match &selected {
+                None => selected = Some(prepositions),
+                Some(first) if *first == prepositions => {}
+                Some(_) => {
+                    return Err(invalid(format!(
+                        "`SelectedBy`: `{id}` selects other prepositions than another member \
+                         of class `{class}`"
+                    )));
+                }
+            }
+        }
+        selected
+            .map(|set| set.into_iter().collect())
+            .ok_or_else(|| invalid(format!("`SelectedBy`: class `{class}` has no member")))
+    }
+
+    /// The lexemes `SymbolDecl::Selecting` admits: those of `category` with
+    /// a frame whose only Complement is a Preposition Phrase headed by one of
+    /// `words`.
+    fn selecting(
+        &self,
+        category: LexicalCategory,
+        words: &[Ident],
+    ) -> Result<BTreeSet<Lexeme>, LoadError> {
+        let words = words
+            .iter()
+            .map(|w| self.word(w).map(|w| self.out.lexeme_id(w)))
+            .collect::<Result<Vec<_>, _>>()?;
+        let lexemes: BTreeSet<Lexeme> = self
+            .out
+            .declared_lexemes()
+            .filter(|(_, facts)| {
+                facts.category == category
+                    && facts.frames.iter().any(|&frame| {
+                        self.sole_preposition_phrase(frame)
+                            .is_some_and(|(list, _)| list.iter().any(|p| words.contains(p)))
+                    })
+            })
+            .map(|(lexeme, _)| lexeme)
+            .collect();
+        if lexemes.is_empty() {
+            return Err(invalid(format!(
+                "`Selecting`: no {category:?} has a frame that selects a Preposition Phrase \
+                 headed by one of {words:?}"
+            )));
+        }
+        Ok(lexemes)
     }
 
     /// A child feature path's `(child, feature)` pairs.
@@ -2552,12 +2684,47 @@ impl<'a> Binder<'a> {
             central,
             central_heads,
             central_families,
+            variant,
+            selects,
+            complemented,
+            unshared,
             ..
         } = schema
         else {
             return Err(invalid("not a Valence schema"));
         };
         let lhs = self.category(phrase)?;
+        if *head == LexicalCategory::Verb && *complemented {
+            return Err(invalid(format!(
+                "valence `{phrase}`: `complemented` on a verb head, which has no bare phrase"
+            )));
+        }
+        if *head == LexicalCategory::Preposition
+            && (variant.is_some() || !selects.is_empty() || *complemented || !unshared.is_empty())
+        {
+            return Err(invalid(format!(
+                "valence `{phrase}`: `variant`, `selects`, `complemented` and `unshared` are \
+                 not a preposition head's"
+            )));
+        }
+        let selects = selects
+            .iter()
+            .map(|word| self.word(word).map(|word| self.out.lexeme_id(word)))
+            .collect::<Result<Vec<_>, _>>()?;
+        let unshared = unshared
+            .iter()
+            .map(|name| {
+                let feature = self.feature(name)?;
+                if self.out.category_features[lhs].contains(&feature) {
+                    Ok(feature)
+                } else {
+                    Err(invalid(format!(
+                        "valence `{phrase}`: unshared feature `{name}` is not one the phrase \
+                         carries"
+                    )))
+                }
+            })
+            .collect::<Result<Vec<_>, _>>()?;
         let complement_kind = complement_kind
             .as_deref()
             .map(|name| {
@@ -2647,7 +2814,38 @@ impl<'a> Binder<'a> {
             passive,
             adjectival,
             central,
+            variant: variant.as_deref(),
+            selects,
+            complemented: *complemented,
+            unshared,
         })
+    }
+
+    /// Whether a Valence schema that `selects` these prepositions takes the
+    /// frame: every frame when it names none, else one whose first Frame
+    /// Slot is a Preposition Phrase headed by those prepositions alone.
+    fn schema_takes(
+        &self,
+        phrase: &str,
+        selects: &[LexemeId],
+        frame: usize,
+    ) -> Result<bool, LoadError> {
+        if selects.is_empty() {
+            return Ok(true);
+        }
+        let Some(SlotFill::PP(list, _)) = self.out.frames[frame].slots.first().map(|s| &s.fill)
+        else {
+            return Ok(false);
+        };
+        let named = list.iter().filter(|p| selects.contains(p)).count();
+        if named != 0 && named != list.len() {
+            return Err(invalid(format!(
+                "valence `{phrase}`: the frame `{}` selects only some of its prepositions \
+                 among the schema's `selects`",
+                frame_label(&self.out.frames[frame])
+            )));
+        }
+        Ok(named != 0)
     }
 
     #[expect(clippy::too_many_lines, reason = "one arm per schema kind")]
@@ -3430,7 +3628,7 @@ impl<'a> Binder<'a> {
             );
         }
         let used = self.used_frames(head)?;
-        if head != LexicalCategory::Verb {
+        if head != LexicalCategory::Verb && !derivations.complemented {
             let mut bare = Draft::new(format!("Valence:{phrase}/Bare"), lhs, cost);
             let test = if obligatory { Test::FreeOptional(head) } else { Test::FreeLexical(head) };
             bare.child("head", Symbol::Leaf(test), GapRule::Closed);
@@ -3456,10 +3654,15 @@ impl<'a> Binder<'a> {
             if head != LexicalCategory::Verb && frame.family == FrameFamily::Intransitive {
                 continue;
             }
+            if !self.schema_takes(phrase, &derivations.selects, index)? {
+                continue;
+            }
             let active = FrameVariant {
                 phrase: Ident::new(phrase),
                 alternation: Alternation::Active,
-                variant: String::new(),
+                variant: derivations
+                    .variant
+                    .map_or_else(String::new, |variant| format!("/{variant}")),
             };
             let slots: Vec<&SlotFill> = frame.slots.iter().map(|s| &s.fill).collect();
             // A verb's NP-like Complements are extracted; a noun's single
@@ -3485,6 +3688,9 @@ impl<'a> Binder<'a> {
                 for draft in &mut family {
                     draft.equations.push((Path::Mother(f), Target::Value(kind)));
                 }
+            }
+            for draft in &mut family {
+                draft.unshared.extend(&derivations.unshared);
             }
             let site = match derivations.central {
                 Some(_)

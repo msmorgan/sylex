@@ -368,6 +368,19 @@ pub enum SymbolDecl {
     /// A Preposition Phrase headed by one of the named Closed Words, as a
     /// Frame Slot `PP([...])` selects one.
     Selected(Ident, Ident, Vec<Ident>),
+    /// A Preposition Phrase that a frame of the Lexical Class's members
+    /// selects as its only Complement: the Complement of a head of that
+    /// Class in a phrase no Valence schema derives, where another child
+    /// stands between the two (an existential's Extension after its
+    /// Displaced Subject). Every member selects the same prepositions, and
+    /// none names its Complement's kind; anything else is a load error.
+    SelectedBy(Ident, Ident, Ident),
+    /// Any word of a lexical Category one of whose frames selects, as its
+    /// only Complement, a Preposition Phrase headed by one of the named
+    /// Closed Words: a head whose Complement the Production places itself
+    /// (an indirect Complement after the Nominal, *more lands than you*) or
+    /// omits.
+    Selecting(Ident, sylex_lexicon::Category, Vec<Ident>),
     /// A Constituent of a Category set in quotation marks, which the engine
     /// supplies: double at even nesting depth, single at odd ("If quoted rules
     /// text itself quotes an ability, use straight single quotation marks";
@@ -585,14 +598,35 @@ pub enum SchemaDecl {
         phrase: Ident,
         #[serde(default)]
         cost: u32,
+        /// Names this schema among several of one phrase, which differ in
+        /// the frames they take (`selects`) or in what their equations
+        /// require of the head: each frame phrase's id carries it.
+        #[serde(default)]
+        variant: Option<Ident>,
+        /// Closed Words: the schema derives phrases only from the frames
+        /// whose first Frame Slot is a Preposition Phrase headed by these
+        /// words alone. A frame that names one of them beside another word
+        /// is a load error.
+        #[serde(default)]
+        selects: Vec<Ident>,
+        /// The schema derives no bare phrase: each of its phrases realizes
+        /// a frame. A load error on a verb head, which has none.
+        #[serde(default)]
+        complemented: bool,
+        /// Features that no frame phrase's mother shares with its head, and
+        /// that `agree` or `active` value instead (a comparative
+        /// determinative's Number is its standard's, *more than one*).
+        #[serde(default)]
+        unshared: Vec<Ident>,
         /// The feature, carried by the phrase, that names the Slot Kind of
         /// its first Frame Slot: a non-verbal head's bare phrase names
         /// `Intransitive`, and a stranded Preposition Phrase the Slot Kind of
         /// the Complement it strands.
         #[serde(default)]
         complement_kind: Option<Ident>,
-        /// Equations on every active phrase of a frame, over `$` and the
-        /// lexical child `head` (a verb's Voice).
+        /// Equations on every active phrase of a frame, over `$`, the
+        /// lexical child `head` (a verb's Voice) and the Frame Slot
+        /// children, each named by its relation (`complement`).
         #[serde(default)]
         active: Vec<Equation>,
         /// Derive passive phrases from active verb frames, naming the Closed

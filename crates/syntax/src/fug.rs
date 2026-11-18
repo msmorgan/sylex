@@ -33,6 +33,7 @@
 //! premodification Participle { head: Verb, host: BareNominal, forms: [...], equations: [Form -> [eq, ...]] }
 //! parameters KeywordParameters { head: Keyword, ... }
 //! valence VerbPhrase { head: Verb, active: [eq, ...], clusters: { cluster: ..., ... }, ... }
+//! valence PartitiveHead { variant: Distributive, head: Determinative, selects: [Of], ... }
 //! coordination NounPhrase { coordinators: And, ... } where eq, ...
 //! coordination over [Mention, Kind] { coordinators: Coordinator }  // one schema per Category
 //! ```
@@ -56,7 +57,8 @@
 //! [`SymbolDecl`] kinds (`Class(X)`, `Word(X)`, `Lex(Noun)`, `Free(X)`,
 //! `FreeLex(Noun)`, `OtherCardName()`, `Numeral(Cardinal)`,
 //! `Numeral(Arabic(false))`, `Hosted(X, Nominal)`, `Attached(X, Suffix)`,
-//! `Selected(X, Of, ...)`). An equation is `path = Value` (require), `path =
+//! `Selected(X, Of, ...)`, `SelectedBy(X, Class)`, `Selecting(Noun, Of,
+//! ...)`). An equation is `path = Value` (require), `path =
 //! path` (agree), `path := Value` (carry), `path != A | B` (exclude each), or
 //! `!(path = A & path = B)` (exclude together), where a path is `$.Feature`
 //! or `child.Feature`; `=` is written only in equations. A child that leaves
@@ -976,7 +978,8 @@ impl Item {
 /// `role:B` is `Cat(role, B)`, `"B"` is `Quoted(head, B)`, `','` is
 /// `Punct(',')`, `'—':Free` is `Mark('—', Free)`, `'+':Prefix:Spoken` is
 /// `SpokenMark('+', Prefix)`, and `Kind(args)` is
-/// `Kind(role, args)`, a `Selected`'s Closed Words gathered in a list.
+/// `Kind(role, args)`, the Closed Words of a `Selected` or a `Selecting`
+/// gathered in a list.
 fn symbol(symbol: RhsSymbol) -> Result<Value, LoadError> {
     let RhsSymbol {
         role,
@@ -1007,7 +1010,7 @@ fn symbol(symbol: RhsSymbol) -> Result<Value, LoadError> {
             vec![role, Value::new(ValueKind::Ident(category), at)],
         ),
         ValueKind::Call(kind, mut args) => {
-            if kind == "Selected" && !args.is_empty() {
+            if matches!(kind.as_str(), "Selected" | "Selecting") && !args.is_empty() {
                 let words = args.split_off(1);
                 args.push(Value::new(ValueKind::List(words), at));
             }
