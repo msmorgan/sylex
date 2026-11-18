@@ -257,7 +257,7 @@ Catalog.
 
 **Proper Name**:
 The lexical Category of an opaque name: a card name or Shortened Name, a
-dungeon name, a predefined token name, an Introduced Name or a vote option.
+dungeon name, a predefined token name or an Introduced Name.
 The code calls it `Category::Catalog`.
 _Avoid_: Catalog for this Category
 
@@ -329,6 +329,25 @@ holds it, heading its ability or in an Anchor Choice.
 The two Anchor Words an ability offers, joined by *or* (*choose Khans or
 Dragons*). The words are cited, so it stands where a cited word does.
 
+**Vote Option**:
+One of the words a vote offers, "words with no rules meaning that are each
+connected to a different effect" [CR#701.38a,701.38b] (*sickness* and
+*psychosis* on Bite of the Black Rose). No inventory lists it: it is read
+from a face's text, the words an Option Choice offers where the text also
+cites one of them in an Option Mention. It stands only where the Card Scope
+holds it, in an Option Choice or as an Option Mention, and is no Proper Name.
+The grammar names no keyword action, so its lexical Category is
+`Category::OptionWord`.
+
+**Option Choice**:
+The two Vote Options a vote offers, joined by *or* (*votes for sickness or
+psychosis*): the Complement of *for* under a verb whose frame selects it.
+
+**Option Mention**:
+A Vote Option cited where the text says what the votes for it do: the Subject
+of a clause that counts them (*If psychosis gets more votes*) or the
+premodifier of *vote* (*each numbers vote*).
+
 **Shortened Name**:
 A shortened card name [CR#201.5c]: the Shortened form of a card's Own Name,
 beside its Full form, in scope only in the text of the face whose name it
@@ -337,12 +356,13 @@ whether or not its own text uses it.
 
 **Card Scope**:
 The card names a text is in the scope of, each with the forms of it that the
-text admits, and the Anchor Words of that text. A face's text holds its own
-name in its Full form and, where the card has a Shortened Name, in its
-Shortened form [CR#201.5c]; a face's Card Scope is derived from its name and
-type line, and its Anchor Words from its rules text, when its text is parsed.
-An Own Name stands only where the Card Scope holds that form of it, and an
-Anchor Word only where it holds that word.
+text admits, and the Anchor Words and Vote Options of that text. A face's
+text holds its own name in its Full form and, where the card has a Shortened
+Name, in its Shortened form [CR#201.5c]; a face's Card Scope is derived from
+its name and type line, and its Anchor Words and Vote Options from its rules
+text, when its text is parsed. An Own Name stands only where the Card Scope
+holds that form of it, and an Anchor Word or a Vote Option only where it holds
+that word.
 
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5]. It

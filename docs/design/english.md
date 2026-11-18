@@ -201,7 +201,7 @@ read as words of an ordinary Category, would take that Category's whole
 distribution, and the census shows that distribution multiplying Readings on
 real card text. Each equation that reads it is an admission gate (§6), and its
 comment names a real card and the spurious structure it prevents. There are
-two, `KindLicense` and `SetNameLicense`.
+three, `KindLicense`, `SetNameLicense` and `OptionLicense`.
 `KindLicense`: The counter Catalog marks each counter's kind name
 (*charge*, *time*) and each keyword a keyword counter can be [CR#122.1b]
 `Kind`, and the noun *counter* `Head`. A `Kind` word is a kind only before
@@ -234,6 +234,19 @@ Spiral*, *Urza's Saga*), and as such *the Time Spiral expansion* would be
 a second tree, the card's name premodifying *expansion*, in Time Spiral's own
 text, and *the Urza's Saga expansion* two more, the subtypes *Urza's* and
 *Saga* premodifying it.
+`OptionLicense`: a noun whose parameter pattern takes a cited Vote Option
+before it ([Lexicon](lexicon.md) §2), *vote*, is `Head`, which the pattern's
+declaration gives it. A Vote Option is open, so no word of it carries the
+license. The noun takes the option it is counted by as its one noun
+premodifier: many options are spelled like nouns (*time*, *money*, *numbers*),
+and as such *For each money vote* (Expropriate) would be a second tree, the
+noun *money* premodifying *vote*. A phrase carries its head noun's license and
+a Verb Phrase its Complement's, so a clause that counts votes is told from any
+other: a cited Vote Option is a Subject only of such a clause (*If psychosis
+gets more votes*), never of one that uses a noun of its spelling (*chaos
+ensues*, Path of the Enigma). Before *gets more votes* a noun of that spelling
+keeps its own Reading beside the cited word's (*If chaos gets more votes*):
+the two are different analyses, and only meaning chooses between them (§4).
 
 ## 4. Admission and ambiguity
 
@@ -329,7 +342,8 @@ production-directed scanning. Every alternative names a declared Lexeme with
 its lexical Category, Word Form, features and Provenance, or is one of the
 leaves no Lexeme declares: a numeral, a card's own name, and the open slots
 read by their shape, a Flavor Word, a Set Name and an Introduced Name, and
-an Anchor Word the parse context holds ([Lexicon](lexicon.md) §2, §6). An
+an Anchor Word or a Vote Option the parse context holds ([Lexicon](lexicon.md)
+§2, §6). An
 unknown word is reported as a vocabulary gap, never guessed; a title run is
 one unless the parse takes it as an Introduced Name. Analysis and realization
 share the same inflection rules. Why: the parser then sees every lexical
@@ -347,11 +361,12 @@ values grow with the number of trees, which is exponential, while the forest
 stays polynomial.
 
 **Both round-trip laws hold**, under the same parse context and Lexical
-Environment. The parse context is the Card Scope: the card names and the
-Anchor Words a text is read with. What decides a face's Anchor Words lies in
-several of its units, so it is decided before any unit's Readings are taken,
-and each unit is then parsed and admitted with the one scope; neither looks
-at another unit.
+Environment. The parse context is the Card Scope: the card names, the Anchor
+Words and the Vote Options a text is read with. What decides a face's Anchor
+Words lies in several of its units, and what decides its Vote Options is no
+shape that lexical analysis could propose a leaf at, so both are decided
+before any unit's Readings are taken, and each unit is then parsed and
+admitted with the one scope; neither looks at another unit.
 
 ```
 v is an admitted Reading of s                      =>  render(v) = s

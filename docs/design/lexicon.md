@@ -31,7 +31,7 @@ a multiword term and its words, or a host and its bound affix, stand as
 alternatives, and the chart decides between them (§5).
 
 **Nothing is guessed.** An unknown word is a vocabulary gap, and no Category is
-inferred from spelling: braces do not license an unknown symbol. Four slots
+inferred from spelling: braces do not license an unknown symbol. Five slots
 are open, each read from the text at its own positions because nothing
 enumerates what fills it. A Flavor Word is the italic run before an ability's
 em dash [CR#207.2d]. An Introduced Name is a name the text itself gives an
@@ -49,6 +49,29 @@ Words. Its Card Scope holds them (§6), and an Anchor Word leaf stands only
 where the scope holds its word, at the head of a bulleted ability and in an
 Anchor Choice; there the label is no Flavor Word. A text read alone states
 its Anchor Words as it states its card's name.
+A Vote Option is one of the words a vote offers, "words with no rules meaning
+that are each connected to a different effect" [CR#701.38a,701.38b] (*votes
+for sickness or psychosis*; *If psychosis gets more votes*; *for each numbers
+vote*). It has no shape of its own: it is any word (*free*, *return*,
+*planeswalk*) or title run (*Mines of Moria*), and the text's other uses of
+that word stay what they are (*chaos ensues* on the Path of the ... cards). Nor
+does the offer alone settle it, since a vote may as well offer what two words
+name [CR#701.38b]. So it is read from the face's lines by two parses. A line
+that writes a word whose frame selects an Option Choice is parsed with every
+word and title run in it in scope as a Vote Option, and the words an Option
+Choice in some Derivation offers are what its vote offers. The face's lines are
+then parsed with those words in scope, and an offer is confirmed where some
+Derivation cites one of its words in an Option Mention, as the Subject of a
+clause that counts its votes or before *vote*: that is the word's connection to
+an effect. The words of a confirmed offer are the face's Vote Options, both of
+them (*innocent*, which Trial of a Time Lord offers and never cites). Its Card
+Scope holds them (§6), and a Vote Option leaf stands only where the scope holds
+its word; the grammar admits it in an Option Choice and an Option Mention and
+nowhere else. A text read alone states its Vote Options as it states its
+Anchor Words. Every printed vote has its offer and its mentions in one line,
+but the words are still read before that line's Readings are taken, not within
+them as an Introduced Name is: lexical analysis proposes an Introduced Name at
+a title run, a shape, and a Vote Option has none to propose it at.
 A Set Name is the name of an expansion a card's text cites before the noun *expansion* [CR#206.3a..206.3c] (*a name originally printed in the
 Antiquities expansion*): no card-scoped list or catalog of printed sets is
 consulted. It is read by title shape alone, right before a noun whose parameter
@@ -198,7 +221,8 @@ way, as a Catalog term's words are.
 the text of its own face [CR#201.5,201.5c,712.6], and everywhere in
 that text. A face's Card Scope holds, of card names, its own name and nothing
 else, in its Full form and, where the card has a Shortened Name, in its
-Shortened form; beside the name it holds the face's Anchor Words (§2). The name
+Shortened form; beside the name it holds the face's Anchor Words and Vote
+Options (§2). The name
 of a meld result is the name of neither card of its meld pair, so it is another
 card's name on both, and neither card's text shortens it: *Mishra* on
 Phyrexian Dragon Engine is no name.
@@ -290,8 +314,10 @@ selected, as *do the same for* selects *for* with a cited word
 the same way (CGEL, Ch. 4 §6, pp. 273–274), and *into* takes a name under no
 other head (*put it into Black Lotus*). Any other position, a Subject,
 Object, possessor or premodifier among them, refuses another card's name with
-no clause of its own. A vote option spelled like another card's name is listed
-as that card's vote option (*votes for Redhorn Pass or Mines of Moria*). Why:
+no clause of its own. A Vote Option spelled like another card's name is no
+card's name where its vote offers it or its votes are counted (*votes for
+Redhorn Pass or Mines of Moria*, Travel Through Caradhras): those positions
+take a Vote Option and no name (§2). Why:
 a card's text mentions another card by name only in those positions, and a
 card name read anywhere else is another word misread (*Exile* in *Exile
 target attacking creature*).
