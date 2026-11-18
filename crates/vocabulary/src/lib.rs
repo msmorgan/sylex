@@ -145,6 +145,8 @@ const VOTE_OPTIONS: &str = "catalogs/vote_options.ron";
 const CITED_NAMES: &str = "catalogs/cited_names.ron";
 /// The card-name catalog, relative to the repository root.
 pub const CARD_NAMES: &str = "data/gen/catalogs/card-names.txt";
+/// The dungeon-name catalog, relative to the repository root.
+pub const DUNGEON_NAMES: &str = "data/gen/catalogs/dungeon-names.txt";
 fn parse<T: DeserializeOwned>(path: &str) -> Result<T, SourceError> {
     let text = FILES
         .iter()
@@ -185,6 +187,8 @@ pub struct Sources {
     pub anchor_words: Vec<AnchorWord>,
     pub vote_options: Vec<ScopedName>,
     pub cited_names: Vec<ScopedName>,
+    /// The names of the dungeon cards, read from [`DUNGEON_NAMES`].
+    pub dungeon_names: Vec<String>,
 }
 
 /// A Lexicon and the Subcategorization Frames of its Lexemes.
@@ -195,9 +199,9 @@ pub struct LexicalEnvironment {
 }
 
 impl LexicalEnvironment {
-    /// Loads every data file, the card names at [`card_names_path`] and
-    /// their attested shortenings computed from the corpus at
-    /// `sylex_upstream::scryfall::oracle_cards`.
+    /// Loads every data file, the dungeon names at [`dungeon_names_path`],
+    /// the card names at [`card_names_path`] and their attested shortenings
+    /// computed from the corpus at `sylex_upstream::scryfall::oracle_cards`.
     ///
     /// # Errors
     /// An unreadable card-name or corpus file, or any
@@ -218,14 +222,42 @@ fn read(path: &std::path::Path) -> Result<String, SourceError> {
 /// The card-name catalog in this repository.
 #[must_use]
 pub fn card_names_path() -> PathBuf {
+    repository_path(CARD_NAMES)
+}
+
+/// The dungeon-name catalog in this repository.
+#[must_use]
+pub fn dungeon_names_path() -> PathBuf {
+    repository_path(DUNGEON_NAMES)
+}
+
+fn repository_path(path: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../..")
-        .join(CARD_NAMES)
+        .join(path)
+}
+
+/// The lines of a generated name catalog, each a name.
+fn generated_names(path: &std::path::Path) -> Result<Vec<String>, SourceError> {
+    read(path)?
+        .lines()
+        .enumerate()
+        .map(|(index, line)| {
+            if line.trim().is_empty() || line.trim() != line {
+                return Err(SourceError::Format {
+                    path: path.display().to_string(),
+                    message: format!("line {} is no name: {line:?}", index + 1),
+                });
+            }
+            Ok(line.to_owned())
+        })
+        .collect()
 }
 
 impl Sources {
     /// # Errors
-    /// Malformed RON in any data file.
+    /// Malformed RON in any data file, or an unreadable or malformed
+    /// dungeon-name catalog.
     pub fn load() -> Result<Self, SourceError> {
         Ok(Self {
             closed_class: parse(CLOSED_CLASS)?,
@@ -249,6 +281,7 @@ impl Sources {
             anchor_words: parse(ANCHOR_WORDS)?,
             vote_options: parse(VOTE_OPTIONS)?,
             cited_names: parse(CITED_NAMES)?,
+            dungeon_names: generated_names(&dungeon_names_path())?,
         })
     }
 
@@ -566,6 +599,9 @@ impl Sources {
             builder.push(card_scoped(lexeme, &introduced.cards));
         }
         self.scoped_name_catalogs(builder);
+        for name in &self.dungeon_names {
+            builder.push(dungeon_name(name));
+        }
         self.counter_kinds(builder)
     }
 
@@ -1151,6 +1187,19 @@ fn mark_lexical_adjectival_passives(lexemes: &mut [Lexeme]) -> Result<(), Source
     Ok(())
 }
 
+/// A dungeon's name [CR#309.1]: a Proper Name in scope on every card, as the
+/// dungeon is a game object any card's text can name (*if you haven't
+/// completed Tomb of Annihilation*, Acererak the Archlich; *venture into
+/// Undercity* [CR#727.2]).
+fn dungeon_name(name: &str) -> Lexeme {
+    exact(
+        &format!("dungeon_name:{name}"),
+        name,
+        Category::Catalog,
+        source(SourceKind::Catalog, DUNGEON_NAMES, name),
+    )
+}
+
 /// No word is both core vocabulary and a catalog item of the same Category.
 fn check_core_and_catalogs_disjoint(lexemes: &[Lexeme]) -> Result<(), SourceError> {
     let mut core = std::collections::BTreeMap::new();
@@ -1169,4 +1218,34 @@ fn check_core_and_catalogs_disjoint(lexemes: &[Lexeme]) -> Result<(), SourceErro
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A dungeon name is a Catalog item, so the loader refuses it when a Core
+    /// word of its Category spells it, as for every other Catalog item.
+    #[test]
+    fn a_dungeon_name_is_never_core_vocabulary() {
+        let (mut lexemes, _) = Sources::load().unwrap().vocabulary().unwrap();
+        let dungeon = lexemes
+            .iter()
+            .find(|lexeme| lexeme.id.as_str() == "dungeon_name:Undercity")
+            .expect("Undercity is a generated dungeon name");
+        assert!(dungeon.card_scope.is_empty() && !dungeon.card_name);
+        lexemes.push(Lexeme::invariant(
+            "core:undercity",
+            "undercity",
+            Category::Catalog,
+            source(SourceKind::Core, NOUNS, "core:undercity"),
+        ));
+        let error = check_core_and_catalogs_disjoint(&lexemes)
+            .unwrap_err()
+            .to_string();
+        assert!(
+            error.contains("`dungeon_name:Undercity` is a catalog item"),
+            "{error}"
+        );
+    }
 }

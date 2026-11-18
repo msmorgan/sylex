@@ -116,7 +116,12 @@ same Category, because its Core spelling would let the grammar name the item.
 **Names come from the Oracle data**, never by hand: card names from the card
 data, Shortened Names from a rule over a face's name, supertypes and types
 (`sylex_vocabulary::short_name`) checked at load against each face's own Oracle
-text (§6). Why: the card list is the authority on what cards exist.
+text (§6), and dungeon names from the faces of card type Dungeon in the card
+data's token sets, oversized aids apart. A dungeon is a card outside the
+corpus, brought into the game by venturing [CR#309.1,309.2], so no Card Scope
+restricts its name: any card's text may name it (*if you haven't completed Tomb
+of Annihilation*). Why: the card list is the authority on what cards and
+dungeons exist.
 
 ## 4. Binding
 

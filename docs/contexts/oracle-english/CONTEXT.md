@@ -245,8 +245,8 @@ Catalog.
 
 **Proper Name**:
 The lexical Category of an opaque name: a card name or Shortened Name, a
-predefined token name, an Introduced Name, a vote option, a cited name or an
-Anchor Word. The code calls it `Category::Catalog`.
+dungeon name, a predefined token name, an Introduced Name, a vote option, a
+cited name or an Anchor Word. The code calls it `Category::Catalog`.
 _Avoid_: Catalog for this Category
 
 **Document**:
