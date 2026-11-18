@@ -2380,7 +2380,10 @@ FrequencyAdverbArithmetic: AdverbPhrase ->
 // It adds a number, so its operand is a quantity (*one*), never an ordinary
 // Noun Phrase: an admission gate (english.md §6) that keeps *[that many plus
 // [one +1/+1]] counters*, a fused measure noun as the operand, off Hardened
-// Scales.
+// Scales. The same gate refuses QuantityPartitiveOfEach's *one of each*, an
+// ordinary Noun Phrase, as the operand, which would split *each* from its own
+// *of* phrase (*[that many plus one of each] [of those kinds of counters]*,
+// Winding Constrictor).
 DegreeArithmetic: DeterminerPhrase ->
     DeterminerPhrase modifier:Selected(PrepositionPhrase, Plus, Minus) { heavy: [head] }
     where head.ComplementKind = Intransitive,
