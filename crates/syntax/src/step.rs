@@ -957,15 +957,16 @@ pub(crate) fn resolve(
 pub(crate) enum Fronting {
     /// It does not.
     None,
-    /// One set off by a comma (*When …, …*, *Until end of turn, …*), or a
-    /// dependent other than a Predicate Adjunct preposed without one. It is
+    /// One set off by a comma (*When …, …*, *Until end of turn, …*). It is
     /// never the initial conjunct of a coordination undelimited before its
     /// coordinator: the fronted dependent scopes over the whole coordination.
     Wide,
-    /// A Predicate Adjunct preposed without a comma (*instead put …*,
-    /// *instead puts …*). Its scope is ambiguous between the initial conjunct
-    /// of a coordination and the whole coordination (*Yesterday Ed was taken
-    /// ill and the lecture's been cancelled*; CGEL, Ch. 15 §1.3.4,
+    /// An Adjunct preposed without a comma: a Predicate Adjunct (*instead
+    /// put …*, *instead puts …*) or a premodifier of a noun premodifier
+    /// conjunct (*[Phyrexian creature] or artifact creature spell*, Brimaz,
+    /// Blight of Oreskos). Its scope is ambiguous between the initial
+    /// conjunct of a coordination and the whole coordination (*Yesterday Ed
+    /// was taken ill and the lecture's been cancelled*; CGEL, Ch. 15 §1.3.4,
     /// pp. 1285–1286), so it may be that initial conjunct.
     Ambiguous,
 }
@@ -2124,9 +2125,9 @@ impl Production {
 
     /// Whether a fronted dependent's scope rules this child out: a fronted
     /// dependent scopes over a comma-set post-dependent of its Clause, never
-    /// inside the post-dependent's host, and, unless it is a Predicate
-    /// Adjunct preposed without a comma (`Fronting::Ambiguous`), over
-    /// a whole coordination, never its initial conjunct
+    /// inside the post-dependent's host, and, unless it is an Adjunct
+    /// preposed without a comma (`Fronting::Ambiguous`), over a whole
+    /// coordination, never its initial conjunct
     /// (`docs/design/english.md` §8). The initial conjunct of a
     /// coordination delimited before its coordinator may have its own (*[If
     /// you do, …], and [if you don't, …]*), and so may a middle conjunct of a
@@ -2672,8 +2673,8 @@ impl Production {
                 || (self.rhs.len() == 1 && state.forced),
             fronted: if !self.fronts() {
                 Fronting::None
-            } else if self.host_check.is_some_and(|(host, adjunct, kind)| {
-                adjunct < host && kind == HostKind::Predicate && !self.set_off_before_head(adjunct)
+            } else if self.host_check.is_some_and(|(host, adjunct, _)| {
+                adjunct < host && !self.set_off_before_head(adjunct)
             }) {
                 Fronting::Ambiguous
             } else {

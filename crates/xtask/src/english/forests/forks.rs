@@ -564,7 +564,8 @@ mod tests {
     /// phases end*: every Clause headed by *don't* that holds *Until* also
     /// holds *and*, which there joins only *steps and phases*; the options
     /// differ in what is coordinated. Its back face, *Lord of the Ulvenwald*,
-    /// has *you control* over *Wolves and Werewolves* or on *Werewolves*.
+    /// has *you control* over *Wolves and Werewolves* or on *Werewolves*, and
+    /// *Other* over it or on *Wolves*.
     /// *Crook of Condemnation*'s one dependency fork has no coordination.
     #[test]
     fn wide_and_narrow_attachments_over_a_coordination() {
@@ -666,8 +667,10 @@ mod tests {
                  planeswalker | 1 | 1 | 2",
                 "Lisette, Dean of the Root | until | adjunct | Clause | and | adjunct | VerbPhrase \
                  | gain | 1 | 1 | 2",
+                "Lord of the Ulvenwald | Other | modifier | Nominal | and | modifier | Nominal | \
+                 Wolves | 2 | 2 | 4",
                 "Lord of the Ulvenwald | control | modifier | Nominal | and | modifier | Nominal | \
-                 Werewolves | 1 | 1 | 2",
+                 Werewolves | 2 | 2 | 4",
                 "Sage Owl | When | adjunct | Clause | then | adjunct | Clause | look | 2 | 2 | 4",
                 "Sage Owl | in | adjunct | Clause | then | adjunct | VerbPhrase | put | 2 | 2 | 4",
                 "Sands of Time | control | modifier | Nominal | and | modifier | Nominal | land | \
