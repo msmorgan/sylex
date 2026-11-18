@@ -32,9 +32,9 @@ fn lexicon() -> Lexicon {
 }
 
 /// The grammar, its feature declared as `setting`. `Marked` values `Shape` on
-/// its mother, `Unmarked` values another, `Wrapped` and `Passed` have a `Phrase` head child, `Passed`
-/// passing the feature up by equation, and `Consumer` requires the carried
-/// value of its head.
+/// its mother, `Unmarked` values another, `Wrapped` and `Passed` have a
+/// `Phrase` head child, `Passed` passing the feature up by equation, and
+/// `Consumer` requires the carried value of its head.
 fn grammar(lexicon: &Lexicon, setting: &str) -> CompiledGrammar {
     let text = format!(
         r#"

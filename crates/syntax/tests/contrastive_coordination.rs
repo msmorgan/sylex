@@ -2,9 +2,9 @@
 //! not Y* (CGEL, Ch. 15 §2.6, p. 1313, [60iia]): only the binary coordination,
 //! plain and with the `delimiter`, with the negator as a `modifier` child
 //! between the coordinator and the last conjunct, and no serial form. It is a
-//! load error with `serial`, `unlike`, `link`, `remnant` or `raising_delimiter`.
-//! The grammar coordinates Preposition Phrases as Haakon, Stromgald Scourge
-//! does: *from your graveyard, but not from your hand*.
+//! load error with `serial`, `unlike`, `link`, `remnant` or
+//! `raising_delimiter`. The grammar coordinates Preposition Phrases as Haakon,
+//! Stromgald Scourge does: *from your graveyard, but not from your hand*.
 
 use sylex_lexicon::Category;
 use sylex_lexicon::Countability;

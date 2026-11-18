@@ -46,10 +46,10 @@
 //! `cost` defaults to 1, and to 0 on `valence`. An adjunct's or
 //! coordination's equations go in `where`. A coordination named `over` is
 //! one declaration for each Category in its list: a feature it names that a
-//! Category does not carry says nothing of that Category. Category, Production and Schema
-//! items are read through the `serde` derives of those types, so their field
-//! names, defaults and unknown-field rejection are declared there alone; a
-//! flag reads as `true`, and a flag may also be written `key: true`.
+//! Category does not carry says nothing of that Category. Category, Production
+//! and Schema items are read through the `serde` derives of those types, so
+//! their field names, defaults and unknown-field rejection are declared there
+//! alone; a flag reads as `true`, and a flag may also be written `key: true`.
 //!
 //! A right-hand-side symbol is `[role:]Category` (role `head` when omitted),
 //! `[role:]"Category"` (set in quotation marks), `'c'` (punctuation),
