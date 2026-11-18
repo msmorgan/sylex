@@ -93,10 +93,12 @@ feature BareMassHead = Unmodified | Expanded
 // `Quantity`: a fused-head quantity (*choose one*). `Manner`: only *way*,
 // the one noun that is a Manner Adjunct without a preposition (*do it this
 // way*; CGEL 8§2.1:671). `Resource`: a measured mass quantity or symbol
-// sequence (*X damage*, *1 life*, *{R}*).
-feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource
+// sequence (*X damage*, *1 life*, *{R}*). `Quotation`: a quoted cost
+// (QuotedCostHead), which coordinates with no nominal of another kind.
+feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource | Quotation
 // The NounKind of a head's *of* oblique.
-feature ObliqueNounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource
+feature ObliqueNounKind =
+    | Ordinary | Temporal | Manner | Numeric | Quantity | Resource | Quotation
 feature Determination = Bare | Mixed | Overt
 // The Determination of a determinative's Complement (*than one*).
 feature ObliqueDetermination = Bare | Mixed | Overt
@@ -167,6 +169,16 @@ feature Ellipsis = Code
 // keeps *each turn, those coins come up heads* from an adverbial relative of
 // *The first time you flip one or more coins* (Edgar, King of Figaro).
 feature ClauseShape = SubjectInitial { local }
+// Privative and local: a Nominal bounded by a relative clause, then by
+// temporal Noun Phrases only (*next time you cast a spell this turn*), and
+// the relative clause as its Postmodifier. RelativePostmodifier values it,
+// NominalPostmodifier takes it from the Postmodifier and TemporalPostmodifier
+// keeps its head's; being local it is on no Nominal with another postmodifier
+// or a premodifier outside the relative, and on no coordination.
+// RelativeTemporalLocation carries it, an admission gate (english.md §6): without
+// the relative, every determined temporal nominal is a temporal Adjunct too
+// (*End [the turn]*, Time Stop).
+feature RelativeBound = Bound { local }
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
@@ -313,20 +325,11 @@ category ComplementNounPhrase : NounPhrase [
 category Nominal [
     Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, BareMass, BareMassHead,
+    RelativeBound,
 ] { gap }
 category QuantifiedNominal : Nominal [QuantityNumber, NounKind, Determination, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
     QuantityNumber, NounKind, Determination, NounDistribution,
-]
-// A temporal nominal bounded by a relative clause (*next time you cast a
-// spell*). An admission gate (english.md §6): RelativeTime and
-// RelativeTimePostmodifier restate NominalPostmodifier and
-// TemporalPostmodifier, so it takes a *when*-less adverbial relative, then
-// only temporal bounds. What it gates is the relative it requires: without
-// one, every determined temporal nominal is one too (*End [the turn]*, Time
-// Stop, with *the turn* a temporal Adjunct).
-category RelativeTemporalNominal : Nominal [
-    Number, Countability, NounKind, Determination, NounDistribution,
 ]
 category BareNominal : Nominal [
     Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
@@ -506,7 +509,7 @@ category PostposedModifier [Number] { function }
 category BarePostposedModifier : PostposedModifier [Number] { function }
 // The Modifier function after a nominal head: a relative clause or a
 // participial clause.
-category Postmodifier [Number, NounKind] { function }
+category Postmodifier [Number, NounKind, RelativeBound] { function }
 // A relative phrase with genitive *whose*.
 category RelativeNounPhrase : NounPhrase [Number]
 // A preposition and its relative pronoun, fronted (*for which*).
@@ -576,8 +579,6 @@ category MentionModifier
 // bare color nouns, *day* or *night* after *be* get no cited-word twin.
 category SpecifyingValue { function }
 category QuotedCost
-// A quoted cost and its premodifiers, kept out of Nominal coordination.
-category QuotedCostNominal : Nominal [Number, Countability, NounKind, NounDistribution]
 category InterrogativeClause : Clause
 category InterrogativePhrase : NounPhrase [Number, Person]
 
@@ -835,27 +836,15 @@ QuotedNominal: BareNominal -> "BareNominal" where head.Number = Singular
 // to activate*, Brutal Suppression, Drought; [CR#118.8]): a singular count
 // noun under a determiner. Any other quoted clause is a QuotedAbility.
 QuotedCost: QuotedCost -> "Clause" { capital: [head] } where head.VerbForm := Plain
-QuotedCostHead: QuotedCostNominal -> QuotedCost
+// Its NounKind is an admission gate (english.md §6): a Nominal's conjuncts
+// share theirs, so a quoted ability is never a quoted cost conjoined in a
+// Nominal (*a ... [token with flying] and ["Whenever Redwing attacks, surveil
+// 1."]*, Falcon, Winged Wonder).
+QuotedCostHead: BareNominal -> QuotedCost
     where $.Number = Singular,
           $.Countability = Count,
-          $.NounKind = Ordinary,
+          $.NounKind = Quotation,
           $.NounDistribution = Ordinary
-QuotedCostPremodifier: QuotedCostNominal -> modifier:AdjectivePhrase QuotedCostNominal
-    where modifier.ComplementKind = Intransitive,
-          modifier.AdjectivePosition != Predicative
-// Twin: Determined. A QuotedCostNominal is no Nominal Conjunct, so a quoted
-// ability is never a quoted cost conjoined in a Nominal (*a ... token with
-// flying and "Whenever Redwing attacks, surveil 1."*, Falcon, Winged
-// Wonder).
-DeterminedQuotedCost: NounPhrase -> determiner:DeterminerPhrase QuotedCostNominal
-    where $.DeterminativeDistribution = determiner.DeterminativeDistribution,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third,
-          determiner.DeterminativeDistribution != Independent | FreeChoice,
-          determiner.ComplementKind != PP,
-          determiner.Countability = head.Countability,
-          determiner.Number = head.Number
 
 TextSymbols: Document -> Symbols { capital: [head] }
 // A symbol sequence as a noun under a determiner (*each {B} in a cost*,
@@ -1668,18 +1657,16 @@ MaximumSerialTemporal: TemporalNounPhrase -> determiner:Selected(PrepositionPhra
 // *Only any time they could cast a sorcery*.
 AdverbModifiedTemporal: TemporalNounPhrase -> modifier:AdverbPhrase TemporalNounPhrase
     where modifier.AdjunctPosition = Phrasal
-RelativeTemporalLocation: TemporalNounPhrase -> determiner:DeterminerPhrase RelativeTemporalNominal
-    where determiner.Countability = head.Countability,
+// A temporal nominal bounded by a relative clause (*next time you cast a
+// spell*), then by temporal Noun Phrases only (RelativeBound).
+RelativeTemporalLocation: TemporalNounPhrase -> determiner:DeterminerPhrase Nominal
+    where head.RelativeBound := Bound,
+          head.NounKind = Temporal,
+          determiner.Countability = head.Countability,
           determiner.Number = head.Number,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-RelativeTime: RelativeTemporalNominal -> Nominal modifier:RelativeClause
-    where head.NounKind = Temporal,
-          head.Number = modifier.Number,
-          head.NounKind = modifier.NounKind
-RelativeTimePostmodifier: RelativeTemporalNominal ->
-    RelativeTemporalNominal modifier:TemporalNounPhrase { cost: 2 }
 // *This turn, ...*; *The next time ..., ...*.
 PreposedTemporalAdjunct: Clause -> adjunct:TemporalNounPhrase ',' Clause { transparent: [head] }
     where $.FrontPosition = Occupied
@@ -1710,7 +1697,8 @@ PreposedPrepositionPair: Clause ->
           $.FrontPosition = Occupied
 // *The first time each turn*.
 TemporalPostmodifier: Nominal -> Nominal modifier:TemporalNounPhrase { cost: 2 }
-    where head.NounKind = Temporal
+    where head.NounKind = Temporal,
+          $.RelativeBound = head.RelativeBound
 TemporalAdjunct: VerbPhrase -> VerbPhrase adjunct:TemporalNounPhrase {
     cost: 2,
     transparent: [head],
@@ -3115,7 +3103,8 @@ ProperPossessor: Possessor -> Name where $.Case = Plain, $.Person = Third
 // (*each creature and planeswalker that is tapped*).
 NominalPostmodifier: Nominal -> Nominal modifier:Postmodifier
     where head.ConjunctNumber = modifier.Number,
-          head.NounKind = modifier.NounKind
+          head.NounKind = modifier.NounKind,
+          $.RelativeBound = modifier.RelativeBound
 // *The next 3 damage that would be dealt*.
 QuantifiedPostmodifier: ModifiedQuantifiedNominal -> QuantifiedNominal modifier:Postmodifier
     where head.QuantityNumber = modifier.Number,
@@ -3162,7 +3151,7 @@ GerundParticipialConjunct: PostmodifierConjunct -> filler:VerbPhrase { heavy: [f
     where filler.VerbForm = GerundParticiple,
           $.ComplementKind = Gerund
 CoordinatedPostmodifier: Nominal -> Nominal modifier:PostmodifierCoordination
-RelativePostmodifier: Postmodifier -> RelativeClause
+RelativePostmodifier: Postmodifier -> RelativeClause where $.RelativeBound = Bound
 // A participial clause with dependents (*each creature tapped this way*): a
 // bare passive, never headed by *been*.
 ParticipialPostmodifier: Postmodifier -> VerbPhrase { heavy: [head] }
