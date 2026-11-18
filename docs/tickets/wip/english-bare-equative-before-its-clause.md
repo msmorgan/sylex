@@ -30,7 +30,9 @@ reader has:
 
 - Where an equative's comparative clause follows it, the *as* phrase is that clause's
   Complement, neither an Adjunct of a Verb Phrase nor a Modifier of a Nominal: the three units
-  above keep only Readings with the comparative clause, and *three times as much of that mana*
+  above keep only Readings with the comparative clause, beside Trade Secrets' Readings without
+  an equative determinative (predicative *as [many times]*, whose *as they choose* is an
+  Adjunct; `english-predicative-as-degree-complement`), and *three times as much of that mana*
   (Nyxbloom Ancient, Mana Reflection) keeps its Reading, with its *of* phrase.
 - An equative determinative with neither an *of* phrase nor an *as* clause has no Reading.
 - The census shows no verdict change, and `cargo xtask english strata --check`,
