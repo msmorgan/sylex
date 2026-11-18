@@ -12,15 +12,14 @@ grammar instead, as a hand-listed class or word list with Productions over it:
   determinatives that take an *of* oblique.
 - `class ComparativeQuantifier`, with the comparative Productions: the determinatives that take
   a *than* Complement.
-- The preposition list `In, On, Among, Under, Outside, After` in `LocatedExistentialBe` and
-  `LocatedProximateExistentialBe`, which restates *be*'s prepositional frame.
+- The preposition list `In, On, Among, Under, Outside, After` in `LocatedExistentialBe`, which
+  restates *be*'s prepositional frame.
 
 They appear to be in the grammar because a frame cannot do two things these need: build a fused
 determiner-head, and give the mother its Number from the Complement (`ComparativeDeterminer`
 names the comparative `quantifier`, not `head`, for that reason). The cost is that what english.md
 promises for frames does not reach them: same-head complement priority cannot apply to *each of
-...*, and the lists drift from the lexicon (the existential list has `After`, which *be* does
-not select).
+...*, and nothing keeps the lists and the lexicon alike.
 
 The half of same-head complement priority by which a bare head with its Complement omitted takes
 the following Preposition Phrase its frame selects is limited to a non-verbal `valence` Schema's
@@ -29,10 +28,13 @@ the following Preposition Phrase its frame selects is limited to a non-verbal `v
 An *of* frame on *each* alone also makes `ExceptiveFusedHead`, `ComparativeFusedHead` and
 `ComplementedPartitive` accept *each of X*, since nothing carries the oblique's preposition.
 With priority on fused *each*, the *of*-phrase half of the `NonNumericComplement` ban becomes
-redundant, but the ban stays until fused *each* before a Nominal it could determine (*cast for
-each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
-`DegreeArithmetic` exclusion become removable; `NominalPredicative`'s exclusion does not (fused
-*each* as the Predicative of *power and toughness are each equal to ...*).
+redundant, but the ban stays until fused *each* before a word it could determine (*pays {X} for
+each attacking creature they control*, War Tax) has another refusal:
+`english-fused-determinative-before-nominal`. While it stays, *of each* has no Complement, so
+`QuantityPartitiveOfEach` stays as the ban's one exception (*create one of each*, Academy
+Manufactor), without the `Distributive` value it set over its `Numerical` head. The
+`DegreeArithmetic` exclusion becomes removable; `NominalPredicative`'s does not (fused *each* as
+the Predicative of *power and toughness are each equal to ...*).
 
 ## Design
 
@@ -40,16 +42,19 @@ each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
   `agree` mappings with `unshared` features, and existential-*be* preposition selection from lexicon
   frames.
 - Move `PartitiveQuantifier` (*of* oblique), `ComparativeQuantifier` (*than* complement) and
-  existential-*be*'s preposition list to lexicon frames in `closed_class.ron` and `verbs.ron`,
-  deleting the grammar classes and hand-listed prepositions along with `QuantityPartitiveOfEach` and
-  `DegreeArithmetic`'s exclusion.
+  existential-*be*'s preposition list to lexicon frames in `closed_class.ron`,
+  deleting the grammar classes and hand-listed prepositions along with `DegreeArithmetic`'s
+  exclusion.
 
 ## Done when
 
-- `PartitiveQuantifier`, `ComparativeQuantifier`, existential-*be*'s hand-listed prepositions,
-  `QuantityPartitiveOfEach` and `DegreeArithmetic`'s exclusion are retired in favor of lexicon
-  frames compiled through `valence`, and no Production sets a `DeterminativeDistribution` its head
-  does not have.
+- `PartitiveQuantifier`, `ComparativeQuantifier`, existential-*be*'s hand-listed prepositions
+  and `DegreeArithmetic`'s exclusion are retired in favor of lexicon frames: compiled through
+  `valence` where the Complement follows its head, and read by the Production where it places
+  or omits the Complement itself.
+- No Production gives its phrase a `DeterminativeDistribution` other than the one its head
+  carries; a head that carries none (a numeral, a genitive pronoun) takes the phrase's from its
+  Production.
 - The census shows no Reading lost on the supported corpus, and `cargo xtask english strata
   --check`, `cargo test` and `cargo clippy --tests -- -D warnings` pass for `sylex_syntax`,
   `sylex_vocabulary` and `sylex_english`.
@@ -57,11 +62,13 @@ each 1 life you gained*) has another refusal; `QuantityPartitiveOfEach` and the
 ## Not in scope
 
 - Collapsing the comparative Productions: `english-comparative-productions`.
+- Retiring the `NonNumericComplement` ban and `QuantityPartitiveOfEach`:
+  `english-fused-determinative-before-nominal`.
 
 ## Pointers
 
 - `crates/english/grammar/english.fug`: `class PartitiveQuantifier`,
   `class ComparativeQuantifier`, `Partitive`, `ComparativeDeterminer`, `LocatedExistentialBe`,
-  `LocatedProximateExistentialBe`, `valence DeterminerPhrase`.
+  `valence DeterminerPhrase`.
 - `crates/vocabulary/lexicon/english/closed_class.ron`, `crates/syntax/src/compile.rs`.
 - `docs/design/english.md` §1, §3.
