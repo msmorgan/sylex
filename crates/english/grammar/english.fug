@@ -182,6 +182,11 @@ feature Countability = Count | Mass
 // or measure, never a Preposition Phrase or temporal Noun Phrase (one tree,
 // english.md §8).
 feature AdjunctPosition = Front | Central | End | Phrasal | Multiplying | Bounding | Linking
+// Privative: an Adverb Phrase headed by a multiplying adverb (*twice*), which
+// is a frequency adverb as well as a multiplier, as a Noun Phrase headed by
+// `Serial` *time* is (*three times*; CGEL 5§12:434). InterleavedAdverb
+// excludes it.
+feature AdverbDistribution = Serial
 // A Clause whose front position holds a comma-set dependent (*If you do,
 // ...*). Dependents sharing one comma are siblings in one Production (*Then
 // if ...*), so a comma-less front Adverb Phrase never also precedes such a
@@ -383,9 +388,10 @@ category NounPhrase [
     Comparison,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
-// (*three times*; 8§9:713–716).
+// (*three times*; 8§9:713–716). NounDistribution is `Serial` on one headed
+// by *time* (InterleavedTemporal).
 category TemporalNounPhrase : NounPhrase [
-    Number, Person, Case, Determination, NounKind, Countability,
+    Number, Person, Case, Determination, NounKind, Countability, NounDistribution,
 ]
 category ComplementNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
@@ -488,7 +494,7 @@ category AdjectivePhrase [
     DeterminerNeed, AdjectivePosition, Voice, ComplementKind, Grade, Polarity, QualityHead,
     AdjectivalPassive,
 ] { gap }
-category AdverbPhrase [AdjunctPosition]
+category AdverbPhrase [AdjunctPosition, AdverbDistribution]
 // The predicative Complement function; its head bears it too, and a Gap
 // passes through an adjectival predicative (*blocks or becomes blocked by
 // a creature*, Dream Fighter; CGEL 15§4.4:1344).
@@ -1497,7 +1503,14 @@ PositionDepictive: VerbPhrase -> VerbPhrase adjunct:PositionPhrase { cost: 2, tr
 PositionAdjunct: PredicateAdjunct -> filler:PositionPhrase where $.ConjunctKind = AdjP
 InterleavedRelative: InterleavedModifier -> RelativeClause { cost: 0 }
 InterleavedPreposition: Interleaved -> PrepositionPhrase { cost: 0 }
+// Never one headed by *time*, an admission gate: before an Object a
+// multiplier is the Object's, which keeps *it produces [three times] [as much
+// of that mana]* (Nyxbloom Ancient) from a frequency Adjunct of *produces*
+// before a shifted Object. It also keeps *put a creature card ... [the last
+// time it became blocked by that Wall] onto the battlefield* (Glyph of
+// Reincarnation) from an Adjunct of *put*.
 InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
+    where head.NounDistribution != Serial
 // A manner Noun Phrase before a passive's Internalized Complement (*weren't
 // chosen this way by any player*, Raiding Party). Before any later
 // Complement, *this way* would also attach to the higher verb wherever an
@@ -1509,8 +1522,13 @@ InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
 InterleavedManner: Interleaved -> NounPhrase { cost: 0 } where head.NounKind := Manner
 // An end adverb before a later Complement (*divided evenly among*);
 // InterleavedSupplement, a comma-set participial one (*deals half X damage,
-// rounded down, to any target*).
-InterleavedAdverb: Interleaved -> AdverbPhrase { cost: 0 } where head.AdjunctPosition = End
+// rounded down, to any target*). Never a multiplying one, an admission gate:
+// before an Object it is the Object's multiplier, which keeps *it produces
+// [twice] [as much of that mana]* (Mana Reflection) from a frequency Adjunct
+// of *produces* before a shifted Object.
+InterleavedAdverb: Interleaved -> AdverbPhrase { cost: 0 }
+    where head.AdjunctPosition = End,
+          head.AdverbDistribution != Serial
 InterleavedSupplement: Interleaved -> ',' supplement:VerbPhrase ',' { cost: 3, heavy: [supplement] }
     where supplement.VerbForm = PastParticiple,
           supplement.Voice = Passive
@@ -1581,7 +1599,14 @@ DepictiveAdjective: VerbPhrase -> VerbPhrase adjunct:AdjectivePhrase {
           adjunct.Grade != Equative | Comparative | NonScalarInequality | Mixed
 
 PhrasalAdverb: AdverbPhrase -> Class(PhrasalAdverb) where $.AdjunctPosition = Phrasal
-MultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb) where $.AdjunctPosition = Multiplying
+MultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb)
+    where $.AdjunctPosition = Multiplying,
+          $.AdverbDistribution = Serial
+// A multiplying adverb is a frequency End adverb too (*copy that spell
+// twice*).
+FrequencyMultiplyingAdverb: AdverbPhrase -> Class(MultiplyingAdverb)
+    where $.AdjunctPosition = End,
+          $.AdverbDistribution = Serial
 BoundingAdverb: AdverbPhrase -> Class(BoundingAdverb) where $.AdjunctPosition = Bounding
 DegreeDeterminer: DeterminerPhrase -> modifier:Word(That) Lex(Determinative)
     where head.DeterminativeDistribution := Degree,

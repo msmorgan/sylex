@@ -440,9 +440,9 @@ pub enum AdverbPosition {
     /// Inside a phrase, focusing it (*only one target*, *just beneath*)
     /// rather than modifying a clause.
     Phrasal,
-    /// Multiplying a quantity (*twice the damage*): a frequency adverb that
-    /// is also a clause's `End` adverb (*draw a card twice*) takes this
-    /// position, and no `Phrasal` one.
+    /// Multiplying a quantity (*twice the damage*). The grammar reads such an
+    /// adverb as a clause's frequency `End` adverb too (*draw a card twice*),
+    /// so it declares neither `End` nor `Phrasal`.
     Multiplying,
     /// Bounding a quantity: its determinative or numeral (*at least two*,
     /// *exactly one*; CGEL p. 1129).
