@@ -30,7 +30,6 @@ use sylex_syntax::FrameCatalog;
 use crate::build::Builder;
 use crate::build::allomorphic;
 use crate::build::bound;
-use crate::build::card_scoped;
 use crate::build::exact;
 use crate::build::source;
 pub use crate::data_text::read_data_file;
@@ -48,7 +47,6 @@ use crate::schema::KeywordAbility;
 use crate::schema::KeywordAction;
 use crate::schema::NounDecl;
 use crate::schema::PrepositionEntry;
-use crate::schema::ScopedName;
 use crate::schema::StemClass;
 use crate::schema::SubtypeFamily;
 use crate::schema::Subtypes;
@@ -90,7 +88,7 @@ pub enum SourceError {
 
 /// Every data file of this crate, by path: embedded at build time in release
 /// and wasm builds, read at run time in dev builds ([`data_text!`]).
-static FILES: [(&str, LazyLock<String>); 18] = [
+static FILES: [(&str, LazyLock<String>); 17] = [
     (CLOSED_CLASS, data_text!("lexicon/english/closed_class.ron")),
     (PREPOSITIONS, data_text!("lexicon/english/prepositions.ron")),
     (VERBS, data_text!("lexicon/english/verbs.ron")),
@@ -111,7 +109,6 @@ static FILES: [(&str, LazyLock<String>); 18] = [
     (STATUSES, data_text!("catalogs/statuses.ron")),
     (TURN_PARTS, data_text!("catalogs/turn_parts.ron")),
     (TOKENS, data_text!("catalogs/tokens.ron")),
-    (VOTE_OPTIONS, data_text!("catalogs/vote_options.ron")),
 ];
 
 pub(crate) const CLOSED_CLASS: &str = "lexicon/english/closed_class.ron";
@@ -134,7 +131,6 @@ const DESIGNATIONS: &str = "catalogs/designations.ron";
 const STATUSES: &str = "catalogs/statuses.ron";
 const TURN_PARTS: &str = "catalogs/turn_parts.ron";
 const TOKENS: &str = "catalogs/tokens.ron";
-const VOTE_OPTIONS: &str = "catalogs/vote_options.ron";
 /// The card-name catalog, relative to the repository root.
 pub const CARD_NAMES: &str = "data/gen/catalogs/card-names.txt";
 /// The dungeon-name catalog, relative to the repository root.
@@ -175,7 +171,6 @@ pub struct Sources {
     pub turn_parts: Vec<TurnPart>,
     pub statuses: Vec<schema::Status>,
     pub tokens: Vec<Token>,
-    pub vote_options: Vec<ScopedName>,
     /// The names of the dungeon cards, read from [`DUNGEON_NAMES`].
     pub dungeon_names: Vec<String>,
 }
@@ -266,7 +261,6 @@ impl Sources {
             turn_parts: parse(TURN_PARTS)?,
             statuses: parse(STATUSES)?,
             tokens: parse(TOKENS)?,
-            vote_options: parse(VOTE_OPTIONS)?,
             dungeon_names: generated_names(&dungeon_names_path())?,
         })
     }
@@ -296,7 +290,6 @@ impl Sources {
     pub fn environment(&self, card_names: &str) -> Result<LexicalEnvironment, SourceError> {
         let (mut lexemes, frames) = self.vocabulary()?;
         let card_names = names::card_names(card_names);
-        Self::check_card_scopes(&lexemes, &card_names)?;
         lexemes.extend(card_names);
         Ok(LexicalEnvironment {
             lexicon: Lexicon::new(lexemes)?,
@@ -624,7 +617,6 @@ impl Sources {
                 ));
             }
         }
-        self.vote_options(builder);
         for name in &self.dungeon_names {
             builder.push(dungeon_name(name));
         }
@@ -693,20 +685,6 @@ impl Sources {
         Ok(())
     }
 
-    /// Vote options: card-scoped Catalog names.
-    fn vote_options(&self, builder: &mut Builder) {
-        for scoped in &self.vote_options {
-            let id = format!("vote_option:{}", scoped.name);
-            let lexeme = exact(
-                &id,
-                &scoped.name,
-                Category::Catalog,
-                source(SourceKind::Catalog, VOTE_OPTIONS, &scoped.name),
-            );
-            builder.push(card_scoped(lexeme, &scoped.cards));
-        }
-    }
-
     fn ability_labels(&self, builder: &mut Builder) {
         let catalog = |path: &str, owner: &str| source(SourceKind::Catalog, path, owner);
         for word in &self.ability_words {
@@ -725,20 +703,6 @@ impl Sources {
             lexeme.properties.classes.insert("AbilityWord".into());
             builder.push(lexeme);
         }
-    }
-
-    /// Every card a card scope names is a card.
-    fn check_card_scopes(lexemes: &[Lexeme], card_names: &[Lexeme]) -> Result<(), SourceError> {
-        let cards: std::collections::BTreeSet<_> = card_names.iter().map(|card| card.id).collect();
-        for lexeme in lexemes {
-            if let Some(card) = lexeme.card_scope.iter().find(|card| !cards.contains(*card)) {
-                return Err(SourceError::Invalid(format!(
-                    "`{}` is scoped to `{card}`, which is not a card name",
-                    lexeme.id
-                )));
-            }
-        }
-        Ok(())
     }
 
     /// Shared catalog verbs, keyword actions and keyword abilities, with their
@@ -1228,7 +1192,7 @@ mod tests {
             .iter()
             .find(|lexeme| lexeme.id.as_str() == "dungeon_name:Undercity")
             .expect("Undercity is a generated dungeon name");
-        assert!(dungeon.card_scope.is_empty() && !dungeon.card_name);
+        assert!(!dungeon.card_name);
         lexemes.push(Lexeme::invariant(
             "core:undercity",
             "undercity",

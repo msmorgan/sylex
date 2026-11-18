@@ -141,7 +141,8 @@ fn a_name_is_its_card_s_own_in_its_scope_and_another_card_s_elsewhere() {
                 | LexicalReading::Numeral { .. }
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. }
-                | LexicalReading::AnchorWord { .. } => false,
+                | LexicalReading::AnchorWord { .. }
+                | LexicalReading::VoteOption { .. } => false,
             })
             .collect()
     };

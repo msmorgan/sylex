@@ -4,7 +4,6 @@ use sylex_vocabulary::LexicalEnvironment;
 use sylex_vocabulary::Sources;
 use sylex_vocabulary::schema::FrameSpec;
 use sylex_vocabulary::schema::NounDecl;
-use sylex_vocabulary::schema::ScopedName;
 use sylex_vocabulary::schema::VerbDecl;
 use sylex_vocabulary::schema::VerbEntry;
 
@@ -168,41 +167,6 @@ fn an_identity_is_declared_once() {
     rejects(&sources, "is declared twice");
 }
 
-#[test]
-fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
-    let card_names = "Dark Depths\nTravel Through Caradhras\nCitadel Siege\n";
-    let mut sources = Sources::load().unwrap();
-    sources
-        .vote_options
-        .retain(|option| option.name == "Redhorn Pass");
-    sources.environment(card_names).unwrap();
-
-    let mut stray = sources.clone();
-    stray.vote_options[0].cards.push("Not a Card".to_owned());
-    let error = stray.environment(card_names).unwrap_err().to_string();
-    assert!(error.contains("which is not a card name"), "{error}");
-
-    // A scoped name may be spelled like a card's name: another card's name
-    // stands only in the positions that opt in to it, so the two never
-    // compete elsewhere.
-    let env = sources
-        .environment(&format!("{card_names}Redhorn Pass\n"))
-        .unwrap();
-    let lexeme = |id: &str| &env.lexicon.lexemes()[&sylex_lexicon::LexemeId::new(id)];
-    assert!(lexeme("name:Redhorn Pass").card_name);
-    assert!(!lexeme("vote_option:Redhorn Pass").card_name);
-    let mut spelled_alike = sources.clone();
-    spelled_alike.vote_options.push(scoped("Dark Depths"));
-    spelled_alike.environment(card_names).unwrap();
-}
-
-fn scoped(name: &str) -> ScopedName {
-    ScopedName {
-        name: name.to_owned(),
-        cards: vec!["Citadel Siege".to_owned()],
-    }
-}
-
 /// A name is number-neutral: the text it stands in fixes its Number
 /// (*When The Notary Hobbits enter*, *Mizzium Mortars deals*), so the
 /// lexicon declares none.
@@ -355,6 +319,53 @@ fn a_set_name_parameter_stands_right_before_its_noun() {
         misplaced.nouns[at] = NounDecl::Entry(expansion);
         rejects(&misplaced, "a Set Name is a whole pattern's one parameter");
     }
+}
+
+/// A cited Vote Option is a noun's one parameter, right before it (*each
+/// numbers vote* [CR#701.38b]), as a Set Name is, and the noun that takes it
+/// is the head of its license (`docs/design/english.md` §3).
+#[test]
+fn a_cited_option_parameter_stands_right_before_its_noun() {
+    use sylex_syntax::frames::ParameterPart;
+    use sylex_syntax::frames::SlotKind;
+    let sources = Sources::load().unwrap();
+    let (lexemes, _) = sources.vocabulary().unwrap();
+    let heads: Vec<&str> = lexemes
+        .iter()
+        .filter(|lexeme| lexeme.properties.features.contains_key("OptionLicense"))
+        .map(|lexeme| lexeme.lemma.as_str())
+        .collect();
+    assert_eq!(heads, ["vote"]);
+    let mut misplaced = sources.clone();
+    let at = misplaced
+        .nouns
+        .iter()
+        .position(|noun| noun.entry().lemma == "vote")
+        .unwrap();
+    let mut vote = misplaced.nouns[at].entry();
+    vote.parameters = vec![vec![
+        ParameterPart::Head,
+        ParameterPart::Slot(SlotKind::OptionMention),
+    ]];
+    misplaced.nouns[at] = NounDecl::Entry(vote);
+    rejects(
+        &misplaced,
+        "a cited option is a whole pattern's one parameter",
+    );
+}
+
+/// A verb's Prepositional Complement of a named kind is a Preposition
+/// Phrase (*votes for sickness or psychosis*: `PPWith(["for"],
+/// OptionChoice)`).
+#[test]
+fn a_prepositional_complement_frame_names_a_preposition_phrase() {
+    use sylex_vocabulary::schema::FillSpec;
+    let mut sources = Sources::load().unwrap();
+    sources.verbs.push(verb(
+        "frobnicate",
+        vec![FrameSpec::PrepositionalComplement(FillSpec::OptionChoice)],
+    ));
+    rejects(&sources, "names no Preposition Phrase");
 }
 
 /// A noun's *of* Complement frame alternates with a genitive determiner
