@@ -836,8 +836,7 @@ pub struct IntroducedName {
 }
 
 /// A name in scope only on the cards that print it: a vote option
-/// (`catalogs/vote_options.ron`) or a name cited from outside the corpus
-/// (`catalogs/cited_names.ron`).
+/// (`catalogs/vote_options.ron`).
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ScopedName {

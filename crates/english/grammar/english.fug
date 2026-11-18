@@ -205,6 +205,10 @@ feature TargetMarked = Marked
 // the kind of the noun *counter*, and on a keyword a keyword counter can be
 // [CR#122.1b]; `Head` on *counter*, the one noun a kind premodifies.
 feature KindLicense = Kind | Head
+// A license feature (english.md §3), which a noun's parameter pattern
+// declares: `Head` on a noun a Set Name premodifies (*expansion*), which
+// takes no other premodifier there.
+feature SetNameLicense = Head
 feature Inflection =
     | Invariant | IndependentGenitive | Singular | Plural | Plain | Present | Preterite | Irrealis
     | GerundParticiple | PastParticiple
@@ -253,6 +257,10 @@ category Header
 category RowHeader
 category Chapters
 category IndexedNominal [Number]
+// A Set Name, which a noun's parameter pattern takes before the noun (*the
+// Antiquities expansion* [CR#206.3b]). It is no Name, so it stands nowhere
+// else.
+category SetName
 category ChoiceQuantity [Number]
 category Sentence
 category Sentences
@@ -345,7 +353,7 @@ category ModifiedQuantifiedNominal : Nominal [
 ]
 category BareNominal : Nominal [
     Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
-    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, BareMass,
+    ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, SetNameLicense, BareMass,
 ] { gap }
 // The singular count nominals that share a determiner before the
 // final, determined conjunct of a SharedDeterminerCoordination.
@@ -744,6 +752,7 @@ slot MeasureNP = MeasureNounPhrase
 slot KeywordPhrase = KeywordPhrase
 slot Nominal = BareNominalComplement
 slot Amount = Amount
+slot SetName = SetName
 // Unlike slots. Where a head's frames select two or more of a slot's kinds
 // in one position, that position also takes the slot's coordination,
 // restricted to conjuncts of the kinds the head selects there: each conjunct
@@ -1006,7 +1015,13 @@ NounPhraseMode: Mode -> '•':Free NounPhrase '.' { capital: [head] }
 // turn.*). No other keyword form is followed by a sentence on its line.
 KeywordFollowedBySentences: Ability -> first:KeywordLineItem rest:Sentences
     where first.FinalParameter := SetOffCost
+// *Expansion* takes its Set Name as its premodifier, and no Name: an
+// admission gate (english.md §3, §6) that keeps a second tree, a card's own
+// name premodifying *expansion*, off Golgothian Sylex's wording citing a set
+// spelled like a card (*a name originally printed in the Time Spiral
+// expansion*) in that card's own text (tests/set_names.rs).
 NamePremodifier: BareNominal -> modifier:Name BareNominal
+    where head.SetNameLicense != Head
 ModeBullet: Mode -> '•':Free Ability { capital: [head] }
 PlusCostedMode: Mode -> '+':Free:Spoken cost:Cost '—':Free ModeEffect { capital: [head] }
 LabeledCostedMode: Mode -> '•':Free label:Lex(FlavorWord) cost:Cost '—':Free ModeEffect { capital: [label, head] }
@@ -1033,6 +1048,7 @@ AdjectivalQuality: Quality -> AdjectivePhrase where head.QualityHead := Fused
 // §6) that keeps the kind name *dread* from a Name Complement of *manifest*
 // in *Manifest dread* (Under the Skin).
 NamedParameter: Name -> Lex(Catalog) where head.KindLicense != Kind
+SetNameWord: SetName -> Lex(SetName)
 NameAsComplement: NameComplement -> Name { cost: 0 }
 OtherCardNameComplement: NameComplement -> OtherCardName()
 SlashMeasure: Measure -> first:SignedAmount '/':Bound second:SignedAmount
@@ -2608,9 +2624,14 @@ AttributedPremodifier: Premodifier -> Attributes { cost: 0, unshared: [Complemen
 // (english.md §3, §6) that keeps the noun *loyalty* from premodifying
 // *counter* beside the kind name in *Put a loyalty counter on target Gideon
 // planeswalker* (Gideon's Company).
+// Nor does *expansion* take a noun premodifier beside its Set Name: an
+// admission gate that keeps the subtypes *Urza's* and *Saga* from
+// premodifying it in Golgothian Sylex's wording citing Urza's Saga (*the
+// Urza's Saga expansion*, tests/set_names.rs).
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
     where head.Determination != Overt,
-          head.KindLicense != Head
+          head.KindLicense != Head,
+          head.SetNameLicense != Head
 QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier QuantifiedNominal
 // A bare count singular nominal that a preposition's frame selects (*until
 // end of turn*).
@@ -3394,7 +3415,8 @@ premodification Participle {
     forms: [GerundParticiple, PastParticiple],
     equations: [PastParticiple -> [head.AdjectivalPassive != Lexical]],
 }
-parameters IndexedNominal { head: Noun }
+parameters IndexedNominal { head: Noun, side: After }
+parameters BareNominal { head: Noun, side: Before }
 // A Keyword Parameter set off by an em dash opens with a capital
 // (*Ward—Pay 2 life.*, *Modular—Sunburst*, *Companion — Each nonland card
 // ...*).

@@ -252,8 +252,8 @@ Catalog.
 
 **Proper Name**:
 The lexical Category of an opaque name: a card name or Shortened Name, a
-dungeon name, a predefined token name, an Introduced Name, a vote option, a
-cited name or an Anchor Word. The code calls it `Category::Catalog`.
+dungeon name, a predefined token name, an Introduced Name, a vote option or an
+Anchor Word. The code calls it `Category::Catalog`.
 _Avoid_: Catalog for this Category
 
 **Document**:
@@ -300,9 +300,16 @@ The CR term [CR#207.2c], here also covering ability words printed on
 Vintage-legal cards that the CR's list omits.
 
 **Flavor Word**:
-The CR term [CR#207.2d]. It is the one open lexical slot: no inventory lists
-them, so the italic run is captured verbatim.
+The CR term [CR#207.2d]. It is an open lexical slot, as a Set Name is: no
+inventory lists them, so the italic run is captured verbatim.
 _Avoid_: flavor text
+
+**Set Name**:
+The name of an expansion a card's text cites before the noun *expansion*
+[CR#206.3a..206.3c] (*the Antiquities expansion*). It is an open lexical slot,
+read by its title shape, and no Proper Name: it stands only as the parameter of
+its noun.
+_Avoid_: cited name
 
 **Anchor Word**:
 The CR term [CR#614.12c]. It is in scope only on the cards that print it.

@@ -41,7 +41,6 @@ vocabulary, all hand-authored RON embedded at build time.
 | `catalogs/introduced_names.ron` | `introduced_name:` |
 | `catalogs/anchor_words.ron` | `anchor_word:`, `anchor_name:` |
 | `catalogs/vote_options.ron` | `vote_option:` |
-| `catalogs/cited_names.ron` | `cited_name:` |
 
 `data/gen/catalogs/card-names.txt` (the `name:` Lexemes) and
 `data/gen/catalogs/dungeon-names.txt` (the `dungeon_name:` Lexemes, in scope on
@@ -73,8 +72,10 @@ a card of a stated name).
   face's name and type line when its text is parsed; see
   [Lexicon](../../docs/design/lexicon.md) §6. What is hand-curated is
   the card-scoped words
-  (`introduced_names.ron`, `cited_names.ron`, `vote_options.ron`,
-  `anchor_words.ron`).
+  (`introduced_names.ron`, `vote_options.ron`, `anchor_words.ron`). An
+  expansion a card's text cites (*the Antiquities expansion*) is in no list:
+  it is a Set Name, read from the text ([Lexicon](../../docs/design/lexicon.md)
+  §2).
 
 The loader refuses a Core word that is also a Catalog item of the same
 Category, and `cr_coverage` refuses a catalog item the CR does not enumerate.

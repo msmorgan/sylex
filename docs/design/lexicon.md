@@ -31,10 +31,29 @@ a multiword term and its words, or a host and its bound affix, stand as
 alternatives, and the chart decides between them (§5).
 
 **Nothing is guessed.** An unknown word is a vocabulary gap, and no Category is
-inferred from spelling: braces do not license an unknown symbol. The one open
-slot is the Flavor Word, because nothing enumerates them [CR#207.2d]. Why: a
-guessed Category lets the grammar admit text no declaration accounts for, and
-the gap is never reported.
+inferred from spelling: braces do not license an unknown symbol. Two slots are
+open, each read from the text in one position because nothing enumerates what
+fills it. A Flavor Word is the italic run before an ability's em dash
+[CR#207.2d]. A Set Name is the name of an expansion a card's text cites before
+the noun *expansion* [CR#206.3a..206.3c] (*a name originally printed in the
+Antiquities expansion*): no card-scoped list or catalog of printed sets is
+consulted. It is read by title shape alone, right before a noun whose parameter
+pattern takes a Set Name before it: the longest run of whole space-separated
+words before the noun that begins and ends on a title word (one that begins with
+an ASCII capital or digit and holds only alphanumerics and `:`, `'`, `-`, `.`,
+`,` and `/`), with the connectors *of*, *the*, *to*, *in*, *for*, *into*, *at*,
+*over*, *and*, *a*, *vs.*, `&`, `/` and `×` between them (*Phyrexia: All Will Be
+One*, *The Brothers' War*, *Shadows over Innistrad*, *Warhammer 40,000
+Commander*). The name is the whole run, never a shorter run inside it (*Urza's
+Saga*, never *Saga*; *Adventures in the Forgotten Realms*, never *Forgotten
+Realms* after *the Adventures in the*). No run is refused for spelling an
+English word or a card's name; a Set Name is no Proper Name, so it stands only
+as its noun's parameter, which premodifies it. The shape covers every set in
+mtgjson's `SetList.json` but *The List (Unfinity Foil Edition)*, whose
+parentheses reminder-text removal strips (§1). Why: a guessed Category lets the
+grammar admit text no declaration accounts for, and the gap is never reported;
+an open slot read in its one position is no guess, and a list of the names cards
+cite would be knowing the cards before parsing them.
 
 **Every irregularity is declared.** Each Word Form has one default spelling
 rule, and every exception, consonant doubling included (*committed*), is an

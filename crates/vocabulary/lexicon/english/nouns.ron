@@ -76,7 +76,9 @@
     "exchange",
     // The zone; the verb is a keyword action [CR#701.13].
     (lemma: "exile", countability: [Mass]),
-    "expansion",
+    // A card's text cites an expansion by its Set Name, before the noun
+    // [CR#206.3a..206.3c] (*the Antiquities expansion*).
+    (lemma: "expansion", parameters: [[Slot(SetName), Head]]),
     "face",
     "flip",
     "foe",

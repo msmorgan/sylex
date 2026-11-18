@@ -162,7 +162,6 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
         .retain(|name| name.name == "Marit Lage");
     sources.anchor_words.clear();
     sources.vote_options.clear();
-    sources.cited_names.clear();
     sources.environment(card_names).unwrap();
 
     let mut stray = sources.clone();
@@ -190,14 +189,9 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
     let lexeme = |id: &str| &env.lexicon.lexemes()[&sylex_lexicon::LexemeId::new(id)];
     assert!(lexeme("name:Marit Lage").card_name);
     assert!(!lexeme("introduced_name:Marit Lage").card_name);
-    for push in [
-        |sources: &mut Sources| sources.vote_options.push(scoped("Dark Depths")),
-        |sources: &mut Sources| sources.cited_names.push(scoped("Dark Depths")),
-    ] {
-        let mut spelled_alike = sources.clone();
-        push(&mut spelled_alike);
-        spelled_alike.environment(card_names).unwrap();
-    }
+    let mut spelled_alike = sources.clone();
+    spelled_alike.vote_options.push(scoped("Dark Depths"));
+    spelled_alike.environment(card_names).unwrap();
 }
 
 fn scoped(name: &str) -> ScopedName {
@@ -327,4 +321,33 @@ fn bare_mass_modified_requires_mass_countability() {
             onset: None,
         }));
     rejects(&sources, "requires `Mass` countability");
+}
+
+/// A Set Name is a noun's one parameter, right before it (*the Antiquities
+/// expansion*), where analysis reads it; a pattern that puts one elsewhere
+/// is refused, since analysis would read a Set Name no Production takes.
+#[test]
+fn a_set_name_parameter_stands_right_before_its_noun() {
+    use sylex_syntax::frames::ParameterPart;
+    use sylex_syntax::frames::SlotKind;
+    let sources = Sources::load().unwrap();
+    for parts in [
+        vec![ParameterPart::Head, ParameterPart::Slot(SlotKind::SetName)],
+        vec![
+            ParameterPart::Slot(SlotKind::SetName),
+            ParameterPart::Head,
+            ParameterPart::Slot(SlotKind::Amount),
+        ],
+    ] {
+        let mut misplaced = sources.clone();
+        let at = misplaced
+            .nouns
+            .iter()
+            .position(|noun| noun.entry().lemma == "expansion")
+            .unwrap();
+        let mut expansion = misplaced.nouns[at].entry();
+        expansion.parameters = vec![parts];
+        misplaced.nouns[at] = NounDecl::Entry(expansion);
+        rejects(&misplaced, "a Set Name is a whole pattern's one parameter");
+    }
 }

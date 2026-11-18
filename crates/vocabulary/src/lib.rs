@@ -92,7 +92,7 @@ pub enum SourceError {
 
 /// Every data file of this crate, by path: embedded at build time in release
 /// and wasm builds, read at run time in dev builds ([`data_text!`]).
-static FILES: [(&str, LazyLock<String>); 21] = [
+static FILES: [(&str, LazyLock<String>); 20] = [
     (CLOSED_CLASS, data_text!("lexicon/english/closed_class.ron")),
     (PREPOSITIONS, data_text!("lexicon/english/prepositions.ron")),
     (VERBS, data_text!("lexicon/english/verbs.ron")),
@@ -119,7 +119,6 @@ static FILES: [(&str, LazyLock<String>); 21] = [
     ),
     (ANCHOR_WORDS, data_text!("catalogs/anchor_words.ron")),
     (VOTE_OPTIONS, data_text!("catalogs/vote_options.ron")),
-    (CITED_NAMES, data_text!("catalogs/cited_names.ron")),
 ];
 
 pub(crate) const CLOSED_CLASS: &str = "lexicon/english/closed_class.ron";
@@ -145,7 +144,6 @@ const TOKENS: &str = "catalogs/tokens.ron";
 const INTRODUCED_NAMES: &str = "catalogs/introduced_names.ron";
 const ANCHOR_WORDS: &str = "catalogs/anchor_words.ron";
 const VOTE_OPTIONS: &str = "catalogs/vote_options.ron";
-const CITED_NAMES: &str = "catalogs/cited_names.ron";
 /// The card-name catalog, relative to the repository root.
 pub const CARD_NAMES: &str = "data/gen/catalogs/card-names.txt";
 /// The dungeon-name catalog, relative to the repository root.
@@ -189,7 +187,6 @@ pub struct Sources {
     pub introduced_names: Vec<IntroducedName>,
     pub anchor_words: Vec<AnchorWord>,
     pub vote_options: Vec<ScopedName>,
-    pub cited_names: Vec<ScopedName>,
     /// The names of the dungeon cards, read from [`DUNGEON_NAMES`].
     pub dungeon_names: Vec<String>,
 }
@@ -283,7 +280,6 @@ impl Sources {
             introduced_names: parse(INTRODUCED_NAMES)?,
             anchor_words: parse(ANCHOR_WORDS)?,
             vote_options: parse(VOTE_OPTIONS)?,
-            cited_names: parse(CITED_NAMES)?,
             dungeon_names: generated_names(&dungeon_names_path())?,
         })
     }
@@ -596,7 +592,7 @@ impl Sources {
             );
             builder.push(card_scoped(lexeme, &introduced.cards));
         }
-        self.scoped_name_catalogs(builder);
+        self.vote_options(builder);
         for name in &self.dungeon_names {
             builder.push(dungeon_name(name));
         }
@@ -665,23 +661,17 @@ impl Sources {
         Ok(())
     }
 
-    /// Vote options and cited names: card-scoped Catalog names.
-    fn scoped_name_catalogs(&self, builder: &mut Builder) {
-        let catalog = |path: &str, owner: &str| source(SourceKind::Catalog, path, owner);
-        for (path, prefix, names) in [
-            (VOTE_OPTIONS, "vote_option", &self.vote_options),
-            (CITED_NAMES, "cited_name", &self.cited_names),
-        ] {
-            for scoped in names {
-                let id = format!("{prefix}:{}", scoped.name);
-                let lexeme = exact(
-                    &id,
-                    &scoped.name,
-                    Category::Catalog,
-                    catalog(path, &scoped.name),
-                );
-                builder.push(card_scoped(lexeme, &scoped.cards));
-            }
+    /// Vote options: card-scoped Catalog names.
+    fn vote_options(&self, builder: &mut Builder) {
+        for scoped in &self.vote_options {
+            let id = format!("vote_option:{}", scoped.name);
+            let lexeme = exact(
+                &id,
+                &scoped.name,
+                Category::Catalog,
+                source(SourceKind::Catalog, VOTE_OPTIONS, &scoped.name),
+            );
+            builder.push(card_scoped(lexeme, &scoped.cards));
         }
     }
 

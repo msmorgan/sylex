@@ -22,8 +22,10 @@ use sylex_syntax::frames::ClauseKind;
 use sylex_syntax::frames::Frame;
 use sylex_syntax::frames::FrameFamily;
 use sylex_syntax::frames::FrameSlot;
+use sylex_syntax::frames::ParameterPart;
 use sylex_syntax::frames::PrepositionFrame;
 use sylex_syntax::frames::SlotFill;
+use sylex_syntax::frames::SlotKind;
 use sylex_syntax::frames::SlotRelation;
 use sylex_syntax::frames::SlotRelation::Complement;
 use sylex_syntax::frames::SlotRelation::IndirectObject;
@@ -339,6 +341,27 @@ impl Builder {
         }
         lexeme.properties.prefix_hyphenation = entry.prefix_hyphenation;
         lexeme.onset = entry.onset;
+        // A noun whose pattern takes a Set Name before it is where analysis
+        // reads one, and takes no other premodifier: its license
+        // (`SetNameLicense`, english.md §3).
+        let set_name = ParameterPart::Slot(SlotKind::SetName);
+        if entry.parameters.iter().any(|parts| {
+            parts.contains(&set_name) && parts.as_slice() != [set_name.clone(), ParameterPart::Head]
+        }) {
+            return Err(SourceError::Invalid(format!(
+                "noun `{id}`: a Set Name is a whole pattern's one parameter, right before its head"
+            )));
+        }
+        lexeme.set_name_host = entry
+            .parameters
+            .iter()
+            .any(|parts| parts.contains(&set_name));
+        if lexeme.set_name_host {
+            lexeme
+                .properties
+                .features
+                .insert("SetNameLicense".into(), Ident::new("Head"));
+        }
         let id = lexeme.id;
         self.push(lexeme);
         self.frames(id, Category::Noun, &entry.frames);
