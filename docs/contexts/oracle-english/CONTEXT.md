@@ -301,20 +301,24 @@ _Avoid_: flavor text
 The CR term [CR#614.12c]. It is in scope only on the cards that print it.
 
 **Shortened Name**:
-A shortened card name [CR#201.5c]: the Shortened form of the card name's
-Lexeme, beside its Full form, in scope only in the text of the face whose name
-it shortens.
+A shortened card name [CR#201.5c]: the Shortened form of a card's Own Name,
+beside its Full form, in scope only in the text of the face whose name it
+shortens. A legendary permanent whose name has a shortened spelling has one,
+whether or not its own text uses it.
 
 **Card Scope**:
 The card names a text is in the scope of, each with the forms of it that the
-text admits. A face's text holds its own name in every form [CR#201.5c], and a
-face's Card Scope is computed from that name alone. A Shortened form stands only
-where its Card Scope holds that form, and an Introduced Name or Anchor Word
-only where it holds one of its cards.
+text admits. A face's text holds its own name in its Full form and, where the
+card has a Shortened Name, in its Shortened form [CR#201.5c]; a face's Card
+Scope is derived from its name and type line when its text is parsed. An Own
+Name stands only where the Card Scope holds that form of it, and an Introduced
+Name or Anchor Word only where it holds one of its cards.
 
 **Own Name**:
-A card's name, full or Shortened, in the text of its own face [CR#201.5]. The
-grammar reads it as any other Proper Name.
+A card's name, full or Shortened, in the text of its own face [CR#201.5]. It
+is spelled from the name and its form alone and needs no Lexeme, so a text may
+be read as if on a card of any name. The grammar reads it as any other Proper
+Name.
 
 **Another Card's Name**:
 A card's full name in the text of a face where it is no Own Name: any face but

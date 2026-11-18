@@ -705,8 +705,8 @@ declaration with no `spelling` is a word only a rule may use ([Semantics](semant
 `ownName` has `spelling = "#"` for the enclosing object's full name (a card face's name [CR#201.5],
 the name a creating effect sets on a named token [CR#111.4], or the granting source named inside a
 granted ability [CR#201.5a]), and `shortenedName` has `spelling = "##"` for its Shortened Name
-[CR#201.5c]. On the English side they stand for the enclosing object's own name Lexeme in its `Full`
-and `Shortened` forms ([Lexicon](lexicon.md) §6).
+[CR#201.5c]. On the English side they stand for the enclosing object's own name in its `Full` and
+`Shortened` forms ([Lexicon](lexicon.md) §6).
 
 **The notation does not yet express passive subject promotion (§2).** Nothing marks a
 context's Subject Hole and Action Hole as the pair the rule links, or which Action's parameter

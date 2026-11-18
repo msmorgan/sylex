@@ -114,14 +114,15 @@ notation symbols. Loading refuses a Core word that is also a Catalog item of the
 same Category, because its Core spelling would let the grammar name the item.
 
 **Names come from the Oracle data**, never by hand: card names from the card
-data, Shortened Names from a rule over a face's name, supertypes and types
-(`sylex_vocabulary::short_name`) checked at load against each face's own Oracle
-text (§6), and dungeon names from the faces of card type Dungeon in the card
-data's token sets, oversized aids apart. A dungeon is a card outside the
+data, and nothing else about a card; and dungeon names from the faces of card
+type Dungeon in the card data's token sets, oversized aids apart. The lexicon
+holds no card's type line, text or Shortened Name: a face's Card Scope is
+derived when its text is parsed (§6). A dungeon is a card outside the
 corpus, brought into the game by venturing [CR#309.1,309.2], so no Card Scope
 restricts its name: any card's text may name it (*if you haven't completed Tomb
 of Annihilation*). Why: the card list is the authority on what cards and
-dungeons exist.
+dungeons exist, and a fact about one card prepared before parsing is the parse
+being told its answer.
 
 ## 4. Binding
 
@@ -149,32 +150,70 @@ term are a second tree of its analysis ([English](english.md) §8).
 
 **Names are scoped.** A card's own name, full or Shortened, is its own only in
 the text of its own face [CR#201.5,201.5c,712.6], and everywhere in
-that text. A face's Card Scope is its own name and nothing else: it is computed
-from the name alone, so a text parsed as if its card had a given name needs
-nothing but that name. The name of a meld result is the name of neither card of
-its meld pair, so it is another card's name on both, and neither card's text
-shortens it: *Mishra* on Phyrexian Dragon Engine is no name. A
-card has a Shortened Name only where its own text uses one, and never one that
-other vocabulary in scope on that card already spells: a token name or
-Introduced Name always, any other word unless it is the name before the comma
-or a planeswalker type. Why: admitted everywhere, every word spelled like one
+that text. A face's Card Scope is its own name and nothing else, in its Full
+form and, where the card has a Shortened Name, in its Shortened form. The name
+of a meld result is the name of neither card of its meld pair, so it is another
+card's name on both, and neither card's text shortens it: *Mishra* on
+Phyrexian Dragon Engine is no name.
+
+**A legendary permanent has a Shortened Name, whatever its text says.** The
+Oracle convention gives the shortened form to a legendary name
+([style guide](../oracle-style-guide.md) §5: "An unambiguous shortened form
+may replace a long legendary name"), so a face has one when its type line is a
+legendary permanent's and its name has a shortened spelling
+(`sylex_vocabulary::face_scope`). Whether its own text uses the form is no
+condition: *Abuelo, Ancestral Echo* never says *Abuelo*, and *When Abuelo
+enters* still reads on it. The scope is derived from the face's name and type
+line when its text is parsed, and nothing about the card is prepared
+beforehand. A text read as if on a card of a given name, which need be no
+printed card's, states whether that card is legendary
+(`sylex_vocabulary::stated_scope`), and without that only the Full form
+stands. A card has no Shortened Name that other vocabulary in scope on it
+already spells: a token name or Introduced Name always, any other word unless
+it is the name before the comma or a planeswalker type (*Sliver* on Sliver
+Queen). Another card's name is no such vocabulary, since it competes with the
+Shortened Name only after *named* (*Nicol Bolas* on Nicol Bolas, the
+Deceiver). Why: admitted everywhere, every word spelled like a Shortened Name
 would be read as a name on every card.
 
-**A Shortened Name is a form of its card name.** A card name's Lexeme has a
-Full form and, where the card has a Shortened Name, a Shortened form, told
-apart by a feature and each with one spelling. Text that uses the Shortened
-Name refers to the card as its full name does [CR#201.5c], so a Reading of
-*Chandra* on Chandra, Pyromaster is that card's own Lexeme in its Shortened
-form, and realization spells *Chandra* from the tree alone. Only its own card
-admits the Shortened form; the scope is keyed by form, not by spelling. A Card
-Scope holds each of its card names in the forms the text admits, a face's own
-names in every form, and one predicate of the lexicon, `Lexicon::stands_in`,
-says whether a value stands in it: analysis finds only such values, and
+**The shortened spelling is a rule over the name alone**
+(`sylex_lexicon::shortened_spelling`): a listed title and the last word before
+any comma (*Captain Kirk* for Captain James T. Kirk); else the words before
+the comma (*Dina*); else, for a name with no comma, nothing when it starts
+with *The*, and otherwise the name less a trailing Roman numeral, or cut before
+its first *and the*, *the* or *of*, or its first word (*Nissa* for Nissa
+Revane). A cut of a name with no comma that ends in a possessive word, or just
+before one, is no Shortened form (*Gaea's* of Gaea's Cradle, *Marit* of Marit
+Lage's Slumber), while a possessive later in the name leaves the cut standing
+(*Krydle* for Krydle of Baldur's Gate). The
+titles are listed because nothing in a name's words shows which one is a
+title. A longer title the text names that starts with the Shortened Name
+(*Mishra, Lost to Phyrexia* on Mishra, Claimed by Gix) withholds nothing: the
+longer title is another card's name at its position, and *Mishra* alone is the
+card's own. Inside the card's own full name, written out, its Shortened form
+is no name of its own: on Instrument of the Bards, *Instrument of the Bards*
+is the name, never the Shortened Name *Instrument* and a phrase *of the
+Bards*. Why: the full name refers to the card [CR#201.5], and a reading of its
+first words as the Shortened Name and the rest as a dependent is a second tree
+for a text that says one thing.
+
+**An own name is its own kind of leaf.** A name the Card Scope holds is read as
+`LexicalReading::OwnName`, which records the card's full name and the form
+written, and is spelled from those alone: the Full form is the name, the
+Shortened form the rule's spelling. It needs no Lexeme, so a text may be read
+as if on a card of any name. Text that uses the Shortened Name refers to the
+card as its full name does [CR#201.5c], so a Reading of *Chandra* on Chandra,
+Pyromaster is that card's own name in its Shortened form, and realization
+spells *Chandra* from the tree alone. The scope is keyed by form, not by
+spelling, and one predicate of the lexicon, `Lexicon::stands_in`, says whether
+a value stands in a scope: an own name where the scope holds that form of that
+name, and a card name's Lexeme, which is another card's name, everywhere but
+where the scope holds its name. Analysis finds only values that stand, and
 admission refuses any other, so a Reading built apart from a parse is held to
-the scope its text would be parsed in. Why: one name is one Lexeme, and a
-spelling chosen apart from the form would be a free variant the tree does not
-record; a scope checked by parsing alone would admit a tree that no parse of
-its text yields.
+the scope its text would be parsed in. Why: one name is one leaf whatever its
+form, and a spelling chosen apart from the form would be a free variant the
+tree does not record; a scope checked by parsing alone would admit a tree that
+no parse of its text yields.
 
 **A name is number-neutral.** No name declares a Number: a proper name has the
 Number of what it names, which only its text shows, so its Lexeme is unmarked
