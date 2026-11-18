@@ -60,7 +60,9 @@
     // Nominal: *that player's life total as the turn began* (Sengir, the Dark
     // Baron).
     (lemma: "as", frames: [
-        (complement: NP, hosts: Predicate, relation: PredicativeComplement),
+        // Its Noun Phrase is no degree determinative's, the grammar's
+        // `NonDegree`: *as [much of that mana]* is the equative's.
+        (complement: NP, hosts: Predicate, relation: PredicativeComplement, constraints: ["NonDegree"]),
         (complement: TemporalClause, hosts: NominalAndPredicate),
         (complement: Nominal, hosts: Predicate),
         // A comparative clause after equative *as*: *as many times as you

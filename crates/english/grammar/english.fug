@@ -946,6 +946,19 @@ constraint Plural {
 // Dolmen Gate; *the number of attacking creatures you control*, Akroan
 // Hoplite), never a verb whose Object is *creatures*.
 constraint KindSelected { kind_selected }
+// A Noun Phrase no degree determinative determines or heads, as predicative
+// *as* takes (*as a copy of any creature*, Clone), an admission gate
+// (english.md §6): on a card an *as* before *much* or *many* is always the
+// equative's degree *as*, with its *of* phrase or its comparative clause, so
+// predicative *as* over the rest of the equative is a second Reading no
+// reader has, leaving *three times* the Object of *produces* in *it produces
+// three times [as [much of that mana]]* (Nyxbloom Ancient, Virtue of
+// Strength) and *as they choose* an Adjunct in *repeat this process [as [many
+// times]] as they choose* (Trade Secrets). A coordination passes.
+constraint NonDegree {
+    coordination: [NP],
+    otherwise: [NP -> [slot.DeterminativeDistribution != Degree]],
+}
 
 // A distributive adjunct (*for each …*) anchors to the outermost eligible
 // clause, as a comma-set Supplement does (english.md §5, AttachmentClass).

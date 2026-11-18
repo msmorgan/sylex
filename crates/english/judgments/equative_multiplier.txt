@@ -1,7 +1,7 @@
 # Scalar equality with an implicit standard; CGEL Ch. 13 §§1.2, 4.1.2,
 # 4.3–4.4.1, pp. 1102, 1126, 1130–1131; OSG §4, Number, amount, total, much, and many.
-+ <card=Nyxbloom Ancient> If you tap a permanent for mana, it produces three times as much of that mana instead. => NounPhrase "three times as much of that mana" as Object of produce; DeterminerPhrase "three times as much"; DeterminerPhrase "as much" head much; PrepositionPhrase "of that mana"
-+ <card=Virtue of Strength> If you tap a basic land for mana, it produces three times as much of that mana instead. => NounPhrase "three times as much of that mana" as Object of produce; DeterminerPhrase "three times as much"; DeterminerPhrase "as much" head much; PrepositionPhrase "of that mana"
++ <card=Nyxbloom Ancient> If you tap a permanent for mana, it produces three times as much of that mana instead. => NounPhrase "three times as much of that mana" as Object of produce; DeterminerPhrase "three times as much"; DeterminerPhrase "as much" head much; PrepositionPhrase "of that mana"; !PrepositionPhrase "as much of that mana"; !NounPhrase "three times" as Object of produce
++ <card=Virtue of Strength> If you tap a basic land for mana, it produces three times as much of that mana instead. => NounPhrase "three times as much of that mana" as Object of produce; DeterminerPhrase "three times as much"; DeterminerPhrase "as much" head much; PrepositionPhrase "of that mana"; !PrepositionPhrase "as much of that mana"; !NounPhrase "three times" as Object of produce
 + <card=Mana Reflection> If you tap a permanent for mana, it produces twice as much of that mana instead. => NounPhrase "twice as much of that mana" as Object of produce; DeterminerPhrase "twice as much"; DeterminerPhrase "as much" head much; PrepositionPhrase "of that mana"
 +NounPhrase three times as much of that mana => DeterminerPhrase "as much"; PrepositionPhrase "of that mana"
 # from: Forget
