@@ -117,11 +117,32 @@ impl AnalyzedText {
         result
     }
 
+    /// The words no declared Lexeme spells. A title run alone covers none:
+    /// it is an Introduced Name only where a parse introduces it
+    /// ([`AnalyzedText::unknown_words_given`]).
     #[must_use]
     pub fn unknown_words(&self) -> Vec<std::ops::Range<usize>> {
+        self.unknown_words_given(|_| false)
+    }
+
+    /// The words that neither a declared Lexeme spells nor an Introduced
+    /// Name that `introduced` holds covers.
+    #[must_use]
+    pub fn unknown_words_given(
+        &self,
+        introduced: impl Fn(&LexicalMatch) -> bool,
+    ) -> Vec<std::ops::Range<usize>> {
+        let known = |found: &LexicalMatch| match found.reading {
+            LexicalReading::IntroducedName { .. } => introduced(found),
+            LexicalReading::Word(_)
+            | LexicalReading::OwnName { .. }
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::SetName { .. }
+            | LexicalReading::Numeral { .. } => true,
+        };
         self.words()
             .into_iter()
-            .filter(|word| !self.is_covered(word.clone(), |_| true))
+            .filter(|word| !self.covered_by(word.clone(), known))
             .collect()
     }
 
@@ -133,12 +154,20 @@ impl AnalyzedText {
         range: std::ops::Range<usize>,
         include: impl Fn(&LexicalReading) -> bool,
     ) -> bool {
+        self.covered_by(range, |found| include(&found.reading))
+    }
+
+    fn covered_by(
+        &self,
+        range: std::ops::Range<usize>,
+        include: impl Fn(&LexicalMatch) -> bool,
+    ) -> bool {
         if range.start >= range.end || range.end > self.tokens.len() {
             return false;
         }
         let mut edges = vec![Vec::new(); range.len()];
         for found in &self.matches {
-            if found.start < range.end && found.end > range.start && include(&found.reading) {
+            if found.start < range.end && found.end > range.start && include(found) {
                 let start = found.start.max(range.start) - range.start;
                 let end = found.end.min(range.end) - range.start;
                 edges[start].push(end);
@@ -372,6 +401,7 @@ impl Lexicon {
                 .copied()
                 .ok_or(LexicalError::UnlicensedValue),
             LexicalReading::OwnName { .. }
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. } => {
@@ -425,6 +455,16 @@ impl Lexicon {
                 .ok_or(LexicalError::UnlicensedValue),
             LexicalReading::SetName { name } => {
                 if !crate::set_name::valid_set_name(name) {
+                    return Err(LexicalError::UnlicensedValue);
+                }
+                Ok(name.clone())
+            }
+            // An Introduced Name is spelled exactly, as the title run it is,
+            // and is never a card's name.
+            LexicalReading::IntroducedName { name } => {
+                let chars: Vec<char> = name.chars().collect();
+                if !crate::introduced::valid_introduced_name(name) || self.spells_card_name(&chars)
+                {
                     return Err(LexicalError::UnlicensedValue);
                 }
                 Ok(name.clone())
@@ -587,8 +627,10 @@ impl Lexicon {
     ///   [CR#201.5,201.5c].
     /// - A card name's Lexeme, another card's name, stands everywhere but where
     ///   the scope holds its name, which is the card's own there.
-    /// - A card-scoped Lexeme, an Introduced Name or an Anchor Word, stands
-    ///   only where the scope holds one of its cards.
+    /// - A card-scoped Lexeme, an Anchor Word or a vote option, stands only
+    ///   where the scope holds one of its cards.
+    /// - An Introduced Name stands everywhere but where the scope holds its
+    ///   spelling as the card's full name.
     /// - A Flavor Word stands only where no label registered there spells it.
     /// - Every other value, a Set Name included, stands everywhere.
     ///
@@ -602,6 +644,7 @@ impl Lexicon {
         match reading {
             LexicalReading::Word(value) => self.word_stands_in(value, scope),
             LexicalReading::OwnName { name, form } => scope.holds(name, *form),
+            LexicalReading::IntroducedName { name } => !scope.holds(name, crate::NameForm::Full),
             LexicalReading::FlavorWord { label } => {
                 self.registered_label(label, Some(scope)).is_none()
             }
@@ -619,6 +662,96 @@ impl Lexicon {
         } else {
             lexeme.card_scope.is_empty()
                 || lexeme.card_scope.iter().any(|card| scope.holds_card(*card))
+        }
+    }
+
+    /// Whether a card name's Lexeme spells all of `spelling`.
+    fn spells_card_name(&self, spelling: &[char]) -> bool {
+        let mut node = 0;
+        for ch in spelling {
+            match self.trie[node].child(*ch) {
+                Some(next) => node = next,
+                None => return false,
+            }
+        }
+        self.names_card(node)
+    }
+
+    /// Whether the trie node is the end of a card name's spelling.
+    fn names_card(&self, node: usize) -> bool {
+        self.trie[node]
+            .values
+            .iter()
+            .any(|(value, _, _)| self.lexemes[&value.lexeme].card_name)
+    }
+
+    /// The title run at each capitalized word of `tokens`, as an Introduced
+    /// Name ([`crate::introduced`]): the longest run there, unless a card's
+    /// full name spells it, or one written at that position runs past it
+    /// (*an artifact named The Mightstone and Weakstone*; *a creature named
+    /// Fang, Fearless l'Cie*). No run starts inside such a card name. A card's
+    /// full name is one a card name's Lexeme spells or the scope holds; a
+    /// Shortened Name is none, so it never ends a run at its comma
+    /// (*Icingdeath, Frost Tongue* on Icingdeath, Frost Tyrant).
+    fn introduced_name_matches(
+        &self,
+        tokens: &[char],
+        scope: &crate::CardScope,
+        matches: &mut Vec<LexicalMatch>,
+    ) {
+        let own: Vec<Vec<char>> = scope
+            .forms()
+            .filter(|(_, form)| *form == crate::NameForm::Full)
+            .map(|(name, _)| name.chars().collect())
+            .collect();
+        let card_name = |run: &[char]| {
+            self.spells_card_name(run) || own.iter().any(|name| name.as_slice() == run)
+        };
+        // The end of the last card name written out so far: no run starts
+        // inside one.
+        let mut written = 0;
+        for start in 0..tokens.len() {
+            if start < written || !crate::introduced::starts_title_run(tokens, start) {
+                continue;
+            }
+            // The longest card name written here.
+            let mut node = Some(0);
+            let lexeme = tokens[start..]
+                .iter()
+                .enumerate()
+                .filter_map(|(offset, ch)| {
+                    node = node.and_then(|at| self.trie[at].child(*ch));
+                    node.is_some_and(|at| self.names_card(at))
+                        .then_some(offset + 1)
+                })
+                .last();
+            let own = own
+                .iter()
+                .filter(|name| tokens[start..].starts_with(name))
+                .map(Vec::len)
+                .max();
+            let name = lexeme.max(own).filter(|&length| {
+                tokens
+                    .get(start + length)
+                    .is_none_or(|ch| !ch.is_alphanumeric())
+            });
+            let Some(end) = crate::introduced::title_run(tokens, start, card_name) else {
+                continue;
+            };
+            let run = &tokens[start..end];
+            written = start + name.unwrap_or(0);
+            // A card name written here that spells the run or runs past it.
+            if name.is_some_and(|length| length >= run.len()) {
+                continue;
+            }
+            matches.push(LexicalMatch {
+                start,
+                end,
+                reading: LexicalReading::IntroducedName {
+                    name: run.iter().collect(),
+                },
+                case: None,
+            });
         }
     }
 
@@ -746,6 +879,7 @@ impl Lexicon {
                     ..
                 }
                 | LexicalReading::Word(_)
+                | LexicalReading::IntroducedName { .. }
                 | LexicalReading::Numeral { .. }
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. } => None,
@@ -763,10 +897,12 @@ impl Lexicon {
                 ..
             }
             | LexicalReading::Word(_)
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. } => true,
         });
+        self.introduced_name_matches(&tokens, scope, &mut matches);
         numeral_matches(&tokens, &mut matches);
         flavor_word_matches(&tokens, &mut matches);
         let hosts = matches
@@ -774,6 +910,7 @@ impl Lexicon {
             .filter(|found| match &found.reading {
                 LexicalReading::Word(value) => self.lexemes[&value.lexeme].set_name_host,
                 LexicalReading::OwnName { .. }
+                | LexicalReading::IntroducedName { .. }
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. }
                 | LexicalReading::Numeral { .. } => false,
@@ -787,6 +924,7 @@ impl Lexicon {
             }
             LexicalReading::Word(_)
             | LexicalReading::OwnName { .. }
+            | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::SetName { .. } => true,
         });

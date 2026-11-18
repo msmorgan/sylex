@@ -64,11 +64,25 @@ fn numeral(value: i32, notation: Numeral) -> LexicalReading {
     LexicalReading::Numeral { value, notation }
 }
 
+/// The readings of a span, less the title run every capitalized word
+/// starts ([`title_runs`]).
 fn at(text: &AnalyzedText, start: usize, end: usize) -> BTreeSet<LexicalReading> {
     text.matches
         .iter()
         .filter(|m| m.start == start && m.end == end)
+        .filter(|m| !matches!(m.reading, LexicalReading::IntroducedName { .. }))
         .map(|m| m.reading.clone())
+        .collect()
+}
+
+/// The title runs of a text, as analysis offers them for Introduced Names.
+fn title_runs(text: &AnalyzedText) -> Vec<&str> {
+    text.matches
+        .iter()
+        .filter_map(|m| match &m.reading {
+            LexicalReading::IntroducedName { name } => Some(name.as_str()),
+            _ => None,
+        })
         .collect()
 }
 
@@ -84,6 +98,7 @@ fn complete_cased(lexicon: &Lexicon, text: &str) -> BTreeSet<(LexicalReading, Op
         .matches
         .into_iter()
         .filter(|m| m.start == 0 && m.end == end)
+        .filter(|m| !matches!(m.reading, LexicalReading::IntroducedName { .. }))
         .map(|m| (m.reading, m.case))
         .collect()
 }
@@ -187,6 +202,7 @@ fn one_or_two_targets_retains_each_word_and_numeral_reading() {
         text.matches
             .iter()
             .filter(|m| m.start == 0)
+            .filter(|m| !matches!(m.reading, LexicalReading::IntroducedName { .. }))
             .all(|m| m.case == Some(LetterCase::Capital))
     );
     assert_eq!(
@@ -1293,7 +1309,8 @@ fn a_scope_may_hold_a_name_no_lexeme_declares() {
     assert_eq!(at(&analyzed, 0, 6), BTreeSet::new());
     // Inside a longer word the spelling is no name.
     let analyzed = lexicon.analyze_source_scoped("Abuelos", None, &scope);
-    assert_eq!(analyzed.matches, []);
+    assert_eq!(at(&analyzed, 0, 6), BTreeSet::new());
+    assert_eq!(title_runs(&analyzed), ["Abuelos"]);
     // A name with no shortened spelling has no Shortened form to realize.
     let progenitus = LexicalReading::OwnName {
         name: "Progenitus".to_owned(),
@@ -1316,31 +1333,140 @@ fn a_card_name_is_scoped_to_no_card_and_has_one_form() {
 
 #[test]
 fn a_card_scope_admits_spellings_on_the_cards_it_names() {
-    let mut token = invariant(
-        "introduced_name:Marit Lage",
-        "Marit Lage",
+    // Travel Through Caradhras's vote option, in scope on that card alone.
+    let mut option = invariant(
+        "vote_option:Redhorn Pass",
+        "Redhorn Pass",
         Category::Catalog,
     );
-    token.capitalization = Capitalization::Exact;
-    token.card_scope = BTreeSet::from([
-        LexemeId::new("name:Dark Depths"),
-        LexemeId::new("name:Marit Lage's Slumber"),
-    ]);
-    let lexicon = Lexicon::new([token.clone()]).unwrap();
+    option.capitalization = Capitalization::Exact;
+    option.card_scope = BTreeSet::from([LexemeId::new("name:Travel Through Caradhras")]);
+    let lexicon = Lexicon::new([option.clone()]).unwrap();
     let found = |scope: &[&str]| {
         let scope = CardScope::full_names(scope.iter().copied());
         lexicon
-            .analyze_source_scoped("Marit Lage", None, &scope)
+            .analyze_source_scoped("Redhorn Pass", None, &scope)
             .matches
             .iter()
-            .any(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == token.id))
+            .any(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == option.id))
     };
-    assert!(found(&["Dark Depths"]));
-    assert!(found(&["Marit Lage's Slumber"]));
+    assert!(found(&["Travel Through Caradhras"]));
     assert!(!found(&[]));
     assert!(!found(&["Vampire Hexmage"]));
     // The Lexeme's own spelling names none of the cards that admit it.
-    assert!(!found(&["Marit Lage"]));
+    assert!(!found(&["Redhorn Pass"]));
+}
+
+/// The lexicon of the card names a title run is held against.
+fn card_names(names: &[&str]) -> Lexicon {
+    Lexicon::new(
+        names
+            .iter()
+            .map(|name| Lexeme::card_name(name, source(&format!("name:{name}")))),
+    )
+    .unwrap()
+}
+
+#[test]
+fn a_title_run_is_offered_at_each_capitalized_word() {
+    // Rinoa Heartilly.
+    let lexicon = card_names(&["Rinoa Heartilly"]);
+    let scope = CardScope::full_names(["Rinoa Heartilly"]);
+    let analyzed = lexicon.analyze_source_scoped(
+        "When Rinoa Heartilly enters, create Angelo, a legendary 1/1 green and white Dog \
+         creature token.",
+        None,
+        &scope,
+    );
+    // The card's own name written out is no title run.
+    assert_eq!(
+        title_runs(&analyzed),
+        ["When Rinoa Heartilly", "Angelo", "Dog"]
+    );
+    // A title run alone covers no word: only a parse makes it a name.
+    assert_ne!(analyzed.unknown_words(), [] as [std::ops::Range<usize>; 0]);
+    let angelo = LexicalReading::IntroducedName {
+        name: "Angelo".to_owned(),
+    };
+    assert_eq!(lexicon.realize(&angelo).unwrap(), "Angelo");
+    assert!(lexicon.stands_in(&angelo, &scope));
+    assert_eq!(
+        lexicon.edges(&angelo).unwrap().left.onset,
+        Some(Onset::Vowel)
+    );
+}
+
+#[test]
+fn a_title_run_is_never_a_card_name_or_a_part_of_one() {
+    let found = |lexicon: &Lexicon, card: &str, text: &str| -> Vec<String> {
+        let scope = CardScope::full_names([card]);
+        let analyzed = lexicon.analyze_source_scoped(text, None, &scope);
+        title_runs(&analyzed)
+            .into_iter()
+            .map(str::to_owned)
+            .collect()
+    };
+    // Helm of Kaldra: each card name written out ends its run at its comma,
+    // and no run starts at one or inside one.
+    let kaldra = card_names(&["Helm of Kaldra", "Sword of Kaldra", "Shield of Kaldra"]);
+    assert_eq!(
+        found(
+            &kaldra,
+            "Helm of Kaldra",
+            "Equipment named Helm of Kaldra, Sword of Kaldra, and Shield of Kaldra",
+        ),
+        ["Equipment"]
+    );
+    // Urza, Lord Protector: the run stops before *and*, short of the card
+    // name written there.
+    let urza = card_names(&["Urza, Lord Protector", "The Mightstone and Weakstone"]);
+    assert_eq!(
+        found(
+            &urza,
+            "Urza, Lord Protector",
+            "an artifact named The Mightstone and Weakstone",
+        ),
+        [] as [&str; 0]
+    );
+    // Skoa, Embermage: the name ends at its second comma.
+    let skoa = card_names(&["Skoa, Embermage"]);
+    assert_eq!(
+        found(
+            &skoa,
+            "Grist, the Hunger Tide",
+            "Discard another card named Skoa, Embermage, Sacrifice two Mountains",
+        ),
+        ["Discard", "Sacrifice", "Mountains"]
+    );
+    // Vanille, Cheerful l'Cie: the run ends before the lowercase *l'Cie*,
+    // short of the card name written there.
+    let fang = card_names(&["Vanille, Cheerful l'Cie", "Fang, Fearless l'Cie"]);
+    assert_eq!(
+        found(
+            &fang,
+            "Vanille, Cheerful l'Cie",
+            "a creature named Fang, Fearless l'Cie"
+        ),
+        [] as [&str; 0]
+    );
+    // An Introduced Name is no card's name, and not the scope's own.
+    let named = |name: &str| LexicalReading::IntroducedName {
+        name: name.to_owned(),
+    };
+    assert!(skoa.realize(&named("Skoa, Embermage")).is_err());
+    assert!(skoa.realize(&named("Skoa")).is_ok());
+    let scope = CardScope::full_names(["Abuelo the Brave"]);
+    assert!(!skoa.stands_in(&named("Abuelo the Brave"), &scope));
+    // A Shortened Name ends no run at its comma: Icingdeath, Frost Tyrant
+    // creates Icingdeath, Frost Tongue.
+    let icingdeath = card_names(&["Icingdeath, Frost Tyrant"]);
+    let scope = CardScope::every_form(["Icingdeath, Frost Tyrant"]);
+    let analyzed = icingdeath.analyze_source_scoped(
+        "create Icingdeath, Frost Tongue, a legendary white Equipment artifact token",
+        None,
+        &scope,
+    );
+    assert!(title_runs(&analyzed).contains(&"Icingdeath, Frost Tongue"));
 }
 
 #[test]

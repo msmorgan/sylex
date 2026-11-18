@@ -145,6 +145,13 @@ pub enum LexicalReading {
         name: String,
         form: crate::NameForm,
     },
+    /// An Introduced Name: a name the text itself gives an object, as a token
+    /// it creates [CR#111.4]. No inventory lists it: the name is the title
+    /// run written at its position ([`crate::Lexicon::analyze_source_scoped`]),
+    /// and it is spelled as that run.
+    IntroducedName {
+        name: String,
+    },
     FlavorWord {
         label: String,
     },
