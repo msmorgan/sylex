@@ -15,6 +15,7 @@ use sylex_lexicon::SourceKind;
 use sylex_syntax::CompiledGrammar;
 use sylex_syntax::FrameCatalog;
 use sylex_syntax::Grammar;
+use sylex_syntax::Reading;
 
 fn lexicon() -> Lexicon {
     let core = || Source {
@@ -115,4 +116,65 @@ fn a_transitive_past_participle_premodifies() {
 #[test]
 fn a_lexical_adjectival_passive_premodifies_in_place_of_its_participle() {
     assert_eq!(count("Tapped Zombies;"), 0);
+}
+
+/// The Readings of `text` under `GRAMMAR` with the schema's `host` removed and
+/// the grammar's own Production attaching the Modifier.
+fn hostless(text: &str) -> Vec<Reading> {
+    let source = GRAMMAR.replace("        host: Nominal,\n", "").replace(
+        "    valence Nominal",
+        "    Attach: Nominal -> modifier:Participle Nominal\n    valence Nominal",
+    );
+    assert!(!source.contains("host:"));
+    let lexicon = lexicon();
+    let grammar = CompiledGrammar::bind(
+        &Grammar::from_fug_str(&source).unwrap(),
+        &lexicon,
+        &FrameCatalog::from_ron_str(FRAMES).unwrap(),
+    )
+    .unwrap();
+    grammar.parse(&lexicon, text).readings().collect()
+}
+
+fn productions(reading: &Reading, out: &mut Vec<String>) {
+    if let Reading::Node(node) = reading {
+        out.push(node.production.to_string());
+        for child in &node.children {
+            productions(child, out);
+        }
+    }
+}
+
+#[test]
+fn a_schema_without_a_host_derives_the_modifier_alone() {
+    // The grammar's own Production attaches it; the schema derives none.
+    let found = hostless("Attacking Zombies;");
+    assert_eq!(found.len(), 1, "{found:#?}");
+    let mut ids = Vec::new();
+    productions(&found[0], &mut ids);
+    assert!(
+        ids.iter()
+            .any(|id| id.starts_with("Premodification:Participle/")),
+        "{ids:?}"
+    );
+    assert!(ids.iter().all(|id| !id.ends_with("/attach")), "{ids:?}");
+    assert!(ids.contains(&"Attach".to_owned()), "{ids:?}");
+    // Its participles are the same ones.
+    assert_eq!(hostless("Destroyed Zombies;").len(), 1);
+    assert_eq!(hostless("Declaring Zombies;").len(), 0);
+    assert_eq!(hostless("Tapped Zombies;").len(), 0);
+}
+
+#[test]
+fn a_schema_without_a_host_attaches_nowhere_by_itself() {
+    let source = GRAMMAR.replace("        host: Nominal,\n", "");
+    let lexicon = lexicon();
+    let grammar = CompiledGrammar::bind(
+        &Grammar::from_fug_str(&source).unwrap(),
+        &lexicon,
+        &FrameCatalog::from_ron_str(FRAMES).unwrap(),
+    )
+    .unwrap();
+    let found = grammar.parse(&lexicon, "Attacking Zombies;");
+    assert_eq!(found.readings().count(), 0);
 }

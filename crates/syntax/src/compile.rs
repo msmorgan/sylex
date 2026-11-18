@@ -323,8 +323,8 @@ impl CompiledGrammar {
     ///    grammar outside a coordination schema), else a `marker` (a relative
     ///    or interrogative clause's).
     /// 6. Its first child besides punctuation that does not bear a dependent
-    ///    function (`ChildRole::is_dependent`): `not`'s `filler`, not the
-    ///    `modifier` *not*.
+    ///    function (`ChildRole::is_dependent`): a `filler` after its
+    ///    `modifier`, not the `modifier`.
     /// 7. Its first child besides punctuation.
     ///
     /// The `head` itself ([`Self::head_index`]) is unchanged. Each Production
@@ -2259,22 +2259,29 @@ impl<'a> Binder<'a> {
     }
 
     /// Resolves a draft's equations into variables and adds it.
+    /// The mother agrees with its `head` child on every feature both carry
+    /// that is neither local nor declared unshared.
+    fn share_with_head(&self, draft: &mut Draft) {
+        let Some(head) = draft.children.iter().position(|c| c.name == "head") else {
+            return;
+        };
+        for &feature in &self.out.category_features[draft.lhs] {
+            if !draft.unshared.contains(&feature)
+                && !self.local(feature)
+                && self.carries(&draft.children[head].symbol, feature)
+            {
+                draft.equations.push((
+                    Path::Mother(feature),
+                    Target::Path(Path::Child(head, feature)),
+                ));
+            }
+        }
+    }
+
     fn add(&mut self, mut draft: Draft) -> Result<(), LoadError> {
         self.dependents(&mut draft)?;
         self.record_holders(&draft);
-        if let Some(head) = draft.children.iter().position(|c| c.name == "head") {
-            for &feature in &self.out.category_features[draft.lhs] {
-                if !draft.unshared.contains(&feature)
-                    && !self.local(feature)
-                    && self.carries(&draft.children[head].symbol, feature)
-                {
-                    draft.equations.push((
-                        Path::Mother(feature),
-                        Target::Path(Path::Child(head, feature)),
-                    ));
-                }
-            }
-        }
+        self.share_with_head(&mut draft);
         let mut production = crate::step::resolve(
             &self.out,
             draft.id,
@@ -2642,14 +2649,7 @@ impl<'a> Binder<'a> {
                 forms,
                 prefix,
                 equations,
-            } => self.premodification(
-                *head,
-                modifier,
-                host.as_deref(),
-                forms,
-                *prefix,
-                equations,
-            ),
+            } => self.premodification(*head, modifier, host.as_deref(), forms, *prefix, equations),
             SchemaDecl::Parameters {
                 head,
                 phrase,
@@ -5110,7 +5110,11 @@ impl Conjoin {
         }
         let c = draft.child("coordinator", Symbol::Leaf(coordinator), GapRule::Closed);
         if let Some(negator) = self.negator {
-            draft.child("modifier", Symbol::Leaf(Test::Word(negator)), GapRule::Closed);
+            draft.child(
+                "modifier",
+                Symbol::Leaf(Test::Word(negator)),
+                GapRule::Closed,
+            );
         }
         let b = draft.child("last", self.conjunct(), GapRule::Shared);
         draft.coordinator = Some(c);
