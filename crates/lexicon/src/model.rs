@@ -113,12 +113,6 @@ pub struct Lexeme {
     pub binding: Binding,
     #[serde(default)]
     pub surface_structure: SurfaceStructure,
-    /// The cards whose own text alone admits the Lexeme: the cards that
-    /// print a vote option. Empty means the
-    /// Lexeme is admitted everywhere, but for a card name on its own card,
-    /// where the name is the card's own ([`crate::LexicalReading::OwnName`]).
-    #[serde(default)]
-    pub card_scope: BTreeSet<crate::LexemeId>,
     /// The Lexeme is a card name [CR#201.1] as the text of any other card
     /// writes it: another card's name [CR#201.5]. It has the one spelling,
     /// the full name. In a scope that holds the name it does not stand: the
@@ -158,7 +152,6 @@ impl Lexeme {
             source,
             capitalization: Capitalization::Initial,
             binding: Binding::Free,
-            card_scope: BTreeSet::new(),
             card_name: false,
             onset: None,
             set_name_host: false,

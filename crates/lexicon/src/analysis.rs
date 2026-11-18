@@ -135,6 +135,7 @@ impl AnalyzedText {
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
             | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. }
             | LexicalReading::Numeral { .. } => true,
         };
         self.words()
@@ -402,6 +403,7 @@ impl Lexicon {
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. }
             | LexicalReading::SetName { .. } => {
                 self.realize(reading)?;
                 crate::Edges::non_word(reading).ok_or(LexicalError::UnlicensedValue)
@@ -461,6 +463,13 @@ impl Lexicon {
             // ability with.
             LexicalReading::AnchorWord { word } => {
                 if !valid_anchor_word(word) {
+                    return Err(LexicalError::UnlicensedValue);
+                }
+                Ok(word.clone())
+            }
+            // A Vote Option is spelled exactly, as the word a vote offers.
+            LexicalReading::VoteOption { word } => {
+                if !crate::valid_vote_option(word) {
                     return Err(LexicalError::UnlicensedValue);
                 }
                 Ok(word.clone())
@@ -632,9 +641,8 @@ impl Lexicon {
     ///   [CR#201.5,201.5c].
     /// - A card name's Lexeme, another card's name, stands everywhere but where
     ///   the scope holds its name, which is the card's own there.
-    /// - A card-scoped Lexeme, a vote option, stands only where the scope holds
-    ///   one of its cards.
-    /// - An Anchor Word stands only where the scope holds it [CR#614.12c].
+    /// - An Anchor Word stands only where the scope holds it [CR#614.12c], and
+    ///   a Vote Option only where the scope holds it [CR#701.38b].
     /// - An Introduced Name stands everywhere but where the scope holds its
     ///   spelling as the card's full name.
     /// - A Flavor Word stands only where no label registered there spells it
@@ -657,6 +665,7 @@ impl Lexicon {
                     && !scope.holds_anchor_word(label)
             }
             LexicalReading::AnchorWord { word } => scope.holds_anchor_word(word),
+            LexicalReading::VoteOption { word } => scope.holds_vote_option(word),
             LexicalReading::Numeral { .. } | LexicalReading::SetName { .. } => true,
         }
     }
@@ -666,12 +675,7 @@ impl Lexicon {
             .lexemes
             .get(&value.lexeme)
             .expect("a word value asked about scope is a Lexeme of this lexicon");
-        if lexeme.card_name {
-            !scope.holds_name(&lexeme.lemma)
-        } else {
-            lexeme.card_scope.is_empty()
-                || lexeme.card_scope.iter().any(|card| scope.holds_card(*card))
-        }
+        !lexeme.card_name || !scope.holds_name(&lexeme.lemma)
     }
 
     /// Whether a card name's Lexeme spells all of `spelling`.
@@ -876,6 +880,7 @@ impl Lexicon {
         drop_shortened_inside_full(&mut matches);
         self.introduced_name_matches(&tokens, scope, &mut matches);
         anchor_word_matches(&tokens, scope, &mut matches);
+        crate::vote_option::vote_option_matches(&tokens, scope, &mut matches);
         numeral_matches(&tokens, &mut matches);
         flavor_word_matches(&tokens, &mut matches);
         let hosts = matches
@@ -887,6 +892,7 @@ impl Lexicon {
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. }
                 | LexicalReading::AnchorWord { .. }
+                | LexicalReading::VoteOption { .. }
                 | LexicalReading::Numeral { .. } => false,
             })
             .map(|found| found.start)
@@ -901,6 +907,7 @@ impl Lexicon {
             | LexicalReading::IntroducedName { .. }
             | LexicalReading::Numeral { .. }
             | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. }
             | LexicalReading::SetName { .. } => true,
         });
         AnalyzedText {
@@ -934,6 +941,7 @@ fn drop_shortened_inside_full(matches: &mut Vec<LexicalMatch>) {
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. }
             | LexicalReading::SetName { .. } => None,
         })
         .collect();
@@ -953,22 +961,16 @@ fn drop_shortened_inside_full(matches: &mut Vec<LexicalMatch>) {
         | LexicalReading::Numeral { .. }
         | LexicalReading::FlavorWord { .. }
         | LexicalReading::AnchorWord { .. }
+        | LexicalReading::VoteOption { .. }
         | LexicalReading::SetName { .. } => true,
     });
 }
 
-/// Why a card name's Lexeme is malformed: it is scoped to cards, has a
-/// second form, or is not spelled as its lemma, the full name.
+/// Why a card name's Lexeme is malformed: it has a second form, or is not
+/// spelled as its lemma, the full name.
 fn card_name_defect(lexeme: &Lexeme) -> Option<&'static str> {
-    if !lexeme.card_name {
-        None
-    } else if !lexeme.card_scope.is_empty() {
-        Some("a card name stands on every card, as its own name or another's")
-    } else if lexeme.forms.len() != 1 || lexeme.forms[0].surface.is_some() {
-        Some("a card name has one form, spelled as the full name")
-    } else {
-        None
-    }
+    (lexeme.card_name && (lexeme.forms.len() != 1 || lexeme.forms[0].surface.is_some()))
+        .then_some("a card name has one form, spelled as the full name")
 }
 
 /// Whether a spelling is one an own name may have: a line of text that
@@ -1158,7 +1160,7 @@ fn valid_word(word: &str, binding: Binding) -> bool {
         })
 }
 
-fn edges_match(tokens: &[char], start: usize, end: usize, binding: Binding) -> bool {
+pub(crate) fn edges_match(tokens: &[char], start: usize, end: usize, binding: Binding) -> bool {
     let left = start == 0 || !word_character(tokens[start - 1]) || !word_character(tokens[start]);
     let right =
         end == tokens.len() || !word_character(tokens[end - 1]) || !word_character(tokens[end]);

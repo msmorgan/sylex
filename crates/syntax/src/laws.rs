@@ -432,7 +432,8 @@ impl Parse<'_> {
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
-            | LexicalReading::AnchorWord { .. } => Binding::Free,
+            | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. } => Binding::Free,
         })
     }
 

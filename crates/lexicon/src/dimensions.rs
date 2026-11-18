@@ -309,7 +309,10 @@ impl Edges {
             crate::LexicalReading::Numeral { value, .. } => crate::numeral_onset(*value),
             crate::LexicalReading::FlavorWord { .. } => None,
             crate::LexicalReading::SetName { name } => crate::pronunciation::default_onset(name),
-            crate::LexicalReading::AnchorWord { word } => crate::pronunciation::default_onset(word),
+            crate::LexicalReading::AnchorWord { word }
+            | crate::LexicalReading::VoteOption { word } => {
+                crate::pronunciation::default_onset(word)
+            }
         };
         Some(Self::plain(onset))
     }

@@ -12,6 +12,7 @@ mod scope;
 mod set_name;
 mod shortening;
 mod types;
+mod vote_option;
 
 pub use crate::analysis::*;
 pub use crate::dimensions::AgreementProperties;
@@ -32,7 +33,6 @@ pub use crate::pronunciation::numeral_onset;
 pub use crate::pronunciation::sign_onset;
 pub use crate::scope::CardScope;
 pub use crate::scope::card_name_id;
-pub use crate::scope::card_name_of;
 pub use crate::shortening::own_name_spelling;
 pub use crate::shortening::shortened_spelling;
 pub use crate::types::Case;
@@ -48,6 +48,8 @@ pub use crate::types::Numeral;
 pub use crate::types::Person;
 pub use crate::types::Tense;
 pub use crate::types::WordForm;
+pub use crate::vote_option::valid_vote_option;
+pub use crate::vote_option::vote_option_candidates;
 
 mod registry;
 pub use registry::ClosedWord;

@@ -35,6 +35,10 @@ pub enum Category {
     SetName,
     /// Open Anchor Word [CR#614.12c], which the Card Scope holds.
     AnchorWord,
+    /// Open word a vote offers, a Vote Option [CR#701.38b], which the Card
+    /// Scope holds. It is named for no keyword action, so a grammar may
+    /// name it (`docs/design/english.md` §2).
+    OptionWord,
     Symbol,
 }
 
@@ -168,6 +172,16 @@ pub enum LexicalReading {
     /// from the face's text, and stands where the Card Scope holds it
     /// ([`crate::Lexicon::stands_in`]). It is spelled as the word.
     AnchorWord {
+        word: String,
+    },
+    /// A Vote Option [CR#701.38a]: one of the words a vote offers, "words
+    /// with no rules meaning that are each connected to a different effect"
+    /// [CR#701.38b] (*votes for sickness or psychosis*; *If psychosis gets
+    /// more votes*; *each numbers vote*). No inventory lists it: it is read
+    /// from the face's text, and stands where the Card Scope holds it
+    /// ([`crate::Lexicon::stands_in`]). It is spelled as the word, which
+    /// may be several (*Mines of Moria*).
+    VoteOption {
         word: String,
     },
     Numeral {

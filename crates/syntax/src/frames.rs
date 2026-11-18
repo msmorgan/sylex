@@ -122,6 +122,10 @@ pub enum SlotFill {
     /// right*: a metalinguistic Noun Phrase (CGEL, Ch. 5 §8.2, p. 401),
     /// taken only where a head selects one.
     Mention,
+    /// The two words a vote offers [CR#701.38a,701.38b], as *sickness or
+    /// psychosis* in *votes for sickness or psychosis*: taken only where a
+    /// head selects it.
+    OptionChoice,
     Nominal,
     /// A numeral or variable naming how many, as in *scry 2* or *scry X*.
     Amount,
@@ -191,6 +195,10 @@ pub enum SlotKind {
     /// A Set Name, the parameter a noun takes before it (*the Antiquities
     /// expansion*).
     SetName,
+    OptionChoice,
+    /// A word a vote offers, cited: the parameter a noun takes before it
+    /// (*each numbers vote* [CR#701.38b]).
+    OptionMention,
     /// A derived unlike Frame Slot ([`SlotFill::Unlike`]): the grammar's
     /// unlike slot of this index, never a declared kind.
     #[serde(skip)]
@@ -226,6 +234,7 @@ impl SlotFill {
             Self::KeywordPhrase => SlotKind::KeywordPhrase,
             Self::QuotedAbility => SlotKind::QuotedAbility,
             Self::Mention => SlotKind::Mention,
+            Self::OptionChoice => SlotKind::OptionChoice,
             Self::Nominal => SlotKind::Nominal,
             Self::Amount => SlotKind::Amount,
             Self::Cost => SlotKind::Cost,

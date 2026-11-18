@@ -68,6 +68,7 @@ impl NameBits {
                 | LexicalReading::FlavorWord { .. }
                 | LexicalReading::SetName { .. }
                 | LexicalReading::AnchorWord { .. }
+                | LexicalReading::VoteOption { .. }
                 | LexicalReading::Numeral { .. } => {}
             }
         }
@@ -272,7 +273,8 @@ pub(crate) fn introduced_names<'r>(reading: &'r Reading, names: &mut Vec<&'r str
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
-            | LexicalReading::AnchorWord { .. },
+            | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. },
         ) => {}
         Reading::Node(node) => {
             for child in &node.children {

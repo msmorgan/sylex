@@ -273,6 +273,7 @@ impl Parse<'_> {
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
             | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. }
             | LexicalReading::Numeral { .. } => None,
         }
     }

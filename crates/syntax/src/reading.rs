@@ -1527,7 +1527,8 @@ impl CompiledGrammar {
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
-            | LexicalReading::AnchorWord { .. } => None,
+            | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. } => None,
         }
     }
 
@@ -1606,7 +1607,8 @@ impl CompiledGrammar {
                     | LexicalReading::Numeral { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. }
-                    | LexicalReading::AnchorWord { .. } => Binding::Free,
+                    | LexicalReading::AnchorWord { .. }
+                    | LexicalReading::VoteOption { .. } => Binding::Free,
                 };
                 out.push((text, binding, AtomKind::Word));
             }

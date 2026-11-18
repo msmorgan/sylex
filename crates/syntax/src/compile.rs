@@ -226,6 +226,21 @@ impl CompiledGrammar {
         self.category_ids.get(name).copied()
     }
 
+    /// Whether a Frame of the Lexeme `id` selects a Preposition Phrase by
+    /// its Complement's kind, `kind` (*vote*'s *for* with an Option Choice).
+    /// A Lexeme the lexicon does not declare selects nothing.
+    #[must_use]
+    pub fn selects_complement_kind(&self, id: &LexemeId, kind: SlotKind) -> bool {
+        self.lexeme(id).is_some_and(|lexeme| {
+            self.facts(lexeme).frames.iter().any(|&frame| {
+                self.frames[frame]
+                    .slots
+                    .iter()
+                    .any(|slot| matches!(&slot.fill, SlotFill::PP(_, Some(selected)) if *selected == kind))
+            })
+        })
+    }
+
     /// The dense id of a Lexeme the lexicon declares.
     pub(crate) fn lexeme(&self, id: &LexemeId) -> Option<Lexeme> {
         self.lexeme_ids.get(id)

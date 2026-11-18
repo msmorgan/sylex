@@ -15,7 +15,7 @@ use crate::grammar::HostKind;
 use crate::lexeme::Lexeme;
 
 /// The most features one Category may carry, so a Summary is inline.
-pub(crate) const MAX_CATEGORY_FEATURES: usize = 16;
+pub(crate) const MAX_CATEGORY_FEATURES: usize = 24;
 /// The most feature variables one Production may unify, so a State is inline.
 pub(crate) const MAX_PRODUCTION_VARS: usize = 24;
 /// The most features a grammar may declare, so a leaf indexes its values.
@@ -2814,7 +2814,8 @@ impl CompiledGrammar {
             | LexicalReading::Numeral { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
-            | LexicalReading::AnchorWord { .. } => sylex_lexicon::Edges::non_word(reading),
+            | LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. } => sylex_lexicon::Edges::non_word(reading),
         }
     }
 
@@ -2914,6 +2915,17 @@ impl CompiledGrammar {
                 notation: None,
                 lexeme: None,
                 category: LexicalCategory::SetName,
+                features: [None; MAX_FEATURES],
+                forms: 0,
+                other_card_name: false,
+                introduced_name: None,
+            }),
+            LexicalReading::VoteOption { .. } => Some(LeafFacts {
+                binding: sylex_lexicon::Binding::Free,
+                integer: None,
+                notation: None,
+                lexeme: None,
+                category: LexicalCategory::OptionWord,
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,

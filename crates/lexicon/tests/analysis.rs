@@ -1335,40 +1335,65 @@ fn a_scope_may_hold_a_name_no_lexeme_declares() {
 }
 
 #[test]
-fn a_card_name_is_scoped_to_no_card_and_has_one_form() {
+fn a_card_name_has_one_form() {
     let mut card = Lexeme::card_name("Chandra, Pyromaster", source("name:Chandra, Pyromaster"));
     assert!(Lexicon::new([card.clone()]).is_ok());
-    card.card_scope = BTreeSet::from([LexemeId::new("name:Chandra, Torch of Defiance")]);
-    assert!(Lexicon::new([card.clone()]).is_err());
-    card.card_scope.clear();
     card.forms[0].surface = Some("Chandra".into());
     assert!(Lexicon::new([card]).is_err());
 }
 
+/// Travel Through Caradhras: *votes for Redhorn Pass or Mines of Moria*. No
+/// Lexeme declares a Vote Option [CR#701.38b]: it stands where the Card
+/// Scope holds it, wherever its spelling is written as whole words, and
+/// nowhere else. Another card's name of its spelling (*Mines of Moria*)
+/// stands beside it.
 #[test]
-fn a_card_scope_admits_spellings_on_the_cards_it_names() {
-    // Travel Through Caradhras's vote option, in scope on that card alone.
-    let mut option = invariant(
-        "vote_option:Redhorn Pass",
-        "Redhorn Pass",
-        Category::Catalog,
-    );
-    option.capitalization = Capitalization::Exact;
-    option.card_scope = BTreeSet::from([LexemeId::new("name:Travel Through Caradhras")]);
-    let lexicon = Lexicon::new([option.clone()]).unwrap();
-    let found = |scope: &[&str]| {
-        let scope = CardScope::full_names(scope.iter().copied());
-        lexicon
-            .analyze_source_scoped("Redhorn Pass", None, &scope)
-            .matches
-            .iter()
-            .any(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == option.id))
+fn a_vote_option_stands_where_the_scope_holds_it() {
+    let lexicon = Lexicon::new([
+        noun("vote/vote", "vote"),
+        Lexeme::card_name("Mines of Moria", source("name:Mines of Moria")),
+    ])
+    .unwrap();
+    let text = "For each Mines of Moria vote, return a card.";
+    let option = LexicalReading::VoteOption {
+        word: "Mines of Moria".into(),
     };
-    assert!(found(&["Travel Through Caradhras"]));
-    assert!(!found(&[]));
-    assert!(!found(&["Vampire Hexmage"]));
-    // The Lexeme's own spelling names none of the cards that admit it.
-    assert!(!found(&["Redhorn Pass"]));
+    let mut on = CardScope::full_names(["Travel Through Caradhras"]);
+    on.insert_vote_option("Mines of Moria");
+    let off = CardScope::full_names(["Travel Through Caradhras"]);
+    let found = |scope: &CardScope| {
+        at(&lexicon.analyze_source_scoped(text, None, scope), 9, 23).contains(&option)
+    };
+    assert!(found(&on) && !found(&off));
+    assert!(lexicon.stands_in(&option, &on) && !lexicon.stands_in(&option, &off));
+    let other = at(&lexicon.analyze_source_scoped(text, None, &on), 9, 23)
+        .into_iter()
+        .filter(|reading| matches!(reading, LexicalReading::Word(_)))
+        .count();
+    assert_eq!(other, 1);
+    // It is spelled as the word, and a word it spells is no vocabulary gap.
+    assert_eq!(lexicon.realize(&option).unwrap(), "Mines of Moria");
+    assert!(lexicon.edges(&option).is_ok());
+    let mut psychosis = CardScope::default();
+    psychosis.insert_vote_option("psychosis");
+    let line = "If psychosis gets more votes, psychosises.";
+    let analyzed = lexicon.analyze_source_scoped(line, None, &psychosis);
+    let unknown: Vec<_> = analyzed.unknown_words().iter().map(|w| w.start).collect();
+    assert!(
+        !unknown.contains(&3) && unknown.contains(&30),
+        "{unknown:?}"
+    );
+    // Only whole words spell it.
+    let written = analyzed
+        .matches
+        .iter()
+        .filter(|found| matches!(found.reading, LexicalReading::VoteOption { .. }))
+        .count();
+    assert_eq!(written, 1);
+    for word in ["", " aid", "aid or", "{G}"] {
+        let reading = LexicalReading::VoteOption { word: word.into() };
+        assert!(lexicon.realize(&reading).is_err(), "{word:?}");
+    }
 }
 
 /// The lexicon of the card names a title run is held against.

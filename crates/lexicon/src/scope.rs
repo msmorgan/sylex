@@ -13,13 +13,6 @@ pub fn card_name_id(name: &str) -> LexemeId {
     LexemeId::new(&format!("{CARD_NAME_ID_PREFIX}{name}"))
 }
 
-/// The card name whose Lexeme id is `card`, or `None` for the id of no card
-/// name.
-#[must_use]
-pub fn card_name_of(card: LexemeId) -> Option<&'static str> {
-    card.as_str().strip_prefix(CARD_NAME_ID_PREFIX)
-}
-
 /// The card names a text is in the scope of, each with the forms of it that
 /// text admits. A face's text holds its own name in its Full form
 /// [CR#201.5] and, where the card has a Shortened Name, in its Shortened
@@ -27,18 +20,23 @@ pub fn card_name_of(card: LexemeId) -> Option<&'static str> {
 ///
 /// A name the scope holds is the card's own name there
 /// ([`crate::LexicalReading::OwnName`]), whether or not the lexicon declares
-/// a card of that name; it is never another card's. A card-scoped Lexeme
-/// whose card it holds stands there ([`crate::Lexicon::stands_in`]).
+/// a card of that name; it is never another card's.
 ///
 /// It also holds the face's Anchor Words [CR#614.12c]: the words its text
 /// offers as its permanent enters and heads a bulleted ability with. An
 /// Anchor Word ([`crate::LexicalReading::AnchorWord`]) stands only where the
 /// scope holds it, and a Flavor Word of that spelling does not stand there.
+///
+/// And it holds the face's Vote Options [CR#701.38b]: the words a vote of
+/// its text offers and its text then mentions. A Vote Option
+/// ([`crate::LexicalReading::VoteOption`]) stands only where the scope
+/// holds it.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct CardScope {
     /// By full name.
     names: BTreeMap<String, BTreeSet<NameForm>>,
     anchor_words: BTreeSet<String>,
+    vote_options: BTreeSet<String>,
 }
 
 impl CardScope {
@@ -66,19 +64,6 @@ impl CardScope {
         scope
     }
 
-    /// The scope of a text that holds, in its Full form, each card name
-    /// whose Lexeme id is in `cards`: one a Lexeme scoped to those cards
-    /// stands in.
-    ///
-    /// # Panics
-    /// On the id of no card name.
-    #[must_use]
-    pub fn of_cards(cards: impl IntoIterator<Item = LexemeId>) -> Self {
-        Self::full_names(cards.into_iter().map(|card| {
-            card_name_of(card).unwrap_or_else(|| panic!("`{card}` is the id of no card name"))
-        }))
-    }
-
     /// Puts one form of the card name `name` in scope.
     pub fn insert(&mut self, name: &str, form: NameForm) {
         self.names.entry(name.to_owned()).or_default().insert(form);
@@ -96,13 +81,6 @@ impl CardScope {
     #[must_use]
     pub fn holds_name(&self, name: &str) -> bool {
         self.names.contains_key(name)
-    }
-
-    /// Whether the scope holds, in any form, the card name whose Lexeme id
-    /// is `card` ([`card_name_id`]).
-    #[must_use]
-    pub fn holds_card(&self, card: LexemeId) -> bool {
-        card_name_of(card).is_some_and(|name| self.holds_name(name))
     }
 
     /// Puts the Anchor Word `word` in scope.
@@ -127,6 +105,30 @@ impl CardScope {
     /// The Anchor Words the scope holds.
     pub fn anchor_words(&self) -> impl Iterator<Item = &str> {
         self.anchor_words.iter().map(String::as_str)
+    }
+
+    /// Puts the Vote Option `word` in scope.
+    ///
+    /// # Panics
+    /// On a word that has not the shape of one
+    /// ([`crate::valid_vote_option`]).
+    pub fn insert_vote_option(&mut self, word: &str) {
+        assert!(
+            crate::valid_vote_option(word),
+            "{word:?} has not the shape of a Vote Option"
+        );
+        self.vote_options.insert(word.to_owned());
+    }
+
+    /// Whether the scope holds the Vote Option `word`.
+    #[must_use]
+    pub fn holds_vote_option(&self, word: &str) -> bool {
+        self.vote_options.contains(word)
+    }
+
+    /// The Vote Options the scope holds.
+    pub fn vote_options(&self) -> impl Iterator<Item = &str> {
+        self.vote_options.iter().map(String::as_str)
     }
 
     /// Every form of a card name the scope holds, with the name.
