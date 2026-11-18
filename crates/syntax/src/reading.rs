@@ -22,7 +22,8 @@ use crate::chart::QUOTATION_MARK;
 use crate::chart::quotation_mark;
 use crate::compile::CompiledGrammar;
 use crate::frames::Frame;
-use crate::names::NameBits;
+use crate::introductions::Offers;
+use crate::introductions::WordBits;
 use crate::step::Anchor;
 use crate::step::ChildRole;
 use crate::step::ChildView;
@@ -113,10 +114,14 @@ pub enum AdmissionError {
     /// ([`sylex_lexicon::Lexicon::stands_in`]).
     #[error("a leaf does not stand in this card scope")]
     OutOfScope,
-    /// An Introduced Name that is left undescribed or unselected, or that
-    /// is named again in a Reading that does not introduce it.
-    #[error("an Introduced Name is not introduced")]
+    /// An Introduced Name that is left undescribed or unselected, or a word
+    /// used that neither the Reading nor a line before its text introduces.
+    #[error("a word its text introduces is not introduced")]
     NotIntroduced,
+    /// A choice the Reading offers (`ProductionDecl::offers`), no word of
+    /// which the Reading or a line after its text uses.
+    #[error("a choice the text offers is not discharged")]
+    Undischarged,
 }
 
 impl Parse<'_> {
@@ -1032,17 +1037,22 @@ impl CompiledGrammar {
         scope: &CardScope,
     ) -> Result<(), AdmissionError> {
         let mut names = Vec::new();
-        crate::names::introduced_names(reading, &mut names);
-        let bits = NameBits::tracking(names.iter().copied()).ok_or(AdmissionError::Rejected {
-            production: "Introduced Names".into(),
-            reason: "more than 32 names in one Reading".into(),
+        crate::introductions::introducible_leaves(reading, &mut names);
+        let bits = WordBits::tracking(names.iter().copied()).ok_or(AdmissionError::Rejected {
+            production: "introduced words".into(),
+            reason: "more than 64 introduced words in one Reading".into(),
         })?;
-        let (category, summary) = self.summarize(reading, lexicon, scope, &bits, &mut 0)?;
+        let mut offers = Offers::default();
+        let mut words = (&bits, &mut offers, 0);
+        let (category, summary) = self.summarize(reading, lexicon, scope, &mut words)?;
         if category != root || summary.gap != Gap::None {
             return Err(AdmissionError::Root(self.categories[category].to_string()));
         }
-        if !summary.names.complete() {
+        if !summary.names.complete(bits.held(scope)) {
             return Err(AdmissionError::NotIntroduced);
+        }
+        if !offers.discharged(summary.names, &bits, scope) {
+            return Err(AdmissionError::Undischarged);
         }
         let mut atoms = Vec::new();
         self.atoms(reading, lexicon, &mut atoms, &mut |_, _| {})?;
@@ -1110,13 +1120,15 @@ impl CompiledGrammar {
                 // A name stands only where analysis finds it: an own name's
                 // Shortened form is no name inside the full name written
                 // out, and an Introduced Name is the whole title run there.
-                if matches!(
-                    value,
-                    LexicalReading::OwnName { .. } | LexicalReading::IntroducedName { .. }
-                ) && !analyzed
-                    .matches
-                    .iter()
-                    .any(|m| m.start == at.start && m.end == at.end && m.reading == *value)
+                // So does an Anchor Word or a Vote Option, a spelling of
+                // its shape.
+                if (matches!(value, LexicalReading::OwnName { .. })
+                    || crate::introductions::introducible(value))
+                    && !analyzed
+                        .matches
+                        .iter()
+                        .chain(&analyzed.open_words)
+                        .any(|m| m.start == at.start && m.end == at.end && m.reading == *value)
                 {
                     return Err(AdmissionError::OutOfScope);
                 }
@@ -1181,15 +1193,15 @@ impl CompiledGrammar {
         Ok((!rebuilt).then_some(whole))
     }
 
-    /// The Category and summary of a Reading, each leaf of an Introduced
-    /// Name numbered from `leaf` on and carrying its name's bit of `bits`.
+    /// The Category and summary of a Reading. `words` holds the bit of each
+    /// introduced word of the whole Reading, the choices it offers so far,
+    /// and the number of the next leaf of such a word.
     fn summarize(
         &self,
         reading: &Reading,
         lexicon: &Lexicon,
         scope: &CardScope,
-        bits: &NameBits,
-        leaf: &mut u32,
+        words: &mut (&WordBits, &mut Offers, u32),
     ) -> Result<(usize, Summary), AdmissionError> {
         let Reading::Node(node) = reading else {
             return Err(AdmissionError::Leaf);
@@ -1217,14 +1229,14 @@ impl CompiledGrammar {
                         return Err(AdmissionError::OutOfScope);
                     }
                     let mut facts = self.leaf_facts(value).ok_or(AdmissionError::Leaf)?;
-                    if let LexicalReading::IntroducedName { name } = value {
-                        // The root holds a name named again to an
-                        // introduction.
-                        facts.introduced_name = Some(crate::names::NameLeaf {
-                            leaf: *leaf,
-                            bit: bits.bit(name),
+                    if facts.introduced.is_some() {
+                        // The root holds a word used to an introduction.
+                        facts.introduced = Some(crate::introductions::IntroducedLeaf {
+                            leaf: words.2,
+                            bit: words.0.bit(value),
+                            held: scope.introduces(value),
                         });
-                        *leaf += 1;
+                        words.2 += 1;
                     }
                     let edges = self.leaf_edges(value).ok_or(AdmissionError::Leaf)?;
                     if !self.leaf_matches(test, &facts) {
@@ -1244,8 +1256,7 @@ impl CompiledGrammar {
                     let Some(child) = children.next() else {
                         return Err(reject("missing child"));
                     };
-                    let (child_category, summary) =
-                        self.summarize(child, lexicon, scope, bits, leaf)?;
+                    let (child_category, summary) = self.summarize(child, lexicon, scope, words)?;
                     if child_category != *category {
                         return Err(reject("child has the wrong category"));
                     }
@@ -1257,9 +1268,25 @@ impl CompiledGrammar {
         if children.next().is_some() {
             return Err(reject("extra children"));
         }
-        let summary = production
+        let mut summary = production
             .finish(self, &state)
             .ok_or_else(|| reject("constituent does not complete"))?;
+        if production.name_rules.offers {
+            let offered = node
+                .children
+                .iter()
+                .filter_map(|child| match child {
+                    Reading::Leaf(value) if crate::introductions::introducible(value) => {
+                        Some(value.clone())
+                    }
+                    Reading::Leaf(_) | Reading::Node(_) => None,
+                })
+                .collect();
+            summary.names.offers |= words
+                .1
+                .bit(offered)
+                .ok_or_else(|| reject("more than 32 choices in one Reading"))?;
+        }
         if self.categories[production.lhs] != node.category
             || self.feature_map(production.lhs, &summary) != node.features
             || summary.gap != node.gap

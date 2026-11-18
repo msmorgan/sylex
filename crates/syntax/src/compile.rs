@@ -638,7 +638,7 @@ struct Draft {
     /// (`ProductionDecl::unclosed`).
     unclosed: bool,
     /// What it says about Introduced Names.
-    name_rules: crate::names::NameRules,
+    name_rules: crate::introductions::NameRules,
     /// Its phrase is only a non-final conjunct (`Production::nonfinal`).
     nonfinal: bool,
     /// Its coordination's conjuncts other than the last
@@ -785,7 +785,7 @@ impl Draft {
             omits_complement: false,
             elliptical: None,
             unclosed: false,
-            name_rules: crate::names::NameRules::default(),
+            name_rules: crate::introductions::NameRules::default(),
             nonfinal: false,
             nonfinal_conjuncts: Vec::new(),
             link: None,
@@ -1366,7 +1366,7 @@ impl<'a> Binder<'a> {
         &self,
         declaration: &crate::grammar::ProductionDecl,
         draft: &Draft,
-    ) -> Result<crate::names::NameRules, LoadError> {
+    ) -> Result<crate::introductions::NameRules, LoadError> {
         let child = |name: &Ident| {
             draft
                 .children
@@ -1382,6 +1382,16 @@ impl<'a> Binder<'a> {
         {
             return Err(invalid(
                 "an undescribed Production is one `IntroducedName()` child",
+            ));
+        }
+        if declaration.offers
+            && declaration
+                .rhs
+                .iter()
+                .any(|symbol| matches!(symbol, crate::grammar::SymbolDecl::Cat { .. }))
+        {
+            return Err(invalid(
+                "a Production that offers words has only lexical children",
             ));
         }
         let describes = declaration.describes.as_ref().map(&child).transpose()?;
@@ -1418,14 +1428,15 @@ impl<'a> Binder<'a> {
             }
         }
         .map(|(word, direct, refused)| {
-            Ok::<_, LoadError>(crate::names::Selection {
+            Ok::<_, LoadError>(crate::introductions::Selection {
                 head: self.name_head(word)?,
                 direct,
                 refused,
             })
         })
         .transpose()?;
-        Ok(crate::names::NameRules {
+        Ok(crate::introductions::NameRules {
+            offers: declaration.offers,
             undescribed: declaration.undescribed,
             describes,
             headed_by,

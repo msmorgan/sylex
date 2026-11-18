@@ -731,8 +731,11 @@ fn homograph_choices_do_not_multiply_the_chart() {
         });
         assert_eq!(one.1, 1);
         assert_eq!(three.1, 3u128.pow(u32::try_from(n).unwrap()));
-        // Beside the homographs, the capitalized first word's title run.
-        assert_eq!(three.0.leaves - 1, 3 * (one.0.leaves - 1));
+        // Beside the homographs, the capitalized first word's title run
+        // and the open words: each word as a Vote Option, and the
+        // capitalized one as an Anchor Word.
+        let open = n + 2;
+        assert_eq!(three.0.leaves - open, 3 * (one.0.leaves - open));
         assert_eq!(three.0.chart_items, one.0.chart_items, "n = {n}");
         assert_eq!(three.0.completed_nodes, one.0.completed_nodes, "n = {n}");
         items.push(one.0.chart_items);

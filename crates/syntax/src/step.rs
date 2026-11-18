@@ -220,7 +220,8 @@ pub(crate) enum Test {
     /// admits.
     IntroducedName,
     /// An Introduced Name named again: one its text writes at more than one
-    /// place (`NameLeaf::bit`).
+    /// place (`IntroducedLeaf::bit`), or one a line before the text
+    /// introduces (`IntroducedLeaf::held`).
     RepeatedName,
 }
 
@@ -626,7 +627,7 @@ pub(crate) struct Production {
     /// (`Summary::unclosed`).
     pub unclosed: bool,
     /// What it says about Introduced Names.
-    pub name_rules: crate::names::NameRules,
+    pub name_rules: crate::introductions::NameRules,
     /// Its phrase is only a conjunct of a coordination other than the last
     /// (`Summary::nonfinal`).
     pub nonfinal: bool,
@@ -874,7 +875,7 @@ pub(crate) fn resolve(
         auxiliary: None,
         omission: Omission::None,
         unclosed: false,
-        name_rules: crate::names::NameRules::default(),
+        name_rules: crate::introductions::NameRules::default(),
         nonfinal: false,
         lexical_head,
         link: None,
@@ -948,7 +949,7 @@ pub(crate) fn resolve(
             forced: false,
             unwritten_period: false,
             unclosed: false,
-            names: crate::names::Names::default(),
+            names: crate::introductions::Introductions::default(),
             headed_link: None,
             cluster: None,
             bare: Bare::NONE,
@@ -1137,8 +1138,8 @@ pub(crate) struct Summary {
     /// only its sentence's end closes (`ProductionDecl::unclosed`): nothing
     /// but a period follows it.
     pub unclosed: bool,
-    /// Its Introduced Names.
-    pub names: crate::names::Names,
+    /// The words it introduces, uses and offers.
+    pub names: crate::introductions::Introductions,
     /// It is only a conjunct of a coordination other than the last
     /// (`SchemaDecl::Adjunct::nonfinal`): no other position takes it.
     pub nonfinal: bool,
@@ -1268,9 +1269,19 @@ pub(crate) struct LeafFacts {
     /// [`Test::OtherCardName`] and [`Test::DistinctOtherCardName`] admit it,
     /// and they admit nothing else.
     pub other_card_name: bool,
-    /// It is an Introduced Name: only [`Test::IntroducedName`] and
-    /// [`Test::RepeatedName`] admit it, and they admit nothing else.
-    pub introduced_name: Option<crate::names::NameLeaf>,
+    /// It is a word of a kind a text introduces: an Introduced Name, an
+    /// Anchor Word or a Vote Option. Only [`Test::IntroducedName`] and
+    /// [`Test::RepeatedName`] admit an Introduced Name, and they admit
+    /// nothing else.
+    pub introduced: Option<crate::introductions::IntroducedLeaf>,
+}
+
+impl LeafFacts {
+    /// What it carries as an Introduced Name, if it is one.
+    pub(crate) fn introduced_name(&self) -> Option<crate::introductions::IntroducedLeaf> {
+        self.introduced
+            .filter(|_| self.category == LexicalCategory::Catalog)
+    }
 }
 
 pub(crate) enum ChildView<'a> {
@@ -1425,8 +1436,8 @@ pub(crate) struct State {
     /// The last child so far ends in an unclosed dash phrase
     /// (`Summary::unclosed`).
     unclosed: bool,
-    /// The Introduced Names of the children so far (`Summary::names`).
-    pub names: crate::names::Names,
+    /// The introduced words of the children so far (`Summary::names`).
+    pub names: crate::introductions::Introductions,
     /// The `head` child's `Summary::link`.
     headed_link: Option<LinkedCoordination>,
     /// The `Summary::cluster` and `Summary::cluster_other` of the head-line
@@ -2785,7 +2796,7 @@ impl CompiledGrammar {
         // Another card's name fills only a position that opts in to it, and
         // so does an Introduced Name.
         if leaf.other_card_name != matches!(test, Test::OtherCardName | Test::DistinctOtherCardName)
-            || leaf.introduced_name.is_some()
+            || leaf.introduced_name().is_some()
                 != matches!(test, Test::IntroducedName | Test::RepeatedName)
         {
             return false;
@@ -2793,7 +2804,9 @@ impl CompiledGrammar {
         match test {
             Test::OtherCardName | Test::IntroducedName => true,
             Test::DistinctOtherCardName => facts.is_some_and(|f| !f.homograph),
-            Test::RepeatedName => leaf.introduced_name.is_some_and(|name| name.bit != 0),
+            Test::RepeatedName => leaf
+                .introduced_name()
+                .is_some_and(|name| name.bit != 0 || name.held),
             Test::Lexical(category) => leaf.category == *category,
             Test::FreeLexical(category) => {
                 leaf.category == *category
@@ -2852,9 +2865,9 @@ impl CompiledGrammar {
 
     /// Projects a lexical alternative into the leaf a Production sees, or
     /// `None` if the lexicon licenses no such value. Its features were
-    /// resolved at bind time (`crate::projection`). What the leaf of an
-    /// Introduced Name carries about its text (`LeafFacts::introduced_name`)
-    /// is its caller's to fill in.
+    /// resolved at bind time (`crate::projection`). What the leaf of a word
+    /// a text introduces carries about its text (`LeafFacts::introduced`) is
+    /// its caller's to fill in.
     pub(crate) fn leaf_facts(&self, reading: &LexicalReading) -> Option<LeafFacts> {
         match reading {
             // A card's own name is a Catalog word no Lexeme declares, as a
@@ -2875,7 +2888,7 @@ impl CompiledGrammar {
                     forms: self.spelled_forms(&spelling)
                         | form_bit(sylex_lexicon::WordForm::Invariant),
                     other_card_name: false,
-                    introduced_name: None,
+                    introduced: None,
                 })
             }
             // An Introduced Name is a Proper Name too, unmarked for Number.
@@ -2893,7 +2906,7 @@ impl CompiledGrammar {
                     features,
                     forms: self.spelled_forms(name) | form_bit(sylex_lexicon::WordForm::Invariant),
                     other_card_name: false,
-                    introduced_name: Some(crate::names::NameLeaf { leaf: 0, bit: 0 }),
+                    introduced: Some(crate::introductions::IntroducedLeaf::default()),
                 })
             }
             LexicalReading::Word(value) => {
@@ -2913,7 +2926,7 @@ impl CompiledGrammar {
                     features,
                     forms: licensed.forms,
                     other_card_name: facts.card_name,
-                    introduced_name: None,
+                    introduced: None,
                 })
             }
             LexicalReading::Numeral {
@@ -2927,7 +2940,7 @@ impl CompiledGrammar {
                 features: self.projection.numeral_features(*value, *notation),
                 forms: 0,
                 other_card_name: false,
-                introduced_name: None,
+                introduced: None,
             }),
             LexicalReading::FlavorWord { .. } => Some(LeafFacts {
                 binding: sylex_lexicon::Binding::Free,
@@ -2938,7 +2951,7 @@ impl CompiledGrammar {
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,
-                introduced_name: None,
+                introduced: None,
             }),
             LexicalReading::SetName { .. } => Some(LeafFacts {
                 binding: sylex_lexicon::Binding::Free,
@@ -2949,7 +2962,7 @@ impl CompiledGrammar {
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,
-                introduced_name: None,
+                introduced: None,
             }),
             LexicalReading::VoteOption { .. } => Some(LeafFacts {
                 binding: sylex_lexicon::Binding::Free,
@@ -2960,7 +2973,7 @@ impl CompiledGrammar {
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,
-                introduced_name: None,
+                introduced: Some(crate::introductions::IntroducedLeaf::default()),
             }),
             LexicalReading::AnchorWord { .. } => Some(LeafFacts {
                 binding: sylex_lexicon::Binding::Free,
@@ -2971,7 +2984,7 @@ impl CompiledGrammar {
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,
-                introduced_name: None,
+                introduced: Some(crate::introductions::IntroducedLeaf::default()),
             }),
         }
     }

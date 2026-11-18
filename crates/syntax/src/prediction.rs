@@ -112,7 +112,7 @@ impl Prediction {
                 forms: 0,
                 // A card name's Lexeme is another card's name.
                 other_card_name: facts.card_name,
-                introduced_name: None,
+                introduced: None,
             };
             let mut mask = vec![0; words];
             prediction.add_tests(grammar, &leaf, Some(facts), &mut mask);

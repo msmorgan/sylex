@@ -314,6 +314,15 @@ pub struct ProductionDecl {
     /// ends in one is followed by nothing but a period.
     #[serde(default)]
     pub unclosed: bool,
+    /// The phrase offers its words, which the text introduces there: each
+    /// lexical child that is an Anchor Word or a Vote Option is one the
+    /// text gives at that place, whatever it spells (*choose Khans or
+    /// Dragons*; *votes for sickness or psychosis*). The choice stands only
+    /// where the face uses a word of it, in the same Reading or on a line
+    /// after the text (`docs/design/lexicon.md` §2). Its children are all
+    /// lexical.
+    #[serde(default)]
+    pub offers: bool,
     /// The phrase is an Introduced Name that nothing has yet introduced: its
     /// one child is an `IntroducedName` symbol, and a Constituent that ends
     /// in it is followed only by the Supplement of a Production that

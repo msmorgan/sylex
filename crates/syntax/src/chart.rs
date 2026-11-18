@@ -19,8 +19,10 @@ use crate::compile::License;
 use crate::counts::ForestCycle;
 use crate::counts::Vertex;
 use crate::hash::ChartHasher;
-use crate::names::NameBits;
-use crate::names::NameLeaf;
+use crate::introductions::IntroducedLeaf;
+use crate::introductions::Offers;
+use crate::introductions::Role;
+use crate::introductions::WordBits;
 use crate::reading::glues_after;
 use crate::step::ChildView;
 use crate::step::CoordinatorId;
@@ -31,7 +33,6 @@ use crate::step::Production;
 use crate::step::State;
 use crate::step::Summary;
 use crate::step::Symbol;
-use crate::step::Test;
 
 /// The hasher of the chart's indexes, which hold indices into
 /// [`PackedForest`] and hash the key each index names.
@@ -243,13 +244,28 @@ pub struct Parse<'g> {
     pub(crate) tokens: Vec<char>,
     /// The analyzed text as written.
     pub(crate) source: String,
-    /// Immutable once parsed: the walks below are memoized over it.
+    /// Fixed once parsed, but for its roots, which [`Parse::discharge`]
+    /// chooses again among the candidates: the walks below are memoized
+    /// over it, and reset there.
     pub(crate) forest: PackedForest,
     /// Words that no declared lexeme spells, and that no partial Production
-    /// takes as an Introduced Name, as char ranges.
+    /// takes as an Introduced Name, an Anchor Word or a Vote Option, as char
+    /// ranges.
     pub vocabulary_gaps: Vec<Range<usize>>,
-    /// The card names the text was analyzed in the scope of.
+    /// The Card Scope the text is read in: the one it was analyzed in, and
+    /// the words the lines after it use ([`Parse::discharge`]).
     pub(crate) scope: sylex_lexicon::CardScope,
+    /// The words the text writes twice, each with its bit.
+    pub(crate) words: WordBits,
+    /// The choices its Readings offer.
+    pub(crate) offers: Offers,
+    /// The completed Constituents that span the whole input and are
+    /// Readings wherever the face discharges the choices they offer: the
+    /// roots, and those a line after the text may yet make one
+    /// ([`Parse::discharge`]).
+    pub(crate) candidates: Vec<usize>,
+    /// Some partial Production took a word of a kind a text introduces.
+    pub(crate) introducing: bool,
     /// The reachable forest, children first ([`Parse::children_first`]).
     pub(crate) children_first: OnceLock<Result<Vec<Vertex>, ForestCycle>>,
     /// The head leaves of every node and item ([`Parse::head_inside`]).
@@ -328,6 +344,122 @@ impl<'g> Parse<'g> {
             })
     }
 
+    /// The Card Scope the text is read in.
+    #[must_use]
+    pub fn scope(&self) -> &sylex_lexicon::CardScope {
+        &self.scope
+    }
+
+    /// Records that the lines after the text use `words`: a root that
+    /// offers a choice is a Reading once the face uses a word of it
+    /// (`docs/design/lexicon.md` §2). The text is not parsed again: the
+    /// roots are chosen among the candidates the parse kept.
+    pub fn discharge(&mut self, words: impl IntoIterator<Item = LexicalReading>) {
+        for word in words {
+            self.scope.discharge(word);
+        }
+        let roots = self
+            .candidates
+            .iter()
+            .copied()
+            .filter(|&node| {
+                let introduced = self.forest.nodes[node].summary.names;
+                self.offers.discharged(introduced, &self.words, &self.scope)
+            })
+            .collect();
+        self.forest.roots = roots;
+        // The walks are memoized over the roots.
+        self.children_first = OnceLock::new();
+        self.head_inside = OnceLock::new();
+    }
+
+    /// The words some Reading introduces if the face discharges every
+    /// choice it offers: what the text makes available to the lines after
+    /// it.
+    #[must_use]
+    pub fn may_introduce(&self) -> std::collections::BTreeSet<LexicalReading> {
+        self.introduced_and_used(&self.candidates).0
+    }
+
+    /// The words some Reading introduces.
+    #[must_use]
+    pub fn introduced(&self) -> std::collections::BTreeSet<LexicalReading> {
+        self.introduced_and_used(&self.forest.roots).0
+    }
+
+    /// The introduced words some Reading uses: a name named again, an
+    /// Anchor Word heading its ability, a Vote Option mentioned. A use
+    /// discharges the choice that offers the word, on this line or one
+    /// before it.
+    #[must_use]
+    pub fn uses(&self) -> std::collections::BTreeSet<LexicalReading> {
+        self.introduced_and_used(&self.forest.roots).1
+    }
+
+    /// The words the Derivations under `roots` introduce, and those they
+    /// use.
+    fn introduced_and_used(
+        &self,
+        roots: &[usize],
+    ) -> (
+        std::collections::BTreeSet<LexicalReading>,
+        std::collections::BTreeSet<LexicalReading>,
+    ) {
+        let forest = &self.forest;
+        let mut introduced = std::collections::BTreeSet::new();
+        let mut used = std::collections::BTreeSet::new();
+        if !self.introducing {
+            return (introduced, used);
+        }
+        let mut seen_nodes = vec![false; forest.nodes.len()];
+        let mut seen_items = vec![false; forest.items.len()];
+        let mut nodes = Vec::new();
+        for &root in roots {
+            if !std::mem::replace(&mut seen_nodes[root], true) {
+                nodes.push(root);
+            }
+        }
+        while let Some(node) = nodes.pop() {
+            let mut items: Vec<usize> = forest.node_items(node).collect();
+            while let Some(item) = items.pop() {
+                if std::mem::replace(&mut seen_items[item], true) {
+                    continue;
+                }
+                let item = &forest.items[item];
+                let production = &self.grammar.productions[item.production];
+                let Some(position) = production.child_before(item.dot) else {
+                    continue;
+                };
+                for &(previous, child) in &item.families {
+                    items.extend(previous);
+                    match child {
+                        ChildRef::Node(child) => {
+                            if !std::mem::replace(&mut seen_nodes[child], true) {
+                                nodes.push(child);
+                            }
+                        }
+                        ChildRef::Leaf(leaf) => {
+                            let leaf = &forest.leaves[leaf];
+                            if leaf.facts.introduced.is_none() {
+                                continue;
+                            }
+                            match Role::of(production, position) {
+                                // A root leaves no name undescribed.
+                                Role::Introduces | Role::Undescribed => {
+                                    introduced.insert(leaf.reading.clone());
+                                }
+                                Role::Uses => {
+                                    used.insert(leaf.reading.clone());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        (introduced, used)
+    }
+
     /// Parses another analyzed text as the Category this Parse was made for.
     /// Unlike [`CompiledGrammar::parse_category`] with [`Parse::category`],
     /// this keeps a Category that Readings report under another Category's
@@ -336,6 +468,27 @@ impl<'g> Parse<'g> {
     pub fn reparse(&self, analyzed: &AnalyzedText) -> Parse<'g> {
         self.grammar.run(analyzed, self.root)
     }
+}
+
+/// The lexical leaves among the children a partial Production has found.
+fn item_leaves(forest: &PackedForest, item: usize) -> Vec<usize> {
+    let mut leaves = Vec::new();
+    let mut seen = vec![item];
+    let mut items = vec![item];
+    while let Some(item) = items.pop() {
+        for &(previous, child) in &forest.items[item].families {
+            if let ChildRef::Leaf(leaf) = child {
+                leaves.push(leaf);
+            }
+            if let Some(previous) = previous
+                && !seen.contains(&previous)
+            {
+                seen.push(previous);
+                items.push(previous);
+            }
+        }
+    }
+    leaves
 }
 
 /// The position of the atom at or after `p`: past the interword spaces
@@ -586,21 +739,21 @@ impl Boundaries {
         &mut self,
         forest: &mut PackedForest,
         end: usize,
-        key: ItemKey,
+        key: &ItemKey,
         family: Option<(Option<usize>, ChildRef)>,
     ) {
         let boundary = self.boundary(end);
         let items = &forest.items;
         let index = match self.index[boundary].entry(
             CHART_HASHER.hash_one(key),
-            |&i| items[i].key() == key,
+            |&i| items[i].key() == *key,
             |&i| CHART_HASHER.hash_one(items[i].key()),
         ) {
             Entry::Occupied(entry) => *entry.get(),
             Entry::Vacant(entry) => {
                 let i = forest.items.len();
                 entry.insert(i);
-                let (production, dot, start, state, seam) = key;
+                let (production, dot, start, state, seam) = *key;
                 forest.items.push(Item {
                     production,
                     dot,
@@ -646,34 +799,43 @@ impl CompiledGrammar {
         Some(self.run(analyzed, root))
     }
 
-    /// The leaves of the Introduced Names that some partial Production of
-    /// the forest introduces, or names again where another introduces the
-    /// name: a title run is a name there, and a vocabulary gap where no
-    /// Production takes it as one. An `undescribed` name is introduced once
-    /// a Production that `describes` it has taken a child after it.
+    /// The leaves of the introduced words that some partial Production of
+    /// the forest introduces, or uses where a line before the text or
+    /// another Production introduces the word: a spelling of the shape of an
+    /// Introduced Name, an Anchor Word or a Vote Option is one there, and a
+    /// vocabulary gap where no Production takes it as one. An `undescribed`
+    /// name is introduced once a Production that `describes` it has taken a
+    /// child after it, and the words a Production `offers` once it has taken
+    /// them all.
     fn introduced_leaves(&self, forest: &PackedForest) -> Vec<usize> {
         let mut leaves = Vec::new();
-        let mut repeated = Vec::new();
+        let mut used = Vec::new();
         let mut introduced = 0;
-        for item in &forest.items {
+        for (index, item) in forest.items.iter().enumerate() {
             introduced |= item.state.names.introduced;
             let production = &self.productions[item.production];
             let Some(position) = production.child_before(item.dot) else {
                 continue;
             };
             let rules = &production.name_rules;
+            if rules.offers {
+                if item.dot == production.rhs.len() {
+                    leaves.extend(item_leaves(forest, index));
+                }
+                continue;
+            }
             let described = rules
                 .describes
                 .filter(|&at| production.child_before(position) == Some(at));
             for &(previous, child) in &item.families {
-                match (&production.rhs[position], child) {
-                    (Symbol::Leaf(Test::IntroducedName), ChildRef::Leaf(leaf))
-                        if !rules.undescribed =>
-                    {
-                        leaves.push(leaf);
+                if let ChildRef::Leaf(leaf) = child
+                    && forest.leaves[leaf].facts.introduced.is_some()
+                {
+                    match Role::of(production, position) {
+                        Role::Introduces => leaves.push(leaf),
+                        Role::Uses => used.push(leaf),
+                        Role::Undescribed => {}
                     }
-                    (Symbol::Leaf(Test::RepeatedName), ChildRef::Leaf(leaf)) => repeated.push(leaf),
-                    _ => {}
                 }
                 let Some((_, previous)) = described.zip(previous) else {
                     continue;
@@ -688,12 +850,13 @@ impl CompiledGrammar {
                 }
             }
         }
-        leaves.extend(repeated.into_iter().filter(|&leaf| {
+        leaves.extend(used.into_iter().filter(|&leaf| {
             forest.leaves[leaf]
                 .facts
-                .introduced_name
-                .is_some_and(|name| name.bit & introduced != 0)
+                .introduced
+                .is_some_and(|word| word.held || word.bit & introduced != 0)
         }));
+        leaves.retain(|&leaf| forest.leaves[leaf].facts.introduced.is_some());
         leaves.sort_unstable();
         leaves.dedup();
         leaves
@@ -771,13 +934,16 @@ impl CompiledGrammar {
 
     /// Parses an analyzed text as Category `root`.
     ///
-    /// A title run written at more than one place may be an Introduced Name
-    /// named again at any of them (`docs/design/lexicon.md` §6), before or
-    /// after the place that introduces it: a root holds each name it names
-    /// again to an introduction (`Names::complete`).
+    /// A word of a kind a text introduces, written at more than one place,
+    /// may be introduced at one and used at another
+    /// (`docs/design/lexicon.md` §2, §6), before or after the place that
+    /// introduces it: a root holds each word it uses to an introduction, its
+    /// own or a line's before the text (`Introductions::complete`), and each
+    /// choice it offers to a use (`Offers::discharged`).
     #[expect(clippy::too_many_lines, reason = "one Earley loop reads best whole")]
     pub(crate) fn run<'g>(&'g self, analyzed: &AnalyzedText, root: usize) -> Parse<'g> {
-        let bits = NameBits::of(analyzed);
+        let bits = WordBits::of(analyzed);
+        let mut offers = Offers::default();
         let n = analyzed.tokens.len();
         let mut covered = vec![false; n];
         // A word spelled by a quotation mark alone (the genitive apostrophe
@@ -799,7 +965,7 @@ impl CompiledGrammar {
         let mut forest = PackedForest::default();
         let mut by_start: Vec<Vec<usize>> = vec![Vec::new(); n + 1];
         let atomic = self.atomic_spans(analyzed);
-        for found in &analyzed.matches {
+        for found in analyzed.matches.iter().chain(&analyzed.open_words) {
             // No Constituent spans nothing: it has a child
             // (`Binder::every_production_has_a_child`), and no leaf does.
             assert!(
@@ -824,11 +990,11 @@ impl CompiledGrammar {
             }
             let licensed = "an analyzed lexical match is licensed by the grammar's lexicon";
             let mut facts = self.leaf_facts(&found.reading).expect(licensed);
-            if let LexicalReading::IntroducedName { name } = &found.reading {
-                let bit = bits.bit(name);
-                facts.introduced_name = Some(NameLeaf {
+            if facts.introduced.is_some() {
+                facts.introduced = Some(IntroducedLeaf {
                     leaf: u32::try_from(forest.leaves.len()).expect("fewer than u32::MAX leaves"),
-                    bit,
+                    bit: bits.bit(&found.reading),
+                    held: analyzed.scope.introduces(&found.reading),
                 });
             }
             let edges = self.leaf_edges(&found.reading).expect(licensed);
@@ -930,6 +1096,7 @@ impl CompiledGrammar {
         let categories = self.categories.len();
         let mut predicted_at = vec![usize::MAX; categories];
 
+        let mut introducing = false;
         let mut active = self.prediction.signature();
         for position in 0..=n {
             let Some(here) = boundaries.at[position] else {
@@ -959,7 +1126,7 @@ impl CompiledGrammar {
                         && let Some((dot, end, state, seam)) =
                             cross(production, 0, 0, 0, production.start(), 0)
                     {
-                        boundaries.add(&mut forest, end, (p, dot, 0, state, seam), None);
+                        boundaries.add(&mut forest, end, &(p, dot, 0, state, seam), None);
                     }
                 }
             }
@@ -973,9 +1140,19 @@ impl CompiledGrammar {
                 };
                 let production = &self.productions[production_id];
                 if dot == production.rhs.len() {
-                    let Some(summary) = production.finish(self, &forest.items[id].state) else {
+                    let Some(mut summary) = production.finish(self, &forest.items[id].state) else {
                         continue;
                     };
+                    if production.name_rules.offers {
+                        let words = item_leaves(&forest, id)
+                            .into_iter()
+                            .filter(|&leaf| forest.leaves[leaf].facts.introduced.is_some())
+                            .map(|leaf| forest.leaves[leaf].reading.clone())
+                            .collect();
+                        summary.names.offers |= offers.bit(words).unwrap_or_else(|| {
+                            panic!("a text offers more than 32 choices: {}", analyzed.text())
+                        });
+                    }
                     let key = (production.lhs, start, position, summary);
                     let nodes = &forest.nodes;
                     let node = match node_index.entry(
@@ -1039,7 +1216,7 @@ impl CompiledGrammar {
                             boundaries.add(
                                 &mut forest,
                                 end,
-                                (p, dot, s, state, seam),
+                                &(p, dot, s, state, seam),
                                 Some((previous, ChildRef::Node(node))),
                             );
                         }
@@ -1065,7 +1242,7 @@ impl CompiledGrammar {
                                 boundaries.add(
                                     &mut forest,
                                     end,
-                                    (p, dot, position, state, seam),
+                                    &(p, dot, position, state, seam),
                                     None,
                                 );
                             }
@@ -1094,6 +1271,7 @@ impl CompiledGrammar {
                             if let Some(state) =
                                 production.accept(self, &forest.items[id].state, dot, &view)
                             {
+                                introducing |= facts.introduced.is_some();
                                 let end = forest.leaves[leaf].end;
                                 let item = &forest.items[id];
                                 let Some(seam) = seams.after(
@@ -1114,7 +1292,7 @@ impl CompiledGrammar {
                                 boundaries.add(
                                     &mut forest,
                                     end,
-                                    (production_id, dot_after, start, state, seam),
+                                    &(production_id, dot_after, start, state, seam),
                                     Some((previous, ChildRef::Leaf(leaf))),
                                 );
                             }
@@ -1126,7 +1304,8 @@ impl CompiledGrammar {
                 }
             }
         }
-        forest.roots = (0..forest.nodes.len())
+        let held = bits.held(&analyzed.scope);
+        let candidates: Vec<usize> = (0..forest.nodes.len())
             .filter(|&i| {
                 let node = &forest.nodes[i];
                 !node.families.is_empty()
@@ -1138,7 +1317,14 @@ impl CompiledGrammar {
                     // with a capital, so it opens as a Constituent inside a
                     // sentence does, where none states one.
                     && node.summary.opening != Opening::Capital
-                    && node.summary.names.complete()
+                    && node.summary.names.complete(held)
+            })
+            .collect();
+        forest.roots = candidates
+            .iter()
+            .copied()
+            .filter(|&node| {
+                offers.discharged(forest.nodes[node].summary.names, &bits, &analyzed.scope)
             })
             .collect();
         let introduced = self.introduced_leaves(&forest);
@@ -1156,6 +1342,10 @@ impl CompiledGrammar {
             forest,
             vocabulary_gaps,
             scope: analyzed.scope.clone(),
+            words: bits,
+            offers,
+            candidates,
+            introducing,
             children_first: OnceLock::new(),
             head_inside: OnceLock::new(),
         }
