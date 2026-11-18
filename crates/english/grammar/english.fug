@@ -2780,7 +2780,9 @@ PrefixedNoun: BareNominal -> prefix:Lex(Affix) BareNominal { light: [head] }
 AttributiveNoun: NounPremodifier -> FreeLex(Noun)
     where head.Inflection = Singular,
           head.NounDistribution != HeadOnly
-PrefixedNounPremodifier: NounPremodifier -> prefix:Lex(Affix) NounPremodifier
+// A prefix takes one noun, never a coordination of noun premodifiers (not
+// *non[creature or Robot]*, Vision, Spectral Synthezoid).
+PrefixedNounPremodifier: NounPremodifier -> prefix:Lex(Affix) NounPremodifier { light: [head] }
     where $.Polarity = Negative
 // *Each differently named dungeon*: only a manner adverb, which a clause
 // has in end position, expands an attributive participle (CGEL
