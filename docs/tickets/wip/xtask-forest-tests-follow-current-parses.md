@@ -12,9 +12,10 @@ of real units and the parses have since changed:
 - `english::forests::forks::tests::wide_and_narrow_attachments_over_a_coordination` expects
   Sands of Time's wide and narrow attachments over 100 Derivations, and the parse now has 50.
 - `english::forestwalk::tests::settled_siblings_fold_as_a_large_forest_narrows_and_under_limit`
-  (Remove Enchantments, line 1) no longer narrows to the 2 Derivations it expects under its
-  picks and exclusion. One fork remains, `dependency "control"#6` (modifier of Nominal "Auras"#4
-  or of "creatures"#2).
+  (Remove Enchantments, line 1) still narrows to 2 Derivations under its picks and exclusion,
+  which differ in whether *your opponents control* modifies *Auras*#4 or *creatures*#2, but its
+  settled spine no longer ends in `head: Nominal "other Auras attached to attacking creatures
+  your opponents control": 2 alternatives`.
 
 ## Done when
 
