@@ -648,6 +648,10 @@ category QuotedAbility
 // Phrase's.
 category Mention
 category MentionModifier
+// The two Anchor Words a replacement effect offers as its permanent enters
+// (*choose Khans or Dragons*): one of two abilities, each marked with its
+// word [CR#614.12c]. The words are cited, so it stands as a Mention.
+category AnchorChoice
 // A singular subtype name or coordination of them as the value of a
 // specifying copular *be* (*the new creature type can't be Wall*, Artificial
 // Evolution; CGEL 4§5.5:266–269). Distinct from Predicative so coordination
@@ -772,7 +776,6 @@ class Supertype { typed }
 class Subtype { typed }
 class ParameterizedKeyword { typed }
 class AbilityWord { typed }
-class AnchorWord { typed }
 // A verb whose Object is an object it brings into being, which the text may
 // name: only *create* [CR#111.4].
 class NamingVerb { typed }
@@ -1061,7 +1064,9 @@ LabeledAbility: Ability -> label:Class(AbilityWord) '—':Free Ability { capital
 // *• Khans — ...*: an ability under an Anchor Word, after the ability
 // offering the choice [CR#607.2m]; the bullet is part of it [CR#614.12c].
 // Never a mode: no instruction to choose options precedes it [CR#700.2].
-AnchoredAbility: Ability -> '•':Free label:Class(AnchorWord) '—':Free Ability { capital: [label, head] }
+// An Anchor Word is no declared word: it is read from the face's text, and
+// stands where the Card Scope holds it (`docs/design/lexicon.md` §2).
+AnchoredAbility: Ability -> '•':Free label:Lex(AnchorWord) '—':Free Ability { capital: [label, head] }
 FlavorLabeledAbility: Ability -> label:Lex(FlavorWord) Ability { capital: [head] }
 NominalMode: Mode -> '•':Free Nominal '.' { capital: [head] }
 NounPhraseMode: Mode -> '•':Free NounPhrase '.' { capital: [head] }
@@ -2618,6 +2623,8 @@ FusedLocative: LocativeHead -> Word(Anywhere)
 // A cited noun (*choose land or nonland*): bare and singular, since it
 // names the word.
 WordMention: Mention -> FreeLex(Noun) where head.Inflection = Singular
+AnchorWordChoice: AnchorChoice -> first:Lex(AnchorWord) coordinator:Word(Or) last:Lex(AnchorWord)
+AnchorChoiceMention: Mention -> AnchorChoice
 NegativeMention: Mention -> prefix:Lex(Affix) Mention { light: [head], uncoordinated: [head] }
 // A cited adjective that names a Quality (*choose odd or even*, Extinction
 // Event), as AdjectivalQuality's does after *protection from*.

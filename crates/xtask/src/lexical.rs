@@ -477,8 +477,11 @@ fn materials(lexicon: &Lexicon, reading: &LexicalReading) -> Result<BTreeSet<Mat
         LexicalReading::OwnName { .. } | LexicalReading::SetName { .. } => {
             return Ok(BTreeSet::from([Material::Catalog]));
         }
-        // A Flavor Word is a label, as an ability word is.
-        LexicalReading::FlavorWord { .. } => return Ok(BTreeSet::from([Material::Keyword])),
+        // A Flavor Word is a label, as an ability word is, and so is an
+        // Anchor Word.
+        LexicalReading::FlavorWord { .. } | LexicalReading::AnchorWord { .. } => {
+            return Ok(BTreeSet::from([Material::Keyword]));
+        }
         // A title run is a name only where a parse introduces it: alone it
         // is no material.
         LexicalReading::IntroducedName { .. } => return Ok(BTreeSet::new()),

@@ -4,7 +4,7 @@
 +Clause <card=Grip of Chaos> reselect its target at random => NounPhrase "its target" as Object of reselect
 + <card=Touch of the Eternal> At the beginning of your upkeep, count the number of permanents you control. => VerbPhrase "count the number of permanents you control"
 + <card=Chaos Moon> At the beginning of each upkeep, count the number of permanents. => VerbPhrase "count the number of permanents"
-+ <card=Monastery Siege> As this enchantment enters, choose Khans or Dragons. => NounPhrase "Khans"
++ <card=Monastery Siege> <anchor=Khans> <anchor=Dragons> As this enchantment enters, choose Khans or Dragons. => AnchorChoice "Khans or Dragons"
 + <card=Aerid Konstrari> When Aerid Konstrari enters or dies, create a Heartwood token. => Nominal "Heartwood"
 + <card=Hungering Puppetbeast> When this creature enters, create a Heartwood token. => Nominal "Heartwood"
 + <card=Invasion of Pyrulea> If it's a land or double-faced card, draw a card. => AdjectivePhrase "double-faced"
@@ -88,11 +88,10 @@
 +NounPhrase <card=Ghostly Keybearer> a locked door of up to one target Room you control => VerbPhrase "locked"
 +Clause <card=Ogre Enforcer> lethal damage dealt by a single source is marked on it
 +NounPhrase <card=Pyramids> all damage marked on it => VerbPhrase "marked on it" as Modifier of damage
-+NounPhrase <card=Barrensteppe Siege> Abzan
-+NounPhrase <card=Barrensteppe Siege> Mardu
-+NounPhrase <card=Windcrag Siege> Jeskai
-+NounPhrase <card=Hollowmurk Siege> Sultai
-+NounPhrase <card=Glacierwood Siege> Temur
++ <card=Barrensteppe Siege> <anchor=Abzan> <anchor=Mardu> As this enchantment enters, choose Abzan or Mardu. => AnchorChoice "Abzan or Mardu"
++ <card=Windcrag Siege> <anchor=Mardu> <anchor=Jeskai> As this enchantment enters, choose Mardu or Jeskai. => AnchorChoice "Mardu or Jeskai"
++ <card=Hollowmurk Siege> <anchor=Sultai> <anchor=Abzan> As this enchantment enters, choose Sultai or Abzan. => AnchorChoice "Sultai or Abzan"
++ <card=Glacierwood Siege> <anchor=Temur> <anchor=Sultai> As this enchantment enters, choose Temur or Sultai. => AnchorChoice "Temur or Sultai"
 +PrepositionPhrase <card=Travel Through Caradhras> for Redhorn Pass or Mines of Moria => NounPhrase "Redhorn Pass"
 +NounPhrase <card=Travel Through Caradhras> Redhorn Pass
 +NounPhrase <card=Jace, Multiverse Architect> Jaces you control => Nominal "Jaces you control"

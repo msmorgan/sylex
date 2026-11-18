@@ -112,14 +112,14 @@ CREATE TABLE families (
 -- lexeme and Word Form), `own name` (the face's own name, declared by no
 -- lexeme, with its name form `Full` or `Shortened` as `form`), `introduced
 -- name` (a name the text itself gives an object, spelled as its `surface`),
--- `flavor word`, `set name` or `numeral` (with `value`).
+-- `flavor word`, `set name`, `anchor word` or `numeral` (with `value`).
 CREATE TABLE leaves (
     unit INTEGER NOT NULL,
     leaf INTEGER NOT NULL,
     start INTEGER NOT NULL,
     end INTEGER NOT NULL,
     surface TEXT NOT NULL,
-    kind TEXT NOT NULL CHECK (kind IN ('word', 'own name', 'introduced name', 'flavor word', 'set name', 'numeral')),
+    kind TEXT NOT NULL CHECK (kind IN ('word', 'own name', 'introduced name', 'flavor word', 'set name', 'anchor word', 'numeral')),
     lexeme TEXT REFERENCES lexemes,
     form TEXT,
     value INTEGER,

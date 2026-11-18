@@ -80,6 +80,28 @@ Forks: 1
     );
 }
 
+/// Frontier Siege: a fetched unit is surveyed with its face's Anchor Words
+/// in scope, read from the face's own text, and stated text with the words
+/// `--anchor` states.
+#[test]
+fn a_unit_is_surveyed_with_its_anchor_words() {
+    let fetched = survey(&["--card", "Frontier Siege", "--line", "1"]).unwrap();
+    assert!(fetched.contains("Derivations: 1\n"), "{fetched}");
+    assert!(
+        fetched.contains("\"Khans\"#1 anchor word \"Khans\""),
+        "{fetched}"
+    );
+    let label = survey(&["--card", "Frontier Siege", "--line", "2"]).unwrap();
+    assert!(label.contains("Ability [AnchoredAbility]"), "{label}");
+    let text = "As this enchantment enters, choose Khans or Dragons.";
+    let stated = survey(&["--anchor", "Khans", "--anchor", "Dragons", text]).unwrap();
+    let entry = survey(&[&format!("<anchor=Khans> <anchor=Dragons> {text}")]).unwrap();
+    assert_eq!(stated, entry);
+    assert!(stated.contains("Derivations: 1\n"), "{stated}");
+    let bare = survey(&[text]).unwrap();
+    assert!(bare.contains("Derivations: 0\n"), "{bare}");
+}
+
 /// Stated text is read as given, its card stated by `--as-card` or by
 /// the entry, and nothing is fetched; a Category prefix is the root.
 #[test]
@@ -198,9 +220,10 @@ fn with_unit<R>(
     line: usize,
     check: impl FnOnce(&Judge<'_>, &Judgment, &Parse<'_>) -> R,
 ) -> R {
-    let item = super::fetched_unit(card, Some(line), false).unwrap();
+    let mut item = super::fetched_unit(card, Some(line), false).unwrap();
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
+    item.read_anchor_words(&env.lexicon, &grammar);
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
@@ -396,8 +419,11 @@ fn check_isolation(card: &str, line: usize, stated: usize) {
         let output = narrow_unit(card, &line.to_string(), &taken, &["--assertions"]).unwrap();
         let assertions = printed_assertions(&output);
         assert!(!assertions.is_empty(), "{output}");
+        let anchors = unit.anchors.iter().fold(String::new(), |stated, word| {
+            format!("{stated}<anchor={word}> ")
+        });
         let written = format!(
-            "+ <card={}> {}{} => {}",
+            "+ <card={}> {}{anchors}{} => {}",
             unit.card.as_deref().unwrap(),
             if unit.legendary { "<legendary> " } else { "" },
             unit.text,

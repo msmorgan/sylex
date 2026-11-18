@@ -146,6 +146,9 @@ pub struct Judgment {
     /// That card is stated to be a legendary permanent (`<legendary>`), so
     /// its name has its Shortened form [CR#201.5c].
     pub legendary: bool,
+    /// The Anchor Words the text is read with in scope (`<anchor=WORD>`,
+    /// once per word) [CR#614.12c].
+    pub anchors: Vec<String>,
     pub text: String,
     /// Alternative groups; each must be satisfied by some one Reading.
     pub groups: Vec<Vec<Assertion>>,
@@ -244,6 +247,18 @@ fn parse_entry(line: &str, location: &str) -> Result<Judgment, String> {
         legendary = true;
         rest = after.trim_start();
     }
+    let mut anchors = Vec::new();
+    while let Some(after) = rest.strip_prefix("<anchor=") {
+        let end = after.find('>').ok_or("unclosed `<anchor=`")?;
+        let word = &after[..end];
+        if !sylex_lexicon::valid_anchor_word(word) {
+            return Err(format!(
+                "`<anchor={word}>` states no word an ability may be headed with"
+            ));
+        }
+        anchors.push(word.to_owned());
+        rest = after[end + 1..].trim_start();
+    }
     let (text, assertions) = match rest.find(" => ") {
         Some(at) => (rest[..at].trim(), Some(rest[at + 4..].trim())),
         None => (rest.trim_end_matches("=>").trim(), None),
@@ -257,6 +272,7 @@ fn parse_entry(line: &str, location: &str) -> Result<Judgment, String> {
         category,
         card,
         legendary,
+        anchors,
         text: text.to_owned(),
         groups: Vec::new(),
         negated: Vec::new(),
@@ -416,15 +432,21 @@ impl Judgment {
     /// (`sylex_vocabulary::stated_scope`): the name it states with
     /// `<card=NAME>` as the card's own, in its Full form and, when the entry
     /// also states `<legendary>` and the name has one, in its Shortened form
-    /// [CR#201.5c]; or the empty scope. The name and the flag are inputs
-    /// like the text: no card is looked up, and the name need be no printed
-    /// card's.
+    /// [CR#201.5c]; and each Anchor Word it states with `<anchor=WORD>`
+    /// [CR#614.12c]. The name, the flag and the words are inputs like the
+    /// text: no card is looked up, the name need be no printed card's, and
+    /// no other text confirms the words as a face's units do
+    /// ([`crate::corpus::Face::scope`]).
     #[must_use]
     pub fn scope(&self, lexicon: &Lexicon) -> CardScope {
-        match &self.card {
+        let mut scope = match &self.card {
             Some(name) => sylex_vocabulary::stated_scope(name, self.legendary, lexicon),
             None => CardScope::default(),
+        };
+        for word in &self.anchors {
+            scope.insert_anchor_word(word);
         }
+        scope
     }
 }
 

@@ -59,6 +59,10 @@ pub(super) struct ForestwalkArgs {
     /// its Shortened form.
     #[arg(long, requires = "as_card")]
     legendary: bool,
+    /// Survey the text with this Anchor Word in scope; repeat it for each
+    /// word. A fetched card's Anchor Words are read from its own text.
+    #[arg(long, value_name = "WORD", conflicts_with = "card")]
+    anchor: Vec<String>,
     /// Fetch the faces so named (a face's name, or its whole card's) from the
     /// supported corpus: alone, list their units; with `--line` or
     /// `--type-line`, survey that unit (then `NAME` must name one face). Takes
@@ -90,7 +94,7 @@ pub(super) struct ForestwalkArgs {
 
 pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
     let selectors = args.steps.selectors()?;
-    let item = match target(args, &selectors)? {
+    let mut item = match target(args, &selectors)? {
         Target::List(listing) => {
             writeln!(output, "{listing}")?;
             return Ok(());
@@ -103,6 +107,7 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
         grammar: &grammar,
         lexicon: &env.lexicon,
     };
+    item.read_anchor_words(&env.lexicon, &grammar);
     let entry = &item.entry;
     let scope = entry.scope(&env.lexicon);
     let parse = judge
@@ -338,6 +343,7 @@ fn target(args: &ForestwalkArgs, selectors: &[Selector]) -> Result<Target> {
                 std::slice::from_ref(text),
                 args.as_card.as_deref(),
                 args.legendary,
+                &args.anchor,
             )?;
             let item = items.remove(0);
             let entry = &item.entry;
@@ -748,6 +754,7 @@ fn lexical(reading: &LexicalReading) -> String {
         LexicalReading::IntroducedName { name } => format!("introduced name {name:?}"),
         LexicalReading::FlavorWord { label } => format!("flavor word {label:?}"),
         LexicalReading::SetName { name } => format!("set name {name:?}"),
+        LexicalReading::AnchorWord { word } => format!("anchor word {word:?}"),
         LexicalReading::Numeral {
             value, notation, ..
         } => format!("numeral {value} {notation:?}"),

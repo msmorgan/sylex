@@ -253,9 +253,9 @@ fn alternatives_distributions_agree_with_enumerated_derivations_on_real_units() 
         let text = cleave
             .as_ref()
             .map_or(unit.text.as_str(), |c| c.uncleaved.as_str());
-        let analyzed = env
-            .lexicon
-            .analyze_source_scoped(text, None, &face.scope(&env.lexicon));
+        let analyzed =
+            env.lexicon
+                .analyze_source_scoped(text, None, &face.scope(&env.lexicon, &grammar));
         let parse = grammar.parse_analyzed(&analyzed);
         let counts = parse.counts().unwrap();
         most = most.max(counts.total());

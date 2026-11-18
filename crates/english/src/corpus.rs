@@ -18,6 +18,7 @@ use std::io::BufRead;
 
 use sylex_lexicon::CardScope;
 use sylex_lexicon::Lexicon;
+use sylex_syntax::CompiledGrammar;
 use sylex_upstream::oracle_text::strip_reminder_text;
 use sylex_upstream::scryfall::OracleCard;
 use sylex_upstream::scryfall::OracleCardReader;
@@ -41,8 +42,10 @@ impl Face {
     /// The Card Scope the face's text is read in: its own name in its Full
     /// form and, for a legendary permanent whose name has one, in its
     /// Shortened form [CR#201.5c], derived from the face's name and type
-    /// line as its text is parsed (`sylex_vocabulary::face_scope`).
-    /// Nothing else of the card is in it.
+    /// line as its text is parsed (`sylex_vocabulary::face_scope`); and its
+    /// Anchor Words [CR#614.12c], read from its rules text across its lines
+    /// ([`crate::anchors::anchor_words`]). Nothing else of the card is in
+    /// it.
     ///
     /// Each face of a double-faced card has its own name [CR#712.6], and two
     /// faces that shorten to one spelling (*Ral*) name one object, not two,
@@ -54,7 +57,25 @@ impl Face {
     /// On a face with no type line, or one whose type line has a word that
     /// is neither a supertype nor a card type before its dash.
     #[must_use]
-    pub fn scope(&self, lexicon: &Lexicon) -> CardScope {
+    pub fn scope(&self, lexicon: &Lexicon, grammar: &CompiledGrammar) -> CardScope {
+        let mut scope = self.name_scope(lexicon);
+        // A face with no rules text has no Anchor Words.
+        if let Some(text) = &self.oracle_text {
+            let lines = split_lines(text);
+            for word in crate::anchors::anchor_words(&lines, &scope, lexicon, grammar) {
+                scope.insert_anchor_word(&word);
+            }
+        }
+        scope
+    }
+
+    /// The face's card names alone ([`Face::scope`]): what its text is
+    /// analyzed with where no grammar reads it.
+    ///
+    /// # Panics
+    /// As [`Face::scope`].
+    #[must_use]
+    pub fn name_scope(&self, lexicon: &Lexicon) -> CardScope {
         let type_line = self
             .type_line
             .as_deref()
@@ -462,7 +483,7 @@ mod tests {
         corpus
             .faces
             .iter()
-            .map(|face| face.scope(&env.lexicon))
+            .map(|face| face.name_scope(&env.lexicon))
             .collect()
     }
 

@@ -174,7 +174,10 @@ pub fn run(corpus: &Corpus, env: &LexicalEnvironment, judgments: &[Judgment]) ->
         .zip(&cleaves)
         .map(|(unit, cleave)| {
             let face = &corpus.faces[unit.face];
-            let scope = face.scope(&env.lexicon);
+            let scope = match grammar {
+                Some((grammar, _)) => face.scope(&env.lexicon, grammar),
+                None => face.name_scope(&env.lexicon),
+            };
             let analyzed = env.lexicon.analyze_source_scoped(&unit.text, None, &scope);
             let profile = profiler.profile(unit.kind, &analyzed);
             let entries = |text: &str| -> Vec<&Judgment> {

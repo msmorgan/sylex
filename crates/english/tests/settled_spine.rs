@@ -307,9 +307,9 @@ fn the_settled_spine_agrees_with_the_counts_and_the_readings() {
     let mut whole_trees = 0;
     for (face, text) in unit_texts::texts(&corpus, &env) {
         let name = |why: String| format!("{} | {text}: {why}", face.name);
-        let analyzed = env
-            .lexicon
-            .analyze_source_scoped(&text, None, &face.scope(&env.lexicon));
+        let analyzed =
+            env.lexicon
+                .analyze_source_scoped(&text, None, &face.scope(&env.lexicon, &grammar));
         let parse = grammar.parse_analyzed(&analyzed);
         let counts = parse.counts().unwrap();
         let forest = parse.fork_forest().unwrap();

@@ -333,9 +333,9 @@ fn unit_rows(
     let u = &corpus.units[unit];
     let face = &corpus.faces[u.face];
     let parsed = cleave.map_or_else(|| u.text.clone(), |c| c.uncleaved.clone());
-    let analyzed = env
-        .lexicon
-        .analyze_source_scoped(&parsed, None, &face.scope(&env.lexicon));
+    let analyzed =
+        env.lexicon
+            .analyze_source_scoped(&parsed, None, &face.scope(&env.lexicon, grammar));
     let parse = grammar.parse_analyzed(&analyzed);
     let counts = parse.counts()?;
     let heads = parse.alternative_heads()?;
@@ -377,6 +377,7 @@ fn unit_rows(
                     | LexicalReading::IntroducedName { .. }
                     | LexicalReading::FlavorWord { .. }
                     | LexicalReading::SetName { .. }
+                    | LexicalReading::AnchorWord { .. }
                     | LexicalReading::Numeral { .. } => None,
                 };
                 Ok(AlternativeRow {
@@ -891,6 +892,9 @@ fn write_leaves(
             LexicalReading::SetName { .. } => {
                 (Val::Static("set name"), Val::Null, Val::Null, Val::Null)
             }
+            LexicalReading::AnchorWord { .. } => {
+                (Val::Static("anchor word"), Val::Null, Val::Null, Val::Null)
+            }
             LexicalReading::Numeral { value, .. } => (
                 Val::Static("numeral"),
                 Val::Null,
@@ -1138,9 +1142,11 @@ mod tests {
                     |r| r.get(0),
                 )
                 .unwrap();
-            let analyzed =
-                env.lexicon
-                    .analyze_source_scoped(&parsed, None, &face.scope(&env.lexicon));
+            let analyzed = env.lexicon.analyze_source_scoped(
+                &parsed,
+                None,
+                &face.scope(&env.lexicon, &grammar),
+            );
             let expected = grammar.parse_analyzed(&analyzed).derivation_count();
             assert_eq!(
                 u128::try_from(totals[unit]).unwrap(),

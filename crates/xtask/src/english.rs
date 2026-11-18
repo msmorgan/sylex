@@ -164,6 +164,10 @@ struct ParseArgs {
     /// its Shortened form.
     #[arg(long, requires = "as_card")]
     legendary: bool,
+    /// Parse each input with this Anchor Word in scope; repeat it for each
+    /// word. A fetched card's Anchor Words are read from its own text.
+    #[arg(long, value_name = "WORD", conflicts_with = "card")]
+    anchor: Vec<String>,
     /// Fetch the faces so named (a face's name, or its whole card's) from
     /// the supported corpus and parse their own type lines and rules-text
     /// lines. Takes no text.
@@ -184,15 +188,39 @@ struct ParseItem {
     kind: sylex_english::corpus::UnitKind,
     /// Whether to print the entry's outcome.
     evaluate: bool,
+    /// The rules-text lines of the face a fetched unit is of, which its
+    /// Anchor Words are read from ([`ParseItem::read_anchor_words`]).
+    face_lines: Option<Vec<String>>,
+}
+
+impl ParseItem {
+    /// Puts the Anchor Words of a fetched unit's face in its entry's scope,
+    /// as the census reads them (`sylex_english::corpus::Face::scope`). A
+    /// stated text keeps the words it states.
+    fn read_anchor_words(
+        &mut self,
+        lexicon: &sylex_lexicon::Lexicon,
+        grammar: &sylex_syntax::CompiledGrammar,
+    ) {
+        if let Some(lines) = &self.face_lines {
+            let names = self.entry.scope(lexicon);
+            self.entry.anchors =
+                sylex_english::anchors::anchor_words(lines, &names, lexicon, grammar)
+                    .into_iter()
+                    .collect();
+        }
+    }
 }
 
 /// The texts the inputs state, each as a judgment entry, with `as_card` the
-/// card of every entry and `legendary` whether that card is a legendary
-/// permanent.
+/// card of every entry, `legendary` whether that card is a legendary
+/// permanent, and `anchors` the Anchor Words in scope of every entry beside
+/// those it states.
 fn stated_items(
     inputs: &[String],
     as_card: Option<&str>,
     legendary: bool,
+    anchors: &[String],
 ) -> Result<Vec<ParseItem>> {
     use sylex_english::corpus::UnitKind;
     use sylex_english::judgment;
@@ -220,6 +248,13 @@ fn stated_items(
                 entry.card = Some(name.to_owned());
                 entry.legendary = legendary;
             }
+            for word in anchors {
+                anyhow::ensure!(
+                    sylex_lexicon::valid_anchor_word(word),
+                    "`--anchor {word:?}` states no word an ability may be headed with"
+                );
+                entry.anchors.push(word.clone());
+            }
             let kind = if entry.category.as_deref() == Some("TypeLine") {
                 UnitKind::TypeLine
             } else {
@@ -230,6 +265,7 @@ fn stated_items(
                 entry,
                 kind,
                 evaluate: marked || input.contains(" => "),
+                face_lines: None,
             })
         })
         .collect()
@@ -246,6 +282,8 @@ struct FetchedUnit {
     /// Its [`sylex_english::corpus::Unit::index`].
     index: usize,
     text: String,
+    /// The rules-text lines of its face.
+    face_lines: Vec<String>,
 }
 
 impl FetchedUnit {
@@ -262,7 +300,8 @@ impl FetchedUnit {
     /// The unit as a judgment entry on its face, which puts the face's own
     /// name in scope as its type line gives it
     /// ([`sylex_english::judgment::Judgment::scope`],
-    /// [`sylex_english::corpus::Face::scope`]).
+    /// [`sylex_english::corpus::Face::scope`]); its face's Anchor Words
+    /// join it once a grammar is bound ([`ParseItem::read_anchor_words`]).
     fn item(&self, header: Option<String>) -> ParseItem {
         ParseItem {
             header,
@@ -272,6 +311,7 @@ impl FetchedUnit {
                 category: None,
                 card: Some(self.face.clone()),
                 legendary: self.legendary,
+                anchors: Vec::new(),
                 text: self.text.clone(),
                 groups: Vec::new(),
                 negated: Vec::new(),
@@ -279,6 +319,7 @@ impl FetchedUnit {
             },
             kind: self.kind,
             evaluate: false,
+            face_lines: Some(self.face_lines.clone()),
         }
     }
 }
@@ -309,6 +350,10 @@ fn fetched_units(name: &str) -> Result<Vec<FetchedUnit>> {
                 kind: unit.kind,
                 index: unit.index,
                 text: unit.text.clone(),
+                face_lines: face
+                    .oracle_text
+                    .as_deref()
+                    .map_or_else(Vec::new, sylex_english::corpus::split_lines),
             })
         })
         .collect()
@@ -347,7 +392,12 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
             anyhow::bail!("nothing to parse: give text, or `--card NAME` for a card's own text")
         }
         (Some(name), _, true) => fetched_items(name)?,
-        (None, as_card, false) => stated_items(&args.inputs, as_card.as_deref(), args.legendary)?,
+        (None, as_card, false) => stated_items(
+            &args.inputs,
+            as_card.as_deref(),
+            args.legendary,
+            &args.anchor,
+        )?,
     };
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
     let grammar = sylex_english::bind(&env.lexicon, &env.frames)?;
@@ -357,13 +407,15 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
         lexicon: &env.lexicon,
     };
     let profiler = Profiler::new(&env);
-    for ParseItem {
-        header,
-        entry,
-        kind,
-        evaluate,
-    } in items
-    {
+    for mut item in items {
+        item.read_anchor_words(&env.lexicon, &grammar);
+        let ParseItem {
+            header,
+            entry,
+            kind,
+            evaluate,
+            face_lines: _,
+        } = item;
         if let Some(header) = header {
             writeln!(output, "{header}")?;
         }
@@ -463,7 +515,8 @@ fn dump_reading(
             Some(
                 sylex_lexicon::LexicalReading::Numeral { .. }
                 | sylex_lexicon::LexicalReading::FlavorWord { .. }
-                | sylex_lexicon::LexicalReading::SetName { .. },
+                | sylex_lexicon::LexicalReading::SetName { .. }
+                | sylex_lexicon::LexicalReading::AnchorWord { .. },
             )
             | None => "-".to_owned(),
         };
@@ -587,6 +640,59 @@ mod tests {
         ]);
         assert_eq!(output.matches("Outcome: holds").count(), 3, "{output}");
         assert!(!output.contains("Reading 1 (ranking key"));
+    }
+
+    /// Frontier Siege: `--anchor` puts an Anchor Word in scope as
+    /// `<anchor=…>` does, and `--card` reads the face's Anchor Words from its
+    /// own text. With neither, *Khans* is an unknown word in the offer and
+    /// its label is a Flavor Word.
+    #[test]
+    fn anchor_words_are_stated_for_text_and_read_for_a_fetched_card() {
+        let offer = "As this enchantment enters, choose Khans or Dragons.";
+        let stated = dump(&["parse", "--anchor", "Khans", "--anchor", "Dragons", offer]);
+        let entry = dump(&["parse", &format!("<anchor=Khans> <anchor=Dragons> {offer}")]);
+        assert_eq!(stated, entry);
+        assert!(stated.contains("Packed Forest derivations: 1"), "{stated}");
+        assert!(
+            stated.contains("AnchorWordChoice\tAnchorChoice"),
+            "{stated}"
+        );
+        let bare = dump(&["parse", offer]);
+        assert!(bare.contains("Vocabulary gaps: [35..40]"), "{bare}");
+        // A malformed word is refused, stated either way.
+        for inputs in [
+            vec!["parse", "--anchor", " Khans", offer],
+            vec!["parse", "<anchor=> Draw a card."],
+        ] {
+            let cli = Cli::try_parse_from(std::iter::once("english").chain(inputs)).unwrap();
+            assert!(run(&cli.args, &mut Vec::new()).is_err());
+        }
+        let fetched = dump(&["parse", "--card", "Frontier Siege"]);
+        assert_eq!(
+            fetched.matches("Packed Forest derivations: 1").count(),
+            4,
+            "{fetched}"
+        );
+        assert!(
+            fetched.contains("AnchorWordChoice\tAnchorChoice"),
+            "{fetched}"
+        );
+        assert_eq!(fetched.matches("AnchoredAbility\tAbility").count(), 2);
+        assert!(!fetched.contains("\tMode\t"), "{fetched}");
+        let label = "• Khans — At the beginning of each of your main phases, add {G}{G}.";
+        let mode = dump(&["parse", label]);
+        assert!(mode.contains("\tMode\t"), "{mode}");
+        assert!(
+            Cli::try_parse_from([
+                "english",
+                "parse",
+                "--card",
+                "Frontier Siege",
+                "--anchor",
+                "Khans"
+            ])
+            .is_err()
+        );
     }
 
     /// *Jace, Cunning Castaway* is a legendary planeswalker, whose name
@@ -744,6 +850,7 @@ mod tests {
                 inputs: vec![input.to_owned()],
                 as_card: None,
                 legendary: false,
+                anchor: Vec::new(),
                 card: None,
                 limit: 8,
             };

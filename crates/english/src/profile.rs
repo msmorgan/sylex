@@ -131,6 +131,7 @@ pub enum Class {
     Symbol,
     FlavorWord,
     SetName,
+    AnchorWord,
 }
 
 impl Class {
@@ -142,11 +143,12 @@ impl Class {
                 Self::CardName
             }
             LexicalReading::SetName { .. } => Self::SetName,
+            LexicalReading::AnchorWord { .. } => Self::AnchorWord,
             LexicalReading::Word(value) => {
                 let id = value.lexeme.as_str();
                 let prefix = id.split(':').next().unwrap_or("");
                 match prefix {
-                    "name" | "anchor_name" => Self::CardName,
+                    "name" => Self::CardName,
                     "type" | "supertype" => Self::CardType,
                     "subtype" => Self::Subtype,
                     "counter" => Self::CounterKind,
@@ -183,6 +185,7 @@ impl Class {
             Self::Symbol => "<Symbol>",
             Self::FlavorWord => "<FlavorWord>",
             Self::SetName => "<SetName>",
+            Self::AnchorWord => "<AnchorWord>",
         })
     }
 }
@@ -320,6 +323,7 @@ impl Tok<'_> {
                         | Class::Subtype
                         | Class::Token
                         | Class::CardName
+                        | Class::AnchorWord
                         | Class::Designation
                         | Class::TurnPart
                 )
@@ -661,9 +665,9 @@ impl<'e> Profiler<'e> {
                 .join(" ");
             match self.env.lexicon.analyze_italic_head(&text) {
                 ItalicHead::Keyword(_) => families.insert(KEYWORD_DASH),
-                ItalicHead::AbilityWord(_)
-                | ItalicHead::AnchorWord(_)
-                | ItalicHead::FlavorWord { .. } => families.insert(LABEL),
+                ItalicHead::AbilityWord(_) | ItalicHead::FlavorWord { .. } => {
+                    families.insert(LABEL)
+                }
             };
         }
         rest.to_vec()
