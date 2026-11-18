@@ -14,8 +14,8 @@ that many plus one {E} instead"`, *Winding Constrictor*'s `"that many plus one o
 kinds of counters"`, *Brad Boimler, Eager Ensign*, *Doc Samson, Super Psychiatrist*, *Pir,
 Imaginative Rascal*, *Lae'zel, Vlaakith's Champion*), `NounPhraseArithmetic` also splits the
 following `{E}` or partitive oblique across `plus` (`[that many] plus [one {E}]`, `[that many] plus
-[one of each …]`) beside `DegreeArithmetic`. `MultiplierPredetermination` already excludes `Degree`
-so `[twice that many]` is canonical.
+[one of each …]`) beside `DegreeArithmetic`. `MultipliedNounPhrase` already excludes a `Degree`
+head so `[twice that many]` is `MultipliedDegree`'s alone.
 
 ## Design
 
@@ -37,4 +37,4 @@ so `[twice that many]` is canonical.
 ## Pointers
 
 - `crates/english/grammar/english.fug`: `DegreeDeterminer`, `FusedDegreeDeterminer`,
-  `DegreeArithmetic`, `NounPhraseArithmetic`, `MultiplierPredetermination`.
+  `DegreeArithmetic`, `NounPhraseArithmetic`, `MultipliedNounPhrase`, `MultipliedDegree`.
