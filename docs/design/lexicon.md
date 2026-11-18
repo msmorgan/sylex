@@ -31,11 +31,12 @@ a multiword term and its words, or a host and its bound affix, stand as
 alternatives, and the chart decides between them (§5).
 
 **Nothing is guessed.** An unknown word is a vocabulary gap, and no Category is
-inferred from spelling: braces do not license an unknown symbol. Two slots are
-open, each read from the text in one position because nothing enumerates what
-fills it. A Flavor Word is the italic run before an ability's em dash
-[CR#207.2d]. A Set Name is the name of an expansion a card's text cites before
-the noun *expansion* [CR#206.3a..206.3c] (*a name originally printed in the
+inferred from spelling: braces do not license an unknown symbol. Three slots
+are open, each read from the text at its own positions because nothing
+enumerates what fills it. A Flavor Word is the italic run before an ability's
+em dash [CR#207.2d]. An Introduced Name is a name the text itself gives an
+object [CR#111.4], the title run written where the text introduces it (§6).
+A Set Name is the name of an expansion a card's text cites before the noun *expansion* [CR#206.3a..206.3c] (*a name originally printed in the
 Antiquities expansion*): no card-scoped list or catalog of printed sets is
 consulted. It is read by title shape alone, right before a noun whose parameter
 pattern takes a Set Name before it: the longest run of whole space-separated
@@ -52,8 +53,8 @@ as its noun's parameter, which premodifies it. The shape covers every set in
 mtgjson's `SetList.json` but *The List (Unfinity Foil Edition)*, whose
 parentheses reminder-text removal strips (§1). Why: a guessed Category lets the
 grammar admit text no declaration accounts for, and the gap is never reported;
-an open slot read in its one position is no guess, and a list of the names cards
-cite would be knowing the cards before parsing them.
+an open slot read at its own positions is no guess, and a list of the names
+cards cite would be knowing the cards before parsing them.
 
 **Every irregularity is declared.** Each Word Form has one default spelling
 rule, and every exception, consonant doubling included (*committed*), is an
@@ -201,12 +202,12 @@ beforehand. A text read as if on a card of a given name, which need be no
 printed card's, states whether that card is legendary
 (`sylex_vocabulary::stated_scope`), and without that only the Full form
 stands. A card has no Shortened Name that other vocabulary in scope on it
-already spells: a token name or Introduced Name always, any other word unless
-it is the name before the comma or a planeswalker type (*Sliver* on Sliver
-Queen). Another card's name is no such vocabulary, since it competes with the
-Shortened Name only after *named* (*Nicol Bolas* on Nicol Bolas, the
-Deceiver). Why: admitted everywhere, every word spelled like a Shortened Name
-would be read as a name on every card.
+already spells: a token name always, any other word unless it is the name
+before the comma or a planeswalker type (*Sliver* on Sliver Queen). Another
+card's name is no such vocabulary, since it competes with the Shortened Name
+only after *named* (*Nicol Bolas* on Nicol Bolas, the Deceiver). Why: admitted
+everywhere, every word spelled like a Shortened Name would be read as a name
+on every card.
 
 **The shortened spelling is a rule over the name alone**
 (`sylex_lexicon::shortened_spelling`): a listed title and the last word before
@@ -253,10 +254,11 @@ for Number (§2). Why: a declared Number is knowledge of the cards before
 parsing them.
 
 **Another card's name stands only after *named*, *Partner with*, *from
-among* or *meld ... into*.** A card's full name is spelled on every face, and off its own card it
+among* or *meld ... into*, and before *token*.** A card's full name is spelled on every face, and off its own card it
 is another card's name, which a position admits only by opting in: no leaf
-symbol of the grammar admits it but `OtherCardName()`, which admits nothing
-else. Four positions opt in, as a `NameComplement`, alone or coordinated: the
+symbol of the grammar admits it but `OtherCardName()` and, before *token*,
+`DistinctOtherCardName()` (below), which admit nothing else. Four positions
+opt in as a `NameComplement`, alone or coordinated: the
 predicative complement of *named* (*cards named Relentless Rats*); the Keyword
 Parameter of *Partner with*, whose name is the one its ability searches for as
 *a card named [name]* [CR#702.124j]; the complement of *among* after
@@ -274,12 +276,85 @@ selected, as *do the same for* selects *for* with a cited word
 the same way (CGEL, Ch. 4 §6, pp. 273–274), and *into* takes a name under no
 other head (*put it into Black Lotus*). Any other position, a Subject,
 Object, possessor or premodifier among them, refuses another card's name with
-no clause of its own. A name a card gives an object, or a vote option, spelled
-like another card's name is listed as that card's Introduced Name or vote
-option (*create a Tarmogoyf token*, *votes for Redhorn Pass or Mines of
-Moria*). Why: a card's text mentions another card by name only in those
-positions, and a card name read anywhere else is another word misread (*Exile*
-in *Exile target attacking creature*).
+no clause of its own. A vote option spelled like another card's name is listed
+as that card's vote option (*votes for Redhorn Pass or Mines of Moria*). Why:
+a card's text mentions another card by name only in those positions, and a
+card name read anywhere else is another word misread (*Exile* in *Exile
+target attacking creature*).
+
+**A token may be named for a card.** One more position takes another card's
+name: the premodifier of *token* inside the Object of *create*, which makes a
+token with the characteristics of the card so named [CR#111.11] (*create a
+Tarmogoyf token*,
+*create a tapped Mutavault token*). It opts in through
+`DistinctOtherCardName()`, which refuses a card name that any other word is
+spelled like: *a Blood token* is the predefined token, though a card is named
+Blood. Why: a name that another word also spells, a subtype or a predefined
+token's name among them, is that word there, and reading the card's name
+beside it would be a second tree.
+
+**An Introduced Name is read from the text.** A name a card's text gives an
+object, the name of a token it creates [CR#111.4] or of a permanent or copy
+it changes, is listed nowhere, and nothing keyed by card holds it. Analysis
+proposes one title run at each capitalized word that begins a word
+(`sylex_lexicon`'s `introduced` module): the longest run of capitalized words
+and numerals, continuing over lowercase *of*, *the* and *to* before a
+capitalized word and over a comma before a capitalized word or *the* (*Voja,
+Friend to Elves*; *Ashaya, the Awoken World*), and ending before any other
+lowercase word (*named The Mightstone and Weakstone* stops before *and*). A
+genitive mark that ends the run is the clitic, no part of the name (*Beau's
+power*). Card names are kept out, where a card's full name is one a card
+name's Lexeme spells or the Card Scope holds:
+
+- a run that a card's full name spells is no Introduced Name;
+- nor is a run that a card's full name written at that position runs past (*a
+  creature named Fang, Fearless l'Cie*);
+- a comma does not continue a run that a card's full name already spells
+  (*Equipment named Helm of Kaldra, Sword of Kaldra, and Shield of Kaldra*),
+  and a Shortened Name is no full name, so *Icingdeath* ends no run on
+  Icingdeath, Frost Tyrant, which creates *Icingdeath, Frost Tongue*;
+- no run starts inside such a card name written out.
+
+The leaf is `LexicalReading::IntroducedName`, a Proper Name spelled as its
+run and unmarked for Number, whose genitive is formed as a card name's is. The
+grammar admits it through two symbols. `IntroducedName()` stands where a name
+is introduced:
+
+- the Complement of *named* (*a 2/2 colorless Wizard Soldier creature token
+  named Cadet*; *a creature you control named Vecna*, on a face that
+  introduces the name nowhere else);
+- the Object of *create*, before the description of the token, a Supplement
+  headed by *token* (*create Angelo, a legendary 1/1 green and white Dog
+  creature token*); without the description, *Create Angelo.* names nothing;
+- the value of *its name is* in a copy's exception (*except its name is
+  Mishra's Warform*).
+
+`RepeatedName()` stands where any other name does, as a Subject, a possessor
+or a premodifier, and only in a Reading that also introduces that name: a
+later sentence (*Ragavan enters tapped and attacking*) or the token's own
+quoted ability, which names the token [CR#201.5] (*"Jumblebones can't
+block"*, *"Beau's power is equal to ..."*). It is never the Object of
+*create*, which offers the name for a new token (*if you don't control a
+creature named Mowu, create Mowu, a legendary 3/3 green Dog creature token*).
+
+The grammar names the words of these positions as it names any word: *named*
+and *except* as Closed Words, and *create*, *token* and *name* as the Lexical
+Classes `NamingVerb`, `TokenNoun` and `NameNoun`, which their declarations
+join ([English](english.md) §2).
+
+Whether a Reading that names a name again also introduces it is no fact of
+one Constituent, so each Constituent's summary records the names it
+introduces and the names it names again, and a root holds the second set
+within the first. Only a title run its text writes at more than one place can
+be named again, before or after the place that introduces it. Admission
+applies the same summary to a Reading built apart from a parse, and holds each
+Introduced Name to the title run analysis finds in its text
+([English](english.md) §7, the second round-trip law). A title run is a
+vocabulary gap unless some partial Production of the parse introduces it, or
+names it again where another introduces that name.
+Why: the name is a fact the text settles, and a list of names by card is the
+parse being told its answer; admitted everywhere, every capitalized word
+would be read as a name.
 
 **Bound keywords are analyzed in parts**, a suffix on a stem from its declared
 stem classes, so *islandwalk* needs no declaration [CR#702.14a]. A stem is

@@ -305,8 +305,9 @@ The CR term [CR#207.2c], here also covering ability words printed on
 Vintage-legal cards that the CR's list omits.
 
 **Flavor Word**:
-The CR term [CR#207.2d]. It is an open lexical slot, as a Set Name is: no
-inventory lists them, so the italic run is captured verbatim.
+The CR term [CR#207.2d]. It is an open lexical slot, as a Set Name and an
+Introduced Name are: no inventory lists Flavor Words, so the italic run is
+captured verbatim.
 _Avoid_: flavor text
 
 **Set Name**:
@@ -330,8 +331,8 @@ The card names a text is in the scope of, each with the forms of it that the
 text admits. A face's text holds its own name in its Full form and, where the
 card has a Shortened Name, in its Shortened form [CR#201.5c]; a face's Card
 Scope is derived from its name and type line when its text is parsed. An Own
-Name stands only where the Card Scope holds that form of it, and an Introduced
-Name or Anchor Word only where it holds one of its cards.
+Name stands only where the Card Scope holds that form of it, and an Anchor
+Word only where it holds one of its cards.
 
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5]. It
@@ -348,12 +349,16 @@ complement of *among* after *from*, wherever that phrase attaches, as in the
 options of a choice (*choose a card name ... from among Disenchant, ..., and
 Black Lotus*), and the complement of *into* after *meld* (*meld them into
 Brisela, Voice of Nightmares*): a meld result's name is the name of neither
-card of its pair [CR#713.2a..713.2g].
+card of its pair [CR#713.2a..713.2g]. Before *token* in the Object of
+*create*, `DistinctOtherCardName()` admits one that no other word is spelled
+like (*create a Tarmogoyf token*, [CR#111.11]).
 
 **Introduced Name**:
 A name a card's own text gives an object that is not a card, such as the name
-of a token it creates, even where another card has that name (*a Tarmogoyf
-token*). It is in scope only on that card.
+of a token it creates [CR#111.4]. No inventory lists it: it is the title run
+written where the text introduces it, after *named*, as the Object of
+*create* before the token's description, or after *its name is*, and it is
+named again only in a Reading that introduces it.
 
 **Name Number**:
 The grammatical Number of a name, which the lexicon does not declare: where its

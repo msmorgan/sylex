@@ -309,8 +309,12 @@ Adding or retiring a gate follows this section and needs no ruling.
 
 **Lexical analysis is independent of the grammar.** Text is analyzed without
 production-directed scanning. Every alternative names a declared Lexeme with
-its lexical Category, Word Form, features and Provenance, and an unknown word
-is reported as a vocabulary gap, never guessed. Analysis and realization share
+its lexical Category, Word Form, features and Provenance, or is one of the
+leaves no Lexeme declares: a numeral, a card's own name, and the open slots
+read by their shape, a Flavor Word, a Set Name and an Introduced Name
+([Lexicon](lexicon.md) §2, §6). An unknown word is reported as a vocabulary
+gap, never guessed; a title run is one unless the parse takes it as an
+Introduced Name. Analysis and realization share
 the same inflection rules. Why: the parser then sees every lexical
 alternative, so no choice is hidden in a scanner, and a word is spelled the
 way it is read.
