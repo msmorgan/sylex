@@ -98,7 +98,7 @@ pub(super) struct ForestwalkArgs {
 
 pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
     let selectors = args.steps.selectors()?;
-    let mut item = match target(args, &selectors)? {
+    let item = match target(args, &selectors)? {
         Target::List(listing) => {
             writeln!(output, "{listing}")?;
             return Ok(());
@@ -111,11 +111,10 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
         grammar: &grammar,
         lexicon: &env.lexicon,
     };
-    item.read_scope(&env.lexicon, &grammar);
+    let mut read = item.read_face(&env.lexicon, &grammar);
     let entry = &item.entry;
-    let scope = entry.scope(&env.lexicon);
-    let parse = judge
-        .parse_scoped(entry, &scope)
+    let parse = item
+        .parse(&judge, read.as_mut())
         .map_err(anyhow::Error::msg)?;
     writeln!(output, "{}: {:?}", entry.location, entry.text)?;
     if !parse.vocabulary_gaps.is_empty() {

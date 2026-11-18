@@ -192,27 +192,53 @@ struct ParseItem {
     kind: sylex_english::corpus::UnitKind,
     /// Whether to print the entry's outcome.
     evaluate: bool,
-    /// The rules-text lines of the face a fetched unit is of, which its
-    /// Anchor Words and Vote Options are read from
-    /// ([`ParseItem::read_scope`]).
+    /// The rules-text lines of the face a fetched unit is of, which are
+    /// read together ([`ParseItem::read_face`]), and the unit's place among
+    /// them; a stated text is read alone, with the words it states.
     face_lines: Option<Vec<String>>,
+    line: usize,
+}
+
+/// The lines of a fetched face, read: the parse of each, and the words
+/// their Readings introduce.
+struct FaceRead<'g> {
+    parses: Vec<Option<sylex_syntax::Parse<'g>>>,
+    words: std::collections::BTreeSet<sylex_lexicon::LexicalReading>,
 }
 
 impl ParseItem {
-    /// Puts the Anchor Words and Vote Options of a fetched unit's face in
-    /// its entry's scope, as the census reads them
-    /// (`sylex_english::corpus::Face::scope`). A stated text keeps the
-    /// words it states.
-    fn read_scope(
-        &mut self,
+    /// Reads the lines of a fetched unit's face once each, in order, as
+    /// the census reads them (`sylex_english::face::read_lines`).
+    fn read_face<'g>(
+        &self,
         lexicon: &sylex_lexicon::Lexicon,
-        grammar: &sylex_syntax::CompiledGrammar,
-    ) {
-        if let Some(lines) = &self.face_lines {
-            let mut scope = self.entry.scope(lexicon);
-            sylex_english::corpus::read_scope(lines, &mut scope, lexicon, grammar);
-            self.entry.anchors = scope.anchor_words().map(str::to_owned).collect();
-            self.entry.votes = scope.vote_options().map(str::to_owned).collect();
+        grammar: &'g sylex_syntax::CompiledGrammar,
+    ) -> Option<FaceRead<'g>> {
+        let lines = self.face_lines.as_ref()?;
+        let names = self.entry.scope(lexicon);
+        let parses = sylex_english::face::read_lines(lines, &names, lexicon, grammar);
+        Some(FaceRead {
+            words: sylex_english::face::introduced_words(&parses),
+            parses: parses.into_iter().map(Some).collect(),
+        })
+    }
+
+    /// The item's parse: its line's among its face's (`read`), or the parse
+    /// of its text alone.
+    fn parse<'g>(
+        &self,
+        judge: &'g sylex_english::judgment::Judge<'g>,
+        read: Option<&mut FaceRead<'g>>,
+    ) -> Result<sylex_syntax::Parse<'g>, String> {
+        use sylex_english::corpus::UnitKind;
+
+        match (read, self.kind) {
+            (Some(read), UnitKind::Line) => Ok(read.parses[self.line]
+                .take()
+                .expect("each line of a face is taken once")),
+            (Some(_), UnitKind::TypeLine) | (None, _) => {
+                judge.parse_scoped(&self.entry, &self.entry.scope(judge.lexicon))
+            }
         }
     }
 }
@@ -279,6 +305,7 @@ fn stated_items(
                 kind,
                 evaluate: marked || input.contains(" => "),
                 face_lines: None,
+                line: 0,
             })
         })
         .collect()
@@ -313,9 +340,9 @@ impl FetchedUnit {
     /// The unit as a judgment entry on its face, which puts the face's own
     /// name in scope as its type line gives it
     /// ([`sylex_english::judgment::Judgment::scope`],
-    /// [`sylex_english::corpus::Face::scope`]); its face's Anchor Words
-    /// and Vote Options join it once a grammar is bound
-    /// ([`ParseItem::read_scope`]).
+    /// [`sylex_english::corpus::Face::name_scope`]); the words its face's
+    /// text introduces join it as the face's lines are read
+    /// ([`ParseItem::read_face`]).
     fn item(&self, header: Option<String>) -> ParseItem {
         ParseItem {
             header,
@@ -335,6 +362,7 @@ impl FetchedUnit {
             kind: self.kind,
             evaluate: false,
             face_lines: Some(self.face_lines.clone()),
+            line: self.index,
         }
     }
 }
@@ -423,14 +451,20 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
         lexicon: &env.lexicon,
     };
     let profiler = Profiler::new(&env);
-    for mut item in items {
-        item.read_scope(&env.lexicon, &grammar);
+    // The lines of the fetched face the items so far are of.
+    let mut read = None;
+    for item in items {
+        if item.header.is_some() || item.face_lines.is_none() {
+            read = item.read_face(&env.lexicon, &grammar);
+        }
+        let parsed = item.parse(&judge, read.as_mut());
         let ParseItem {
             header,
             entry,
             kind,
             evaluate,
             face_lines: _,
+            line: _,
         } = item;
         if let Some(header) = header {
             writeln!(output, "{header}")?;
@@ -438,7 +472,12 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
         writeln!(output, "{}: {:?}", entry.location, entry.text)?;
         let text = sylex_upstream::oracle_text::strip_reminder_text(&entry.text);
         let scope = entry.scope(&env.lexicon);
-        let analyzed = env.lexicon.analyze_source_scoped(&text, None, &scope);
+        // A fetched unit is stratified with the words its face introduces.
+        let stratified = match &read {
+            Some(read) => sylex_english::face::scope_with(&scope, &read.words),
+            None => scope.clone(),
+        };
+        let analyzed = env.lexicon.analyze_source_scoped(&text, None, &stratified);
         let profile = profiler.profile(kind, &analyzed);
         writeln!(output, "Stratum: {}", profile.stratum)?;
         writeln!(
@@ -454,7 +493,7 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
         if evaluate {
             writeln!(output, "Outcome: {}", judge.evaluate_scoped(&entry, &scope))?;
         }
-        let parse = match judge.parse_scoped(&entry, &scope) {
+        let parse = match parsed {
             Ok(parse) => parse,
             Err(why) => {
                 writeln!(output, "Unparsed: {why}")?;
@@ -661,7 +700,8 @@ mod tests {
 
     /// Frontier Siege: `--anchor` puts an Anchor Word in scope as
     /// `<anchor=…>` does, and `--card` reads the face's Anchor Words from its
-    /// own text. With neither, *Khans* is an unknown word in the offer and
+    /// own text. With neither, the offer reads *Khans* where it stands, as
+    /// no unknown word, and has no Reading, since nothing discharges it; and
     /// its label is a Flavor Word.
     #[test]
     fn anchor_words_are_stated_for_text_and_read_for_a_fetched_card() {
@@ -675,7 +715,8 @@ mod tests {
             "{stated}"
         );
         let bare = dump(&["parse", offer]);
-        assert!(bare.contains("Vocabulary gaps: [35..40]"), "{bare}");
+        assert!(bare.contains("Vocabulary gaps: []"), "{bare}");
+        assert!(bare.contains("Packed Forest derivations: 0"), "{bare}");
         // A malformed word is refused, stated either way.
         for inputs in [
             vec!["parse", "--anchor", " Khans", offer],

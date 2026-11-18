@@ -467,21 +467,9 @@ mod tests {
         let env = LexicalEnvironment::load().unwrap();
         let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
         let mut seen: BTreeMap<&str, usize> = BTreeMap::new();
+        let parses = super::super::tests::parses(&corpus, &env, &grammar);
         for (unit, u) in corpus.units.iter().enumerate() {
-            let face = &corpus.faces[u.face];
-            let parsed: String = db
-                .query_row(
-                    "SELECT parsed FROM units WHERE unit = ?1",
-                    [index(unit)],
-                    |r| r.get(0),
-                )
-                .unwrap();
-            let analyzed = env.lexicon.analyze_source_scoped(
-                &parsed,
-                None,
-                &face.scope(&env.lexicon, &grammar),
-            );
-            let parse = grammar.parse_analyzed(&analyzed);
+            let parse = &parses[unit];
             let forest = parse.fork_forest().unwrap();
             let expected = forest.forks();
             let lines: Vec<HeadLineNode> = db
@@ -509,7 +497,7 @@ mod tests {
                     *seen.entry("aliased").or_default() += 1;
                 }
             }
-            assert_eq!(stored(&db, index(unit), &parse), expected, "{}", u.text);
+            assert_eq!(stored(&db, index(unit), parse), expected, "{}", u.text);
         }
         for what in ["lexical", "dependency", "frame", "aliased"] {
             assert!(seen.contains_key(what), "no {what} fork: {seen:?}");

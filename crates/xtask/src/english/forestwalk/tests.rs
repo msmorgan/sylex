@@ -241,16 +241,15 @@ fn with_unit<R>(
     line: usize,
     check: impl FnOnce(&Judge<'_>, &Judgment, &Parse<'_>) -> R,
 ) -> R {
-    let mut item = super::fetched_unit(card, Some(line), false).unwrap();
+    let item = super::fetched_unit(card, Some(line), false).unwrap();
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    item.read_scope(&env.lexicon, &grammar);
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
     };
-    let scope = item.entry.scope(&env.lexicon);
-    let parse = judge.parse_scoped(&item.entry, &scope).unwrap();
+    let mut read = item.read_face(&env.lexicon, &grammar);
+    let parse = item.parse(&judge, read.as_mut()).unwrap();
     check(&judge, &item.entry, &parse)
 }
 

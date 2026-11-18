@@ -16,6 +16,8 @@ use std::collections::HashSet;
 use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
+use std::sync::Mutex;
+use std::sync::OnceLock;
 use std::sync::mpsc;
 use std::time::Instant;
 
@@ -217,7 +219,7 @@ pub(crate) fn write(
     db.execute_batch(VIEWS)?;
     let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
     let reader = context::Reader::new(grammar, &env.lexicon);
-    let scopes = corpus.scopes(&env.lexicon, grammar);
+    let faces = FaceParses::new(corpus, &cleaves, env, grammar);
     // `lexemes` and `embeddings` are written after the unit rows that reference
     // them so each table grows in key order in one pass;
     // `pragma_foreign_key_check` verifies every foreign key once the
@@ -230,16 +232,9 @@ pub(crate) fn write(
         WINDOW,
         |unit| describe(corpus, unit),
         |unit| {
-            let scope = &scopes[corpus.units[unit].face];
-            unit_rows(
-                corpus,
-                unit,
-                scope,
-                cleaves[unit].as_ref(),
-                env,
-                grammar,
-                &reader,
-            )
+            let parsed =
+                sylex_english::census::line_text(&corpus.units[unit], cleaves[unit].as_ref());
+            unit_rows(parsed, &faces.take(unit), grammar, &reader)
         },
         |units| {
             let tx = db.transaction()?;
@@ -332,26 +327,78 @@ fn describe(corpus: &Corpus, unit: usize) -> String {
     format!("{} {place}: {:?}", face.name, u.text)
 }
 
-/// Parses one unit as the census does and gathers the rows of the part of
-/// its forest some Derivation uses.
+/// The parse of each unit, read face by face as the census reads it
+/// (`sylex_english::face::read_units`): a face's lines are parsed together
+/// when the first of its units is asked for, once each, and each unit's
+/// parse is taken once.
+struct FaceParses<'a, 'g> {
+    corpus: &'a Corpus,
+    cleaves: &'a [Option<sylex_english::cleave::CleaveText>],
+    env: &'a LexicalEnvironment,
+    grammar: &'g CompiledGrammar,
+    ranges: Vec<std::ops::Range<usize>>,
+    faces: Vec<OnceLock<Vec<Mutex<Option<sylex_syntax::Parse<'g>>>>>>,
+}
+
+impl<'a, 'g> FaceParses<'a, 'g> {
+    fn new(
+        corpus: &'a Corpus,
+        cleaves: &'a [Option<sylex_english::cleave::CleaveText>],
+        env: &'a LexicalEnvironment,
+        grammar: &'g CompiledGrammar,
+    ) -> Self {
+        Self {
+            corpus,
+            cleaves,
+            env,
+            grammar,
+            ranges: corpus.face_units(),
+            faces: corpus.faces.iter().map(|_| OnceLock::new()).collect(),
+        }
+    }
+
+    /// The parse of `unit`.
+    ///
+    /// # Panics
+    /// When it was taken before.
+    fn take(&self, unit: usize) -> sylex_syntax::Parse<'g> {
+        let face = self.corpus.units[unit].face;
+        let range = &self.ranges[face];
+        let parses = self.faces[face].get_or_init(|| {
+            sylex_english::face::read_units(
+                &self.corpus.faces[face],
+                &self.corpus.units[range.clone()],
+                &self.cleaves[range.clone()],
+                &self.env.lexicon,
+                self.grammar,
+            )
+            .into_iter()
+            .map(|parse| Mutex::new(Some(parse)))
+            .collect()
+        });
+        parses[unit - range.start]
+            .lock()
+            .expect("no thread panics holding a unit's parse")
+            .take()
+            .expect("a unit's parse is taken once")
+    }
+}
+
+/// Gathers the rows of the part of a unit's forest some Derivation uses:
+/// `parse` is its parse, as the census reads it, and `parsed` the text it
+/// was read as.
 fn unit_rows(
-    corpus: &Corpus,
-    unit: usize,
-    scope: &sylex_lexicon::CardScope,
-    cleave: Option<&sylex_english::cleave::CleaveText>,
-    env: &LexicalEnvironment,
+    parsed: &str,
+    parse: &sylex_syntax::Parse<'_>,
     grammar: &CompiledGrammar,
     reader: &context::Reader<'_>,
 ) -> Result<UnitRows> {
-    let u = &corpus.units[unit];
-    let parsed = cleave.map_or_else(|| u.text.clone(), |c| c.uncleaved.clone());
-    let analyzed = env.lexicon.analyze_source_scoped(&parsed, None, scope);
-    let parse = grammar.parse_analyzed(&analyzed);
+    let parsed = parsed.to_owned();
     let counts = parse.counts()?;
     let heads = parse.alternative_heads()?;
     let conjuncts = parse.alternative_conjuncts()?;
     let embeddings = parse.alternative_embeddings(context::DEPTH, |step| reader.wrapper(step))?;
-    exclusive(&parse, &counts)?;
+    exclusive(parse, &counts)?;
     let forest = parse.forest();
     let tokens = parse.tokens();
     // A Constituent's span begins where it was predicted, before the space
@@ -475,7 +522,7 @@ fn unit_rows(
             }
         })
         .collect::<Vec<_>>();
-    let forks = forks::rows(&parse, &leaves)?;
+    let forks = forks::rows(parse, &leaves)?;
     Ok(UnitRows {
         derivations: counts.total(),
         parsed,
@@ -1048,6 +1095,29 @@ mod tests {
         (dir, path, corpus)
     }
 
+    /// The parse of each unit of `corpus`, as the census reads it.
+    pub(super) fn parses<'g>(
+        corpus: &Corpus,
+        env: &LexicalEnvironment,
+        grammar: &'g CompiledGrammar,
+    ) -> Vec<sylex_syntax::Parse<'g>> {
+        let cleaves = sylex_english::census::cleave_texts(corpus, &env.lexicon);
+        corpus
+            .face_units()
+            .into_iter()
+            .enumerate()
+            .flat_map(|(face, range)| {
+                sylex_english::face::read_units(
+                    &corpus.faces[face],
+                    &corpus.units[range.clone()],
+                    &cleaves[range],
+                    &env.lexicon,
+                    grammar,
+                )
+            })
+            .collect()
+    }
+
     fn column(db: &Connection, sql: &str) -> Vec<i64> {
         let mut statement = db.prepare(sql).unwrap();
         statement
@@ -1147,21 +1217,9 @@ mod tests {
         let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
         let totals = column(&db, "SELECT derivations FROM units ORDER BY unit");
         assert_eq!(totals.len(), corpus.units.len());
+        let parses = parses(&corpus, &env, &grammar);
         for (unit, u) in corpus.units.iter().enumerate() {
-            let face = &corpus.faces[u.face];
-            let parsed: String = db
-                .query_row(
-                    "SELECT parsed FROM units WHERE unit = ?1",
-                    [index(unit)],
-                    |r| r.get(0),
-                )
-                .unwrap();
-            let analyzed = env.lexicon.analyze_source_scoped(
-                &parsed,
-                None,
-                &face.scope(&env.lexicon, &grammar),
-            );
-            let expected = grammar.parse_analyzed(&analyzed).derivation_count();
+            let expected = parses[unit].derivation_count();
             assert_eq!(
                 u128::try_from(totals[unit]).unwrap(),
                 expected,
