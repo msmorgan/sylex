@@ -66,6 +66,11 @@
         // A comparative clause after equative *as*: *as many times as you
         // choose* (CGEL Ch. 13 §2.1, p. 1108).
         (complement: ComparativeClause, hosts: ComplementOnly),
+        // Manner *as*, whose comparative clause has an implicit manner
+        // element compared with the phrase's (CGEL Ch. 13 §5.5, p. 1149,
+        // [34]): *divided as you choose among any number of targets*. It
+        // gives its host no time, unlike a temporal clause.
+        (complement: MannerClause, hosts: Predicate),
     ]),
     // Prepositional idiom licensing a content clause (CGEL p. 971).
     (lemma: "as long as", frames: [(complement: FiniteClause, hosts: Predicate)]),

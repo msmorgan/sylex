@@ -214,6 +214,11 @@ pub fn lexicon() -> Lexicon {
     set(&mut do_verb, Present, Some(Third), Some(Singular), "does");
     set(&mut do_verb, Preterite, None, None, "did");
     set(&mut do_verb, PastParticiple, None, None, "done");
+    // *Choose*, whose Complement the grammar's MannerEllipsis leaves
+    // unexpressed (*as you choose*).
+    let mut choose = verb("choose", Core);
+    set(&mut choose, Preterite, None, None, "chose");
+    set(&mut choose, PastParticiple, None, None, "chosen");
     let mut genitive = invariant("clitic", "genitive", Category::Clitic, Core);
     genitive.forms[0].surface = Some("'s".to_owned());
     genitive.binding = Binding::Suffix;
@@ -227,6 +232,7 @@ pub fn lexicon() -> Lexicon {
         have,
         be,
         do_verb,
+        choose,
         genitive,
         verb("attack", Core),
         // *named*, a Closed Word of the grammar: its Complement introduces

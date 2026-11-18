@@ -73,9 +73,9 @@ feature Polarity = Affirmative | Negative
 // *meld*, *into* (*meld them into Brisela, Voice of Nightmares*).
 feature ComplementKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | TemporalClause
-    | ComparativeClause | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf
-    | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
-    | UnlikeObject | Name | OptionChoice
+    | ComparativeClause | MannerClause | ExpandableClause | SetOffClause | VerblessClause
+    | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost
+    | Intransitive | AmountOrNP | UnlikeObject | Name | OptionChoice
 // What an unlike coordination's conjunct is, which no other conjunct of it
 // shares (`unlike: ConjunctKind`): the Category of its filler. A conjunct of
 // a derived unlike Frame Slot takes the name of the Slot Kind its filler
@@ -96,9 +96,9 @@ feature PremodifierKind = Adjectival | Measure | Keyword | Participial
 // values of ComplementKind, which it agrees with.
 feature ObliqueKind =
     | NP | MeasureNP | PP | AdjP | AdvP | Nominal | Amount | FiniteClause | TemporalClause
-    | ComparativeClause | ExpandableClause | SetOffClause | VerblessClause | AbsoluteClause | ToInf
-    | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost | Intransitive | AmountOrNP
-    | UnlikeObject | Name | OptionChoice
+    | ComparativeClause | MannerClause | ExpandableClause | SetOffClause | VerblessClause
+    | AbsoluteClause | ToInf | Gerund | BareInf | KeywordPhrase | QuotedAbility | Mention | Cost
+    | Intransitive | AmountOrNP | UnlikeObject | Name | OptionChoice
 // `Quantity`: only *number*, the number-transparent noun (*any number
 // of target creatures*; CGEL 5§3.3:349–351). `Serial`: only *time*, a
 // frequency or multiplier head (*three times*; CGEL 8§9:715).
@@ -664,6 +664,8 @@ category Cost
 category FiniteClause : Clause [PastTime, NonPastTime]
 // The Complement of *than* or equative *as* (CGEL 13§2.1:1108).
 category ComparativeClause : Clause
+// The Complement of manner *as* (CGEL 13§5.5:1149).
+category MannerClause : Clause
 category ExpandableClause : Clause
 // A dash-set Supplement giving a head's Complement its content
 // (SetOffComplementClause).
@@ -787,6 +789,8 @@ class StrandableModal = ["verb:can", "verb:can't", "verb:may", "verb:must", "ver
 class StrandableHave = ["verb:have", "verb:haven't"]
 class StrandableBe = ["verb:be", "verb:aren't"]
 class StrandableDo = ["verb:do", "verb:don't"]
+// The verbs of MannerEllipsis.
+class MannerEllipsisVerb = ["verb:choose"]
 // They float as an Adjunct after a plural Subject or an auxiliary (CGEL
 // 5§9.2:413). *All* floats in FloatedAll.
 class FloatingQuantifier = ["det:each", "det:both"]
@@ -896,6 +900,7 @@ slot TemporalClause = FiniteClause
     where $.PastTime = slot.PastTime,
           $.NonPastTime = slot.NonPastTime
 slot ComparativeClause = ComparativeClause
+slot MannerClause = MannerClause
 slot ExpandableClause = ExpandableClause
 slot SetOffClause = SetOffClause
 slot VerblessClause = VerblessClause
@@ -1473,6 +1478,18 @@ StrandedDo: VerbPhrase -> Class(StrandableDo) { elliptical: [Plain] }
     where head.VerbForm = Finite,
           $.Voice = Active,
           $.Ellipsis = Code
+// A finite verb whose Complement is left unexpressed, retrievable
+// anaphorically, which only a small number of heads permit (CGEL
+// 17§7.4:1527): *divided as you choose* is *divided as you choose [to divide
+// it]* (Fire Covenant; *reorder your graveyard as you choose*, Fossil Find).
+// Its clause's manner element, which manner *as* compares, is its Gap, so
+// it stands only in MannerComplementClause: Oracle text leaves *choose*'s
+// Complement unexpressed nowhere else, and the heads that permit it are
+// those of MannerEllipsisVerb.
+MannerEllipsis: VerbPhrase -> Class(MannerEllipsisVerb)
+    where head.VerbForm = Finite,
+          $.Voice = Active,
+          $.Gap = Adjunct
 Progressive: VerbPhrase -> Class(BeVerb) complement:AuxiliaryComplement {
     transparent: [complement],
 }
@@ -3552,6 +3569,20 @@ GappedComparativeClause: ComparativeClause -> Clause { unlinked: [head] }
 EllipticalComparativeClause: ComparativeClause -> Clause { unlinked: [head] }
     where head.VerbForm = Finite,
           head.Ellipsis := Code
+// Manner *as* takes a comparative clause whose implicit manner element is
+// compared with the phrase's (CGEL 13§5.5:1149, [34]), its Gap. Oracle
+// text's manner clauses are all MannerEllipsis's (*divided as you choose
+// among any number of targets*, Fire Covenant), and the grammar takes no
+// other: a complete Clause after *as* is temporal only (*as you cast this
+// spell*), *as the turn began* (Sengir, the Dark Baron) is no manner clause
+// over transitive *begin* with an object Gap, nor *as many cards as they
+// discarded this way* (Forget) over *discard*. English has elliptical
+// manner clauses too (*as Europeans do*, [34iii]), which Oracle text does
+// not print; the grammar takes none, so *at least as many lands as you do*
+// (Land Equilibrium) has no manner Reading.
+MannerComplementClause: MannerClause -> Clause { unlinked: [head] }
+    where head.VerbForm = Finite,
+          head.Gap = Adjunct
 // Content clauses that permit *that*; their governors select this Category
 // (CGEL 11§4.8:971).
 UnmarkedExpandableClause: ExpandableClause -> FiniteClause

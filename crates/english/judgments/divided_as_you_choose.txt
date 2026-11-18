@@ -1,4 +1,6 @@
-# Participial postmodifier `divided as you choose among ...` of a damage nominal
+# Participial postmodifier `divided as you choose among ...` of a damage nominal. A manner `as`
+# phrase (`divided as you choose`, `reorder your graveyard as you choose`) is an Adjunct of its
+# verb, never a Modifier of a nominal
 + <card=Forked Bolt> Forked Bolt deals 2 damage divided as you choose among one or two targets. => VerbPhrase "divided as you choose among one or two targets" as Modifier of damage; PrepositionPhrase "among one or two targets" as Complement of divide; PrepositionPhrase "as you choose" as Adjunct of divide
 + <card=Magma Opus> Magma Opus deals 4 damage divided as you choose among any number of targets. => VerbPhrase "divided as you choose among any number of targets" as Modifier of damage; PrepositionPhrase "among any number of targets" as Complement of divide; PrepositionPhrase "as you choose" as Adjunct of divide
 + <card=Samut, the Tested> <legendary> −2: Samut deals 2 damage divided as you choose among one or two targets. => VerbPhrase "divided as you choose among one or two targets" as Modifier of damage; PrepositionPhrase "among one or two targets" as Complement of divide; PrepositionPhrase "as you choose" as Adjunct of divide
@@ -7,3 +9,7 @@
 +PrepositionPhrase as this land enters => Clause "this land enters" as Complement of as
 +VerbPhrase divided as you choose among one or two targets => PrepositionPhrase "among one or two targets" as Complement of divide
 +NounPhrase 2 damage divided as you choose among one or two targets => VerbPhrase "divided as you choose among one or two targets" as Modifier of damage
++ <card=Fire Covenant> Fire Covenant deals X damage divided as you choose among any number of target creatures. => PrepositionPhrase "as you choose" as Adjunct of divide; !PrepositionPhrase "as you choose" as Modifier of damage
++ <card=Master of the Wild Hunt> That creature deals damage equal to its power divided as its controller chooses among any number of those Wolves. => PrepositionPhrase "as its controller chooses" as Adjunct of divide; !PrepositionPhrase "as its controller chooses" as Modifier of damage; !PrepositionPhrase "as its controller chooses" as Modifier of power
++ <card=Angel of Salvation> When this creature enters, prevent the next 5 damage that would be dealt this turn to any number of targets, divided as you choose. => PrepositionPhrase "as you choose" as Adjunct of divide; readings 1
++ <card=Fossil Find> Return a card at random from your graveyard to your hand, then reorder your graveyard as you choose. => PrepositionPhrase "as you choose" as Adjunct of reorder; !PrepositionPhrase "as you choose" as Modifier of graveyard

@@ -25,7 +25,7 @@
     (lemma: "choose", preterite: "chose", past_participle: "chosen",
         // *choose first strike, vigilance, or lifelink*; a cited word
         // (*choose left or right*, *choose land or nonland*).
-        frames: [Intransitive, Monotransitive, Transitive(KeywordPhrase), Transitive(Mention), Amount, Catenative(ToInf), ContentClause]),
+        frames: [Monotransitive, Transitive(KeywordPhrase), Transitive(Mention), Amount, Catenative(ToInf), ContentClause]),
     (lemma: "circle", frames: [Monotransitive]),
     // *whichever comes first*; *come under your control*; *coins come up heads*
     (lemma: "come", preterite: "came", past_participle: "come",
