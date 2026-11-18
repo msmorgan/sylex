@@ -110,19 +110,11 @@ impl Prediction {
                 category: facts.category,
                 features: [None; MAX_FEATURES],
                 forms: 0,
-                other_card_name: false,
+                // A card name's Lexeme is another card's name.
+                other_card_name: facts.card_name,
             };
             let mut mask = vec![0; words];
             prediction.add_tests(grammar, &leaf, Some(facts), &mut mask);
-            // A card name is the face's own or another card's by the face's
-            // scope, so it predicts the terminals of both.
-            if facts.card_name {
-                let other = LeafFacts {
-                    other_card_name: true,
-                    ..leaf
-                };
-                prediction.add_tests(grammar, &other, Some(facts), &mut mask);
-            }
             prediction.lexemes.push(mask);
         }
         prediction
@@ -154,9 +146,10 @@ impl Prediction {
                 *word |= mask;
             }
         } else {
+            // An own name, a numeral or a Flavor Word.
             debug_assert!(matches!(
                 leaf.category,
-                Category::Numeral | Category::FlavorWord
+                Category::Catalog | Category::Numeral | Category::FlavorWord
             ));
             self.add_tests(grammar, leaf, None, active);
         }

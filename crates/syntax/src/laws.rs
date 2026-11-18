@@ -427,7 +427,9 @@ impl Parse<'_> {
                     .expect("a forest leaf's Lexeme is declared by the grammar's lexicon");
                 self.grammar.facts(lexeme).binding
             }
-            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => Binding::Free,
+            LexicalReading::OwnName { .. }
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::FlavorWord { .. } => Binding::Free,
         })
     }
 

@@ -2699,22 +2699,37 @@ impl CompiledGrammar {
     pub(crate) fn leaf_edges(&self, reading: &LexicalReading) -> Option<sylex_lexicon::Edges> {
         match reading {
             LexicalReading::Word(value) => self.value_facts(value).map(|v| v.edges),
-            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
-                sylex_lexicon::Edges::non_word(reading)
-            }
+            LexicalReading::OwnName { .. }
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::FlavorWord { .. } => sylex_lexicon::Edges::non_word(reading),
         }
     }
 
-    /// Projects a lexical alternative into the leaf a Production sees, in
-    /// the text of a face whose own card names are `scope`, or `None` if the
-    /// lexicon licenses no such value. Its features were resolved at bind
-    /// time (`crate::projection`).
-    pub(crate) fn leaf_facts(
-        &self,
-        reading: &LexicalReading,
-        scope: &sylex_lexicon::CardScope,
-    ) -> Option<LeafFacts> {
+    /// Projects a lexical alternative into the leaf a Production sees, or
+    /// `None` if the lexicon licenses no such value. Its features were
+    /// resolved at bind time (`crate::projection`).
+    pub(crate) fn leaf_facts(&self, reading: &LexicalReading) -> Option<LeafFacts> {
         match reading {
+            // A card's own name is a Catalog word no Lexeme declares, as a
+            // card name's Lexeme is but for being another card's name.
+            LexicalReading::OwnName { name, form } => {
+                let spelling = sylex_lexicon::own_name_spelling(name, *form)?;
+                let mut features = [None; MAX_FEATURES];
+                for &(feature, value) in &self.own_name_features {
+                    features[feature] = Some(value);
+                }
+                Some(LeafFacts {
+                    binding: sylex_lexicon::Binding::Free,
+                    integer: None,
+                    notation: None,
+                    lexeme: None,
+                    category: LexicalCategory::Catalog,
+                    features,
+                    forms: self.spelled_forms(&spelling)
+                        | form_bit(sylex_lexicon::WordForm::Invariant),
+                    other_card_name: false,
+                })
+            }
             LexicalReading::Word(value) => {
                 let lexeme = self.lexeme(&value.lexeme)?;
                 let facts = self.facts(lexeme);
@@ -2731,11 +2746,7 @@ impl CompiledGrammar {
                     category: facts.category,
                     features,
                     forms: licensed.forms,
-                    other_card_name: facts.card_name
-                        && !value
-                            .features
-                            .name
-                            .is_some_and(|form| scope.holds(value.lexeme, form)),
+                    other_card_name: facts.card_name,
                 })
             }
             LexicalReading::Numeral {

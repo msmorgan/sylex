@@ -245,7 +245,9 @@ fn every_homograph_reaches_every_production_accepting_it() {
                 let category = match &m.reading {
                     LexicalReading::Word(value) => lexicon.lexemes()[&value.lexeme].category,
                     LexicalReading::Numeral { .. } => Category::Numeral,
-                    LexicalReading::FlavorWord { .. } => unreachable!(),
+                    LexicalReading::OwnName { .. } | LexicalReading::FlavorWord { .. } => {
+                        unreachable!("the text has no name in scope and no label")
+                    }
                 };
                 word_reading(production_for(category), m.reading.clone())
             })

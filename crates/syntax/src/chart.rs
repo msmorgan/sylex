@@ -671,11 +671,12 @@ impl CompiledGrammar {
         // A word spelled by a quotation mark alone (the genitive apostrophe
         // of *owners'*) leaves it a candidate mark, and so does a Flavor
         // Word's label, which spans any text before an em dash.
-        for found in analyzed
-            .matches
-            .iter()
-            .filter(|m| matches!(m.reading, LexicalReading::Word(_)) && m.end - m.start > 1)
-        {
+        for found in analyzed.matches.iter().filter(|m| {
+            matches!(
+                m.reading,
+                LexicalReading::Word(_) | LexicalReading::OwnName { .. }
+            ) && m.end - m.start > 1
+        }) {
             covered[found.start..found.end].fill(true);
         }
         let (logical, marks) = quotations(&analyzed.tokens, &covered);
@@ -694,7 +695,10 @@ impl CompiledGrammar {
             );
             // Inside a multiword noun, only an ordinary word of a term whose
             // words may stand apart reaches the chart.
-            let word = matches!(found.reading, LexicalReading::Word(_));
+            let word = matches!(
+                found.reading,
+                LexicalReading::Word(_) | LexicalReading::OwnName { .. }
+            );
             if atomic.iter().any(|(span, splits)| {
                 ((span.start < found.start && found.start < span.end)
                     || (span.start < found.end && found.end < span.end))
@@ -703,9 +707,7 @@ impl CompiledGrammar {
                 continue;
             }
             let licensed = "an analyzed lexical match is licensed by the grammar's lexicon";
-            let facts = self
-                .leaf_facts(&found.reading, &analyzed.scope)
-                .expect(licensed);
+            let facts = self.leaf_facts(&found.reading).expect(licensed);
             let edges = self.leaf_edges(&found.reading).expect(licensed);
             by_start[found.start].push(forest.leaves.len());
             forest.leaves.push(Leaf {

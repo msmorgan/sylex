@@ -62,8 +62,8 @@ pub(crate) struct LexemeFacts {
     pub preposition_frames: BTreeSet<usize>,
     /// The kind of source that declares it.
     pub source: sylex_lexicon::SourceKind,
-    /// It is a card name [CR#201.1]: a leaf of one the face's scope does
-    /// not hold is another card's name (`LeafFacts::other_card_name`).
+    /// It is a card name [CR#201.1]: its leaf is another card's name
+    /// (`LeafFacts::other_card_name`).
     pub card_name: bool,
 }
 
@@ -116,6 +116,13 @@ pub struct CompiledGrammar {
     pub(crate) lexemes: Vec<LexemeFacts>,
     /// Each declared Lexeme's licensed values, by `Lexeme::index`.
     pub(crate) word_values: Vec<Vec<ValueFacts>>,
+    /// The word forms of every Word with each spelling, in lower case, as a
+    /// mask (`step::form_bit`).
+    spelled_forms: SpelledForms,
+    /// The features the leaf of a card's own name carries
+    /// (`Projection::leaf_features`): those of a Catalog word that declares
+    /// none.
+    pub(crate) own_name_features: Vec<(usize, u16)>,
     pub(crate) frames: Vec<Frame>,
     /// Each frame's shape for Complement Clusters, as the index of the first
     /// frame with the same: the relation of each Frame Slot, and what fills
@@ -218,6 +225,15 @@ impl CompiledGrammar {
         self.word_values[self.lexeme(&value.lexeme)?.index()]
             .iter()
             .find(|v| v.is(value))
+    }
+
+    /// The word forms of every Word spelled `spelling`, ignoring case, as a
+    /// mask (`step::form_bit`).
+    pub(crate) fn spelled_forms(&self, spelling: &str) -> u16 {
+        self.spelled_forms
+            .get(&spelling.to_lowercase())
+            .copied()
+            .unwrap_or(0)
     }
 
     /// The name of every Category, by index.
@@ -367,10 +383,15 @@ impl CompiledGrammar {
     }
 }
 
+/// The word forms of every Word with each spelling, in lower case, as a mask
+/// (`step::form_bit`).
+type SpelledForms = BTreeMap<String, u16>;
+
 /// Each declared Lexeme's licensed values, by `Lexeme::index`
 /// (`CompiledGrammar::word_values`): their edges, the word forms of every
 /// Word spelled like each, ignoring case (a value that has no spelling has
-/// only its own form), and the features its leaf carries.
+/// only its own form), and the features its leaf carries. With them, those
+/// word forms by spelling (`CompiledGrammar::spelled_forms`).
 ///
 /// # Errors
 /// A licensed value whose projected feature the grammar has no value for
@@ -380,7 +401,7 @@ fn word_values(
     lexemes: &Lexemes,
     facts: &[LexemeFacts],
     projection: &Projection,
-) -> Result<Vec<Vec<ValueFacts>>, LoadError> {
+) -> Result<(Vec<Vec<ValueFacts>>, SpelledForms), LoadError> {
     let spelled: Vec<(Option<String>, &sylex_lexicon::LexicalValue)> = lexicon
         .values()
         .map(|value| {
@@ -389,10 +410,10 @@ fn word_values(
             (spelling, value)
         })
         .collect();
-    let mut by_spelling: BTreeMap<&str, u16> = BTreeMap::new();
+    let mut by_spelling = SpelledForms::new();
     for (spelling, value) in &spelled {
         if let Some(spelling) = spelling {
-            *by_spelling.entry(spelling).or_default() |= crate::step::form_bit(value.form);
+            *by_spelling.entry(spelling.clone()).or_default() |= crate::step::form_bit(value.form);
         }
     }
     let mut table = vec![Vec::new(); lexemes.len()];
@@ -410,7 +431,9 @@ fn word_values(
         let leaf_features = projection.leaf_features(
             &facts[lexeme.index()].features,
             &lexicon.lexemes()[&value.lexeme].properties.countability,
-            value,
+            value.form,
+            &value.features,
+            value.lexeme.as_str(),
         )?;
         table[lexeme.index()].push(ValueFacts {
             form: value.form,
@@ -423,7 +446,7 @@ fn word_values(
             leaf_features,
         });
     }
-    Ok(table)
+    Ok((table, by_spelling))
 }
 
 fn invalid(message: impl Into<String>) -> LoadError {
@@ -1096,7 +1119,15 @@ impl<'a> Binder<'a> {
             classes.push(members);
         }
         let by_lhs = vec![Vec::new(); categories.len()];
-        let word_values = word_values(lexicon, &lexeme_ids, &lexemes, &projection)?;
+        let (word_values, spelled_forms) =
+            word_values(lexicon, &lexeme_ids, &lexemes, &projection)?;
+        let own_name_features = projection.leaf_features(
+            &[],
+            &[],
+            sylex_lexicon::WordForm::Invariant,
+            &sylex_lexicon::FeatureBundle::default(),
+            "a card's own name",
+        )?;
         Ok(Self {
             grammar,
             catalog,
@@ -1119,6 +1150,8 @@ impl<'a> Binder<'a> {
                 by_lhs,
                 root,
                 word_values,
+                spelled_forms,
+                own_name_features,
                 lexeme_ids,
                 lexemes,
                 frames,

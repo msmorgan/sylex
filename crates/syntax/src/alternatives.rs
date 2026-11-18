@@ -268,7 +268,9 @@ impl Parse<'_> {
     fn leaf_word(&self, leaf: HeadLeaf) -> Option<HeadWord> {
         match &self.forest.leaves[leaf?].reading {
             LexicalReading::Word(value) => Some((value.lexeme, value.form)),
-            LexicalReading::FlavorWord { .. } | LexicalReading::Numeral { .. } => None,
+            LexicalReading::OwnName { .. }
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::Numeral { .. } => None,
         }
     }
 

@@ -11,7 +11,6 @@ use dpsi::Ident;
 use serde::de::DeserializeOwned;
 use sylex_lexicon::Case;
 use sylex_lexicon::Countability;
-use sylex_lexicon::LexicalValue;
 use sylex_lexicon::Number;
 use sylex_lexicon::Person;
 use sylex_lexicon::Tense;
@@ -270,9 +269,10 @@ impl Projection {
         &self,
         lexeme_features: &[(usize, u16)],
         countability: &[Countability],
-        value: &LexicalValue,
+        form: WordForm,
+        bundle: &sylex_lexicon::FeatureBundle,
+        owner: &str,
     ) -> Result<Vec<(usize, u16)>, LoadError> {
-        let bundle = &value.features;
         let countability = match countability {
             [single] => Some(*single),
             _ if countability.contains(&Countability::Count)
@@ -295,10 +295,10 @@ impl Projection {
             (NON_PAST_TIME, non_past_time),
             (
                 VERB_FORM,
-                verb_form(value.form).map(|_| self.verb_form.project(value.form)),
+                verb_form(form).map(|_| self.verb_form.project(form)),
             ),
             (CASE, bundle.case.map(|c| self.case.project(c))),
-            (INFLECTION, Some(self.inflection.project(value.form))),
+            (INFLECTION, Some(self.inflection.project(form))),
             (
                 COUNTABILITY,
                 countability.map(|c| self.countability.project(c)),
@@ -309,9 +309,9 @@ impl Projection {
             let Some(resolved) = resolved else { continue };
             let resolved = resolved.map_err(|variant| {
                 LoadError::Invalid(format!(
-                    "the lexicon licenses a {:?} value of `{}` whose {} is {variant}, which \
-                     feature `{}` has no value for",
-                    value.form, value.lexeme, PROJECTED[slot], PROJECTED[slot]
+                    "the lexicon licenses a {form:?} value of `{owner}` whose {} is {variant}, \
+                     which feature `{}` has no value for",
+                    PROJECTED[slot], PROJECTED[slot]
                 ))
             })?;
             if let Some((feature, v)) = resolved

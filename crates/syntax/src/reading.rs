@@ -1026,8 +1026,10 @@ impl CompiledGrammar {
         let mut atoms = Vec::new();
         self.atoms(reading, lexicon, &mut atoms, &mut |_, _| {})?;
         let (text, offsets) = join(&atoms);
-        let atomic = self.atomic_spans(&lexicon.analyze(&text));
-        if atomic.is_empty() {
+        let analyzed = lexicon.analyze_source_scoped(&text, None, scope);
+        let atomic = self.atomic_spans(&analyzed);
+        // An own name is checked against the analysis of its text.
+        if atomic.is_empty() && scope.forms().next().is_none() {
             return Ok(());
         }
         let mut chars = vec![0; text.len() + 1];
@@ -1041,7 +1043,7 @@ impl CompiledGrammar {
             .collect();
         let mut next = 0;
         if self
-            .atomic_reading(reading, &atoms, &atomic, &mut next)?
+            .atomic_reading(reading, &atoms, &atomic, &analyzed, &mut next)?
             .is_none()
         {
             return Err(AdmissionError::Rejected {
@@ -1066,6 +1068,7 @@ impl CompiledGrammar {
         reading: &Reading,
         atoms: &[Range<usize>],
         atomic: &[(Range<usize>, bool)],
+        analyzed: &sylex_lexicon::AnalyzedText,
         next: &mut usize,
     ) -> Result<Option<Range<usize>>, AdmissionError> {
         let inside = |at: usize, span: &Range<usize>| span.start < at && at < span.end;
@@ -1073,7 +1076,20 @@ impl CompiledGrammar {
             Reading::Leaf(value) => {
                 let at = atoms[*next].clone();
                 *next += 1;
-                let word = matches!(value, LexicalReading::Word(_));
+                // An own name stands only where analysis finds it: its
+                // Shortened form is no name inside the full name written out.
+                if matches!(value, LexicalReading::OwnName { .. })
+                    && !analyzed
+                        .matches
+                        .iter()
+                        .any(|m| m.start == at.start && m.end == at.end && m.reading == *value)
+                {
+                    return Err(AdmissionError::OutOfScope);
+                }
+                let word = matches!(
+                    value,
+                    LexicalReading::Word(_) | LexicalReading::OwnName { .. }
+                );
                 let parted = atomic.iter().any(|(span, splits)| {
                     (inside(at.start, span) || inside(at.end, span)) && !(*splits && word)
                 });
@@ -1096,7 +1112,7 @@ impl CompiledGrammar {
                     production: node.production.to_string(),
                     reason: "missing child".to_owned(),
                 })?;
-                match self.atomic_reading(child, atoms, atomic, next)? {
+                match self.atomic_reading(child, atoms, atomic, analyzed, next)? {
                     Some(span) => span,
                     None => return Ok(None),
                 }
@@ -1152,7 +1168,7 @@ impl CompiledGrammar {
                     if !lexicon.stands_in(value, scope) {
                         return Err(AdmissionError::OutOfScope);
                     }
-                    let facts = self.leaf_facts(value, scope).ok_or(AdmissionError::Leaf)?;
+                    let facts = self.leaf_facts(value).ok_or(AdmissionError::Leaf)?;
                     let edges = self.leaf_edges(value).ok_or(AdmissionError::Leaf)?;
                     if !self.leaf_matches(test, &facts) {
                         return Err(reject("leaf does not satisfy its symbol"));
@@ -1441,15 +1457,27 @@ impl CompiledGrammar {
     /// its lexeme, Word Form and features. Two Readings that differ only in
     /// the form of a syncretic head (*cast* as present or preterite) differ
     /// here.
+    /// `None` where that leaf is no declared word: a card's own name, a
+    /// numeral or a Flavor Word ([`Self::head_leaf`]).
     #[must_use]
     pub fn head_word<'r>(&self, reading: &'r Reading) -> Option<&'r LexicalValue> {
+        match self.head_leaf(reading)? {
+            LexicalReading::Word(value) => Some(value),
+            LexicalReading::OwnName { .. }
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::FlavorWord { .. } => None,
+        }
+    }
+
+    /// The leaf reached by following `head` children down from `reading`.
+    #[must_use]
+    pub fn head_leaf<'r>(&self, reading: &'r Reading) -> Option<&'r LexicalReading> {
         match reading {
-            Reading::Leaf(LexicalReading::Word(value)) => Some(value),
-            Reading::Leaf(_) => None,
+            Reading::Leaf(leaf) => Some(leaf),
             Reading::Node(node) => {
                 let production = *self.by_id.get(&node.production)?;
                 let at = self.head_index(production)?;
-                self.head_word(node.children.get(self.reading_child(production, at))?)
+                self.head_leaf(node.children.get(self.reading_child(production, at))?)
             }
         }
     }
@@ -1511,9 +1539,9 @@ impl CompiledGrammar {
                         let lexeme = self.lexeme(&v.lexeme).ok_or(AdmissionError::Leaf)?;
                         self.facts(lexeme).binding
                     }
-                    LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
-                        Binding::Free
-                    }
+                    LexicalReading::OwnName { .. }
+                    | LexicalReading::Numeral { .. }
+                    | LexicalReading::FlavorWord { .. } => Binding::Free,
                 };
                 out.push((text, binding, AtomKind::Word));
             }
