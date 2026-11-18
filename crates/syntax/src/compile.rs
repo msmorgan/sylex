@@ -671,6 +671,9 @@ struct Derivations<'d> {
     complemented: bool,
     /// Features no frame phrase's mother shares with its head.
     unshared: Vec<usize>,
+    /// Equations on its Frame Slot children by Slot Kind
+    /// (`SchemaDecl::Valence::slots`).
+    slots: &'d [(SlotKind, Vec<Equation>)],
 }
 
 /// A Valence schema's central Adjunct (`SchemaDecl::Valence::central`).
@@ -2875,25 +2878,14 @@ impl<'a> Binder<'a> {
             selects,
             complemented,
             unshared,
+            slots,
             ..
         } = schema
         else {
             return Err(invalid("not a Valence schema"));
         };
         let lhs = self.category(phrase)?;
-        if *head == LexicalCategory::Verb && *complemented {
-            return Err(invalid(format!(
-                "valence `{phrase}`: `complemented` on a verb head, which has no bare phrase"
-            )));
-        }
-        if *head == LexicalCategory::Preposition
-            && (variant.is_some() || !selects.is_empty() || *complemented || !unshared.is_empty())
-        {
-            return Err(invalid(format!(
-                "valence `{phrase}`: `variant`, `selects`, `complemented` and `unshared` are \
-                 not a preposition head's"
-            )));
-        }
+        valence_head_fields(schema)?;
         let selects = selects
             .iter()
             .map(|word| self.word(word).map(|word| self.out.lexeme_id(word)))
@@ -3005,6 +2997,7 @@ impl<'a> Binder<'a> {
             selects,
             complemented: *complemented,
             unshared,
+            slots,
         })
     }
 
@@ -3869,6 +3862,7 @@ impl<'a> Binder<'a> {
                     0,
                     false,
                     derivations.active,
+                    derivations.slots,
                     gappable,
                     heavy_shift,
                 )?;
@@ -3881,25 +3875,7 @@ impl<'a> Binder<'a> {
                 for draft in &mut family {
                     draft.unshared.extend(&derivations.unshared);
                 }
-                let site = match derivations.central {
-                    Some(_)
-                        if matches!(
-                            frame.family,
-                            FrameFamily::Catenative | FrameFamily::ComplexCatenative
-                        ) =>
-                    {
-                        CentralSite::None
-                    }
-                    Some(decl) if decl.families.contains(&frame.family) => CentralSite::AnyHead,
-                    Some(decl)
-                        if self.out.classes[decl.class]
-                            .iter()
-                            .any(|&member| self.out.facts(member).frames.contains(&index)) =>
-                    {
-                        CentralSite::ClassHead
-                    }
-                    Some(_) | None => CentralSite::None,
-                };
+                let site = self.central_site(derivations.central, index);
                 for draft in &mut family {
                     if draft.children.len() > 1 {
                         draft.central_site = site;
@@ -3939,6 +3915,7 @@ impl<'a> Binder<'a> {
                         1,
                         agent,
                         passive.verbal,
+                        derivations.slots,
                         gappable,
                         heavy_shift,
                     )?);
@@ -3953,15 +3930,47 @@ impl<'a> Binder<'a> {
                     );
                 }
             }
-            if let (Some(passive), true) = (passive, head == LexicalCategory::Verb)
+            if let (Some(_), true) = (passive, head == LexicalCategory::Verb)
                 && frame.family == FrameFamily::Prepositional
                 && let [fill @ SlotFill::PP(..)] = slots.as_slice()
             {
-                drafts
-                    .extend(self.prepositional_passive(lhs, &active, index, cost, fill, passive)?);
+                drafts.extend(self.prepositional_passive(
+                    lhs,
+                    &active,
+                    index,
+                    cost,
+                    fill,
+                    derivations,
+                )?);
             }
         }
         Ok(drafts)
+    }
+
+    /// Whether the phrase of frame `index` takes the schema's central
+    /// Adjunct: never a catenative frame's, else a frame of a declared family
+    /// under any head, or one a member of the declared Class has.
+    fn central_site(&self, central: Option<CentralDecl<'_>>, index: usize) -> CentralSite {
+        let family = self.out.frames[index].family;
+        match central {
+            Some(_)
+                if matches!(
+                    family,
+                    FrameFamily::Catenative | FrameFamily::ComplexCatenative
+                ) =>
+            {
+                CentralSite::None
+            }
+            Some(decl) if decl.families.contains(&family) => CentralSite::AnyHead,
+            Some(decl)
+                if self.out.classes[decl.class]
+                    .iter()
+                    .any(|&member| self.out.facts(member).frames.contains(&index)) =>
+            {
+                CentralSite::ClassHead
+            }
+            Some(_) | None => CentralSite::None,
+        }
     }
 
     /// The prepositional passive of a Prepositional frame, as in *each card
@@ -3975,8 +3984,12 @@ impl<'a> Binder<'a> {
         frame: usize,
         cost: u32,
         fill: &SlotFill,
-        passive: &PassiveDecl<'_>,
+        derivations: &Derivations<'_>,
     ) -> Result<Vec<Draft>, LoadError> {
+        let passive = derivations
+            .passive
+            .as_ref()
+            .ok_or_else(|| invalid("a prepositional passive of a schema with no `passive`"))?;
         let by_pp = SlotFill::PP(vec![self.out.lexeme_id(self.word(passive.by)?)], None);
         let relation = self.out.frames[frame].slots[0].relation;
         let mut drafts = Vec::new();
@@ -3990,7 +4003,7 @@ impl<'a> Binder<'a> {
                 self.slot_symbol(fill)?,
                 GapRule::Require(Gap::NP),
             );
-            self.slot_equations(&mut draft, child, fill.kind())?;
+            self.schema_slot_equations(&mut draft, child, fill.kind(), derivations.slots)?;
             if agent {
                 draft.internalized =
                     Some(draft.child("complement", self.slot_symbol(&by_pp)?, GapRule::Closed));
@@ -4246,6 +4259,7 @@ impl<'a> Binder<'a> {
         first_slot: usize,
         agent: bool,
         equations: &[Equation],
+        slot_equations: &[(SlotKind, Vec<Equation>)],
         gappable: bool,
         heavy_shift: bool,
     ) -> Result<Vec<Draft>, LoadError> {
@@ -4326,7 +4340,7 @@ impl<'a> Binder<'a> {
                     self.slot_symbol(fill)?,
                     GapRule::Transparent,
                 );
-                self.slot_equations(&mut draft, child, fill.kind())?;
+                self.schema_slot_equations(&mut draft, child, fill.kind(), slot_equations)?;
                 self.unlike_slot(&mut draft, child, fill)?;
                 if **fill == SlotFill::Pred {
                     draft.predicative = Some(child);
@@ -4688,6 +4702,22 @@ impl<'a> Binder<'a> {
             return Ok(());
         };
         self.equations_over_slot(draft, child, equations)
+    }
+
+    /// Adds the grammar's `slot` equations of `kind` and a Valence schema's
+    /// own (`SchemaDecl::Valence::slots`) over Frame Slot child `child`.
+    fn schema_slot_equations(
+        &self,
+        draft: &mut Draft,
+        child: usize,
+        kind: SlotKind,
+        schema: &[(SlotKind, Vec<Equation>)],
+    ) -> Result<(), LoadError> {
+        self.slot_equations(draft, child, kind)?;
+        for (_, equations) in schema.iter().filter(|(k, _)| *k == kind) {
+            self.equations_over_slot(draft, child, equations)?;
+        }
+        Ok(())
     }
 
     /// Adds `equations` to `draft` with child `child` named `slot`.
@@ -6831,4 +6861,51 @@ fn frame_category(family: FrameFamily) -> Option<LexicalCategory> {
         | FrameFamily::Cost
         | FrameFamily::Idiom => LexicalCategory::Verb,
     })
+}
+
+/// Refuses a Valence schema field its head Category has no use for: a verb
+/// has no bare phrase to leave out (`complemented`), and a preposition's
+/// phrases are one schema's, each with its own Complement.
+fn valence_head_fields(schema: &SchemaDecl) -> Result<(), LoadError> {
+    let SchemaDecl::Valence {
+        phrase,
+        head,
+        variant,
+        selects,
+        complemented,
+        unshared,
+        slots,
+        ..
+    } = schema
+    else {
+        return Err(invalid("not a Valence schema"));
+    };
+    if *head == LexicalCategory::Verb && *complemented {
+        return Err(invalid(format!(
+            "valence `{phrase}`: `complemented` on a verb head, which has no bare phrase"
+        )));
+    }
+    if let Some((kind, _)) = slots.iter().enumerate().find_map(|(at, slot)| {
+        slots[..at]
+            .iter()
+            .any(|(k, _)| *k == slot.0)
+            .then_some(slot)
+    }) {
+        return Err(invalid(format!(
+            "valence `{phrase}`: `slots` lists {kind:?} twice"
+        )));
+    }
+    if *head == LexicalCategory::Preposition
+        && (variant.is_some()
+            || !selects.is_empty()
+            || *complemented
+            || !unshared.is_empty()
+            || !slots.is_empty())
+    {
+        return Err(invalid(format!(
+            "valence `{phrase}`: `variant`, `selects`, `complemented`, `unshared` and `slots` \
+             are not a preposition head's"
+        )));
+    }
+    Ok(())
 }

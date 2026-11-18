@@ -773,6 +773,14 @@ pub enum SchemaDecl {
         /// (a Preposition Phrase takes its Complement's Number).
         #[serde(default)]
         agree: Vec<(Ident, Ident)>,
+        /// Equations on each Frame Slot child of a Slot Kind in this schema's
+        /// phrases, over the child `slot` and `$`, beside the grammar's own
+        /// `slot` declaration of that kind: what one head Category's Slot of
+        /// a kind admits that another's does not (a noun's Amount Complement
+        /// is no comparative bound, *reduce it to less than 1*'s Amount is).
+        /// Not a preposition head's.
+        #[serde(default)]
+        slots: Vec<(SlotKind, Vec<Equation>)>,
         /// Complement Clusters: a verb heads a coordination of parallel
         /// sequences of its Frame Slots, each sequence optionally ending in
         /// an Adjunct (*put one of them into your hand and the rest into your
