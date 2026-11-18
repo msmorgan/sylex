@@ -121,7 +121,7 @@ feature NominalCoordination = Coordinated
 // Whether a `BareMass = Modified` Nominal is still a bare single-word head
 // (`Unmodified`) or has a Complement or Modifier (`Expanded`), so
 // `CoordinatedBareMass` admits a coordinated Nominal only when at least one
-// conjunct could not stand as a `ModifiedBareMass` Noun Phrase on its own.
+// conjunct could not stand as a `BareMass/Modified` Noun Phrase on its own.
 feature BareMassHead = Unmodified | Expanded
 // Privative: a nominal whose head noun has a Complement that names the one
 // argument a genitive subject-determiner names, realized or shared by Right
@@ -1967,22 +1967,20 @@ MannerAdjunct: VerbPhrase -> VerbPhrase adjunct:NounPhrase { cost: 2, transparen
           head.OuterAdjunct != Central
 FrequencyInterval: AdverbPhrase -> AdverbPhrase adjunct:TemporalNounPhrase
     where head.AdjunctPosition != Central | Phrasal | Multiplying | Linking
-NumericCountPremodifier: QuantifiedNominal -> modifier:Amount BareNominal
-    where $.QuantityNumber = head.Number,
-          head.Countability = Count,
-          modifier.QuantityNumber = head.Number
-NumericMassPremodifier: QuantifiedNominal -> modifier:Amount BareNominal
-    where $.QuantityNumber = head.Number,
-          head.Countability = Mass,
-          head.NounDistribution = DirectMeasure
-CardinalCountPremodifier: QuantifiedNominal -> modifier:Numeral(Cardinal) BareNominal
-    where $.QuantityNumber = head.Number,
-          head.Countability = Count,
-          modifier.Number = head.Number
-CardinalMassPremodifier: QuantifiedNominal -> modifier:Numeral(Cardinal) BareNominal
-    where $.QuantityNumber = head.Number,
-          head.Countability = Mass,
-          head.NounDistribution = DirectMeasure
+NumericPremodifier: QuantifiedNominal -> modifier:Amount BareNominal {
+    cases: head.Countability -> [
+        Count -> [head.Countability = Count, modifier.QuantityNumber = head.Number],
+        Mass -> [head.Countability = Mass, head.NounDistribution = DirectMeasure],
+    ],
+}
+    where $.QuantityNumber = head.Number
+CardinalPremodifier: QuantifiedNominal -> modifier:Numeral(Cardinal) BareNominal {
+    cases: head.Countability -> [
+        Count -> [head.Countability = Count, modifier.Number = head.Number],
+        Mass -> [head.Countability = Mass, head.NounDistribution = DirectMeasure],
+    ],
+}
+    where $.QuantityNumber = head.Number
 ModifiedQuantity: ModifiedQuantifiedNominal -> modifier:AdjectivePhrase QuantifiedNominal
 // Free-choice *any* with a cardinal is the determinative phrase *any one*
 // (SingularQuantifier), so excluding `FreeChoice` is a gate (english.md §6, §8):
@@ -2057,24 +2055,28 @@ DistributiveModifiedQuantity: NounPhrase -> determiner:DeterminerPhrase Modified
           $.Person = Third,
           $.Determination = Overt
 // A Preposition Phrase in Determiner function (*up to two target
-// creatures*; CGEL 5§4:357). Its Complement is a bare quantity, never a
-// determined Noun Phrase.
-MaximumDetermination: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) Nominal
-    where determiner.Determination = Bare,
-          determiner.Number = head.Number,
-          head.Countability = Count,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-// *Up to five {P} worth of modes* [CR#700.2i].
-MaximumMeasuredMass: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) Nominal {
-    unshared: [NounKind],
+// creatures*; CGEL 5§4:357). Over a count head its Complement is a bare
+// quantity, never a determined Noun Phrase; over a mass head it measures a
+// resource (*up to five {P} worth of modes* [CR#700.2i]).
+MaximumDetermination: NounPhrase -> determiner:Selected(PrepositionPhrase, Up) Nominal {
+    cases: head.Countability -> [
+        Count -> [
+            head.Countability = Count,
+            determiner.Determination = Bare,
+            determiner.Number = head.Number,
+        ],
+        Mass -> {
+            unshared: [NounKind],
+            equations: [
+                head.Countability = Mass,
+                determiner.Countability != Count,
+                head.Number = Singular,
+                $.NounKind = Resource,
+            ],
+        },
+    ],
 }
-    where determiner.Countability != Count,
-          head.Countability = Mass,
-          head.Number = Singular,
-          $.NounKind = Resource,
-          $.Determination = Overt,
+    where $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
 // The fused head of its Noun Phrase (*choose up to one*).
@@ -2096,16 +2098,13 @@ MeasuredComparativeHead: NounPhrase -> modifier:NounPhrase Selecting(Determinati
 // A determinative fused head and its *of* oblique (CGEL 5§9.1:411) are
 // `valence PartitiveHead`'s. *Any* with a plural oblique leaves the Noun
 // Phrase's Number open (*if any of those cards shares a card type*).
-AnyPartitive: PartitiveHead -> Word(Any) complement:Selected(PrepositionPhrase, Of)
-    where complement.Number = Plural,
-          $.NounKind = Ordinary,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-AnyMassPartitive: PartitiveHead -> Word(Any) complement:Selected(PrepositionPhrase, Of)
-    where complement.Number = Singular,
-          $.Number = Singular,
-          $.NounKind = Ordinary,
+AnyPartitive: PartitiveHead -> Word(Any) complement:Selected(PrepositionPhrase, Of) {
+    cases: complement.Number -> [
+        Plural -> [complement.Number = Plural],
+        Singular -> [complement.Number = Singular, $.Number = Singular],
+    ],
+}
+    where $.NounKind = Ordinary,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -2137,19 +2136,13 @@ QuantityPartitiveOfEach: FusedNounPhrase -> DeterminerPhrase preposition:Word(Of
 // count and mass over mass: exceptive (*all but one of them*) or
 // comparative with a bare standard (*more than one of the same mana
 // symbol*). The Noun Phrase has the determiner's Number.
-ComplementedPartitive: PartitiveHead -> DeterminerPhrase complement:Selected(PrepositionPhrase, Of)
+ComplementedPartitive: PartitiveHead -> DeterminerPhrase complement:Selected(PrepositionPhrase, Of) {
+    cases: head.Countability -> [
+        Count -> [head.Countability := Count, head.Countability = complement.Countability],
+        Mass -> [head.Countability := Mass, complement.Countability := Mass],
+    ],
+}
     where head.ComplementKind = PP,
-          head.Countability := Count,
-          head.Countability = complement.Countability,
-          $.NounKind = Ordinary,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-ComplementedMassPartitive: PartitiveHead ->
-    DeterminerPhrase complement:Selected(PrepositionPhrase, Of)
-    where head.ComplementKind = PP,
-          head.Countability := Mass,
-          complement.Countability := Mass,
           $.NounKind = Ordinary,
           $.Determination = Overt,
           $.Case = Plain,
@@ -2259,14 +2252,13 @@ MeasuredStandardComparative: AdjectivePhrase -> modifier:NounPhrase AdjectivePhr
           modifier.NounKind := Numeric,
           modifier.Case := Plain
 // *The most creatures* (CGEL 5§6.1:393).
-SuperlativeCountDeterminer: DeterminerPhrase -> marker:Word(The) Class(SuperlativeQuantifier)
-    where $.Number = Plural,
-          $.Countability = Count,
-          $.ComplementKind = Intransitive
-SuperlativeMassDeterminer: DeterminerPhrase -> marker:Word(The) Class(SuperlativeQuantifier)
-    where $.Number = Singular,
-          $.Countability = Mass,
-          $.ComplementKind = Intransitive
+SuperlativeDeterminer: DeterminerPhrase -> marker:Word(The) Class(SuperlativeQuantifier) {
+    cases: $.Countability -> [
+        Count -> [$.Countability = Count, $.Number = Plural],
+        Mass -> [$.Countability = Mass, $.Number = Singular],
+    ],
+}
+    where $.ComplementKind = Intransitive
 // The *than* Complement after the head (*more lands than you*, *less life
 // than an opponent*; CGEL 13§2.1:1104): a count determinative over a plural
 // count head, a mass one over a singular mass head, as the determinative's
@@ -2917,22 +2909,20 @@ SuperlativeFusedHead: BareNominalComplement -> AdjectivePhrase
 // and toughness] 0/2*, *[mana value, power, or toughness] equal to ...*;
 // english.md §8). A `BareMass = Modified` noun (*mana value*, *power*,
 // *toughness*, *control*, *loyalty*) takes `BareMass` only when a Complement,
-// Modifier or coordinated Nominal expands it (`ModifiedBareMass`,
+// Modifier or coordinated Nominal expands it (`BareMass/Modified`,
 // `CoordinatedBareMass`), an admission gate (english.md §6) keeping *[a spell
 // with mana value] [less than or equal to ...]* off Maralen, Fae Ascendant and
 // Sphere of Annihilation, and *under [its owner's] [control tapped ...]* off
 // Tawnos's Coffin.
-BareMass: NounPhrase -> Nominal { transparent: [head], uncoordinated: [head] }
-    where head.BareMass != Modified,
-          $.Determination = Bare,
-          head.DeterminerNeed != Required,
-          $.Case = Plain,
-          head.Countability = Mass,
-          head.Number = Singular,
-          $.Person = Third
-ModifiedBareMass: NounPhrase -> Nominal { heavy: [head], transparent: [head], uncoordinated: [head] }
-    where head.BareMass := Modified,
-          $.Determination = Bare,
+BareMass: NounPhrase -> Nominal {
+    transparent: [head],
+    uncoordinated: [head],
+    cases: head.BareMass -> [
+        Unvalued -> [head.BareMass != Modified],
+        Modified -> { heavy: [head], equations: [head.BareMass := Modified] },
+    ],
+}
+    where $.Determination = Bare,
           head.DeterminerNeed != Required,
           $.Case = Plain,
           head.Countability = Mass,
@@ -3011,24 +3001,21 @@ DeterminedCluster: NominalCluster ->
           $.Countability = determiner.Countability,
           $.DeterminativeDistribution = determiner.DeterminativeDistribution
 // A comparative or exceptive quantity's Cluster, count or mass as
-// ComparativeQuantityCountDetermined and ComparativeQuantityMassDetermined
-// give the nominal its Number.
-ComparativeCountCluster: NominalCluster ->
-    determiner:DeterminerPhrase modifier:Premodifier
+// ComparativeQuantityDetermined's cases give the nominal its Number: the
+// standard's, or Singular.
+ComparativeCluster: NominalCluster -> determiner:DeterminerPhrase modifier:Premodifier {
+    cases: determiner.Countability -> [
+        Count -> [
+            determiner.Countability = Count,
+            $.Countability = Count,
+            $.Number = determiner.ObliqueNumber,
+        ],
+        Mass -> [determiner.Countability := Mass, $.Countability = Mass, $.Number = Singular],
+    ],
+}
     where determiner.ComplementKind = PP,
           determiner.ObliqueKind != ComparativeClause,
-          determiner.ObliqueDetermination = Bare,
-          determiner.Countability = Count,
-          $.Countability = Count,
-          $.Number = determiner.ObliqueNumber
-ComparativeMassCluster: NominalCluster ->
-    determiner:DeterminerPhrase modifier:Premodifier
-    where determiner.ComplementKind = PP,
-          determiner.ObliqueKind != ComparativeClause,
-          determiner.ObliqueDetermination = Bare,
-          determiner.Countability := Mass,
-          $.Countability = Mass,
-          $.Number = Singular
+          determiner.ObliqueDetermination = Bare
 MaximumCluster: NominalCluster ->
     determiner:Selected(PrepositionPhrase, Up) modifier:Premodifier
     where determiner.Determination = Bare,
@@ -3086,31 +3073,23 @@ JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
 // mana*; CGEL 13§4.1.2:1126–1127, [16], [17i]), a measured mass as
 // MeasuredMass's is; a noun both count and mass is no mass head. The mass
 // Noun Phrase is `Resource` and the count one keeps its head's NounKind,
-// which no equation values by Countability, so each is its own Production
-// (as are their Clusters, whose Number is the standard's or Singular). Only
-// a bare standard:
+// which no equation values by Countability, so the mass case alone does
+// not share it. Only a bare standard:
 // *more than the total* determines nothing (CGEL 5§11(d):432), nor does a
 // comparative clause (∗*more than you do creatures*).
-ComparativeQuantityCountDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal
-    where determiner.ComplementKind = PP,
-          determiner.ObliqueKind != ComparativeClause,
-          determiner.ObliqueDetermination = Bare,
-          head.Countability = Count,
-          determiner.ObliqueNumber = head.Number,
-          determiner.Countability = head.Countability,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-ComparativeQuantityMassDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
-    unshared: [NounKind],
+ComparativeQuantityDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
+    cases: head.Countability -> [
+        Count -> [head.Countability = Count, determiner.ObliqueNumber = head.Number],
+        Mass -> {
+            unshared: [NounKind],
+            equations: [head.Countability := Mass, head.Number = Singular, $.NounKind = Resource],
+        },
+    ],
 }
     where determiner.ComplementKind = PP,
           determiner.ObliqueKind != ComparativeClause,
           determiner.ObliqueDetermination = Bare,
-          head.Countability := Mass,
-          head.Number = Singular,
           determiner.Countability = head.Countability,
-          $.NounKind = Resource,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -3286,13 +3265,16 @@ Unmodified: Nominal -> BareNominal { transparent: [head] }
     where head.BareMass != Modified,
           $.BareMassHead = Expanded,
           $.ConjunctNumber = $.Number
-ExpandedBareMass: Nominal -> BareNominal { heavy: [head], transparent: [head] }
+// A `BareMass = Modified` noun's Nominal is `Unmodified` while it is the one
+// word, and `Expanded` once it spans more.
+BareMassNominal: Nominal -> BareNominal {
+    transparent: [head],
+    cases: $.BareMassHead -> [
+        Expanded -> { heavy: [head], equations: [$.BareMassHead = Expanded] },
+        Unmodified -> { light: [head], equations: [$.BareMassHead = Unmodified] },
+    ],
+}
     where head.BareMass := Modified,
-          $.BareMassHead = Expanded,
-          $.ConjunctNumber = $.Number
-UnmodifiedBareMass: Nominal -> BareNominal { light: [head], transparent: [head] }
-    where head.BareMass := Modified,
-          $.BareMassHead = Unmodified,
           $.ConjunctNumber = $.Number
 // The Targeting Marker word alone is its determinative's own
 // DeterminerPhrase (*target creature*). BareTargetingMarker builds the word,
