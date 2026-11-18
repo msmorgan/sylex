@@ -4255,13 +4255,26 @@ impl<'a> Binder<'a> {
         let copular = self.out.frames[frame].family == FrameFamily::Copular;
         let noun = self.out.frames[frame].family == FrameFamily::NounComplement;
         let catenative = self.out.frames[frame].family == FrameFamily::Catenative;
+        // An Indirect Object resists prenuclear position (*?Sue he gave the
+        // key*, *∗He asked who(m) I bought presents*), while a ditransitive
+        // Direct Object takes it as readily as a monotransitive one (CGEL,
+        // Ch. 4 §4.3(d), pp. 248–250, [9]): only the Direct Object extracts.
+        // The Internalized Complement, past the frame's own slots, extracts
+        // never.
+        let agent_slot = agent.then(|| slots.len() - 1);
+        let indirect = |i: usize| {
+            Some(i) != agent_slot
+                && self.out.frames[frame].slots[first_slot + i].relation
+                    == SlotRelation::IndirectObject
+        };
         let extractable: Vec<Option<usize>> = std::iter::once(None)
             .chain(
                 slots
                     .iter()
                     .enumerate()
-                    .filter(|(_, fill)| {
+                    .filter(|(i, fill)| {
                         gappable
+                            && !indirect(*i)
                             && if noun {
                                 matches!(***fill, SlotFill::PP(ref list, _) if list.len() == 1)
                                     || ***fill == SlotFill::Amount
@@ -4279,7 +4292,6 @@ impl<'a> Binder<'a> {
                     .map(|(i, _)| Some(i)),
             )
             .collect();
-        let agent_slot = agent.then(|| slots.len() - 1);
         for gap in extractable {
             if gap.is_some() && gap == agent_slot {
                 continue;
