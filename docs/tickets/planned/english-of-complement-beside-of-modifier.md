@@ -40,4 +40,7 @@ no game a turn is part of.
 
 `crates/vocabulary/lexicon/english/nouns.ron` (*color*, *type*, *source*, *turn*);
 `docs/design/english.md` §3, "Same-head complement priority"; `crates/syntax/src/compile.rs` (`omits_complement`);
-`cargo xtask english forestwalk --card "Together as One" --line 1`.
+`cargo xtask english forestwalk --card "Together as One" --line 1`. An *of* frame competes with a
+genitive determiner unless its noun has a `distinct_genitive` (`docs/design/english.md` §3, "A
+genitive and an *of* Complement compete"): *your first, second, or third turns of the game* needs
+*turn* to have one, as the phases and steps do.
