@@ -6,11 +6,12 @@
 +AdverbPhrase no more than twice => PrepositionPhrase "than twice"
 + Activate no more than twice each turn. => AdverbPhrase "twice" as Complement of than || AdverbPhrase "twice each turn" as Complement of than
 + Activate no more than three times each turn. => NounPhrase "three times" as Complement of than
-+ <card=Judoon Enforcers> No more than two creatures can attack you each combat. => DeterminerPhrase "No more than two" as Determiner of creature
-+ <card=Crawlspace> No more than one creature can attack you each combat. => DeterminerPhrase "No more than one" as Determiner of creature
++ <card=Crawlspace> No more than two creatures can attack you each combat. => DeterminerPhrase "No more than two" as Determiner of creature
++ <card=Judoon Enforcers> No more than one creature can attack you each combat. => DeterminerPhrase "No more than one" as Determiner of creature
 + <card=Pit Imp> {B}: This creature gets +1/+0 until end of turn. Activate no more than twice each turn.
 + {B}, Pay 1 life: This creature gets +1/+0 until end of turn. Activate no more than three times each turn.
 + You can cast spells only during your turn and you can cast no more than two spells each turn. => DeterminerPhrase "no more than two" as Determiner of spell
+# from: Silent Arbiter
 *NounPhrase no more than one creatures
 *NounPhrase no more than two creature
 +NounPhrase no more than two creatures => DeterminerPhrase "no more than two" as Determiner of creature

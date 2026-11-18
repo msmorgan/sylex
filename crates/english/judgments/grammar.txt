@@ -1,4 +1,5 @@
 # Core clause, noun phrase, coordination, number, and keyword-line grammar of Oracle text
+# from: Life's Legacy
 + Draw cards.
 # from: Vanish into Memory
 + You draw cards equal to that creature's power.
@@ -18,22 +19,35 @@
 + You may draw cards equal to its power.
 # from: Into the Fray
 + Target creature attacks this turn if able.
+# from: Goblin Diplomats
 * Each creatures attack.
+# from: Suicidal Charge
 * Those creature attacks.
+# from: Pursued Whale
 * Creatures attacks.
+# from: Spry and Mighty
 * You draws cards.
+# from: Unifying Theory
 * Them draw cards.
+# from: God-Eternal Kefnet
 * Draw they.
+# from: River Song
 * Draw cards from they.
+# from: Song of Serenity
 * Creatures that attacks draw cards.
+# from: Pursued Whale
 * Creatures you controls attack.
+# from: Consecrated Sphinx
 * You may draws cards.
+# from: Witch's Mark
 * If you do, .
 # from: Wedding Ring
 +Nominal artifact named Powerstone Shard => VerbPhrase "named Powerstone Shard" as Modifier of artifact
 +VerbPhrase named Powerstone Shard
 +Nominal defending player
+# from: Fear of Falling
 *Nominal defend player
+# from: Fear of Falling
 *Nominal defends player
 +PrepositionPhrase in addition
 # from: Saheeli's Artistry
@@ -43,13 +57,16 @@
 +Clause no mana was spent
 + <card=Rite of the Raging Storm> Creatures named Lightning Rager can't attack you or planeswalkers you control. => VerbPhrase "named Lightning Rager" as Modifier of creature
 *NounPhrase game
+# from: Mirror Entity
 *NounPhrase much game
+# from: Freestrider Commando
 *Clause no mana was spended
 +Nominal amount of {G}
 # from: Soul Burn
 +NounPhrase the amount of {G}
 # from: Cradle Clearcutter
 + Add an amount of {G} equal to this creature's power.
+# from: Cradle Clearcutter
 *NounPhrase much amount of {G}
 +Clause you do
 + Draw two cards.
@@ -70,29 +87,30 @@
 + Creatures with power 2 or less can't attack you.
 + Your maximum hand size is increased by two.
 + You gain X plus 3 life.
+# from: Witch's Mark
 * Draw two card.
 +AdjectivePhrase second
 # from: Liquid Fire
 +Amount 5 minus X
+# from: Blessed Wine
 + Gain 1 life. => readings 1
 + +3/-2
 + 1/1
 + X/X
 + +3/+3
 + +X/-X
-# from: Nissa, Worldsoul Speaker
+# from: Greater Werewolf
 + -0/+0
 + 0/1
-# from: Inferno Titan
-+ 1,000/2
 # from: Supply
 +NounPhrase X 1/1 green Saproling creature tokens => DeterminerPhrase "X" as Determiner of token
 # from: Gelatinous Genesis
 +NounPhrase X X/X green Ooze creature tokens => DeterminerPhrase "X" as Determiner of token
-# from: Jace, the Perfected Mind
+# from: Giant Growth
 + Target creature gets +3/+3.
+# from: Ascendant Evincar
 + Creatures get -1/-1.
-# from: Weakstone
+# from: Sulfur Elemental
 +VerbPhrase get +3/-2
 +AdjectivePhrase equal to 2 => PrepositionPhrase "to 2" as Complement of equal
 +AdjectivePhrase equal
@@ -108,6 +126,7 @@
 + {T}, Discard a card: Draw a card.
 # from: Mysteries of the Deep
 + Landfall — If you had a land enter the battlefield under your control this turn, draw three cards instead.
+# from: Pulmonic Sliver
 + Creatures have flying.
 # from: Star Whale
 + Other creatures you control have ward {2}.
@@ -117,7 +136,9 @@
 +KeywordPhrase frenzy
 # from: Shadow Puppeteers
 + Flying, ward {2}
+# from: Markov Warlord
 * Target creatures attack.
+# from: Spellwild Ouphe
 * Spells that targets creatures attack.
 + Instant
 + Artifact Creature — Golem
@@ -126,6 +147,7 @@
 + Enchantment Creature — Human Soldier
 + Kindred Instant — Elf
 + Battle — Siege
+# from: Storm Crow
 * Creature — NoSuchSubtype
 # from: Cradle Clearcutter
 +Nominal amount of {G} equal to this creature's power => AdjectivePhrase "equal to this creature's power" as Modifier of amount
@@ -161,8 +183,9 @@
 + Artifacts, creatures, and lands your opponents control enter tapped.
 # from: Obliterate
 + Destroy all artifacts, creatures, and lands.
+# from: Shalai, Voice of Plenty
 * You, they, and creatures attacks.
-* Draw cards, creatures, and they.
+# from: Live Fast
 * You draws cards, discard cards, and gain life.
 # from: Frozen Aether
 +NounPhrase artifacts, creatures, and lands => NounPhrase "artifacts"; NounPhrase "creatures"; NounPhrase "lands"; readings 1

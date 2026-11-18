@@ -6,7 +6,7 @@
 +NounPhrase her
 +NounPhrase turns other than yours => NounPhrase "yours" as Complement of than; AdjectivePhrase "other than yours" as Modifier of turn
 + <card=Mesa Lynx> During turns other than yours, this creature gets +0/+2. => NounPhrase "yours" as Complement of than
-+ <card=Mesa Lynx> During your turn, this creature gets +0/+2.
++ <card=Hardy Veteran> During your turn, this creature gets +0/+2.
 + <card=Geyser Drake> During turns other than yours, spells you cast cost {1} less to cast. => NounPhrase "yours" as Complement of than
 # from: Geyser Drake
 + <card=Geyser Drake> During turns other than yours, spells you cast cost {1} less to cast.

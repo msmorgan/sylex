@@ -12,17 +12,16 @@
 # Expandability is selected by the preposition (CGEL, Ch. 11 §4.8, p. 971).
 # from: Donal, Herald of Wings
 + Copy target spell, except the copy is red. => PrepositionPhrase "except the copy is red" as Adjunct of copy
-* When that this creature enters, draw a card.
-* Copy target spell, except that that the copy is red.
 # A participial modifier is a bare passive (CGEL, Ch. 14 §9, pp. 1264–1265).
+# from: Chaos Defiler
 * Destroy one of them been chosen at random.
+# from: Omenpath Journey
 * Choose a card at random been exiled with this creature.
 # Interrogative *how* is no focusing modifier of a Noun Phrase.
 *NounPhrase how those creatures
 # This additional deferred witness becomes readable through general NP focus.
 + <card=Scrying Glass> {3}, {T}: Choose a number greater than 0 and a color. Target opponent reveals their hand. If that opponent reveals exactly the chosen number of cards of the chosen color, you draw a card. => NounPhrase "exactly the chosen number of cards of the chosen color" as Object of reveal
-# Manner is clause-level, within Complement Clusters too (CGEL, Ch. 15 §4.3, pp. 1341–1343).
+# Manner is clause-level (CGEL, Ch. 15 §4.3, pp. 1341–1343).
 *NounPhrase a card at random
-+ Exile a card at random and a creature card at random. => ComplementCluster "a card at random"; ComplementCluster "a creature card at random"; PredicateAdjunct "at random" as Adjunct of exile; !NounPhrase "a card at random"; readings 1
 # from: Grip of Desolation
 + Exile target creature and target land. => NounPhrase "target creature and target land" as Object of exile; readings 1

@@ -1,9 +1,12 @@
 # Indefinite article allomorphy (a/an by onset), count agreement, and sentence-initial capitalization
 +NounPhrase a creature
 +NounPhrase an artifact
+# from: Ruthless Knave
 *NounPhrase a creatures
+# from: Embraal Gear-Smasher
 *NounPhrase an artifacts
 *NounPhrase a mana
+# from: Inga and Esika
 *NounPhrase an mana
 +Clause sacrifice an artifact
 +NounPhrase an Aura
@@ -11,13 +14,14 @@
 # from: Kiora Bests the Sea God
 +NounPhrase an 8/8 blue Kraken creature token
 +NounPhrase a 1/1 creature
-# from: Illusionary Mask
-+NounPhrase a +8/+8 creature
+# from: Abigale, Poet Laureate // Heroic Stanza
++NounPhrase a +8/+8 counter
 +NounPhrase two target creatures
 +PrepositionPhrase at the beginning
 +PrepositionPhrase in a graveyard
 + Draw a card.
 + Flying, trample
+# from: Levitation
 + Creatures have flying.
 # The article agrees with the Onset of the word after it, whatever that word heads
 # from: Krark-Clan Ironworks
@@ -26,8 +30,8 @@
 *NounPhrase an creature
 # from: Kiora Bests the Sea God
 *NounPhrase a 8/8 blue Kraken creature token
-# from: Illusionary Mask; a sign is spoken *plus* or *minus*
-*NounPhrase an +8/+8 creature
+# from: Abigale, Poet Laureate // Heroic Stanza; a sign is spoken *plus* or *minus*
+*NounPhrase an +8/+8 counter
 # from: Abigale, Poet Laureate; a sign is spoken *plus* or *minus*
 *NounPhrase an +1/+1 counter
 # from: Baleful Ammit

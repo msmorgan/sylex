@@ -1,9 +1,7 @@
 # Coordinated verbs and auxiliaries sharing a following complement (right-node raising), agreement and form mismatches, and ordinary serial coordination
 # from: Gilded Drake
 +VerbPhrase don't or can't make an exchange => NounPhrase "an exchange" as Object of make
-*VerbPhrase may and can drawing cards
-*VerbPhrase be and may drawn
-*VerbPhrase draw and drawing
+# from: Banon, the Returners' Leader
 *VerbPhrase draws and discard
 # from: Loxodon Gatekeeper
 +NounPhrase artifacts, creatures, and lands

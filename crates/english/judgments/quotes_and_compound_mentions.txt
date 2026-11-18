@@ -5,8 +5,7 @@
 + <card=Teferi's Realm> At the beginning of each player's upkeep, that player chooses artifact, creature, land, or non-Aura enchantment. => Mention "artifact, creature, land, or non-Aura enchantment" as Object of choose; Mention "non-Aura enchantment"; MentionModifier "non-Aura" as Modifier of enchantment
 + <card=Sarpadian Empires, Vol. VII> As this artifact enters, choose white Citizen, blue Camarid, black Thrull, red Goblin, or green Saproling. => Mention "white Citizen, blue Camarid, black Thrull, red Goblin, or green Saproling" as Object of choose; Mention "white Citizen"; Mention "green Saproling"
 + <card=Artificial Evolution> The new creature type can't be Wall. => NounPhrase "The new creature type" as Subject of can; SpecifyingValue "Wall" as PredicativeComplement of be; readings 1
-+ The chosen creature type is Goblin or Elf. => SpecifyingValue "Goblin or Elf" as PredicativeComplement of be; readings 1
 + <card=Conversion> All Mountains are Plains. => NounPhrase "Plains" as PredicativeComplement of be; !SpecifyingValue "Plains"; readings 1
 + <card=Urza's Tower> {T}: Add {C}. If you control an Urza's Mine and an Urza's Power-Plant, add {C}{C}{C} instead. => !SpecifyingValue "Power-Plant"
-+ <card=Ancient Cellarspawn> Whenever a player casts a spell, if the amount of mana spent to cast that spell was less than its mana value, target opponent loses life equal to the difference unless you control no other permanents that's a Demon, Horror, or Nightmare. => !SpecifyingValue "Demon, Horror, or Nightmare"
++ <card=Ancient Cellarspawn> Each spell you cast that's a Demon, Horror, or Nightmare costs {1} less to cast. => !SpecifyingValue "Demon, Horror, or Nightmare"
 + <card=Urza's Saga> III — Search your library for an artifact card with mana cost {0} or {1}, put it onto the battlefield, then shuffle. => PrepositionPhrase "with mana cost {0} or {1}"

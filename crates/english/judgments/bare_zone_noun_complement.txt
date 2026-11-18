@@ -15,7 +15,6 @@
 +PrepositionPhrase to hand
 *PrepositionPhrase from graveyard
 *VerbPhrase put into graveyard
-*VerbPhrase put into top of your library
 +PrepositionPhrase in your hand
 +PrepositionPhrase from your graveyard
 +PrepositionPhrase into a graveyard

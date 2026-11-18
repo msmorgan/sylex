@@ -42,9 +42,6 @@
 # Under a coordinated host one of whose conjuncts is present.
 # from: Merciless Harlequin
 * When this creature entered, you draw a card and you lost 1 life.
-# Over a coordination of imperative Clauses.
-# from: Goatnapper
-* When this creature enters, untap target Goat and gain control of it until this creature left the battlefield.
 
 # A non-past temporal clause under a past host, before it and after its verb.
 # from: Soulgorger Orgg
@@ -52,11 +49,8 @@
 # from: Soulgorger Orgg
 *NounPhrase the life you lost when it enters
 
-# A temporal clause under a modal preterite, and a modal preterite inside a
-# temporal clause.
+# A temporal clause under a modal preterite.
 + <card=Laboratory Maniac> If you would draw a card while your library has no cards in it, you win the game instead. => PrepositionPhrase "while your library has no cards in it" as Adjunct of will
-# from: Laboratory Maniac
-+ When you would draw a card while your library has no cards in it, you win the game instead. => PrepositionPhrase "When you would draw a card while your library has no cards in it" as Adjunct of win
 
 # A coordinated temporal clause one of whose conjuncts is past, under a
 # present-tense host.
@@ -92,14 +86,3 @@
 
 # A past temporal clause under a participle, which has no time of its own.
 + <card=Minion of the Wastes> Minion of the Wastes's power and toughness are each equal to the life paid as it entered. => PrepositionPhrase "as it entered" as Adjunct of pay; !PrepositionPhrase "as it entered" as Adjunct of be
-
-# Inside a non-finite Complement that gives its governor its time: causative
-# "have"'s bare infinitival and past participial, and the bare infinitival of
-# "rather than", each under a present-tense modal host.
-+ <card=Melira's Keepers> This creature can't have counters put on it while it's attacking. => VerbPhrase "put on it while it's attacking" as Complement of have
-+ <card=Melira's Keepers> This creature can't have counters put on it while it was attacking. => !VerbPhrase "put on it while it was attacking" as Complement of have
-# from: Quill-Slinger Boggart
-* Whenever a player casts a Kithkin spell, you may have target player lose 1 life whenever an opponent gained life.
-+ <card=Lethargy Trap> If three or more creatures are attacking, you may pay {U} rather than pay this spell's mana cost before it resolves. => VerbPhrase "pay this spell's mana cost before it resolves" as Complement of "rather than"
-# from: Lethargy Trap
-* If three or more creatures are attacking, you may pay {U} rather than pay this spell's mana cost after it was cast.

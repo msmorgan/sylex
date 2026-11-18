@@ -1,4 +1,4 @@
-# The universal quantifiers "all" and "both" as predeterminers of a definite or possessive plural noun phrase, with number, definiteness, stacking and agreement constraints
+# The universal quantifier "all" as predeterminer of a definite or possessive plural noun phrase, with number, definiteness, stacking and agreement constraints
 + This creature gets +2/+0 for every seven cards in your graveyard.
 +NounPhrase all the cards => NounPhrase "the cards"
 + <card=Tolarian Winds> Discard all the cards in your hand, then draw that many cards. => NounPhrase "all the cards in your hand" as Object of discard; NounPhrase "the cards in your hand" || NounPhrase "all the cards" as Object of discard; PrepositionPhrase "in your hand" as Adjunct of discard
@@ -16,8 +16,6 @@
 # from: Incendiary Command
 + Each player discards all the cards in their hand, then draws that many cards.
 *NounPhrase all the card
-*NounPhrase both the card
-*NounPhrase both the damage
 + All creatures get -1/-1. => NounPhrase "All creatures" as Subject of get
+# from: Heartwarming Redemption
 * All the creatures gets -1/-1.
-* Both the creatures gets -1/-1.

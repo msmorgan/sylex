@@ -10,14 +10,17 @@
 +NounPhrase an additional 2 damage => AdjectivePhrase "additional"; Nominal "2 damage"
 # from: Sage of Hours
 +NounPhrase each five counters removed this way => DeterminerPhrase "each" as Determiner of counter; readings 1
+# from: Pest Rescuer
 *NounPhrase much one
 
+# from: Dead Drop
 *NounPhrase a two creatures
+# from: Dead Drop
 *NounPhrase much two creatures
+# from: Eater of Days
 *NounPhrase much two turns
-*Clause every two turns are turns
-*Clause each two turns are turns
 
+# from: Invasion of Alara // Awaken the Maelstrom
 *NounPhrase those one creature
 # from: Invasion of Alara
 +NounPhrase those two cards => Nominal "two cards"

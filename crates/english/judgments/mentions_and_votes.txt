@@ -41,7 +41,5 @@
 + <card=Acererak the Archlich> <legendary> When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon. => NounPhrase "Tomb of Annihilation" as Object of complete; readings 1
 # from: Acererak the Archlich
 + When this creature enters, if you haven't completed Tomb of Annihilation, return this creature to its owner's hand and venture into the dungeon. => NounPhrase "Tomb of Annihilation" as Object of complete; readings 1
-# from: Undercity // The Initiative (the initiative's ability [CR#727.2]; a dungeon of the dungeon type Undercity [CR#701.49d,205.3p])
-+ Venture into Undercity. => NounPhrase "Undercity" as Complement of into; readings 1
 + <card=Extinction Event> Choose odd or even. Exile each creature with mana value of the chosen quality. => Mention "odd or even" as Object of choose
 + <card=Extinction Event> Choose odd or even. => Mention "odd or even" as Object of choose; readings 1

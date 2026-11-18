@@ -15,19 +15,24 @@
 + <card=Juxtapose> You and target player exchange control of the creature you each control with the greatest mana value. => RelativeClause "you each control" gap "creature"
 # "Both" floats after a plural Subject; after "you" it is the correlative of the coordination
 + <card=Obelisk of Undoing> {6}, {T}: Return target permanent you both own and control to your hand. => readings 1
+# from: Join Forces
 *Clause this creature each gains flying
+# from: Join Forces
 *Clause this creature both gains flying
+# from: Keen Duelist
 *Clause you each loses 2 life
 + <card=Leonardo's Technique> Return one or two target creature cards each with mana value 3 or less from your graveyard to the battlefield. => Nominal "creature cards each with mana value 3 or less"; PrepositionPhrase "with mana value 3 or less" as Modifier of card
 + <card=Angelic Aberration> When this creature enters, sacrifice any number of creatures each with base power or toughness 1 or less. Create that many 4/4 colorless Eldrazi Angel creature tokens with flying and vigilance. => Nominal "creatures each with base power or toughness 1 or less"; PrepositionPhrase "with base power or toughness 1 or less" as Modifier of creature
+# from: Angelic Aberration
 *NounPhrase a creature each with flying
 + <card=Storyweave> • Put two lore counters on target Saga you control. The next time one or more enchantment creatures you control enter this turn, each enters with two additional +1/+1 counters on it. => NounPhrase "each" as Subject of enter
 # Floated "each" over a coordination of Noun Phrases, each conjunct its own member
 + <card=Finale of Promise> You may cast up to one target instant card and/or up to one target sorcery card from your graveyard each with mana value X or less without paying their mana costs. If a spell cast this way would be put into your graveyard, exile it instead. If X is 10 or more, copy each of those spells twice. You may choose new targets for the copies. => NounPhrase "up to one target instant card and/or up to one target sorcery card from your graveyard each with mana value X or less" as Object of cast; NounPhrase "up to one target instant card and/or up to one target sorcery card from your graveyard"
 # from: Finale of Promise
 + You may cast up to one target instant card and/or up to one target sorcery card from your graveyard each with mana value X or less without paying their mana costs. => NounPhrase "up to one target instant card and/or up to one target sorcery card from your graveyard each with mana value X or less" as Object of cast; NounPhrase "up to one target instant card and/or up to one target sorcery card from your graveyard"; NounPhrase "up to one target instant card and/or up to one target sorcery card"; PrepositionPhrase "from your graveyard"
+# from: Angelic Aberration
 *NounPhrase a creature or a land each with flying
-# "All" after an accusative personal pronoun is part of a compound pronoun, never after a common-noun Noun Phrase (CGEL, Ch. 5 §10.1.1, pp. 427-428)
+# "All" after an accusative personal pronoun is part of a compound pronoun (CGEL, Ch. 5 §10.1.1, pp. 427-428)
 + <card=Strixhaven Stadium> Whenever a creature you control deals combat damage to an opponent, put a point counter on this artifact. Then if it has ten or more point counters on it, remove them all and that player loses the game. => NounPhrase "them all" as Object of remove
-* Remove the counters all.
+# from: Strixhaven Stadium
 + Remove it all. => NounPhrase "it all" as Object of remove

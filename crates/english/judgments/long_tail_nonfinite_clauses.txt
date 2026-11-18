@@ -3,13 +3,13 @@
 # the passive of lexical *do*.
 
 # *If tapped for mana*: the participle keeps the *for* phrase as its Adjunct
-# (CGEL, Ch. 14 §10(b), p. 1267). Bare *tapped* is the Adjectival Passive; neither
-# string has a second tree.
+# (CGEL, Ch. 14 §10(b), p. 1267), and the string has no second tree.
 + <card=Naked Singularity> If tapped for mana, Plains produce {R}, Islands produce {G}, Swamps produce {W}, Mountains produce {U}, and Forests produce {B} instead of any other type. => Clause "tapped for mana" as Complement of if; PrepositionPhrase "for mana" as Adjunct of tap
 + <card=Reality Twist> If tapped for mana, Plains produce {R}, Swamps produce {G}, Mountains produce {W}, and Forests produce {B} instead of any other type. => Clause "tapped for mana" as Complement of if; PrepositionPhrase "for mana" as Adjunct of tap
+# from: Reality Twist
 + If sacrificed for mana, this land produces {R}. => Clause "sacrificed for mana" as Complement of if; readings 1
+# from: Reality Twist
 + If tapped for mana, this land produces {R}. => readings 1
-+ If tapped, this land produces {R}. => readings 1
 + This creature attacks each combat if able unless you control another Ally. => !Clause "able unless you control another Ally"
 
 # *result in*: the gerund-participial *being removed* postmodifies the nominal

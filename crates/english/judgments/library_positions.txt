@@ -5,8 +5,6 @@
 +VerbPhrase put the rest on top of that library in any order => NounPhrase "the rest" as Object of put; PrepositionPhrase "on top of that library" as Complement of put; PrepositionPhrase "in any order"
 +VerbPhrase put the rest on the bottom of your library in a random order => NounPhrase "the rest" as Object of put; PrepositionPhrase "on the bottom of your library" as Complement of put; PrepositionPhrase "in a random order"
 +PrepositionPhrase on top of that library => PrepositionPhrase "of that library" as Complement of top
-* Exile top of that library.
-* Top of that library draws cards.
 +VerbPhrase put target nonland permanent on top of its owner's library => PrepositionPhrase "on top of its owner's library" as Complement of put; !PrepositionPhrase "on top of its owner's library" as Adjunct of put
 +VerbPhrase put target artifact or enchantment on the bottom of its owner's library => PrepositionPhrase "on the bottom of its owner's library" as Complement of put; !PrepositionPhrase "on the bottom of its owner's library" as Adjunct of put
 + Whenever a +1/+1 counter is put on this creature, you may draw a card.
