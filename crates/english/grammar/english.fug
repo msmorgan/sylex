@@ -2878,20 +2878,13 @@ TargetedNounPhrase: TargetedNounPhrase -> determiner:TargetingMarker Nominal
     where head.Number = Plural,
           head.Determination = Overt,
           determiner.Countability = head.Countability
-// *Pay {1}{G} any number of times*: as TransparentQuantity, with NounKind
-// `Temporal` from the oblique.
-TemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase Nominal {
-    unshared: [Number, NounKind, Countability],
-}
-    where determiner.DeterminativeDistribution = FreeChoice,
-          head.ComplementKind = PP,
-          head.ObliqueNumber := Plural,
-          head.ObliqueNounKind := Temporal,
-          $.Number = head.ObliqueNumber,
-          $.NounKind = Temporal,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
+// *Pay {1}{G} any number of times*: TransparentQuantity's Noun Phrase, a
+// plural one headed by *number* with NounKind `Temporal` from its oblique, as
+// a frequency Adjunct.
+TemporalQuantity: TemporalNounPhrase -> NounPhrase
+    where head.NounDistribution := Quantity,
+          head.NounKind := Temporal,
+          head.Number := Plural
 // A quantified *number of times*, postmodifiers included (CGEL 8§9:715 n.
 // 19); Number, NounKind and Countability as in TemporalQuantity.
 DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase Nominal {
