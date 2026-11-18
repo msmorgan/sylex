@@ -41,9 +41,12 @@
     // Restricted to active voice (CGEL, Ch. 16 §10.1.2, p. 1432, [17]).
     (lemma: "cost", past: "cost", frames: [ActiveOnly(Monotransitive), ActiveOnly(TransitiveWithComplement(HollowToInf))]),
     (lemma: "count", frames: [Monotransitive]),
-    // Ditransitive for the recipient passive *this creature is dealt damage*.
+    // Ditransitive only in the recipient passive (*this creature is dealt
+    // damage*): the Oracle register has no active *deals it damage*, only
+    // *deals damage to it*. A verb may be restricted to the passive with a
+    // particular complementation (CGEL, Ch. 16 §10.1.2, p. 1435, [31]).
     (lemma: "deal", past: "dealt",
-        frames: [Monotransitive, Ditransitive, TransitiveWithPP(["to"])]),
+        frames: [Monotransitive, PassiveOnly(Ditransitive), TransitiveWithPP(["to"])]),
     // *you decide whether to flip again*
     (lemma: "decide", frames: [ContentClause]),
     // The main verb *do* is lexical and has a passive (*can be done on any

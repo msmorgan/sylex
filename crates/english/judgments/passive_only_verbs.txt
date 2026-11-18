@@ -1,0 +1,5 @@
+# ditransitive "deal" is restricted to passive voice, as a verb may be with a particular complementation (CGEL, Ch. 16 §10.1.2, p. 1435, [31]): the active "deal" takes no Indirect Object, while the recipient passive "is dealt damage" keeps its Direct Object
++ <card=Arc Lightning> Arc Lightning deals 3 damage divided as you choose among one, two, or three targets. => NounPhrase "3 damage divided as you choose among one, two, or three targets" as Object of deal; !NounPhrase "targets" as Object of deal
++ Prevent all combat damage target creature would deal this turn. => !NounPhrase "this turn" as Object of deal; !NounPhrase "this turn" as IndirectObject of deal
++ To solve — Three or more sources you controlled dealt damage this turn. => NounPhrase "damage" as Object of deal; !NounPhrase "this turn" as Object of deal
++ Whenever this creature is dealt damage, it deals that much damage to any target. => NounPhrase "damage"#1 as Object of deal

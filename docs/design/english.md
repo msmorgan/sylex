@@ -76,8 +76,13 @@ narrows only the second, and only as the charter allows (§4).
 declared once, in the lexicon, and a verb's frame in the active voice. From it
 the engine derives the passive, the gapped forms of every verb form, and the
 complements that coordinated heads share. It derives them for every frame,
-whether or not any card prints the combination. Only an Active-only Frame
-derives no passive. In the same way, every declared verb and noun has its full
+whether or not any card prints the combination. An Active-only Frame derives
+no passive (*costs {1} less*, *has flying*), and a Passive-only Frame no
+active: *deal* takes two objects only in the recipient passive (*this
+creature is dealt damage*; CGEL, Ch. 16 §10.1.2, p. 1432, [17], and
+p. 1435, [31]). Of a ditransitive's two objects only the Direct Object is
+gapped, since the Indirect Object resists prenuclear position (CGEL, Ch. 4
+§4.3(d), pp. 248–250, [9]). In the same way, every declared verb and noun has its full
 inflectional paradigm: attestation in the corpus is provenance, never a filter.
 Why: these alternations are productive English. Written out by hand, they
 multiply as frames times forms. Filtered by attestation, they fail on the next

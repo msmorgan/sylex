@@ -413,6 +413,10 @@ passive, Extraction or a Shared Complement. It is never declared per Lexeme.
 **Active-only Frame**:
 A verb frame with no passive, as for *cost* and *have*.
 
+**Passive-only Frame**:
+A verb frame with no active, as ditransitive *deal*, which has only the
+recipient passive *is dealt damage*.
+
 **Host Category**:
 A Category an unselected Preposition Phrase may modify, declared for each
 pairing of a preposition with one of its frames.

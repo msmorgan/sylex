@@ -234,7 +234,7 @@ lemma  frame                                                                    
 block  Monotransitive(NP)                                                                        718           15
 put    TransitiveWithPP(NP,PP[prep:into|prep:in|prep:on|prep:onto|prep:back|prep:there])         558          542
 deal   TransitiveWithPP(NP,PP[prep:to])                                                          405          393
-deal   Ditransitive(NP,NP)                                                                       390           82
+deal   Ditransitive(NP,NP)[PassiveOnly]                                                          390           84
 name   ComplexTransitive(NP,Name)                                                                343          318
 exile  Monotransitive(NP)                                                                        323          243
 ```
@@ -292,7 +292,7 @@ ORDER BY u.face_name, u.line LIMIT 5;
 
 ```
 face_name         line  lemma  frame
-Abattoir Ghoul       1  deal   Ditransitive(NP,NP)
+Abattoir Ghoul       1  deal   Ditransitive(NP,NP)[PassiveOnly]
 Abuna Acolyte        0  deal   TransitiveWithPP(NP,PP[prep:to])
 Abuna Acolyte        1  deal   TransitiveWithPP(NP,PP[prep:to])
 Abuna's Chant        2  deal   TransitiveWithPP(NP,PP[prep:to])
