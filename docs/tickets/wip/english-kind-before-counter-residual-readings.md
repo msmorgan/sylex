@@ -2,52 +2,63 @@
 needs: [english-counter-kind-premodifies-counter]
 ---
 
-# Thirteen units read a counter's kind as another word
+# A kind's homograph rebuilds the kind and its head
 
 ## Why
 
-A counter's kind is a premodifier of the noun "counter", licensed by `KindLicense`. Thirteen units
-have more Readings than they had when "time counter" was one compound word, each a spurious one:
+A counter's kind is a premodifier of the noun "counter", licensed by `KindLicense`. Where a kind
+name has a homograph, the homograph and the head word form another constituent of their own,
+beside the kind reading, in five units:
 
-- **A kind's homograph as a noun or verb, with "counters" as a verb** (11 units). After a fused
-  numeral, "with three [time counters on it]" reads "time" as an ordinary noun and "counters" as
-  a verb: *Sibylline Soothsayer* (420 to 672 Derivations), *Gandalf of the Secret Fire*, *Ojer
-  Pakpatiq*, *Taigam*, *Doom's Time Platform*, *Spark Rupture* ("loyalty"), *Cryptex* ("unlock"
-  as a verb), *Deadly Designs* ("plot" as a verb), *Fylgja* and *Ursine Fylgja* ("healing" as a
-  participle), *Sensei Golden-Tail* ("training" as a participle).
-- **A fused measure under a determiner before "counter"** (2 units): *Fangs of Kalonia* ("had [a
-  +1/+1] [counter put on it]", 123 to 127) and *Hindervines* ("with [no +1/+1] …", 60 to 65).
+- **The homograph as a verb, with "counters" its Object**: *Deadly Designs* line 2 ("five or
+  [more plot counters on this enchantment]", "plot" a verb, 3 of 4 Derivations); *Cryptex* line 2
+  (the same with "unlock", and "unlock" as a bare infinitival under "has", 11 of 14); *Fylgja*
+  line 2 and *Ursine Fylgja* line 1 ("enters with four, [healing counters on it]", 3 of 5).
+- **The homograph as a participle premodifying "counter"**: *Sensei Golden-Tail* line 2
+  ("training", 2 of 4).
 
-Each structure is grammatical where it stands by itself; what makes the Reading wrong is that
-the word before "counter" is a kind name, which the compound word's atomicity used to enforce.
+In each, the two words make a constituent that begins with the kind word or ends with the head
+word, which is the kind's own analysis built a second way. Words that meet by accident across a
+constituent boundary are a different analysis: *Ajani Unyielding*'s −9 line reads "five loyalty"
+as a Subject and "counters on each other planeswalker" as its verb phrase in a relative clause,
+and *Stalwart Successor* line 2 needs "the first time [counters have been put on that
+creature]". Ajani's other Readings with that Subject (6 of 11) attach "on each other
+planeswalker" above a clause "[five loyalty] [counters]" that ends with the head word, and
+rebuild the pair.
 
 In Oracle text every word ending in "-ing" or "-ed" printed before "counter" or "counters" is a
 kind name in `crates/vocabulary/catalogs/counters.ron` (flying, hatchling, healing, mining,
-blessing, awakening, feeding, hatching, contested, exalted, decayed, training, enlightened), so no
-in-scope card prints a participle that modifies "counter".
+blessing, awakening, feeding, hatching, contested, exalted, decayed, training, enlightened).
 
-## Open questions
+## Design
 
-- **Whether a participle may premodify "counter".** None is printed. Refusing one removes the
-  *Fylgja*, *Ursine Fylgja* and *Sensei Golden-Tail* Readings, and needs an equation on the host
-  in the participle premodification schema, which the engine does not support today.
-- **What restores a kind's hold on the word before "counter".** The other ten units need the
-  grammar to prefer, or require, the kind reading of a word that is a kind name when "counter"
-  follows it. Options: a lexical mechanism like the multiword-term straddle rule
-  (`docs/design/lexicon.md` §5), applied to a kind and its head; or leaving the Readings to the
-  step that ranks them (`docs/design/pragmatics.md`).
+- A kind and its head hold their words as a multiword term does (`docs/design/lexicon.md` §5): a
+  word that carries `KindLicense` `Kind`, followed by a word that carries `Head`, keeps its other
+  analyses only where the two straddle a constituent boundary. Where they would rebuild the pair,
+  only the kind's own analysis, the Production that admits the head (`:= Head`), holds them. The
+  rule lives in the lexicon and the engine, keyed on the license feature, never on a Production
+  per kind.
+- No grammar refusal of a participle premodifying "counter": the participle premodification
+  schema gets no host equation and the engine no capability for one. Where the participle is a
+  kind name's homograph, the rule above removes it.
 
 ## Done when
 
-- The open questions are answered with the units that decide them.
-- Each of the thirteen units has the Derivation count it had before the split, or the landing
-  says which Readings remain and why each is a reading of the English.
+- Deadly Designs line 2, Cryptex line 2, Fylgja line 2, Ursine Fylgja line 1 and Sensei
+  Golden-Tail line 2 keep only the kind reading of the word before "counter(s)".
+- Each of the thirteen units read with a spurious kind when "time counter" was one word
+  (Sibylline Soothsayer, Gandalf of the Secret Fire, Ojer Pakpatiq, Taigam, Doom's Time Platform,
+  Spark Rupture, Cryptex, Deadly Designs, Fylgja, Ursine Fylgja, Sensei Golden-Tail, Fangs of
+  Kalonia, Hindervines) has no Reading that reads the word before "counter(s)" as anything but
+  its kind, or the landing says which Readings remain and why each is a reading of the English.
+- Ajani Unyielding's −9 line and Stalwart Successor line 2 keep their straddling Readings.
 - The census shows which Readings changed on the supported corpus and why, and `cargo xtask
   english strata --check`, `cargo test` and `cargo clippy --tests -- -D warnings` pass for every
   changed crate.
 
 ## Pointers
 
-`crates/english/grammar/english.fug` (`Kind`, `KindPremodifier`, `feature KindLicense`);
-`crates/vocabulary/catalogs/counters.ron`; `docs/design/english.md` §3 (License features), §6;
-`cargo xtask english forestwalk --card "Sibylline Soothsayer" --line 1`.
+`crates/english/grammar/english.fug` (`KindPremodifier`, `feature KindLicense`);
+`crates/syntax/src/chart.rs` (`Seams`, `atomic_spans`); `crates/syntax/src/reading.rs`
+(`atomic_reading`); `crates/vocabulary/src/lib.rs` (`counter_kinds`); `docs/design/lexicon.md`
+§5; `docs/design/english.md` §3 (License features).
