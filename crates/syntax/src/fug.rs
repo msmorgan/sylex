@@ -68,6 +68,25 @@
 //! the value writes `:=`, and `child.F = Value` on a privative feature (one
 //! value) is a load error, since it never fails. Props are
 //! `key: value` or a bare `key` flag; a pair in a prop list is `A -> B`.
+//!
+//! A Production may state its cases over one feature of a child or of the
+//! mother, each value of the feature once:
+//!
+//! ```text
+//! Name: Lhs -> head:B { cases: head.F -> [A -> [eq, ...], C -> { heavy: [head], equations: [eq, ...] }] }
+//! ```
+//!
+//! It is one Production per case, `Name/A` and `Name/C`, each with the
+//! Production's equations and props and its case's own: a case written
+//! `[eq, ...]` adds equations, and one written `{ ... }` adds any Production
+//! props, a list prop the Production also sets extending its list. Each case
+//! states its own guard, an equation `head.F = A` or `head.F := A`: the
+//! compiler adds none, so a case's equations alone say what it admits, and
+//! twins whose guards both pass one input (a child that leaves `F`
+//! unvalued passes `head.F = A` and `head.F = C`) both stand. A privative
+//! feature's cases are its value, guarded `:=`, and `Unvalued`, guarded
+//! `!=`. A value left out, a value stated twice, a name that is no value of
+//! the feature, and a case without its guard are load errors.
 
 use std::fmt::Display;
 
@@ -1024,7 +1043,41 @@ fn symbol(symbol: RhsSymbol) -> Result<Value, LoadError> {
     Ok(Value::new(ValueKind::Call(kind, args), at))
 }
 
-fn production(item: &mut Item) -> Result<ProductionDecl, LoadError> {
+/// An authored Production as written: one declaration, or one with cases,
+/// which become declarations once every feature is declared.
+enum Authored {
+    One(Box<ProductionDecl>),
+    Cased {
+        name: String,
+        /// The Production's props, its `where` equations among them.
+        record: Props,
+        cases: Cases,
+    },
+}
+
+/// A Production's `cases: path -> [Value -> body, ...]`.
+struct Cases {
+    at: Pos,
+    /// `$.Feature` or `child.Feature`.
+    path: String,
+    entries: Vec<Case>,
+}
+
+struct Case {
+    at: Pos,
+    value: String,
+    /// The props the case adds, its equations as `equations`.
+    props: Props,
+}
+
+/// The case of a privative feature's child or mother that does not carry
+/// its one value.
+const UNVALUED: &str = "Unvalued";
+
+/// Props a case may not set: what the Production's own syntax fills.
+const UNCASED: [&str; 4] = ["name", "lhs", "rhs", "cases"];
+
+fn production(item: &mut Item) -> Result<Authored, LoadError> {
     let (Some(lhs), Some(rhs)) = (item.parent.take(), item.rhs.take()) else {
         return fail(item.at, "a Production is `Name: Lhs -> ...`");
     };
@@ -1032,11 +1085,189 @@ fn production(item: &mut Item) -> Result<ProductionDecl, LoadError> {
     let name = item.ident(&item.name.clone());
     let lhs = item.ident(&lhs);
     let rhs = Value::new(ValueKind::List(rhs), item.at);
+    let cases = match item.props.as_mut() {
+        Some(props) => match props.iter().position(|(key, ..)| key == "cases") {
+            Some(at) => Some(cases(props.remove(at))?),
+            None => None,
+        },
+        None => None,
+    };
     let record = item.record(
         vec![("name", Some(name)), ("lhs", Some(lhs)), ("rhs", Some(rhs))],
         Some("equations"),
     )?;
-    read(record)
+    match cases {
+        None => Ok(Authored::One(Box::new(read(record)?))),
+        Some(cases) => {
+            let ValueKind::Props(record) = record.kind else {
+                unreachable!("a record is props")
+            };
+            Ok(Authored::Cased {
+                name: item.name.clone(),
+                record,
+                cases,
+            })
+        }
+    }
+}
+
+/// Reads `cases: path -> [Value -> [eq, ...], Value -> { ... }, ...]`.
+fn cases((_, value, at): (String, Option<Value>, Pos)) -> Result<Cases, LoadError> {
+    let shape = "cases are `cases: path -> [Value -> [eq, ...], ...]`, the path `child.Feature` \
+                 or `$.Feature`";
+    let Some(Value {
+        kind: ValueKind::Rel(path, "->", list),
+        ..
+    }) = value
+    else {
+        return fail(at, shape);
+    };
+    let (ValueKind::Path(path), ValueKind::List(entries)) = (path.kind, list.kind) else {
+        return fail(at, shape);
+    };
+    let cases = entries
+        .into_iter()
+        .map(|entry| {
+            let ValueKind::Rel(value, "->", body) = entry.kind else {
+                return fail(entry.at, shape);
+            };
+            let ValueKind::Ident(value) = value.kind else {
+                return fail(value.at, "a case is named by a value of its feature");
+            };
+            let props = match body.kind {
+                ValueKind::List(equations) => vec![(
+                    "equations".to_owned(),
+                    Some(Value::new(ValueKind::List(equations), body.at)),
+                    body.at,
+                )],
+                ValueKind::Props(props) => props,
+                _ => return fail(body.at, "a case is `[eq, ...]` or `{ ... }`"),
+            };
+            if let Some((key, _, at)) = props.iter().find(|(key, ..)| UNCASED.contains(&&**key)) {
+                return fail(*at, format!("`{key}` is the Production's, not a case's"));
+            }
+            Ok(Case {
+                at: entry.at,
+                value,
+                props,
+            })
+        })
+        .collect::<Result<_, _>>()?;
+    Ok(Cases {
+        at,
+        path,
+        entries: cases,
+    })
+}
+
+/// A Production's declarations, one per case: each case's props added to
+/// the Production's, named `Name/Value`.
+fn expand(
+    name: &str,
+    record: &Props,
+    cases: Cases,
+    grammar: &Grammar,
+) -> Result<Vec<ProductionDecl>, LoadError> {
+    let Cases {
+        at,
+        path,
+        entries: cases,
+    } = cases;
+    let Some((_, feature)) = path.split_once('.') else {
+        unreachable!("a path is `$.Feature` or `child.Feature`")
+    };
+    let Some(values) = grammar.features.get(&Ident::from(feature)) else {
+        return fail(at, format!("cases over `{path}`: no feature `{feature}`"));
+    };
+    let privative = values.len() == 1;
+    let mut owed: Vec<String> = values.iter().map(ToString::to_string).collect();
+    if privative {
+        owed.push(UNVALUED.to_owned());
+    }
+    let mut stated: Vec<&str> = Vec::new();
+    for case in &cases {
+        if stated.contains(&case.value.as_str()) {
+            return fail(case.at, format!("case `{}` is stated twice", case.value));
+        }
+        if !owed.contains(&case.value) {
+            return fail(
+                case.at,
+                format!("case `{}` is no value of `{feature}`", case.value),
+            );
+        }
+        stated.push(&case.value);
+    }
+    if let Some(left) = owed.iter().find(|value| !stated.contains(&value.as_str())) {
+        return fail(at, format!("cases over `{path}` leave `{left}` out"));
+    }
+    cases
+        .into_iter()
+        .map(|case| {
+            let own: Vec<Equation> = match case.props.iter().find(|(key, ..)| key == "equations") {
+                Some((_, Some(equations), _)) => read(equations.clone())?,
+                Some((_, None, at)) => return fail(*at, "`equations` takes a value"),
+                None => Vec::new(),
+            };
+            let guarded = own.iter().any(|equation| match equation {
+                Equation::Require(p, v) | Equation::Carry(p, v) => {
+                    p.as_str() == path && v.as_str() == case.value
+                }
+                Equation::Exclude(p, v) => {
+                    case.value == UNVALUED && p.as_str() == path && v == &values[0]
+                }
+                Equation::Agree(..) | Equation::ExcludeTogether(..) => false,
+            });
+            if !guarded {
+                let guard = if case.value == UNVALUED {
+                    format!("`{path} != {}`", values[0])
+                } else {
+                    format!("`{path} = {0}` or `{path} := {0}`", case.value)
+                };
+                return fail(
+                    case.at,
+                    format!("case `{}` states no guard {guard}", case.value),
+                );
+            }
+            let mut props = record.clone();
+            for (key, value, at) in case.props {
+                match props.iter_mut().find(|(k, ..)| *k == key) {
+                    None => props.push((key, value, at)),
+                    Some((
+                        _,
+                        Some(Value {
+                            kind: ValueKind::List(base),
+                            ..
+                        }),
+                        _,
+                    )) => {
+                        let Some(Value {
+                            kind: ValueKind::List(added),
+                            ..
+                        }) = value
+                        else {
+                            return fail(at, format!("`{key}` is a list on the Production"));
+                        };
+                        if added.is_empty() {
+                            return fail(at, format!("the case's `{key}` adds nothing"));
+                        }
+                        base.extend(added);
+                    }
+                    Some(_) => {
+                        return fail(
+                            at,
+                            format!("`{key}` is set on the Production and on its case"),
+                        );
+                    }
+                }
+            }
+            let Some((_, Some(written), _)) = props.iter_mut().find(|(key, ..)| key == "name")
+            else {
+                unreachable!("a Production's record names it")
+            };
+            written.kind = ValueKind::Ident(format!("{name}/{}", case.value));
+            read(Value::new(ValueKind::Props(props), case.at))
+        })
+        .collect()
 }
 
 fn category(item: &mut Item) -> Result<CategoryDecl, LoadError> {
@@ -1144,6 +1375,9 @@ fn feature(item: &mut Item, name: Ident, grammar: &mut Grammar) -> Result<bool, 
 struct Builder {
     root: Option<Ident>,
     grammar: Grammar,
+    /// The authored Productions in file order, expanded once every feature
+    /// is declared.
+    productions: Vec<Authored>,
 }
 
 impl Builder {
@@ -1151,13 +1385,27 @@ impl Builder {
         Self {
             root: None,
             grammar: Grammar::default(),
+            productions: Vec::new(),
         }
     }
 
-    fn finish(self) -> Result<Grammar, LoadError> {
+    fn finish(mut self) -> Result<Grammar, LoadError> {
         let Some(root) = self.root else {
             return Err(LoadError::Format("no `root` item".into()));
         };
+        for authored in self.productions {
+            match authored {
+                Authored::One(declaration) => self.grammar.productions.push(*declaration),
+                Authored::Cased {
+                    name,
+                    record,
+                    cases,
+                } => {
+                    let declarations = expand(&name, &record, cases, &self.grammar)?;
+                    self.grammar.productions.extend(declarations);
+                }
+            }
+        }
         Ok(Grammar {
             root,
             ..self.grammar
@@ -1170,7 +1418,7 @@ impl Builder {
         let grammar = &mut self.grammar;
         let duplicate = match item.keyword.take().as_deref() {
             None => {
-                grammar.productions.push(production(&mut item)?);
+                self.productions.push(production(&mut item)?);
                 false
             }
             Some("root") if self.root.is_some() => return fail(at, "`root` is given twice"),

@@ -150,3 +150,117 @@ fn a_grammar_needs_a_root() {
         Err(LoadError::Format(message)) if message.contains("no `root` item")
     ));
 }
+
+/// A Production's cases over `head.F`: one declaration per case, each the
+/// Production's with its case's equations and props added.
+#[test]
+fn cases_are_one_production_each() {
+    let grammar = Grammar::from_fug_str(
+        "root S\ncategory S\nfeature F = A | B\nfeature P = Marked\n\
+         X: S -> head:S { transparent: [head], cases: head.F -> [\n    \
+         A -> [head.F = A, $.F = A],\n    \
+         B -> { heavy: [head], equations: [head.F := B] },\n] }\n    \
+         where $.F = head.F\n\
+         Y: S -> head:S { cases: head.P -> [Marked -> [head.P := Marked], Unvalued -> [head.P != Marked]] }\n",
+    )
+    .unwrap();
+    let declarations: Vec<_> = grammar
+        .productions
+        .iter()
+        .map(|p| {
+            (
+                p.name.to_string(),
+                p.equations.len(),
+                p.heavy.len(),
+                p.transparent.len(),
+            )
+        })
+        .collect();
+    assert_eq!(
+        declarations,
+        [
+            ("X/A".to_owned(), 3, 0, 1),
+            ("X/B".to_owned(), 2, 1, 1),
+            ("Y/Marked".to_owned(), 1, 0, 0),
+            ("Y/Unvalued".to_owned(), 1, 0, 0),
+        ]
+    );
+}
+
+#[test]
+fn malformed_cases_are_rejected_naming_the_defect() {
+    const FEATURES: &str = "feature F = A | B\nfeature P = Marked\n";
+    for (item, expected) in [
+        (
+            "X: S -> head:S { cases: head.F -> [A -> [head.F = A], C -> [head.F = C]] }",
+            "case `C` is no value of `F`",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [A -> [head.F = A], A -> [head.F := A], B -> [head.F = B]] }",
+            "case `A` is stated twice",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [A -> [head.F = A]] }",
+            "cases over `head.F` leave `B` out",
+        ),
+        (
+            "X: S -> head:S { cases: head.P -> [Marked -> [head.P := Marked]] }",
+            "cases over `head.P` leave `Unvalued` out",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [A -> [head.F = A], B -> [$.F = B]] }",
+            "case `B` states no guard `head.F = B` or `head.F := B`",
+        ),
+        (
+            "X: S -> head:S { cases: head.P -> [Marked -> [head.P := Marked], Unvalued -> [$.P = Marked]] }",
+            "case `Unvalued` states no guard `head.P != Marked`",
+        ),
+        (
+            "X: S -> head:S { cases: head.G -> [A -> [head.G = A]] }",
+            "cases over `head.G`: no feature `G`",
+        ),
+        (
+            "X: S -> head:S { cases: [A -> [head.F = A]] }",
+            "cases are `cases: path -> [Value -> [eq, ...], ...]`",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [A -> { lhs: S }, B -> [head.F = B]] }",
+            "`lhs` is the Production's, not a case's",
+        ),
+        (
+            "X: S -> head:S { cost: 2, cases: head.F -> [A -> { cost: 3, equations: [head.F = A] }, B -> [head.F = B]] }",
+            "`cost` is set on the Production and on its case",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [A -> { tint: [head], equations: [head.F = A] }, B -> [head.F = B]] }",
+            "unknown field `tint`",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [head.F -> [head.F = A], B -> [head.F = B]] }",
+            "5:36: a case is named by a value of its feature",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [A -> B, B -> [head.F = B]] }",
+            "5:41: a case is `[eq, ...]` or `{ ... }`",
+        ),
+        (
+            "X: S -> head:S { cases: head.F -> [A -> { equations }, B -> [head.F = B]] }",
+            "`equations` takes a value",
+        ),
+        (
+            "X: S -> head:S { cost: 2, cases: head.F -> [A -> { cost: [3], equations: [head.F = A] }, B -> [head.F = B]] }",
+            "`cost` is set on the Production and on its case",
+        ),
+        (
+            "X: S -> head:S { transparent: [head], cases: head.F -> [A -> { transparent: head, equations: [head.F = A] }, B -> [head.F = B]] }",
+            "`transparent` is a list on the Production",
+        ),
+        (
+            "X: S -> head:S { transparent: [head], cases: head.F -> [A -> { transparent: [], equations: [head.F = A] }, B -> [head.F = B]] }",
+            "the case's `transparent` adds nothing",
+        ),
+    ] {
+        let message = error(&format!("{FEATURES}{item}"));
+        assert!(message.contains(expected), "{item}: {message}");
+    }
+}
