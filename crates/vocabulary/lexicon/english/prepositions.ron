@@ -210,6 +210,14 @@
     // *a creature of the chosen type*; *end of turn*; *instead of putting*;
     // *your choice of flying, first strike, or trample*
     (lemma: "of", frames: [
+        // An unselected *of* phrase describes its Nominal: *mana of any color*,
+        // *a creature of their choice*, *a counter of that kind* (CGEL, Ch. 5,
+        // §14.2, p. 446, [14i]: *a woman of great wisdom*, *a school of this
+        // type*). Every Nominal host takes one (*card*, *creature*,
+        // *permanent*, *mana*, *source*, *spell*, *player*, *token*, …), so
+        // the Host Category is the whole licence; an *of* phrase whose oblique
+        // is an argument of its noun is that noun's Complement instead
+        // (nouns.ron).
         (complement: NP, hosts: Nominal),
         // *the value of X*
         (complement: Amount, hosts: ComplementOnly),
