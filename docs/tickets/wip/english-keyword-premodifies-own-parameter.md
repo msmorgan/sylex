@@ -21,11 +21,14 @@ Two grammatical premodifier Readings stand beside the intended Reading and stay 
 
 ## Design
 
-- Require `head.DeterminerNeed != Required` of a keyword or participle `Premodifier` on the one
-  `BareNominal` premodification Production (`Premodifier`, a joint exclusion over the kind
-  `ParticipialPremodifier` and `KeywordPremodifier` give the `Premodifier` Category), so determiner-demanding `NumeralNominal` and
-  `SymbolNominal` (`2`, `{1}`) are never premodified by a keyword or participle while preserving
-  adjectival premodification (*a natural 20*, *an additional {G}*).
+- A `Participial` value of `PremodifierKind`, which `ParticipialPremodifier` gives its
+  `Premodifier` as `KeywordPremodifier` gives `Keyword`, and two joint exclusions on the one
+  `BareNominal` premodification Production (`Premodifier`):
+  `!(modifier.PremodifierKind = Keyword & head.DeterminerNeed = Required)` and the same for
+  `Participial` (a joint exclusion tests values its children carry, so an unvalued participle
+  kind could not be excluded). Determiner-demanding `NumeralNominal` and `SymbolNominal` (`2`,
+  `{1}`) are then never premodified by a keyword or participle, while adjectival premodification
+  stays (*a natural 20*, *an additional {G}*).
 
 ## Done when
 
