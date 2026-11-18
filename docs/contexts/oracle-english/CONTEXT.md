@@ -220,12 +220,12 @@ A declared group of Lexemes eligible for the same grammatical slot.
 **License Feature**:
 A lexical feature by which a Catalog licenses one position: it marks the
 words that stand only there and the one head whose position it is.
-`KindLicense` marks each counter's kind name, each keyword a keyword counter
-can be, and the noun *counter* (english.md §3).
+`KindLicense` marks each keyword a keyword counter can be and the noun
+*counter* (english.md §3).
 
 **Licensed Term**:
 Two words: one that holds a License Feature, directly before one that carries
-its head value (*time counters*). Its words keep their other analyses only where
+its head value (*flying counters*). Its words keep their other analyses only where
 they straddle a constituent boundary, as a multiword term's do (lexicon.md §5).
 
 **Local Feature**:
@@ -318,6 +318,13 @@ The name of an expansion a card's text cites before the noun *expansion*
 read by its title shape, and no Proper Name: it stands only as the parameter of
 its noun.
 _Avoid_: cited name
+
+**Kind Name**:
+The kind of a counter [CR#122.1] that is neither a slash measure nor a keyword
+a keyword counter can be (*a charge counter*). It is an open lexical slot: no
+inventory lists the kinds, and it is read as the one word right before the
+noun *counter*, which it premodifies and nowhere else. It holds no License
+Feature.
 
 **Introduced Word**:
 A word a face's own text gives and then uses again, which no inventory lists:

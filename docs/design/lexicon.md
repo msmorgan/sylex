@@ -31,7 +31,7 @@ a multiword term and its words, or a host and its bound affix, stand as
 alternatives, and the chart decides between them (§5).
 
 **Nothing is guessed.** An unknown word is a vocabulary gap, and no Category is
-inferred from spelling: braces do not license an unknown symbol. Five slots
+inferred from spelling: braces do not license an unknown symbol. Six slots
 are open, each read from the text at its own positions because nothing
 enumerates what fills it. A Flavor Word is the italic run before an ability's
 em dash [CR#207.2d]. An Introduced Name is a name the text itself gives an
@@ -67,6 +67,22 @@ parentheses reminder-text removal strips (§1). Why: a guessed Category lets the
 grammar admit text no declaration accounts for, and the gap is never reported;
 an open slot read at its own positions is no guess, and a list of the names
 cards cite would be knowing the cards before parsing them.
+A Kind Name is the kind of a counter [CR#122.1] that is neither a slash
+measure [CR#122.1a] nor a keyword a keyword counter can be [CR#122.1b] (*a
+charge counter*, *an everything counter*): the one orthographic word, letters
+with a hyphen only between two of them, written after a space right before
+the noun *counter*, its only host. No list of kinds is consulted: cards keep
+coining them, so any word may be one (*Put a goddamn counter on it.*), an
+English word included (*time*, *plot*). No word of a closed class is one, a
+determinative that determines a noun, a pronoun, a preposition, a
+coordinator, a subordinator or an auxiliary, nor a numeral or an adjective:
+each stands before the noun as itself (*two counters*, *those counters*,
+*have counters put on it*, *an additional counter*), and a compound
+determinative that is only a fused head is no such word (*everything*). A
+keyword that is a counter's kind ends no Kind Name ([English](english.md) §3,
+`KindLicense`). Why: the kinds are coined by the cards, so a list of them
+would be knowing the cards before parsing them, and a word read only right
+before its host hides no vocabulary gap elsewhere.
 
 **A word a text introduces is read where the text introduces it.** An
 Introduced Name, an Anchor Word and a Vote Option are each given by the face's
@@ -125,9 +141,11 @@ rule, and every exception, consonant doubling included (*committed*), is an
 override on its Lexeme; nothing infers stress or a paradigm class. A word's
 Onset is its first letter's, a vowel letter's Vowel and any other's Consonant,
 and a Lexeme whose first sound is not its first letter's declares its Onset
-(*an hour counter*, *a unity counter*, *a Unicorn*, *an X/X*); a numeral's is
-its spoken cardinal's (*an 8/8*, *a 1/1*), and a measure's sign is spoken
-*plus* or *minus*. A spelling with neither has no Onset. Why: each irregularity
+(*a Unicorn*, *an X/X*); a numeral's is its spoken cardinal's (*an 8/8*, *a
+1/1*), and a measure's sign is spoken *plus* or *minus*. A Kind Name has no
+Lexeme to declare one, so its Onset is the one the article before it agrees
+with, the text's own record of its sound (*an hour counter*, *a unity
+counter*), and its first letter's where no article stands before it. A spelling with neither has no Onset. Why: each irregularity
 is a reviewable fact, and the rules that analyze a form are the rules that
 realize it.
 
@@ -232,16 +250,20 @@ term are a second tree of its analysis ([English](english.md) §8).
 
 A licensed term is two words, a word that holds a license feature directly
 before the word that carries its head value ([English](english.md) §3): a
-counter's kind and *counter* (*time counters*). It is no leaf: its own
-analysis is the Production that admits the head (`:= Head`), built from its
-words. Its words keep their other analyses as a Catalog term's do, only where
-they straddle a constituent boundary, and only its own analysis may rebuild
-them. So *five or more plot counters* reads no verb *plot* with *counters* its
-Object (Deadly Designs) and *a training counter* no participle premodifying
-*counter* (Sensei Golden-Tail), while *the first time [counters have been put
-on that creature]* stands (Stalwart Successor). Why: a kind name's homograph
-and its head that form one constituent are the kind's analysis built a second
-way, as a Catalog term's words are.
+keyword a keyword counter can be and *counter* (*first strike counters*). It
+is no leaf: its own analysis is the Production that admits the head (`:=
+Head`), built from its words. Its words keep their other analyses as a
+Catalog term's do, only where they straddle a constituent boundary, and only
+its own analysis may rebuild them; no Kind Name stands where its first word
+ends (*strike* in *a first strike counter*). A Kind Name (§2) holds no
+license, so it and *counter* are no licensed term, and its word keeps every
+other analysis beside the kind's: *five or more plot counters* also reads
+*plot* as a verb with *counters* its Object (Deadly Designs), as *Players
+can't get counters* reads *get* (Solemnity). Why: a keyword's homograph and
+its head that form one constituent are the kind's analysis built a second
+way, as a Catalog term's words are; but a Kind Name is any word, and a word
+the lexicon does not know as a kind is a verb before its Object wherever the
+English lets it be one, so only a list of kinds could tell *plot* from *get*.
 
 ## 6. Names and notation
 

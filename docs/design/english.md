@@ -205,28 +205,35 @@ distribution, and the census shows that distribution multiplying Readings on
 real card text. Each equation that reads it is an admission gate (§6), and its
 comment names a real card and the spurious structure it prevents. There are
 two, `KindLicense` and `OptionLicense`.
-`KindLicense`: The counter Catalog marks each counter's kind name
-(*charge*, *time*) and each keyword a keyword counter can be [CR#122.1b]
-`Kind`, and the noun *counter* `Head`. A `Kind` word is a kind only before
-*counter*, and a kind name is nothing else: it heads no nominal, premodifies
-no other noun and names nothing. *Counter* takes its kind as one premodifier,
-a slash measure, a licensed keyword, a kind name or a coordination of them,
-and no other noun premodifier: a measure or keyword before it is its kind,
-never also the general measure or keyword premodifier, and an ordinary noun
-before it (*time*, *loyalty*) is no premodifier of it. A slash measure and a
-keyword are no Catalog words, so the license reaches them only through the
-head. `Head` has one holder, *counter*, which binding reports as a value with
-fewer than two holders ([Lexicon](lexicon.md) §4): the position has one head.
-The grammar names its head value (`feature KindLicense = Kind | Head { head:
-Head }`), so a `Kind` word directly before *counter* is a licensed term, whose
-words stand apart as a multiword term's do ([Lexicon](lexicon.md) §5): a kind
-name's homograph and *counter* form no constituent of their own.
-Why: as ordinary nouns the kind names would head nominals and premodify any
-noun, and many are homographs of other words (*Treasure*, *time*). The kinds
-are open, as every Catalog is; a license states their one position as a
-lexical fact of the Catalog, where a Production per kind would name Catalog
-items (§2), and it leaves the attachment of general adjuncts to Category,
-function and grammatical feature.
+`KindLicense`: the keyword catalog marks each keyword a keyword counter can
+be [CR#122.1b] `Kind`, and the vocabulary marks the noun *counter* `Head`.
+Any other kind is a Kind Name, read from the text as the word directly before
+*counter* with no list of kinds ([Lexicon](lexicon.md) §2), and stands
+nowhere else: it heads no nominal, premodifies no other noun and names
+nothing. *Counter* takes its kind as one premodifier, a slash measure, a
+licensed keyword, a Kind Name or a coordination of them, and no other noun
+premodifier or participle: a measure or keyword before it is its kind, never
+also the general measure or keyword premodifier, and an ordinary noun or
+participle before it (*time*, *loyalty*, *training*) is no premodifier of it.
+A slash measure is no Catalog word, so the license reaches it only through
+the head. `Head` has one holder, *counter*, which binding reports as a value
+with fewer than two holders ([Lexicon](lexicon.md) §4): the position has one
+head. The grammar names its head value (`feature KindLicense = Kind | Head {
+head: Head }`), so a `Kind` keyword directly before *counter* is a licensed
+term, whose words stand apart as a multiword term's do ([Lexicon](lexicon.md)
+§5), and no Kind Name stands where it ends (*a flying counter*, *a first
+strike counter*). A Kind Name holds no license, so it makes no licensed term:
+its word keeps its other analyses beside it, as words a reader does not know
+to be a kind would (*five or more plot counters*, Deadly Designs, also reads
+*plot* as a verb, and *Players can't get counters*, Solemnity, needs *get*
+as one).
+Why: a kind written before *counter* would otherwise be an ordinary noun
+premodifier, which premodifies any noun, and cards keep coining kinds, so no
+list could hold them (*a goddamn counter* reads). A license states the one
+position of the keywords that are kinds as a lexical fact of the keyword
+catalog, where a Production per kind would name Catalog items (§2), and it
+leaves the attachment of general adjuncts to Category, function and
+grammatical feature.
 `OptionLicense`: a noun whose parameter pattern takes a cited Vote Option
 before it ([Lexicon](lexicon.md) §2), *vote*, is `Head`, which the pattern's
 declaration gives it. A Vote Option is open, so no word of it carries the
