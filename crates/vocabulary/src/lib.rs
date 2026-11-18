@@ -35,7 +35,9 @@ use crate::build::exact;
 use crate::build::source;
 pub use crate::data_text::read_data_file;
 pub use crate::names::card_name_id;
+pub use crate::names::face_scope;
 pub use crate::names::shortened_name;
+pub use crate::names::stated_scope;
 use crate::schema::AbilityWord;
 use crate::schema::AdjectiveDecl;
 use crate::schema::AdverbEntry;
@@ -57,7 +59,8 @@ use crate::schema::TurnPart;
 use crate::schema::Types;
 use crate::schema::VerbDecl;
 use crate::schema::VerbEntry;
-pub use crate::shortening::AttestedShortenings;
+pub use crate::shortening::legendary_permanent;
+pub use crate::shortening::parse_type_line;
 pub use crate::shortening::short_name;
 
 /// The license feature of a counter's kind name and of the noun *counter*
@@ -199,16 +202,16 @@ pub struct LexicalEnvironment {
 }
 
 impl LexicalEnvironment {
-    /// Loads every data file, the dungeon names at [`dungeon_names_path`],
-    /// the card names at [`card_names_path`] and their attested shortenings
-    /// computed from the corpus at `sylex_upstream::scryfall::oracle_cards`.
+    /// Loads every data file, the dungeon names at [`dungeon_names_path`] and
+    /// the card names at [`card_names_path`]. It reads no card's text or type
+    /// line: a face's Card Scope is derived when its text is parsed
+    /// ([`face_scope`]).
     ///
     /// # Errors
-    /// An unreadable card-name or corpus file, or any
-    /// [`Sources::environment`] error.
+    /// An unreadable card-name file, or any [`Sources::environment`] error.
     pub fn load() -> Result<Self, SourceError> {
         let names = read(&card_names_path())?;
-        Sources::load()?.environment(&names, &AttestedShortenings::load()?)
+        Sources::load()?.environment(&names)
     }
 }
 
@@ -303,18 +306,13 @@ impl Sources {
     }
 
     /// The whole Lexical Environment, with card names read from `card_names`
-    /// (one per line) and their Shortened Names from `shortened`.
+    /// (one per line).
     ///
     /// # Errors
     /// Any [`Sources::vocabulary`] error.
-    pub fn environment(
-        &self,
-        card_names: &str,
-        shortened: &AttestedShortenings,
-    ) -> Result<LexicalEnvironment, SourceError> {
+    pub fn environment(&self, card_names: &str) -> Result<LexicalEnvironment, SourceError> {
         let (mut lexemes, frames) = self.vocabulary()?;
-        let vocabulary = Lexicon::new(lexemes.clone())?;
-        let card_names = names::card_names(card_names, shortened, &vocabulary);
+        let card_names = names::card_names(card_names);
         Self::check_card_scopes(&lexemes, &card_names)?;
         lexemes.extend(card_names);
         Ok(LexicalEnvironment {

@@ -1,6 +1,5 @@
 //! The loader rejects declarations that would break the catalog contract.
 
-use sylex_vocabulary::AttestedShortenings;
 use sylex_vocabulary::LexicalEnvironment;
 use sylex_vocabulary::Sources;
 use sylex_vocabulary::schema::AnchorWord;
@@ -164,17 +163,13 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
     sources.anchor_words.clear();
     sources.vote_options.clear();
     sources.cited_names.clear();
-    let none = AttestedShortenings::default();
-    sources.environment(card_names, &none).unwrap();
+    sources.environment(card_names).unwrap();
 
     let mut stray = sources.clone();
     stray.introduced_names[0]
         .cards
         .push("Not a Card".to_owned());
-    let error = stray
-        .environment(card_names, &none)
-        .unwrap_err()
-        .to_string();
+    let error = stray.environment(card_names).unwrap_err().to_string();
     assert!(error.contains("which is not a card name"), "{error}");
 
     let mut stray = sources.clone();
@@ -182,10 +177,7 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
         word: "Khans".to_owned(),
         cards: vec!["Not a Card".to_owned()],
     });
-    let error = stray
-        .environment(card_names, &none)
-        .unwrap_err()
-        .to_string();
+    let error = stray.environment(card_names).unwrap_err().to_string();
     assert!(error.contains("which is not a card name"), "{error}");
 
     // A scoped name may be spelled like a card's name (Disa the Restless's
@@ -193,7 +185,7 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
     // *named*, *Partner with* or *from among*, so the two never compete
     // elsewhere.
     let env = sources
-        .environment(&format!("{card_names}Marit Lage\n"), &none)
+        .environment(&format!("{card_names}Marit Lage\n"))
         .unwrap();
     let lexeme = |id: &str| &env.lexicon.lexemes()[&sylex_lexicon::LexemeId::new(id)];
     assert!(lexeme("name:Marit Lage").card_name);
@@ -204,7 +196,7 @@ fn a_card_scope_names_cards_and_a_scoped_name_may_be_spelled_like_one() {
     ] {
         let mut spelled_alike = sources.clone();
         push(&mut spelled_alike);
-        spelled_alike.environment(card_names, &none).unwrap();
+        spelled_alike.environment(card_names).unwrap();
     }
 }
 

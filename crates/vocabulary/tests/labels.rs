@@ -2,7 +2,6 @@
 //! registered ability word [CR#207.2c] or keyword ability [CR#702.1].
 
 use sylex_lexicon::ItalicHead;
-use sylex_lexicon::LexemeId;
 use sylex_lexicon::LexicalReading;
 use sylex_vocabulary::LexicalEnvironment;
 use sylex_vocabulary::Sources;
@@ -109,8 +108,7 @@ fn an_anchor_word_is_a_registered_label_on_the_cards_that_print_it() {
             anchor.word
         );
         for card in &anchor.cards {
-            let scope =
-                sylex_lexicon::CardScope::own_names([LexemeId::new(&format!("name:{card}"))]);
+            let scope = sylex_lexicon::CardScope::full_names([card.as_str()]);
             let analyzed = environment
                 .lexicon
                 .analyze_source_scoped(&line, None, &scope);
