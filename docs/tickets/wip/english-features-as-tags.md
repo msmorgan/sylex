@@ -10,23 +10,25 @@ different categories:
 
 - `Determination` means "has a determiner" (`Bare | Mixed | Overt`) on `NounPhrase` and
   `PrepositionPhrase`, and "needs an overt determiner" on `Nominal`, `BareNominal`,
-  `QuantifiedNominal`, `ModifiedQuantifiedNominal` and `AdjectivePhrase`
+  `QuantifiedNominal`, `ModifiedQuantifiedNominal`, `AdjectivePhrase`, `Premodifier` and
+  `ModifiedAdjustment`
   (propagating `Mixed` across categories that have no determination resolution).
 - `ComplementKind` serves as the Slot Kind of a head's selected Complement, as the filler tag in
   unlike-coordination categories (`Depictive`, `PredicateAdjunct`, `Attributes`, `ObjectConjunct`,
-  `PostmodifierConjunct`, `AmountOrNounConjunct`), and as a location-presence tag (`NP` vs `PP`) on
+  `PostmodifierConjunct`, `AmountOrNounConjunct`), as the premodifier-kind tag on `Premodifier`,
+  and as a location-presence tag (`NP` vs `PP`) on
   `ExistentialPredicate` (`adjunct PrepositionPhrase { host: ExistentialPredicate }` requiring
   `head.ComplementKind != NP`).
-- `Polarity`'s comment claims auxiliary negation alongside `non-` premodifiers and `but not`
-  contrasts.
+- `Polarity`'s comment does not say what it holds on each category.
 
 ## Design
 
 - Split a privative `feature DeterminerNeed = Required` on `Nominal`, `BareNominal`,
-  `QuantifiedNominal`, `ModifiedQuantifiedNominal` and `AdjectivePhrase`
+  `QuantifiedNominal`, `ModifiedQuantifiedNominal`, `AdjectivePhrase` and `Premodifier`
   (including `adjectives.ron` / `crates/vocabulary/src/build.rs`) from `Determination` (`Bare |
   Mixed | Overt` on `NounPhrase` and `PrepositionPhrase`).
-- Split `ConjunctKind` for unlike-coordination filler categories from `ComplementKind`, and replace
+- Split `ConjunctKind` for unlike-coordination filler categories, and a kind tag for
+  `Premodifier`, from `ComplementKind`, and replace
   `ComplementKind` on `ExistentialPredicate` with a dedicated privative feature (such as
   `ExistentialLocation = Located` on `LocatedExistentialBe`, read by `adjunct PrepositionPhrase {
   host: ExistentialPredicate }`).
