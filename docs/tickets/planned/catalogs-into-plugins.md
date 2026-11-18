@@ -8,9 +8,9 @@ needs: [v1-retirement, lexicon-dungeon-names, english-names-read-from-text, engl
 Every game word is a `.syl` declaration under `plugins/`, its `lexical` field beside its spelling
 and meaning (`docs/design/lexicon.md` §3). The Catalogs still live in
 `crates/vocabulary/catalogs/*.ron`. Some are declared twice: card types and supertypes (`types.ron`),
-subtypes, counters, designations, predefined tokens (`tokens.ron`), keyword abilities and keyword
-actions also have `plugins/builtin/definitions/` declarations, so `ageCounter.syl` and the `age`
-entry of `counters.ron` both declare the age counter. The rest (`ability_words.ron`,
+subtypes, designations, predefined tokens (`tokens.ron`), keyword abilities and keyword actions
+also have `plugins/builtin/definitions/` declarations, so `flying.syl` and the `flying` entry of
+`keyword_abilities.ron` both declare flying. The rest (`ability_words.ron`,
 `statuses.ron`, `turn_parts.ron`) have no `.syl` declaration yet.
 
 ## Done when
