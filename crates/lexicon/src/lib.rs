@@ -49,7 +49,6 @@ pub use crate::types::Person;
 pub use crate::types::Tense;
 pub use crate::types::WordForm;
 pub use crate::vote_option::valid_vote_option;
-pub use crate::vote_option::vote_option_candidates;
 
 mod registry;
 pub use registry::ClosedWord;

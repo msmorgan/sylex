@@ -3,12 +3,12 @@
 //! No inventory lists these words. A face's text offers them where a vote
 //! is taken (*votes for sickness or psychosis*) and mentions them where it
 //! says what the votes do (*If psychosis gets more votes*, *each numbers
-//! vote*), so they are read from that text and held in its Card Scope
-//! ([`crate::CardScope`]). Lexical analysis knows no grammar: it proposes a
-//! Vote Option only where the scope holds its word, and this module says
-//! which spellings of a text could be one.
-
-use std::collections::BTreeSet;
+//! vote*), so they are read from that text. Lexical analysis knows no
+//! grammar: beside its matches it offers a Vote Option at every spelling
+//! that has the shape of one (`AnalyzedText::open_words`), and the grammar
+//! admits it only where a vote offers it or the text mentions a word a
+//! vote offers (`docs/design/lexicon.md` §2). An Anchor Word [CR#614.12c]
+//! is offered the same way, at each capitalized spelling of that shape.
 
 use crate::Binding;
 use crate::LexicalMatch;
@@ -41,61 +41,92 @@ pub fn valid_vote_option(word: &str) -> bool {
         || crate::introduced::valid_introduced_name(word)
 }
 
-/// Every spelling in `text` that has the shape of a Vote Option
+/// The spans of `tokens` that have the shape of a Vote Option
 /// ([`valid_vote_option`]): each orthographic word, and the title run at
-/// each capitalized word. Which of them a vote offers is the parse's to
-/// say.
-#[must_use]
-pub fn vote_option_candidates(text: &str) -> BTreeSet<String> {
-    let tokens: Vec<char> = text.chars().collect();
-    let mut candidates = BTreeSet::new();
+/// each capitalized word.
+fn shaped_spans(tokens: &[char]) -> Vec<(usize, usize)> {
+    let mut spans = Vec::new();
     for start in 0..tokens.len() {
         if !tokens[start].is_alphabetic()
-            || !crate::analysis::edges_match(&tokens, start, start + 1, Binding::Prefix)
+            || !crate::analysis::edges_match(tokens, start, start + 1, Binding::Prefix)
         {
             continue;
         }
-        let ends = [
-            Some(word_end(&tokens, start)),
-            crate::introduced::starts_title_run(&tokens, start)
-                .then(|| crate::introduced::title_run(&tokens, start, |_| false))
-                .flatten(),
-        ];
-        for end in ends.into_iter().flatten() {
+        let word = word_end(tokens, start);
+        let run = crate::introduced::starts_title_run(tokens, start)
+            .then(|| crate::introduced::title_run(tokens, start, |_| false))
+            .flatten();
+        for end in [Some(word), run.filter(|&run| run != word)]
+            .into_iter()
+            .flatten()
+        {
             let spelling: String = tokens[start..end].iter().collect();
             if valid_vote_option(&spelling) {
-                candidates.insert(spelling);
+                spans.push((start, end));
             }
         }
     }
-    candidates
+    spans
 }
 
-/// Each Vote Option the scope holds, wherever its spelling is written as
-/// whole words.
-pub(crate) fn vote_option_matches(
+/// The spans at which `spelling` is written as whole words.
+fn written(tokens: &[char], spelling: &str) -> Vec<(usize, usize)> {
+    let spelling: Vec<char> = spelling.chars().collect();
+    (0..tokens
+        .len()
+        .saturating_sub(spelling.len().saturating_sub(1)))
+        .map(|start| (start, start + spelling.len()))
+        .filter(|&(start, end)| {
+            tokens[start..].starts_with(&spelling)
+                && crate::analysis::edges_match(tokens, start, end, Binding::Free)
+        })
+        .collect()
+}
+
+/// The Anchor Words and Vote Options of `tokens`. Each one the scope
+/// introduces is a lexical match wherever it is written, whatever its shape
+/// (a stated Anchor Word may be any label), and joins `matches`. Returned
+/// are the open words (`AnalyzedText::open_words`): a Vote Option at every
+/// other spelling of its shape, and an Anchor Word at every capitalized one.
+pub(crate) fn introduced_word_matches(
     tokens: &[char],
     scope: &crate::CardScope,
     matches: &mut Vec<LexicalMatch>,
-) {
-    for word in scope.vote_options() {
-        let spelling: Vec<char> = word.chars().collect();
-        for start in 0..tokens.len().saturating_sub(spelling.len() - 1) {
-            let end = start + spelling.len();
-            if tokens[start..].starts_with(&spelling)
-                && crate::analysis::edges_match(tokens, start, end, Binding::Free)
-            {
-                matches.push(LexicalMatch {
-                    start,
-                    end,
-                    reading: LexicalReading::VoteOption {
-                        word: word.to_owned(),
-                    },
-                    case: None,
-                });
-            }
+) -> Vec<LexicalMatch> {
+    let mut held = std::collections::BTreeSet::new();
+    for word in scope.anchor_words() {
+        for (start, end) in written(tokens, word) {
+            let word = word.to_owned();
+            held.insert((start, end, LexicalReading::AnchorWord { word }));
         }
     }
+    for word in scope.vote_options() {
+        for (start, end) in written(tokens, word) {
+            let word = word.to_owned();
+            held.insert((start, end, LexicalReading::VoteOption { word }));
+        }
+    }
+    let mut open = std::collections::BTreeSet::new();
+    for (start, end) in shaped_spans(tokens) {
+        let word: String = tokens[start..end].iter().collect();
+        if tokens[start].is_uppercase() && crate::valid_anchor_word(&word) {
+            open.insert((
+                start,
+                end,
+                LexicalReading::AnchorWord { word: word.clone() },
+            ));
+        }
+        open.insert((start, end, LexicalReading::VoteOption { word }));
+    }
+    let found = |(start, end, reading)| LexicalMatch {
+        start,
+        end,
+        reading,
+        case: None,
+    };
+    let open = open.difference(&held).cloned().map(found).collect();
+    matches.extend(held.into_iter().map(found));
+    open
 }
 
 #[cfg(test)]
@@ -123,11 +154,14 @@ mod tests {
 
     /// Travel Through Caradhras.
     #[test]
-    fn the_candidates_are_each_word_and_each_title_run() {
-        let candidates = vote_option_candidates(
-            "Starting with you, each player votes for Redhorn Pass or Mines of Moria. For each \
-             Redhorn Pass vote, shuffle.",
-        );
+    fn the_shaped_spans_are_each_word_and_each_title_run() {
+        let text = "Starting with you, each player votes for Redhorn Pass or Mines of Moria. For \
+                    each Redhorn Pass vote, shuffle.";
+        let tokens: Vec<char> = text.chars().collect();
+        let spellings: Vec<String> = shaped_spans(&tokens)
+            .into_iter()
+            .map(|(start, end)| tokens[start..end].iter().collect())
+            .collect();
         for word in [
             "Redhorn Pass",
             "Mines of Moria",
@@ -136,8 +170,13 @@ mod tests {
             "or",
             "For",
         ] {
-            assert!(candidates.contains(word), "{word:?}");
+            assert!(spellings.iter().any(|s| s == word), "{word:?}");
         }
-        assert!(!candidates.contains("Redhorn Pass or Mines of Moria"));
+        assert!(
+            !spellings
+                .iter()
+                .any(|s| s == "Redhorn Pass or Mines of Moria")
+        );
+        assert_eq!(spellings.iter().filter(|s| *s == "Redhorn Pass").count(), 2);
     }
 }

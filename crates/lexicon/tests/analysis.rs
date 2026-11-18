@@ -1139,15 +1139,14 @@ fn a_registered_label_is_never_also_a_flavor_word() {
 }
 
 /// Citadel Siege: *• Khans — ...*. No Lexeme declares an Anchor Word
-/// [CR#614.12c]: it stands where the Card Scope holds it, and there the
-/// label is never a Flavor Word; elsewhere the label is an open Flavor Word
-/// and no Anchor Word.
+/// [CR#614.12c]: it is a lexical match where the Card Scope introduces it,
+/// and there the label is never a Flavor Word; elsewhere the label is an
+/// open Flavor Word, and the Anchor Word only an open word, which a parse
+/// reads where the text introduces it.
 #[test]
-fn an_anchor_word_stands_where_the_scope_holds_it_and_a_flavor_word_elsewhere() {
+fn an_anchor_word_is_a_match_where_the_scope_introduces_it_and_an_open_word_elsewhere() {
     let lexicon = Lexicon::new([noun("anchor/card", "card")]).unwrap();
     let text = "• Khans — At the beginning of combat on your turn, draw a card.";
-    assert_eq!(sylex_lexicon::bulleted_label(text), Some("Khans"));
-    assert_eq!(sylex_lexicon::bulleted_label("Khans — Draw a card."), None);
     let anchor = LexicalReading::AnchorWord {
         word: "Khans".into(),
     };
@@ -1166,10 +1165,19 @@ fn an_anchor_word_stands_where_the_scope_holds_it_and_a_flavor_word_elsewhere() 
     };
     assert_eq!(readings(&on), (true, false));
     assert_eq!(readings(&off), (false, true));
-    assert!(lexicon.stands_in(&anchor, &on));
+    let open = |scope: &CardScope| {
+        lexicon
+            .analyze_source_scoped(text, None, scope)
+            .open_words
+            .iter()
+            .any(|found| (found.start, found.end) == (2, 7) && found.reading == anchor)
+    };
+    assert!(!open(&on) && open(&off));
     assert!(!lexicon.stands_in(&flavor, &on));
-    assert!(!lexicon.stands_in(&anchor, &off));
     assert!(lexicon.stands_in(&flavor, &off));
+    // Scope refuses no Anchor Word: the grammar admits one only where its
+    // text introduces it or the face does.
+    assert!(lexicon.stands_in(&anchor, &on) && lexicon.stands_in(&anchor, &off));
     // It is spelled as the word, and found where the text offers it too.
     assert_eq!(lexicon.realize(&anchor).unwrap(), "Khans");
     assert!(lexicon.edges(&anchor).is_ok());
@@ -1343,12 +1351,12 @@ fn a_card_name_has_one_form() {
 }
 
 /// Travel Through Caradhras: *votes for Redhorn Pass or Mines of Moria*. No
-/// Lexeme declares a Vote Option [CR#701.38b]: it stands where the Card
-/// Scope holds it, wherever its spelling is written as whole words, and
-/// nowhere else. Another card's name of its spelling (*Mines of Moria*)
-/// stands beside it.
+/// Lexeme declares a Vote Option [CR#701.38b]: it is a lexical match where
+/// the Card Scope introduces it, wherever its spelling is written as whole
+/// words, and an open word anywhere else. Another card's name of its
+/// spelling (*Mines of Moria*) stands beside it.
 #[test]
-fn a_vote_option_stands_where_the_scope_holds_it() {
+fn a_vote_option_is_a_match_where_the_scope_introduces_it_and_an_open_word_elsewhere() {
     let lexicon = Lexicon::new([
         noun("vote/vote", "vote"),
         Lexeme::card_name("Mines of Moria", source("name:Mines of Moria")),
@@ -1365,7 +1373,15 @@ fn a_vote_option_stands_where_the_scope_holds_it() {
         at(&lexicon.analyze_source_scoped(text, None, scope), 9, 23).contains(&option)
     };
     assert!(found(&on) && !found(&off));
-    assert!(lexicon.stands_in(&option, &on) && !lexicon.stands_in(&option, &off));
+    let open = |scope: &CardScope| {
+        lexicon
+            .analyze_source_scoped(text, None, scope)
+            .open_words
+            .iter()
+            .any(|found| (found.start, found.end) == (9, 23) && found.reading == option)
+    };
+    assert!(!open(&on) && open(&off));
+    assert!(lexicon.stands_in(&option, &on) && lexicon.stands_in(&option, &off));
     let other = at(&lexicon.analyze_source_scoped(text, None, &on), 9, 23)
         .into_iter()
         .filter(|reading| matches!(reading, LexicalReading::Word(_)))

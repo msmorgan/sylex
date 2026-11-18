@@ -65,8 +65,16 @@ pub struct AnalyzedText {
     pub normalized: Option<String>,
     pub tokens: Vec<char>,
     pub matches: Vec<LexicalMatch>,
-    /// The card names the text was analyzed in the scope of: the names of
-    /// the face whose text it is.
+    /// The open words of the text: each spelling that has the shape of an
+    /// Anchor Word or a Vote Option, which the scope does not introduce.
+    /// They are no lexical matches. A text introduces a word of either kind
+    /// at any word (*votes for sickness or psychosis*), so every spelling of
+    /// the shape is offered to the parse, which reads one only at a
+    /// position that introduces it or, in the same Reading, uses it
+    /// (`docs/design/lexicon.md` §2); one no parse reads is nothing.
+    pub open_words: Vec<LexicalMatch>,
+    /// The Card Scope the text was analyzed in: the names of the face whose
+    /// text it is, and the words its other lines introduce and use.
     pub scope: crate::CardScope,
 }
 
@@ -113,8 +121,9 @@ impl AnalyzedText {
         result
     }
 
-    /// The words no declared Lexeme spells. A title run alone covers none:
-    /// it is an Introduced Name only where a parse introduces it
+    /// The words no declared Lexeme spells. A title run or an open word
+    /// alone covers none: it is an Introduced Name, an Anchor Word or a Vote
+    /// Option only where a parse takes it as one
     /// ([`AnalyzedText::unknown_words_given`]).
     #[must_use]
     pub fn unknown_words(&self) -> Vec<std::ops::Range<usize>> {
@@ -122,7 +131,7 @@ impl AnalyzedText {
     }
 
     /// The words that neither a declared Lexeme spells nor an Introduced
-    /// Name that `introduced` holds covers.
+    /// Name, Anchor Word or Vote Option that `introduced` holds covers.
     #[must_use]
     pub fn unknown_words_given(
         &self,
@@ -130,12 +139,15 @@ impl AnalyzedText {
     ) -> Vec<std::ops::Range<usize>> {
         let known = |found: &LexicalMatch| match found.reading {
             LexicalReading::IntroducedName { .. } => introduced(found),
+            // A match is a word the scope introduces; an open word is one
+            // only where the parse takes it.
+            LexicalReading::AnchorWord { .. } | LexicalReading::VoteOption { .. } => {
+                self.scope.introduces(&found.reading) || introduced(found)
+            }
             LexicalReading::Word(_)
             | LexicalReading::OwnName { .. }
             | LexicalReading::FlavorWord { .. }
             | LexicalReading::SetName { .. }
-            | LexicalReading::AnchorWord { .. }
-            | LexicalReading::VoteOption { .. }
             | LexicalReading::Numeral { .. } => true,
         };
         self.words()
@@ -164,7 +176,7 @@ impl AnalyzedText {
             return false;
         }
         let mut edges = vec![Vec::new(); range.len()];
-        for found in &self.matches {
+        for found in self.matches.iter().chain(&self.open_words) {
             if found.start < range.end && found.end > range.start && include(found) {
                 let start = found.start.max(range.start) - range.start;
                 let end = found.end.min(range.end) - range.start;
@@ -641,12 +653,14 @@ impl Lexicon {
     ///   [CR#201.5,201.5c].
     /// - A card name's Lexeme, another card's name, stands everywhere but where
     ///   the scope holds its name, which is the card's own there.
-    /// - An Anchor Word stands only where the scope holds it [CR#614.12c], and
-    ///   a Vote Option only where the scope holds it [CR#701.38b].
+    /// - An Anchor Word [CR#614.12c] and a Vote Option [CR#701.38b] stand
+    ///   everywhere, as open words: the grammar admits one only where its text
+    ///   introduces it or uses a word the face introduces
+    ///   (`AnalyzedText::open_words`).
     /// - An Introduced Name stands everywhere but where the scope holds its
     ///   spelling as the card's full name.
     /// - A Flavor Word stands only where no label registered there spells it
-    ///   and the scope holds no Anchor Word of its spelling.
+    ///   and the scope introduces no Anchor Word of its spelling.
     /// - Every other value, a Set Name included, stands everywhere.
     ///
     /// It checks scope alone: whether the lexicon licenses the value is
@@ -664,9 +678,10 @@ impl Lexicon {
                 self.registered_label(label, Some(scope)).is_none()
                     && !scope.holds_anchor_word(label)
             }
-            LexicalReading::AnchorWord { word } => scope.holds_anchor_word(word),
-            LexicalReading::VoteOption { word } => scope.holds_vote_option(word),
-            LexicalReading::Numeral { .. } | LexicalReading::SetName { .. } => true,
+            LexicalReading::AnchorWord { .. }
+            | LexicalReading::VoteOption { .. }
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::SetName { .. } => true,
         }
     }
 
@@ -879,8 +894,7 @@ impl Lexicon {
             .collect::<Vec<_>>();
         drop_shortened_inside_full(&mut matches);
         self.introduced_name_matches(&tokens, scope, &mut matches);
-        anchor_word_matches(&tokens, scope, &mut matches);
-        crate::vote_option::vote_option_matches(&tokens, scope, &mut matches);
+        let open_words = crate::vote_option::introduced_word_matches(&tokens, scope, &mut matches);
         numeral_matches(&tokens, &mut matches);
         flavor_word_matches(&tokens, &mut matches);
         let hosts = matches
@@ -915,6 +929,7 @@ impl Lexicon {
             normalized: normalized.map(str::to_owned),
             tokens,
             matches,
+            open_words,
             scope: scope.clone(),
         }
     }
@@ -1039,42 +1054,6 @@ fn valid_flavor_label(label: &str) -> bool {
 #[must_use]
 pub fn valid_anchor_word(word: &str) -> bool {
     valid_flavor_label(word) && word.trim() == word
-}
-
-/// The label a bulleted line opens with (*• Khans — ...*), where it has the
-/// shape of an Anchor Word: what stands between the bullet and the line's
-/// first em dash. A flavor-labeled mode opens the same way [CR#207.2d], so
-/// the label alone is no Anchor Word: a face's text has to offer it too
-/// [CR#614.12c].
-#[must_use]
-pub fn bulleted_label(line: &str) -> Option<&str> {
-    let after = line.strip_prefix("• ")?;
-    let label = &after[..after.find(" —")?];
-    valid_anchor_word(label).then_some(label)
-}
-
-/// Each Anchor Word the scope holds, wherever its spelling is written as
-/// whole words: heading its bulleted ability, and where the text offers it
-/// (*choose Khans or Dragons*).
-fn anchor_word_matches(tokens: &[char], scope: &crate::CardScope, matches: &mut Vec<LexicalMatch>) {
-    for word in scope.anchor_words() {
-        let spelling: Vec<char> = word.chars().collect();
-        for start in 0..tokens.len().saturating_sub(spelling.len() - 1) {
-            let end = start + spelling.len();
-            if tokens[start..].starts_with(&spelling)
-                && edges_match(tokens, start, end, Binding::Free)
-            {
-                matches.push(LexicalMatch {
-                    start,
-                    end,
-                    reading: LexicalReading::AnchorWord {
-                        word: word.to_owned(),
-                    },
-                    case: None,
-                });
-            }
-        }
-    }
 }
 
 fn missing_explicit_spelling(slot: &crate::FormDeclaration) -> Option<&'static str> {

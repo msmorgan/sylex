@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 use crate::LexemeId;
+use crate::LexicalReading;
 use crate::NameForm;
 
 /// The prefix of a card name's Lexeme id.
@@ -13,30 +14,47 @@ pub fn card_name_id(name: &str) -> LexemeId {
     LexemeId::new(&format!("{CARD_NAME_ID_PREFIX}{name}"))
 }
 
-/// The card names a text is in the scope of, each with the forms of it that
-/// text admits. A face's text holds its own name in its Full form
-/// [CR#201.5] and, where the card has a Shortened Name, in its Shortened
-/// form [CR#201.5c].
+/// The parse context of a text: the card names it is in the scope of, each
+/// with the forms of it that text admits, and the words its face's other
+/// lines introduce and use. A face's text holds its own name in its Full
+/// form [CR#201.5] and, where the card has a Shortened Name, in its
+/// Shortened form [CR#201.5c].
 ///
 /// A name the scope holds is the card's own name there
 /// ([`crate::LexicalReading::OwnName`]), whether or not the lexicon declares
 /// a card of that name; it is never another card's.
 ///
-/// It also holds the face's Anchor Words [CR#614.12c]: the words its text
-/// offers as its permanent enters and heads a bulleted ability with. An
-/// Anchor Word ([`crate::LexicalReading::AnchorWord`]) stands only where the
-/// scope holds it, and a Flavor Word of that spelling does not stand there.
-///
-/// And it holds the face's Vote Options [CR#701.38b]: the words a vote of
-/// its text offers and its text then mentions. A Vote Option
-/// ([`crate::LexicalReading::VoteOption`]) stands only where the scope
-/// holds it.
+/// A face's text introduces words of three kinds, which no inventory lists:
+/// an Introduced Name [CR#111.4], an Anchor Word [CR#614.12c] and a Vote
+/// Option [CR#701.38b]. Its lines are read in order, and a line's scope
+/// holds the words the lines before it introduce, which the line may use
+/// (a name named again, an Anchor Word heading its bulleted ability, a Vote
+/// Option where its votes are counted), and the words the lines after it
+/// use, which discharge the choice the line offers them in (*choose Khans
+/// or Dragons*; *votes for sickness or psychosis*). A Flavor Word spelled like
+/// an Anchor Word the scope introduces does not stand there.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct CardScope {
     /// By full name.
     names: BTreeMap<String, BTreeSet<NameForm>>,
-    anchor_words: BTreeSet<String>,
-    vote_options: BTreeSet<String>,
+    /// The words the lines before the text introduce.
+    introduced: BTreeSet<LexicalReading>,
+    /// The words the lines after the text use.
+    discharged: BTreeSet<LexicalReading>,
+}
+
+/// Whether `word` is of a kind a text introduces and uses again.
+fn introducible(word: &LexicalReading) -> bool {
+    match word {
+        LexicalReading::IntroducedName { .. }
+        | LexicalReading::AnchorWord { .. }
+        | LexicalReading::VoteOption { .. } => true,
+        LexicalReading::Word(_)
+        | LexicalReading::OwnName { .. }
+        | LexicalReading::FlavorWord { .. }
+        | LexicalReading::SetName { .. }
+        | LexicalReading::Numeral { .. } => false,
+    }
 }
 
 impl CardScope {
@@ -83,7 +101,41 @@ impl CardScope {
         self.names.contains_key(name)
     }
 
-    /// Puts the Anchor Word `word` in scope.
+    /// Records that a line before the text introduces `word`, an Introduced
+    /// Name, an Anchor Word or a Vote Option.
+    ///
+    /// # Panics
+    /// On a reading of any other kind.
+    pub fn introduce(&mut self, word: LexicalReading) {
+        assert!(introducible(&word), "{word:?} is no word a text introduces");
+        self.introduced.insert(word);
+    }
+
+    /// Whether a line before the text introduces `word`.
+    #[must_use]
+    pub fn introduces(&self, word: &LexicalReading) -> bool {
+        self.introduced.contains(word)
+    }
+
+    /// Records that a line after the text uses `word`, an Introduced Name,
+    /// an Anchor Word or a Vote Option. The use discharges a choice the
+    /// text offers that word in; a name is offered in none.
+    ///
+    /// # Panics
+    /// On a reading of any other kind.
+    pub fn discharge(&mut self, word: LexicalReading) {
+        assert!(introducible(&word), "{word:?} is no word a text introduces");
+        self.discharged.insert(word);
+    }
+
+    /// Whether a line after the text uses `word`.
+    #[must_use]
+    pub fn discharges(&self, word: &LexicalReading) -> bool {
+        self.discharged.contains(word)
+    }
+
+    /// States the Anchor Word `word`: the rest of the face introduces it
+    /// and uses it.
     ///
     /// # Panics
     /// On a word that has not the shape of one
@@ -93,21 +145,32 @@ impl CardScope {
             crate::valid_anchor_word(word),
             "{word:?} has not the shape of an Anchor Word"
         );
-        self.anchor_words.insert(word.to_owned());
+        let word = LexicalReading::AnchorWord {
+            word: word.to_owned(),
+        };
+        self.introduced.insert(word.clone());
+        self.discharged.insert(word);
     }
 
-    /// Whether the scope holds the Anchor Word `word`.
+    /// Whether the scope introduces the Anchor Word `word`.
     #[must_use]
     pub fn holds_anchor_word(&self, word: &str) -> bool {
-        self.anchor_words.contains(word)
+        self.anchor_words().any(|held| held == word)
     }
 
-    /// The Anchor Words the scope holds.
+    /// The Anchor Words the scope introduces.
     pub fn anchor_words(&self) -> impl Iterator<Item = &str> {
-        self.anchor_words.iter().map(String::as_str)
+        self.introduced.iter().filter_map(|word| {
+            if let LexicalReading::AnchorWord { word } = word {
+                Some(word.as_str())
+            } else {
+                None
+            }
+        })
     }
 
-    /// Puts the Vote Option `word` in scope.
+    /// States the Vote Option `word`: the rest of the face introduces it
+    /// and uses it.
     ///
     /// # Panics
     /// On a word that has not the shape of one
@@ -117,18 +180,22 @@ impl CardScope {
             crate::valid_vote_option(word),
             "{word:?} has not the shape of a Vote Option"
         );
-        self.vote_options.insert(word.to_owned());
+        let word = LexicalReading::VoteOption {
+            word: word.to_owned(),
+        };
+        self.introduced.insert(word.clone());
+        self.discharged.insert(word);
     }
 
-    /// Whether the scope holds the Vote Option `word`.
-    #[must_use]
-    pub fn holds_vote_option(&self, word: &str) -> bool {
-        self.vote_options.contains(word)
-    }
-
-    /// The Vote Options the scope holds.
+    /// The Vote Options the scope introduces.
     pub fn vote_options(&self) -> impl Iterator<Item = &str> {
-        self.vote_options.iter().map(String::as_str)
+        self.introduced.iter().filter_map(|word| {
+            if let LexicalReading::VoteOption { word } = word {
+                Some(word.as_str())
+            } else {
+                None
+            }
+        })
     }
 
     /// Every form of a card name the scope holds, with the name.

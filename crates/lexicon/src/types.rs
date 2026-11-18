@@ -33,11 +33,11 @@ pub enum Category {
     FlavorWord,
     /// Open name of an expansion, cited before the noun *expansion*.
     SetName,
-    /// Open Anchor Word [CR#614.12c], which the Card Scope holds.
+    /// Open Anchor Word [CR#614.12c], which its face's text introduces.
     AnchorWord,
-    /// Open word a vote offers, a Vote Option [CR#701.38b], which the Card
-    /// Scope holds. It is named for no keyword action, so a grammar may
-    /// name it (`docs/design/english.md` §2).
+    /// Open word a vote offers, a Vote Option [CR#701.38b], which its
+    /// face's text introduces. It is named for no keyword action, so a grammar
+    /// may name it (`docs/design/english.md` §2).
     OptionWord,
     Symbol,
 }
@@ -168,18 +168,18 @@ pub enum LexicalReading {
     },
     /// An Anchor Word [CR#614.12c]: one of the two words a face's text
     /// offers as its permanent enters, each heading the bulleted ability
-    /// linked to that choice [CR#607.2m]. No inventory lists it: it is read
-    /// from the face's text, and stands where the Card Scope holds it
-    /// ([`crate::Lexicon::stands_in`]). It is spelled as the word.
+    /// linked to that choice [CR#607.2m]. No inventory lists it: the face's
+    /// text introduces it where it offers the two, and uses it where it
+    /// heads the ability ([`crate::CardScope`]). It is spelled as the word.
     AnchorWord {
         word: String,
     },
     /// A Vote Option [CR#701.38a]: one of the words a vote offers, "words
     /// with no rules meaning that are each connected to a different effect"
     /// [CR#701.38b] (*votes for sickness or psychosis*; *If psychosis gets
-    /// more votes*; *each numbers vote*). No inventory lists it: it is read
-    /// from the face's text, and stands where the Card Scope holds it
-    /// ([`crate::Lexicon::stands_in`]). It is spelled as the word, which
+    /// more votes*; *each numbers vote*). No inventory lists it: the face's
+    /// text introduces it where a vote offers it, and uses it where it
+    /// mentions it ([`crate::CardScope`]). It is spelled as the word, which
     /// may be several (*Mines of Moria*).
     VoteOption {
         word: String,
