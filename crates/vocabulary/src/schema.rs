@@ -574,13 +574,16 @@ pub enum DeterminativeDistribution {
     /// a Noun Phrase Adjunct of temporal location (*this turn*; CGEL, Ch. 8
     /// §6.3, p. 698).
     Deictic,
-    /// Selects a singular head or a quantified plural (*another three
-    /// bodies*; CGEL, Ch. 5 §3.4, p. 353, set (c) [69–70]). It has one holder,
-    /// *another*, and that is the whole class: the other members are
-    /// sequences, *a* with *further* or *additional*, whose quantified plural
-    /// the grammar reads with the modifier. Unlike *a*, it also determines a
-    /// temporal location Noun Phrase (*another day*; Ch. 8 §6.3, p. 698).
-    SingularOrQuantified,
+    /// The alternative-additive determinative *another* (CGEL, Ch. 5 §7.9,
+    /// p. 391). It has one holder, *another*, and that is the whole class.
+    /// It is kept apart from `IndefiniteArticle` because, unlike *a*, it
+    /// determines a temporal location Noun Phrase (*We can do that another
+    /// day*; Ch. 8 §6.3, p. 698), which `TemporalLocation` takes and refuses
+    /// with *a*. Like *a*, it reaches a quantified plural only through a
+    /// modifier (*another additional two tokens*,
+    /// `DeterminedModifiedQuantity`); the grammar builds no bare *another three
+    /// bodies* (Ch. 5 §3.4, p. 353).
+    AlternativeAdditive,
     /// Free-choice *any* (CGEL, Ch. 5 §7.5, p. 381): with a quantificational
     /// noun the Noun Phrase takes the Number of its oblique (*any number of
     /// target creatures become ...*). It has one holder, *any*, and that is

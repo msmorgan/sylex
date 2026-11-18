@@ -182,7 +182,7 @@ feature OuterOperation = Arithmetic { local }
 // Noun Phrase (*all but [the highest roll]*).
 feature ObliqueDistribution =
     | Dependent | Independent | Numerical | IndefiniteArticle | Distributive | Deictic
-    | SingularOrQuantified | FreeChoice | Multiplier | Targeting | Degree
+    | AlternativeAdditive | FreeChoice | Multiplier | Targeting | Degree
 feature AdjectivePosition = Attributive | Predicative
 feature Sign = Negative | Zero | Positive
 // `Existential`: only dummy *there* (CGEL 16§6.2:1394).
@@ -202,10 +202,12 @@ feature RelativeGender = Personal | NonPersonal
 // TemporalQuantity; never *any number of target creatures becomes*), and
 // builds no second tree of an analysis FreeChoiceDetermined builds (the
 // gate is Determined's).
-// `IndefiniteArticle`: only *a*. `SingularOrQuantified`: only *another*,
-// which also takes a quantified plural (*another three bodies*; CGEL
-// 5§3.4:353) and determines a temporal location Noun Phrase (*another day*;
-// 8§6.3:698). TemporalLocation refuses *a*, an admission gate.
+// `IndefiniteArticle`: only *a*. `AlternativeAdditive`: only *another*
+// (CGEL 5§7.9:391), which unlike *a* determines a temporal location Noun
+// Phrase (*We can do that another day*; 8§6.3:698): TemporalLocation refuses
+// *a*, an admission gate, and takes *another*. Over a quantified plural both
+// are DeterminedModifiedQuantity's (*another additional two tokens*); no
+// Production builds CGEL's bare *another three bodies* (5§3.4:353).
 // `Targeting`: only the Targeting Marker *target*. Kept apart from
 // `Dependent` and `Degree`, which FusedDegreeDeterminer and DegreePartitive
 // require: it never fuses or partitions (not *choose target*, *target of
@@ -214,7 +216,7 @@ feature RelativeGender = Personal | NonPersonal
 // determines, which a multiplier joins as a quantity, never as a Noun Phrase.
 feature DeterminativeDistribution =
     | Dependent | Independent | Numerical | IndefiniteArticle | Distributive | Deictic
-    | SingularOrQuantified | FreeChoice | Multiplier | Targeting | Degree
+    | AlternativeAdditive | FreeChoice | Multiplier | Targeting | Degree
 feature Case = Plain | Nominative | Accusative | Genitive
 feature Countability = Count | Mass
 // Where an Adverb Phrase stands, its head's position class (the lexicon's
@@ -1754,7 +1756,7 @@ BoundedEquativeDeterminer: DeterminerPhrase -> modifier:AdverbPhrase DeterminerP
 FusedDegreeDeterminer: FusedNounPhrase -> DeterminerPhrase { heavy: [head], uncoordinated: [head] }
     where head.ComplementKind = Intransitive,
           head.TargetMarked != Marked,
-          head.DeterminativeDistribution != Independent | Numerical | IndefiniteArticle | Distributive | Deictic | SingularOrQuantified | FreeChoice | Multiplier | Targeting,
+          head.DeterminativeDistribution != Independent | Numerical | IndefiniteArticle | Distributive | Deictic | AlternativeAdditive | FreeChoice | Multiplier | Targeting,
           $.Countability = head.Countability,
           $.Countability = Count,
           $.NounKind = Quantity,
@@ -2150,7 +2152,7 @@ DegreePartitive: PartitiveHead -> DeterminerPhrase complement:Selected(Prepositi
 }
     where head.ComplementKind = Intransitive,
           head.TargetMarked != Marked,
-          head.DeterminativeDistribution != Independent | Numerical | IndefiniteArticle | Distributive | Deictic | SingularOrQuantified | FreeChoice | Multiplier | Targeting,
+          head.DeterminativeDistribution != Independent | Numerical | IndefiniteArticle | Distributive | Deictic | AlternativeAdditive | FreeChoice | Multiplier | Targeting,
           head.Countability = complement.Countability,
           $.NounKind = Ordinary,
           $.Determination = Overt,
@@ -3131,7 +3133,7 @@ TransparentQuantity: NounPhrase -> determiner:DeterminerPhrase Nominal {
 }
     where determiner.DeterminativeDistribution
               != Dependent | Independent | Numerical | Distributive | Deictic
-              | SingularOrQuantified | Multiplier | Targeting | Degree,
+              | AlternativeAdditive | Multiplier | Targeting | Degree,
           head.NounDistribution = Quantity,
           head.ComplementKind = PP,
           head.ObliqueNumber := Plural,

@@ -15,7 +15,7 @@
         // is not Oracle's. Like *more*, each use is its own sense.
         (number: Plural, countability: Count, lemma: "all", sense: Some("count"), frames: [Complement(PP(["but"])), Complement(PP(["of"]))]),
         (number: Singular, countability: Mass, lemma: "all", sense: Some("mass"), frames: [Complement(PP(["but"])), Complement(PP(["of"]))]),
-        (number: Singular, countability: Count, lemma: "another", distribution: SingularOrQuantified, frames: [Complement(PP(["of"]))]),
+        (number: Singular, countability: Count, lemma: "another", distribution: AlternativeAdditive, frames: [Complement(PP(["of"]))]),
         // Its partitive is the grammar's, so it declares no *of* frame: with
         // a plural oblique the Noun Phrase may be singular or plural (*if any
         // of those cards shares ...*).
