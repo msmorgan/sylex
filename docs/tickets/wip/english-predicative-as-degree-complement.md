@@ -11,15 +11,15 @@ Phrase that is really the equative degree determinative *as much* / *as many*, s
 
 - *it produces three times [as [much of that mana]]* (Nyxbloom Ancient, Virtue of Strength): a
   predicative Adjunct of *produces*, which leaves *three times* as its Object;
-- *[As [many times as you choose]], you may ...* (Lim-Dûl's Vault, Dance with Calamity) and
-  *repeat this process [as [many times]] as they choose* (Trade Secrets).
+- *repeat this process [as [many times]] as they choose* (Trade Secrets), where *as they
+  choose* is then an Adjunct of *repeat* or *may*.
 
-The forest database has five units with such a Preposition Phrase, none correct.
+The forest database has three units with such a Preposition Phrase, none correct.
 
 ## Done when
 
 - Predicative *as* never takes a Noun Phrase whose determiner or fused head is a degree
-  determinative (*much*, *many*), and the five units above keep only their equative Readings.
+  determinative (*much*, *many*), and the three units above keep only their equative Readings.
 - The census shows no verdict change on the supported corpus, and `cargo xtask english strata
   --check`, `cargo test -p sylex_english`, `cargo test -p xtask` and
   `cargo clippy -p sylex_english --tests -- -D warnings` pass.
