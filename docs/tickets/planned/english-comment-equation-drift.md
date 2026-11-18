@@ -24,7 +24,7 @@ implement, or state a corpus or style observation as a fact of English (`docs/de
   `$.Countability = Count`.
 - `NounAttribute` and `NominalPremodifier`: "A noun premodifier sits inside determinative and
   adjectival ones, never outside them", while `NominalPremodifier` checks only
-  `head.Determination != Overt`.
+  `head.DeterminerNeed != Required`.
 - `TransparentQuantity` and `feature DeterminativeDistribution` (`FreeChoice`): number transparency
   is a property of *number* under indefinite/imprecise determiners generally (CGEL, Ch. 5, §3.3(a),
   p. 350), whereas in Oracle only `any number of …` ever governs finite verb or relative number
