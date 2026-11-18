@@ -115,14 +115,14 @@ pub struct Lexeme {
     pub surface_structure: SurfaceStructure,
     /// The cards whose own text alone admits the Lexeme: the cards that
     /// introduce an Introduced Name or an Anchor Word. Empty means the
-    /// Lexeme is admitted everywhere, but for a card name's Shortened form,
-    /// which only its own card admits [CR#201.5c].
+    /// Lexeme is admitted everywhere, but for a card name on its own card,
+    /// where the name is the card's own ([`crate::LexicalReading::OwnName`]).
     #[serde(default)]
     pub card_scope: BTreeSet<crate::LexemeId>,
-    /// The Lexeme is a card name [CR#201.1]: a face's lexical scope holds it
-    /// when the face is that card or one of its faces, and it is another
-    /// card's name everywhere else. Its forms are told apart by
-    /// [`crate::FeatureBundle::name`].
+    /// The Lexeme is a card name [CR#201.1] as the text of any other card
+    /// writes it: another card's name [CR#201.5]. It has the one spelling,
+    /// the full name. In a scope that holds the name it does not stand: the
+    /// name there is the card's own ([`crate::LexicalReading::OwnName`]).
     #[serde(default)]
     pub card_name: bool,
     /// The Onset of every spelling of the Lexeme, declared where it is not
@@ -167,30 +167,18 @@ impl Lexeme {
         }
     }
 
-    /// A card name [CR#201.1]: its Full form, spelled `name`, and its
-    /// Shortened form [CR#201.5c] when it has one.
+    /// The card name `name` [CR#201.1], with the id [`crate::card_name_id`]
+    /// gives it.
     #[must_use]
-    pub fn card_name(
-        id: impl AsRef<str>,
-        name: &str,
-        shortened: Option<String>,
-        source: Source,
-    ) -> Self {
-        let mut lexeme = Self::invariant(id, name, crate::Category::Catalog, source);
+    pub fn card_name(name: &str, source: Source) -> Self {
+        let mut lexeme = Self::invariant(
+            crate::card_name_id(name).as_str(),
+            name,
+            crate::Category::Catalog,
+            source,
+        );
         lexeme.capitalization = Capitalization::Exact;
         lexeme.card_name = true;
-        lexeme.forms = [(crate::NameForm::Full, None)]
-            .into_iter()
-            .chain(shortened.map(|short| (crate::NameForm::Shortened, Some(short))))
-            .map(|(form, surface)| FormDeclaration {
-                form: crate::WordForm::Invariant,
-                features: crate::FeatureBundle {
-                    name: Some(form),
-                    ..crate::FeatureBundle::default()
-                },
-                surface,
-            })
-            .collect();
         lexeme
     }
 

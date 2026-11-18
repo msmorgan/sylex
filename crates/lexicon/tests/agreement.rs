@@ -110,12 +110,7 @@ fn lexicon() -> Lexicon {
     }
     let octopus = count_noun("Octopus");
     // A card name ending in *s* (*Swarm of Rats's*).
-    let rats = Lexeme::card_name(
-        "Swarm of Rats",
-        "Swarm of Rats",
-        None,
-        source("Swarm of Rats"),
-    );
+    let rats = Lexeme::card_name("Swarm of Rats", source("Swarm of Rats"));
     let mut elf = count_noun("Elf");
     for slot in &mut elf.forms {
         if slot.form == WordForm::Plural {
@@ -244,16 +239,19 @@ fn each_allomorph_realizes_one_spelling_its_neighbor_selects() {
     // name ending in *s*, where CGEL's bare genitive is only a variant [35ii]
     // and Oracle writes *'s* (*Swarm of Rats's*).
     let octopus = noun("Octopus", WordForm::Singular);
+    // The name takes it as another card's name and as its card's own.
     let rats = value(
-        "Swarm of Rats",
+        "name:Swarm of Rats",
         WordForm::Invariant,
-        FeatureBundle {
-            name: Some(NameForm::Full),
-            ..FeatureBundle::default()
-        },
+        FeatureBundle::default(),
     );
+    let own_rats = LexicalReading::OwnName {
+        name: "Swarm of Rats".to_owned(),
+        form: NameForm::Full,
+    };
     assert!(agree(&lexicon, &octopus, &suffixed) && !agree(&lexicon, &octopus, &bare));
     assert!(agree(&lexicon, &rats, &suffixed) && !agree(&lexicon, &rats, &bare));
+    assert!(agree(&lexicon, &own_rats, &suffixed) && !agree(&lexicon, &own_rats, &bare));
 }
 
 /// Only a Category that hosts a prefix has a prefix hyphenation, so *non*
@@ -328,16 +326,4 @@ fn a_dimension_stands_only_on_its_owner_with_every_value() {
         [(genitive(GenitiveAlternant::Bare), "'")],
     );
     assert!(Lexicon::new([only_bare]).is_err());
-    let named = allomorphs(
-        "Thalakos",
-        Category::Noun,
-        [(
-            FeatureBundle {
-                name: Some(NameForm::Full),
-                ..FeatureBundle::default()
-            },
-            "Thalakos",
-        )],
-    );
-    assert!(Lexicon::new([named]).is_err());
 }

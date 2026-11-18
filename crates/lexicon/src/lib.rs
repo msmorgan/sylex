@@ -8,6 +8,7 @@ mod morphology;
 pub mod numeral;
 mod pronunciation;
 mod scope;
+mod shortening;
 mod types;
 
 pub use crate::analysis::*;
@@ -28,6 +29,10 @@ pub use crate::numeral::ParseNumeralError;
 pub use crate::pronunciation::numeral_onset;
 pub use crate::pronunciation::sign_onset;
 pub use crate::scope::CardScope;
+pub use crate::scope::card_name_id;
+pub use crate::scope::card_name_of;
+pub use crate::shortening::own_name_spelling;
+pub use crate::shortening::shortened_spelling;
 pub use crate::types::Case;
 pub use crate::types::Category;
 pub use crate::types::Countability;

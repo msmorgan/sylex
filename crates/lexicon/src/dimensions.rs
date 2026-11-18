@@ -45,8 +45,6 @@ macro_rules! domain {
 ///   after, read at that word's [`LeftEdge`].
 /// - `agrees_with_previous`: the mirror image, carried at the [`LeftEdge`] and
 ///   agreeing with a property at the previous word's [`RightEdge`].
-/// - `selected`: a dimension that selects a form without agreeing with a
-///   neighbor.
 ///
 /// Every dimension but an inflectional one belongs to one Category's
 /// invariant form. A property is compared through `Option::from`, so it is
@@ -71,9 +69,6 @@ macro_rules! dimensions {
                     $previous_property:ident: $previous_property_ty:ty;
             )*
         }
-        selected {
-            $( $(#[$selected_meta:meta])* $selected:ident: $selected_ty:ty => $selected_owner:ident; )*
-        }
     ) => {
         $(#[$bundle_meta])*
         #[derive(Debug, Clone, Default, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
@@ -82,7 +77,6 @@ macro_rules! dimensions {
             $( pub $inflection: Option<$inflection_ty>, )*
             $( $(#[$next_meta])* #[serde(default)] pub $next: Option<$next_ty>, )*
             $( $(#[$previous_meta])* #[serde(default)] pub $previous: Option<$previous_ty>, )*
-            $( $(#[$selected_meta])* #[serde(default)] pub $selected: Option<$selected_ty>, )*
         }
 
         impl FeatureBundle {
@@ -93,7 +87,6 @@ macro_rules! dimensions {
                 let mut owners = Vec::new();
                 $( if self.$next.is_some() { owners.push(Category::$next_owner); } )*
                 $( if self.$previous.is_some() { owners.push(Category::$previous_owner); } )*
-                $( if self.$selected.is_some() { owners.push(Category::$selected_owner); } )*
                 owners
             }
 
@@ -232,8 +225,8 @@ domain! {
 }
 
 domain! {
-    /// The two forms of a card name: the Full name and its Shortened Name
-    /// [CR#201.5c].
+    /// The two forms of a card's own name ([`crate::LexicalReading::OwnName`]):
+    /// the Full name and its Shortened Name [CR#201.5c].
     pub enum NameForm {
         Full,
         Shortened,
@@ -284,10 +277,6 @@ dimensions! {
             /// ([`GenitiveAlternant`]).
             genitive_host: GenitiveAlternant;
     }
-    selected {
-        /// A card name's form [CR#201.5c].
-        name: NameForm => Catalog;
-    }
 }
 
 /// The edges of one realized word.
@@ -298,15 +287,20 @@ pub struct Edges {
 }
 
 impl Edges {
-    /// The edges of a numeral or a Flavor Word, which no Feature Bundle
-    /// declares: a numeral has the Onset of its spoken cardinal (*an 8/8*),
-    /// a Flavor Word none, neither hosts a prefix, and each takes the *'s*
-    /// genitive. `None` for a declared word, whose edges its Lexicon holds
-    /// ([`crate::Lexicon::edges`]).
+    /// The edges of an own name, a numeral or a Flavor Word, which no
+    /// Feature Bundle declares: an own name has the Onset of its spelling, a
+    /// numeral that of its spoken cardinal (*an 8/8*), a Flavor Word none,
+    /// none hosts a prefix, and each takes the *'s* genitive (a name the
+    /// text treats as singular ending in *s* included, *Swarm of Rats's*).
+    /// `None` for a declared word, whose edges its Lexicon holds
+    /// ([`crate::Lexicon::edges`]), and for an own name with no spelling.
     #[must_use]
     pub fn non_word(reading: &crate::LexicalReading) -> Option<Self> {
         let onset = match reading {
             crate::LexicalReading::Word(_) => return None,
+            crate::LexicalReading::OwnName { name, form } => {
+                crate::pronunciation::default_onset(&crate::own_name_spelling(name, *form)?)
+            }
             crate::LexicalReading::Numeral { value, .. } => crate::numeral_onset(*value),
             crate::LexicalReading::FlavorWord { .. } => None,
         };

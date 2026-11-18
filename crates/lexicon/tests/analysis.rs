@@ -1138,7 +1138,7 @@ fn an_anchor_word_is_a_registered_label_on_the_cards_that_admit_it() {
     ));
     let text = "• Khans — At the beginning of combat on your turn, draw a card.";
     let readings = |scope: &[&str]| {
-        let scope = CardScope::own_names(scope.iter().map(|card| LexemeId::new(card)));
+        let scope = CardScope::full_names(scope.iter().copied());
         let analyzed = lexicon.analyze_source_scoped(text, None, &scope);
         (
             at(&analyzed, 2, 7)
@@ -1151,7 +1151,7 @@ fn an_anchor_word_is_a_registered_label_on_the_cards_that_admit_it() {
         )
     };
     // On its own card, the anchor word is the label and never a Flavor Word.
-    assert_eq!(readings(&["name:Citadel Siege"]), (true, false));
+    assert_eq!(readings(&["Citadel Siege"]), (true, false));
     // Elsewhere nothing declares the run, so it is an open Flavor Word.
     assert_eq!(readings(&[]), (false, true));
 }
@@ -1205,78 +1205,112 @@ fn lexical_ids_are_interned_across_declarations_values_and_wire_formats() {
 }
 
 #[test]
-fn a_shortened_name_is_admitted_only_on_its_own_card_and_realizes_alone() {
-    let card = Lexeme::card_name(
-        "card:Chandra, Pyromaster",
-        "Chandra, Pyromaster",
-        Some("Chandra".into()),
-        source("card:Chandra, Pyromaster"),
-    );
+fn an_own_name_is_admitted_only_where_its_scope_holds_its_form_and_realizes_alone() {
+    // Chandra, Pyromaster's own text shortens its name to *Chandra*
+    // [CR#201.5c].
+    let name = "Chandra, Pyromaster";
+    let card = Lexeme::card_name(name, source("name:Chandra, Pyromaster"));
+    assert_eq!(card.id, sylex_lexicon::card_name_id(name));
     let decoded: Lexeme = ron::from_str(&ron::to_string(&card).unwrap()).unwrap();
     assert_eq!(decoded, card);
     let lexicon = Lexicon::new([decoded, noun("subtype:Chandra", "Chandra")]).unwrap();
-    let name = |form| FeatureBundle {
-        name: Some(form),
-        ..FeatureBundle::default()
+    let own = |form| LexicalReading::OwnName {
+        name: name.to_owned(),
+        form,
     };
-    let shortened = word(
+    let shortened = own(NameForm::Shortened);
+    let full = own(NameForm::Full);
+    // Each form is spelled from the name alone, whatever the lexicon holds.
+    assert_eq!(lexicon.realize(&shortened).unwrap(), "Chandra");
+    assert_eq!(lexicon.realize(&full).unwrap(), name);
+    let other = word(
         card.id.as_str(),
         WordForm::Invariant,
-        name(NameForm::Shortened),
+        FeatureBundle::default(),
     );
-    assert_eq!(lexicon.realize(&shortened).unwrap(), "Chandra");
-    let scope = CardScope::own_names([card.id]);
-    for (scope, expected) in [
-        (CardScope::default(), false),
-        (CardScope::own_names([LexemeId::new("another-card")]), false),
-        (scope.clone(), true),
-    ] {
-        let input = lexicon.analyze_source_scoped("raw metadata", Some("Chandra"), &scope);
+    let every_form = CardScope::every_form([name]);
+    let full_only = CardScope::full_names([name]);
+    let elsewhere = CardScope::full_names(["Dark Depths"]);
+    let named = |text: &str, scope: &CardScope| -> Vec<LexicalReading> {
+        let input = lexicon.analyze_source_scoped("raw metadata", Some(text), scope);
         assert_eq!(input.raw, "raw metadata");
-        assert_eq!(input.text(), "Chandra");
-        let words: Vec<_> = input
-            .matches
-            .iter()
-            .filter(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == card.id))
-            .map(|m| m.reading.clone())
-            .collect();
-        assert_eq!(
-            words,
-            if expected { vec![shortened.clone()] } else { vec![] }
-        );
+        assert_eq!(input.text(), text);
+        // The subtype spelled like the Shortened Name stands on every card.
         assert!(input.matches.iter().any(
             |m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == "subtype:Chandra")
         ));
+        input
+            .matches
+            .iter()
+            .filter(|m| m.reading == other || matches!(m.reading, LexicalReading::OwnName { .. }))
+            .map(|m| m.reading.clone())
+            .collect()
+    };
+    // The Shortened form stands only where the scope holds that form.
+    assert_eq!(
+        named("Chandra", &every_form),
+        std::slice::from_ref(&shortened)
+    );
+    for scope in [&full_only, &elsewhere, &CardScope::default()] {
+        assert_eq!(named("Chandra", scope), []);
+        assert!(!lexicon.stands_in(&shortened, scope));
     }
-    // The Full form is admitted everywhere.
-    let full = word(card.id.as_str(), WordForm::Invariant, name(NameForm::Full));
-    for scope in [CardScope::default(), scope] {
-        let analyzed = lexicon.analyze_source_scoped("Chandra, Pyromaster", None, &scope);
-        assert!(analyzed.matches.iter().any(|m| m.reading == full));
+    // The full name is the card's own where the scope holds it, and
+    // another card's, the Lexeme's, everywhere else.
+    for scope in [&every_form, &full_only] {
+        let found = named(name, scope);
+        assert!(
+            found.contains(&full) && !found.contains(&other),
+            "{found:?}"
+        );
+        assert!(lexicon.stands_in(&full, scope) && !lexicon.stands_in(&other, scope));
+    }
+    for scope in [&elsewhere, &CardScope::default()] {
+        assert_eq!(named(name, scope), std::slice::from_ref(&other));
+        assert!(!lexicon.stands_in(&full, scope) && lexicon.stands_in(&other, scope));
     }
 }
 
 #[test]
-fn only_a_card_name_has_name_forms() {
-    // Chandra, Pyromaster's own text shortens its name to *Chandra*
-    // [CR#201.5c]: only a card name has a Shortened form, and only its own
-    // card admits it.
-    let mut card = Lexeme::card_name(
-        "card:Chandra, Pyromaster",
-        "Chandra, Pyromaster",
-        Some("Chandra".into()),
-        source("card:Chandra, Pyromaster"),
+fn a_scope_may_hold_a_name_no_lexeme_declares() {
+    // No card is named *Abuelo the Brave*; a text may be read as if on one.
+    let lexicon = Lexicon::new([noun("noun:card", "card")]).unwrap();
+    let name = "Abuelo the Brave";
+    let scope = CardScope::every_form([name]);
+    let analyzed = lexicon.analyze_source_scoped("Abuelo the Brave, Abuelo", None, &scope);
+    let own = |form| LexicalReading::OwnName {
+        name: name.to_owned(),
+        form,
+    };
+    assert_eq!(at(&analyzed, 0, 16), BTreeSet::from([own(NameForm::Full)]));
+    assert_eq!(
+        at(&analyzed, 18, 24),
+        BTreeSet::from([own(NameForm::Shortened)])
     );
+    assert_eq!(analyzed.unknown_words(), []);
+    // The full name written out is the name: its first word is no
+    // Shortened Name there.
+    assert_eq!(at(&analyzed, 0, 6), BTreeSet::new());
+    // Inside a longer word the spelling is no name.
+    let analyzed = lexicon.analyze_source_scoped("Abuelos", None, &scope);
+    assert_eq!(analyzed.matches, []);
+    // A name with no shortened spelling has no Shortened form to realize.
+    let progenitus = LexicalReading::OwnName {
+        name: "Progenitus".to_owned(),
+        form: NameForm::Shortened,
+    };
+    assert!(lexicon.realize(&progenitus).is_err());
+    assert!(lexicon.edges(&progenitus).is_err());
+}
+
+#[test]
+fn a_card_name_is_scoped_to_no_card_and_has_one_form() {
+    let mut card = Lexeme::card_name("Chandra, Pyromaster", source("name:Chandra, Pyromaster"));
     assert!(Lexicon::new([card.clone()]).is_ok());
-    card.card_name = false;
-    assert!(Lexicon::new([card.clone()]).is_err());
-    card.card_name = true;
     card.card_scope = BTreeSet::from([LexemeId::new("name:Chandra, Torch of Defiance")]);
     assert!(Lexicon::new([card.clone()]).is_err());
     card.card_scope.clear();
-    // A card name has one Full form.
-    card.forms
-        .retain(|slot| slot.features.name == Some(NameForm::Shortened));
+    card.forms[0].surface = Some("Chandra".into());
     assert!(Lexicon::new([card]).is_err());
 }
 
@@ -1294,19 +1328,19 @@ fn a_card_scope_admits_spellings_on_the_cards_it_names() {
     ]);
     let lexicon = Lexicon::new([token.clone()]).unwrap();
     let found = |scope: &[&str]| {
-        let scope = CardScope::own_names(scope.iter().map(|card| LexemeId::new(card)));
+        let scope = CardScope::full_names(scope.iter().copied());
         lexicon
             .analyze_source_scoped("Marit Lage", None, &scope)
             .matches
             .iter()
             .any(|m| matches!(&m.reading, LexicalReading::Word(v) if v.lexeme == token.id))
     };
-    assert!(found(&["name:Dark Depths"]));
-    assert!(found(&["name:Marit Lage's Slumber"]));
+    assert!(found(&["Dark Depths"]));
+    assert!(found(&["Marit Lage's Slumber"]));
     assert!(!found(&[]));
-    assert!(!found(&["name:Vampire Hexmage"]));
-    // The Lexeme's own identity is not one of the cards that admit it.
-    assert!(!found(&["introduced_name:Marit Lage"]));
+    assert!(!found(&["Vampire Hexmage"]));
+    // The Lexeme's own spelling names none of the cards that admit it.
+    assert!(!found(&["Marit Lage"]));
 }
 
 #[test]

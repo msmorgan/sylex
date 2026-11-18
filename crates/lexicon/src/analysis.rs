@@ -310,7 +310,7 @@ impl Lexicon {
                 }
                 result.surfaces.insert(value, surface);
             }
-            if let Some(reason) = card_scope_defect(&lexeme).or_else(|| agreement_defect(&lexeme)) {
+            if let Some(reason) = card_name_defect(&lexeme).or_else(|| agreement_defect(&lexeme)) {
                 return Err(error(reason));
             }
             if redundant_onset {
@@ -368,7 +368,9 @@ impl Lexicon {
                 .get(value)
                 .copied()
                 .ok_or(LexicalError::UnlicensedValue),
-            LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => {
+            LexicalReading::OwnName { .. }
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::FlavorWord { .. } => {
                 self.realize(reading)?;
                 crate::Edges::non_word(reading).ok_or(LexicalError::UnlicensedValue)
             }
@@ -413,6 +415,10 @@ impl Lexicon {
                 }
                 Ok(format!("{label} —"))
             }
+            // An own name is spelled exactly, from its name and form alone.
+            LexicalReading::OwnName { name, form } => crate::own_name_spelling(name, *form)
+                .filter(|spelling| valid_own_name(spelling))
+                .ok_or(LexicalError::UnlicensedValue),
             LexicalReading::Word(value) => {
                 let declared = self
                     .surfaces
@@ -567,10 +573,10 @@ impl Lexicon {
     /// Whether a lexical value stands in the text of a face whose card names
     /// are `scope`: analysis finds it there, and admission admits it there.
     ///
-    /// - A card name's Full form stands everywhere: in its scope it is the
-    ///   card's own name, and elsewhere another card's [CR#201.5]. Its
-    ///   Shortened form stands only where the scope holds that form
-    ///   [CR#201.5c].
+    /// - An own name stands only where the scope holds that form of that name
+    ///   [CR#201.5,201.5c].
+    /// - A card name's Lexeme, another card's name, stands everywhere but where
+    ///   the scope holds its name, which is the card's own there.
     /// - A card-scoped Lexeme, an Introduced Name or an Anchor Word, stands
     ///   only where the scope holds one of its cards.
     /// - A Flavor Word stands only where no label registered there spells it.
@@ -585,6 +591,7 @@ impl Lexicon {
     pub fn stands_in(&self, reading: &LexicalReading, scope: &crate::CardScope) -> bool {
         match reading {
             LexicalReading::Word(value) => self.word_stands_in(value, scope),
+            LexicalReading::OwnName { name, form } => scope.holds(name, *form),
             LexicalReading::FlavorWord { label } => {
                 self.registered_label(label, Some(scope)).is_none()
             }
@@ -597,13 +604,11 @@ impl Lexicon {
             .lexemes
             .get(&value.lexeme)
             .expect("a word value asked about scope is a Lexeme of this lexicon");
-        match value.features.name {
-            Some(crate::NameForm::Full) => true,
-            Some(form) => scope.holds(value.lexeme, form),
-            None => {
-                lexeme.card_scope.is_empty()
-                    || lexeme.card_scope.iter().any(|card| scope.holds_card(*card))
-            }
+        if lexeme.card_name {
+            !scope.holds_name(&lexeme.lemma)
+        } else {
+            lexeme.card_scope.is_empty()
+                || lexeme.card_scope.iter().any(|card| scope.holds_card(*card))
         }
     }
 
@@ -654,6 +659,33 @@ impl Lexicon {
                 }
             }
         }
+        // A name the scope holds is spelled by no Lexeme: each form of it
+        // is found wherever its spelling is written.
+        for (name, form) in scope.forms() {
+            let Some(spelling) = crate::own_name_spelling(name, form) else {
+                continue;
+            };
+            let spelling: Vec<char> = spelling.chars().collect();
+            if spelling.is_empty() || !valid_own_name_chars(&spelling) {
+                continue;
+            }
+            for start in 0..tokens.len().saturating_sub(spelling.len() - 1) {
+                if tokens[start..].starts_with(&spelling) {
+                    candidates.push((
+                        LexicalMatch {
+                            start,
+                            end: start + spelling.len(),
+                            reading: LexicalReading::OwnName {
+                                name: name.to_owned(),
+                                form,
+                            },
+                            case: None,
+                        },
+                        Binding::Free,
+                    ));
+                }
+            }
+        }
         // Prefixes expose a following word boundary; suffixes expose a
         // preceding one. Both passes follow increasing surface length, with
         // no grammar or host-category judgment at this boundary.
@@ -689,13 +721,49 @@ impl Lexicon {
                 (left && right).then_some(found)
             })
             .collect::<Vec<_>>();
+        // The full name written out is the name: its Shortened form is no
+        // name of its own inside it (*Instrument* in *Instrument of the
+        // Bards*).
+        let full_names: Vec<(usize, usize, String)> = matches
+            .iter()
+            .filter_map(|found| match &found.reading {
+                LexicalReading::OwnName {
+                    name,
+                    form: crate::NameForm::Full,
+                } => Some((found.start, found.end, name.clone())),
+                LexicalReading::OwnName {
+                    form: crate::NameForm::Shortened,
+                    ..
+                }
+                | LexicalReading::Word(_)
+                | LexicalReading::Numeral { .. }
+                | LexicalReading::FlavorWord { .. } => None,
+            })
+            .collect();
+        matches.retain(|found| match &found.reading {
+            LexicalReading::OwnName {
+                name,
+                form: crate::NameForm::Shortened,
+            } => !full_names.iter().any(|(start, end, full)| {
+                full == name && *start <= found.start && found.end <= *end
+            }),
+            LexicalReading::OwnName {
+                form: crate::NameForm::Full,
+                ..
+            }
+            | LexicalReading::Word(_)
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::FlavorWord { .. } => true,
+        });
         numeral_matches(&tokens, &mut matches);
         flavor_word_matches(&tokens, &mut matches);
         matches.retain(|found| match &found.reading {
             LexicalReading::FlavorWord { label } => {
                 self.title_cased(label) && self.stands_in(&found.reading, scope)
             }
-            LexicalReading::Word(_) | LexicalReading::Numeral { .. } => true,
+            LexicalReading::Word(_)
+            | LexicalReading::OwnName { .. }
+            | LexicalReading::Numeral { .. } => true,
         });
         AnalyzedText {
             raw: raw.to_owned(),
@@ -707,27 +775,31 @@ impl Lexicon {
     }
 }
 
-/// Why a Lexeme's card scope or name forms are malformed: a card name scoped
-/// to other cards, a card name without exactly one Full form and at most one
-/// Shortened form, or name forms on a Lexeme that is no card name.
-fn card_scope_defect(lexeme: &Lexeme) -> Option<&'static str> {
-    let names: Vec<_> = lexeme.forms.iter().map(|slot| slot.features.name).collect();
-    let count = |form| names.iter().filter(|name| **name == Some(form)).count();
+/// Why a card name's Lexeme is malformed: it is scoped to cards, has a
+/// second form, or is not spelled as its lemma, the full name.
+fn card_name_defect(lexeme: &Lexeme) -> Option<&'static str> {
     if !lexeme.card_name {
-        names
-            .iter()
-            .any(Option::is_some)
-            .then_some("name forms on a Lexeme that is no card name")
+        None
     } else if !lexeme.card_scope.is_empty() {
-        Some("a card name is scoped to its own card, never to others")
-    } else if names.iter().any(Option::is_none)
-        || count(crate::NameForm::Full) != 1
-        || count(crate::NameForm::Shortened) > 1
-    {
-        Some("a card name has one Full form and at most one Shortened form")
+        Some("a card name stands on every card, as its own name or another's")
+    } else if lexeme.forms.len() != 1 || lexeme.forms[0].surface.is_some() {
+        Some("a card name has one form, spelled as the full name")
     } else {
         None
     }
+}
+
+/// Whether a spelling is one an own name may have: a line of text that
+/// begins and ends with something written.
+fn valid_own_name(spelling: &str) -> bool {
+    valid_own_name_chars(&spelling.chars().collect::<Vec<_>>())
+}
+
+fn valid_own_name_chars(spelling: &[char]) -> bool {
+    let written = |ch: &char| !ch.is_whitespace();
+    spelling.first().is_some_and(written)
+        && spelling.last().is_some_and(written)
+        && !spelling.iter().any(|ch| ch.is_control())
 }
 
 /// Why a Lexeme's Adjacency Agreement paradigm is incomplete

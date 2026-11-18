@@ -133,6 +133,21 @@ pub struct LexicalValue {
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Ord, PartialOrd, Serialize)]
 pub enum LexicalReading {
     Word(LexicalValue),
-    FlavorWord { label: String },
-    Numeral { value: i32, notation: Numeral },
+    /// A card's own name in the text of its own face [CR#201.5]: the card's
+    /// full name and the form of it written, Full or Shortened [CR#201.5c].
+    /// It is spelled from these alone ([`crate::shortened_spelling`]) and
+    /// needs no Lexeme, so a text may be read as if on a card of any name.
+    /// It stands where the Card Scope holds that form of that name
+    /// ([`crate::Lexicon::stands_in`]).
+    OwnName {
+        name: String,
+        form: crate::NameForm,
+    },
+    FlavorWord {
+        label: String,
+    },
+    Numeral {
+        value: i32,
+        notation: Numeral,
+    },
 }
