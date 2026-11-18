@@ -1030,7 +1030,7 @@ fn clause(tokens: &[Tok<'_>], baseline: bool, families: &mut BTreeSet<Family>) {
                             && tokens[j].alts().iter().any(|a| {
                                 !a.auxiliary
                                     && a.frames.iter().any(|f| {
-                                        !f.active_only
+                                        f.voice.passive()
                                             && f.slots
                                                 .iter()
                                                 .any(|s| s.relation == SlotRelation::Object)

@@ -195,8 +195,8 @@
         // Restricted to active voice (CGEL, Ch. 16 §10.1.2, p. 1432, [17]);
         // the perfect auxiliary is the grammar's.
         (lemma: "have", third_singular: "has", past: "had",
-            frames: [Monotransitive, Transitive(KeywordPhrase), Transitive(QuotedAbility), Catenative(ToInf), ComplexCatenative(BareInf), ComplexCatenative(PastPart)],
-            active_only: true),
+            frames: [ActiveOnly(Monotransitive), ActiveOnly(Transitive(KeywordPhrase)), ActiveOnly(Transitive(QuotedAbility)),
+                ActiveOnly(Catenative(ToInf)), ActiveOnly(ComplexCatenative(BareInf)), ActiveOnly(ComplexCatenative(PastPart))]),
         // Only the perfect auxiliary (*hasn't been chosen*), which the grammar
         // names: dynamic *have* always negates with *do* (CGEL, Ch. 3 §2.5.6,
         // p. 111, [56]), as does stative *have* in the Oracle register (the

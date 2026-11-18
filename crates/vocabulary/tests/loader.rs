@@ -25,7 +25,6 @@ fn verb(lemma: &str, frames: Vec<FrameSpec>) -> VerbEntry {
         form_of: None,
         binding: None,
         frames,
-        active_only: false,
         classes: Vec::new(),
     }
 }
@@ -108,12 +107,25 @@ fn a_verb_has_a_frame() {
 }
 
 #[test]
-fn only_a_verb_with_frames_restricts_them_to_active_voice() {
+fn a_passive_only_frame_has_a_passive() {
     let mut sources = Sources::load().unwrap();
-    let mut auxiliary = verb("frobnicate", Vec::new());
-    auxiliary.active_only = true;
-    sources.closed_class.auxiliaries.push(auxiliary);
-    rejects(&sources, "restricts them to active voice");
+    sources.verbs.push(verb(
+        "frobnicate",
+        vec![FrameSpec::PassiveOnly(Box::new(FrameSpec::Intransitive))],
+    ));
+    rejects(&sources, "is Passive-only but has no passive");
+}
+
+#[test]
+fn a_frame_restricts_its_voice_once() {
+    let mut sources = Sources::load().unwrap();
+    sources.verbs.push(verb(
+        "frobnicate",
+        vec![FrameSpec::ActiveOnly(Box::new(FrameSpec::PassiveOnly(
+            Box::new(FrameSpec::Monotransitive),
+        )))],
+    ));
+    rejects(&sources, "inside a restricted frame");
 }
 
 #[test]

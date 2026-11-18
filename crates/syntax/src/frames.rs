@@ -242,23 +242,96 @@ pub struct FrameSlot {
     pub fill: SlotFill,
 }
 
+/// The voices a verb frame is realized in.
+#[derive(
+    Debug, Clone, Copy, Default, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize,
+)]
+pub enum FrameVoice {
+    /// Both: the active, and every passive the frame's shape derives.
+    #[default]
+    ActiveOrPassive,
+    /// Active only, deriving no passive Valence Alternation: *A packet of
+    /// cigarettes costs around seven dollars*, *Jill has the best
+    /// qualifications* (CGEL, Ch. 16 §10.1.2, p. 1432, [17]).
+    ActiveOnly,
+    /// Passive only, with no active: a verb restricted to the passive with
+    /// a particular complementation, as *say* with an object and an
+    /// infinitival (*Kim is said to be a manic depressive*; CGEL, Ch. 16
+    /// §10.1.2, p. 1435, [31]), or *deal* with two objects (*this creature
+    /// is dealt damage*).
+    PassiveOnly,
+}
+
+impl FrameVoice {
+    /// Whether the frame has an active.
+    #[must_use]
+    pub fn active(self) -> bool {
+        self != Self::PassiveOnly
+    }
+
+    /// Whether the frame derives its passives.
+    #[must_use]
+    pub fn passive(self) -> bool {
+        self != Self::ActiveOnly
+    }
+
+    /// The voices both admit, or `None` when they share none.
+    #[must_use]
+    pub fn meet(self, other: Self) -> Option<Self> {
+        match (self, other) {
+            (Self::ActiveOnly, Self::PassiveOnly) | (Self::PassiveOnly, Self::ActiveOnly) => None,
+            (Self::ActiveOrPassive, voice) | (voice, Self::ActiveOrPassive) => Some(voice),
+            (Self::ActiveOnly, Self::ActiveOnly) => Some(Self::ActiveOnly),
+            (Self::PassiveOnly, Self::PassiveOnly) => Some(Self::PassiveOnly),
+        }
+    }
+
+    #[expect(
+        clippy::trivially_copy_pass_by_ref,
+        reason = "serde's `skip_serializing_if` passes a reference"
+    )]
+    fn is_default(&self) -> bool {
+        *self == Self::ActiveOrPassive
+    }
+}
+
 /// An ordered list of the Complements a head licenses.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Ord, PartialOrd, Serialize)]
 pub struct Frame {
     pub family: FrameFamily,
     pub slots: Vec<FrameSlot>,
-    /// The frame is restricted to active voice, so it derives no passive
-    /// Valence Alternation: *A packet of cigarettes costs around seven
-    /// dollars*, *Jill has the best qualifications* (CGEL, Ch. 16 §10.1.2,
-    /// p. 1432, [17]).
-    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
-    pub active_only: bool,
+    #[serde(default, skip_serializing_if = "FrameVoice::is_default")]
+    pub voice: FrameVoice,
 }
 
 impl Frame {
-    /// Whether the slot list has the shape its family names.
+    /// Whether the slot list has the shape its family names, and a
+    /// Passive-only frame is one that passivizes: its first slot is an
+    /// Object Noun Phrase, or it is a Prepositional frame, whose
+    /// preposition's object is the passive's subject.
     #[must_use]
     pub fn is_well_formed(&self) -> bool {
+        self.has_family_shape() && (self.voice != FrameVoice::PassiveOnly || self.passivizes())
+    }
+
+    /// Whether the frame's shape derives a passive: verbal from an Object
+    /// Noun Phrase first, or prepositional from a Prepositional frame.
+    #[must_use]
+    pub fn passivizes(&self) -> bool {
+        match self.slots.first() {
+            Some(FrameSlot {
+                relation: SlotRelation::Object | SlotRelation::IndirectObject,
+                fill: SlotFill::NP,
+            }) => true,
+            Some(FrameSlot {
+                fill: SlotFill::PP(..),
+                ..
+            }) => self.family == FrameFamily::Prepositional,
+            _ => false,
+        }
+    }
+
+    fn has_family_shape(&self) -> bool {
         use SlotRelation::Complement;
         use SlotRelation::IndirectObject;
         use SlotRelation::Object;
@@ -499,10 +572,17 @@ impl FrameCatalog {
         let catalog: Self =
             ron::from_str(text).map_err(|error| LoadError::Format(error.to_string()))?;
         for (lexeme, frames) in &catalog.frames {
-            if let Some(frame) = frames.iter().find(|frame| !frame.is_well_formed()) {
-                return Err(LoadError::Invalid(format!(
-                    "frame {frame:?} of {lexeme} does not have the shape of its family"
-                )));
+            for frame in frames {
+                if !frame.has_family_shape() {
+                    return Err(LoadError::Invalid(format!(
+                        "frame {frame:?} of {lexeme} does not have the shape of its family"
+                    )));
+                }
+                if !frame.is_well_formed() {
+                    return Err(LoadError::Invalid(format!(
+                        "frame {frame:?} of {lexeme} is Passive-only but has no passive"
+                    )));
+                }
             }
         }
         Ok(catalog)
@@ -534,4 +614,22 @@ pub enum ParameterPart {
 
 fn complement_relation() -> SlotRelation {
     SlotRelation::Complement
+}
+
+#[cfg(test)]
+mod tests {
+    use super::FrameVoice::ActiveOnly;
+    use super::FrameVoice::ActiveOrPassive;
+    use super::FrameVoice::PassiveOnly;
+
+    /// An unlike frame has the voices every frame it unites has.
+    #[test]
+    fn frame_voices_meet_by_intersection() {
+        assert_eq!(ActiveOrPassive.meet(ActiveOrPassive), Some(ActiveOrPassive));
+        assert_eq!(ActiveOrPassive.meet(ActiveOnly), Some(ActiveOnly));
+        assert_eq!(PassiveOnly.meet(ActiveOrPassive), Some(PassiveOnly));
+        assert_eq!(PassiveOnly.meet(PassiveOnly), Some(PassiveOnly));
+        assert_eq!(ActiveOnly.meet(PassiveOnly), None);
+        assert_eq!(PassiveOnly.meet(ActiveOnly), None);
+    }
 }

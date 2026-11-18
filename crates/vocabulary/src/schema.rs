@@ -127,7 +127,8 @@ pub enum Catenation {
     PastPart,
 }
 
-/// A Subcategorization Frame as authored, in active voice only.
+/// A Subcategorization Frame as authored, its slots in their active-voice
+/// order.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 pub enum FrameSpec {
     Intransitive,
@@ -153,6 +154,12 @@ pub enum FrameSpec {
     Complement(FillSpec),
     /// A verb with a fixed preposition among its Complements: *come up heads*.
     Idiom(Vec<IdiomPart>),
+    /// A verb's frame restricted to active voice, deriving no passive (CGEL,
+    /// Ch. 16 §10.1.2, p. 1432, [17]): *costs {1} less*, *has flying*.
+    ActiveOnly(Box<FrameSpec>),
+    /// A verb's frame restricted to passive voice, with no active (CGEL,
+    /// Ch. 16 §10.1.2, p. 1435, [31]): *this creature is dealt damage*.
+    PassiveOnly(Box<FrameSpec>),
 }
 
 /// One Complement of an [`FrameSpec::Idiom`], in order.
@@ -179,10 +186,6 @@ pub struct FormOverride {
 /// A verb with its full paradigm and active Subcategorization Frames.
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize)]
 #[serde(deny_unknown_fields)]
-#[expect(
-    clippy::struct_excessive_bools,
-    reason = "independent declarations of the verb's class and paradigm"
-)]
 pub struct VerbEntry {
     pub lemma: String,
     /// The third-person singular present.
@@ -230,11 +233,6 @@ pub struct VerbEntry {
     /// Closed Word or Lexical Class member (perfect *have*, *hasn't*, *'ve*).
     #[serde(default)]
     pub frames: Vec<FrameSpec>,
-    /// Every frame is restricted to active voice and derives no passive
-    /// (CGEL, Ch. 16 §10.1.2, p. 1432): *costs {1} less*, *has flying*. Only
-    /// a verb with frames may declare it.
-    #[serde(default)]
-    pub active_only: bool,
     /// The Lexical Classes of the grammar it is a member of
     /// (`NamingVerb`: its Object is an object it brings into being, which
     /// the text may name, [CR#111.4]).

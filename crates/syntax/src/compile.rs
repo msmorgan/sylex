@@ -17,6 +17,7 @@ use crate::frames::Frame;
 use crate::frames::FrameCatalog;
 use crate::frames::FrameFamily;
 use crate::frames::FrameSlot;
+use crate::frames::FrameVoice;
 use crate::frames::Hosts;
 use crate::frames::PrepositionFrame;
 use crate::frames::SlotFill;
@@ -996,6 +997,13 @@ impl<'a> Binder<'a> {
                 if !frame.is_well_formed() {
                     return Err(invalid(format!("frame {frame:?} of `{id}` is ill-formed")));
                 }
+                if frame.voice != FrameVoice::ActiveOrPassive
+                    && facts.category != LexicalCategory::Verb
+                {
+                    return Err(invalid(format!(
+                        "frame {frame:?} of `{id}` restricts its voice, but only a verb's has one"
+                    )));
+                }
                 // A non-verb's Intransitive frame only makes its Complement
                 // optional (`optional_complement`); it is no frame a Valence
                 // schema heads, or the verb's Intransitive frame, which it
@@ -1019,7 +1027,8 @@ impl<'a> Binder<'a> {
             }
             facts.optional_complement =
                 list.is_empty() || list.iter().any(|f| f.family == FrameFamily::Intransitive);
-            facts.active_only = !list.is_empty() && list.iter().all(|f| f.active_only);
+            facts.active_only =
+                !list.is_empty() && list.iter().all(|f| f.voice == FrameVoice::ActiveOnly);
             for frame in unlike_frames(&grammar.unlike_slots, list) {
                 let index = intern(&mut frames, &frame);
                 facts.frames.insert(index);
@@ -3848,56 +3857,68 @@ impl<'a> Binder<'a> {
             // Raising (*the top or bottom of their library*).
             let gappable = gap_capable
                 && (head == LexicalCategory::Verb || frame.family == FrameFamily::NounComplement);
-            // Active, with every NP slot optionally extracted.
-            let mut family = self.valence_family(
-                lhs,
-                &active,
-                index,
-                cost,
-                &slots,
-                0,
-                false,
-                derivations.active,
-                gappable,
-                heavy_shift,
-            )?;
-            if let (Some(f), Some(first)) = (complement_kind, slots.first()) {
-                let kind = self.kind_value(f, first.kind())?;
+            // Active, with every NP slot optionally extracted, unless the
+            // frame is Passive-only.
+            if frame.voice.active() {
+                let mut family = self.valence_family(
+                    lhs,
+                    &active,
+                    index,
+                    cost,
+                    &slots,
+                    0,
+                    false,
+                    derivations.active,
+                    gappable,
+                    heavy_shift,
+                )?;
+                if let (Some(f), Some(first)) = (complement_kind, slots.first()) {
+                    let kind = self.kind_value(f, first.kind())?;
+                    for draft in &mut family {
+                        draft.equations.push((Path::Mother(f), Target::Value(kind)));
+                    }
+                }
                 for draft in &mut family {
-                    draft.equations.push((Path::Mother(f), Target::Value(kind)));
+                    draft.unshared.extend(&derivations.unshared);
                 }
+                let site = match derivations.central {
+                    Some(_)
+                        if matches!(
+                            frame.family,
+                            FrameFamily::Catenative | FrameFamily::ComplexCatenative
+                        ) =>
+                    {
+                        CentralSite::None
+                    }
+                    Some(decl) if decl.families.contains(&frame.family) => CentralSite::AnyHead,
+                    Some(decl)
+                        if self.out.classes[decl.class]
+                            .iter()
+                            .any(|&member| self.out.facts(member).frames.contains(&index)) =>
+                    {
+                        CentralSite::ClassHead
+                    }
+                    Some(_) | None => CentralSite::None,
+                };
+                for draft in &mut family {
+                    if draft.children.len() > 1 {
+                        draft.central_site = site;
+                    }
+                }
+                drafts.extend(family);
             }
-            for draft in &mut family {
-                draft.unshared.extend(&derivations.unshared);
+            if frame.voice == FrameVoice::PassiveOnly && derivations.passive.is_none() {
+                return Err(invalid(format!(
+                    "valence `{phrase}`: the Passive-only frame `{}` needs the schema's passive",
+                    frame_label(frame)
+                )));
             }
-            let site = match derivations.central {
-                Some(_)
-                    if matches!(
-                        frame.family,
-                        FrameFamily::Catenative | FrameFamily::ComplexCatenative
-                    ) =>
-                {
-                    CentralSite::None
-                }
-                Some(decl) if decl.families.contains(&frame.family) => CentralSite::AnyHead,
-                Some(decl)
-                    if self.out.classes[decl.class]
-                        .iter()
-                        .any(|&member| self.out.facts(member).frames.contains(&index)) =>
-                {
-                    CentralSite::ClassHead
-                }
-                Some(_) | None => CentralSite::None,
-            };
-            for draft in &mut family {
-                if draft.children.len() > 1 {
-                    draft.central_site = site;
-                }
-            }
-            drafts.extend(family);
-            // A frame restricted to active voice derives no passive of any
-            // kind: verbal, prepositional or adjectival.
-            let passive = derivations.passive.as_ref().filter(|_| !frame.active_only);
+            // An Active-only frame derives no passive of any kind: verbal,
+            // prepositional or adjectival.
+            let passive = derivations
+                .passive
+                .as_ref()
+                .filter(|_| frame.voice.passive());
             if let (Some(passive), true) = (passive, head == LexicalCategory::Verb)
                 && matches!(slots.first(), Some(SlotFill::NP))
             {
@@ -6339,7 +6360,8 @@ pub(crate) fn frame_name(phrase: &str, frame: &Frame) -> String {
 }
 
 /// A frame's name: its family and the fill of each slot, as in
-/// `Monotransitive(NP)` or `Copular(Pred)[ActiveOnly]`.
+/// `Monotransitive(NP)`, `Copular(Pred)[ActiveOnly]` or
+/// `Ditransitive(NP,NP)[PassiveOnly]`.
 pub(crate) fn frame_label(frame: &Frame) -> String {
     let slots: Vec<String> = frame
         .slots
@@ -6354,7 +6376,11 @@ pub(crate) fn frame_label(frame: &Frame) -> String {
         FrameFamily::Intransitive => "Intransitive".to_owned(),
         family => format!("{family:?}"),
     };
-    let voice = if frame.active_only { "[ActiveOnly]" } else { "" };
+    let voice = match frame.voice {
+        FrameVoice::ActiveOrPassive => "",
+        FrameVoice::ActiveOnly => "[ActiveOnly]",
+        FrameVoice::PassiveOnly => "[PassiveOnly]",
+    };
     format!("{family}({}){voice}", slots.join(","))
 }
 
@@ -6362,14 +6388,15 @@ pub(crate) fn frame_label(frame: &Frame) -> String {
 /// slots: where frames of one family differ only in one slot, whose fills
 /// are two or more of an unlike slot's kinds, a frame with that slot's
 /// unlike coordination of those kinds there (CGEL, Ch. 15 §3.1, p. 1323,
-/// rule [1]). It is active-only if any of them is.
+/// rule [1]). It has the voices all of them have, and there is none when
+/// an Active-only frame meets a Passive-only one.
 fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Frame> {
     let mut derived = Vec::new();
     for (index, (name, kinds)) in slots.iter().enumerate() {
         let slot = u8::try_from(index).expect("at most 256 unlike slots");
         // (family, varied position, every other slot, its relation) -> the
-        // kinds selected there, and whether any such frame is active-only.
-        let mut groups: BTreeMap<_, (BTreeSet<SlotKind>, bool)> = BTreeMap::new();
+        // kinds selected there, and the voices all such frames have.
+        let mut groups: BTreeMap<_, (BTreeSet<SlotKind>, Option<FrameVoice>)> = BTreeMap::new();
         for frame in frames {
             for (at, varied) in frame.slots.iter().enumerate() {
                 let kind = varied.fill.kind();
@@ -6380,15 +6407,15 @@ fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Fram
                 rest.remove(at);
                 let group = groups
                     .entry((frame.family, at, rest, varied.relation))
-                    .or_default();
+                    .or_insert((BTreeSet::new(), Some(FrameVoice::ActiveOrPassive)));
                 group.0.insert(kind);
-                group.1 |= frame.active_only;
+                group.1 = group.1.and_then(|voice| voice.meet(frame.voice));
             }
         }
-        for ((family, at, rest, relation), (selected, active_only)) in groups {
-            if selected.len() < 2 {
+        for ((family, at, rest, relation), (selected, voice)) in groups {
+            let Some(voice) = voice.filter(|_| selected.len() >= 2) else {
                 continue;
-            }
+            };
             let mut slots = rest;
             slots.insert(
                 at,
@@ -6400,7 +6427,7 @@ fn unlike_frames(slots: &[(Ident, Vec<SlotKind>)], frames: &[Frame]) -> Vec<Fram
             derived.push(Frame {
                 family,
                 slots,
-                active_only,
+                voice,
             });
         }
     }

@@ -658,6 +658,7 @@ fn normal_form_identifies_same_head_complement_priority() {
     use sylex_syntax::frames::Frame;
     use sylex_syntax::frames::FrameFamily;
     use sylex_syntax::frames::FrameSlot;
+    use sylex_syntax::frames::FrameVoice;
     use sylex_syntax::frames::SlotFill;
     use sylex_syntax::frames::SlotRelation;
     let s = seed();
@@ -675,7 +676,7 @@ fn normal_form_identifies_same_head_complement_priority() {
                 relation: SlotRelation::Object,
                 fill: SlotFill::NP,
             }],
-            active_only: false,
+            voice: FrameVoice::ActiveOrPassive,
         }),
         children: vp.children[..2].to_vec(),
         ..vp.clone()

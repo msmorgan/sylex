@@ -22,6 +22,7 @@ use sylex_syntax::frames::ClauseKind;
 use sylex_syntax::frames::Frame;
 use sylex_syntax::frames::FrameFamily;
 use sylex_syntax::frames::FrameSlot;
+use sylex_syntax::frames::FrameVoice;
 use sylex_syntax::frames::ParameterPart;
 use sylex_syntax::frames::PrepositionFrame;
 use sylex_syntax::frames::SlotFill;
@@ -54,8 +55,6 @@ pub(crate) struct Builder {
     parameters: std::collections::BTreeMap<LexemeId, Vec<Vec<sylex_syntax::frames::ParameterPart>>>,
     pub(crate) lexemes: Vec<Lexeme>,
     frames: Vec<(LexemeId, Category, Vec<FrameSpec>, String)>,
-    /// Verbs whose every frame is restricted to active voice.
-    active_only: std::collections::BTreeSet<LexemeId>,
     prepositions: Vec<(LexemeId, Vec<PrepositionFrameSpec>, String)>,
 }
 
@@ -166,11 +165,6 @@ impl Builder {
         if entry.frames.is_empty() && !auxiliary {
             return Err(invalid(
                 "a verb declares at least one Subcategorization Frame",
-            ));
-        }
-        if entry.active_only && entry.frames.is_empty() {
-            return Err(invalid(
-                "only a verb with frames restricts them to active voice",
             ));
         }
         if entry.binding.is_some() && !auxiliary {
@@ -304,9 +298,6 @@ impl Builder {
         let id = lexeme.id;
         self.push(lexeme);
         self.frames(id, Category::Verb, &entry.frames);
-        if entry.active_only {
-            self.active_only.insert(id);
-        }
         Ok(())
     }
 
@@ -487,8 +478,7 @@ impl Builder {
         for (id, category, specs, owner) in &self.frames {
             let mut frames = Vec::new();
             for spec in specs {
-                let mut frame = resolver.frame(spec, *category, owner)?;
-                frame.active_only = self.active_only.contains(id);
+                let frame = resolver.frame(spec, *category, owner)?;
                 if frames.contains(&frame) {
                     return Err(SourceError::Invalid(format!(
                         "`{owner}` declares {spec:?} twice"
@@ -602,14 +592,47 @@ impl Resolver<'_> {
         })
     }
 
-    /// The engine Frame an authored frame of a `category` head declares.
+    /// The engine Frame an authored frame of a `category` head declares,
+    /// with the voices it restricts a verb's frame to.
     fn frame(
         &self,
         spec: &FrameSpec,
         category: Category,
         owner: &str,
     ) -> Result<Frame, SourceError> {
+        let (shape, voice) = match spec {
+            FrameSpec::ActiveOnly(shape) => (&**shape, FrameVoice::ActiveOnly),
+            FrameSpec::PassiveOnly(shape) => (&**shape, FrameVoice::PassiveOnly),
+            shape => (shape, FrameVoice::ActiveOrPassive),
+        };
+        if voice != FrameVoice::ActiveOrPassive && category != Category::Verb {
+            return Err(SourceError::Invalid(format!(
+                "`{owner}`: only a verb's frame restricts its voice, not {spec:?}"
+            )));
+        }
+        let mut frame = self.shaped_frame(shape, category, owner)?;
+        frame.voice = voice;
+        if !frame.is_well_formed() {
+            return Err(SourceError::Invalid(format!(
+                "`{owner}`: {spec:?} is Passive-only but has no passive"
+            )));
+        }
+        Ok(frame)
+    }
+
+    /// The engine Frame of an authored frame's shape, in both voices.
+    fn shaped_frame(
+        &self,
+        spec: &FrameSpec,
+        category: Category,
+        owner: &str,
+    ) -> Result<Frame, SourceError> {
         let (family, slots) = match spec {
+            FrameSpec::ActiveOnly(_) | FrameSpec::PassiveOnly(_) => {
+                return Err(SourceError::Invalid(format!(
+                    "`{owner}`: {spec:?} restricts a frame's voice inside a restricted frame"
+                )));
+            }
             FrameSpec::Intransitive => (FrameFamily::Intransitive, vec![]),
             FrameSpec::Monotransitive => (
                 FrameFamily::Monotransitive,
@@ -734,7 +757,7 @@ impl Resolver<'_> {
         let frame = Frame {
             family,
             slots,
-            active_only: false,
+            voice: FrameVoice::ActiveOrPassive,
         };
         if !frame.is_well_formed() {
             return Err(SourceError::Invalid(format!(
