@@ -34,6 +34,7 @@
 //! parameters KeywordParameters { head: Keyword, ... }
 //! valence VerbPhrase { head: Verb, active: [eq, ...], clusters: { cluster: ..., ... }, ... }
 //! coordination NounPhrase { coordinators: And, ... } where eq, ...
+//! coordination over [Mention, Kind] { coordinators: Coordinator }  // one schema per Category
 //! ```
 //!
 //! A Production's name is capitalized; the keywords are lowercase. A Schema's
@@ -41,7 +42,9 @@
 //! the coordinated Category), and its props are named as the [`SchemaDecl`]
 //! fields, as a Production's are named as the [`ProductionDecl`] fields; a
 //! `cost` defaults to 1, and to 0 on `valence`. An adjunct's or
-//! coordination's equations go in `where`. Category, Production and Schema
+//! coordination's equations go in `where`. A coordination named `over` is
+//! one declaration for each Category in its list: a feature it names that a
+//! Category does not carry says nothing of that Category. Category, Production and Schema
 //! items are read through the `serde` derives of those types, so their field
 //! names, defaults and unknown-field rejection are declared there alone; a
 //! flag reads as `true`, and a flag may also be written `key: true`.
@@ -1041,21 +1044,47 @@ fn category(item: &mut Item) -> Result<CategoryDecl, LoadError> {
     read(item.record(vec![("category", parent), ("features", features)], None)?)
 }
 
-fn schema(keyword: &str, item: &mut Item) -> Result<SchemaDecl, LoadError> {
+/// The Schemas an item declares: one, or for `coordination over [A, B]` one
+/// per listed Category.
+fn schemas(keyword: &str, item: &mut Item) -> Result<Vec<SchemaDecl>, LoadError> {
     let Some((_, field)) = SCHEMAS.iter().find(|(k, _)| *k == keyword) else {
         return fail(
             item.at,
             format!("unknown keyword `{keyword}`; a Production's name is capitalized"),
         );
     };
-    let name = item.ident(&item.name.clone());
+    let names = if keyword == "coordination" && item.name == "over" {
+        let Some(categories) = item.list.take().filter(|list| list.len() > 1) else {
+            return fail(
+                item.at,
+                "a coordination over several Categories is `coordination over [A, B, ...]`",
+            );
+        };
+        // A written list names nothing twice.
+        Seq::list(categories.clone()).map_err(|e| e.load(item.at))?;
+        categories
+            .into_iter()
+            .map(|category| category.name().map_err(|e| e.load(item.at)))
+            .collect::<Result<Vec<_>, _>>()?
+    } else {
+        vec![item.ident(&item.name.clone())]
+    };
     // Only an adjunct's and a coordination's equations are written in `where`.
     let where_field = matches!(keyword, "adjunct" | "coordination").then_some("equations");
-    let record = item.record(vec![(field, Some(name))], where_field)?;
-    read(Value::new(
-        ValueKind::Call(keyword.to_owned(), vec![record]),
-        item.at,
-    ))
+    let props = item.props.take();
+    let equations = item.equations.take();
+    names
+        .into_iter()
+        .map(|name| {
+            item.props.clone_from(&props);
+            item.equations.clone_from(&equations);
+            let record = item.record(vec![(field, Some(name))], where_field)?;
+            read(Value::new(
+                ValueKind::Call(keyword.to_owned(), vec![record]),
+                item.at,
+            ))
+        })
+        .collect()
 }
 
 /// A feature's values and whether it is local (`{ local }`).
@@ -1236,7 +1265,7 @@ impl Builder {
                 false
             }
             Some(keyword) => {
-                grammar.schemas.push(schema(keyword, &mut item)?);
+                grammar.schemas.extend(schemas(keyword, &mut item)?);
                 false
             }
         };

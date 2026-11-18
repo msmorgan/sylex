@@ -83,8 +83,10 @@ pub struct Grammar {
     /// a `complement_kind` feature takes for it.
     pub unlike_slots: Vec<(Ident, Vec<SlotKind>)>,
     /// Equations on every Frame Slot child of that kind in a derived valence
-    /// phrase, over the child `slot`: what fills the slot as a Complement
-    /// (a Noun Phrase Complement is never nominative).
+    /// phrase, over the child `slot` and the phrase `$`: what fills the slot
+    /// as a Complement (a Noun Phrase Complement is never nominative) and
+    /// what the phrase takes from it (a temporal preposition's phrase its
+    /// Clause's time).
     pub slot_equations: BTreeMap<SlotKind, Vec<Equation>>,
     /// Complement Constraints by name (`constraint Name { ... }`), which a
     /// Preposition Frame names (`PrepositionFrame::constraints`).
@@ -253,6 +255,13 @@ pub struct ProductionDecl {
     /// never also attached beside it (`docs/design/english.md` §8).
     #[serde(default)]
     pub unadjoined: Vec<(Ident, Vec<Ident>)>,
+    /// Children that the named `dependents` declarations do not apply to,
+    /// each a child they would otherwise call `dependent`: one the
+    /// Production's head relates to differently from every other head (perfect
+    /// *have*'s Complement gives it no time). Naming a declaration that does
+    /// not list the child's Category is a load error.
+    #[serde(default)]
+    pub exempt: Vec<(Ident, Vec<Ident>)>,
     /// Children through which a Gap may pass to the mother. A Gap passes
     /// up through no other child: an auxiliary marks its Verb Phrase
     /// Complement transparent, so extraction works across every verb form
@@ -399,7 +408,8 @@ pub enum Equation {
 /// equations call it `dependent`, and may name the Production's `head` and
 /// its mother `$`. Each equation applies to each dependent of a Production
 /// where every path it names resolves: the mother or the named child carries
-/// the feature. One that applies to no Production is a load error.
+/// the feature. One that applies to no Production is a load error. An
+/// authored Production may exempt a child (`ProductionDecl::exempt`).
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DependentsDecl {
     pub name: Ident,
@@ -593,11 +603,12 @@ pub enum SchemaDecl {
         /// Adjunct category permitted before a selected PP or shifted Object.
         #[serde(default)]
         interleaved: Option<Ident>,
-        /// Adjunct category permitted only before the Internalized Complement
-        /// of a passive, a non-core Complement (CGEL, Ch. 4 §3.2.1, p. 241),
-        /// beside the `interleaved` one.
+        /// Equations on an `interleaved` Adjunct before any Complement or
+        /// shifted Object but a passive's Internalized Complement, a non-core
+        /// Complement (CGEL, Ch. 4 §3.2.1, p. 241), over the child `adjunct`:
+        /// what interleaves only before the *by* phrase fails them.
         #[serde(default)]
-        interleaved_internalized: Option<Ident>,
+        interleaved_core: Vec<Equation>,
         /// Function Category of an Adjunct in central position between a
         /// verb and its first Complement (*is [still] on top of your
         /// library*, *is [still] a land*), derived from a frame of
@@ -805,6 +816,15 @@ pub enum SchemaDecl {
         /// `AdjunctClustersDecl`).
         #[serde(default)]
         parallel: bool,
+        /// A contrastive coordination: the Closed Word that negates its
+        /// second coordinate, the `modifier` between the coordinator and the
+        /// last conjunct (*Jill but not her husband*; CGEL, Ch. 15 §2.6,
+        /// p. 1313, [60iia]). It derives the binary coordination, plain and
+        /// with the `delimiter`, and nothing else: no serial or correlative
+        /// one and no Right Node Raising. A load error with `link`, `serial`,
+        /// `unlike`, `remnant` or `raising_delimiter`.
+        #[serde(default)]
+        negator: Option<Ident>,
     },
 }
 

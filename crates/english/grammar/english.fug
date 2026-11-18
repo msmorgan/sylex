@@ -403,7 +403,7 @@ category TargetingMarker : DeterminerPhrase [
 ]
 // A Preposition Phrase's Number and Determination are its Complement's
 // (*up to two*, a determiner; *of them*, a partitive oblique), and so is its
-// time (a TemporalClause's).
+// time (slot `TemporalClause`).
 category PrepositionPhrase [
     ComplementKind, Number, Determination, Case, NounKind, Countability, DeterminativeDistribution,
     PastTime, NonPastTime,
@@ -460,18 +460,6 @@ category IdiomaticCoordinate
 // end step*; CGEL 15§4.5:1347–1348).
 category ClauseFragment
 category QualifyingFragment
-// A positive and a *not* coordinate joined by *but* (*from your graveyard,
-// but not from anywhere else*; CGEL 15§2.6:1313), and each coordinate.
-category ContrastConjunct : NounPhrase [Polarity] { function }
-category ContrastCoordination : NounPhrase [Polarity] { function }
-category ContrastPrepositionConjunct : PrepositionPhrase [
-    ComplementKind, Number, Determination, Case, NounKind, Countability, DeterminativeDistribution,
-    Polarity,
-] { function }
-category ContrastPrepositionCoordination : PrepositionPhrase [
-    ComplementKind, Number, Determination, Case, NounKind, Countability, DeterminativeDistribution,
-    Polarity,
-] { function }
 // Unlike premodifiers coordinated, with a coordinator or asyndetically
 // (*noncreature, nonland card*), and each premodifier.
 category Attributes [ComplementKind] { function }
@@ -499,11 +487,8 @@ category AdjunctCoordination : PredicateAdjunct [ComplementKind, PastTime, NonPa
 // twice*, *more than three times*).
 category Adverbial { function }
 // The Adjunct function before a selected Complement or shifted Object.
-category Interleaved [PastTime, NonPastTime] { function }
-// The Adjunct function before a passive's Internalized Complement only, the
-// *by* phrase (CGEL 4§3.2.1:241); an admission gate (english.md §6), see
-// InterleavedManner.
-category InternalizedInterleaved { function }
+// NounKind is a Noun Phrase Adjunct's (InterleavedManner).
+category Interleaved [PastTime, NonPastTime, NounKind] { function }
 // The Adjunct function in central position between *be* or a copula and
 // its Complement (*is still on top of your library*, *become no longer
 // suspected*; english.md §3).
@@ -541,11 +526,9 @@ category BoundKeyword [KeywordForm, FinalParameter]
 category Amount [QuantityNumber, Sign, ComplementKind]
 category SignedAmount [Adjustment]
 category Cost
-category FiniteClause : Clause
-// A temporal preposition's Clause, whose time its Preposition Phrase takes
-// (*when*, *whenever*, *until*, *before*, *after*, *while*, *as*; CGEL
-// 8§6:700).
-category TemporalClause : Clause [PastTime, NonPastTime]
+// A preposition's or verb's finite Clause Complement. It carries its time,
+// which a temporal preposition's phrase takes (slot `TemporalClause`).
+category FiniteClause : Clause [PastTime, NonPastTime]
 // The Complement of *than* or equative *as* (CGEL 13§2.1:1108).
 category ComparativeClause : Clause
 category ExpandableClause : Clause
@@ -565,15 +548,9 @@ category BareInf : VerbPhrase [Number, Person, VerbForm, Voice, PastTime, NonPas
     gap,
     closed_gaps: [Pred],
 }
-// Passive or progressive *be*'s participial Complement (*is being __*).
+// An auxiliary's participial Complement: passive or progressive *be*'s (*is
+// being __*) and perfect *have*'s (*have been __*).
 category AuxiliaryComplement : VerbPhrase [VerbForm, Voice, VerbKind, PastTime, NonPastTime] {
-    gap,
-    closed_gaps: [Pred],
-    function,
-}
-// Perfect *have*'s participial Complement (*have been __*), which gives
-// *have* no time (TimeGiving).
-category PerfectComplement : VerbPhrase [VerbForm, Voice, VerbKind] {
     gap,
     closed_gaps: [Pred],
     function,
@@ -769,7 +746,13 @@ slot UnlikeObject = ObjectCoordination { unlike: [NP, KeywordPhrase, QuotedAbili
 // keyword costs and keyword actions.
 slot Cost = SymbolCosts
 slot FiniteClause = FiniteClause
-slot TemporalClause = TemporalClause
+// A temporal preposition's phrase takes its Clause's time (*when*,
+// *whenever*, *until*, *before*, *after*, *while*, *as*; CGEL 8§6:700); any
+// other preposition's has none (a conditional clause is independent of its
+// host in time, CGEL 8§14.1.2:743).
+slot TemporalClause = FiniteClause
+    where $.PastTime = slot.PastTime,
+          $.NonPastTime = slot.NonPastTime
 slot ComparativeClause = ComparativeClause
 slot ExpandableClause = ExpandableClause
 slot SetOffClause = SetOffClause
@@ -1262,8 +1245,6 @@ CentralAdverbial: VerbPhrase -> adjunct:AdverbPhrase VerbPhrase { transparent: [
 
 // A Gap passes through an auxiliary's Complement.
 AuxiliaryParticiple: AuxiliaryComplement -> VerbPhrase { transparent: [head] }
-// Twin: AuxiliaryParticiple.
-PerfectParticiple: PerfectComplement -> VerbPhrase { transparent: [head] }
 // A finite auxiliary stranded before its Complement's ellipsis site (*If
 // you can't, ...*). Only a coordinator, punctuation or the head it is a
 // dependent of may follow: a dependent there would be the Complement. Nor
@@ -1296,13 +1277,18 @@ Progressive: VerbPhrase -> Class(BeVerb) complement:AuxiliaryComplement {
     where complement.VerbForm = GerundParticiple,
           $.Voice = complement.Voice
 // The perfect takes an active participle phrase or a passive one
-// headed by *been*.
-Perfect: VerbPhrase -> Class(HaveVerb) complement:PerfectComplement { transparent: [complement] }
+// headed by *been*. Its Complement gives *have* no time (`exempt`): the
+// perfect is itself a past tense (CGEL 3§5:139).
+Perfect: VerbPhrase -> Class(HaveVerb) complement:AuxiliaryComplement {
+    transparent: [complement],
+    exempt: [complement -> [TimeGiving]],
+}
     where complement.VerbForm = PastParticiple,
           complement.Voice := Active,
           $.Voice = Active
-PassivePerfect: VerbPhrase -> Class(HaveVerb) complement:PerfectComplement {
+PassivePerfect: VerbPhrase -> Class(HaveVerb) complement:AuxiliaryComplement {
     transparent: [complement],
+    exempt: [complement -> [TimeGiving]],
 }
     where complement.VerbForm = PastParticiple,
           complement.Voice = Passive,
@@ -1416,8 +1402,9 @@ InterleavedTemporal: Interleaved -> TemporalNounPhrase { cost: 0 }
 // Object ends in a participle or relative clause: an Adjunct of *put*
 // before *into your hand* instead of *revealed*'s (*Put all creature cards
 // revealed this way into your hand*, Beast Hunt). The gate also refuses
-// *deals 3 damage this way to any target*.
-InterleavedManner: InternalizedInterleaved -> NounPhrase { cost: 0 } where head.NounKind := Manner
+// *deals 3 damage this way to any target*. The gate is the Verb Phrase
+// valence's `interleaved_core`, an admission gate (english.md §6).
+InterleavedManner: Interleaved -> NounPhrase { cost: 0 } where head.NounKind := Manner
 // An end adverb before a later Complement (*divided evenly among*);
 // InterleavedSupplement, a comma-set participial one (*deals half X damage,
 // rounded down, to any target*).
@@ -3162,15 +3149,6 @@ MeasureObjectConjunct: ObjectConjunct -> filler:MeasureNounPhrase where $.Comple
 QuotedObjectConjunct: ObjectConjunct -> filler:QuotedAbility where $.ComplementKind = QuotedAbility
 AmountConjunct: AmountOrNounConjunct -> filler:Amount where $.ComplementKind = Amount
 NounPhraseConjunct: AmountOrNounConjunct -> filler:ComplementNounPhrase where $.ComplementKind = NP
-AffirmativeConjunct: ContrastConjunct -> filler:ComplementNounPhrase where $.Polarity = Affirmative
-NegatedConjunct: ContrastConjunct -> modifier:Word(Not) filler:ComplementNounPhrase
-    where $.Polarity = Negative
-ContrastedComplement: ComplementNounPhrase -> filler:ContrastCoordination
-AffirmativePrepositionConjunct: ContrastPrepositionConjunct -> PrepositionPhrase
-    where $.Polarity = Affirmative
-NegatedPrepositionConjunct: ContrastPrepositionConjunct -> modifier:Word(Not) PrepositionPhrase
-    where $.Polarity = Negative
-ContrastedPrepositionPhrase: PrepositionPhrase -> ContrastPrepositionCoordination
 AdjectivalConjunct: PostmodifierConjunct -> filler:AdjectivePhrase { heavy: [filler] }
     where filler.Voice != Passive,
           $.ComplementKind = AdjP
@@ -3329,9 +3307,6 @@ PostposedAdjective: PostposedModifier -> AdjectivePhrase { cost: 5, heavy: [head
 // subordinate clauses, so never *until [they exile a nonland card, then you
 // may cast it]*.
 FiniteComplementClause: FiniteClause -> Clause { unlinked: [head] } where head.VerbForm = Finite
-// Twin: FiniteComplementClause.
-TemporalComplementClause: TemporalClause -> Clause { unlinked: [head] }
-    where head.VerbForm = Finite
 // A comparative clause has a gap where its comparative governor
 // corresponds (CGEL 13§2.1:1108): a Gap (*as many cards as they discarded
 // __ this way*, Forget), or, where an auxiliary or *do* is stranded, one
@@ -3476,7 +3451,7 @@ valence VerbPhrase {
         head.AdjectivalPassive != Lexical, head.VerbKind != Auxiliary,
     ],
     interleaved: Interleaved,
-    interleaved_internalized: InternalizedInterleaved,
+    interleaved_core: [adjunct.NounKind != Manner],
     central: CentralAdjunct,
     central_heads: BeVerb,
     central_families: [Copular],
@@ -3523,8 +3498,7 @@ valence PrepositionPhrase {
     agree: [
         Number -> Number, Number -> QuantityNumber, Determination -> Determination, Case -> Case,
         NounKind -> NounKind, Countability -> Countability,
-        DeterminativeDistribution -> DeterminativeDistribution, PastTime -> PastTime,
-        NonPastTime -> NonPastTime,
+        DeterminativeDistribution -> DeterminativeDistribution,
     ],
     remnants: [NP -> PrepositionRemnant],
 }
@@ -3555,8 +3529,8 @@ valence PrepositionPhrase {
 // progressive aspect (CGEL 14§4.2.2:1217; its futurate use, *At that time
 // he was still arriving tomorrow*, is, and the grammar does not tell the two
 // apart). Perfect
-// *have*'s Complement gives none (PerfectComplement): the perfect is itself a
-// past tense (CGEL 3§5:139). A Nominal carries no time, so a temporal clause
+// *have*'s Complement gives none (Perfect and PassivePerfect exempt it): the
+// perfect is itself a past tense (CGEL 3§5:139). A Nominal carries no time, so a temporal clause
 // that modifies one is free (*the player's life total before the damage was
 // dealt*, Soul Burn).
 dependents TimeGiving = [
@@ -3748,14 +3722,17 @@ coordination VerbPhrase {
 }
     where $.CentralPosition = first.CentralPosition
 coordination KeywordPhrase { coordinators: Coordinator, unshared: [KeywordForm, FinalParameter] }
-// *"A" and "B"*; *"A," "B," and "C."*
-coordination QuotedAbility { coordinators: Coordinator }
-// *left or right*; *artifact, creature, or land*.
-coordination Mention { coordinators: Coordinator }
-coordination SpecifyingValue { coordinators: Coordinator }
-// *named Crown of Empires and Scepter of Empires*; *from among Disenchant,
-// Braingeyser, ..., and Black Lotus*.
-coordination NameComplement { coordinators: Coordinator }
+// Categories whose conjuncts share every feature. QuotedAbility: *"A" and
+// "B"*; *"A," "B," and "C."*. Mention: *left or right*; *artifact, creature,
+// or land*. NameComplement: *named Crown of Empires and Scepter of Empires*;
+// *from among Disenchant, Braingeyser, ..., and Black Lotus*.
+// InterrogativeClause: *which creatures block and how those creatures
+// block*. Kind: a counter's kinds, whatever each is (*a flying, lifelink, or
+// +1/+1 counter*, Reluctant Role Model).
+coordination over [
+    QuotedAbility, Mention, SpecifyingValue, NameComplement, InterrogativeClause, AdverbPhrase,
+    MeasureNounPhrase, Kind, SymbolCosts,
+] { coordinators: Coordinator }
 // Only a medial conjunct may be a SubjectRemnant, agreeing with the initial
 // Clause's Subject (never *you gain 4 life, draws four cards, ...*); a
 // subjectless last conjunct coordinates at the final conjunct's level (CGEL
@@ -3966,8 +3943,6 @@ coordination PossessorNominals {
 // time you could mulligan and this card is in your hand*).
 coordination RelativeClause { coordinators: Coordinator }
 coordination RelativeClause { coordinators: But }
-// *Which creatures block and how those creatures block*.
-coordination InterrogativeClause { coordinators: Coordinator }
 coordination NounPremodifier {
     coordinators: Coordinator,
     unshared: [Polarity],
@@ -4019,7 +3994,6 @@ coordination PrepositionPhrase {
     unshared: [DeterminativeDistribution],
     proximate: [ComplementKind, Number, Determination, Case, NounKind, Countability],
 }
-coordination AdverbPhrase { coordinators: Coordinator }
 coordination DepictiveCoordination {
     coordinators: Coordinator,
     unshared: [ComplementKind],
@@ -4066,25 +4040,17 @@ coordination AdjunctClusterCoordination {
     conjunct: AdjunctCluster,
     parallel,
 }
-coordination ContrastCoordination {
+// A positive coordinate and a *not* one joined by *but* (*from your
+// graveyard, but not from anywhere else*, Haakon, Stromgald Scourge; *equal
+// to the damage dealt, but not more than the player's life total*, Drain
+// Life; CGEL 15§2.6:1313).
+coordination over [ComplementNounPhrase, PrepositionPhrase] {
     coordinators: But,
-    unshared: [Polarity],
-    delimiter: ',',
-    serial: false,
-    conjunct: ContrastConjunct,
-}
-    where first.Polarity = Affirmative,
-          last.Polarity = Negative
-coordination ContrastPrepositionCoordination {
-    coordinators: But,
-    unshared: [Polarity, DeterminativeDistribution],
+    negator: Not,
+    unshared: [DeterminativeDistribution],
     proximate: [ComplementKind, Number, Determination, Case, NounKind, Countability],
     delimiter: ',',
-    serial: false,
-    conjunct: ContrastPrepositionConjunct,
 }
-    where first.Polarity = Affirmative,
-          last.Polarity = Negative
 // *Only during the declare blockers step, only if ..., and only once each
 // turn*.
 coordination AdjunctCoordination {
@@ -4100,12 +4066,7 @@ coordination AmountOrNounPhrase {
     conjunct: AmountOrNounConjunct,
     unlike: ComplementKind,
 }
-coordination MeasureNounPhrase { coordinators: Coordinator }
-// A counter's kinds, whatever each is (*a flying, lifelink, or +1/+1
-// counter*, Reluctant Role Model).
-coordination Kind { coordinators: Coordinator }
 coordination Amount { coordinators: Coordinator, proximate: [QuantityNumber, Sign] }
-coordination SymbolCosts { coordinators: Coordinator }
 // It determines as its last conjunct does (*one or more cards*). No
 // conjunct ends in the Targeting Marker: the determiners coordinate under
 // the one Marker (*[one or two] target creatures*, not *one or [two

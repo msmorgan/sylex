@@ -2416,6 +2416,31 @@ impl<'a> Binder<'a> {
     /// (`grammar::DependentsDecl`): each equation whose every path resolves.
     fn dependents(&mut self, draft: &mut Draft) -> Result<(), LoadError> {
         let grammar = self.grammar;
+        // An authored Production's exemptions (`ProductionDecl::exempt`).
+        let exempt = grammar
+            .productions
+            .iter()
+            .find(|p| p.name == draft.id)
+            .map_or(&[][..], |p| &p.exempt);
+        for (name, declarations) in exempt {
+            for declaration in declarations {
+                let listed = grammar.dependents.iter().any(|decl| {
+                    decl.name == *declaration
+                        && draft.children.iter().any(|c| {
+                            c.name == *name
+                                && matches!(c.symbol, Symbol::Cat { category, .. }
+                                    if decl.categories.contains(&self.out.categories[category]))
+                        })
+                });
+                if !listed {
+                    return Err(invalid(format!(
+                        "production `{}`: `{name}` is exempt from `dependents {declaration}`, \
+                         which does not apply to it",
+                        draft.id
+                    )));
+                }
+            }
+        }
         for (index, decl) in grammar.dependents.iter().enumerate() {
             for child in 0..draft.children.len() {
                 let Symbol::Cat { category, .. } = draft.children[child].symbol else {
@@ -2423,6 +2448,9 @@ impl<'a> Binder<'a> {
                 };
                 if crate::step::ChildRole::of(&draft.children[child].name).in_head_line()
                     || !decl.categories.contains(&self.out.categories[category])
+                    || exempt.iter().any(|(name, declarations)| {
+                        *name == draft.children[child].name && declarations.contains(&decl.name)
+                    })
                 {
                     continue;
                 }
@@ -2634,7 +2662,7 @@ impl<'a> Binder<'a> {
                 cost,
                 internalized,
                 interleaved,
-                interleaved_internalized,
+                interleaved_core,
                 heavy_shift,
                 shifted_object,
                 postposed,
@@ -2702,7 +2730,7 @@ impl<'a> Binder<'a> {
                 };
                 let interleaved = Interleaving {
                     adjunct: interleaved.as_deref(),
-                    internalized: interleaved_internalized.as_deref(),
+                    core: interleaved_core,
                 };
                 let shifted = heavy_shift.then_some(shifted_object.as_slice());
                 let mut ordered = self.valence_order(drafts.clone(), interleaved, shifted, host)?;
@@ -3933,7 +3961,9 @@ impl<'a> Binder<'a> {
     }
 
     /// A phrase's prefix up to an interleaved dependent of the Adjunct
-    /// Category `adjunct`, ending in it, and that prefix with another one.
+    /// Category `adjunct`, ending in it, and that prefix with another one,
+    /// each dependent under `equations`.
+    #[expect(clippy::too_many_arguments, reason = "one interleaving site")]
     fn interleaved_dependent(
         &self,
         base: &Draft,
@@ -3942,6 +3972,7 @@ impl<'a> Binder<'a> {
         adjunct: usize,
         function: &str,
         host: HostKind,
+        equations: &[Equation],
     ) -> Result<[Draft; 2], LoadError> {
         let symbol = |category, host| Symbol::Cat {
             category,
@@ -3977,6 +4008,8 @@ impl<'a> Binder<'a> {
             more.equations
                 .push((Path::Mother(feature), Target::Path(Path::Child(1, feature))));
         }
+        self.equations(&mut prefix, equations)?;
+        self.equations(&mut more, equations)?;
         Ok([prefix, more])
     }
 
@@ -3989,10 +4022,6 @@ impl<'a> Binder<'a> {
     ) -> Result<Vec<Draft>, LoadError> {
         let adjunct = interleaving
             .adjunct
-            .map(|name| self.category(name))
-            .transpose()?;
-        let internalized = interleaving
-            .internalized
             .map(|name| self.category(name))
             .transpose()?;
         let mut ordered = Vec::new();
@@ -4088,18 +4117,18 @@ impl<'a> Binder<'a> {
                     HostKind::Nominal => "modifier",
                     _ => "adjunct",
                 };
-                // Before the Internalized Complement, its own Adjunct
-                // Category interleaves too.
-                let before_internalized =
-                    internalized.filter(|_| draft.internalized == Some(split));
-                for (adjunct, suffix) in std::iter::once((adjunct, ""))
-                    .chain(before_internalized.map(|c| (c, "/internalized")))
-                {
-                    let segment = format!("prefix{split}{suffix}");
-                    out.extend(self.interleaved_dependent(
-                        &base, &segment, category, adjunct, function, host,
-                    )?);
-                }
+                // The Internalized Complement is no core Complement.
+                let core: &[Equation] =
+                    if draft.internalized == Some(split) { &[] } else { interleaving.core };
+                out.extend(self.interleaved_dependent(
+                    &base,
+                    &format!("prefix{split}"),
+                    category,
+                    adjunct,
+                    function,
+                    host,
+                    core,
+                )?);
                 let mut suffix = draft.clone();
                 suffix.extend_id(&format!("interleaved{split}"));
                 suffix.children.drain(..split);
@@ -4329,12 +4358,47 @@ impl<'a> Binder<'a> {
             delimited,
             raising_delimiter,
             serial: serial_shapes,
+            negator,
+            unlike,
             ..
         } = schema
         else {
             unreachable!("a coordination schema")
         };
         let conjoin = Conjoin::new(self, schema)?;
+        if negator.is_some() {
+            if link.is_some()
+                || serial_shapes.is_some()
+                || unlike.is_some()
+                || remnant.is_some()
+                || raising_delimiter.is_some()
+            {
+                return Err(invalid(format!(
+                    "coordination of `{category}`: a `negator` with `link`, `serial`, `unlike`, \
+                     `remnant` or `raising_delimiter`"
+                )));
+            }
+            let Some(coordinators) = coordinators else {
+                unreachable!("a coordination names its coordinators or its link")
+            };
+            let test = self.coordinator_test(coordinators)?;
+            let id = |shape: &str| format!("Coordination:{}/{shape}", conjoin.tail_name);
+            let mut drafts = Vec::new();
+            if !*delimited {
+                drafts.push(conjoin.binary(self, id("binary"), None, test.clone(), None, *cost)?);
+            }
+            if let Some(mark) = delimiter {
+                drafts.push(conjoin.binary(
+                    self,
+                    id("binary-delimited"),
+                    None,
+                    test,
+                    Some(*mark),
+                    *cost,
+                )?);
+            }
+            return Ok(drafts);
+        }
         // A middle conjunct may be a remnant, its head elided: never the
         // initial or last one (`SchemaDecl::Coordination::remnant`).
         let middles = std::iter::once(None)
@@ -4748,6 +4812,9 @@ struct Conjoin {
     /// Equations over the initial conjunct alone (`initial`), which is a
     /// whole coordination's `first` child.
     initials: Vec<Equation>,
+    /// The word that negates the last coordinate
+    /// (`SchemaDecl::Coordination::negator`).
+    negator: Option<Lexeme>,
 }
 
 impl Conjoin {
@@ -4761,11 +4828,13 @@ impl Conjoin {
             conjunct,
             unlike,
             recovered,
+            negator,
             ..
         } = schema
         else {
             unreachable!("a coordination schema")
         };
+        let negator = negator.as_deref().map(|w| binder.word(w)).transpose()?;
         let lhs = binder.category(category)?;
         let conjunct = conjunct
             .as_deref()
@@ -4869,6 +4938,7 @@ impl Conjoin {
             firsts: select("first."),
             lasts: select("last."),
             initials: select("initial."),
+            negator,
         })
     }
 
@@ -5025,6 +5095,9 @@ impl Conjoin {
             draft.delimits = true;
         }
         let c = draft.child("coordinator", Symbol::Leaf(coordinator), GapRule::Closed);
+        if let Some(negator) = self.negator {
+            draft.child("modifier", Symbol::Leaf(Test::Word(negator)), GapRule::Closed);
+        }
         let b = draft.child("last", self.conjunct(), GapRule::Shared);
         draft.coordinator = Some(c);
         draft.distinct_coordinator = vec![a, b];
@@ -5322,13 +5395,13 @@ fn cluster_shapes(frames: &[Frame]) -> Vec<u16> {
         .collect()
 }
 
-/// The Adjunct Categories a Valence schema interleaves before its later
-/// Complements: one before any of them, and one only before an Internalized
-/// Complement.
+/// The Adjunct Category a Valence schema interleaves before its later
+/// Complements, and the equations on one before any of them but an
+/// Internalized Complement (`SchemaDecl::Valence::interleaved_core`).
 #[derive(Clone, Copy)]
 struct Interleaving<'a> {
     adjunct: Option<&'a str>,
-    internalized: Option<&'a str>,
+    core: &'a [Equation],
 }
 
 /// The Categories a Valence schema's Complement Clusters are built in
