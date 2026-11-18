@@ -1,0 +1,5 @@
+# "with different names"
+template withDifferentNames: PrepositionPhrase {
+  spelling = "with different names",
+  body = agree(cardName, differ)
+}

@@ -1,0 +1,6 @@
+# "controlled by <who>" ("each creature controlled by that player"): `who` controls the object
+# [CR#110.2].
+template controlledBy(who: NounPhrase): Participle {
+  spelling = "controlled by $who",
+  body = hasPossessor(controller, $who)
+}

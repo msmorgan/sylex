@@ -9,7 +9,7 @@ card singleFaced({
         static(
           asLongAs(
             exists(
-              nominal(pre = [creature], card, post = [in(graveyard), hasKeyword(thatKeyword)])),
+              nominal(pre = [creature], card, post = [in(graveyard), withKeyword(thatKeyword)])),
             keywordGrant(
               this(creature),
               thatKeyword,

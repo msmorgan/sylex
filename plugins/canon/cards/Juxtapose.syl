@@ -14,39 +14,33 @@ card singleFaced({
                 nominal(
                   creature,
                   post = [
-                    controlledBy(you),
-                    superlative(
-                      max,
-                      stat(manaValue),
-                      nominal(creature, post = [controlledBy(you)]))])),
+                    controls(you),
+                    superlative(max, stat(manaValue), nominal(creature, post = [controls(you)]))])),
               the(
                 nominal(
                   creature,
                   post = [
-                    controlledBy(target(player)),
+                    controls(target(player)),
                     superlative(
                       max,
                       stat(manaValue),
-                      nominal(creature, post = [controlledBy(target(player))]))]))),
+                      nominal(creature, post = [controls(target(player))]))]))),
             exchangeControl(
               the(
                 nominal(
                   artifact,
                   post = [
-                    controlledBy(you),
-                    superlative(
-                      max,
-                      stat(manaValue),
-                      nominal(artifact, post = [controlledBy(you)]))])),
+                    controls(you),
+                    superlative(max, stat(manaValue), nominal(artifact, post = [controls(you)]))])),
               the(
                 nominal(
                   artifact,
                   post = [
-                    controlledBy(that(player)),
+                    controls(that(player)),
                     superlative(
                       max,
                       stat(manaValue),
-                      nominal(artifact, post = [controlledBy(that(player))]))]))),
+                      nominal(artifact, post = [controls(that(player))]))]))),
             doIf(
               thereAre(
                 counted(
@@ -54,9 +48,9 @@ card singleFaced({
                   nominal(
                     permanent,
                     post = [
-                      controlledBy(a(player)),
+                      controls(a(player)),
                       tiedFor(
                         max,
                         stat(manaValue),
-                        nominal(permanent, post = [controlledBy(that(player))]))]))),
+                        nominal(permanent, post = [controls(that(player))]))]))),
               instruct(controllerOf(them), choose(partOf(exactly(1), them))))]))]})

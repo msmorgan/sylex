@@ -1,0 +1,5 @@
+card singleFaced({
+    name = "Pull from Eternity",
+    cost = [pip(white)],
+    types = [instant],
+    text = [spell(putInto(target(nominal(pre = [faceUp, was(exile(which))], card)), graveyard))]})

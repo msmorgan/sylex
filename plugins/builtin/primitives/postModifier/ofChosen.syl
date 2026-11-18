@@ -1,2 +1,0 @@
-# "of the chosen <quality>"
-primitive ofChosen(sort: QualitySort, ref: ChoiceRef = theChoice): PostModifier = OfChosen

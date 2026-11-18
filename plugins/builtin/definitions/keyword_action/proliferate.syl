@@ -4,6 +4,6 @@ action proliferate {
   lexical = {verbs = [{lemma = "proliferate", frames = [Intransitive]}]},
   spelling = "proliferate",
   body = sequentially([
-      choose(counted(anyNumber, nominal(andOr([permanent, player]), post = [hasCounter]))),
+      choose(counted(anyNumber, nominal(andOr([permanent, player]), post = [withCounter]))),
       doForEach(eachOf(those(join)), putCounters(1, sameKindAs(it), it))])
 }

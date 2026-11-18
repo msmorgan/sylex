@@ -1,0 +1,3 @@
+primitive other: AdjectivePhrase = Other {
+  spelling = "other"
+}

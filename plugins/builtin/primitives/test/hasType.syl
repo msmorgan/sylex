@@ -1,0 +1,2 @@
+# The card-type test alone, with no zone implied.
+primitive hasType(type: CardType): Test = HasType

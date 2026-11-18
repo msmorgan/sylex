@@ -1,7 +1,2 @@
-# "phased out": a permanent's phased-out status [CR#110.5].
-primitive phasedOut: Status = PhasedOut {
-  lexical = {
-    prepositions = [
-      {lemma = "phased out", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},
-  spelling = "phased out"
-}
+# A permanent's phased-out status [CR#110.5].
+primitive phasedOut: Status = PhasedOut

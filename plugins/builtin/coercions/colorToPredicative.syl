@@ -1,4 +1,0 @@
-# A color as a Predicative complement ("that's white or blue"): the color test [CR#105.2].
-coercion(color: Color): Predicative {
-  body = hasColor($color)
-}

@@ -1,4 +1,0 @@
-# A card type as a Nominal head: a permanent of that card type on the battlefield [CR#109.2,110.1].
-primitive type(type: CardType): Nominal = Type {
-  spelling = "$type"
-}

@@ -1,0 +1,8 @@
+# "phased out": a permanent with the phased-out status [CR#110.5].
+template phasedOut: PrepositionPhrase {
+  lexical = {
+    prepositions = [
+      {lemma = "phased out", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},
+  spelling = "phased out",
+  body = hasStatus(phasedOut)
+}

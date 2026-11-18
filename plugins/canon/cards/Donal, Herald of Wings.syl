@@ -13,7 +13,7 @@ card singleFaced({
               nominal(
                 pre = [non(legendary), creature],
                 spell,
-                post = [hasKeyword(theKeyword(flying))])))),
+                post = [withKeyword(theKeyword(flying))])))),
         doOnlyOnceEachTurn(
           may(
             copyOnStack(

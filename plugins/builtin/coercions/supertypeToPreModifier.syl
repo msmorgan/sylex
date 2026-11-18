@@ -1,4 +1,0 @@
-# A supertype as a PreModifier: the bare supertype test [CR#205.4a].
-coercion(supertype: Supertype): PreModifier {
-  body = hasSupertype($supertype)
-}

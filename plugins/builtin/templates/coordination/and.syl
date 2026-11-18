@@ -1,0 +1,17 @@
+# "<a> and <b>": what matches every item, or for noun phrases and nominals the items together
+# ("Artifact and enchantment spells", "you and target opponent").
+template and(items: List(Self)): Self {
+  at = [
+    AdjectivePhrase,
+    PrepositionPhrase,
+    RelativeClause,
+    Participle,
+    Nominal,
+    NounPhrase,
+    PreModifier,
+    PostModifier,
+    Predicative,
+    Test],
+  spelling = "$items#<and>",
+  body = coord(and, $items)
+}

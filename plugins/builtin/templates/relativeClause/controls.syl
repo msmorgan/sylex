@@ -1,0 +1,5 @@
+# "<who> controls"
+template controls(who: NounPhrase): RelativeClause {
+  spelling = "$who control",
+  body = hasPossessor(controller, $who)
+}

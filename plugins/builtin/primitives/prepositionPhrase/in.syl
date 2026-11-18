@@ -1,0 +1,3 @@
+primitive in(loc: Location): PrepositionPhrase = In {
+  spelling = "in $loc"
+}

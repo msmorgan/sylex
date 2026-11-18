@@ -1,4 +1,0 @@
-template outsideTheGame: PostModifier {
-  spelling = "outside the game",
-  body = not(in(or([library, hand, battlefield, graveyard, stack, exileZone, commandZone])))
-}

@@ -6,7 +6,7 @@ card singleFaced({
       activated(
         mana([pip(blue), pip(blue)]),
         doForEach(
-          each(nominal(pre = [attacking], creature, post = [not(hasKeyword(theKeyword(flying)))])),
+          each(nominal(pre = [attacking], creature, post = [withoutKeyword(theKeyword(flying))])),
           instruct(
             controllerOf(it),
             doUnless(
@@ -14,9 +14,6 @@ card singleFaced({
               instruct(
                 you,
                 gain(
-                  bare(
-                    nominal(
-                      creature,
-                      post = [youControl, inCombat(blockerOf, counterpart = that(creature))])),
+                  bare(nominal(creature, post = [youControl, blocking(attacker = that(creature))])),
                   [firstStrike],
                   duration = untilEndOfTurn))))))]})

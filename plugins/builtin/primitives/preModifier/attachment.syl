@@ -1,3 +1,0 @@
-primitive attachment(
-  side: AttachmentSide,
-  word: Option(AttachWord) = none): PreModifier = Attachment

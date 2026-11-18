@@ -1,3 +1,0 @@
-primitive not(predicative: Predicative): Predicative = Not {
-  spelling = "not $predicative"
-}

@@ -1,0 +1,1 @@
+primitive superlative(op: AggregateOp, axis: ProjAxis, domain: Nominal): Test = Superlative

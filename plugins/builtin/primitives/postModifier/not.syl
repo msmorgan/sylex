@@ -1,3 +1,0 @@
-primitive not(modifier: PostModifier): PostModifier = Not {
-  spelling = "not $modifier"
-}

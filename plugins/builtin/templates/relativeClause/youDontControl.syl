@@ -1,0 +1,5 @@
+# "you don't control"
+template youDontControl: RelativeClause {
+  spelling = "you don't control",
+  body = not(controls(you))
+}

@@ -1,0 +1,6 @@
+# "face-up": face up, as a face-up exiled card or a face-up pile is; of a permanent, the face-up
+# status [CR#110.5].
+template faceUp: PreModifier {
+  spelling = "face-up",
+  body = hasStatus(faceUp)
+}

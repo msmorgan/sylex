@@ -9,7 +9,7 @@ card singleFaced({
         can(
           by(bare(nominal(or([spell, abilityHead(anyOnStack)]), post = [youControl]))),
           target(
-            bare(nominal(creature, post = [opponentsControl, hasKeyword(theKeyword(hexproof))]))),
+            bare(nominal(creature, post = [opponentsControl, withKeyword(theKeyword(hexproof))]))),
           asThough = holds(is(them, not(hasKeyword(theKeyword(hexproof))))))),
       activated(
         compound([mana([generic(3)]), perform(sacrifice(this(artifact)))]),

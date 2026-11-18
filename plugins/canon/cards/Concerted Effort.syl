@@ -13,7 +13,7 @@ card singleFaced({
                 thatKeyword,
                 and([hasType(creature), youControl, hasKeyword(thatKeyword)])),
               untilEndOfTurn),
-            exists(nominal(creature, post = [youControl, hasKeyword(thatKeyword)])))),
+            exists(nominal(creature, post = [youControl, withKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(fear),

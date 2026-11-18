@@ -1,0 +1,6 @@
+# "untapped": a permanent with the untapped status [CR#110.5,701.26a].
+template untapped: AdjectivePhrase {
+  lexical = {adjectives = ["untapped"]},
+  spelling = "untapped",
+  body = hasStatus(untapped)
+}

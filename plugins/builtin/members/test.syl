@@ -1,0 +1,6 @@
+# What a describing phrase means is a test. A body may write a test where a phrase of one of
+# these kinds is expected, and such a phrase where a test is; a card's term writes the phrase.
+denotes(AdjectivePhrase): Test
+denotes(PrepositionPhrase): Test
+denotes(RelativeClause): Test
+denotes(Participle): Test

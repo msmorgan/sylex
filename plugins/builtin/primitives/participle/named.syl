@@ -1,0 +1,3 @@
+primitive named(source: NameSource): Participle = Named {
+  spelling = "named $source"
+}

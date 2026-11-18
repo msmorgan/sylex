@@ -1,3 +1,0 @@
-primitive legalAttachment(
-  side: AttachmentSide,
-  counterpart: NounPhrase): PostModifier = LegalAttachment

@@ -8,7 +8,7 @@ card singleFaced({
     text = [
       spell(
         sequentially([
-            separateIntoPiles(allOf(nominal(creature, post = [controlledBy(target(player))])), 2),
+            separateIntoPiles(allOf(nominal(creature, post = [controls(target(player))])), 2),
             doUnderProhibition(
               destroy(allOf(nominal(creature, post = [inPile(pileOfChoice(they))]))),
               regeneration(them))]))]})

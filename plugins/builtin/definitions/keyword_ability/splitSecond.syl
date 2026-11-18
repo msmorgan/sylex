@@ -13,5 +13,5 @@ ability splitSecond {
               actor(bare(player)),
               activate(
                 bare(
-                  nominal(pre = [non(hasQuality(isManaAbility))], abilityHead(anyActivated)))))])))]
+                  nominal(abilityHead(anyActivated), post = [thatIsnt(bare(manaAbility))]))))])))]
 }

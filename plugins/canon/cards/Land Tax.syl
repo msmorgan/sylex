@@ -8,7 +8,7 @@ card singleFaced({
         if = exists(
           compareOver(
             opponent,
-            countOf(nominal(land, post = [controlledBy(they)])),
+            countOf(nominal(land, post = [controls(they)])),
             greater,
             countOf(nominal(land, post = [youControl])))),
         may(

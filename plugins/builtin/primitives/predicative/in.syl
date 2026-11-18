@@ -1,3 +1,0 @@
-primitive in(loc: Location): Predicative = In {
-  spelling = "in $loc"
-}

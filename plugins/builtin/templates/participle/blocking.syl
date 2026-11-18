@@ -1,0 +1,6 @@
+# "blocking [<attacker>]" ("blocking creature", "creatures you control blocking that creature"):
+# a blocking creature, blocking `attacker` when one is named [CR#509.1g].
+template blocking(attacker: Option(NounPhrase) = none): Participle {
+  spelling = "blocking< $attacker>",
+  body = inCombat(blockerOf, counterpart = $attacker)
+}

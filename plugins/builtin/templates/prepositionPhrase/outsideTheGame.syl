@@ -1,0 +1,5 @@
+# "outside the game": in no game zone [CR#400.11].
+template outsideTheGame: PrepositionPhrase {
+  spelling = "outside the game",
+  body = not(in(or([library, hand, battlefield, graveyard, stack, exileZone, commandZone])))
+}

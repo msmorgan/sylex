@@ -1,5 +1,5 @@
-# "in <pile>": a PostModifier selecting Objects in the named pile.
-template inPile(pile: NounPhrase): PostModifier {
+# "in <pile>": the Objects in the named pile.
+template inPile(pile: NounPhrase): PrepositionPhrase {
   spelling = "in $pile",
   body = in(thePile($pile))
 }

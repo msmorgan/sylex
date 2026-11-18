@@ -1,3 +1,0 @@
-primitive token: PreModifier = IsToken {
-  spelling = "token"
-}

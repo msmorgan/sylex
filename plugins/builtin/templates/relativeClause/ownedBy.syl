@@ -1,0 +1,5 @@
+# "<who> owns"
+template ownedBy(who: NounPhrase): RelativeClause {
+  spelling = "$who own",
+  body = hasPossessor(owner, $who)
+}

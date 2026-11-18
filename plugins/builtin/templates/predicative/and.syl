@@ -1,5 +1,0 @@
-# "<p> and <q>" after a copula ("is tapped and attacking"): the subject matches every arm.
-template and(conjuncts: List(Predicative)): Predicative {
-  spelling = "$conjuncts#<and>",
-  body = coord(and, $conjuncts)
-}

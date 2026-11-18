@@ -16,12 +16,10 @@ card_type battle {
     property(can(any, attack(defender = this(battle)))),
     damageResult(battle, loseCounters(printedKind(defenseCounter), thatMany, agent = this(battle))),
     stateBased(
-      and([
-          not(is(this(battle), noun(a(siege)))),
-          compareAmt(countersOn(defenseCounter, it), equal, 0)]),
+      and([not(is(this(battle), a(siege))), compareAmt(countersOn(defenseCounter, it), equal, 0)]),
       putInto(it, graveyard)),
     property(
       onlyUnless(
         entryChoice(this(battle), a(nominal(player, post = [not(otherThan(you))]))),
-        is(it, noun(a(siege)))))]
+        is(it, a(siege))))]
 }

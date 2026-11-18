@@ -1,2 +1,0 @@
-# Unspelled status test; reached through `tapped`, `untapped`, `faceDown`, `phasedOut`.
-primitive hasStatus(status: Status): PreModifier = HasStatus

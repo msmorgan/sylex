@@ -1,0 +1,6 @@
+# "tapped": a permanent with the tapped status [CR#110.5,701.26a].
+template tapped: AdjectivePhrase {
+  lexical = {adjectives = ["tapped"]},
+  spelling = "tapped",
+  body = hasStatus(tapped)
+}

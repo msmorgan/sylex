@@ -1,0 +1,2 @@
+# The object has a counter on it, of `kind` when one is named.
+primitive hasCounter(kind: Option(CounterKind) = none): Test = HasCounters

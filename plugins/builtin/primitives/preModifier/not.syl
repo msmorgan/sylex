@@ -1,3 +1,0 @@
-primitive not(modifier: PreModifier): PreModifier = Not {
-  spelling = "not $modifier"
-}

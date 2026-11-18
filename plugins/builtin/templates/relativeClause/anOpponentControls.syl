@@ -1,0 +1,5 @@
+# "an opponent controls"
+template anOpponentControls: RelativeClause {
+  spelling = "an opponent controls",
+  body = controls(anOpponent)
+}

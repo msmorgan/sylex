@@ -1,6 +1,0 @@
-# A stacked premodifier arm inside a PreModifier coordination ("legendary artifact" in
-# "Knight, Aura, Equipment, or legendary artifact card", *Acclaimed Contender*).
-template stacked(modifiers: List(PreModifier)): PreModifier {
-  spelling = "$modifiers#<>",
-  body = coord(and, $modifiers)
-}

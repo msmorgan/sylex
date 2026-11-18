@@ -15,7 +15,7 @@ card singleFaced({
             recipient = a(
               nominal(
                 or([creature, planeswalker]),
-                post = [anOpponentControls, hasCounter(kind = bountyCounter)])))),
+                post = [anOpponentControls, withCounter(kind = bountyCounter)])))),
         destroy(it))],
     power = 1,
     toughness = 3})

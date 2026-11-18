@@ -1,0 +1,4 @@
+template equipped: Participle {
+  spelling = "equipped",
+  body = attachment(host, word = equipped)
+}

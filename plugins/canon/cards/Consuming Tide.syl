@@ -7,7 +7,7 @@ card singleFaced({
         sequentially([
             instruct(
               eachPlayer,
-              choose(a(nominal(pre = [non(land)], permanent, post = [controlledBy(they)])))),
+              choose(a(nominal(pre = [non(land)], permanent, post = [controls(they)])))),
             returnToHand(allOf(nominal(pre = [non(land)], permanent, post = [notChosen]))),
             doForEach(
               each(

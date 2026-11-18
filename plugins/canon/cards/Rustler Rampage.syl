@@ -7,7 +7,7 @@ card singleFaced({
         chooseSpree([
             plusMode(
               mana([generic(1)]),
-              untap(allOf(nominal(creature, post = [controlledBy(target(player))])))),
+              untap(allOf(nominal(creature, post = [controls(target(player))])))),
             plusMode(
               mana([generic(1)]),
               gain(target(creature), [doubleStrike], duration = untilEndOfTurn))]))]})

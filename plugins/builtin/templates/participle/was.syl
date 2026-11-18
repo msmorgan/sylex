@@ -1,0 +1,9 @@
+# "<action>ed [<within>]", the passive participle with no agent, before a head ("the exiled
+# card", "the sacrificed creature") or after it ("a creature dealt damage this turn"): the object
+# `action` was done to, read as it was then or by its last known information [CR#608.2h]. In an
+# ability linked to one that exiled cards, "the exiled card" is one that ability exiled
+# [CR#607.2a,607.1,608.2c].
+template was(action: VerbPhrase, within: Option(LookbackSpan) = none): Participle {
+  spelling = "$action< $within>",
+  body = predicateDid({subj = any, action = $action, within = $within})
+}

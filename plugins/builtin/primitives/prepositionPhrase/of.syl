@@ -1,0 +1,5 @@
+# "of <whole>": what the head belongs to, an ability's source ("abilities of creatures"
+# [CR#113.7]) or the card a half is a half of ("this half of this split card" [CR#702.127a]).
+primitive of(whole: NounPhrase): PrepositionPhrase = Of {
+  spelling = "of $whole"
+}

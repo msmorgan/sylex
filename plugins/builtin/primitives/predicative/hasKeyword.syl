@@ -1,3 +1,0 @@
-# TODO(spelling): "<subject> has <keyword>" uses `have` rather than `be`; waits on
-# `syl-lookback-operator-and-holds`.
-primitive hasKeyword(keyword: KeywordTerm): Predicative = HasKeyword

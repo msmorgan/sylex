@@ -1,0 +1,5 @@
+# "with a [<kind>] counter on it"
+template withCounter(kind: Option(CounterKind) = none): PrepositionPhrase {
+  spelling = "with a< $kind> counter on it",
+  body = hasCounter(kind = $kind)
+}

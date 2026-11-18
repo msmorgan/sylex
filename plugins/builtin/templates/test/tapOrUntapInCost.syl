@@ -1,0 +1,5 @@
+# An ability "with the tap symbol or the untap symbol in its activation cost"
+# [CR#302.6,107.5,107.6], a wording of the rules that no card prints.
+template tapOrUntapInCost: Test {
+  body = or([activationCostHas(tapSymbol), activationCostHas(untapSymbol)])
+}

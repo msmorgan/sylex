@@ -6,4 +6,4 @@ card singleFaced({
       spell(
         doForEach(
           eachOpponent,
-          gainControl(target(nominal(permanent, post = [controlledBy(that(player))])))))]})
+          gainControl(target(nominal(permanent, post = [controls(that(player))])))))]})

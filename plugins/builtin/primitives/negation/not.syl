@@ -1,0 +1,7 @@
+# "not <phrase>": "not" before an adjective phrase ("that's not historic"), a preposition phrase
+# ("card not on the battlefield"), a noun phrase ("if it's not a Kree") or a participle ("not
+# named …"): what does not match `phrase`. At `Test` it negates a test and prints nothing.
+primitive not(phrase: Self): Self = Not {
+  at = [AdjectivePhrase, PrepositionPhrase, NounPhrase, Participle, Test],
+  spelling = "not $phrase"
+}

@@ -1,5 +1,0 @@
-# "you own"
-template youOwn: PostModifier {
-  spelling = "you own",
-  body = ownedBy(you)
-}

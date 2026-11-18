@@ -1,0 +1,12 @@
+card singleFaced({
+    name = "Stunning Strike",
+    cost = [generic(2), pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      flash,
+      enchant(hasType(creature)),
+      when(
+        does(actor(this(aura)), enter),
+        sequentially([tap(enchanted(creature)), removeFromCombat(it)])),
+      static(asLongAs(isnt(enchanted(creature), legendary), doesntUntap(it, controllerOf(it))))]})

@@ -1,5 +1,0 @@
-# "untapped": a permanent with the untapped status [CR#110.5,701.26a].
-template untapped: PreModifier {
-  spelling = "untapped",
-  body = hasStatus(untapped)
-}

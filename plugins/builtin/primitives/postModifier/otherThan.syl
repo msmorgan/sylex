@@ -1,3 +1,0 @@
-primitive otherThan(anchor: NounPhrase): PostModifier = OtherThan {
-  spelling = "other than $anchor"
-}

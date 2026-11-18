@@ -16,7 +16,7 @@ card singleFaced({
               this(creature),
               thatKeyword,
               and([in(exiledWith(it)), hasKeyword(thatKeyword)])),
-            exists(nominal(card, post = [in(exiledWith(it)), hasKeyword(thatKeyword)])))),
+            exists(nominal(card, post = [in(exiledWith(it)), withKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(firstStrike),

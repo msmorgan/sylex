@@ -7,4 +7,4 @@ card singleFaced({
         costShift(
           bare(abilityHead(anyActivated)),
           more(2),
-          unless = is(them, noun(bare(manaAbility)))))]})
+          unless = is(them, bare(manaAbility))))]})

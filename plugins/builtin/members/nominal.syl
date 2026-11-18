@@ -1,0 +1,6 @@
+# A card type word or a subtype word is a nominal: "creature" in "creature card" is the word
+# the head "creature" is. With no zone and no "card", "spell" or "source" in its description, it
+# means a permanent of that type on the battlefield [CR#109.2]; which is meant is read from where
+# the word stands.
+member(CardType): Nominal
+member(Subtype): Nominal

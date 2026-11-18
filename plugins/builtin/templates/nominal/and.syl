@@ -1,5 +1,0 @@
-# "<p> and <q>": union of domains.
-template and(conjuncts: List(Nominal)): Nominal {
-  spelling = "$conjuncts#<and>",
-  body = coord(and, $conjuncts)
-}

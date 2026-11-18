@@ -9,7 +9,7 @@ card singleFaced({
         sequentially([
             exile(topSlice(1)),
             doIf(
-              is(it, noun(a(nominal(pre = [creature], card)))),
+              is(it, a(nominal(pre = [creature], card))),
               get(
                 this(creature),
                 up(powerOf(the(nominal(pre = [was(exile(which)), creature], card)))),

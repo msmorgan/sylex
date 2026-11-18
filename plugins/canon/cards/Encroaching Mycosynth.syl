@@ -12,6 +12,6 @@ card singleFaced({
                 nominal(
                   pre = [non(land), permanent],
                   card,
-                  post = [youOwn, not(in(battlefield))]))]),
+                  post = [youOwn, thatIsnt(in(battlefield))]))]),
           adds,
           bundle({characteristics = {types = [artifact]}})))]})

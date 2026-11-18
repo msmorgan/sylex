@@ -15,7 +15,7 @@ card singleFaced({
                     fromAmong(
                       exactly(1),
                       nominal(
-                        pre = [or([knight, aura, equipment, stacked([legendary, artifact])])],
+                        pre = [or([knight, aura, equipment, nominal(pre = [legendary], artifact)])],
                         card),
                       them)),
                   putInto(that(card), hand)])),

@@ -12,7 +12,7 @@ card singleFaced({
           p1p1Counter)),
       whenever(
         does(
-          actor(a(nominal(creature, post = [youControl, hasCounter(kind = p1p1Counter)]))),
+          actor(a(nominal(creature, post = [youControl, withCounter(kind = p1p1Counter)]))),
           dealDamage(kind = combat, recipient = a(player))),
         instruct(that(player), discard(a(nominal(card, post = [in(hand)])))))],
     power = 1,

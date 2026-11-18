@@ -1,0 +1,6 @@
+# "foretold": a card with the foretold designation, which the foretell special action or an effect
+# gives a card in exile [CR#702.143a,702.143c,702.143d].
+template foretold: Participle {
+  spelling = "foretold",
+  body = hasDesignation(foretold)
+}

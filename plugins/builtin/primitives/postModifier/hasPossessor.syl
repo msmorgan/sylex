@@ -1,1 +1,0 @@
-primitive hasPossessor(axis: PossessorAxis, possessor: NounPhrase): PostModifier = HasPossessor

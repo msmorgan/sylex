@@ -1,5 +1,0 @@
-template did(subj: Subject, action: VerbPhrase, within: Option(LookbackSpan) = none): PostModifier {
-  # TODO(spelling): Bare or participial lookbacks wait on `syl-lookback-operator-and-holds`.
-  spelling = "that $subj $action< $within>",
-  body = predicateDid({subj = $subj, action = $action, within = $within, ordinal = none})
-}

@@ -1,0 +1,3 @@
+primitive otherThan(anchor: NounPhrase): AdjectivePhrase = OtherThan {
+  spelling = "other than $anchor"
+}

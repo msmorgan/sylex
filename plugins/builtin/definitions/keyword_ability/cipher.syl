@@ -8,7 +8,7 @@ ability cipher {
   body = [
     spell(
       doIf(
-        is(this(spell), noun(a(card))),
+        is(this(spell), a(card)),
         may(
           sequentially([
               exile(this(card)),

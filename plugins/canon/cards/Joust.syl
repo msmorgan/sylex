@@ -20,5 +20,5 @@ card singleFaced({
                 up(2),
                 up(1),
                 duration = untilEndOfTurn),
-              is(it, noun(a(knight)))),
+              is(it, a(knight))),
             fightEachOther(those(creature))]))]})

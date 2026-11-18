@@ -1,3 +1,0 @@
-primitive hasDesignation(
-  designation: DesignationLabel,
-  holder: Option(NounPhrase) = none): Predicative = HasDesignation

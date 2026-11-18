@@ -1,4 +1,0 @@
-template multicolored: PreModifier {
-  spelling = "multicolored",
-  body = colorCount(atLeast, 2)
-}

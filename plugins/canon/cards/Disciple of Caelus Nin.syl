@@ -13,7 +13,7 @@ card singleFaced({
               eachPlayer,
               chooseStartingWith(
                 you,
-                counted(upTo(5), nominal(permanent, post = [controlledBy(they)])))),
+                counted(upTo(5), nominal(permanent, post = [controls(they)])))),
             instruct(
               allOf(nominal(permanent, post = [otherThan(this(creature)), notChosen])),
               phaseOut)])),

@@ -1,0 +1,5 @@
+# "with <keyword>" ("creature with flying")
+template withKeyword(keyword: KeywordTerm): PrepositionPhrase {
+  spelling = "with $keyword",
+  body = hasKeyword($keyword)
+}

@@ -1,5 +1,0 @@
-# "you control"
-template youControl: PostModifier {
-  spelling = "you control",
-  body = controlledBy(you)
-}

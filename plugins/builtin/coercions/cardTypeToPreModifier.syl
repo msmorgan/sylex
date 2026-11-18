@@ -1,4 +1,0 @@
-# A card type as a PreModifier: the bare card-type test, with no zone implied.
-coercion(type: CardType): PreModifier {
-  body = hasType($type)
-}

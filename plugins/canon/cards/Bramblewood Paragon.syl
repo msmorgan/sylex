@@ -11,7 +11,7 @@ card singleFaced({
           p1p1Counter)),
       static(
         abilityGrant(
-          each(nominal(creature, post = [youControl, hasCounter(kind = p1p1Counter)])),
+          each(nominal(creature, post = [youControl, withCounter(kind = p1p1Counter)])),
           [trample]))],
     power = 2,
     toughness = 2})

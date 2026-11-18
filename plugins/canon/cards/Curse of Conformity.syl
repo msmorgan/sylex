@@ -8,11 +8,7 @@ card singleFaced({
       static(
         conjunction([
             getsBase(
-              bare(
-                nominal(
-                  pre = [non(legendary)],
-                  creature,
-                  post = [controlledBy(enchanted(player))])),
+              bare(nominal(pre = [non(legendary)], creature, post = [controls(enchanted(player))])),
               3,
               3),
             qualityChange(them, loses, everyTypeOf(creature))]))]})

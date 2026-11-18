@@ -1,0 +1,4 @@
+template unblocked: AdjectivePhrase {
+  spelling = "unblocked",
+  body = inCombat(unblocked)
+}

@@ -1,0 +1,1 @@
+primitive targeting(subject: NounPhrase, extent: TargetExtent): Test = Targets

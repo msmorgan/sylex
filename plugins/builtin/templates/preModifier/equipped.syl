@@ -1,4 +1,0 @@
-template equipped: PreModifier {
-  spelling = "equipped",
-  body = attachment(host, word = equipped)
-}

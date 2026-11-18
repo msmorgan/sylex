@@ -17,7 +17,7 @@ card singleFaced({
               nominal(
                 pre = [creature],
                 card,
-                post = [in(yourGraveyard), hasKeyword(thatKeyword)])))),
+                post = [in(yourGraveyard), withKeyword(thatKeyword)])))),
         [
           theKeyword(flying),
           theKeyword(firstStrike),

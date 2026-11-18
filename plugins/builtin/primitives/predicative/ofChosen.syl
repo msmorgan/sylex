@@ -1,3 +1,0 @@
-# "of the chosen <quality>" after a copula ("that aren't of the chosen type"): the subject has the
-# chosen value of `sort`.
-primitive ofChosen(sort: QualitySort, ref: ChoiceRef = theChoice): Predicative = OfChosen

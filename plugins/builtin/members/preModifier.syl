@@ -1,0 +1,5 @@
+# What stands before a head: an adjective phrase ("red", "tapped"), a nominal ("creature" in
+# "creature card") or a participle ("attacking").
+member(AdjectivePhrase): PreModifier
+member(Nominal): PreModifier
+member(Participle): PreModifier

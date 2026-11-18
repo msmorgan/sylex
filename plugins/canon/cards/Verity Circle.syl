@@ -9,4 +9,4 @@ card singleFaced({
         may(draw(1))),
       activated(
         mana([generic(4), pip(blue)]),
-        tap(target(nominal(creature, post = [not(hasKeyword(theKeyword(flying)))]))))]})
+        tap(target(nominal(creature, post = [withoutKeyword(theKeyword(flying))]))))]})

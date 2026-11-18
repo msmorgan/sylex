@@ -1,0 +1,6 @@
+# "attacking [<defender>]" ("attacking creature", "each creature attacking you"): an attacking
+# creature, attacking `defender` when one is named [CR#508.1k].
+template attacking(defender: Option(NounPhrase) = none): Participle {
+  spelling = "attacking< $defender>",
+  body = inCombat(attackerOf, counterpart = $defender)
+}

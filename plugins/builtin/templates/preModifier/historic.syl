@@ -1,5 +1,0 @@
-# "historic" [CR#700.6]
-template historic: PreModifier {
-  spelling = "historic",
-  body = or([artifact, legendary, saga])
-}

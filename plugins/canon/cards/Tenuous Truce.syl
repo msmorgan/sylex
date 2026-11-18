@@ -14,9 +14,8 @@ card singleFaced({
               does(
                 actor(you),
                 attack(
-                  defender = or([
-                      enchanted(opponent),
-                      a(nominal(planeswalker, post = [controlledBy(they)]))])))),
+                  defender = or(
+                    [enchanted(opponent), a(nominal(planeswalker, post = [controls(they)]))])))),
             when(
               does(
                 actor(they),

@@ -8,7 +8,7 @@ ability increment {
     whenever(
       does(actor(you), cast(a(spell))),
       if = and([
-          is(this(permanent), noun(a(creature))),
+          is(this(permanent), a(creature)),
           or([
               compareAmt(manaValueSpentToCast(that(spell)), greater, powerOf(this(creature))),
               compareAmt(

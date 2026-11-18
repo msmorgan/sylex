@@ -1,1 +1,0 @@
-primitive superlative(op: AggregateOp, axis: ProjAxis, domain: Nominal): PostModifier = Superlative

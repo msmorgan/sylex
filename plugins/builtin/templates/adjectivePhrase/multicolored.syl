@@ -1,0 +1,4 @@
+template multicolored: AdjectivePhrase {
+  spelling = "multicolored",
+  body = colorCount(atLeast, 2)
+}

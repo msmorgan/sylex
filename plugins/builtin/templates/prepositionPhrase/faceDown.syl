@@ -1,0 +1,8 @@
+# "face down": a permanent with the face-down status [CR#110.5].
+template faceDown: PrepositionPhrase {
+  lexical = {
+    prepositions = [
+      {lemma = "face down", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},
+  spelling = "face down",
+  body = hasStatus(faceDown)
+}

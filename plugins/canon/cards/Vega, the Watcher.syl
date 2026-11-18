@@ -4,16 +4,6 @@ card singleFaced({
     supertypes = [legendary],
     types = [creature],
     subtypes = [bird, spirit],
-    text = [
-      flying,
-      whenever(
-        does(
-          actor(you),
-          cast(
-            a(
-              nominal(
-                spell,
-                post = [not(was(cast(which, from = yourHand), within = thisObject))])))),
-        draw(1))],
+    text = [flying, whenever(does(actor(you), cast(a(spell), from = not(yourHand))), draw(1))],
     power = 2,
     toughness = 2})

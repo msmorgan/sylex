@@ -1,0 +1,6 @@
+# "without a [<kind>] counter on it" ("each nonland permanent without a fate counter on it",
+# *Oblivion Stone*)
+template withoutCounter(kind: Option(CounterKind) = none): PrepositionPhrase {
+  spelling = "without a< $kind> counter on it",
+  body = not(hasCounter(kind = $kind))
+}

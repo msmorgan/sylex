@@ -7,10 +7,10 @@ ability shadow {
   body = [
     static(
       cant(
-        by(bare(nominal(creature, post = [not(hasKeyword(theKeyword(shadow)))]))),
+        by(bare(nominal(creature, post = [withoutKeyword(theKeyword(shadow))]))),
         block(attacker = this(creature)))),
     static(
       cant(
         by(this(creature)),
-        block(attacker = allOf(nominal(creature, post = [not(hasKeyword(theKeyword(shadow)))])))))]
+        block(attacker = allOf(nominal(creature, post = [withoutKeyword(theKeyword(shadow))])))))]
 }

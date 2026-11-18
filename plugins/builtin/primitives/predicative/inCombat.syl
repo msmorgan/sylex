@@ -1,3 +1,0 @@
-primitive inCombat(
-  relation: CombatRelation,
-  counterpart: Option(NounPhrase) = none): Predicative = InCombat

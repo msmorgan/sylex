@@ -1,0 +1,3 @@
+# A color word or a supertype word is an adjective.
+member(Color): AdjectivePhrase
+member(Supertype): AdjectivePhrase

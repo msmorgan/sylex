@@ -1,0 +1,4 @@
+template colorless: AdjectivePhrase {
+  spelling = "colorless",
+  body = colorCount(equal, 0)
+}

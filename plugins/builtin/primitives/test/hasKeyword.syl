@@ -1,0 +1,2 @@
+# The object has the keyword.
+primitive hasKeyword(keyword: KeywordTerm): Test = HasKeyword

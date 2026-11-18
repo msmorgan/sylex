@@ -10,7 +10,7 @@ ability provoke {
       may(
         establishThroughout(
           must(
-            actor(target(nominal(creature, post = [controlledBy(defendingPlayer)]))),
+            actor(target(nominal(creature, post = [controls(defendingPlayer)]))),
             block(attacker = this(creature))),
           untilEndOfCombat),
         ifDid = untap(that(creature))))]

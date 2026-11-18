@@ -7,6 +7,6 @@ action recruit {
       draw(1),
       discard(a(nominal(card, post = [in(handOf($actor))]))),
       doIf(
-        not(is(the(nominal(card, post = [was(discard(which), within = thisWay)])), noun(a(land)))),
+        not(is(the(nominal(card, post = [was(discard(which), within = thisWay)])), a(land))),
         create(1, written(creatureToken(1, 1, [white], [human, soldier]))))])
 }

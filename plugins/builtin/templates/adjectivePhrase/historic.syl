@@ -1,0 +1,5 @@
+# "historic" [CR#700.6]
+template historic: AdjectivePhrase {
+  spelling = "historic",
+  body = or([hasType(artifact), legendary, hasSubtype(saga)])
+}

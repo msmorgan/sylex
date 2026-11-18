@@ -1,0 +1,5 @@
+# "you control"
+template youControl: RelativeClause {
+  spelling = "you control",
+  body = controls(you)
+}

@@ -1,0 +1,6 @@
+# "non<p>": the prefix on a nominal ("nonland"), an adjective ("nonbasic") or a participle
+# ("nonattacking"): what does not match `p`, a phrase of the kind `p` is.
+primitive non(p: Self): Self = Non {
+  at = [AdjectivePhrase, Nominal, Participle],
+  spelling = "non~$p"
+}

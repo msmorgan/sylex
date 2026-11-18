@@ -1,0 +1,1 @@
+primitive chosenRef(ref: ChoiceRef): Test = Chosen

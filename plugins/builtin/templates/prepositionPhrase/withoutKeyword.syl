@@ -1,0 +1,5 @@
+# "without <keyword>" ("creatures without flying")
+template withoutKeyword(keyword: KeywordTerm): PrepositionPhrase {
+  spelling = "without $keyword",
+  body = not(hasKeyword($keyword))
+}

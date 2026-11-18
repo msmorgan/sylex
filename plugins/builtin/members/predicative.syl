@@ -1,0 +1,5 @@
+# What stands after a copula: an adjective phrase ("is tapped"), a preposition phrase ("is in
+# your graveyard") or a noun phrase ("is the monarch").
+member(AdjectivePhrase): Predicative
+member(PrepositionPhrase): Predicative
+member(NounPhrase): Predicative

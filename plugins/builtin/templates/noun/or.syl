@@ -1,5 +1,0 @@
-# A disjunction of Noun Phrases.
-template or(phrases: List(NounPhrase)): NounPhrase {
-  spelling = "$phrases#<or>",
-  body = coord(or, $phrases)
-}

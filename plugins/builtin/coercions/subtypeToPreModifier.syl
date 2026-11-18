@@ -1,4 +1,0 @@
-# A subtype as a PreModifier: the bare subtype test, with no zone implied.
-coercion(subtype: Subtype): PreModifier {
-  body = hasSubtype($subtype)
-}

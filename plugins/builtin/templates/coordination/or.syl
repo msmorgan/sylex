@@ -1,0 +1,17 @@
+# "<a> or <b>": what matches some item ("white or blue", "instant or sorcery", "you or a
+# planeswalker you control").
+template or(items: List(Self)): Self {
+  at = [
+    AdjectivePhrase,
+    PrepositionPhrase,
+    RelativeClause,
+    Participle,
+    Nominal,
+    NounPhrase,
+    PreModifier,
+    PostModifier,
+    Predicative,
+    Test],
+  spelling = "$items#<or>",
+  body = coord(or, $items)
+}

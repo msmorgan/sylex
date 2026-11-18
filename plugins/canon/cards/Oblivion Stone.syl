@@ -14,5 +14,5 @@ card singleFaced({
                 nominal(
                   pre = [non(land)],
                   permanent,
-                  post = [not(hasCounter(kind = fateCounter))]))),
+                  post = [withoutCounter(kind = fateCounter)]))),
             removeAllCounters(printedKind(fateCounter), allOf(permanent))]))]})

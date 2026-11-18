@@ -9,6 +9,6 @@ card singleFaced({
           and([
               bare(nominal(creature, post = [youControl])),
               bare(nominal(pre = [creature], spell, post = [youControl])),
-              bare(nominal(pre = [creature], card, post = [youOwn, not(in(battlefield))]))]),
+              bare(nominal(pre = [creature], card, post = [youOwn, thatIsnt(in(battlefield))]))]),
           adds,
           chosenQuality(ofChosen(subtype(creature)))))]})

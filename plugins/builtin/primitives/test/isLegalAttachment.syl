@@ -1,0 +1,1 @@
+primitive isLegalAttachment(side: AttachmentSide, counterpart: NounPhrase): Test = LegalAttachment

@@ -1,3 +1,0 @@
-primitive related(
-  label: RelationLabel,
-  counterpart: Option(NounPhrase) = none): Predicative = Related

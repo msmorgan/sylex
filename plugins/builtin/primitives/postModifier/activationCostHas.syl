@@ -1,3 +1,0 @@
-primitive activationCostHas(cost: Cost): PostModifier = ActivationCostHas {
-  spelling = "with $cost in its activation cost"
-}

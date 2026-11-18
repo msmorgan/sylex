@@ -1,0 +1,6 @@
+# "<subject> isn't <predicative>", `is` with its copula negated ("as long as it isn't
+# legendary"): `subject` does not match `predicative`.
+template isnt(subject: NounPhrase, predicative: Predicative): Condition {
+  spelling = "$subject aren't $predicative",
+  body = not(is($subject, $predicative))
+}

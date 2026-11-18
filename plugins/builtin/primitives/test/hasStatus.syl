@@ -1,0 +1,2 @@
+# The status test [CR#110.5]. Each wording is a Template over it at its kind of phrase.
+primitive hasStatus(status: Status): Test = HasStatus

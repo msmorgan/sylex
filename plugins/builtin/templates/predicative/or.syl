@@ -1,5 +1,0 @@
-# "<p> or <q>" after a copula ("that's white or blue"): the subject matches some arm.
-template or(disjuncts: List(Predicative)): Predicative {
-  spelling = "$disjuncts#<or>",
-  body = coord(or, $disjuncts)
-}

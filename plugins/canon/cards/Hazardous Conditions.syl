@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       spell(
         get(
-          bare(nominal(creature, post = [not(hasCounter)])),
+          bare(nominal(creature, post = [withNoCounters])),
           down(2),
           down(2),
           duration = untilEndOfTurn))]})

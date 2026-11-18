@@ -1,4 +1,0 @@
-# A status as a Predicative complement ("is tapped", "is phased out") [CR#110.5].
-coercion(status: Status): Predicative {
-  body = hasStatus($status)
-}

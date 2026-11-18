@@ -15,7 +15,7 @@ card singleFaced({
               faceAVillainousChoice(
                 instruct(defendingPlayer, sacrifice(a(creature))),
                 gainControl(
-                  target(nominal(creature, post = [controlledBy(defendingPlayer)])),
+                  target(nominal(creature, post = [controls(defendingPlayer)])),
                   duration = untilEndOfTurn)),
               doIf(
                 did(actor(you), gainControlOf(a(creature)), thisWay),

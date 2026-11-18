@@ -1,8 +1,0 @@
-# Attributive participial lookback before the head ("the exiled card", "the sacrificed creature"):
-# the object `action` was done to, read as it was then or by its last known information
-# [CR#608.2h]. In an ability linked to one that exiled cards, "the exiled card" is one that
-# ability exiled [CR#607.2a].
-template was(action: VerbPhrase): PreModifier {
-  spelling = "$action",
-  body = predicateDid({subj = any, action = $action, within = none})
-}

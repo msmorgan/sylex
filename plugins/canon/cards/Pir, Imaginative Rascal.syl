@@ -13,7 +13,7 @@ card singleFaced({
             putCounters(
               anyAmount,
               anyKind,
-              a(nominal(permanent, post = [controlledBy(or([you, a(teammate)]))])))),
+              a(nominal(permanent, post = [controls(or([you, a(teammate)]))])))),
           instead(putCounters(plus(thatMany, 1), thoseCounters, that(permanent)))))],
     power = 1,
     toughness = 1})

@@ -1,6 +1,0 @@
-# "both <left> and <right>" after a copula ("that's both red and white"): the subject matches both.
-# The correlative takes exactly two arms.
-template both(left: Predicative, right: Predicative): Predicative {
-  spelling = "both $left and $right",
-  body = and([$left, $right])
-}

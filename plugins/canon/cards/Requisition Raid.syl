@@ -12,4 +12,4 @@ card singleFaced({
               putCounters(
                 1,
                 printedKind(p1p1Counter),
-                each(nominal(creature, post = [controlledBy(target(player))]))))]))]})
+                each(nominal(creature, post = [controls(target(player))]))))]))]})

@@ -1,3 +1,0 @@
-primitive triggeredNotLeftStack: PostModifier = TriggeredNotLeftStack {
-  spelling = "that have triggered but not yet left the stack"
-}

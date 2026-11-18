@@ -1,5 +1,0 @@
-# "with the same name"
-template withTheSameName: PostModifier {
-  spelling = "with the same name",
-  body = agree(cardName, share)
-}

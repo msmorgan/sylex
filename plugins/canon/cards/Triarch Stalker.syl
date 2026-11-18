@@ -8,9 +8,7 @@ card singleFaced({
       static(
         abilityGrant(
           bare(
-            nominal(
-              creature,
-              post = [inCombat(attackerOf, counterpart = the(nominal(pre = [chosen], player)))])),
+            nominal(creature, post = [attacking(defender = the(nominal(pre = [chosen], player)))])),
           [menace]))],
     power = 4,
     toughness = 5})

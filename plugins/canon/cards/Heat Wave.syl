@@ -16,4 +16,4 @@ card singleFaced({
             payLife(
               amount = forEach(
                 1,
-                nominal(pre = [blocking], creature, post = [controlledBy(they)]))))))]})
+                nominal(pre = [blocking], creature, post = [controls(they)]))))))]})

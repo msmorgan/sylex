@@ -8,7 +8,7 @@ card singleFaced({
       static(can(actor(you), play(bare(nominal(pre = [goblin], spell)), from = onTop))),
       static(
         asLongAs(
-          is(topSlice(1), noun(a(nominal(pre = [goblin], card)))),
+          is(topSlice(1), a(nominal(pre = [goblin], card))),
           abilityGrantFrom(this(creature), [anyActivated], topSlice(1))))],
     power = 2,
     toughness = 2})

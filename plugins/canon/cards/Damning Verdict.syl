@@ -2,4 +2,4 @@ card singleFaced({
     name = "Damning Verdict",
     cost = [generic(3), pip(white), pip(white)],
     types = [sorcery],
-    text = [spell(destroy(allOf(nominal(creature, post = [not(hasCounter)]))))]})
+    text = [spell(destroy(allOf(nominal(creature, post = [withNoCounters]))))]})

@@ -1,4 +1,0 @@
-# A subtype as a Nominal head: a permanent of that subtype on the battlefield [CR#109.2,110.1].
-coercion(subtype: Subtype): Nominal {
-  body = subtype($subtype)
-}

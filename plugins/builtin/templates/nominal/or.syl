@@ -1,5 +1,0 @@
-# "<p> or <q>": union of domains.
-template or(disjuncts: List(Nominal)): Nominal {
-  spelling = "$disjuncts#<or>",
-  body = coord(or, $disjuncts)
-}

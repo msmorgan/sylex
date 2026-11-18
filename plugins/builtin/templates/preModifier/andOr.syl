@@ -1,5 +1,0 @@
-# "<p> and/or <q>": as `or`, an object matching any arm, the arms printed with "and/or".
-template andOr(disjuncts: List(PreModifier)): PreModifier {
-  spelling = "$disjuncts#<and/or>",
-  body = or($disjuncts)
-}

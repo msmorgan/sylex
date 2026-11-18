@@ -1,0 +1,1 @@
+primitive hasPossessor(axis: PossessorAxis, possessor: NounPhrase): Test = HasPossessor

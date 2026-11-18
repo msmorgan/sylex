@@ -1,4 +1,0 @@
-# Bare subtype test, with no zone implied.
-primitive hasSubtype(subtype: Subtype): PreModifier = HasSubtype {
-  spelling = "$subtype"
-}

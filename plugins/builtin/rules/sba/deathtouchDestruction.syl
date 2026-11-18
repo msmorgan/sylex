@@ -8,7 +8,7 @@ sba deathtouchDestruction {
     when = and([
         compareAmt(toughnessOf(this(creature)), greater, 0),
         did(
-          by(a(nominal(source, post = [hasKeyword(theKeyword(deathtouch))]))),
+          by(a(nominal(source, post = [withKeyword(theKeyword(deathtouch))]))),
           dealDamage(recipient = it),
           within(between(start = stateBasedActionsChecked, end = now)))]),
     then = destroy(this(creature))}

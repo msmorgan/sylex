@@ -1,0 +1,6 @@
+# "plotted": a card with the plotted designation, which plot's special action or an effect gives a
+# card in exile [CR#702.170a].
+template plotted: AdjectivePhrase {
+  spelling = "plotted",
+  body = hasDesignation(plotted)
+}

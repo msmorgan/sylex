@@ -1,0 +1,5 @@
+# "that is <predicative>", a subject relative over the copula ("a spell that's both red and
+# white"): the member matches `predicative`, as `is(member, predicative)` would hold.
+primitive thatIs(predicative: Predicative): RelativeClause = CopularRelative {
+  spelling = "that be $predicative"
+}

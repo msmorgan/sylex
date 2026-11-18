@@ -1,0 +1,5 @@
+# "with the same name"
+template withTheSameName: PrepositionPhrase {
+  spelling = "with the same name",
+  body = agree(cardName, share)
+}

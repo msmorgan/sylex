@@ -1,0 +1,6 @@
+# "that isn't <predicative>", `thatIs` with its copula negated ("Creatures that aren't of the
+# chosen type", *Crippling Fear*): the member does not match `predicative`.
+template thatIsnt(predicative: Predicative): RelativeClause {
+  spelling = "that aren't $predicative",
+  body = not(thatIs($predicative))
+}

@@ -12,7 +12,7 @@ card singleFaced({
       activated(
         loyaltySymbol(down(6)),
         sequentially([
-            separateIntoPiles(allOf(nominal(permanent, post = [controlledBy(target(player))])), 2),
+            separateIntoPiles(allOf(nominal(permanent, post = [controls(target(player))])), 2),
             instruct(
               they,
               sacrifice(allOf(nominal(permanent, post = [inPile(pileOfChoice(they))]))))]))],

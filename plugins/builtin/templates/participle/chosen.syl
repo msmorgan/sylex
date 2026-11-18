@@ -1,0 +1,4 @@
+template chosen: Participle {
+  spelling = "chosen",
+  body = chosenRef(theChoice)
+}

@@ -1,0 +1,2 @@
+# An integer stands as an amount: "3" in "deals 3 damage".
+member(Int): Amount

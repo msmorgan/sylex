@@ -10,7 +10,7 @@ card singleFaced({
       indestructible,
       whenever(
         does(by(you), putCounters(anyAmount, anyKind, a(nominal(pre = [other], creature)))),
-        if = is(it, not(noun(a(kree)))),
+        if = is(it, not(a(kree))),
         may(putCounters(thatMuch, thoseCounters, shortenedName)))],
     power = 4,
     toughness = 4})

@@ -1,0 +1,5 @@
+# "attached to <host>"
+template attachedTo(host: NounPhrase): Participle {
+  spelling = "attached to $host",
+  body = attachment(attachment, counterpart = $host)
+}

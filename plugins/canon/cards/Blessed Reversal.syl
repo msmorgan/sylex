@@ -2,7 +2,4 @@ card singleFaced({
     name = "Blessed Reversal",
     cost = [generic(1), pip(white)],
     types = [instant],
-    text = [
-      spell(
-        gainLife(
-          forEach(3, nominal(creature, post = [inCombat(attackerOf, counterpart = you)]))))]})
+    text = [spell(gainLife(forEach(3, nominal(creature, post = [attacking(defender = you)]))))]})

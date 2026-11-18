@@ -1,0 +1,5 @@
+# "with no counters on it" (*Damning Verdict*)
+template withNoCounters: PrepositionPhrase {
+  spelling = "with no counters on it",
+  body = not(hasCounter)
+}

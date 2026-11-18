@@ -1,1 +1,0 @@
-primitive shares(axis: QualitySort, agreement: Agreement, with: NounPhrase): Predicative = Shares

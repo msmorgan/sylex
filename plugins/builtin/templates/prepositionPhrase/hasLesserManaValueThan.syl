@@ -1,0 +1,5 @@
+# "with lesser mana value than <than>" (*Death's Oasis*).
+template hasLesserManaValueThan(than: NounPhrase): PrepositionPhrase {
+  spelling = "with lesser mana value than $than",
+  body = compare(less, statOf(stat(manaValue), $than), [stat(manaValue)])
+}

@@ -8,7 +8,7 @@ action explore {
     sequentially([
         reveal(slice(top, 1, libraryOf(they))),
         doIf(
-          is(that(card), noun(a(land))),
+          is(that(card), a(land)),
           putInto(that(card), zone(hand, ownerOf(that(card)))),
           otherwise = sequentially([
               putCounters(1, printedKind(p1p1Counter), $actor),

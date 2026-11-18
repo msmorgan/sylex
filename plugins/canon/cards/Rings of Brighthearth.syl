@@ -5,7 +5,7 @@ card singleFaced({
     text = [
       whenever(
         does(actor(you), activate(a(abilityHead(anyActivated)))),
-        if = not(is(that(ability), noun(a(manaAbility)))),
+        if = isnt(that(ability), a(manaAbility)),
         may(
           pay(payment(mana([generic(2)])), once),
           ifDid = sequentially([

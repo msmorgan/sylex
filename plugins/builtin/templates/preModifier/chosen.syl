@@ -1,4 +1,0 @@
-template chosen: PreModifier {
-  spelling = "chosen",
-  body = chosenRef(theChoice)
-}

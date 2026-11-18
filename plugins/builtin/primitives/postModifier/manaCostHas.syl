@@ -1,3 +1,0 @@
-primitive manaCostHas(symbol: ManaSymbol): PostModifier = ManaCostHas {
-  spelling = "with $symbol in its mana cost"
-}

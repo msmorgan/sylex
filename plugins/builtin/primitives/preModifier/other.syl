@@ -1,3 +1,0 @@
-primitive other: PreModifier = Other {
-  spelling = "other"
-}

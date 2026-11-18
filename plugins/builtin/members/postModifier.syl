@@ -1,0 +1,6 @@
+# What stands after a head: a preposition phrase ("with flying"), a relative clause ("you
+# control"), an adjective phrase ("other than this creature") or a participle ("attached to it").
+member(PrepositionPhrase): PostModifier
+member(RelativeClause): PostModifier
+member(AdjectivePhrase): PostModifier
+member(Participle): PostModifier

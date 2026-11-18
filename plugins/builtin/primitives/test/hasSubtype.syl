@@ -1,0 +1,2 @@
+# The subtype test alone, with no zone implied.
+primitive hasSubtype(subtype: Subtype): Test = HasSubtype

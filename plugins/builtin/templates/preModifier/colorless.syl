@@ -1,4 +1,0 @@
-template colorless: PreModifier {
-  spelling = "colorless",
-  body = colorCount(equal, 0)
-}

@@ -1,5 +1,0 @@
-# "<who> owns"
-template ownedBy(who: NounPhrase): PostModifier {
-  spelling = "$who own",
-  body = hasPossessor(owner, $who)
-}

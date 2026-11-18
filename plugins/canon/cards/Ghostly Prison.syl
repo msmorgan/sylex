@@ -12,4 +12,4 @@ card singleFaced({
               2,
               nominal(
                 creature,
-                post = [controlledBy(they), inCombat(attackerOf, counterpart = you)])))))]})
+                post = [controls(they), inCombat(attackerOf, counterpart = you)])))))]})

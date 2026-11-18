@@ -12,7 +12,7 @@ card singleFaced({
                 creature,
                 post = [
                   anOpponentControls,
-                  hasKeyword(thatKeyword),
+                  withKeyword(thatKeyword),
                   not(named(printedName("Escaped Shapeshifter")))])),
             keywordGrant(
               this(creature),

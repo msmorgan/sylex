@@ -1,0 +1,3 @@
+primitive manaCostHas(symbol: ManaSymbol): PrepositionPhrase = ManaCostHas {
+  spelling = "with $symbol in its mana cost"
+}

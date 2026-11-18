@@ -1,0 +1,16 @@
+card singleFaced({
+    name = "Unable to Scream",
+    cost = [pip(blue)],
+    types = [enchantment],
+    subtypes = [aura],
+    text = [
+      enchant(hasType(creature)),
+      static(
+        conjunction([
+            allAbilityLoss(enchanted(creature)),
+            qualityChange(
+              it,
+              adds,
+              bundle({characteristics = {types = [artifact, creature], subtypes = [toy]}})),
+            getsBase(it, 0, 2)])),
+      static(asLongAs(is(enchanted(creature), faceDown), cant(any, turnFaceUp(it))))]})

@@ -3,7 +3,7 @@
 # quantificational force; semantics reads the force from where the phrase stands
 # (`docs/design/semantics.md` §2.4): the universal in *Glorious Anthem*'s "Creatures you control get
 # +1/+1", a test of each member in *Pithing Needle*'s "unless they're mana abilities"
-# (`noun(bare(manaAbility))`), an indefinite in *Aggressive Mining*'s "You can't play lands", a
+# (`bare(manaAbility)`), an indefinite in *Aggressive Mining*'s "You can't play lands", a
 # measured domain in "the number of creatures you control" (`countOf`).
 template bare(p: Nominal): NounPhrase {
   spelling = "$p",

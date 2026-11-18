@@ -1,4 +1,0 @@
-template blocked: PreModifier {
-  spelling = "blocked",
-  body = inCombat(blockedBy)
-}

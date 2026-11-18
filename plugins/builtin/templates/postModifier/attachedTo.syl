@@ -1,5 +1,0 @@
-# "attached to <host>"
-template attachedTo(host: NounPhrase): PostModifier {
-  spelling = "attached to $host",
-  body = attachment(attachment, counterpart = $host)
-}

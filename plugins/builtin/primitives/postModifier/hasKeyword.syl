@@ -1,3 +1,0 @@
-primitive hasKeyword(keyword: KeywordTerm): PostModifier = HasKeyword {
-  spelling = "with $keyword"
-}

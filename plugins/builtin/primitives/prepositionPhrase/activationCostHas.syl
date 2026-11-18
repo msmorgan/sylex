@@ -1,0 +1,3 @@
+primitive activationCostHas(cost: Cost): PrepositionPhrase = ActivationCostHas {
+  spelling = "with $cost in its activation cost"
+}

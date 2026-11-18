@@ -7,5 +7,5 @@ card singleFaced({
         sequentially([
             exile(topSlice(1)),
             doIf(
-              is(it, noun(a(nominal(pre = [permanent], card)))),
+              is(it, a(nominal(pre = [permanent], card))),
               may(putOntoBattlefield(it), ifDid = repeat(again)))]))]})

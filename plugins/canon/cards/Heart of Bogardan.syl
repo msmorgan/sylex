@@ -20,5 +20,5 @@ card singleFaced({
                 amount = letter(x),
                 recipient = and([
                     target(or([player, planeswalker])),
-                    each(nominal(creature, post = [controlledBy(splitOverPlaneswalker)]))]))),
+                    each(nominal(creature, post = [controls(splitOverPlaneswalker)]))]))),
             define(x, minus(times(2, countersOn(ageCounter, this(enchantment))), 2))]))]})

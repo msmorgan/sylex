@@ -1,3 +1,0 @@
-primitive named(source: NameSource): PostModifier = Named {
-  spelling = "named $source"
-}

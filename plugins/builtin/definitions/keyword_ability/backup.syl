@@ -10,7 +10,7 @@ ability backup(amount: Amount) {
       sequentially([
           putCounters($amount, printedKind(p1p1Counter), target(creature)),
           doIf(
-            is(that(creature), noun(a(nominal(pre = [other], creature)))),
+            is(that(creature), a(nominal(pre = [other], creature))),
             establishThroughout(
               abilityGrantSelected(that(creature), printedAfter(backup), this(creature)),
               untilEndOfTurn))]))]

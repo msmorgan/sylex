@@ -1,0 +1,7 @@
+# "both <left> and <right>" ("that's both red and white", "both you and that player"). The
+# correlative takes exactly two items.
+template both(left: Self, right: Self): Self {
+  at = [AdjectivePhrase, NounPhrase],
+  spelling = "both $left and $right",
+  body = and([$left, $right])
+}

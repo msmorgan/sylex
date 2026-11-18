@@ -14,4 +14,4 @@ card singleFaced({
               3,
               nominal(
                 creature,
-                post = [controlledBy(they), inCombat(blockerOf, counterpart = it)])))))]})
+                post = [controls(they), inCombat(blockerOf, counterpart = it)])))))]})

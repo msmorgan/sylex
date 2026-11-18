@@ -1,0 +1,16 @@
+# "<a> and/or <b>": as `or`, with the items printed with "and/or".
+template andOr(items: List(Self)): Self {
+  at = [
+    AdjectivePhrase,
+    PrepositionPhrase,
+    RelativeClause,
+    Participle,
+    Nominal,
+    NounPhrase,
+    PreModifier,
+    PostModifier,
+    Predicative,
+    Test],
+  spelling = "$items#<and/or>",
+  body = coord(andOr, $items)
+}

@@ -1,0 +1,15 @@
+# A coordination of phrases of one sort, which the Templates `or`, `and` and `andOr` word. It
+# stands at the lowest of its sorts that holds every item.
+primitive coord(coordinator: Coordinator, items: List(Self)): Self = Coordination {
+  at = [
+    AdjectivePhrase,
+    PrepositionPhrase,
+    RelativeClause,
+    Participle,
+    Nominal,
+    NounPhrase,
+    PreModifier,
+    PostModifier,
+    Predicative,
+    Test]
+}

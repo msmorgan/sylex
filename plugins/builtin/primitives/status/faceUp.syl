@@ -1,7 +1,2 @@
-# "face up": a permanent's face-up status [CR#110.5].
-primitive faceUp: Status = FaceUp {
-  lexical = {
-    prepositions = [
-      {lemma = "face up", frames = [{complement = Intransitive, hosts = NominalAndPredicate}]}]},
-  spelling = "face up"
-}
+# A permanent's face-up status [CR#110.5].
+primitive faceUp: Status = FaceUp
