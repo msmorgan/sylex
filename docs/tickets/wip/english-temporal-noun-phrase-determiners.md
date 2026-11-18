@@ -17,11 +17,17 @@ holds a postmodifier that the temporal Production leaves outside: 132 units, suc
 time a source of your choice would deal damage to you this turn* (*Circle of Protection: Red*)
 and *four or more times this turn* (*Dragon Whelp*).
 
-## Open questions
+## Design
 
-- Which determiners does a temporal Adjunct of location or frequency take, and are the
-  differences from `Determined` (`TemporalLocation` refuses articles and numerals, `SerialTemporal`
-  takes every determiner) facts of English or gates (`docs/design/english.md` §6)?
+- A temporal location or frequency Adjunct is a Noun Phrase (CGEL Ch. 8 §6.3, p. 698; §9, p. 715),
+  so `TemporalLocation` and `SerialTemporal` take the Noun Phrase the Noun Phrase Productions build
+  (`MaximumSerialTemporal` is `SerialTemporal` over `MaximumDetermination`'s). Their differences
+  from `Determined` are gates, each backed by a card: a Noun Phrase that ends in its head
+  (relatives are `RelativeTemporalLocation`'s, a following *this turn* or *each turn* is a second
+  Adjunct), no dependent outside the determiner, and for a period noun no `Dependent`, `Numerical`
+  or `IndefiniteArticle` determiner (English refuses a bare *the*, p. 698; the others are gates).
+- *A number of* is number-transparent (CGEL Ch. 5 §3.3, p. 350): `TransparentQuantity` takes *a*
+  as well as *any*, and `DeterminedTemporalQuantity` is `TemporalQuantity` over it.
 
 ## Done when
 
