@@ -270,6 +270,7 @@ impl Parse<'_> {
             LexicalReading::Word(value) => Some((value.lexeme, value.form)),
             LexicalReading::OwnName { .. }
             | LexicalReading::FlavorWord { .. }
+            | LexicalReading::SetName { .. }
             | LexicalReading::Numeral { .. } => None,
         }
     }

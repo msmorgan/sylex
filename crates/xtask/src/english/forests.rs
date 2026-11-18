@@ -375,6 +375,7 @@ fn unit_rows(
                     LexicalReading::Word(word) => Some((word.lexeme, word.form)),
                     LexicalReading::OwnName { .. }
                     | LexicalReading::FlavorWord { .. }
+                    | LexicalReading::SetName { .. }
                     | LexicalReading::Numeral { .. } => None,
                 };
                 Ok(AlternativeRow {
@@ -879,6 +880,9 @@ fn write_leaves(
             ),
             LexicalReading::FlavorWord { .. } => {
                 (Val::Static("flavor word"), Val::Null, Val::Null, Val::Null)
+            }
+            LexicalReading::SetName { .. } => {
+                (Val::Static("set name"), Val::Null, Val::Null, Val::Null)
             }
             LexicalReading::Numeral { value, .. } => (
                 Val::Static("numeral"),

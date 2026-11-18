@@ -429,7 +429,8 @@ impl Parse<'_> {
             }
             LexicalReading::OwnName { .. }
             | LexicalReading::Numeral { .. }
-            | LexicalReading::FlavorWord { .. } => Binding::Free,
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::SetName { .. } => Binding::Free,
         })
     }
 

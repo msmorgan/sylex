@@ -143,7 +143,9 @@ fn a_name_is_its_card_s_own_in_its_scope_and_another_card_s_elsewhere() {
             .filter(|reading| match reading {
                 LexicalReading::Word(value) => value.lexeme == other,
                 LexicalReading::OwnName { .. } => true,
-                LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. } => false,
+                LexicalReading::Numeral { .. }
+                | LexicalReading::FlavorWord { .. }
+                | LexicalReading::SetName { .. } => false,
             })
             .collect()
     };

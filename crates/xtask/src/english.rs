@@ -459,7 +459,8 @@ fn dump_reading(
             }
             Some(
                 sylex_lexicon::LexicalReading::Numeral { .. }
-                | sylex_lexicon::LexicalReading::FlavorWord { .. },
+                | sylex_lexicon::LexicalReading::FlavorWord { .. }
+                | sylex_lexicon::LexicalReading::SetName { .. },
             )
             | None => "-".to_owned(),
         };

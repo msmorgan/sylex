@@ -149,7 +149,7 @@ impl Prediction {
             // An own name, a numeral or a Flavor Word.
             debug_assert!(matches!(
                 leaf.category,
-                Category::Catalog | Category::Numeral | Category::FlavorWord
+                Category::Catalog | Category::Numeral | Category::FlavorWord | Category::SetName
             ));
             self.add_tests(grammar, leaf, None, active);
         }

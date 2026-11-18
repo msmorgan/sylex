@@ -746,6 +746,7 @@ fn lexical(reading: &LexicalReading) -> String {
         }
         LexicalReading::OwnName { name, form } => format!("own name {name:?} {form:?}"),
         LexicalReading::FlavorWord { label } => format!("flavor word {label:?}"),
+        LexicalReading::SetName { name } => format!("set name {name:?}"),
         LexicalReading::Numeral {
             value, notation, ..
         } => format!("numeral {value} {notation:?}"),

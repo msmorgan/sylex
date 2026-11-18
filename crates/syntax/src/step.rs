@@ -2742,7 +2742,8 @@ impl CompiledGrammar {
             LexicalReading::Word(value) => self.value_facts(value).map(|v| v.edges),
             LexicalReading::OwnName { .. }
             | LexicalReading::Numeral { .. }
-            | LexicalReading::FlavorWord { .. } => sylex_lexicon::Edges::non_word(reading),
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::SetName { .. } => sylex_lexicon::Edges::non_word(reading),
         }
     }
 
@@ -2808,6 +2809,16 @@ impl CompiledGrammar {
                 notation: None,
                 lexeme: None,
                 category: LexicalCategory::FlavorWord,
+                features: [None; MAX_FEATURES],
+                forms: 0,
+                other_card_name: false,
+            }),
+            LexicalReading::SetName { .. } => Some(LeafFacts {
+                binding: sylex_lexicon::Binding::Free,
+                integer: None,
+                notation: None,
+                lexeme: None,
+                category: LexicalCategory::SetName,
                 features: [None; MAX_FEATURES],
                 forms: 0,
                 other_card_name: false,

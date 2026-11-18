@@ -1458,14 +1458,15 @@ impl CompiledGrammar {
     /// the form of a syncretic head (*cast* as present or preterite) differ
     /// here.
     /// `None` where that leaf is no declared word: a card's own name, a
-    /// numeral or a Flavor Word ([`Self::head_leaf`]).
+    /// numeral, a Flavor Word or a Set Name ([`Self::head_leaf`]).
     #[must_use]
     pub fn head_word<'r>(&self, reading: &'r Reading) -> Option<&'r LexicalValue> {
         match self.head_leaf(reading)? {
             LexicalReading::Word(value) => Some(value),
             LexicalReading::OwnName { .. }
             | LexicalReading::Numeral { .. }
-            | LexicalReading::FlavorWord { .. } => None,
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::SetName { .. } => None,
         }
     }
 
@@ -1541,7 +1542,8 @@ impl CompiledGrammar {
                     }
                     LexicalReading::OwnName { .. }
                     | LexicalReading::Numeral { .. }
-                    | LexicalReading::FlavorWord { .. } => Binding::Free,
+                    | LexicalReading::FlavorWord { .. }
+                    | LexicalReading::SetName { .. } => Binding::Free,
                 };
                 out.push((text, binding, AtomKind::Word));
             }

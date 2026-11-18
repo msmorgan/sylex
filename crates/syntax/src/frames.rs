@@ -188,6 +188,9 @@ pub enum SlotKind {
     Amount,
     Cost,
     Intransitive,
+    /// A Set Name, the parameter a noun takes before it (*the Antiquities
+    /// expansion*).
+    SetName,
     /// A derived unlike Frame Slot ([`SlotFill::Unlike`]): the grammar's
     /// unlike slot of this index, never a declared kind.
     #[serde(skip)]

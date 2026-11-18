@@ -45,6 +45,17 @@ use crate::step::Test;
 use crate::step::Unlike;
 use crate::step::Weight;
 
+/// The parameter patterns a Parameters schema takes: those of the lexemes of
+/// its head Category (of one binding, where it names one) whose parameters
+/// stand on its side of the head, where it names one
+/// (`grammar::SchemaDecl::Parameters`).
+#[derive(Debug, Clone, Copy)]
+struct PatternSelection {
+    head: LexicalCategory,
+    binding: Option<Binding>,
+    side: Option<crate::grammar::Side>,
+}
+
 /// The lexical facts a bound grammar keeps about one lexeme.
 #[derive(Debug, Clone)]
 pub(crate) struct LexemeFacts {
@@ -2657,10 +2668,14 @@ impl<'a> Binder<'a> {
                 coordinators,
                 remnant,
                 capital_after,
+                side,
             } => self.parameters(
-                *head,
+                PatternSelection {
+                    head: *head,
+                    binding: *binding,
+                    side: *side,
+                },
                 phrase,
-                *binding,
                 coordinators.as_deref(),
                 remnant.as_deref(),
                 capital_after,
@@ -3098,14 +3113,18 @@ impl<'a> Binder<'a> {
 
     fn parameters(
         &mut self,
-        head: LexicalCategory,
+        selection: PatternSelection,
         phrase: &str,
-        binding: Option<Binding>,
         coordinators: Option<&str>,
         remnant: Option<&str>,
         capital_after: &[char],
     ) -> Result<Vec<Draft>, LoadError> {
         use crate::frames::ParameterPart;
+        let PatternSelection {
+            head,
+            binding,
+            side,
+        } = selection;
         let coordinator = coordinators.map(|c| self.coordinator_test(c)).transpose()?;
         let lhs = self.category(phrase)?;
         let remnant = remnant.map(|r| self.category(r)).transpose()?;
@@ -3130,6 +3149,28 @@ impl<'a> Binder<'a> {
                         "parameter pattern of `{id}` needs one head"
                     )));
                 }
+                // The side of the head its parameters, the parts that are no
+                // feature value, stand on.
+                let structural: Vec<&ParameterPart> = parts
+                    .iter()
+                    .filter(|part| !matches!(part, ParameterPart::Feature(..)))
+                    .collect();
+                let pattern_side = match structural.as_slice() {
+                    [ParameterPart::Head, _, ..] => Some(crate::grammar::Side::After),
+                    [.., _, ParameterPart::Head] => Some(crate::grammar::Side::Before),
+                    _ => None,
+                };
+                if let Some(side) = side {
+                    let Some(pattern_side) = pattern_side else {
+                        return Err(invalid(format!(
+                            "parameter pattern of `{id}` puts its parameters on neither side of \
+                             its head, which `{phrase}` selects by side"
+                        )));
+                    };
+                    if pattern_side != side {
+                        continue;
+                    }
+                }
                 let mut draft = Draft::new(format!("Parameters:{phrase}/{id}/{index}"), lhs, 0);
                 for part in parts {
                     let (name, symbol) = match part {
@@ -3147,8 +3188,14 @@ impl<'a> Binder<'a> {
                             continue;
                         }
                         ParameterPart::Head => ("head", Symbol::Leaf(Test::Word(lexeme))),
+                        // A parameter that premodifies its head is a
+                        // Modifier of it (*the Antiquities expansion*).
                         ParameterPart::Slot(kind) => (
-                            "complement",
+                            if side == Some(crate::grammar::Side::Before) {
+                                "modifier"
+                            } else {
+                                "complement"
+                            },
                             Symbol::Cat {
                                 binding: None,
                                 category: self.slot_category(*kind)?,
@@ -3184,10 +3231,6 @@ impl<'a> Binder<'a> {
                     }
                     draft.child(name, symbol, GapRule::Closed);
                 }
-                let structural: Vec<&ParameterPart> = parts
-                    .iter()
-                    .filter(|part| !matches!(part, ParameterPart::Feature(..)))
-                    .collect();
                 // A pattern that begins with its head and has more after it
                 // also stands without the head, as a Complement Cluster's
                 // remnant (`grammar::ClustersDecl::remnants`).

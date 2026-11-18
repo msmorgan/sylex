@@ -548,6 +548,13 @@ pub enum SchemaDecl {
         /// by an em dash does (*Modular—Sunburst*).
         #[serde(default)]
         capital_after: Vec<char>,
+        /// The side of the head its patterns' parameters stand on, where
+        /// the schema takes only those patterns: `After` for a nominal
+        /// indexed by its parameter (*level 2*), `Before` for one its
+        /// parameter premodifies (*the Antiquities expansion*). Without it,
+        /// the schema takes every pattern of its head Category.
+        #[serde(default)]
+        side: Option<Side>,
     },
     /// Frame-driven phrases headed by every lexeme of a lexical Category.
     ///

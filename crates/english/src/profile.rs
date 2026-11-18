@@ -130,6 +130,7 @@ pub enum Class {
     Number,
     Symbol,
     FlavorWord,
+    SetName,
 }
 
 impl Class {
@@ -138,6 +139,7 @@ impl Class {
             LexicalReading::Numeral { .. } => Self::Number,
             LexicalReading::FlavorWord { .. } => Self::FlavorWord,
             LexicalReading::OwnName { .. } => Self::CardName,
+            LexicalReading::SetName { .. } => Self::SetName,
             LexicalReading::Word(value) => {
                 let id = value.lexeme.as_str();
                 let prefix = id.split(':').next().unwrap_or("");
@@ -178,6 +180,7 @@ impl Class {
             Self::Number => "<Number>",
             Self::Symbol => "<Symbol>",
             Self::FlavorWord => "<FlavorWord>",
+            Self::SetName => "<SetName>",
         })
     }
 }
