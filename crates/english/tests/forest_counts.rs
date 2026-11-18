@@ -32,9 +32,9 @@ const ENUMERATE: u128 = 10_000;
 /// Real units of every size class, by face: one Derivation (*+2 Mace*); a
 /// few (*Crook of Condemnation*, *Cruel Calculations*, and *Aetheric
 /// Amplifier*'s three live roots); tens (*Hauken's Insight*); hundreds
-/// (*Dawnhand Dissident*'s two live roots, *Coram, the Undertaker*); and
-/// thousands (*Draugr Necromancer* 3,312, *Maralen, Fae Ascendant*, *Remove
-/// Enchantments*).
+/// (*Dawnhand Dissident*'s two live roots, *Coram, the Undertaker*, *Remove
+/// Enchantments*); and thousands (*Draugr Necromancer* 3,312, *Maralen, Fae
+/// Ascendant*, *Muse Vortex*).
 const SAMPLE: &[&str] = &[
     "+2 Mace",
     "Crook of Condemnation",
@@ -46,6 +46,7 @@ const SAMPLE: &[&str] = &[
     "Draugr Necromancer",
     "Maralen, Fae Ascendant",
     "Remove Enchantments",
+    "Muse Vortex",
 ];
 
 /// Time spent in each pass over one text.

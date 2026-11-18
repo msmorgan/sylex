@@ -184,7 +184,7 @@ fn false_judgments_fail() {
     }
 }
 
-/// *Remove Enchantments* and *Maralen, Fae Ascendant* are
+/// *Muse Vortex* and *Maralen, Fae Ascendant* are
 /// evaluated like any unit: their entries hold, and a false
 /// assertion on them fails on the assertion, not on their size.
 #[test]

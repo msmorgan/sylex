@@ -386,7 +386,7 @@ fn picks_and_exclusions_narrow_to_the_enumerated_readings_that_agree() {
     });
 }
 
-/// *Remove Enchantments*' only line, a forest of thousands of Derivations,
+/// *Remove Enchantments*' only line, a forest of hundreds of Derivations,
 /// narrows to one Derivation without enumerating, and each count the command
 /// prints is the Derivations the survey's option counts leave.
 #[test]
