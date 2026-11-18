@@ -44,6 +44,7 @@ fn lexicon() -> Lexicon {
         Lexeme::invariant("p:with", "with", Category::Preposition, core()),
         Lexeme::invariant("p:on", "on", Category::Preposition, core()),
         Lexeme::invariant("p:of", "of", Category::Preposition, core()),
+        Lexeme::invariant("a:last", "last", Category::Adjective, core()),
         count("n:instant", "instant"),
         count("n:sorcery", "sorcery"),
         count("n:graveyard", "graveyard"),
@@ -89,6 +90,7 @@ const GRAMMAR: &str = r#"
     category Nominal [Number, Countability]
     category NounPhrase [Number, Determination]
     category PrepositionPhrase
+    category AdjectivePhrase
     category Sentence
     category VerbPhrase [VerbForm]
     word Each = "d:each"
@@ -115,6 +117,8 @@ const GRAMMAR: &str = r#"
         NounPhrase adjunct:Word(Each) modifier:Hosted(PrepositionPhrase, Nominal) {
         coordinated: [head],
     }
+    Adj: AdjectivePhrase -> Lex(Adjective)
+    CoordinationPremodifier: Nominal -> modifier:AdjectivePhrase Nominal
     valence VerbPhrase { head: Verb }
     valence PrepositionPhrase { head: Preposition }
     valence Nominal { head: Noun }
@@ -136,6 +140,20 @@ fn grammar(lexicon: &Lexicon) -> CompiledGrammar {
         &FrameCatalog::from_ron_str(FRAMES).unwrap(),
     )
     .unwrap()
+}
+
+/// Whether a node of Production `outer` has a child of Production `inner`.
+fn has_nested(reading: &Reading, outer: &str, inner: &str) -> bool {
+    match reading {
+        Reading::Leaf(_) => false,
+        Reading::Node(node) => {
+            (node.production.as_str() == outer
+                && node.children.iter().any(
+                    |c| matches!(c, Reading::Node(child) if child.production.as_str() == inner),
+                ))
+                || node.children.iter().any(|c| has_nested(c, outer, inner))
+        }
+    }
 }
 
 fn has_production(reading: &Reading, target: &str) -> bool {
@@ -222,6 +240,22 @@ fn unlike_omissions_hold_only_for_undetermined_bare_head_coordinations() {
         .readings()
         .collect();
     assert_eq!(cauldron.len(), 2, "{cauldron:#?}");
+
+    // Ice Cauldron: an attributive adjective over that coordination leaves
+    // it the host, so *of mana* postmodifies *last [type and amount]*
+    // (*this artifact's last noted type and amount of mana*).
+    let noted: Vec<Reading> = grammar
+        .parse(&lexicon, "Note the last type and amount of mana.")
+        .readings()
+        .collect();
+    assert!(
+        noted.iter().any(|r| has_nested(
+            r,
+            "Adjunct:Nominal+PrepositionPhrase/After/Nominal",
+            "CoordinationPremodifier"
+        )),
+        "{noted:#?}"
+    );
 
     // Johann, Apprentice Sorcerer: in *cast an instant or sorcery spell from
     // the top of your library*, the second Nominal conjunct *sorcery from the

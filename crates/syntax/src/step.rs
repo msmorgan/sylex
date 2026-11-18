@@ -1035,10 +1035,12 @@ pub(crate) struct Summary {
     /// (`LeafFacts::forms`).
     pub head_forms: u16,
     /// It is a coordination of undetermined bare-head phrases whose conjuncts
-    /// omit unlike Complements, the last conjunct's `omitted_complement`: a
-    /// Preposition Phrase right after it may be a dependent of the whole
-    /// coordination, which cannot share it as a Complement (*the type and
-    /// amount of mana*), but of no other host.
+    /// omit unlike Complements, the last conjunct's `omitted_complement`, or
+    /// an undetermined bare-head phrase that ends in one, its head (*last
+    /// noted [type and amount]*): a Preposition Phrase right after it may be
+    /// a dependent of the coordination or of that phrase, which cannot share
+    /// it as a Complement (*the type and amount of mana*), but of no other
+    /// host.
     pub unlike_omissions: bool,
     /// The preposition and complement frame heading a Preposition Phrase.
     pub preposition: Option<(Lexeme, usize)>,
@@ -2637,10 +2639,15 @@ impl Production {
             } else {
                 state.omitted_complement
             },
-            unlike_omissions: coordinated
-                && state.bare_head
-                && state.unlike_omissions
-                && state.omitted_complement != 0,
+            // An undetermined bare-head phrase whose last child is such a
+            // coordination, its head, keeps it, so a pre-head dependent over
+            // the coordination leaves it the host (*[last noted [type and
+            // amount]] of mana*, Ice Cauldron).
+            unlike_omissions: state.bare_head
+                && ((coordinated && state.unlike_omissions && state.omitted_complement != 0)
+                    || (self.shape.undetermined_head_final
+                        && self.omission != Omission::Selected
+                        && state.after_unlike_omissions)),
             preposition: if coordinated && state.mixed_prepositions {
                 None
             } else {
