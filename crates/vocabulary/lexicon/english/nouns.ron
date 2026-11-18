@@ -222,7 +222,10 @@
     // outside the game*). Elsewhere *outside* is the preposition (*from
     // outside the game*, *cards you own outside the game*).
     "outside the game",
-    (lemma: "mana cost", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PP(["for", "of"])), Complement(Cost)]),
+    // The object whose mana cost it is [CR#202.1a] (*the mana cost for spells
+    // you cast*, *the mana costs of exiled cards*), never a duration (*its
+    // mana cost for as long as it remains exiled*, Spelljack).
+    (lemma: "mana cost", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PPWith(["for", "of"], NP)), Complement(Cost)]),
     // An object's mana value [CR#202.3] and its bearer (*the mana value of the
     // exiled card*; CGEL, Ch. 5, §14.1, p. 442, [7i]), as *power* takes.
     (lemma: "mana value", countability: [Count, Mass], bare_mass_modified: true, frames: [Complement(PPWith(["of"], NP)), Complement(Amount)]),
