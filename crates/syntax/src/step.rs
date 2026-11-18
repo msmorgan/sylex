@@ -147,8 +147,8 @@ pub(crate) enum GapRule {
     Raise(Gap),
 }
 
-/// How heavy a child must be: one lexical leaf, more than one, or
-/// postposable.
+/// How heavy a child must be: one lexical leaf, more than one, postposable,
+/// head-final or complement-final.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Weight {
     Light,
@@ -159,6 +159,14 @@ pub(crate) enum Weight {
     /// large blue bucket full of ice-cubes]*). A head-final phrase (*this
     /// turn*, *a card*) or a single word stays in place.
     Postposable,
+    /// A phrase that ends in its head, not in a dependent of it
+    /// (`Summary::head_final`), or a single word: a genitive's possessor,
+    /// whose marker follows its head noun.
+    HeadFinal,
+    /// A phrase that ends in its head or, through the Complements it and
+    /// they end in, in the last one's head (`Summary::complement_final`):
+    /// no unselected dependent ends it.
+    ComplementFinal,
 }
 
 /// A lexical leaf test.
@@ -456,6 +464,8 @@ pub(crate) struct Shape {
     pub keeps_coordination: bool,
     /// Its last non-punctuation child is in the head line.
     pub ends_in_head_line: bool,
+    /// Its last non-punctuation child is in the head line or a `complement`.
+    pub ends_in_complement_line: bool,
     /// Its last non-punctuation child is in the head line and it takes no
     /// `Determiner` child.
     pub undetermined_head_final: bool,
@@ -880,6 +890,7 @@ pub(crate) fn resolve(
             conjoined: false,
             leaves: 0,
             head_final: false,
+            complement_final: false,
             bare_head: true,
             final_preposition: None,
             final_adjunct: None,
@@ -975,6 +986,12 @@ pub(crate) struct Summary {
     /// dependent of it: its last child is in the head line and itself ends in
     /// its head (a leaf does).
     pub head_final: bool,
+    /// It ends in its head or in a Complement that itself does so: its last
+    /// child is in the head line or a `complement`, and is itself
+    /// `complement_final` (a leaf is). No Adjunct, Modifier or other
+    /// dependent ends it (*any number of [target players]*, never *the top
+    /// card [of target player]* with its unselected *of* phrase).
+    pub complement_final: bool,
     /// It ends in its head, undetermined (and, for a coordination, every
     /// conjunct does): no `Determiner` stands on its head line, and its last
     /// child is in the head line and itself `bare_head`.
@@ -1299,6 +1316,9 @@ pub(crate) struct State {
     /// The last head-line child so far ends in its head
     /// (`Production::track_head_final`).
     pub head_final: bool,
+    /// The last head-line or Complement child so far is
+    /// `Summary::complement_final` (`Production::track_head_final`).
+    complement_final: bool,
     /// Every head-line child so far is `Summary::bare_head`
     /// (`Production::track_head_final`).
     bare_head: bool,
@@ -1506,6 +1526,13 @@ impl Production {
     /// then sets it. [`Production::finish`] reports it only when the last
     /// non-punctuation child is in the head line.
     fn track_head_final(&self, next: &mut State, position: usize, child: &ChildView<'_>) {
+        if self.head_line[position] || self.roles[position] == ChildRole::Complement {
+            match child {
+                ChildView::Node(summary) => next.complement_final = summary.complement_final,
+                ChildView::Leaf(..) => next.complement_final = true,
+                ChildView::Punct => {}
+            }
+        }
         if !self.head_line[position] {
             return;
         }
@@ -1808,6 +1835,16 @@ impl Production {
             Some(Weight::Postposable) => {
                 matches!(child, ChildView::Node(s) if !s.head_final || s.head_coordination)
             }
+            Some(Weight::HeadFinal) => match child {
+                ChildView::Node(summary) => summary.head_final,
+                ChildView::Leaf(..) => true,
+                ChildView::Punct => false,
+            },
+            Some(Weight::ComplementFinal) => match child {
+                ChildView::Node(summary) => summary.complement_final,
+                ChildView::Leaf(..) => true,
+                ChildView::Punct => false,
+            },
             None => true,
         }
     }
@@ -2127,6 +2164,9 @@ impl Production {
             post_adjunct_host,
             keeps_coordination,
             ends_in_head_line: children.last().is_some_and(|&at| self.head_line[at]),
+            ends_in_complement_line: children
+                .last()
+                .is_some_and(|&at| self.head_line[at] || roles[at] == ChildRole::Complement),
             undetermined_head_final: children.last().is_some_and(|&at| self.head_line[at])
                 && !roles.contains(&ChildRole::Determiner),
         };
@@ -2528,6 +2568,7 @@ impl Production {
             },
             leaves: state.leaves,
             head_final: state.head_final && self.shape.ends_in_head_line,
+            complement_final: state.complement_final && self.shape.ends_in_complement_line,
             bare_head: state.bare_head && self.shape.undetermined_head_final,
             final_preposition: state.final_preposition,
             final_adjunct: state.final_adjunct,

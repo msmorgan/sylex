@@ -240,6 +240,17 @@ pub struct ProductionDecl {
     /// Children that must be exactly one lexical leaf, alone or projected.
     #[serde(default)]
     pub light: Vec<Ident>,
+    /// Children that end in their head, not in a dependent of it: a
+    /// genitive's possessor, whose marker follows its head noun (*[the
+    /// player]'s*, never *[the top card of target player]'s*).
+    #[serde(default)]
+    pub head_final: Vec<Ident>,
+    /// Children that end in their head or, through the Complements they
+    /// end in, in the last one's head: no unselected dependent ends one (a
+    /// number-transparent quantity as possessor, *[any number of target
+    /// players]'*, whose genitive marks its oblique's head).
+    #[serde(default)]
+    pub complement_final: Vec<Ident>,
     /// A child that does not end, through its head line, in a Preposition
     /// Phrase dependent that this Production, or a sibling Production with
     /// the same children up to and including it, selects as a `PP`
