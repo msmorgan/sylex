@@ -125,9 +125,10 @@ feature NominalCoordination = Coordinated
 feature BareMassHead = Unmodified | Expanded
 // Privative: a nominal whose head noun has a Complement that names the one
 // argument a genitive subject-determiner names, realized or shared by Right
-// Node Raising (a genitive-alternant frame). The two compete (*the flood's
-// consequences*, *the consequences of the flood*; CGEL 5§16.5.3:475–476,
-// [56ii], [59]), so no genitive determines it (GenitiveDependents).
+// Node Raising (a genitive-alternant frame). The two compete (*this
+// creature's owner*, Blitz Hellion; *the owner of target nonenchantment
+// permanent*, Audacious Swap; CGEL 5§16.5.3:475–476, [56ii], [59]), so no
+// genitive determines it (GenitiveDependents).
 feature GenitiveAlternant = Filled
 // `Quantity`: a fused-head quantity (*choose one*). `Manner`: only *way*,
 // the one noun that is a Manner Adjunct without a preposition (*do it this
@@ -1817,8 +1818,8 @@ FloatedObjectBoth: ComplementNounPhrase -> NounPhrase adjunct:Word(Both) { uncoo
     where head.Number = Plural,
           head.NounKind != Numeric,
           head.Case != Nominative | Genitive
-// *All* after an accusative personal pronoun (*remove them all*, *remove it
-// all*; CGEL 5§10.1.1:427–428), never a full Noun Phrase.
+// *All* after an accusative personal pronoun (*remove them all*, Strixhaven
+// Stadium; CGEL 5§10.1.1:427–428), never a full Noun Phrase.
 FloatedObjectAll: ComplementNounPhrase -> NounPhrase adjunct:Word(All) { uncoordinated: [head] }
     where head.Case = Accusative
 AdverbModifiedPrepositionPhrase: PrepositionPhrase -> modifier:AdverbPhrase PrepositionPhrase
@@ -1857,11 +1858,10 @@ SingularQuantifier: DeterminerPhrase -> Word(Any) modifier:Numeral(Cardinal)
 // A temporal location or frequency Adjunct is a Noun Phrase (CGEL
 // 8§6.3:698, 8§9:715), the one the Noun Phrase Productions build, and these
 // take it whole. TemporalLocation: a period noun, which as such an Adjunct
-// requires a dependent (*this turn*, *each combat*, *last turn*), *the* only
-// with another one (*the following year*, never ∗*She resigned the day*;
-// 8§6.3:698). Refusing the `Dependent` determinatives is an admission gate
-// (english.md §6) that keeps *End [the turn]* (Time Stop) from a temporal
-// Adjunct; refusing `IndefiniteArticle` and
+// requires a dependent (*this turn*, *each combat*, *last turn*;
+// 8§6.3:698). Refusing the `Dependent` determinatives, *the* among them, is
+// an admission gate (english.md §6) that keeps *End [the turn]* (Time Stop)
+// from a temporal Adjunct; refusing `IndefiniteArticle` and
 // `Numerical` keeps *begin [an extra turn]* (Gerrard's Hourglass Pendant)
 // and *its controller's next [two untap steps]* (Telekinesis) from one.
 // SerialTemporal: a Noun Phrase headed by *time* (*three times*, *up to
@@ -2725,8 +2725,9 @@ FloatedEach: Clause -> subject:NounPhrase adjunct:Class(FloatingQuantifier) Verb
           $.ClauseMarking = Unmarked,
           $.ClauseShape = SubjectInitial
 // *They all share a color* (Common Cause): *all* floats as an Adjunct after
-// a pronoun or a full Noun Phrase Subject, as *both* and *each* do (CGEL
-// 5§9.2:413, [13]). `subject.Number = Plural` is an admission gate
+// its Subject (CGEL 5§9.2:413, [13]), a pronoun or a full Noun Phrase, as
+// *each* does in FloatedEach (*Up to two target creatures each get +1/+0*,
+// Abandon Reason). `subject.Number = Plural` is an admission gate
 // (english.md §6): it keeps the noun *exile* from a Subject that *all*
 // floats after, *[Exile] all [untapped creatures]* (False Floor).
 FloatedAll: Clause -> subject:NounPhrase adjunct:Word(All) VerbPhrase { transparent: [head] }
