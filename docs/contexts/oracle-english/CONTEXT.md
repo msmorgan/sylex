@@ -365,6 +365,12 @@ prepositions, nouns, adjectives and determinatives declare them.
 One position in a Subcategorization Frame: its grammatical function and the
 Category that fills it.
 
+**Complement Constraint**:
+A requirement, declared by name in the grammar and named by a preposition's
+Subcategorization Frame, on that frame's Complement beyond the kind of its
+Frame Slot, or on which Frame Slots select the phrase: *among*'s Complement is
+plural.
+
 **Frame Family**:
 The kind of a Subcategorization Frame, named by its slots' shape, such as
 monotransitive or copular.
