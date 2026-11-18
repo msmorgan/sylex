@@ -15,9 +15,9 @@ use crate::grammar::HostKind;
 use crate::lexeme::Lexeme;
 
 /// The most features one Category may carry, so a Summary is inline.
-pub(crate) const MAX_CATEGORY_FEATURES: usize = 12;
+pub(crate) const MAX_CATEGORY_FEATURES: usize = 16;
 /// The most feature variables one Production may unify, so a State is inline.
-pub(crate) const MAX_PRODUCTION_VARS: usize = 16;
+pub(crate) const MAX_PRODUCTION_VARS: usize = 24;
 /// The most features a grammar may declare, so a leaf indexes its values.
 pub(crate) const MAX_FEATURES: usize = 48;
 /// The most conjuncts one coordination Production may mark distinct.
