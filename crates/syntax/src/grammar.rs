@@ -53,6 +53,15 @@ pub struct Grammar {
     pub root: Ident,
     /// Finite feature domains by feature name. The Gap feature is built in.
     pub features: BTreeMap<Ident, Vec<Ident>>,
+    /// Local features (`feature Name = ... { local }`): a fact of the
+    /// phrase's own Production, which values it. No mother shares one with
+    /// its `head` child implicitly, no coordination's conjuncts share one
+    /// or give it to the coordination, and no Schema makes a derived
+    /// dependent agree in one; an equation that names it
+    /// relates it as any other feature. A Category that only a local
+    /// feature tells apart from another is that other Category with the
+    /// feature: the phrases some Productions build, without restating them.
+    pub local_features: std::collections::BTreeSet<Ident>,
     pub categories: BTreeMap<Ident, CategoryDecl>,
     /// Closed Words by grammar name, each naming one core closed-class lexeme
     /// id.

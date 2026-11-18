@@ -1200,6 +1200,13 @@ impl<'a> Binder<'a> {
             .ok_or_else(|| invalid(format!("unknown feature `{name}`")))
     }
 
+    /// Whether the feature is local (`Grammar::local_features`).
+    fn local(&self, feature: usize) -> bool {
+        self.grammar
+            .local_features
+            .contains(&self.out.features[feature])
+    }
+
     fn value(&self, feature: usize, name: &str) -> Result<u16, LoadError> {
         let index = self.out.values[feature]
             .iter()
@@ -2256,6 +2263,7 @@ impl<'a> Binder<'a> {
         if let Some(head) = draft.children.iter().position(|c| c.name == "head") {
             for &feature in &self.out.category_features[draft.lhs] {
                 if !draft.unshared.contains(&feature)
+                    && !self.local(feature)
                     && self.carries(&draft.children[head].symbol, feature)
                 {
                     draft.equations.push((
@@ -2871,7 +2879,8 @@ impl<'a> Binder<'a> {
                 applied = true;
                 let last = postposing.children.len() - 1;
                 for &feature in shared {
-                    if self.carries(&postposing.children[1].symbol, feature) {
+                    if !self.local(feature) && self.carries(&postposing.children[1].symbol, feature)
+                    {
                         postposing.equations.push((
                             Path::Child(1, feature),
                             Target::Path(Path::Child(last, feature)),
@@ -3952,7 +3961,7 @@ impl<'a> Binder<'a> {
         let shared: Vec<usize> = self.out.category_features[adjunct]
             .iter()
             .copied()
-            .filter(|f| self.out.category_features[category].contains(f))
+            .filter(|f| self.out.category_features[category].contains(f) && !self.local(*f))
             .collect();
         for &feature in &shared {
             prefix
@@ -4815,6 +4824,13 @@ impl Conjoin {
         let recovered = features(recovered)?;
         let mut unshared = features(unshared)?;
         unshared.extend(recovered.iter().copied());
+        // No conjunct shares a local feature (`Grammar::local_features`).
+        unshared.extend(
+            binder.out.category_features[lhs]
+                .iter()
+                .copied()
+                .filter(|&feature| binder.local(feature)),
+        );
         let proximate = features(proximate)?;
         let mut resolutions = Vec::new();
         for (name, value) in resolve {

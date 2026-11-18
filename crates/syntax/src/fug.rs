@@ -15,6 +15,7 @@
 //! ```text
 //! root Document
 //! feature Number = Singular | Plural          // a leading `|` is allowed
+//! feature ClauseShape = SubjectInitial { local }  // no head or conjunct shares it implicitly
 //! category NounPhrase : Parent [Number, Case] { gap, closed_gaps: [Measure], function }
 //! word Of = "prep:of"                         // a Closed Word and its lexeme id
 //! class Coordinator = ["coord:and", "coord:or"]
@@ -1057,6 +1058,22 @@ fn schema(keyword: &str, item: &mut Item) -> Result<SchemaDecl, LoadError> {
     ))
 }
 
+/// A feature's values and whether it is local (`{ local }`).
+fn feature(item: &mut Item) -> Result<(Vec<Ident>, bool), LoadError> {
+    let value = item.value()?;
+    let values = match value.kind {
+        ValueKind::Alt(values) => values,
+        kind => vec![Value::new(kind, value.at)],
+    };
+    let values = read(Value::new(ValueKind::List(values), value.at))?;
+    let local = match item.props.take().as_deref() {
+        None => false,
+        Some([(key, None, _)]) if key == "local" => true,
+        Some(_) => return fail(item.at, "a feature's only setting is `{ local }`"),
+    };
+    Ok((values, local))
+}
+
 /// The Grammar's sections, filled item by item.
 struct Builder {
     root: Option<Ident>,
@@ -1096,12 +1113,10 @@ impl Builder {
                 false
             }
             Some("feature") => {
-                let value = item.value()?;
-                let values = match value.kind {
-                    ValueKind::Alt(values) => values,
-                    kind => vec![Value::new(kind, value.at)],
-                };
-                let values = read(Value::new(ValueKind::List(values), value.at))?;
+                let (values, local) = feature(&mut item)?;
+                if local {
+                    grammar.local_features.insert(name);
+                }
                 grammar.features.insert(name, values).is_some()
             }
             Some("category") => {
