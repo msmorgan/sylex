@@ -99,9 +99,16 @@ feature NounKind = Ordinary | Temporal | Manner | Numeric | Quantity | Resource 
 // The NounKind of a head's *of* oblique.
 feature ObliqueNounKind =
     | Ordinary | Temporal | Manner | Numeric | Quantity | Resource | Quotation
+// Whether a Noun Phrase or Preposition Phrase has a determiner: `Mixed`
+// resolves a coordination of differing conjuncts.
 feature Determination = Bare | Mixed | Overt
 // The Determination of a determinative's Complement (*than one*).
 feature ObliqueDetermination = Bare | Mixed | Overt
+// Privative: a nominal that stands in a Noun Phrase only under an overt
+// determiner (*a natural 20*, *the first creature*), and an adjective or
+// premodifier that passes that need to its nominal (*only*, an ordinal). A
+// bare Noun Phrase excludes it.
+feature DeterminerNeed = Required
 // Privative: a Noun Phrase headed by a personal pronoun (CGEL 5§10.2:429–430)
 // or serving as a proper name (5§2:328, 5§20.3–20.4:520–521), neither of
 // which takes integrated nominal postmodifiers; a coordination carries it
@@ -322,7 +329,7 @@ category PartitiveHead : NounPhrase [
 category MeasureNounPhrase : NounPhrase
 // A signed slash adjustment under an attributive premodifier (*additional
 // +2/+2*), determined into MeasureNounPhrase.
-category ModifiedAdjustment [Determination]
+category ModifiedAdjustment
 // A compound locative determinative, which a Preposition Phrase may
 // postmodify (*anywhere else*).
 category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKind, Countability]
@@ -348,16 +355,16 @@ category ComplementNounPhrase : NounPhrase [
 // A nominal's ComplementKind and ObliqueNumber are its head noun's
 // Complement's.
 category Nominal [
-    Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
+    Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, BareMass, BareMassHead,
     RelativeBound,
 ] { gap }
-category QuantifiedNominal : Nominal [QuantityNumber, NounKind, Determination, NounDistribution]
+category QuantifiedNominal : Nominal [QuantityNumber, NounKind, DeterminerNeed, NounDistribution]
 category ModifiedQuantifiedNominal : Nominal [
-    QuantityNumber, NounKind, Determination, NounDistribution,
+    QuantityNumber, NounKind, DeterminerNeed, NounDistribution,
 ]
 category BareNominal : Nominal [
-    Number, Countability, NounKind, Determination, NounDistribution, ComplementKind,
+    Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, SetNameLicense, BareMass,
 ] { gap }
 // The singular count nominals that share a determiner before the
@@ -407,9 +414,9 @@ category FusedQuantity : DeterminerPhrase [Number, Countability]
 // Attributes, a slash measure or a bare keyword. A bare nominal and a
 // determiner's Cluster take it alike. ComplementKind names an Adjective
 // Phrase (`AdjP`), and a measure (`MeasureNP`) and a keyword
-// (`KeywordPhrase`), which before *counter* are its kind; Determination is an
+// (`KeywordPhrase`), which before *counter* are its kind; DeterminerNeed is an
 // adjective's.
-category Premodifier [ComplementKind, Determination] { function }
+category Premodifier [ComplementKind, DeterminerNeed] { function }
 category NominalCluster [
     Number, Countability, DeterminativeDistribution,
 ] { cluster }
@@ -440,7 +447,7 @@ category PrepositionPhrase [
 // An Adjectival Passive is Passive; it is a predicative Complement
 // only, never a depictive Adjunct or a premodifier.
 category AdjectivePhrase [
-    Determination, AdjectivePosition, Voice, ComplementKind, Grade, Polarity, QualityHead,
+    DeterminerNeed, AdjectivePosition, Voice, ComplementKind, Grade, Polarity, QualityHead,
     AdjectivalPassive,
 ] { gap }
 category AdverbPhrase [AdjunctPosition]
@@ -856,7 +863,7 @@ TextSymbols: Document -> Symbols { capital: [head] }
 // A symbol sequence as a noun under a determiner (*each {B} in a cost*,
 // *six {E}*).
 SymbolNominal: BareNominal -> Symbols
-    where $.Determination = Overt,
+    where $.DeterminerNeed = Required,
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
 // An Arabic numeral as a singular count noun under a determiner (*a natural
@@ -869,7 +876,7 @@ ComparativeBoundedNumeralName: NumeralName ->
     where last.Grade := Comparative,
           last.ComplementKind = Intransitive
 NumeralNominal: BareNominal -> NumeralName
-    where $.Determination = Overt,
+    where $.DeterminerNeed = Required,
           $.Number = Singular,
           $.Countability = Count,
           $.NounKind = Ordinary,
@@ -981,7 +988,7 @@ UnicodeNegativeLoyaltySymbol: LoyaltySymbol -> '[':Prefix '−':Bound:Spoken amo
 PositiveLoyaltySymbol: LoyaltySymbol -> '[':Prefix '+':Bound:Spoken amount:Amount ']'
 LoyaltyCost: ActivationCost -> LoyaltySymbol
 LoyaltyNominal: BareNominal -> LoyaltySymbol
-    where $.Determination = Overt,
+    where $.DeterminerNeed = Required,
           $.Number = Singular,
           $.Countability = Count,
           $.NounKind = Ordinary,
@@ -1361,12 +1368,10 @@ MeasureNounPhrase: MeasureNounPhrase -> Measure
 PremodifiedAdjustment: ModifiedAdjustment -> modifier:AdjectivePhrase Measure { transparent: [head] }
     where head.Adjustment := Signed,
           modifier.ComplementKind = Intransitive,
-          modifier.Determination = $.Determination,
           modifier.AdjectivePosition != Predicative
 StackedAdjustmentPremodifier: ModifiedAdjustment ->
     modifier:AdjectivePhrase ModifiedAdjustment { transparent: [head] }
     where modifier.ComplementKind = Intransitive,
-          modifier.Determination = $.Determination,
           modifier.AdjectivePosition != Predicative
 DeterminedAdjustment: MeasureNounPhrase -> determiner:DeterminerPhrase ModifiedAdjustment {
     transparent: [head],
@@ -1385,7 +1390,7 @@ MeasurePredicative: Predicative -> MeasureNounPhrase
 // A bare ordinal is attributive (*the second spell*).
 OrdinalAdjective: AdjectivePhrase -> Numeral(Ordinal)
     where $.AdjectivePosition = Attributive,
-          $.Determination = Overt
+          $.DeterminerNeed = Required
 // *Third from the top*.
 OrdinalFromEnd: PositionPhrase -> Numeral(Ordinal) complement:Selected(PrepositionPhrase, From)
 PositionDepictive: VerbPhrase -> VerbPhrase adjunct:PositionPhrase { cost: 2, transparent: [head] }
@@ -2154,7 +2159,7 @@ ComparativeIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, Than)
     where modifier.Grade := Comparative,
           modifier.AdjectivePosition != Predicative,
-          modifier.Determination = $.Determination
+          modifier.DeterminerNeed = $.DeterminerNeed
 // The same for a non-scalar governor of inequality (CGEL 13§5.4:1143–1145).
 // English also has *from* and *to* here (*a different question from the one I
 // asked*); Oracle prints only *than*.
@@ -2162,12 +2167,12 @@ NonScalarIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, Than)
     where modifier.Grade := NonScalarInequality,
           modifier.AdjectivePosition != Predicative,
-          modifier.Determination = $.Determination
+          modifier.DeterminerNeed = $.DeterminerNeed
 EquativeIndirectComplement: Nominal ->
     modifier:AdjectivePhrase Nominal complement:Selected(PrepositionPhrase, As)
     where modifier.Grade := Equative,
           complement.ComplementKind = NP,
-          modifier.Determination = $.Determination
+          modifier.DeterminerNeed = $.DeterminerNeed
 // *Your most recent turn*: a plain adjective heads a superlative phrase.
 DegreeModifiedAdjective: AdjectivePhrase -> modifier:Word(Most) AdjectivePhrase {
     unshared: [Grade],
@@ -2387,7 +2392,7 @@ IndexedNounPhrase: NounPhrase -> IndexedNominal
           $.Person = Third
 // The count-noun pro-form *one* (*this one*, *the first one they draw*).
 CardinalNominal: BareNominal -> Numeral(Cardinal)
-    where $.Determination = Overt,
+    where $.DeterminerNeed = Required,
           $.Number = Singular,
           $.Countability = Count,
           $.NounKind = Ordinary,
@@ -2577,7 +2582,7 @@ AttributedPremodifier: Premodifier -> Attributes { cost: 0, unshared: [Complemen
 // premodifying it in Golgothian Sylex's wording citing Urza's Saga (*the
 // Urza's Saga expansion*, tests/set_names.rs).
 NominalPremodifier: BareNominal -> modifier:NounPremodifier BareNominal { transparent: [head] }
-    where head.Determination != Overt,
+    where head.DeterminerNeed != Required,
           head.KindLicense != Head,
           head.SetNameLicense != Head
 QuantifiedNominalPremodifier: QuantifiedNominal -> modifier:NounPremodifier QuantifiedNominal
@@ -2627,6 +2632,7 @@ SuperlativeFusedHead: BareNominalComplement -> AdjectivePhrase
 BareMass: NounPhrase -> Nominal { transparent: [head], uncoordinated: [head] }
     where head.BareMass != Modified,
           $.Determination = Bare,
+          head.DeterminerNeed != Required,
           $.Case = Plain,
           head.Countability = Mass,
           head.Number = Singular,
@@ -2634,6 +2640,7 @@ BareMass: NounPhrase -> Nominal { transparent: [head], uncoordinated: [head] }
 ModifiedBareMass: NounPhrase -> Nominal { heavy: [head], transparent: [head], uncoordinated: [head] }
     where head.BareMass := Modified,
           $.Determination = Bare,
+          head.DeterminerNeed != Required,
           $.Case = Plain,
           head.Countability = Mass,
           head.Number = Singular,
@@ -2648,6 +2655,7 @@ CoordinatedBareMass: NounPhrase -> Nominal { transparent: [head], coordinated: [
     where head.BareMass := Modified,
           head.BareMassHead = Unmodified,
           $.Determination = Bare,
+          head.DeterminerNeed != Required,
           $.Case = Plain,
           head.Countability = Mass,
           $.Person = Third
@@ -2846,7 +2854,6 @@ TargetedOblique: TargetedOblique -> Word(Of) complement:TargetedNounPhrase
           $.NounKind = complement.NounKind
 TargetedNounPhrase: TargetedNounPhrase -> determiner:TargetingMarker Nominal
     where head.Number = Plural,
-          head.Determination = Overt,
           determiner.Countability = head.Countability
 // *Pay {1}{G} any number of times*: TransparentQuantity's Noun Phrase, a
 // plural one headed by *number* with NounKind `Temporal` from its oblique, as
@@ -2879,6 +2886,7 @@ DeterminedTemporalQuantity: TemporalNounPhrase -> determiner:DeterminerPhrase No
 // nominal projects through `BareMass` / `CoordinatedBareMass` instead.
 BarePlural: NounPhrase -> Nominal { uncoordinated: [head] }
     where $.Determination = Bare,
+          head.DeterminerNeed != Required,
           $.Case = Plain,
           head.Number = Plural,
           $.Person = Third,
@@ -3038,7 +3046,7 @@ ParticipialPremodifier: Premodifier -> Participle { cost: 0 }
 // off *Put a +1/+1 counter on each of up to two target creatures* (Travel
 // Preparations) and *Put a double strike counter on Mai* (Mai, Jaded Edge).
 Premodifier: BareNominal -> modifier:Premodifier BareNominal { transparent: [head] }
-    where modifier.Determination = $.Determination,
+    where modifier.DeterminerNeed = $.DeterminerNeed,
           !(modifier.ComplementKind = MeasureNP & head.KindLicense = Head),
           !(modifier.ComplementKind = KeywordPhrase & head.KindLicense = Head)
 // An attributive adjective over a whole *and*-coordination of singular
@@ -3047,7 +3055,7 @@ Premodifier: BareNominal -> modifier:Premodifier BareNominal { transparent: [hea
 // premodifiers, so a shared Amount is too.
 CoordinationPremodifier: Nominal -> modifier:Premodifier Nominal
     where modifier.ComplementKind := AdjP,
-          modifier.Determination = $.Determination,
+          modifier.DeterminerNeed = $.DeterminerNeed,
           head.Number = Plural,
           head.ConjunctNumber := Singular
 GenitiveConjunct: GenitiveNominal -> BareNominal marker:Word(Genitive)

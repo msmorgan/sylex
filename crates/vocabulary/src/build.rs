@@ -402,11 +402,11 @@ impl Builder {
                     Ident::new(&format!("{position:?}")),
                 );
             }
-            if let Some(determination) = entry.determination {
-                lexeme.properties.features.insert(
-                    "Determination".into(),
-                    Ident::new(&format!("{determination:?}")),
-                );
+            if entry.needs_determiner {
+                lexeme
+                    .properties
+                    .features
+                    .insert("DeterminerNeed".into(), Ident::new("Required"));
             }
             if entry.follows_sum {
                 lexeme.properties.classes.insert("SumAdjective".into());

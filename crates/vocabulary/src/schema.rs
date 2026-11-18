@@ -334,10 +334,11 @@ impl NounDecl {
 pub struct AdjectiveEntry {
     #[serde(default)]
     pub position: Option<AdjectivePosition>,
-    /// `Overt` for an attributive adjective that requires its nominal to
-    /// have an overt determiner (*only*).
+    /// An attributive adjective whose nominal stands only under an overt
+    /// determiner (*the only creature card*): it carries the grammar's
+    /// `DeterminerNeed`.
     #[serde(default)]
-    pub determination: Option<Determination>,
+    pub needs_determiner: bool,
     #[serde(default)]
     pub fused_head: Option<FusedHeadDetermination>,
     /// The adjective follows a specific sum (*fifty dollars net*; CGEL, Ch. 5
@@ -404,7 +405,7 @@ impl AdjectiveDecl {
         match self {
             Self::Lemma(lemma) => AdjectiveEntry {
                 position: None,
-                determination: None,
+                needs_determiner: false,
                 fused_head: None,
                 follows_sum: false,
                 fused_quality: false,
@@ -869,13 +870,6 @@ pub struct SymbolEntry {
 
 fn complement_relation() -> sylex_syntax::frames::SlotRelation {
     sylex_syntax::frames::SlotRelation::Complement
-}
-
-/// Whether a nominal has an overt determiner.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
-pub enum Determination {
-    Bare,
-    Overt,
 }
 
 /// Lexical realizations of the permanent status values.

@@ -72,7 +72,7 @@
     "next",
     (lemma: "odd", fused_quality: true),
     // Attributive-only "the only creature card" (CGEL, Ch. 6, §4.1, p. 553).
-    (lemma: "only", position: Some(Attributive), determination: Some(Overt)),
+    (lemma: "only", position: Some(Attributive), needs_determiner: true),
     "original",
     (lemma: "other", position: Some(Attributive), fused_head: Some(Ordinary), grade: Some(NonScalarInequality), frames: [Complement(PP(["than"]))]),
     // Attributive-only (CGEL, Ch. 6, §4.1, p. 553); the verb `own` is separate.
