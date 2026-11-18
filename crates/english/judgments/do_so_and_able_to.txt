@@ -11,7 +11,9 @@
 +VerbPhrase does so => VerbPhrase "does so" head "do so"
 +VerbPhrase doing so => VerbPhrase "doing so" head "do so"
 +AdjectivePhrase able to block this creature => Clause "to block this creature" as Complement of able
+# from: Elvish Bard
 *Clause That player do so.
+# from: Elvish Bard
 *Clause All creatures does so.
 +Nominal creatures tapped this way => VerbPhrase "tapped this way" as Modifier of creature
 # ellipsis after "do" and verbless "if able"

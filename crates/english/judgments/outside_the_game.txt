@@ -9,4 +9,5 @@
 + <card=Spawnsire of Ulamog> {20}: Cast any number of Eldrazi spells from among cards you own outside the game without paying their mana costs. => PrepositionPhrase "outside the game" head outside; !NounPhrase "outside the game"
 # *Outside the game* is no role noun, so it never stands bare as a
 # predicative: *if it's outside the game* has the preposition alone.
+# from: Ouphe Vandals
 +PrepositionPhrase if it's outside the game => PrepositionPhrase "outside the game" head outside; !NounPhrase "outside the game"; readings 1

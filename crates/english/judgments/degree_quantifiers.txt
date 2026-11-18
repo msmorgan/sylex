@@ -10,6 +10,9 @@
 +DeterminerPhrase that many => readings 1
 +DeterminerPhrase that much => readings 1
 *NounPhrase that many card
+# from: Mourning Thrull
 *NounPhrase that many life
+# from: Heartwarming Redemption
 *NounPhrase that much cards
+# from: Mass Polymorph
 *NounPhrase that much creature

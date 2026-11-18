@@ -9,5 +9,7 @@
 +Clause that spell's mana value is X => NounPhrase "that spell's mana value" as Subject of be; Predicative "X" as PredicativeComplement of be
 +Clause X is 2 => NounPhrase "X" as Subject of be; VerbPhrase "is 2"; Predicative "2" as PredicativeComplement of be
 + Activate only if the number of other Caves you control plus the number of Cave cards in your graveyard is three or greater. => NounPhrase "the number of other Caves you control plus the number of Cave cards in your graveyard" as Subject of be
+# from: Chaos Lord
 *Clause The number of cards in your hand are three.
+# from: Witch-Maw Nephilim
 *Clause its power are 2

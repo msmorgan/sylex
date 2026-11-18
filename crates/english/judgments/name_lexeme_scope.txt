@@ -1,7 +1,10 @@
 # A card's own name, full or Shortened, is in scope only on that card's own text [CR#201.5c]; another card's name stands only after *named*, *Partner with* [CR#702.124j] or *from among*; subtype nouns on type lines; full card names with "and" as one name
 * Chandra deals 2 damage to any target.
+# from: Comparative Analysis
 * Jace draws two cards.
+# from: Chandra, Flame's Fury
 * Ajani deals 2 damage to any target.
+# from: Chandra, Flame's Fury
 * Gandalf deals 2 damage to any target.
 * Niv-Mizzet deals 1 damage to any target.
 + <card=Chandra, Pyromaster> <legendary> Chandra deals 2 damage to any target. => NounPhrase "Chandra" as Subject of deal
@@ -56,6 +59,7 @@
 + <card=Titania, Voice of Gaea> <legendary> At the beginning of your upkeep, if there are four or more land cards in your graveyard and you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them, then meld them into Titania, Gaea Incarnate. => NameComplement "Titania, Gaea Incarnate" as Complement of into
 + <card=Urza, Lord Protector> <legendary> {7}: If you both own and control Urza, Lord Protector and an artifact named The Mightstone and Weakstone, exile them, then meld them into Urza, Planeswalker. Activate only as a sorcery. => NameComplement "Urza, Planeswalker" as Complement of into
 + <card=Vanille, Cheerful l'Cie> <legendary> At the beginning of your first main phase, if you both own and control Vanille and a creature named Fang, Fearless l'Cie, you may pay {3}{B}{G}. If you do, exile them, then meld them into Ragnarok, Divine Deliverance. => NameComplement "Ragnarok, Divine Deliverance" as Complement of into
+# from: Gisela, the Broken Blade
 + <card=Bruna, the Fading Light> Exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into
 # from: Gisela, the Broken Blade
 + Exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into

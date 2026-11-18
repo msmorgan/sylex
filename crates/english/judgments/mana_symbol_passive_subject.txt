@@ -12,5 +12,6 @@
 + Mana from a Treasure was spent to cast it.
 # from: Chromatic Orrery
 + You may spend mana as though it were mana of any color.
+# from: Mythos of Brokkos
 * {U}{B} were spent.
 +Clause {U} was spent

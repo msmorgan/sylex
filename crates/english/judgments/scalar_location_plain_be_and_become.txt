@@ -24,6 +24,7 @@
 # from: PuPu UFO
 + Its power becomes equal to the number of Towns you control.
 + You have no maximum hand size.
+# from: Jin Sakai, Ghost of Tsushima
 + It can't be blocked.
 # from: Tawnos's Tinkering
 + It becomes a 1/1 creature.

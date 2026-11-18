@@ -7,9 +7,13 @@
 + <card=Immovable Rod> For as long as this artifact remains tapped, another target permanent loses all abilities and can't attack or block. => PrepositionPhrase "For as long as this artifact remains tapped"; Clause "this artifact remains tapped"
 # from: Immovable Rod
 + For as long as this artifact remains tapped, another target permanent loses all abilities and can't attack or block.
+# from: Hoarding Broodlord
 + As long as that card remains exiled, you may play it. => PrepositionPhrase "As long as that card remains exiled"; Clause "that card remains exiled"
+# from: Minas Morgul, Dark Fortress
 + As long as that creature has a shadow counter on it, it's a Wraith in addition to its other types. => PrepositionPhrase "As long as that creature has a shadow counter on it"; Clause "that creature has a shadow counter on it"
+# from: Extraordinary Journey
 + Its owner may play it for as long as it remains exiled. => PrepositionPhrase "for as long as it remains exiled" as Adjunct of play; Clause "it remains exiled"
+# from: Mind Flayer
 + Gain control of target creature for as long as you control this creature. => PrepositionPhrase "for as long as you control this creature" as Adjunct of gain; Clause "you control this creature"
 + <card=Master Thief> When this creature enters, gain control of target artifact for as long as you control this creature. => PrepositionPhrase "for as long as you control this creature"; !PrepositionPhrase "for as long as you control this creature" as Modifier of artifact
 +PrepositionPhrase as long as you control this creature

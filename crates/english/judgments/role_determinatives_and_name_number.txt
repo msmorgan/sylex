@@ -4,6 +4,7 @@
 + <card=Greater Auramancy> Enchanted creatures you control have shroud. => VerbPhrase "Enchanted" as Modifier of creature; !DeterminerPhrase "Enchanted" as Determiner of creature
 +NounPhrase equipped creatures => VerbPhrase "equipped" as Modifier of creature; readings 1
 + Enchanted creature gets +1/+1. => DeterminerPhrase "Enchanted" as Determiner of creature; readings 1
+# from: Agate-Blade Assassin
 + Whenever this creature attacks, defending player loses 1 life. => DeterminerPhrase "defending" as Determiner of player
 # A name is number-neutral: the agreement its text shows fixes its Number (docs/design/lexicon.md §6)
 + <card=The Notary Hobbits> When The Notary Hobbits enter, if they're not a token, create a Food token. => NounPhrase "The Notary Hobbits" as Subject of enter

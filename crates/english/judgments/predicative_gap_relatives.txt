@@ -8,4 +8,5 @@
 # from: Tablet of the Guilds
 +NounPhrase the chosen colors it is => RelativeClause "it is" gap "chosen colors"; readings 1
 + Blue creatures you control can't be blocked. => VerbPhrase "blocked" as Complement of be; !RelativeClause "you control can't be"
+# from: Jared Carthalion
 *NounPhrase the number of colors it's

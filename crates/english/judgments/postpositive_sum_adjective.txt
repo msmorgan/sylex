@@ -1,5 +1,6 @@
 # A postpositive sum adjective after a determined Noun Phrase (ten or more creature cards total, Avatar of Woe), never a bare one
 + If there are ten or more creature cards total in all graveyards, this spell costs {6} less to cast. => NounPhrase "ten or more creature cards total" head card; !NounPhrase "creature cards total"; !NounPhrase "ten or more creature cards"; readings 1
+# from: Avatar of Woe
 +NounPhrase ten creature cards total
 +NounPhrase ten or more creature cards total
 *NounPhrase creature cards total

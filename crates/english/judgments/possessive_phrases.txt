@@ -3,11 +3,14 @@
 +NounPhrase your graveyard
 +NounPhrase their hand
 +NounPhrase the command zone
+# from: Apocalypse
 *NounPhrase yours hand
+# from: Windfall
 *NounPhrase they hand
 +PrepositionPhrase from your hand
 +PrepositionPhrase from the command zone
 +PrepositionPhrase from your hand or from the command zone => PrepositionPhrase "from your hand"; PrepositionPhrase "from the command zone"
 +Clause you may discard your hand
 + You discard your hand.
+# from: Apocalypse
 * You discards your hand.

@@ -9,7 +9,7 @@
 + Exile target creature with a counter on it. => PrepositionPhrase "with a counter on it" as Modifier of creature || PrepositionPhrase "with a counter on it" as Adjunct of exile
 + Untap all permanents you control during each other player's untap step. => Clause "you control" gap "permanents"; PrepositionPhrase "during each other player's untap step" as Adjunct of untap || Clause "you control during each other player's untap step" gap "permanents"; PrepositionPhrase "during each other player's untap step" as Adjunct of control; readings 2
 
-# from: Grand Melee
+# from: Lightmine Field
 + Creatures attack. => NounPhrase "Creatures" as Subject of attack; readings 1
 # from: Flywheel Racer
 + The card is a creature. => NounPhrase "The card" as Subject of be; Predicative "a creature" as PredicativeComplement of be; readings 1

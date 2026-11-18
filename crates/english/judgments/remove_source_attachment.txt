@@ -7,12 +7,15 @@
 + Untap target attacking creature and remove it from combat. Gain control of that creature until end of turn. => PrepositionPhrase "from combat" as Complement of remove; !PrepositionPhrase "from combat" as Adjunct of remove
 # from: Temple of Cyclical Time
 + Remove a counter from this land. => PrepositionPhrase "from this land" as Complement of remove; !PrepositionPhrase "from this land" as Adjunct of remove
+# from: Stunning Strike
 + Remove it from combat. => PrepositionPhrase "from combat" as Complement of remove; !PrepositionPhrase "from combat" as Adjunct of remove
 + If you would draw a card during your draw step, instead you may skip that draw. => PrepositionPhrase "during your draw step" as Adjunct of draw
 + Remove all counters from target permanent. => PrepositionPhrase "from target permanent" as Complement of remove
 + Activate only if an oil counter was removed from a permanent you controlled this turn or a permanent with an oil counter on it was put into a graveyard this turn. => PrepositionPhrase "from a permanent you controlled this turn" as Complement of remove
 +VerbPhrase removed
+# from: Galloping Lizrog
 + Remove any number of +1/+1 counters from among creatures you control. => PrepositionPhrase "from among creatures you control" as Complement of remove; RelativeClause "you control" gap "creatures"
+# from: Descendant of Masumaro
 + Remove a +1/+1 counter from this creature for each card in target opponent's hand. => PrepositionPhrase "from this creature" as Complement of remove; PrepositionPhrase "for each card in target opponent's hand" as Adjunct of remove; !PrepositionPhrase "for each card in target opponent's hand" as Modifier of counter
 + You may cast spells from the top of your library by removing a counter from a creature you control in addition to paying their other costs. => PrepositionPhrase "from a creature you control" as Complement of remove; PrepositionPhrase "by removing a counter from a creature you control in addition to paying their other costs" as Adjunct of cast
 + <card=All Suns' Dawn> For each color, return up to one target card of that color from your graveyard to your hand. Exile All Suns' Dawn. => NounPhrase "up to one target card of that color from your graveyard" as Object of return || PrepositionPhrase "from your graveyard" as Adjunct of return; PrepositionPhrase "to your hand" as Complement of return

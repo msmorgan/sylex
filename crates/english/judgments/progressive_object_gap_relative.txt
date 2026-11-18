@@ -20,5 +20,7 @@
 + Whenever this creature blocks a creature, if at least one other Wall creature is blocking that creature and no non-Wall creatures are blocking that creature, this creature gains banding until end of turn.
 # from: Wall of Corpses
 + Destroy target creature this creature is blocking. => RelativeClause "this creature is blocking" gap "creature"
+# from: Scorch Spitter
 *NounPhrase the player it is attack
+# from: Scorch Spitter
 *NounPhrase the player it is attacked

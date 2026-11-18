@@ -1,4 +1,5 @@
 # Polyhedral die nouns (d4 to d20) as the head of the object of roll, with ordinary die and dice controls
+# from: Bucknard's Everfull Purse
 + Roll a d4. => NounPhrase "a d4" as Object of roll
 + Roll two d4 and choose one result. => NounPhrase "two d4" as Object of roll
 + Roll a d6. => NounPhrase "a d6" as Object of roll
@@ -7,10 +8,12 @@
 + Roll two d8 and choose one result. => NounPhrase "two d8" as Object of roll
 + Roll a d10. => NounPhrase "a d10" as Object of roll
 + Roll two d10 and choose one result. => NounPhrase "two d10" as Object of roll
+# from: Sword of Hours
 + Roll a d12. => NounPhrase "a d12" as Object of roll
 + Roll two d12 and choose one result. => NounPhrase "two d12" as Object of roll
 +VerbPhrase roll two d20 => NounPhrase "two d20" as Object of roll
 + Roll a d20. => NounPhrase "a d20" as Object of roll
+# from: Mr. House, President and CEO
 + Roll a six-sided die. => NounPhrase "a six-sided die" as Object of roll
 # from: Brazen Dwarf
 + Whenever you roll one or more dice, this creature deals 1 damage to each opponent. => NounPhrase "one or more dice" as Object of roll

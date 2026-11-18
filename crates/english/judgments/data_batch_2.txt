@@ -16,6 +16,7 @@
 +VerbPhrase transforms => VerbPhrase "transforms" head transform
 +VerbPhrase transforms into a non-Human creature => PrepositionPhrase "into a non-Human creature" as Complement of transform
 +VerbPhrase surveil => VerbPhrase "surveil" head surveil
+# from: Stunning Strike
 + Remove it from combat. => PrepositionPhrase "from combat" as Complement of remove; NounPhrase "combat" as Complement of from
 # from: Gustcloak Runner
 +VerbPhrase remove it from combat => PrepositionPhrase "from combat" as Complement of remove; NounPhrase "combat" as Complement of from

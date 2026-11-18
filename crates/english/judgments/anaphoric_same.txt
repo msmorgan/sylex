@@ -11,5 +11,7 @@
 # *for*-phrase *do* selects by that kind alone: *for flying, …* above stays
 # an Adjunct.
 + <card=Grim Captain's Call> Return a Pirate card from your graveyard to your hand, then do the same for Vampire, Dinosaur, and Merfolk. => NounPhrase "the same" as Object of do; PrepositionPhrase "for Vampire, Dinosaur, and Merfolk" as Complement of do; Mention "Vampire, Dinosaur, and Merfolk" as Complement of for
+# from: Curse of Vitality
 *Clause Each opponent do the same
+# from: The Wedding of River Song
 *Clause You does the same

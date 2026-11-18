@@ -14,6 +14,7 @@
 +PrepositionPhrase from your hand, from your graveyard, or from among cards you own in exile
 + Exile target artifact or enchantment.
 +NounPhrase target blue or black creature => AdjectivePhrase "blue or black" as Modifier of creature
+# from: Tin Street Gossip
 *Clause to attacks or to block
 # A coordination of Noun Phrases is determined only when every conjunct is, and countable when its last conjunct is
 + Destroy all artifacts and enchantments. => !NounPhrase "artifacts and enchantments"; Nominal "artifacts and enchantments" || NounPhrase "all artifacts"; NounPhrase "enchantments"

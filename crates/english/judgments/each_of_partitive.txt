@@ -12,6 +12,7 @@
 +PrepositionPhrase on each of those creatures => NounPhrase "each of those creatures"; PrepositionPhrase "of those creatures" as Complement of each; NounPhrase "those creatures"
 +NounPhrase each of them => readings 1
 +Clause each of them gets +1/+1 => NounPhrase "each of them" as Subject of get
+# from: Hope and Glory
 *Clause Each of them get +1/+1
 +NounPhrase each creature
 +NounPhrase one of them

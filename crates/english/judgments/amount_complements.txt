@@ -6,7 +6,10 @@
 + You scry 3.
 # from: Bumi, King of Three Trials
 + Target player scries 3.
+# from: Leader, Super-Genius
 + Connive.
 + This creature connives.
+# from: Psychic Impetus
 * You scries 3.
+# from: Bumi, King of Three Trials
 * This creature scry 3.

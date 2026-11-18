@@ -1,6 +1,7 @@
 # "instead" in replacement effects: an intransitive preposition phrase beside a complete host clause, or a final connective over coordinated predicates
 +PrepositionPhrase instead
 *PrepositionPhrase instead of
+# from: Reality Twist
 *PrepositionPhrase instead any other type
 +PrepositionPhrase instead of any other type => NounPhrase "any other type"
 + <card=Forbidden Crypt> If you would draw a card, return a card from your graveyard to your hand instead. => PrepositionPhrase "instead"

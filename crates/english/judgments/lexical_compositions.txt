@@ -3,6 +3,7 @@
 +Nominal combat damage
 + Whenever this creature attacks, defending player loses 1 life and you gain 1 life.
 +NounPhrase defending player
+# from: Guiltfeeder
 *NounPhrase defend player
 + Return all permanents to their owners' hands. => PrepositionPhrase "to their owners' hands" as Complement of return
 +NounPhrase their owners' hands => NounPhrase "their owners'" as Determiner of hand

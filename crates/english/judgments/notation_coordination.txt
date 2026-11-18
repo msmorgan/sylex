@@ -13,4 +13,5 @@
 # from: Amazing Acrobatics
 +NounPhrase one or two target creatures
 +NounPhrase one, two, or three creatures
+# from: Infernal Rebirth
 *NounPhrase one or two creature

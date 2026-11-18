@@ -27,7 +27,7 @@
 # from: Coalition Honor Guard
 +PrepositionPhrase as part of casting a spell => Nominal "part of casting a spell" as Complement of as; readings 1
 
-# from: Nissa, Worldsoul Speaker
+# from: Greater Werewolf
 +Measure -0/+0 => readings 1
 # from: The War in Heaven
 +PrepositionPhrase in addition to their other types => PrepositionPhrase "to their other types" as Complement of "in addition"

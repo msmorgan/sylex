@@ -2,4 +2,5 @@
 +VerbPhrase have been chosen => VerbPhrase "been chosen" as Complement of have
 +VerbPhrase have been exiled => VerbPhrase "been exiled" as Complement of have
 +VerbPhrase block or be blocked => VerbPhrase "blocked" as Complement of be || AdjectivePhrase "blocked" as PredicativeComplement of be; readings 2
+# from: Colfenor's Urn
 *VerbPhrase be been destroyed

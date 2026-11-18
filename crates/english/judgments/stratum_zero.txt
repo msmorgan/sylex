@@ -43,6 +43,7 @@
 + +3: Destroy target noncreature permanent. => ActivationCost "+3"
 + 0: Draw three cards, then put two cards from your hand on top of your library in any order. => ActivationCost "0"
 + Choose one or more — => NounPhrase "one or more" as Object of choose
+# from: Sensory Deprivation
 * Enchant two creature
 + {1}{G}, {T}: Choose one — => NounPhrase "one" as Object of choose
 # from: Glimpse of Freedom

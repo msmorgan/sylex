@@ -57,7 +57,7 @@
 +Clause no mana was spent
 + <card=Rite of the Raging Storm> Creatures named Lightning Rager can't attack you or planeswalkers you control. => VerbPhrase "named Lightning Rager" as Modifier of creature
 *NounPhrase game
-# from: Mirror Entity
+# from: Pest Rescuer
 *NounPhrase much game
 # from: Freestrider Commando
 *Clause no mana was spended
@@ -92,7 +92,7 @@
 +AdjectivePhrase second
 # from: Liquid Fire
 +Amount 5 minus X
-# from: Blessed Wine
+# from: Oracle's Restoration
 + Gain 1 life. => readings 1
 + +3/-2
 + 1/1
@@ -126,7 +126,7 @@
 + {T}, Discard a card: Draw a card.
 # from: Mysteries of the Deep
 + Landfall — If you had a land enter the battlefield under your control this turn, draw three cards instead.
-# from: Pulmonic Sliver
+# from: Levitation
 + Creatures have flying.
 # from: Star Whale
 + Other creatures you control have ward {2}.

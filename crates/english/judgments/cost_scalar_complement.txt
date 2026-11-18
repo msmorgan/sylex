@@ -14,5 +14,7 @@
 +VerbPhrase costs {0}
 # from: Hour of Need
 +VerbPhrase cost {1}{U} more to cast
+# from: Kopala, Warden of Waves
 *VerbPhrase to costs
+# from: Bedlam Reveler
 * This spell cost {1} less to casts.

@@ -20,7 +20,9 @@
 + Also draw a card. => AdverbPhrase "Also" as Adjunct of draw; readings 1
 # from: Oil-Gorger Troll
 + Then if you control a creature, draw a card. => AdverbPhrase "Then" as Adjunct of draw; PrepositionPhrase "if you control a creature" as Adjunct of draw; readings 1
+# from: Life's Finale
 * Then that player shuffle.
+# from: Vendilion Clique
 * Then draws a card.
 + You choose which creatures block this turn and how those creatures block. => Clause "how those creatures block"; !AdverbPhrase "how"; readings 2
 + <card=Vampiric Tutor> Search your library for a card, then shuffle and put that card on top. => Clause "then shuffle and put that card on top"; AdverbPhrase "then"; Clause "shuffle and put that card on top"; Clause "shuffle"; Clause "put that card on top"
@@ -39,4 +41,5 @@
 + When this creature enters, secretly choose an opponent. => AdverbPhrase "secretly" as Adjunct of choose; readings 1
 # from: Menacing Ogre
 + Each player secretly chooses an opponent. => AdverbPhrase "secretly" as Adjunct of choose; readings 1
+# from: Gran-Gran
 * Draw a card, then discards a card.

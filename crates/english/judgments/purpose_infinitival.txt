@@ -7,12 +7,14 @@
 + Spend this mana only to cast spells. => Clause "only to cast spells" as Adjunct of spend; Clause "to cast spells"; VerbPhrase "cast spells"
 +NounPhrase mana spent to cast this spell => VerbPhrase "spent to cast this spell" as Modifier of mana; VerbPhrase "spent"; Clause "to cast this spell" as Adjunct of spend
 +NounPhrase mana spent
+# from: Proft, Sinister Mastermind
 *Clause to can't cast this spell
 # from: Inga and Esika
 + If three or more mana was spent to cast it, draw a card. => Clause "to cast it" as Adjunct of spend
 +Clause to cast this spell => readings 1
 +VerbPhrase spent to cast this spell =>
 +Clause only to cast spells => readings 1
+# from: Infernal Denizen
 + This creature remains on the battlefield.
 # from: Ribbons of Night
 + If {R} was spent to cast this spell, draw a card. => VerbPhrase "spent to cast this spell"; Clause "to cast this spell" as Adjunct of spend

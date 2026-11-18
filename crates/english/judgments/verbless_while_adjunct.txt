@@ -7,6 +7,7 @@
 # from: Aeon Chronicler
 + Whenever a time counter is removed from this card while it's exiled, draw a card. => PrepositionPhrase "while it's exiled" as Adjunct of remove
 + Whenever this creature attacks, draw a card.
+# from: Archmage's Newt
 + This creature is saddled.
 # from: Watcher of Hours
 + Whenever you remove a time counter from this card while it's exiled, surveil 1. => PrepositionPhrase "while it's exiled" as Adjunct of remove

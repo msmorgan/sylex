@@ -6,4 +6,5 @@
 + Activate only during your turn, before attackers are declared. => PrepositionPhrase "only during your turn"; PrepositionPhrase "before attackers are declared"
 + Cast this spell only during combat before blockers are declared. => PrepositionPhrase "only during combat"; PrepositionPhrase "before blockers are declared"
 + Cast this spell only before attackers are declared. => PrepositionPhrase "only before attackers are declared" as Adjunct of cast
+# from: Master Warcraft
 + Attackers are declared.

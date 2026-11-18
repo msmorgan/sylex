@@ -6,7 +6,9 @@
 + <card=Syncopate> If that spell is countered this way, exile it instead of putting it into its owner's graveyard. => PrepositionPhrase "instead of putting it into its owner's graveyard" as Adjunct of exile; VerbPhrase "putting it into its owner's graveyard" as Complement of of
 + <card=The Five Doctors> If this spell was kicked, put those cards onto the battlefield instead of putting them into your hand. => PrepositionPhrase "instead of putting them into your hand" as Adjunct of put; VerbPhrase "putting them into your hand"
 +PrepositionPhrase without paying its mana cost => VerbPhrase "paying its mana cost" as Complement of without; NounPhrase "its mana cost" as Object of pay
+# from: Dazzling Sphinx
 *PrepositionPhrase without pay its mana cost
+# from: Dazzling Sphinx
 *PrepositionPhrase without paid its mana cost
 +NounPhrase creatures without flying => PrepositionPhrase "without flying" as Modifier of creature
 +PrepositionPhrase instead of any other type

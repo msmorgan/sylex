@@ -8,9 +8,13 @@
 + <card=Lotus Vale> {T}: Add three mana of any one color. => DeterminerPhrase "any one" as Determiner of color; !Nominal "one color"; readings 1
 + <card=Stadium Vendors> When this creature enters, choose a player. That player adds two mana of any one color they choose. => DeterminerPhrase "any one" as Determiner of color; !Nominal "one color"
 +PrepositionPhrase as an additional cost to cast this spell => NounPhrase "an additional cost to cast this spell" as PredicativeComplement of as; AdjectivePhrase "additional" as Modifier of cost; Clause "to cast this spell" as Complement of cost
+# from: Lotus Vale
 *NounPhrase any two color
+# from: Lotus Vale
 *NounPhrase any one colors
+# from: Coalition Relic
 *NounPhrase one manas of any color
+# from: Mind Extraction
 * As an additional cost to casts this spell, sacrifice a creature.
 +NounPhrase two mana
 + At the beginning of your upkeep, sacrifice a creature.

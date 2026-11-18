@@ -6,8 +6,11 @@
 + <card=Survival Cache> You gain 2 life. Then if you have more life than an opponent, draw a card. => NounPhrase "more life than an opponent" as Object of have
 +NounPhrase less life than an opponent
 +NounPhrase more lands than you
+# from: Beza, the Bounding Spring
 *NounPhrase more land than you
+# from: Beza, the Bounding Spring
 *NounPhrase fewer life than you
+# from: Beza, the Bounding Spring
 *NounPhrase less lands than you
 # from: Expand the Sphere
 +NounPhrase fewer than two lands => DeterminerPhrase "fewer than two" as Determiner of land; readings 1

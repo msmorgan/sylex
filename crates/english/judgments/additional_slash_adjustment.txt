@@ -10,5 +10,7 @@
 + <card=Fangs of Kalonia> Put a +1/+1 counter on target creature you control, then double the number of +1/+1 counters on each creature that had a +1/+1 counter put on it this way. => !NounPhrase "a +1/+1"
 # from: Quenchable Fire
 + It deals an additional 2 damage. => NounPhrase "an additional 2 damage" as Object of deal
+# from: Chocobo Camp
 + It enters with an additional +1/+1 counter on it. => AdjectivePhrase "additional" as Modifier of counter
+# from: Avaricious Dragon
 + Draw an additional card. => NounPhrase "an additional card" as Object of draw; AdjectivePhrase "additional" as Modifier of card

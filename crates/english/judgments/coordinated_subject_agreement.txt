@@ -1,8 +1,11 @@
 # Number agreement of a clause with a coordinated subject; singular-selecting determiners over coordinated nominals
+# from: Hulking Metamorph
 + Its power and toughness are equal to this creature's power and toughness. => NounPhrase "Its power and toughness" as Subject of be; Nominal "power and toughness"
+# from: Hulking Metamorph
 * Its power and toughness is equal to this creature's power and toughness.
 # from: Lord of Extinction
 + <card=Lord of Extinction> Lord of Extinction's power and toughness are equal to the number of cards in all graveyards. => NounPhrase "Lord of Extinction's power and toughness" as Subject of be; Nominal "power and toughness"
+# from: Lord of Extinction
 * Lord of Extinction's power and toughness is equal to the number of cards in all graveyards.
 # from: Gemini Engine
 + Its power is equal to this creature's power.
@@ -11,7 +14,10 @@
 * <card=Brightcap Badger> Each Fungus and Saproling you control have "{T}: Add {G}."
 + <card=Great Divide Guide> Each land and Ally you control has "{T}: Add one mana of any color." => RelativeClause "you control" gap "land and Ally" || RelativeClause "you control" gap "Ally"
 * <card=Great Divide Guide> Each land and Ally you control have "{T}: Add one mana of any color."
+# from: Goblin Chainwhirler
 *Clause each creature and planeswalker they control have
+# from: Captain America's Motorcycle
 + Target creature or Vehicle gets +2/+0 until end of turn. => NounPhrase "Target creature or Vehicle" as Subject of get
+# from: Captain America's Motorcycle
 * Target creature or Vehicle get +2/+0 until end of turn.
 +NounPhrase its power and toughness => Nominal "power and toughness"

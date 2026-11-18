@@ -6,5 +6,7 @@
 *Clause this ability resolve
 *Clause those abilities resolves
 *Clause that ability trigger
+# from: Cytoplast Manipulator
 *Clause this creature remain on the battlefield
+# from: Cytoplast Manipulator
 *Clause this creature remains on they

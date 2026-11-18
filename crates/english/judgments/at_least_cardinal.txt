@@ -6,6 +6,7 @@
 + <card=Synchronized Eviction> This spell costs {2} less to cast if you control at least two creatures that share a creature type. => DeterminerPhrase "at least two" as Determiner of creature; RelativeClause "that share a creature type" as Modifier of creature
 +NounPhrase at least one other creature => DeterminerPhrase "at least one" as Determiner of creature; !PrepositionPhrase "at least one other creature"
 +NounPhrase at least two other Merfolk => DeterminerPhrase "at least two" as Determiner of Merfolk; !PrepositionPhrase "at least two other Merfolk"
+# from: Sokka, Lateral Strategist
 *NounPhrase at least one other creatures
 *NounPhrase at least two other creature
 +NounPhrase at least 7 life => DeterminerPhrase "at least 7" as Determiner of life

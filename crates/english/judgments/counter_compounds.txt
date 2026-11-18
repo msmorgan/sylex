@@ -8,6 +8,7 @@
 +NounPhrase a -0/-1 counter
 +NounPhrase a -0/-2 counter
 +NounPhrase a -1/-0 counter
+# from: Frankenstein's Monster
 +NounPhrase a +1/+1 or -1/-1 counter => Kind "+1/+1 or -1/-1" as Modifier of counter; readings 1
 +NounPhrase a +2/+0, +1/+1, or +0/+2 counter => Kind "+2/+0, +1/+1, or +0/+2" as Modifier of counter; readings 1
 # An unsigned slash measure is a premodifier of the token's nominal, never a determined nominal head on its own.

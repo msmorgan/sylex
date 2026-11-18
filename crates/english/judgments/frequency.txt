@@ -1,8 +1,9 @@
 # Frequency adverbial noun phrases (`X times`, `two times`, `one time`) as adjuncts of the verb phrase
 +NounPhrase X times
 +NounPhrase two times
-# from: Tourach's Gate
+# from: Mnemonic Deluge
 +NounPhrase one time
+# from: Mnemonic Deluge
 *NounPhrase one times
 *NounPhrase two time
 +VerbPhrase explores X times => NounPhrase "X times" as Adjunct of explore

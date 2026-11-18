@@ -5,4 +5,5 @@
 +NounPhrase target permanent you both own and control
 # from: Conjured Currency
 +NounPhrase target permanent you neither own nor control
+# from: Hanweir Battlements
 *NounPhrase target permanent that player both owns and control

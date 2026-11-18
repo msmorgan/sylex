@@ -21,15 +21,22 @@
 # [CR#603.12] (`docs/oracle-style-guide.md` §8, Delayed and reflexive
 # triggers; §10, Modal choices).
 + When you do, choose one — => PrepositionPhrase "When you do" as Adjunct of choose
+# from: Voltstorm Angel
 + You may pay {E}{E}. When you do, choose one — => Sentence "You may pay {E}{E}."; PrepositionPhrase "When you do" as Adjunct of choose
 + At the beginning of combat on your turn, you may pay {E}{E}. When you do, choose one — => Sentence "At the beginning of combat on your turn, you may pay {E}{E}."; Clause "When you do, choose one"
 # Agreement, case and form, including the full auxiliary a reduced clitic
 # cannot replace (Ch. 18 §6.1, p. 1614).
+# from: Tunnel Vision
 * If they is, draw a card.
+# from: Tunnel Vision
 * If you is, draw a card.
+# from: Roots of Wisdom
 * If them can't, draw a card.
+# from: Tunnel Vision
 * If it's, draw a card.
+# from: Vedalken Heretic
 *Clause you may is
+# from: Ivory Mask
 *Clause you have being
 # A head or coordinator right after the site whose lexical head is spelled
 # like a verb in the omitted Complement's form is that Complement, and no

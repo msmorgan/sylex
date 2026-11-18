@@ -11,6 +11,7 @@
 + Nonartifact creatures get +2/+2 as long as they all share a color. => PrepositionPhrase "as long as they all share a color" as Adjunct of get; Clause "they all share a color"
 # from: Johtull Wurm
 + Draw a card for each creature blocking it beyond the first. => NounPhrase "the first" as Complement of beyond
+# from: Atlantis Attacks
 + This spell was cast using teamwork. => VerbPhrase "using teamwork"; KeywordPhrase "teamwork" as Object of use
 # from: Vodalian War Machine
 + Destroy all Merfolk tapped this turn to pay for its abilities. => PrepositionPhrase "for its abilities" as Complement of pay

@@ -7,6 +7,7 @@
 + <card=City on Fire> If a source you control would deal damage to a permanent or player, it deals triple that damage instead. => NounPhrase "triple that damage"; NounPhrase "that damage"
 + <card=Bruvac the Grandiloquent> If an opponent would mill one or more cards, they mill twice that many cards instead. => NounPhrase "twice that many cards"; DeterminerPhrase "twice that many"; !NounPhrase "that many cards"
 +NounPhrase twice its power => readings 1
+# from: Complete the Circuit
 + Copy that spell twice.
 + Double target player's life total.
 + Target creature gains double strike until end of turn.

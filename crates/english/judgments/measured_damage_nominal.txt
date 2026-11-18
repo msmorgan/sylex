@@ -14,5 +14,7 @@
 +VerbPhrase deals 3 damage => NounPhrase "3 damage" as Object of deal; readings 1
 # from: Conservator
 +NounPhrase the next 3 damage that would be dealt to you this turn => RelativeClause "that would be dealt to you this turn"
+# from: Kaervek's Hex
 *NounPhrase 3 damages
+# from: Saltcrusted Steppe
 *NounPhrase 3 manas

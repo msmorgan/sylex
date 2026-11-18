@@ -7,7 +7,9 @@
 +NounPhrase up to that many target creatures => DeterminerPhrase "up to that many target" as Determiner of creature; !PrepositionPhrase "up to that many target creatures"; readings 1
 +NounPhrase up to that many land cards => PrepositionPhrase "up to that many" as Determiner of card; readings 1
 *NounPhrase up to that many target creature
+# from: Nyssa of Traken
 *NounPhrase up to that many life
+# from: Swashbuckler Extraordinaire
 * Up to that many target creatures gains double strike until end of turn.
 # from: Cephalid Constable
 + Return up to that many target permanents that player controls to their owner's hand. => DeterminerPhrase "up to that many target" as Determiner of permanent; DeterminerPhrase "that many"
@@ -15,6 +17,7 @@
 + Tap up to two target permanents. => DeterminerPhrase "up to two target" as Determiner of permanent
 # from: Settle the Wreckage
 + That player may search their library for that many basic land cards. => DeterminerPhrase "that many" as Determiner of card
-# from: Nissa's Triumph
+# from: Hour of Promise
 + Search your library for up to two land cards. => PrepositionPhrase "up to two" as Determiner of card
+# from: Swashbuckler Extraordinaire
 + That many target creatures gain double strike until end of turn. => DeterminerPhrase "That many target" as Determiner of creature; DeterminerPhrase "That many"

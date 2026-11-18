@@ -22,14 +22,23 @@
 +NounPhrase any of those cards => PrepositionPhrase "of those cards" as Complement of any
 +Clause each of them gets +1/+1
 +Clause any of that mana is spent on a creature spell
+# from: Hope and Glory
 *Clause All of them gets +1/+1
+# from: Hope and Glory
 *Clause Both of them gets +1/+1
+# from: Hope and Glory
 *Clause Many of them gets +1/+1
+# from: Hope and Glory
 *Clause Each of them get +1/+1
+# from: Hope and Glory
 *Clause Either of them get +1/+1
+# from: Hope and Glory
 *Clause Another of them get +1/+1
+# from: Arena of Glory
 *Clause Any of that mana are spent on a creature spell
+# from: Arena of Glory
 *Clause Much of that mana are spent on a creature spell
+# from: Ludevic's Test Subject // Ludevic's Abomination
 + Remove all of them. => NounPhrase "all of them" as Object of remove; PrepositionPhrase "of them" as Complement of all
 # from: Maddening Imp
 + Destroy each of those creatures that didn't attack this turn. => NounPhrase "each of those creatures that didn't attack this turn" as Object of destroy; PrepositionPhrase "of those creatures that didn't attack this turn" as Complement of each; RelativeClause "that didn't attack this turn" as Modifier of creature

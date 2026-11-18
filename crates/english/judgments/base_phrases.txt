@@ -9,6 +9,7 @@
 +Clause to attack
 # from: Gaze of Pain
 +VerbPhrase choose to have it deal damage equal to its power to a target creature
+# from: Fiery Gambit
 * Choose to attacks.
 +Clause it explores again
 +Clause this creature can't attack alone

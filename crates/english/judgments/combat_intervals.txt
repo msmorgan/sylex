@@ -6,4 +6,5 @@
 + Equipped creature can block an additional creature each combat. => NounPhrase "each combat" as Adjunct of block; Nominal "combat"
 + Players can't cast spells during combat. => PrepositionPhrase "during combat" as Adjunct of cast; NounPhrase "combat"
 +Nominal combat damage => Nominal "combat damage"; !Nominal "combat" as Modifier of damage; readings 1
+# from: Phyrexian Juggernaut
 *NounPhrase each combats

@@ -6,5 +6,6 @@
 +VerbPhrase attacks each combat => NounPhrase "each combat" as Adjunct of attack
 +VerbPhrase entered this turn => NounPhrase "this turn" as Adjunct of enter
 +NounPhrase this way
+# from: Veil of Summer
 *NounPhrase this turns
 +VerbPhrase died this turn => NounPhrase "this turn" as Adjunct of die
