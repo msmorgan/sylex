@@ -182,6 +182,16 @@ feature AdjectivePosition = Attributive | Predicative
 feature Sign = Negative | Zero | Positive
 // `Existential`: only dummy *there* (CGEL 16§6.2:1394).
 feature PronounKind = Personal | Existential | Relative
+// The gender relative *who* and *which* contrast in: a relative pronoun's,
+// personal *who* and non-personal *which*, and its antecedent's, its head
+// noun's: a person's `Personal`, a thing's `NonPersonal`, and none on an
+// animal or another being, which takes either (*the dog who*/*which*), or on
+// a head with no noun (CGEL 5§17.3:497–498, 12§3.5.1:1048). An
+// *and*-coordinated antecedent takes its last conjunct's (*the books and
+// people who*; 12§3.5.1:1049). A relative clause and the nominal it modifies
+// agree in it (RelativeAntecedent), so does a postposed relative and its
+// Object, and *whose*, the genitive of both, carries it into no clause.
+feature RelativeGender = Personal | NonPersonal
 // `FreeChoice`: only *any*. Determined excludes it so *any* takes number
 // transparency (FreeChoiceDetermined, TransparentQuantity,
 // TemporalQuantity; never *any number of target creatures becomes*), and
@@ -358,7 +368,7 @@ category Clause [
 ] { gap }
 // Number: a subject relative agrees with its antecedent. NounKind: an
 // adverbial relative modifies a temporal nominal.
-category RelativeClause [Number, NounKind, ClauseMarking]
+category RelativeClause [Number, NounKind, ClauseMarking, RelativeGender]
 // A finite clause whose Subject is its Gap.
 category SubjectGapClause : Clause [Number, Person, VerbForm, Inflection] { gap }
 // A finite clause with an extracted Adjunct.
@@ -387,10 +397,13 @@ category ExistentialPredicate : VerbPhrase [
 category DisplacedSubject : NounPhrase [Number, Case] { gap }
 category FusedNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
+    RelativeGender,
 ] { gap }
 // A symbol sequence as a Noun Phrase, which a Preposition Phrase may
 // postmodify (*{X} in its mana cost*).
-category SymbolHead : NounPhrase [Number, Person, Case, Determination, NounKind, Countability]
+category SymbolHead : NounPhrase [
+    Number, Person, Case, Determination, NounKind, Countability, RelativeGender,
+]
 // A determinative or quantity with its partitive oblique (*each of those
 // cards that has suspend*); it carries its determinative's distribution.
 category PartitiveHead : NounPhrase [
@@ -414,7 +427,7 @@ category LocativeHead : NounPhrase [Number, Person, Case, Determination, NounKin
 category NounPhrase [
     Periphery, Number, Person, Case, Determination, NounKind, Countability,
     DeterminativeDistribution, FirstConjunctNumber, NounDistribution, Postmodification,
-    Comparison, OuterOperation,
+    Comparison, OuterOperation, RelativeGender,
 ] { gap, closed_gaps: [Measure] }
 // A temporal Adjunct of location (*this turn*; CGEL 8§6.3:698) or frequency
 // (*three times*; 8§9:713–716). NounDistribution is `Serial` on one headed
@@ -424,23 +437,25 @@ category TemporalNounPhrase : NounPhrase [
 ]
 category ComplementNounPhrase : NounPhrase [
     Number, Person, Case, Determination, NounKind, Countability, DeterminativeDistribution,
-    Postmodification,
+    Postmodification, RelativeGender,
 ] { gap }
 // A nominal's ComplementKind and ObliqueNumber are its head noun's
 // Complement's.
 category Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueNounKind, ConjunctNumber, KindLicense, BareMass, BareMassHead,
-    RelativeBound, GenitiveAlternant, OuterModifier,
+    RelativeBound, GenitiveAlternant, OuterModifier, RelativeGender,
 ] { gap }
-category QuantifiedNominal : Nominal [QuantityNumber, NounKind, DeterminerNeed, NounDistribution]
+category QuantifiedNominal : Nominal [
+    QuantityNumber, NounKind, DeterminerNeed, NounDistribution, RelativeGender,
+]
 category ModifiedQuantifiedNominal : Nominal [
-    QuantityNumber, NounKind, DeterminerNeed, NounDistribution,
+    QuantityNumber, NounKind, DeterminerNeed, NounDistribution, RelativeGender,
 ]
 category BareNominal : Nominal [
     Number, Countability, NounKind, DeterminerNeed, NounDistribution, ComplementKind,
     ObliqueNumber, ObliqueKind, ObliqueNounKind, KindLicense, SetNameLicense, BareMass,
-    GenitiveAlternant,
+    GenitiveAlternant, RelativeGender,
 ] { gap }
 // The singular count nominals that share a determiner before the
 // final, determined conjunct of a SharedDeterminerCoordination.
@@ -607,22 +622,22 @@ category Interleaved [PastTime, NonPastTime, NounKind] { function }
 category CentralAdjunct { function }
 // A relative clause before the Complement its noun selects (*Equip
 // abilities [you activate] [of other Equipment]*; CGEL 5§15:454).
-category InterleavedModifier [Number, NounKind] { function }
+category InterleavedModifier [Number, NounKind, RelativeGender] { function }
 // An Object's Modifier postposed past the Complements that follow it or a
 // Predicate Preposition Phrase Adjunct (CGEL 12§4:1066), with the Number
-// its Object agrees in.
-category PostposedModifier [Number] { function }
+// and RelativeGender its Object agrees in.
+category PostposedModifier [Number, RelativeGender] { function }
 // An unmarked relative or bare passive past-participial Modifier postposed
 // out of the Object past an AdjP-Complement Preposition Phrase Adjunct (*at
 // random*).
 category BarePostposedModifier : PostposedModifier [Number] { function }
 // The Modifier function after a nominal head: a relative clause or a
 // participial clause.
-category Postmodifier [Number, NounKind, RelativeBound] { function }
+category Postmodifier [Number, NounKind, RelativeBound, RelativeGender] { function }
 // A relative phrase with genitive *whose*.
 category RelativeNounPhrase : NounPhrase [Number]
 // A preposition and its relative pronoun, fronted (*for which*).
-category RelativePrepositionPhrase : PrepositionPhrase
+category RelativePrepositionPhrase : PrepositionPhrase [RelativeGender]
 category KeywordPhrase [KeywordForm, FinalParameter, KindLicense]
 // A Keyword Phrase in quotation marks (*have "bands with other legendary
 // creatures."*, *loses "enchant creature card in a graveyard"*), beside
@@ -956,9 +971,11 @@ QuotedCostHead: BareNominal -> QuotedCost
 
 TextSymbols: Document -> Symbols { capital: [head] }
 // A symbol sequence as a noun under a determiner (*each {B} in a cost*,
-// *six {E}*).
+// *six {E}*). A symbol names a thing, as SymbolNominalPhrase's and
+// MultipliedSymbols' do.
 SymbolNominal: BareNominal -> Symbols
     where $.DeterminerNeed = Required,
+          $.RelativeGender = NonPersonal,
           $.NounKind = Ordinary,
           $.NounDistribution = Ordinary
 // An Arabic numeral as a singular count noun under a determiner (*a natural
@@ -2275,6 +2292,7 @@ MultipliedNounPhrase: NounPhrase -> multiplier:Multiplier NounPhrase
 // controller pays twice {X}*, Thassa's Intervention).
 MultipliedSymbols: FusedNounPhrase -> multiplier:Multiplier Symbols
     where $.NounKind = Resource,
+          $.RelativeGender = NonPersonal,
           $.Determination = Bare,
           $.Case = Plain,
           $.Number = Singular,
@@ -2850,6 +2868,7 @@ CoordinatedBareMass: NounPhrase -> Nominal { transparent: [head], coordinated: [
 SymbolFusedHead: FusedNounPhrase -> SymbolHead
 SymbolNominalPhrase: SymbolHead -> Symbols
     where $.NounKind = Resource,
+          $.RelativeGender = NonPersonal,
           $.Determination = Bare,
           $.Case = Plain,
           $.Number = Singular,
@@ -3378,11 +3397,13 @@ BarePredicativeRelative: RelativeClause -> clause:Clause { cost: 3 }
           clause.ClauseShape := SubjectInitial
 MarkedRelative: RelativeClause -> marker:Class(RelativeMarker) clause:Clause
     where $.ClauseMarking = Relative,
+          $.RelativeGender = marker.RelativeGender,
           clause.Gap = NP,
           clause.VerbForm = Finite,
           marker.Case != Nominative | Genitive
 SubjectRelative: RelativeClause -> marker:Class(RelativeMarker) clause:SubjectGapClause
     where $.ClauseMarking = Relative,
+          $.RelativeGender = marker.RelativeGender,
           clause.Gap = NP,
           $.Number = clause.Number,
           marker.Number = clause.Number,
@@ -3418,9 +3439,11 @@ GenitivePredicativeRelative: RelativeClause -> marker:RelativeNounPhrase clause:
 // *For which*.
 PrepositionRelativePhrase: RelativePrepositionPhrase -> Lex(Preposition) complement:Lex(Pronoun)
     where complement.PronounKind = Relative,
+          $.RelativeGender = complement.RelativeGender,
           complement.Case != Nominative | Genitive
 PrepositionalRelative: RelativeClause -> marker:RelativePrepositionPhrase clause:AdjunctGapClause
     where $.ClauseMarking = Relative,
+          $.RelativeGender = marker.RelativeGender,
           clause.Gap = Adjunct
 // A fused relative is a Noun Phrase (CGEL 12§6:1068).
 FusedSubjectRelative: NounPhrase -> Word(Whichever) clause:SubjectGapClause
@@ -3688,6 +3711,14 @@ valence PrepositionPhrase {
 // creature*, Serene Master), and neither takes its own.
 dependents GenitiveDependents = [DeterminerPhrase, NounPhrase]
     where !(dependent.Case = Genitive & head.GenitiveAlternant = Filled)
+// A relative clause agrees in RelativeGender with the nominal it modifies,
+// its antecedent: *who* takes no non-personal one and *which* no personal
+// one (CGEL 12§3.5.1:1048, 5§17.3:498). A postposed relative agrees with its
+// Object as every postposed Modifier does, so *who* is postposed out of no
+// *2 damage* (*deals 2 damage to each white creature and each player [who
+// controls a white creature]*, Disorder).
+dependents RelativeAntecedent = [Postmodifier, InterleavedModifier, RelativeClause]
+    where dependent.RelativeGender = head.RelativeGender
 // A temporal clause locates its host's situation at the time of its own
 // (CGEL 8§6:700), so a dependent that gives a phrase its time never carries
 // a time the phrase's head does not: no past clause under a non-past head
@@ -4109,7 +4140,7 @@ coordination Clause {
 coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Case, Countability, NounDistribution],
+    proximate: [Case, Countability, NounDistribution, RelativeGender],
     resolve: [Determination -> Mixed],
 }
     where $.Number = Plural,
@@ -4120,7 +4151,7 @@ coordination NounPhrase {
 coordination NounPhrase {
     coordinators: And,
     unshared: [Number, Person, FirstConjunctNumber],
-    proximate: [Case, Countability, NounDistribution],
+    proximate: [Case, Countability, NounDistribution, RelativeGender],
     resolve: [Determination -> Mixed],
 }
     where $.Number = Singular,
@@ -4134,7 +4165,7 @@ coordination NounPhrase {
 coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Person, Case, Countability, NounDistribution],
+    proximate: [Person, Case, Countability, NounDistribution, RelativeGender],
     resolve: [Determination -> Mixed],
 }
     where last.Number := Plural,
@@ -4142,7 +4173,7 @@ coordination NounPhrase {
 coordination NounPhrase {
     coordinators: AndOr,
     unshared: [Number, DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Person, Case, Countability, NounDistribution],
+    proximate: [Person, Case, Countability, NounDistribution, RelativeGender],
     resolve: [Determination -> Mixed],
 }
     where last.Number = Singular
@@ -4155,7 +4186,7 @@ coordination NounPhrase {
     coordinators: Alternative,
     raising_delimiter: ',',
     unshared: [DeterminativeDistribution, FirstConjunctNumber],
-    proximate: [Number, Person, Case, Countability, NounDistribution],
+    proximate: [Number, Person, Case, Countability, NounDistribution, RelativeGender],
     resolve: [Determination -> Mixed],
 }
     where first.NounKind != Numeric | Quantity,
@@ -4163,7 +4194,7 @@ coordination NounPhrase {
 coordination Nominal {
     coordinators: And,
     unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber],
-    proximate: [NounDistribution, KindLicense, BareMass],
+    proximate: [NounDistribution, KindLicense, BareMass, RelativeGender],
     resolve: [BareMassHead -> Unmodified],
 }
     where $.Number = Plural,
@@ -4171,7 +4202,7 @@ coordination Nominal {
 coordination Nominal {
     coordinators: Disjunctive,
     unshared: [ObliqueNumber, ObliqueNounKind, ConjunctNumber],
-    proximate: [NounDistribution, KindLicense, BareMass],
+    proximate: [NounDistribution, KindLicense, BareMass, RelativeGender],
     resolve: [BareMassHead -> Unmodified],
 }
     where $.ConjunctNumber = $.Number
