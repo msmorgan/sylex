@@ -158,6 +158,15 @@ feature CentralPosition = Occupied
 // carries none: one stranded conjunct does not make *than [you lost life or
 // did]* an elliptical clause.
 feature Ellipsis = Code
+// Privative and local: a Clause that is its Subject and its Verb Phrase and
+// no more, so it opens with its Subject, as a bare relative's must (CGEL
+// 12§3.5.5:1055). The Productions of a Subject and its predicate value it,
+// and being local it is on no Clause built over one: none with a preposed or
+// comma-set dependent, and no coordination. BareRelative, BarePredicativeRelative
+// and AdverbialRelative carry it, an admission gate (english.md §6) that
+// keeps *each turn, those coins come up heads* from an adverbial relative of
+// *The first time you flip one or more coins* (Edgar, King of Figaro).
+feature ClauseShape = SubjectInitial { local }
 // A lexicon-declared fused-head adjective naming a Quality (*protection
 // from multicolored*).
 feature QualityHead = Fused
@@ -229,7 +238,7 @@ category Sentences
 // SubjectRemnant recovers.
 category Clause [
     Number, Person, VerbForm, ClauseMarking, Inflection, FrontPosition, PastTime, NonPastTime,
-    Ellipsis,
+    Ellipsis, ClauseShape,
 ] { gap }
 // Number: a subject relative agrees with its antecedent. NounKind: an
 // adverbial relative modifies a temporal nominal.
@@ -237,13 +246,7 @@ category RelativeClause [Number, NounKind, ClauseMarking]
 // A finite clause whose Subject is its Gap.
 category SubjectGapClause : Clause [Number, Person, VerbForm, Inflection] { gap }
 // A finite clause with an extracted Adjunct.
-category AdjunctGapClause : Clause [VerbForm] { gap }
-// A finite clause that opens with its Subject, as a bare relative's must
-// (CGEL 12§3.5.5:1055). An admission gate (english.md §6): it restates the Clause
-// Productions that open with the Subject, which keeps *each turn, those coins
-// come up heads* from an adverbial relative of *The first time you flip one
-// or more coins* (Edgar, King of Figaro).
-category SubjectInitialClause : Clause [VerbForm, Inflection] { gap }
+category AdjunctGapClause : Clause [VerbForm, ClauseShape] { gap }
 // A participle premodifying a nominal (*attacking creature*).
 category Participle : VerbPhrase [Inflection, Polarity]
 category VerbPhrase [
@@ -1086,13 +1089,13 @@ Declarative: Sentence -> clause:Clause '.' { capital: [clause] }
 SubjectRemnant: SubjectRemnant -> VerbPhrase
     where head.VerbForm = Finite,
           head.CentralPosition != Occupied
-// Twin: RelativeSubjectPredicate.
 SubjectPredicate: Clause -> subject:NounPhrase Free(VerbPhrase) { transparent: [head] }
     where subject.Number = head.Number,
           subject.Person = head.Person,
           head.VerbForm = Finite,
           subject.Case != Accusative | Genitive,
-          $.ClauseMarking = Unmarked
+          $.ClauseMarking = Unmarked,
+          $.ClauseShape = SubjectInitial
 // A specifying copular Verb Phrase, whose value is a singular subtype name
 // or coordination of them (CGEL 4§5.5:266–269), for Artificial Evolution's
 // *the new creature type can't be Wall*. `head.Number != Plural` is an
@@ -1106,7 +1109,6 @@ SpecifyingBe: VerbPhrase -> Class(BeVerb) predicative_complement:SpecifyingValue
 SubtypeSpecifyingValue: SpecifyingValue -> Class(Subtype) where head.Number = Singular
 // A bound auxiliary clitic has a nominative pronoun host (*it's*, *you're*,
 // *they've*).
-// Twin: RelativeCliticSubjectPredicate.
 CliticSubjectPredicate: Clause -> subject:NounPhrase Attached(VerbPhrase, Suffix) {
     transparent: [head],
 }
@@ -1114,7 +1116,8 @@ CliticSubjectPredicate: Clause -> subject:NounPhrase Attached(VerbPhrase, Suffix
           subject.Person = head.Person,
           head.VerbForm = Finite,
           subject.Case = Nominative,
-          $.ClauseMarking = Unmarked
+          $.ClauseMarking = Unmarked,
+          $.ClauseShape = SubjectInitial
 
 // *Turning a face-down permanent face up causes ...*.
 GerundSubject: Clause -> subject:Gerund VerbPhrase { transparent: [head] }
@@ -2502,7 +2505,6 @@ KeywordInstruction: Sentence -> KeywordLineItem '.' { capital: [head] } where he
 // correlative of a coordination (*all enchantments you [both own and
 // control]*, Remove Enchantments); *both* floats after a plural Subject, as
 // FloatedObjectBoth's Object is plural.
-// Twin: RelativeFloatedEach.
 FloatedEach: Clause -> subject:NounPhrase adjunct:Class(FloatingQuantifier) VerbPhrase {
     transparent: [head],
 }
@@ -2512,16 +2514,17 @@ FloatedEach: Clause -> subject:NounPhrase adjunct:Class(FloatingQuantifier) Verb
           subject.Number = head.Number,
           subject.Person = head.Person,
           head.VerbForm = Finite,
-          $.ClauseMarking = Unmarked
+          $.ClauseMarking = Unmarked,
+          $.ClauseShape = SubjectInitial
 // *They all share a color*: after a personal pronoun Subject only.
-// Twin: RelativeFloatedAll.
 FloatedAll: Clause -> subject:NounPhrase adjunct:Word(All) VerbPhrase { transparent: [head] }
     where subject.Number = Plural,
           subject.Case = Nominative,
           subject.Number = head.Number,
           subject.Person = head.Person,
           head.VerbForm = Finite,
-          $.ClauseMarking = Unmarked
+          $.ClauseMarking = Unmarked,
+          $.ClauseShape = SubjectInitial
 NumericalDetermination: DeterminerPhrase -> NumericalDeterminer
     where $.DeterminativeDistribution = Numerical,
           $.ComplementKind = Intransitive
@@ -3213,51 +3216,19 @@ SingleGerundParticipialPostmodifier: Nominal -> BareNominal modifier:VerbPhrase 
           modifier.VerbForm = GerundParticiple
 // A bare relative: a finite clause with an object Gap. A marked one may
 // also have a subject Gap, which agrees with the antecedent.
-BareRelative: RelativeClause -> clause:SubjectInitialClause
+BareRelative: RelativeClause -> clause:Clause
     where $.ClauseMarking = Unmarked,
           clause.Gap = NP,
-          clause.VerbForm = Finite
+          clause.VerbForm = Finite,
+          clause.ClauseShape := SubjectInitial
 // A bare relative whose Gap is a predicative (*the permanent it becomes*;
 // CGEL 12§3.3(c):1045).
-BarePredicativeRelative: RelativeClause -> clause:SubjectInitialClause { cost: 3 }
+BarePredicativeRelative: RelativeClause -> clause:Clause { cost: 3 }
     where $.ClauseMarking = Unmarked,
           $.NounKind = Ordinary,
           clause.Gap = Pred,
-          clause.VerbForm = Finite
-// A bare relative's Clause opens with its Subject, never a preposed adjunct
-// (CGEL 12§3.5.5:1055). Twins minus `$.ClauseMarking`; change both:
-// RelativeSubjectPredicate / SubjectPredicate,
-// RelativeCliticSubjectPredicate / CliticSubjectPredicate,
-// RelativeFloatedEach / FloatedEach, RelativeFloatedAll / FloatedAll.
-RelativeSubjectPredicate: SubjectInitialClause -> subject:NounPhrase Free(VerbPhrase) {
-    transparent: [head],
-}
-    where subject.Number = head.Number,
-          subject.Person = head.Person,
-          head.VerbForm = Finite,
-          subject.Case != Accusative | Genitive
-RelativeCliticSubjectPredicate: SubjectInitialClause ->
-    subject:NounPhrase Attached(VerbPhrase, Suffix) { transparent: [head] }
-    where subject.Number = head.Number,
-          subject.Person = head.Person,
-          head.VerbForm = Finite,
-          subject.Case = Nominative
-RelativeFloatedEach: SubjectInitialClause ->
-    subject:NounPhrase adjunct:Class(FloatingQuantifier) VerbPhrase { transparent: [head] }
-    where !(subject.Number = Singular & subject.Person = Third),
-          !(adjunct.Number = Plural & subject.Number = Singular),
-          subject.Case != Accusative,
-          subject.Number = head.Number,
-          subject.Person = head.Person,
-          head.VerbForm = Finite
-RelativeFloatedAll: SubjectInitialClause -> subject:NounPhrase adjunct:Word(All) VerbPhrase {
-    transparent: [head],
-}
-    where subject.Number = Plural,
-          subject.Case = Nominative,
-          subject.Number = head.Number,
-          subject.Person = head.Person,
-          head.VerbForm = Finite
+          clause.VerbForm = Finite,
+          clause.ClauseShape := SubjectInitial
 MarkedRelative: RelativeClause -> marker:Class(RelativeMarker) clause:Clause
     where $.ClauseMarking = Relative,
           clause.Gap = NP,
@@ -3321,14 +3292,15 @@ FusedRelative: NounPhrase -> Word(Whichever) clause:Clause
 // Its Gap is a temporal Adjunct (*the next time you cast a spell*). It is
 // bare, so its Clause opens with its Subject: *the first time [each turn,
 // those coins come up heads]* is no adverbial relative.
-AdverbialRelative: RelativeClause -> clause:SubjectInitialClause
+AdverbialRelative: RelativeClause -> clause:AdjunctGapClause
     where $.ClauseMarking = Unmarked,
           clause.Gap = Adjunct,
+          clause.ClauseShape := SubjectInitial,
           $.NounKind = Temporal
-// Twin: AdjunctGap, over SubjectInitialClause.
-RelativeAdjunctGap: SubjectInitialClause -> SubjectInitialClause where $.Gap = Adjunct
-// Twin: RelativeAdjunctGap.
-AdjunctGap: AdjunctGapClause -> Clause where head.VerbForm = Finite, $.Gap = Adjunct
+AdjunctGap: AdjunctGapClause -> Clause
+    where head.VerbForm = Finite,
+          $.Gap = Adjunct,
+          $.ClauseShape = head.ClauseShape
 // A marked relative postposed out of its Object (*Choose a card at random
 // that was exiled with ...*; CGEL 12§4:1066). It ranks behind the relative
 // clause in place.
