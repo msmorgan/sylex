@@ -31,6 +31,8 @@ pub enum Category {
     Keyword,
     /// Open ability-head label, including its following em dash.
     FlavorWord,
+    /// Open name of an expansion, cited before the noun *expansion*.
+    SetName,
     Symbol,
 }
 
@@ -145,6 +147,11 @@ pub enum LexicalReading {
     },
     FlavorWord {
         label: String,
+    },
+    /// A Set Name, read from the text by its title shape
+    /// ([`crate::Lexicon::analyze`]).
+    SetName {
+        name: String,
     },
     Numeral {
         value: i32,

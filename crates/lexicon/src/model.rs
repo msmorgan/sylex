@@ -130,6 +130,11 @@ pub struct Lexeme {
     /// `pronunciation::default_onset`).
     #[serde(default)]
     pub onset: Option<crate::Onset>,
+    /// The Lexeme is a noun a Set Name premodifies (*the Antiquities
+    /// expansion*): analysis reads a Set Name only right before one of its
+    /// forms ([`Lexicon::analyze`]).
+    #[serde(default)]
+    pub set_name_host: bool,
 }
 
 impl Lexeme {
@@ -156,6 +161,7 @@ impl Lexeme {
             card_scope: BTreeSet::new(),
             card_name: false,
             onset: None,
+            set_name_host: false,
             surface_structure: if matches!(
                 category,
                 crate::Category::Catalog | crate::Category::Symbol

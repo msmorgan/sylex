@@ -1479,3 +1479,144 @@ fn only_a_modal_preterite_has_no_tense() {
     cat.properties.modal = true;
     refused(Lexicon::new([cat]), "a modal that is not a verb");
 }
+
+/// The Set Names analysis reads in `text`, by their spans' text.
+fn set_names(lexicon: &Lexicon, text: &str) -> BTreeSet<String> {
+    lexicon
+        .analyze(text)
+        .matches
+        .iter()
+        .filter_map(|found| match &found.reading {
+            LexicalReading::SetName { name } => Some(name.clone()),
+            _ => None,
+        })
+        .collect()
+}
+
+fn set_name_host() -> Lexicon {
+    let mut expansion = noun("noun:expansion", "expansion");
+    expansion.set_name_host = true;
+    Lexicon::new([
+        expansion,
+        invariant("det:the", "the", Category::Determinative),
+        invariant("prep:in", "in", Category::Preposition),
+    ])
+    .unwrap()
+}
+
+/// A Set Name is read by its title shape alone, right before a noun that
+/// takes one [CR#206.3a..206.3c]: no list of set names is consulted, and no
+/// word of the run is refused for spelling an English word or a card's name.
+/// Each name is a `SetList.json` shape: a colon subtitle, a word-final
+/// apostrophe, interior prepositions, digits and a comma inside a numeral.
+#[test]
+fn a_set_name_is_read_from_its_title_shape_before_its_noun() {
+    let lexicon = set_name_host();
+    for name in [
+        "Antiquities",
+        "Arabian Nights",
+        "Time Spiral",
+        "Urza's Saga",
+        "Phyrexia: All Will Be One",
+        "The Brothers' War",
+        "Shadows over Innistrad",
+        "Warhammer 40,000 Commander",
+        "30th Anniversary Edition",
+        "Duel Decks: Elves vs. Goblins",
+    ] {
+        let text = format!("originally printed in the {name} expansion");
+        assert_eq!(
+            set_names(&lexicon, &text),
+            BTreeSet::from([name.to_owned()]),
+            "{text}"
+        );
+        let start = "originally printed in the ".chars().count();
+        let reading = LexicalReading::SetName { name: name.into() };
+        assert!(
+            at(&lexicon.analyze(&text), start, start + name.chars().count()).contains(&reading)
+        );
+        assert_eq!(lexicon.realize(&reading).unwrap(), name);
+        assert!(!lexicon.takes_capital(&reading).unwrap());
+        assert!(lexicon.stands_in(&reading, &CardScope::default()));
+    }
+    assert_eq!(
+        lexicon
+            .edges(&LexicalReading::SetName {
+                name: "Antiquities".into()
+            })
+            .unwrap()
+            .left
+            .onset,
+        Some(Onset::Vowel)
+    );
+}
+
+/// A Set Name is the whole title run before its noun, never a shorter run
+/// inside it, so a capitalized word before it, joined by connectors, is part of
+/// it.
+#[test]
+fn a_set_name_is_the_whole_title_run() {
+    let lexicon = set_name_host();
+    for (text, name) in [
+        ("the Urza's Saga expansion", "Urza's Saga"),
+        (
+            "printed in the Adventures in the Forgotten Realms expansion",
+            "Adventures in the Forgotten Realms",
+        ),
+        (
+            "each Island in the Antiquities expansion",
+            "Island in the Antiquities",
+        ),
+    ] {
+        assert_eq!(
+            set_names(&lexicon, text),
+            BTreeSet::from([name.to_owned()]),
+            "{text}"
+        );
+    }
+}
+
+/// No Set Name is read where no noun that takes one follows, nor from a run
+/// that is no title run.
+#[test]
+fn a_set_name_is_read_only_before_its_noun() {
+    let lexicon = set_name_host();
+    for text in [
+        "the Antiquities",
+        "the antiquities expansion",
+        "the Antiquities  expansion",
+        "the Antiquities of expansion",
+        "Antiquities\nexpansion",
+    ] {
+        assert!(set_names(&lexicon, text).is_empty(), "{text}");
+    }
+    // The plural is a form of the noun that takes a Set Name.
+    assert_eq!(
+        set_names(&lexicon, "the Antiquities expansions"),
+        BTreeSet::from(["Antiquities".to_owned()])
+    );
+    let without_host = Lexicon::new([noun("noun:expansion", "expansion")]).unwrap();
+    assert!(set_names(&without_host, "the Antiquities expansion").is_empty());
+    for name in [
+        "",
+        "antiquities",
+        "Antiquities ",
+        "of Antiquities",
+        "Antiquities of",
+        "A\tB",
+    ] {
+        assert!(
+            lexicon
+                .realize(&LexicalReading::SetName { name: name.into() })
+                .is_err(),
+            "{name:?}"
+        );
+    }
+}
+
+#[test]
+fn only_a_noun_takes_a_set_name() {
+    let mut host = invariant("prep:in", "in", Category::Preposition);
+    host.set_name_host = true;
+    assert!(Lexicon::new([host]).is_err());
+}

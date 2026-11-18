@@ -8,6 +8,7 @@ mod morphology;
 pub mod numeral;
 mod pronunciation;
 mod scope;
+mod set_name;
 mod shortening;
 mod types;
 

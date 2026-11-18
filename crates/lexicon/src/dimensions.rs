@@ -287,12 +287,13 @@ pub struct Edges {
 }
 
 impl Edges {
-    /// The edges of an own name, a numeral or a Flavor Word, which no
-    /// Feature Bundle declares: an own name has the Onset of its spelling, a
-    /// numeral that of its spoken cardinal (*an 8/8*), a Flavor Word none,
-    /// none hosts a prefix, and each takes the *'s* genitive (a name the
-    /// text treats as singular ending in *s* included, *Swarm of Rats's*).
-    /// `None` for a declared word, whose edges its Lexicon holds
+    /// The edges of an own name, a numeral, a Flavor Word or a Set Name,
+    /// which no Feature Bundle declares: an own name has the Onset of its
+    /// spelling, a numeral that of its spoken cardinal (*an 8/8*), a Set Name
+    /// its first word's, as a declared spelling has (*Arabian Nights*), a
+    /// Flavor Word none; none hosts a prefix, and each takes the *'s* genitive
+    /// (a name the text treats as singular ending in *s* included, *Swarm of
+    /// Rats's*). `None` for a declared word, whose edges its Lexicon holds
     /// ([`crate::Lexicon::edges`]), and for an own name with no spelling.
     #[must_use]
     pub fn non_word(reading: &crate::LexicalReading) -> Option<Self> {
@@ -303,6 +304,7 @@ impl Edges {
             }
             crate::LexicalReading::Numeral { value, .. } => crate::numeral_onset(*value),
             crate::LexicalReading::FlavorWord { .. } => None,
+            crate::LexicalReading::SetName { name } => crate::pronunciation::default_onset(name),
         };
         Some(Self::plain(onset))
     }

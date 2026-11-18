@@ -316,6 +316,9 @@ impl Lexicon {
             if redundant_onset {
                 return Err(error("a declared Onset its spellings have by default"));
             }
+            if lexeme.set_name_host && lexeme.category != Category::Noun {
+                return Err(error("a Set Name premodifies only a noun"));
+            }
             result.lexemes.insert(lexeme.id, lexeme);
         }
         Ok(result)
@@ -370,7 +373,8 @@ impl Lexicon {
                 .ok_or(LexicalError::UnlicensedValue),
             LexicalReading::OwnName { .. }
             | LexicalReading::Numeral { .. }
-            | LexicalReading::FlavorWord { .. } => {
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::SetName { .. } => {
                 self.realize(reading)?;
                 crate::Edges::non_word(reading).ok_or(LexicalError::UnlicensedValue)
             }
@@ -419,6 +423,12 @@ impl Lexicon {
             LexicalReading::OwnName { name, form } => crate::own_name_spelling(name, *form)
                 .filter(|spelling| valid_own_name(spelling))
                 .ok_or(LexicalError::UnlicensedValue),
+            LexicalReading::SetName { name } => {
+                if !crate::set_name::valid_set_name(name) {
+                    return Err(LexicalError::UnlicensedValue);
+                }
+                Ok(name.clone())
+            }
             LexicalReading::Word(value) => {
                 let declared = self
                     .surfaces
@@ -482,8 +492,8 @@ impl Lexicon {
     ///
     /// A run no registered label spells is not a vocabulary gap here: it is
     /// a flavor word, and the label is the run verbatim. Nothing
-    /// enumerates flavor words, so this is the only open slot the lexicon
-    /// reports rather than an unknown word.
+    /// enumerates flavor words, so the lexicon reports it as an open slot
+    /// rather than an unknown word, as it does a Set Name.
     #[must_use]
     pub fn analyze_italic_head(&self, run: &str) -> ItalicHead {
         match self.registered_label(run, None) {
@@ -580,7 +590,7 @@ impl Lexicon {
     /// - A card-scoped Lexeme, an Introduced Name or an Anchor Word, stands
     ///   only where the scope holds one of its cards.
     /// - A Flavor Word stands only where no label registered there spells it.
-    /// - Every other value stands everywhere.
+    /// - Every other value, a Set Name included, stands everywhere.
     ///
     /// It checks scope alone: whether the lexicon licenses the value is
     /// [`Lexicon::realize`]'s question, which admission asks first.
@@ -595,7 +605,7 @@ impl Lexicon {
             LexicalReading::FlavorWord { label } => {
                 self.registered_label(label, Some(scope)).is_none()
             }
-            LexicalReading::Numeral { .. } => true,
+            LexicalReading::Numeral { .. } | LexicalReading::SetName { .. } => true,
         }
     }
 
@@ -737,7 +747,8 @@ impl Lexicon {
                 }
                 | LexicalReading::Word(_)
                 | LexicalReading::Numeral { .. }
-                | LexicalReading::FlavorWord { .. } => None,
+                | LexicalReading::FlavorWord { .. }
+                | LexicalReading::SetName { .. } => None,
             })
             .collect();
         matches.retain(|found| match &found.reading {
@@ -753,17 +764,31 @@ impl Lexicon {
             }
             | LexicalReading::Word(_)
             | LexicalReading::Numeral { .. }
-            | LexicalReading::FlavorWord { .. } => true,
+            | LexicalReading::FlavorWord { .. }
+            | LexicalReading::SetName { .. } => true,
         });
         numeral_matches(&tokens, &mut matches);
         flavor_word_matches(&tokens, &mut matches);
+        let hosts = matches
+            .iter()
+            .filter(|found| match &found.reading {
+                LexicalReading::Word(value) => self.lexemes[&value.lexeme].set_name_host,
+                LexicalReading::OwnName { .. }
+                | LexicalReading::FlavorWord { .. }
+                | LexicalReading::SetName { .. }
+                | LexicalReading::Numeral { .. } => false,
+            })
+            .map(|found| found.start)
+            .collect();
+        crate::set_name::set_name_matches(&tokens, &hosts, &mut matches);
         matches.retain(|found| match &found.reading {
             LexicalReading::FlavorWord { label } => {
                 self.title_cased(label) && self.stands_in(&found.reading, scope)
             }
             LexicalReading::Word(_)
             | LexicalReading::OwnName { .. }
-            | LexicalReading::Numeral { .. } => true,
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::SetName { .. } => true,
         });
         AnalyzedText {
             raw: raw.to_owned(),
