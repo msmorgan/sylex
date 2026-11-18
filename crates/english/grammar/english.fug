@@ -2358,8 +2358,14 @@ NumericArithmetic: NounPhrase -> Amount modifier:Selected(PrepositionPhrase, Plu
           $.Determination = Bare,
           $.Case = Plain,
           $.Person = Third
+// A bare degree Noun Phrase, fused *that many*, is no operand: its arithmetic
+// is the determinative's (DegreeArithmetic, *[that many plus one] {E}*,
+// Izzet Generatorium), never also the Noun Phrase's (*[that many] plus [one
+// {E}]*). An overtly determined one is (*draw [that many cards] plus one*,
+// Colossus of the Blood Age).
 NounPhraseArithmetic: NounPhrase -> NounPhrase modifier:Selected(PrepositionPhrase, Plus, Minus)
     where head.NounKind != Numeric,
+          !(head.Determination = Bare & head.DeterminativeDistribution = Degree),
           head.Case := Plain,
           $.OuterOperation = Arithmetic
 // *That many times plus an additional time*.

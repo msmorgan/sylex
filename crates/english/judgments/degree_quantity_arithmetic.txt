@@ -11,3 +11,9 @@
 # from: Lightning Storm
 + <card=Lightning Storm> X is 3 plus the number of charge counters on Lightning Storm. => NounPhrase "3 plus the number of charge counters on Lightning Storm" as PredicativeComplement of be
 + If one or more +1/+1 counters would be put on a creature you control, twice that many +1/+1 counters are put on it instead. => NounPhrase "twice that many +1/+1 counters"
+# A fused degree Noun Phrase takes its arithmetic in the determiner phrase only; an overtly determined one takes it as a Noun Phrase
++ <card=Izzet Generatorium> If you would get one or more {E}, you get that many plus one {E} instead. => DeterminerPhrase "that many plus one"; PrepositionPhrase "plus one" as Modifier of many; !PrepositionPhrase "plus one {E}"
++ <card=Winding Constrictor> If one or more counters would be put on an artifact or creature you control, that many plus one of each of those kinds of counters are put on that permanent instead. => DeterminerPhrase "that many plus one"; PrepositionPhrase "plus one" as Modifier of many; !PrepositionPhrase "plus one of each of those kinds of counters"
+# from: Winding Constrictor
++ Draw cards equal to that many plus one. => DeterminerPhrase "that many plus one"; PrepositionPhrase "plus one" as Modifier of many || NounPhrase "cards equal to that many"; PrepositionPhrase "plus one" as Modifier of card; readings 2
++ <card=Colossus of the Blood Age> When this creature dies, discard any number of cards, then draw that many cards plus one. => NounPhrase "that many cards plus one"; NounPhrase "that many cards"; PrepositionPhrase "plus one" as Modifier of card
