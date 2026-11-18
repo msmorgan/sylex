@@ -184,6 +184,7 @@
     // retention"; §12, "Colors and types").
     (lemma: "in addition", frames: [
         (complement: PP(["to"]), hosts: Predicate),
+        (complement: PPWith(["to"], Gerund), hosts: Predicate),
         (complement: Intransitive, hosts: Predicate),
     ]),
     // *cards you've drafted this draft round, including this card*
@@ -196,6 +197,7 @@
     (lemma: "instead", frames: [
         (complement: Intransitive, hosts: Predicate),
         (complement: PP(["of"]), hosts: Predicate),
+        (complement: PPWith(["of"], Gerund), hosts: Predicate),
     ]),
     (lemma: "into", frames: [
         (complement: NP, hosts: ComplementOnly),
@@ -230,7 +232,11 @@
         // *the value of X*
         (complement: Amount, hosts: ComplementOnly),
         (complement: Nominal, hosts: ComplementOnly),
-        (complement: Gerund, hosts: ComplementOnly),
+        // A gerund-participial clause only where a head names it (*instead of
+        // putting it into ...*; *as part of casting a spell*), never after a
+        // head that selects *of* alone, where *attacking* premodifies the
+        // Complement's head (*the number of attacking creatures*).
+        (complement: Gerund, hosts: ComplementOnly, constraints: ["KindSelected"]),
         (complement: KeywordPhrase, hosts: ComplementOnly),
         // *instead of into that player's graveyard*: a goal or location
         // that *instead* contrasts with the clause's own, its preposition
@@ -293,7 +299,11 @@
         (complement: Amount, hosts: ComplementOnly),
         // *, to a maximum of 10*
         (complement: NP, hosts: Supplement),
-        (complement: Gerund, hosts: ComplementOnly),
+        // A gerund-participial clause only where a head names it (*in
+        // addition to paying its other costs*), never after a head that
+        // selects *to* alone, where *attacking* premodifies the Complement's
+        // head (*damage that would be dealt to attacking creatures*).
+        (complement: Gerund, hosts: ComplementOnly, constraints: ["KindSelected"]),
         // A bare singular count noun in a fixed frame (CGEL, Ch. 5 §8.5(b),
         // p. 409): *return an unblocked attacker you control to hand*, as
         // *in hand*.

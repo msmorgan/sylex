@@ -934,7 +934,12 @@ constraint Plural {
 // A Complement taken only where a head's Frame Slot names its kind: a cited
 // word after *for* (*do the same for Vampire*), never under a head that
 // selects *for* alone, where it would be a second tree of the bare noun
-// (*vote for blue*).
+// (*vote for blue*); a gerund-participial clause after *to* or *of* (*in
+// addition to paying its other costs*), never under a head that selects the
+// preposition alone, where a participle premodifies the Noun Phrase the card
+// means (*damage that would be dealt to attacking creatures you control*,
+// Dolmen Gate; *the number of attacking creatures you control*, Akroan
+// Hoplite), never a verb whose Object is *creatures*.
 constraint KindSelected { kind_selected }
 
 // A distributive adjunct (*for each …*) anchors to the outermost eligible

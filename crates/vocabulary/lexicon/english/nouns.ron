@@ -152,7 +152,8 @@
     (lemma: "owner", relative_gender: Personal, frames: [Complement(PP(["of"]))]),
     "pack",
     (lemma: "pair", frames: [Complement(PP(["of"]))], distinct_genitive: true),
-    (lemma: "part", frames: [Complement(PP(["of"]))], distinct_genitive: true),
+    // *as part of casting a spell they control* (Standard Bearer)
+    (lemma: "part", frames: [Complement(PP(["of"])), Complement(PPWith(["of"], Gerund))], distinct_genitive: true),
     (lemma: "party", relative_gender: Dual),
     "permanent",
     (lemma: "phase", kind: Temporal),

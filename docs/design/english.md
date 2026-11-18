@@ -107,7 +107,10 @@ lexicon names it. `Plural` is *among*'s: its Complement is itself a
 coordination or else a Noun Phrase that is not Singular (CGEL, Ch. 7 §5.1(a),
 p. 636). `KindSelected` marks a frame that only a Frame Slot naming the
 Complement's kind selects (*do the same for Vampire*, a cited word, never
-*vote for blue*). The engine knows only the constraint's form: for each slot
+*vote for blue*); *to* and *of* take a gerund-participial clause under it, so
+*in addition to paying its other costs* and *instead of putting it into ...*
+keep theirs while *dealt to attacking creatures* reads *attacking* only as a
+premodifier. The engine knows only the constraint's form: for each slot
 kind, whether the Complement may be itself a coordination, and the equations
 it satisfies otherwise. Why: the requirement is stated in grammar features
 (§1), so the engine cannot hold it, and a flag per preposition would grow the
