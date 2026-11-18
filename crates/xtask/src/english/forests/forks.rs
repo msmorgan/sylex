@@ -476,9 +476,9 @@ mod tests {
                     |r| r.get(0),
                 )
                 .unwrap();
-            let analyzed = env
-                .lexicon
-                .analyze_source_scoped(&parsed, None, &face.scope());
+            let analyzed =
+                env.lexicon
+                    .analyze_source_scoped(&parsed, None, &face.scope(&env.lexicon));
             let parse = grammar.parse_analyzed(&analyzed);
             let forest = parse.fork_forest().unwrap();
             let expected = forest.forks();

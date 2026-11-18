@@ -28,7 +28,7 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
 
 ```
 # a comment
-<mark> [<card=NAME>] <text> [=> <assertions>]
+<mark> [<card=NAME> [<legendary>]] <text> [=> <assertions>]
 ```
 
 - **Mark.** `+` the text is grammatical; `*` it has no Reading at all (see
@@ -36,11 +36,12 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
   The text is parsed as the grammar's root unless the mark names a Category,
   as in `+NounPhrase` or `*PrepositionPhrase`.
 - **Card.** `<card=Seedborn Muse>` reads the text as if it were on the card so
-  named: with that card's own name in scope (`Judgment::scope`,
-  `corpus::own_names`), for a self-reference by its full or Shortened Name
-  ([CR#201.5,201.5c]). The name is an input like the text, and no card is
-  looked up. A name that is no card name of the lexicon is an error naming
-  the entry.
+  named: with that card's own name in scope (`Judgment::scope`), for a
+  self-reference by its full name ([CR#201.5]). `<legendary>` after it states
+  that the card is a legendary permanent, which puts its Shortened Name in
+  scope too ([CR#201.5c]): `<card=Jace, Cunning Castaway> <legendary> Jace
+  draws two cards.` The name and the flag are inputs like the text: no card is
+  looked up, and the name need be no printed card's.
 - **Text.** The exact expression, with its final punctuation; it runs to the
   end of the line or to `=>`.
 - **Assertions** follow `=>`, separated by `;`. `||` separates alternative
@@ -172,7 +173,8 @@ Each was settled while adjudicating the migrated judgments.
   lemma (`as Modifier of "combat damage"`), except where its words straddle a
   constituent boundary (`docs/design/lexicon.md` §5).
 - A card's own name, full or Shortened, is its own only on that card:
-  `<card=...>` is needed for any self-reference by name. Without it a card
+  `<card=...>` is needed for any self-reference by name, and `<legendary>`
+  with it for one by Shortened Name. Without it a card
   name is another card's, which stands only after *named* (`NameComplement
   "Relentless Rats"`), *Partner with* ([CR#702.124j]), *from among* or *meld
   ... into*: a meld result's name is another card's on every card, its meld

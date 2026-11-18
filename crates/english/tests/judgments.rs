@@ -108,13 +108,7 @@ fn check_judgments(completed: Option<u8>) {
                     let mut pending = 0;
                     let mut failures = Vec::new();
                     for entry in entries {
-                        let scope = match entry.scope(&env.lexicon) {
-                            Ok(scope) => scope,
-                            Err(why) => {
-                                failures.push(why);
-                                continue;
-                            }
-                        };
+                        let scope = entry.scope(&env.lexicon);
                         let analyzed = env.lexicon.analyze_source_scoped(&entry.text, None, &scope);
                         let stratum = profiler.profile(UnitKind::Line, &analyzed).stratum;
                         if completed.is_none_or(|done| stratum > done)
@@ -274,17 +268,15 @@ fn stratum_zero_spines_hold_over_seed_payloads() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// An entry's Card Scope is computed from the name it states, with no card
-/// looked up: *Jace, Cunning Castaway* shortens its own name; *Insectile
-/// Aberration* is the back face of *Delver of Secrets*, with a name of its own
-/// [CR#712.6]; *Gisela, the Broken Blade* is a meld card, whose front face and
-/// combined back face each have their own name [CR#713.5], so its scope does
-/// not hold its meld result.
+/// An entry's Card Scope is computed from what it states, with no card
+/// looked up: *Jace, Cunning Castaway*, stated to be legendary, shortens its
+/// own name; *Insectile Aberration* is the back face of *Delver of Secrets*,
+/// with a name of its own [CR#712.6]; *Gisela, the Broken Blade* is a meld
+/// card, whose front face and combined back face each have their own name
+/// [CR#713.5], so its scope does not hold its meld result.
 #[test]
 fn an_entry_s_scope_is_the_own_name_of_the_card_it_states() {
     use sylex_lexicon::CardScope;
-    use sylex_lexicon::NameForm;
-    use sylex_vocabulary::card_name_id;
 
     let (env, _) = environment();
     let entry = |line: &str| {
@@ -294,44 +286,66 @@ fn an_entry_s_scope_is_the_own_name_of_the_card_it_states() {
     };
     assert_eq!(
         entry("+ Draw a card.").scope(&env.lexicon),
-        Ok(CardScope::default())
+        CardScope::default()
     );
     for name in [
         "Jace, Cunning Castaway",
         "Insectile Aberration",
         "Gisela, the Broken Blade",
     ] {
-        let scope = entry(&format!("+ <card={name}> Draw a card."))
-            .scope(&env.lexicon)
-            .unwrap();
-        assert_eq!(scope, CardScope::own_names([card_name_id(name)]), "{name}");
-        assert!(scope.holds(card_name_id(name), NameForm::Shortened));
+        let scope = entry(&format!("+ <card={name}> Draw a card.")).scope(&env.lexicon);
+        assert_eq!(scope, CardScope::full_names([name]), "{name}");
     }
-    let gisela = entry("+ <card=Gisela, the Broken Blade> Draw a card.")
-        .scope(&env.lexicon)
-        .unwrap();
-    assert!(!gisela.holds_card(card_name_id("Brisela, Voice of Nightmares")));
+    // Only a card stated to be legendary has its Shortened Name.
+    for name in ["Jace, Cunning Castaway", "Gisela, the Broken Blade"] {
+        let scope = entry(&format!("+ <card={name}> <legendary> Draw a card.")).scope(&env.lexicon);
+        assert_eq!(scope, CardScope::every_form([name]), "{name}");
+        assert!(!scope.holds_name("Brisela, Voice of Nightmares"));
+    }
+    // A name with no shortened spelling has none, legendary or not.
+    assert_eq!(
+        entry("+ <card=Progenitus> <legendary> Draw a card.").scope(&env.lexicon),
+        CardScope::full_names(["Progenitus"])
+    );
+    assert!(sylex_english::judgment::parse_file("test", "+ <legendary> Draw a card.").is_err());
 }
 
-/// A stated name that is no card name is refused: a misspelled name
-/// (*Lightning Blot*), and a whole card's combined name, which is the name
-/// of no face (*Delver of Secrets // Insectile Aberration*).
+/// A stated name need be no printed card's: the text is read as if on a
+/// card so named. *Abuelo the Brave* is no card; *Abuelo, Ancestral Echo*
+/// is one whose text never shortens its name.
 #[test]
-fn a_stated_name_that_is_no_card_name_is_refused_naming_the_entry() {
-    let (env, _) = environment();
-    for name in [
-        "Lightning Blot",
-        "Delver of Secrets // Insectile Aberration",
-    ] {
-        let entry =
-            sylex_english::judgment::parse_file("test", &format!("+ <card={name}> Draw a card."))
-                .unwrap()
-                .remove(0);
+fn a_stated_name_reads_as_the_card_s_own_whether_or_not_a_card_has_it() {
+    let (env, grammar) = environment();
+    let judge = Judge {
+        grammar,
+        lexicon: &env.lexicon,
+    };
+    let outcome = |line: &str| {
+        let entry = sylex_english::judgment::parse_file("test", line)
+            .unwrap()
+            .remove(0);
+        judge.evaluate(&entry)
+    };
+    for name in ["Abuelo the Brave", "Abuelo, Ancestral Echo"] {
+        for line in [
+            format!(
+                "+ <card={name}> <legendary> When Abuelo enters, draw a card. => NounPhrase \
+                 \"Abuelo\" as Subject of enter; readings 1"
+            ),
+            format!(
+                "+ <card={name}> <legendary> When {name} enters, draw a card. => NounPhrase \
+                 \"{name}\" as Subject of enter; readings 1"
+            ),
+            format!("+ <card={name}> When {name} enters, draw a card. => readings 1"),
+            // Without `<legendary>` only the Full form stands.
+            format!("* <card={name}> When Abuelo enters, draw a card."),
+        ] {
+            assert_eq!(outcome(&line), Outcome::Holds, "{line}");
+        }
         assert_eq!(
-            entry.scope(&env.lexicon),
-            Err(format!(
-                "test:1: `<card={name}>` states a name that is no card name of the lexicon"
-            ))
+            outcome(&format!("+ <card={name}> When Abuelo enters, draw a card.")),
+            Outcome::Fails("vocabulary gaps at [5..11]".to_owned()),
+            "{name}"
         );
     }
 }

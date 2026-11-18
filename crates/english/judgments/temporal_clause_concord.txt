@@ -60,7 +60,7 @@
 
 # A coordinated temporal clause one of whose conjuncts is past, under a
 # present-tense host.
-* <card=Ral, Storm Conduit> Whenever you cast or copied an instant or sorcery spell, Ral deals 1 damage to target opponent or planeswalker.
+* <card=Ral, Storm Conduit> <legendary> Whenever you cast or copied an instant or sorcery spell, Ral deals 1 damage to target opponent or planeswalker.
 # from: Up the Beanstalk
 * When this enchantment entered and whenever you cast a spell with mana value 5 or greater, draw a card.
 
@@ -84,7 +84,7 @@
 * Flip a coin that many times or until you lost a flip, whichever comes first.
 
 # A past conditional clause under an imperative host.
-+ <card=Hixus, Prison Warden> Whenever a creature deals combat damage to you, if Hixus entered this turn, exile that creature until Hixus leaves the battlefield. => PrepositionPhrase "if Hixus entered this turn" as Adjunct of exile
++ <card=Hixus, Prison Warden> <legendary> Whenever a creature deals combat damage to you, if Hixus entered this turn, exile that creature until Hixus leaves the battlefield. => PrepositionPhrase "if Hixus entered this turn" as Adjunct of exile
 
 # A past temporal clause modifying a Nominal.
 +NounPhrase <card=Soul Burn> the player's life total before the damage was dealt => PrepositionPhrase "before the damage was dealt" as Modifier of "life total"

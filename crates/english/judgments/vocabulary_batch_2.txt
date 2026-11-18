@@ -63,13 +63,13 @@
 +RelativeClause <card=Círdan the Shipwright> they received
 +RelativeClause <card=Mob Verdict> an opponent received
 + <card=Karakyk Guardian> This creature has hexproof as long as it hasn't dealt damage yet. => AdverbPhrase "yet"
-+ <card=Palladia-Mors, the Ruiner> Palladia-Mors has hexproof as long as it hasn't dealt damage yet. => AdverbPhrase "yet"
++ <card=Palladia-Mors, the Ruiner> <legendary> Palladia-Mors has hexproof as long as it hasn't dealt damage yet. => AdverbPhrase "yet"
 +Clause <card=Gollum, Scheming Guide> they guessed => VerbPhrase "guessed"
 +NounPhrase <card=Fire Navy Trebuchet> a 2/1 colorless Construct artifact creature token with flying named Ballistic Boulder that's tapped and attacking => Name "Ballistic Boulder"
 +NounPhrase <card=Ellie, Brick Master> a tapped 1/1 black Fungus Zombie creature token named Cordyceps Infected that's attacking that opponent => Name "Cordyceps Infected"
 +NounPhrase <card=Abby, Merciless Soldier> 1/1 black Fungus Zombie creature tokens named Cordyceps Infected => Name "Cordyceps Infected"
-+NounPhrase <card=Koma, Cosmos Serpent> a 3/3 blue Serpent creature token named Koma's Coil => Name "Koma's Coil"
-+NounPhrase <card=Koma, World-Eater> four 3/3 blue Serpent creature tokens named Koma's Coil => Name "Koma's Coil"
++NounPhrase <card=Koma, Cosmos Serpent> <legendary> a 3/3 blue Serpent creature token named Koma's Coil => Name "Koma's Coil"
++NounPhrase <card=Koma, World-Eater> <legendary> four 3/3 blue Serpent creature tokens named Koma's Coil => Name "Koma's Coil"
 +NounPhrase <card=Nurgle's Rot> a 1/3 black Demon creature token named Plaguebearer of Nurgle => Name "Plaguebearer of Nurgle"
 +Clause <card=Marit Lage's Slumber> create Marit Lage => NounPhrase "Marit Lage"
 +Clause <card=The Book of Vile Darkness> create Vecna => NounPhrase "Vecna"
@@ -123,8 +123,8 @@
 +NounPhrase <card=Kwia Vigorbloom> Lotus
 +NounPhrase <card=Weapons Manufacturing> a colorless artifact token named Munitions => Name "Munitions"
 +NounPhrase <card=Weapons Manufacturing> Munitions
-+Clause <card=Tamiyo, Compleated Sage> create Tamiyo's Notebook => NounPhrase "Tamiyo's Notebook"
-+NounPhrase <card=Tamiyo, Compleated Sage> Tamiyo's Notebook
++Clause <card=Tamiyo, Compleated Sage> <legendary> create Tamiyo's Notebook => NounPhrase "Tamiyo's Notebook"
++NounPhrase <card=Tamiyo, Compleated Sage> <legendary> Tamiyo's Notebook
 +Clause <card=Ozox, the Clattering King> create Jumblebones => NounPhrase "Jumblebones"
 +NounPhrase <card=Ozox, the Clattering King> Jumblebones
 +NounPhrase <card=Svella, Ice Shaper> a colorless snow artifact token named Icy Manalith => Name "Icy Manalith"
@@ -135,8 +135,8 @@
 +NounPhrase <card=Rite of the Raging Storm> Lightning Rager
 +NounPhrase <card=Awakening of Vitu-Ghazi> a legendary 0/0 Elemental creature with haste named Vitu-Ghazi => Name "Vitu-Ghazi"
 +NounPhrase <card=Awakening of Vitu-Ghazi> Vitu-Ghazi
-+Clause <card=Mishra, Eminent One> its name is Mishra's Warform => NounPhrase "Mishra's Warform"
-+NounPhrase <card=Mishra, Eminent One> Mishra's Warform
++Clause <card=Mishra, Eminent One> <legendary> its name is Mishra's Warform => NounPhrase "Mishra's Warform"
++NounPhrase <card=Mishra, Eminent One> <legendary> Mishra's Warform
 +Clause <card=Mechtitan Core> create Mechtitan => NounPhrase "Mechtitan"
 +NounPhrase <card=Mechtitan Core> Mechtitan
 +Clause <card=Ka-Zar of the Savage Land> create Zabu => NounPhrase "Zabu"
@@ -170,4 +170,4 @@
 +Clause <card=Tomb of Urami> create Urami => NounPhrase "Urami"
 +NounPhrase <card=Tomb of Urami> Urami
 +VerbPhrase <card=Kibo, Uktabi Prince> named Banana => Name "Banana"
-+NounPhrase <card=Tuktuk the Explorer> Tuktuk the Returned
++NounPhrase <card=Tuktuk the Explorer> <legendary> Tuktuk the Returned

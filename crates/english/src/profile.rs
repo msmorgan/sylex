@@ -137,6 +137,7 @@ impl Class {
         match reading {
             LexicalReading::Numeral { .. } => Self::Number,
             LexicalReading::FlavorWord { .. } => Self::FlavorWord,
+            LexicalReading::OwnName { .. } => Self::CardName,
             LexicalReading::Word(value) => {
                 let id = value.lexeme.as_str();
                 let prefix = id.split(':').next().unwrap_or("");

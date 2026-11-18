@@ -9,4 +9,4 @@
 +KeywordPhrase nonbasic landwalk => readings 1
 + <card=Traveler's Cloak> Enchanted creature has landwalk of the chosen type. => KeywordPhrase "landwalk of the chosen type" as Object of have; Quality "the chosen type" as Complement of landwalk; readings 1
 + <card=Goblin King> Other Goblins get +1/+1 and have mountainwalk. => KeywordPhrase "mountainwalk" as Object of have
-+ <card=Veldrane of Sengir> Veldrane gets -3/-0 and gains forestwalk until end of turn. => KeywordPhrase "forestwalk" as Object of gain
++ <card=Veldrane of Sengir> <legendary> Veldrane gets -3/-0 and gains forestwalk until end of turn. => KeywordPhrase "forestwalk" as Object of gain

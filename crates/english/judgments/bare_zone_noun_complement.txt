@@ -3,8 +3,8 @@
 + <card=Norin, Swift Survivalist> You may play that card from exile this turn. => PrepositionPhrase "from exile"
 + <card=Wild-Magic Sorcerer> The first spell you cast from exile each turn has cascade. => PrepositionPhrase "from exile"
 +NounPhrase the first spell you cast from exile => PrepositionPhrase "from exile" as Adjunct of cast; RelativeClause "you cast from exile" || PrepositionPhrase "from exile" as Modifier of spell; RelativeClause "you cast"
-+ <card=Umbris, Fear Manifest> Umbris gets +1/+1 for each card your opponents own in exile. => PrepositionPhrase "in exile"
-+ <card=Ennis, Debate Moderator> At the beginning of your end step, if one or more cards were put into exile this turn, put a +1/+1 counter on Ennis. => PrepositionPhrase "into exile"
++ <card=Umbris, Fear Manifest> <legendary> Umbris gets +1/+1 for each card your opponents own in exile. => PrepositionPhrase "in exile"
++ <card=Ennis, Debate Moderator> <legendary> At the beginning of your end step, if one or more cards were put into exile this turn, put a +1/+1 counter on Ennis. => PrepositionPhrase "into exile"
 +PrepositionPhrase in hand
 +PrepositionPhrase from exile
 +PrepositionPhrase in exile

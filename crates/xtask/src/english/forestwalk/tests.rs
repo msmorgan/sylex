@@ -85,16 +85,19 @@ Forks: 1
 #[test]
 fn stated_text_is_surveyed_with_its_stated_card() {
     let text = "Jace draws two cards.";
-    let as_card = survey(&["--as-card", "Jace, Cunning Castaway", text]).unwrap();
-    let entry = survey(&[&format!("<card=Jace, Cunning Castaway> {text}")]).unwrap();
+    let as_card = survey(&["--as-card", "Jace, Cunning Castaway", "--legendary", text]).unwrap();
+    let entry = survey(&[&format!("<card=Jace, Cunning Castaway> <legendary> {text}")]).unwrap();
     assert_eq!(as_card, entry);
     assert!(
         as_card.contains(
             "subject: NounPhrase [ProperName] > Name [NamedParameter] > \"Jace\"#1 \
-             name:Jace, Cunning Castaway Invariant"
+             own name \"Jace, Cunning Castaway\" Shortened"
         ),
         "{as_card}"
     );
+    // A card not stated to be legendary has no Shortened Name.
+    let plain = survey(&["--as-card", "Jace, Cunning Castaway", text]).unwrap();
+    assert!(plain.contains("Derivations: 0\n"), "{plain}");
     let bare = survey(&[text]).unwrap();
     assert!(bare.contains("Derivations: 0\n"), "{bare}");
     let phrase = survey(&["+NounPhrase target creature"]).unwrap();
@@ -202,7 +205,7 @@ fn with_unit<R>(
         grammar: &grammar,
         lexicon: &env.lexicon,
     };
-    let scope = item.entry.scope(&env.lexicon).unwrap();
+    let scope = item.entry.scope(&env.lexicon);
     let parse = judge.parse_scoped(&item.entry, &scope).unwrap();
     check(&judge, &item.entry, &parse)
 }
@@ -394,8 +397,9 @@ fn check_isolation(card: &str, line: usize, stated: usize) {
         let assertions = printed_assertions(&output);
         assert!(!assertions.is_empty(), "{output}");
         let written = format!(
-            "+ <card={}> {} => {}",
+            "+ <card={}> {}{} => {}",
             unit.card.as_deref().unwrap(),
+            if unit.legendary { "<legendary> " } else { "" },
             unit.text,
             assertions.join("; ")
         );

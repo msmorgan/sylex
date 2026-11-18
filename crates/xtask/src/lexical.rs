@@ -271,20 +271,14 @@ pub fn run(args: &LexicalArgs, output: &mut dyn Write) -> Result<()> {
 }
 
 /// Every value realizes to a spelling that analyzes back to it on the cards
-/// whose scope admits it: its own card for a card name or Shortened Name, the
-/// introducing cards for a card-scoped Catalog item.
+/// whose scope admits it: the introducing cards for a card-scoped Catalog
+/// item, and any card for another value. So does each form of every card
+/// name as its card's own name, in a scope that holds it.
 fn check_independent_values(lexicon: &Lexicon) -> Result<usize> {
     let mut checked = 0;
-    for value in lexicon.values() {
-        let reading = LexicalReading::Word(value.clone());
+    let mut check = |reading: LexicalReading, scope: &CardScope| -> Result<()> {
         let surface = lexicon.realize(&reading)?;
-        let cards = &lexicon.lexemes()[&value.lexeme].card_scope;
-        let scope = CardScope::own_names(if cards.is_empty() {
-            BTreeSet::from([value.lexeme])
-        } else {
-            cards.clone()
-        });
-        let analyzed = lexicon.analyze_source_scoped(&surface, None, &scope);
+        let analyzed = lexicon.analyze_source_scoped(&surface, None, scope);
         ensure!(
             analyzed.matches.iter().any(|found| {
                 found.start == 0 && found.end == analyzed.tokens.len() && found.reading == reading
@@ -292,6 +286,27 @@ fn check_independent_values(lexicon: &Lexicon) -> Result<usize> {
             "lexical value/render/analyze law failed: {reading:?} -> {surface:?}"
         );
         checked += 1;
+        Ok(())
+    };
+    for value in lexicon.values() {
+        let lexeme = &lexicon.lexemes()[&value.lexeme];
+        let scope = CardScope::of_cards(lexeme.card_scope.iter().copied());
+        check(LexicalReading::Word(value.clone()), &scope)?;
+        if lexeme.card_name {
+            let name = &lexeme.lemma;
+            let scope = CardScope::every_form([name.as_str()]);
+            for form in sylex_lexicon::NameForm::ALL {
+                if sylex_lexicon::own_name_spelling(name, *form).is_some() {
+                    check(
+                        LexicalReading::OwnName {
+                            name: name.clone(),
+                            form: *form,
+                        },
+                        &scope,
+                    )?;
+                }
+            }
+        }
     }
     Ok(checked)
 }
@@ -348,7 +363,12 @@ fn analyze_face(face: &SelectedFace, lexicon: &Lexicon) -> Result<Option<(FaceRe
     let Some(raw) = face.text.as_deref() else {
         return Ok(None);
     };
-    let analyzed = lexicon.analyze_source_scoped(raw, None, &face.scope);
+    let type_line = face
+        .type_line
+        .as_deref()
+        .with_context(|| format!("face {} ({}) has no type line", face.name, face.identity))?;
+    let scope = sylex_vocabulary::face_scope(&face.name, type_line, lexicon)?;
+    let analyzed = lexicon.analyze_source_scoped(raw, None, &scope);
     let mut inventory = Inventory::default();
     let (words, unrecognized_nonwords) = account_text(&analyzed, lexicon, &mut inventory)
         .with_context(|| format!("lexical laws for {} ({})", face.name, face.identity))?;

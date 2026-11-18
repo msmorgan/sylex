@@ -1,7 +1,7 @@
 # A Supplement is a complete NP, not the singular-count nominal tail of a shared determiner (CGEL Ch. 5 §8.5, pp. 409–410; Ch. 15 §3.1, p. 1323).
 # These deferred shared-determiner coordinations must be read in their entirety as the predicative Complement, never counted as coverage through a detached tail.
 + <card=Stonework Packbeast> Stonework Packbeast is also a Cleric, Rogue, Warrior, and Wizard. => NounPhrase "a Cleric, Rogue, Warrior, and Wizard" as PredicativeComplement of be
-+ <card=Burakos, Party Leader> Burakos is also a Cleric, Rogue, Warrior, and Wizard. => NounPhrase "a Cleric, Rogue, Warrior, and Wizard" as PredicativeComplement of be
++ <card=Burakos, Party Leader> <legendary> Burakos is also a Cleric, Rogue, Warrior, and Wizard. => NounPhrase "a Cleric, Rogue, Warrior, and Wizard" as PredicativeComplement of be
 + <card=Tajuru Paragon> Tajuru Paragon is also a Cleric, Rogue, Warrior, and Wizard. => NounPhrase "a Cleric, Rogue, Warrior, and Wizard" as PredicativeComplement of be
 + <card=Veteran Adventurer> Veteran Adventurer is also a Cleric, Rogue, Warrior, and Wizard. => NounPhrase "a Cleric, Rogue, Warrior, and Wizard" as PredicativeComplement of be
 # The relative clause must contain all three alternatives. A separate imperative is grammatical clause coordination but not the intended analysis of these deferred units.

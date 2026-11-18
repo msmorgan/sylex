@@ -18,4 +18,4 @@
 +Clause this creature becomes saddled => AdjectivePhrase "saddled" as PredicativeComplement of become
 +Clause this creature is saddled => AdjectivePhrase "saddled" as PredicativeComplement of be
 + <card=Marooned> Enchanted permanent doesn't untap during its controller's untap step and can't be beamed up. => VerbPhrase "beamed up" head beam; PrepositionPhrase "up" as Complement of beam
-+ <card=Scotty, Miracle Worker> Scotty can't be beamed up to cast a spell this way. => VerbPhrase "beamed up" head beam; PrepositionPhrase "up" as Complement of beam
++ <card=Scotty, Miracle Worker> <legendary> Scotty can't be beamed up to cast a spell this way. => VerbPhrase "beamed up" head beam; PrepositionPhrase "up" as Complement of beam

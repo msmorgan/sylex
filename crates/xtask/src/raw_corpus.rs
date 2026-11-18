@@ -148,10 +148,6 @@ pub(crate) struct SelectedFace {
     /// selection.
     #[serde(skip)]
     pub card_names: BTreeSet<String>,
-    /// Card-name lexemes in scope on this face: its
-    /// [`sylex_english::corpus::own_names`].
-    #[serde(skip)]
-    pub scope: sylex_lexicon::CardScope,
     pub face_name: Option<String>,
     pub side: Option<String>,
     pub layout: String,
@@ -403,7 +399,6 @@ fn selected_face(
         face_index: unit.face_index(),
         name: unit.display_name().to_owned(),
         card_names: card_names.clone(),
-        scope: sylex_english::corpus::own_names(unit.display_name()),
         face_name: unit.face_index().map(|_| unit.display_name().to_owned()),
         side: unit.face_index().map(face_side),
         layout: unit.layout().to_owned(),

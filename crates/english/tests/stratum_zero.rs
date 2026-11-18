@@ -106,8 +106,7 @@ fn new_catalog_keyword_parameters_need_no_grammar_change() {
     custom.parameters = vec![vec![KeywordParameter::Amount, KeywordParameter::Cost]];
     sources.keyword_abilities.push(custom);
     let names = std::fs::read_to_string(sylex_vocabulary::card_names_path()).unwrap();
-    let shortened = sylex_vocabulary::AttestedShortenings::load().unwrap();
-    let env = sources.environment(&names, &shortened).unwrap();
+    let env = sources.environment(&names).unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     for (text, final_parameter) in [
         ("Testkeyword 2 {W}{U}", "Cost"),

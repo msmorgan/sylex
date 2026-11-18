@@ -1,7 +1,7 @@
 # Core nominal and clause structure composed with the card frame.
 + <card=Ral and the Implicit Maze> III — Create a Spellgorger Weird token. => NounPhrase "a Spellgorger Weird token" as Object of create; Name "Spellgorger Weird" as Modifier of token
-+ <card=Wolverine, Best There Is> {1}{G}: Regenerate Wolverine. => Name "Wolverine"
-+ <card=Phoenix, Warden of Fire> I, II — Rising Flames — Phoenix deals 2 damage to each opponent. => Name "Phoenix"
++ <card=Wolverine, Best There Is> <legendary> {1}{G}: Regenerate Wolverine. => Name "Wolverine"
++ <card=Phoenix, Warden of Fire> <legendary> I, II — Rising Flames — Phoenix deals 2 damage to each opponent. => Name "Phoenix"
 + <card=Hithlain Rope> {2}, {T}: Draw a card. The player to your right gains control of this artifact. => PrepositionPhrase "to your right" as Complement of player
 + <card=Traveler's Cloak> Enchanted creature has landwalk of the chosen type. => DeterminerPhrase "Enchanted" as Determiner of creature; KeywordPhrase "landwalk of the chosen type" as Object of have; Quality "the chosen type" as Complement of landwalk; !PrepositionPhrase "of the chosen type"
 + <card=Call Damage Control> • Target artifact card. => NounPhrase "Target artifact card"; DeterminerPhrase "Target" as Determiner of card

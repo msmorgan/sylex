@@ -156,9 +156,14 @@ struct ParseArgs {
     /// card with `<card=NAME>`.
     inputs: Vec<String>,
     /// Parse each input as if it were on the card so named. Nothing is
-    /// fetched: the name is an input like the text.
+    /// fetched: the name is an input like the text, and need be no printed
+    /// card's.
     #[arg(long, value_name = "NAME", conflicts_with = "card")]
     as_card: Option<String>,
+    /// With `--as-card`: that card is a legendary permanent, so its name has
+    /// its Shortened form.
+    #[arg(long, requires = "as_card")]
+    legendary: bool,
     /// Fetch the faces so named (a face's name, or its whole card's) from
     /// the supported corpus and parse their own type lines and rules-text
     /// lines. Takes no text.
@@ -182,8 +187,13 @@ struct ParseItem {
 }
 
 /// The texts the inputs state, each as a judgment entry, with `as_card` the
-/// card of every entry.
-fn stated_items(inputs: &[String], as_card: Option<&str>) -> Result<Vec<ParseItem>> {
+/// card of every entry and `legendary` whether that card is a legendary
+/// permanent.
+fn stated_items(
+    inputs: &[String],
+    as_card: Option<&str>,
+    legendary: bool,
+) -> Result<Vec<ParseItem>> {
     use sylex_english::corpus::UnitKind;
     use sylex_english::judgment;
 
@@ -208,6 +218,7 @@ fn stated_items(inputs: &[String], as_card: Option<&str>) -> Result<Vec<ParseIte
                     index + 1
                 );
                 entry.card = Some(name.to_owned());
+                entry.legendary = legendary;
             }
             let kind = if entry.category.as_deref() == Some("TypeLine") {
                 UnitKind::TypeLine
@@ -228,6 +239,9 @@ fn stated_items(inputs: &[String], as_card: Option<&str>) -> Result<Vec<ParseIte
 struct FetchedUnit {
     face: String,
     card: String,
+    /// Whether the face's type line is a legendary permanent's, which gives
+    /// its name its Shortened form.
+    legendary: bool,
     kind: sylex_english::corpus::UnitKind,
     /// Its [`sylex_english::corpus::Unit::index`].
     index: usize,
@@ -246,7 +260,9 @@ impl FetchedUnit {
     }
 
     /// The unit as a judgment entry on its face, which puts the face's own
-    /// name in scope ([`sylex_english::judgment::Judgment::scope`]).
+    /// name in scope as its type line gives it
+    /// ([`sylex_english::judgment::Judgment::scope`],
+    /// [`sylex_english::corpus::Face::scope`]).
     fn item(&self, header: Option<String>) -> ParseItem {
         ParseItem {
             header,
@@ -255,6 +271,7 @@ impl FetchedUnit {
                 grammatical: true,
                 category: None,
                 card: Some(self.face.clone()),
+                legendary: self.legendary,
                 text: self.text.clone(),
                 groups: Vec::new(),
                 negated: Vec::new(),
@@ -275,20 +292,26 @@ fn fetched_units(name: &str) -> Result<Vec<FetchedUnit>> {
         !corpus.faces.is_empty(),
         "`--card {name}` names no face of the supported corpus"
     );
-    Ok(corpus
+    corpus
         .units
         .iter()
         .map(|unit| {
             let face = &corpus.faces[unit.face];
-            FetchedUnit {
+            let type_line = face
+                .type_line
+                .as_deref()
+                .with_context(|| format!("face {} has no type line", face.name))?;
+            let (supertypes, types) = sylex_vocabulary::parse_type_line(&face.name, type_line)?;
+            Ok(FetchedUnit {
                 face: face.name.clone(),
                 card: face.card.clone(),
+                legendary: sylex_vocabulary::legendary_permanent(&supertypes, &types),
                 kind: unit.kind,
                 index: unit.index,
                 text: unit.text.clone(),
-            }
+            })
         })
-        .collect())
+        .collect()
 }
 
 /// The units of the supported faces named `name` (a face's name or its whole
@@ -324,15 +347,9 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
             anyhow::bail!("nothing to parse: give text, or `--card NAME` for a card's own text")
         }
         (Some(name), _, true) => fetched_items(name)?,
-        (None, as_card, false) => stated_items(&args.inputs, as_card.as_deref())?,
+        (None, as_card, false) => stated_items(&args.inputs, as_card.as_deref(), args.legendary)?,
     };
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
-    if let Some(name) = &args.as_card {
-        anyhow::ensure!(
-            sylex_english::judgment::is_card_name(&env.lexicon, name),
-            "`--as-card {name}` is no card name of the lexicon"
-        );
-    }
     let grammar = sylex_english::bind(&env.lexicon, &env.frames)?;
     let frame = sylex_english::segments::segment_frame(&grammar)?;
     let judge = Judge {
@@ -352,13 +369,7 @@ fn parse(args: &ParseArgs, output: &mut dyn Write) -> Result<()> {
         }
         writeln!(output, "{}: {:?}", entry.location, entry.text)?;
         let text = sylex_upstream::oracle_text::strip_reminder_text(&entry.text);
-        let scope = match entry.scope(&env.lexicon) {
-            Ok(scope) => scope,
-            Err(why) => {
-                writeln!(output, "Unparsed: {why}")?;
-                continue;
-            }
-        };
+        let scope = entry.scope(&env.lexicon);
         let analyzed = env.lexicon.analyze_source_scoped(&text, None, &scope);
         let profile = profiler.profile(kind, &analyzed);
         writeln!(output, "Stratum: {}", profile.stratum)?;
@@ -438,17 +449,20 @@ fn dump_reading(
     )?;
     for (index, (c, node)) in constituents.iter().zip(nodes).enumerate() {
         let production = node.node().map_or("", |n| n.production.as_str());
-        let head = grammar.head_word(node).map_or_else(
-            || "-".to_owned(),
-            |word| {
-                let lemma = env
-                    .lexicon
-                    .lexemes()
-                    .get(&word.lexeme)
-                    .map_or("?", |l| l.lemma.as_str());
+        let head = match grammar.head_leaf(node) {
+            Some(sylex_lexicon::LexicalReading::Word(word)) => {
+                let lemma = &env.lexicon.lexemes()[&word.lexeme].lemma;
                 format!("{lemma} / {} / {:?}", word.lexeme.as_str(), word.form)
-            },
-        );
+            }
+            Some(sylex_lexicon::LexicalReading::OwnName { name, form }) => {
+                format!("{name} / own name / {form:?}")
+            }
+            Some(
+                sylex_lexicon::LexicalReading::Numeral { .. }
+                | sylex_lexicon::LexicalReading::FlavorWord { .. },
+            )
+            | None => "-".to_owned(),
+        };
         writeln!(
             output,
             "{index}\t{:?}\t{production}\t{}\t{:?}\t{:?}\t{}\t{head}\t{:?}",
@@ -542,22 +556,17 @@ mod tests {
     }
 
     #[test]
-    fn parse_reports_gaps_unknown_categories_and_unknown_cards_without_aborting_other_inputs() {
+    fn parse_reports_gaps_and_unknown_categories_without_aborting_other_inputs() {
         let output = dump(&[
             "parse",
             "--limit",
             "0",
             "+ Destroy target zzzunknownword.",
             "+MissingCategory target creature",
-            "+ <card=Lightning Blot> Draw a card.",
             "*PrepositionPhrase target creature",
         ]);
         assert!(output.contains("Outcome: vocabulary gaps"));
         assert!(output.contains("Unparsed: the grammar has no Category `MissingCategory`"));
-        assert!(output.contains(
-            "Unparsed: input 3:1: `<card=Lightning Blot>` states a name that is no card name of \
-             the lexicon"
-        ));
         assert!(output.contains("Outcome: holds"));
         assert!(!output.contains("Reading 1 (ranking key"));
     }
@@ -568,7 +577,7 @@ mod tests {
             "parse",
             "--limit",
             "0",
-            "+ <card=Jace, Cunning Castaway> Jace draws two cards. => NounPhrase \"Jace\" as Subject of draw",
+            "+ <card=Jace, Cunning Castaway> <legendary> Jace draws two cards. => NounPhrase \"Jace\" as Subject of draw",
             "* Jace draws two cards.",
             "Destroy target creature. => NounPhrase \"target creature\" as Object of destroy",
         ]);
@@ -576,18 +585,59 @@ mod tests {
         assert!(!output.contains("Reading 1 (ranking key"));
     }
 
-    /// *Jace, Cunning Castaway* shortens its own name: `--as-card` puts the
-    /// name in scope as `<card=…>` does, and without it *Jace* is no word.
+    /// *Jace, Cunning Castaway* is a legendary planeswalker, whose name
+    /// shortens: `--as-card` with `--legendary` puts the name in scope in
+    /// both forms as `<card=…> <legendary>` does, and without `--legendary`
+    /// or without the card *Jace* is no name.
     #[test]
     fn as_card_parses_the_text_as_if_on_the_card_so_named() {
         let text = "Jace draws two cards.";
-        let stated = dump(&["parse", "--as-card", "Jace, Cunning Castaway", text]);
-        let entry = dump(&["parse", &format!("<card=Jace, Cunning Castaway> {text}")]);
+        let name = "Jace, Cunning Castaway";
+        let stated = dump(&["parse", "--as-card", name, "--legendary", text]);
+        let entry = dump(&["parse", &format!("<card={name}> <legendary> {text}")]);
         assert_eq!(stated, entry);
         assert!(stated.contains("Packed Forest derivations: 1"), "{stated}");
-        assert!(stated.contains("name:Jace, Cunning Castaway / Invariant"));
-        let bare = dump(&["parse", text]);
-        assert!(bare.contains("Packed Forest derivations: 0"), "{bare}");
+        assert!(stated.contains("Jace, Cunning Castaway / own name / Shortened"));
+        for plain in [
+            dump(&["parse", "--as-card", name, text]),
+            dump(&["parse", text]),
+        ] {
+            assert!(plain.contains("Packed Forest derivations: 0"), "{plain}");
+        }
+        let full = dump(&[
+            "parse",
+            "--as-card",
+            name,
+            &format!("{name} draws two cards."),
+        ]);
+        assert!(
+            full.contains("Jace, Cunning Castaway / own name / Full"),
+            "{full}"
+        );
+    }
+
+    /// A text may be read as if on a card of any name. No card is named
+    /// *Abuelo the Brave*, and *Abuelo, Ancestral Echo*'s own text never
+    /// shortens its name.
+    #[test]
+    fn as_card_takes_a_name_no_card_has_and_shortens_it_when_legendary() {
+        let text = "+ When Abuelo enters, draw a card. => readings 1";
+        for name in ["Abuelo the Brave", "Abuelo, Ancestral Echo"] {
+            let legendary = dump(&["parse", "--as-card", name, "--legendary", text]);
+            assert!(legendary.contains("Outcome: holds"), "{legendary}");
+            assert!(
+                legendary.contains(&format!("{name} / own name / Shortened")),
+                "{legendary}"
+            );
+            let plain = dump(&["parse", "--as-card", name, text]);
+            assert!(
+                plain.contains("Outcome: vocabulary gaps at [5..11]"),
+                "{plain}"
+            );
+            let full = format!("+ When {name} enters, draw a card. => readings 1");
+            let plain = dump(&["parse", "--as-card", name, &full]);
+            assert!(plain.contains("Outcome: holds"), "{plain}");
+        }
     }
 
     /// `--card` fetches the card's own units. *Delver of Secrets* is a
@@ -644,7 +694,7 @@ mod tests {
             ),
             "{output}"
         );
-        assert!(output.contains("name:Gisela, the Broken Blade / Invariant"));
+        assert!(output.contains("Gisela, the Broken Blade / own name / Shortened"));
         assert!(!output.contains("derivations: 0"), "{output}");
     }
 
@@ -661,9 +711,9 @@ mod tests {
         assert!(without_text.contains("use `--card`"), "{without_text}");
         assert!(fail(&["parse"]).contains("nothing to parse"));
         assert!(fail(&["parse", "--card", "Lightning Blot"]).contains("names no face"));
-        assert_eq!(
-            fail(&["parse", "--as-card", "Lightning Blot", "Draw a card."]),
-            "`--as-card Lightning Blot` is no card name of the lexicon"
+        assert!(
+            Cli::try_parse_from(["english", "parse", "--legendary", "Jace draws two cards."])
+                .is_err()
         );
         let twice = fail(&[
             "parse",
@@ -689,6 +739,7 @@ mod tests {
             let args = ParseArgs {
                 inputs: vec![input.to_owned()],
                 as_card: None,
+                legendary: false,
                 card: None,
                 limit: 8,
             };

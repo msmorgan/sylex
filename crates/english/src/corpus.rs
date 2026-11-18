@@ -17,10 +17,10 @@ use std::collections::BTreeSet;
 use std::io::BufRead;
 
 use sylex_lexicon::CardScope;
+use sylex_lexicon::Lexicon;
 use sylex_upstream::oracle_text::strip_reminder_text;
 use sylex_upstream::scryfall::OracleCard;
 use sylex_upstream::scryfall::OracleCardReader;
-use sylex_vocabulary::card_name_id;
 
 /// One Card Face record of the supported corpus.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -38,10 +38,29 @@ pub struct Face {
 }
 
 impl Face {
-    /// The Card Scope the face's text is read in: its [`own_names`].
+    /// The Card Scope the face's text is read in: its own name in its Full
+    /// form and, for a legendary permanent whose name has one, in its
+    /// Shortened form [CR#201.5c], derived from the face's name and type
+    /// line as its text is parsed (`sylex_vocabulary::face_scope`).
+    /// Nothing else of the card is in it.
+    ///
+    /// Each face of a double-faced card has its own name [CR#712.6], and two
+    /// faces that shorten to one spelling (*Ral*) name one object, not two,
+    /// so a face's text shortens its own name. The whole card's name
+    /// (*A // B*) is no card name, and a meld result's name is another
+    /// card's on both cards of its pair (`docs/design/lexicon.md` §6).
+    ///
+    /// # Panics
+    /// On a face with no type line, or one whose type line has a word that
+    /// is neither a supertype nor a card type before its dash.
     #[must_use]
-    pub fn scope(&self) -> CardScope {
-        own_names(&self.name)
+    pub fn scope(&self, lexicon: &Lexicon) -> CardScope {
+        let type_line = self
+            .type_line
+            .as_deref()
+            .unwrap_or_else(|| panic!("face {} has no type line", self.name));
+        sylex_vocabulary::face_scope(&self.name, type_line, lexicon)
+            .unwrap_or_else(|error| panic!("{error}"))
     }
 
     /// The face's units as (kind, index, text): its trimmed type line, then
@@ -188,20 +207,6 @@ pub enum CorpusError {
     Snapshot(#[from] &'static sylex_upstream::scryfall::OracleSnapshotError),
     #[error(transparent)]
     Read(#[from] sylex_upstream::scryfall::OracleCardReadError),
-}
-
-/// The Card Scope of a face named `name`: its own name in every form
-/// [CR#201.5c]. Nothing else of the card is in it, so the scope of a text is
-/// computed from the name of the face it is on.
-///
-/// Each face of a double-faced card has its own name [CR#712.6], and two faces
-/// that shorten to one spelling (*Ral*) name one object, not two, so a face's
-/// text shortens its own name. The whole card's name (*A // B*) is no card-name
-/// Lexeme, and a meld result's name is another card's on both cards of its pair
-/// (`docs/design/lexicon.md` §6).
-#[must_use]
-pub fn own_names(name: &str) -> CardScope {
-    CardScope::own_names([card_name_id(name)])
 }
 
 /// The rules-text units of a face: its paragraph lines after balanced
@@ -452,22 +457,32 @@ mod tests {
         assert!(corpus.unmatched_deferrals.iter().any(|l| l == line));
     }
 
+    fn scopes(corpus: &Corpus) -> Vec<CardScope> {
+        let env = sylex_vocabulary::LexicalEnvironment::load().unwrap();
+        corpus
+            .faces
+            .iter()
+            .map(|face| face.scope(&env.lexicon))
+            .collect()
+    }
+
     #[test]
     fn a_face_has_its_own_name_in_scope_and_not_its_other_face_s() {
         // Both faces shorten to *Ral*; each face's text names only itself.
         let input = r#"{"object":"card","id":"p","oracle_id":"o","name":"Ral, Monsoon Mage // Ral, Leyline Prodigy","layout":"transform","legalities":{"vintage":"legal"},"card_faces":[{"name":"Ral, Monsoon Mage","type_line":"Creature — Human Wizard","oracle_text":"Transform Ral."},{"name":"Ral, Leyline Prodigy","type_line":"Legendary Planeswalker — Ral","oracle_text":"Ral deals 2 damage to any target."}]}"#;
         let corpus = Corpus::read(std::io::Cursor::new(input), |_| true).unwrap();
-        let scopes: Vec<_> = corpus.faces.iter().map(Face::scope).collect();
+        let scopes = scopes(&corpus);
+        // Only the legendary face has a Shortened Name.
         assert_eq!(
             scopes,
             [
-                CardScope::own_names([card_name_id("Ral, Monsoon Mage")]),
-                CardScope::own_names([card_name_id("Ral, Leyline Prodigy")]),
+                CardScope::full_names(["Ral, Monsoon Mage"]),
+                CardScope::every_form(["Ral, Leyline Prodigy"]),
             ]
         );
         // The whole card's name is the name of no face.
-        let card = card_name_id("Ral, Monsoon Mage // Ral, Leyline Prodigy");
-        assert!(scopes.iter().all(|scope| !scope.holds_card(card)));
+        let card = "Ral, Monsoon Mage // Ral, Leyline Prodigy";
+        assert!(scopes.iter().all(|scope| !scope.holds_name(card)));
     }
 
     #[test]
@@ -475,27 +490,27 @@ mod tests {
         let parts = r#""all_parts":[{"object":"related_card","id":"r","component":"meld_result","name":"Brisela, Voice of Nightmares","type_line":"Legendary Creature — Eldrazi Angel"},{"object":"related_card","id":"g","component":"meld_part","name":"Gisela, the Broken Blade","type_line":"Legendary Creature — Angel Horror"},{"object":"related_card","id":"b","component":"meld_part","name":"Bruna, the Fading Light","type_line":"Legendary Creature — Angel Horror"}]"#;
         let input = [
             format!(
-                r#"{{"object":"card","id":"g","oracle_id":"g","name":"Gisela, the Broken Blade","layout":"meld","legalities":{{"vintage":"legal"}},{parts}}}"#
+                r#"{{"object":"card","id":"g","oracle_id":"g","name":"Gisela, the Broken Blade","type_line":"Legendary Creature — Angel Horror","layout":"meld","legalities":{{"vintage":"legal"}},{parts}}}"#
             ),
             format!(
-                r#"{{"object":"card","id":"b","oracle_id":"b","name":"Bruna, the Fading Light","layout":"meld","legalities":{{"vintage":"legal"}},{parts}}}"#
+                r#"{{"object":"card","id":"b","oracle_id":"b","name":"Bruna, the Fading Light","type_line":"Legendary Creature — Angel Horror","layout":"meld","legalities":{{"vintage":"legal"}},{parts}}}"#
             ),
-            r#"{"object":"card","id":"l","oracle_id":"l","name":"Lightning Bolt","layout":"normal","legalities":{"vintage":"legal"}}"#.to_owned(),
+            r#"{"object":"card","id":"l","oracle_id":"l","name":"Lightning Bolt","type_line":"Instant","layout":"normal","legalities":{"vintage":"legal"}}"#.to_owned(),
         ]
         .join("\n");
         let corpus = Corpus::read(std::io::Cursor::new(input), |_| true).unwrap();
-        let scopes: Vec<_> = corpus.faces.iter().map(Face::scope).collect();
+        let scopes = scopes(&corpus);
         assert_eq!(
             scopes,
             [
-                CardScope::own_names([card_name_id("Gisela, the Broken Blade")]),
-                CardScope::own_names([card_name_id("Bruna, the Fading Light")]),
-                CardScope::own_names([card_name_id("Lightning Bolt")]),
+                CardScope::every_form(["Gisela, the Broken Blade"]),
+                CardScope::every_form(["Bruna, the Fading Light"]),
+                CardScope::full_names(["Lightning Bolt"]),
             ]
         );
         // The meld result's name is another card's on both cards of the pair.
-        let result = card_name_id("Brisela, Voice of Nightmares");
-        assert!(scopes.iter().all(|scope| !scope.holds_card(result)));
+        let result = "Brisela, Voice of Nightmares";
+        assert!(scopes.iter().all(|scope| !scope.holds_name(result)));
     }
 
     #[test]

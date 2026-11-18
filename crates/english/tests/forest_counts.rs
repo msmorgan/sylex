@@ -65,7 +65,9 @@ fn check(
 ) -> Result<Timing, String> {
     let name = |why: String| format!("{} | {text}: {why}", face.name);
     let start = Instant::now();
-    let analyzed = env.lexicon.analyze_source_scoped(text, None, &face.scope());
+    let analyzed = env
+        .lexicon
+        .analyze_source_scoped(text, None, &face.scope(&env.lexicon));
     let parse = grammar.parse_analyzed(&analyzed);
     let parsed = Instant::now();
     let total = parse.derivation_count();

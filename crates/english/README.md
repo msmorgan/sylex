@@ -66,8 +66,9 @@ per seed sentence.
 `corpus` reads the supported corpus (Vintage legal or restricted, outside
 `set_type: funny`) from `data/scryfall/oracle-cards.jsonl` through
 `sylex_upstream`, which reads the snapshot once per process, one `Face` per
-Card Face record with its own name in every form in lexical scope
-(`corpus::own_names`, a function of the face's name alone). Each face yields
+Card Face record with its own name in lexical scope, in its Shortened form
+too for a legendary permanent (`Face::scope`, a function of the face's name
+and type line). Each face yields
 Corpus Units: its Type Line, and each paragraph line of its rules text after
 balanced reminder text is removed
 (`sylex_upstream::oracle_text::strip_reminder_text`). The split needs no parse.
@@ -183,7 +184,9 @@ Reading. The schema (`sqlite3 FILE .schema`) describes every table and view:
 
 - `units`; `nodes` (Category, span, surface, Gap, features, coordinator,
   settled); `alternatives` (Production, completed item); `items` (Production,
-  dot, span); `families` (previous item, child node or leaf); `leaves`;
+  dot, span); `families` (previous item, child node or leaf); `leaves` (a
+  word with its lexeme, the face's own name with its name form, a Flavor Word
+  or a numeral);
 - per alternative: `heads` (head leaf, lexeme and form),
   `alternative_embeddings` (the Embedding it stands under: `embeddings`, with
   its context, and `embedding_steps`) and, for a coordination, `conjuncts`;
@@ -401,9 +404,13 @@ There are three ways to give it text:
   assertions. Bare Oracle text is parsed as a positive entry at the grammar
   root. Balanced reminder text is stripped.
 - **`--as-card NAME` with text.** Each input is parsed as if it were on the
-  card so named: the name is an input like the text, and no card is fetched. A
-  name that is no card name is refused. An input in entry syntax may state its
-  card itself with `<card=NAME>` instead; giving both is an error.
+  card so named: the name is an input like the text, no card is fetched, and
+  the name need be no printed card's. `--legendary` states that the card is a
+  legendary permanent, which gives its name its Shortened form (*Abuelo* for
+  `--as-card 'Abuelo, Ancestral Echo' --legendary`); without it only the full
+  name is the card's own. An input in entry syntax may state its card itself
+  with `<card=NAME>`, and `<legendary>` after it, instead; giving both is an
+  error.
 - **`--card NAME` with no text.** The faces so named (a face's name, or its
   whole card's) are fetched from the supported corpus and their own Corpus
   Units parsed: under a `Face: NAME (card: CARD)` line, the face's type line
@@ -440,14 +447,14 @@ evidence.
 cargo xtask english forestwalk --card 'Draugr Necromancer'
 cargo xtask english forestwalk --card 'Draugr Necromancer' --line 2
 cargo xtask english forestwalk --card 'Draugr Necromancer' --type-line
-cargo xtask english forestwalk --as-card 'Jace, Cunning Castaway' 'Jace draws two cards.'
+cargo xtask english forestwalk --as-card 'Jace, Cunning Castaway' --legendary 'Jace draws two cards.'
 ```
 
 `forestwalk` shows one unit's ambiguity without enumerating its Readings, so a
 unit of thousands of Readings fits on a screen. `--card NAME` alone lists the
 units of every matching face (`FACE type line`, `FACE line N`). To survey one
-unit, give text (one entry, without assertions; `--as-card` or `<card=NAME>`
-for its card), or `--card NAME` with `--line N` or `--type-line`, where `NAME`
+unit, give text (one entry, without assertions; `--as-card`, with `--legendary`
+for a legendary permanent, or `<card=NAME>` for its card), or `--card NAME` with `--line N` or `--type-line`, where `NAME`
 is a face's name (or the whole card's when the card has one face). Faces of two
 cards that share a name (*Lightning Bolt*) give one unit when the picked units
 have the same text. A wrong choice is an error that lists the face's units or

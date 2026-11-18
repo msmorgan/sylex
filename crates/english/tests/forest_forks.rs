@@ -419,7 +419,9 @@ fn check(
     every_option_up_to: u128,
 ) -> Result<Measure, String> {
     let name = |why: String| format!("{} | {text}: {why}", face.name);
-    let analyzed = env.lexicon.analyze_source_scoped(text, None, &face.scope());
+    let analyzed = env
+        .lexicon
+        .analyze_source_scoped(text, None, &face.scope(&env.lexicon));
     let parse: Parse<'_> = grammar.parse_analyzed(&analyzed);
     let started = Instant::now();
     let forest = parse.fork_forest().map_err(|e| name(e.to_string()))?;

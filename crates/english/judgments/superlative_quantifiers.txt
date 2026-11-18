@@ -15,4 +15,4 @@
 +NounPhrase the player who has the most cards in hand => DeterminerPhrase "the most" as Determiner of card
 +NounPhrase the player with the most life => DeterminerPhrase "the most" as Determiner of life
 +NounPhrase the player with the most cards in hand => DeterminerPhrase "the most" as Determiner of card
-+ <card=Witch-king, Bringer of Ruin> Whenever Witch-king attacks, defending player sacrifices a creature with the least power among creatures they control. => DeterminerPhrase "the least" as Determiner of power
++ <card=Witch-king, Bringer of Ruin> <legendary> Whenever Witch-king attacks, defending player sacrifices a creature with the least power among creatures they control. => DeterminerPhrase "the least" as Determiner of power

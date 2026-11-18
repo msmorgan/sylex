@@ -7,7 +7,6 @@
 
 use sylex_lexicon::Lexicon;
 use sylex_vocabulary::LexicalEnvironment;
-use sylex_vocabulary::card_name_id;
 
 const UNITS: [(&str, &str); 6] = [
     (
@@ -36,17 +35,10 @@ const UNITS: [(&str, &str); 6] = [
     ),
 ];
 
-/// The lexicon with no card name marked a card name: each name's Full form
-/// alone, with no name form, and its Shortened form dropped.
+/// The lexicon with no card name marked a card name.
 fn unmarked(env: &LexicalEnvironment) -> Lexicon {
     let lexemes = env.lexicon.lexemes().values().cloned().map(|mut lexeme| {
-        if lexeme.card_name {
-            lexeme.card_name = false;
-            lexeme
-                .forms
-                .retain(|slot| slot.features.name == Some(sylex_lexicon::NameForm::Full));
-            lexeme.forms[0].features.name = None;
-        }
+        lexeme.card_name = false;
         lexeme
     });
     Lexicon::new(lexemes).unwrap()
@@ -58,7 +50,7 @@ fn named_readings(lexicon: &Lexicon, env: &LexicalEnvironment) -> Vec<(&'static 
     UNITS
         .iter()
         .map(|(card, text)| {
-            let scope = sylex_lexicon::CardScope::own_names([card_name_id(card)]);
+            let scope = sylex_lexicon::CardScope::full_names([*card]);
             let parse = grammar.parse_analyzed(&lexicon.analyze_source_scoped(text, None, &scope));
             let readings: Vec<_> = parse.readings().collect();
             assert!(!readings.is_empty(), "{card}: no Reading");

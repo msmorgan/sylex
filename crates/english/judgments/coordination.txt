@@ -50,8 +50,8 @@
 + The owner of target nonland permanent puts it into their library second from the top or on the bottom. => AdjectivePhrase "second from the top"; PrepositionPhrase "on the bottom"; !Nominal "library second from the top or on the bottom"; !PrepositionPhrase "into their library second from the top"
 + The owner of target creature an opponent controls puts it into their library second from the top or on the bottom. Then up to one target creature you control connives. => !Nominal "library second from the top or on the bottom"; !PrepositionPhrase "into their library second from the top"
 + The owner of target creature or enchantment puts it into their library second from the top or on the bottom. You create a Clue token. => !Nominal "library second from the top or on the bottom"; !PrepositionPhrase "into their library second from the top"
-+ <card=Wan Shi Tong, All-Knowing> When Wan Shi Tong enters, target nonland permanent's owner puts it into their library second from the top or on the bottom. => !Nominal "library second from the top or on the bottom"; !PrepositionPhrase "into their library second from the top"
-+ <card=Happy Hogan, Bodyguard> When Happy Hogan enters, the owner of target creature an opponent controls puts it into their library second from the top or on the bottom. => !Nominal "library second from the top or on the bottom"; !PrepositionPhrase "into their library second from the top"
++ <card=Wan Shi Tong, All-Knowing> <legendary> When Wan Shi Tong enters, target nonland permanent's owner puts it into their library second from the top or on the bottom. => !Nominal "library second from the top or on the bottom"; !PrepositionPhrase "into their library second from the top"
++ <card=Happy Hogan, Bodyguard> <legendary> When Happy Hogan enters, the owner of target creature an opponent controls puts it into their library second from the top or on the bottom. => !Nominal "library second from the top or on the bottom"; !PrepositionPhrase "into their library second from the top"
 + You choose which creatures block this turn and how those creatures block. => Clause "which creatures block this turn"; Clause "how those creatures block"
 +NounPhrase X tokens that are copies of it and that are tapped and attacking => RelativeClause "that are copies of it"; RelativeClause "that are tapped and attacking"; readings 1
 +Clause you and/or at least one permanent you control becomes the target of a spell => NounPhrase "you and/or at least one permanent you control" as Subject of become; readings 1
@@ -81,6 +81,6 @@
 + Destroy target permanent you own and an opponent controls. => RelativeClause "you own and an opponent controls" as Modifier of permanent
 + Destroy target permanent you own or an opponent controls. => RelativeClause "you own or an opponent controls" as Modifier of permanent
 + Destroy target permanent you own and/or an opponent controls. => RelativeClause "you own and/or an opponent controls" as Modifier of permanent
-+ <card=Rhonas the Indomitable> Rhonas can't attack or block unless you control another creature with power 4 or greater. => VerbPhrase "attack or block" as Complement of can; !VerbPhrase "can't attack"
++ <card=Rhonas the Indomitable> <legendary> Rhonas can't attack or block unless you control another creature with power 4 or greater. => VerbPhrase "attack or block" as Complement of can; !VerbPhrase "can't attack"
 + <card=Break the Ice> Destroy target land that is snow or could produce {C}. => VerbPhrase "is snow"; VerbPhrase "could produce {C}"
 + <card=Hooded Horror> This creature can't be blocked as long as defending player controls the most creatures or is tied for the most. => VerbPhrase "controls the most creatures"; VerbPhrase "is tied for the most"

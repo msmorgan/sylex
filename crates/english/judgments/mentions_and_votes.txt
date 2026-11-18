@@ -3,7 +3,7 @@
 + <card=Pir's Whim> For each player, choose friend or foe. => Mention "friend or foe" as Object of choose
 + <card=Abundant Harvest> Choose land or nonland. => Mention "land or nonland" as Object of choose; Mention "nonland"
 + <card=Cloud Key> As this artifact enters, choose artifact, creature, enchantment, instant, or sorcery. => Mention "artifact, creature, enchantment, instant, or sorcery" as Object of choose
-+ <card=Stenn, Paranoid Partisan> As Stenn enters, choose a card type other than creature or land. => Mention "creature or land" as Complement of than; AdjectivePhrase "other than creature or land" as Modifier of type
++ <card=Stenn, Paranoid Partisan> <legendary> As Stenn enters, choose a card type other than creature or land. => Mention "creature or land" as Complement of than; AdjectivePhrase "other than creature or land" as Modifier of type
 + <card=Standardize> Choose a creature type other than Wall. => Mention "Wall" as Complement of than
 + <card=New Blood> Gain control of target creature. Change the text of that creature by replacing all instances of one creature type with Vampire. => Mention "Vampire" as Complement of with; PrepositionPhrase "with Vampire" as Complement of replace
 # Text-changing effects [CR#612.1]: *another* as a fused determiner-head opposed to *one* (CGEL, Ch. 5 §9.1, p. 410), and two object-and-complement clusters of *replace* coordinated by *or*
@@ -25,7 +25,7 @@
 # A name cited from outside the corpus: an expansion [CR#206.1]
 + <card=Golgothian Sylex> {1}, {T}: Each nontoken permanent with a name originally printed in the Antiquities expansion is sacrificed by its controller. => NounPhrase "the Antiquities expansion"
 # A dungeon's name [CR#309.1] is a Proper Name in scope on every card's text, so it reads alike with no card named
-+ <card=Acererak the Archlich> When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon. => NounPhrase "Tomb of Annihilation" as Object of complete; readings 1
++ <card=Acererak the Archlich> <legendary> When Acererak enters, if you haven't completed Tomb of Annihilation, return Acererak to its owner's hand and venture into the dungeon. => NounPhrase "Tomb of Annihilation" as Object of complete; readings 1
 # from: Acererak the Archlich
 + When this creature enters, if you haven't completed Tomb of Annihilation, return this creature to its owner's hand and venture into the dungeon. => NounPhrase "Tomb of Annihilation" as Object of complete; readings 1
 # from: Undercity // The Initiative (the initiative's ability [CR#727.2]; a dungeon of the dungeon type Undercity [CR#701.49d,205.3p])

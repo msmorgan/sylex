@@ -6,7 +6,7 @@
 + <card=Veil of Summer> Draw a card if an opponent has cast a blue or black spell this turn. => PrepositionPhrase "if an opponent has cast a blue or black spell this turn" as Adjunct of draw
 + <card=Wyluli Wolf> Target creature gets +1/+1 until end of turn. => PrepositionPhrase "until end of turn" as Adjunct of get
 + <card=Suffocation> Cast this spell only if you were dealt damage this turn by a red instant or sorcery spell. => PrepositionPhrase "only if you were dealt damage this turn by a red instant or sorcery spell" as Adjunct of cast
-+ <card=Scarlet Witch, Chaotic Avenger> Then you may cast a Hero or noncreature spell from among cards exiled with Scarlet Witch without paying its mana cost. => PrepositionPhrase "without paying its mana cost" as Adjunct of cast || PrepositionPhrase "without paying its mana cost" as Adjunct of may
++ <card=Scarlet Witch, Chaotic Avenger> <legendary> Then you may cast a Hero or noncreature spell from among cards exiled with Scarlet Witch without paying its mana cost. => PrepositionPhrase "without paying its mana cost" as Adjunct of cast || PrepositionPhrase "without paying its mana cost" as Adjunct of may
 + <card=Suffocation> Suffocation deals 4 damage to the controller of the last red instant or sorcery spell that dealt damage to you this turn. => RelativeClause "that dealt damage to you" gap "last red instant or sorcery spell" || RelativeClause "that dealt damage to you this turn" gap "last red instant or sorcery spell"
 + <card=Teething Wurmlet> If this is the first time this ability has resolved this turn, put a +1/+1 counter on this creature. => PrepositionPhrase "If this is the first time this ability has resolved this turn" as Adjunct of put
 + <card=Skyrider Patrol> When you do, put a +1/+1 counter on another target creature you control, and that creature gains flying until end of turn. => PrepositionPhrase "until end of turn" as Adjunct of gain || Clause "put a +1/+1 counter on another target creature you control, and that creature gains flying"
@@ -19,7 +19,7 @@
 + <card=Sphinx of the Second Sun> At the beginning of each of your postcombat main phases, there is an additional beginning phase after this phase.
 + <card=Moraug, Fury of Akoum> Each creature you control gets +1/+0 for each time it has attacked this turn.
 + <card=Moraug, Fury of Akoum> Landfall — Whenever a land you control enters, if it's your main phase, there's an additional combat phase after this phase. At the beginning of that combat, untap all creatures you control.
-+ <card=Cyclonus, Cybertronian Fighter> Whenever Cyclonus deals combat damage to a player, convert it. If you do, there is an additional beginning phase after this phase.
++ <card=Cyclonus, Cybertronian Fighter> <legendary> Whenever Cyclonus deals combat damage to a player, convert it. If you do, there is an additional beginning phase after this phase.
 + <card=Marauding Maulhorn> This creature attacks each combat if able unless you control a creature named Advocate of the Beast.
 + <card=Raiyuu, Storm's Edge> Whenever a Samurai or Warrior you control attacks alone, untap it. If it's the first combat phase of the turn, there is an additional combat phase after this phase.
 + <card=Grim Reaper's Sprint> Morbid — This spell costs {3} less to cast if a creature died this turn.

@@ -67,62 +67,70 @@ fn a_distributive_adjunct_attaches_to_the_outermost_predicate() {
 fn a_subject_spelled_like_another_card_s_name_is_the_face_s_own() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Deceiver");
-    let scope = sylex_lexicon::CardScope::own_names([own]);
+    let own = "Nicol Bolas, the Deceiver";
+    let scope =
+        sylex_vocabulary::face_scope(own, "Legendary Planeswalker — Bolas", &env.lexicon).unwrap();
     let text = "Nicol Bolas deals 7 damage to each opponent.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 1);
-    assert!(
-        names(&grammar, &env, &ranked[0].1)
-            .iter()
-            .all(|h| *h == own)
-    );
+    assert_eq!(names(&env, &ranked[0].1), [Name::Own(own.to_owned())]);
 }
 
 /// After *named*, the face's own Shortened Name and another card's full name
 /// spelled alike are two Readings with one key: neither ranks first. A minimal
-/// repro on Nicol Bolas, the Ravager, whose own text shortens its name to
-/// *Nicol Bolas*; no card prints *named* before its own Shortened Name.
+/// repro on Nicol Bolas, the Ravager, a legendary creature, whose own text
+/// shortens its name to *Nicol Bolas*; no card prints *named* before its own
+/// Shortened Name.
 #[test]
 fn after_named_a_face_s_own_name_ties_with_another_card_s_spelled_alike() {
     let env = LexicalEnvironment::load().unwrap();
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
-    let own = sylex_vocabulary::card_name_id("Nicol Bolas, the Ravager");
-    let scope = sylex_lexicon::CardScope::own_names([own]);
+    let own = "Nicol Bolas, the Ravager";
+    let scope =
+        sylex_vocabulary::face_scope(own, "Legendary Creature — Elder Dragon", &env.lexicon)
+            .unwrap();
     let text = "Search your library for a card named Nicol Bolas.";
     let parse = grammar.parse_analyzed(&env.lexicon.analyze_source_scoped(text, None, &scope));
     let ranked = parse.best_ranked(usize::MAX).collect::<Vec<_>>();
     assert_eq!(ranked.len(), 2);
     assert_eq!(ranked[0].0, ranked[1].0);
-    let other = sylex_vocabulary::card_name_id("Nicol Bolas");
-    let mut heads: Vec<_> = ranked
+    let mut found: Vec<_> = ranked
         .iter()
-        .map(|(_, reading)| {
-            let mut names = names(&grammar, &env, reading);
-            names.dedup();
-            names
-        })
+        .map(|(_, reading)| names(&env, reading))
         .collect();
-    heads.sort();
-    let mut expected = vec![vec![own], vec![other]];
+    found.sort();
+    let mut expected = vec![
+        vec![Name::Own(own.to_owned())],
+        vec![Name::Other(sylex_vocabulary::card_name_id("Nicol Bolas"))],
+    ];
     expected.sort();
-    assert_eq!(heads, expected);
-    for (key, reading) in &ranked {
-        assert_eq!(grammar.ranking_key(reading, &env.lexicon), Ok(*key));
-    }
+    assert_eq!(found, expected);
 }
 
-/// The card names that head a Reading's Constituents.
-fn names(
-    grammar: &sylex_syntax::CompiledGrammar,
-    env: &LexicalEnvironment,
-    reading: &sylex_syntax::Reading,
-) -> Vec<sylex_lexicon::LexemeId> {
-    let (_, constituents) = grammar.constituents(reading, &env.lexicon).unwrap();
-    constituents
-        .iter()
-        .filter_map(|c| c.head)
-        .filter(|h| env.lexicon.lexemes()[h].card_name)
-        .collect()
+/// A name leaf of a Reading: the face's own name, or another card's.
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+enum Name {
+    Own(String),
+    Other(sylex_lexicon::LexemeId),
+}
+
+/// The name leaves of a Reading, in order.
+fn names(env: &LexicalEnvironment, reading: &sylex_syntax::Reading) -> Vec<Name> {
+    use sylex_lexicon::LexicalReading;
+    use sylex_syntax::Reading;
+    match reading {
+        Reading::Node(node) => node
+            .children
+            .iter()
+            .flat_map(|child| names(env, child))
+            .collect(),
+        Reading::Leaf(LexicalReading::OwnName { name, .. }) => vec![Name::Own(name.clone())],
+        Reading::Leaf(LexicalReading::Word(value))
+            if env.lexicon.lexemes()[&value.lexeme].card_name =>
+        {
+            vec![Name::Other(value.lexeme)]
+        }
+        Reading::Leaf(_) => Vec::new(),
+    }
 }

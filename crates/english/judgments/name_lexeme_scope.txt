@@ -4,13 +4,16 @@
 * Ajani deals 2 damage to any target.
 * Gandalf deals 2 damage to any target.
 * Niv-Mizzet deals 1 damage to any target.
-+ <card=Chandra, Pyromaster> Chandra deals 2 damage to any target. => NounPhrase "Chandra" as Subject of deal
-# a Shortened Name is in scope on its own card alone, not on another
++ <card=Chandra, Pyromaster> <legendary> Chandra deals 2 damage to any target. => NounPhrase "Chandra" as Subject of deal
+# a Shortened Name is in scope on its own card alone, not on another, and only a card stated to be legendary has one
 * <card=Lightning Bolt> Chandra deals 2 damage to any target.
-+ <card=Ajani Vengeant> Ajani deals 2 damage to any target. => NounPhrase "Ajani" as Subject of deal
+* <card=Chandra, Pyromaster> Chandra deals 2 damage to any target.
+# the full name written out is the name, never its Shortened Name and a phrase after it
++ <card=Instrument of the Bards> <legendary> {3}{G}, {T}: Search your library for a creature card with mana value equal to the number of harmony counters on Instrument of the Bards, reveal it, and put it into your hand. If that card is legendary, create a Treasure token. Then shuffle. => NounPhrase "Instrument of the Bards"; !Name "Instrument"
++ <card=Ajani Vengeant> <legendary> Ajani deals 2 damage to any target. => NounPhrase "Ajani" as Subject of deal
 # from: Gandalf the Grey
-+ <card=Gandalf the Grey> Gandalf deals 3 damage to each opponent. => NounPhrase "Gandalf" as Subject of deal
-+ <card=Niv-Mizzet, Parun> Niv-Mizzet deals 1 damage to any target. => NounPhrase "Niv-Mizzet" as Subject of deal
++ <card=Gandalf the Grey> <legendary> Gandalf deals 3 damage to each opponent. => NounPhrase "Gandalf" as Subject of deal
++ <card=Niv-Mizzet, Parun> <legendary> Niv-Mizzet deals 1 damage to any target. => NounPhrase "Niv-Mizzet" as Subject of deal
 # from: Chandra's Defeat
 + If that permanent is a Chandra planeswalker, you may discard a card.
 + Legendary Planeswalker — Chandra
@@ -46,13 +49,13 @@
 * <card=Garth One-Eye> Create a copy of Black Lotus.
 * <card=Garth One-Eye> Choose a card name among Disenchant and Black Lotus.
 # a meld result's name is the name of neither card of its meld pair: on every card it is another card's name, which stands as the Name Complement of *into* after *meld*, as after *named*
-+ <card=Gisela, the Broken Blade> At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into
++ <card=Gisela, the Broken Blade> <legendary> At the beginning of your end step, if you both own and control Gisela and a creature named Bruna, the Fading Light, exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into
 + <card=Graf Rats> At the beginning of combat on your turn, if you both own and control this creature and a creature named Midnight Scavengers, exile them, then meld them into Chittering Host. => NameComplement "Chittering Host" as Complement of into
 + <card=Hanweir Battlements> {3}{R}{R}, {T}: If you both own and control this land and a creature named Hanweir Garrison, exile them, then meld them into Hanweir, the Writhing Township. => NameComplement "Hanweir, the Writhing Township" as Complement of into
-+ <card=Mishra, Claimed by Gix> Whenever you attack, each opponent loses X life and you gain X life, where X is the number of attacking creatures. If Mishra, Claimed by Gix and a creature named Phyrexian Dragon Engine are attacking, and you both own and control them, exile them, then meld them into Mishra, Lost to Phyrexia. It enters tapped and attacking. => NameComplement "Mishra, Lost to Phyrexia" as Complement of into
-+ <card=Titania, Voice of Gaea> At the beginning of your upkeep, if there are four or more land cards in your graveyard and you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them, then meld them into Titania, Gaea Incarnate. => NameComplement "Titania, Gaea Incarnate" as Complement of into
-+ <card=Urza, Lord Protector> {7}: If you both own and control Urza, Lord Protector and an artifact named The Mightstone and Weakstone, exile them, then meld them into Urza, Planeswalker. Activate only as a sorcery. => NameComplement "Urza, Planeswalker" as Complement of into
-+ <card=Vanille, Cheerful l'Cie> At the beginning of your first main phase, if you both own and control Vanille and a creature named Fang, Fearless l'Cie, you may pay {3}{B}{G}. If you do, exile them, then meld them into Ragnarok, Divine Deliverance. => NameComplement "Ragnarok, Divine Deliverance" as Complement of into
++ <card=Mishra, Claimed by Gix> <legendary> Whenever you attack, each opponent loses X life and you gain X life, where X is the number of attacking creatures. If Mishra, Claimed by Gix and a creature named Phyrexian Dragon Engine are attacking, and you both own and control them, exile them, then meld them into Mishra, Lost to Phyrexia. It enters tapped and attacking. => NameComplement "Mishra, Lost to Phyrexia" as Complement of into
++ <card=Titania, Voice of Gaea> <legendary> At the beginning of your upkeep, if there are four or more land cards in your graveyard and you both own and control Titania, Voice of Gaea and a land named Argoth, Sanctum of Nature, exile them, then meld them into Titania, Gaea Incarnate. => NameComplement "Titania, Gaea Incarnate" as Complement of into
++ <card=Urza, Lord Protector> <legendary> {7}: If you both own and control Urza, Lord Protector and an artifact named The Mightstone and Weakstone, exile them, then meld them into Urza, Planeswalker. Activate only as a sorcery. => NameComplement "Urza, Planeswalker" as Complement of into
++ <card=Vanille, Cheerful l'Cie> <legendary> At the beginning of your first main phase, if you both own and control Vanille and a creature named Fang, Fearless l'Cie, you may pay {3}{B}{G}. If you do, exile them, then meld them into Ragnarok, Divine Deliverance. => NameComplement "Ragnarok, Divine Deliverance" as Complement of into
 + <card=Bruna, the Fading Light> Exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into
 # from: Gisela, the Broken Blade
 + Exile them, then meld them into Brisela, Voice of Nightmares. => NameComplement "Brisela, Voice of Nightmares" as Complement of into

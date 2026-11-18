@@ -12,7 +12,7 @@
 +NounPhrase two +1/+1 counters => !RelativeClause "+1/+1 counters"
 # from: Conservator
 +NounPhrase the next 3 damage that would be dealt to you this turn => RelativeClause "that would be dealt to you this turn" gap "next 3 damage"
-+ <card=Verazol, the Split Current> Verazol enters with a +1/+1 counter on it for each mana spent to cast it. => NounPhrase "each mana spent to cast it"; VerbPhrase "spent to cast it" as Modifier of mana
++ <card=Verazol, the Split Current> <legendary> Verazol enters with a +1/+1 counter on it for each mana spent to cast it. => NounPhrase "each mana spent to cast it"; VerbPhrase "spent to cast it" as Modifier of mana
 # from: Mental Modulation
 + This spell costs {1} less to cast during your turn. => Clause "to cast" as Complement of cost
 + <card=Rain of Riches> The first spell you cast each turn that mana from a Treasure was spent to cast has cascade. => RelativeClause "that mana from a Treasure was spent to cast" gap "first spell you cast each turn"; Clause "to cast" as Adjunct of spend
@@ -30,6 +30,6 @@
 + Discard a card at random. => PrepositionPhrase "at random" as Adjunct of discard; readings 1
 + <card=Clay Champion> This creature enters with three +1/+1 counters on it for each {G}{G} spent to cast it. => NounPhrase "each {G}{G} spent to cast it" as Complement of for; Nominal "{G}{G} spent to cast it"; VerbPhrase "spent to cast it"
 # A token that is attacking or blocking, without tapped: the combat clause is a relative clause modifying the token NounPhrase
-+ <card=Brimaz, King of Oreskos> Whenever Brimaz attacks, create a 1/1 white Cat Soldier creature token with vigilance that's attacking. => RelativeClause "that's attacking" as Modifier of token
-+ <card=Brimaz, King of Oreskos> Whenever Brimaz blocks a creature, create a 1/1 white Cat Soldier creature token with vigilance that's blocking that creature. => RelativeClause "that's blocking that creature" as Modifier of token
++ <card=Brimaz, King of Oreskos> <legendary> Whenever Brimaz attacks, create a 1/1 white Cat Soldier creature token with vigilance that's attacking. => RelativeClause "that's attacking" as Modifier of token
++ <card=Brimaz, King of Oreskos> <legendary> Whenever Brimaz blocks a creature, create a 1/1 white Cat Soldier creature token with vigilance that's blocking that creature. => RelativeClause "that's blocking that creature" as Modifier of token
 + <card=Flash Foliage> Create a 1/1 green Saproling creature token that's blocking target creature attacking you. => RelativeClause "that's blocking target creature attacking you" as Modifier of token

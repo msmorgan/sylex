@@ -28,7 +28,7 @@
 + Green is tied for most common. => Nominal "most common" as Complement of for; AdjectivePhrase "most common"; readings 1
 * Each player votes for untapped.
 # A gerund-participial Supplement (CGEL, Ch. 14 §9) with a heavy-shifted Object.
-+ <card=Karn Liberated> −14: Restart the game, leaving in exile all non-Aura permanent cards exiled with Karn. Then put those cards onto the battlefield under your control. => VerbPhrase "leaving in exile all non-Aura permanent cards exiled with Karn"; NounPhrase "all non-Aura permanent cards exiled with Karn" as Object of leave
++ <card=Karn Liberated> <legendary> −14: Restart the game, leaving in exile all non-Aura permanent cards exiled with Karn. Then put those cards onto the battlefield under your control. => VerbPhrase "leaving in exile all non-Aura permanent cards exiled with Karn"; NounPhrase "all non-Aura permanent cards exiled with Karn" as Object of leave
 + <card=Time and Tide> Simultaneously, all phased-out creatures phase in and all creatures with phasing phase out. => AdverbPhrase "Simultaneously"; AdjectivePhrase "phased-out" as Modifier of creature
 # *One at a time*, an exceptional Preposition Phrase (CGEL, Ch. 7 §4.3); *face up* on *draft* is a depictive Adjunct, never a PredicativeComplement.
 + <card=Agent of Acquisitions> Draft this card face up. => PrepositionPhrase "face up" as Adjunct of draft; !Predicative "face up" as PredicativeComplement of draft; !PrepositionPhrase "face up" as PredicativeComplement of draft
@@ -46,7 +46,7 @@
 + <card=Withering Wisps> {B}: This enchantment deals 1 damage to each creature and each player. Activate no more times each turn than the number of snow Swamps you control. => NounPhrase "no more times each turn than the number of snow Swamps you control" as Adjunct of activate
 + <card=Tranquil Frillback> When this creature enters, you may pay {G} up to three times. When you pay this cost one or more times, choose up to that many — => NounPhrase "up to three times" as Adjunct of pay
 + <card=Tempt with Mayhem> Tempting offer — Choose target instant or sorcery spell. Each opponent may copy that spell and may choose new targets for the copy they control. You copy that spell once plus an additional time for each opponent who copied the spell this way. You may choose new targets for the copies you control. => AdverbPhrase "once plus an additional time" as Adjunct of copy
-+ <card=Elenda, Saint of Dusk> As long as your life total is greater than your starting life total, Elenda gets +1/+1 and has menace. Elenda gets an additional +5/+5 as long as your life total is at least 10 greater than your starting life total. => AdjectivePhrase "at least 10 greater than your starting life total" as PredicativeComplement of be
++ <card=Elenda, Saint of Dusk> <legendary> As long as your life total is greater than your starting life total, Elenda gets +1/+1 and has menace. Elenda gets an additional +5/+5 as long as your life total is at least 10 greater than your starting life total. => AdjectivePhrase "at least 10 greater than your starting life total" as PredicativeComplement of be
 + <card=Spikeshell Harrier> This effect can't reduce their speed below 1. => PrepositionPhrase "below 1" as Complement of reduce
 # A villainous choice's options, set off by a dash after the choice
 # [CR#701.55a]; the sentence end closes the dash (CGEL, Ch. 20 §5, p. 1751),

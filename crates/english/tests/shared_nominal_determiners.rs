@@ -4,7 +4,6 @@
 //! determiner coordination, and the `NominalModifier` admission gate
 //! (`docs/design/english.md` §6, §8).
 
-use sylex_english::corpus::own_names;
 use sylex_lexicon::CardScope;
 use sylex_lexicon::LexicalReading;
 use sylex_syntax::CompiledGrammar;
@@ -22,7 +21,11 @@ fn word_lexemes(reading: &Reading, out: &mut Vec<String>) {
             }
         }
         Reading::Leaf(LexicalReading::Word(word)) => out.push(word.lexeme.to_string()),
-        Reading::Leaf(LexicalReading::Numeral { .. } | LexicalReading::FlavorWord { .. }) => {}
+        Reading::Leaf(
+            LexicalReading::OwnName { .. }
+            | LexicalReading::Numeral { .. }
+            | LexicalReading::FlavorWord { .. },
+        ) => {}
     }
 }
 
@@ -49,11 +52,10 @@ fn nodes_with_production<'a>(
 fn parse_readings(
     grammar: &CompiledGrammar,
     env: &LexicalEnvironment,
-    card: Option<&str>,
+    scope: &CardScope,
     text: &str,
 ) -> Vec<Reading> {
-    let scope = card.map_or_else(CardScope::default, own_names);
-    let analyzed = env.lexicon.analyze_source_scoped(text, None, &scope);
+    let analyzed = env.lexicon.analyze_source_scoped(text, None, scope);
     grammar.parse_analyzed(&analyzed).readings().collect()
 }
 
@@ -168,7 +170,12 @@ fn balthor_and_participial_shared_nominal_determiners() {
     let grammar = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
 
     let balthor_line = "{B}{B}{B}, Exile Balthor: Each player returns all black and all red creature cards from their graveyard to the battlefield.";
-    let balthor = parse_readings(&grammar, &env, Some("Balthor the Defiled"), balthor_line);
+    let balthor = parse_readings(
+        &grammar,
+        &env,
+        &CardScope::every_form(["Balthor the Defiled"]),
+        balthor_line,
+    );
 
     assert!(
         balthor.iter().any(|reading| {
@@ -216,7 +223,7 @@ fn balthor_and_participial_shared_nominal_determiners() {
     // Ticket witness derived from Balthor the Defiled and Evacuation:
     let participial_line =
         "Each player returns all tapped and all attacking creatures to their owners' hands.";
-    let participial = parse_readings(&grammar, &env, None, participial_line);
+    let participial = parse_readings(&grammar, &env, &CardScope::default(), participial_line);
     assert_eq!(participial.len(), 1);
     assert!(
         has_shared_nominal_reading(
@@ -239,7 +246,7 @@ fn balthor_and_participial_shared_nominal_determiners() {
     // "blocking" on the shared nominal ([all untapped] + [blocking creature
     // cards]).
     let stacked_line = "Each player returns all tapped attacking and all untapped blocking creature cards to their owners' hands.";
-    let stacked = parse_readings(&grammar, &env, None, stacked_line);
+    let stacked = parse_readings(&grammar, &env, &CardScope::default(), stacked_line);
     assert_eq!(stacked.len(), 2);
     assert!(
         stacked.iter().any(|reading| {
@@ -296,7 +303,7 @@ fn number_agreement_across_conjuncts_and_clause() {
         "A tapped and/or an untapped creature gets +1/+1 until end of turn.",
         "A tapped and/or an untapped creature get +1/+1 until end of turn.",
     ] {
-        let readings = parse_readings(&grammar, &env, None, grammatical);
+        let readings = parse_readings(&grammar, &env, &CardScope::default(), grammatical);
         assert_eq!(readings.len(), 1, "{grammatical}");
     }
 
@@ -308,7 +315,7 @@ fn number_agreement_across_conjuncts_and_clause() {
         "Each tapped and each untapped creature get +1/+1 until end of turn.",
         "Target tapped or target untapped creature get +1/+1 until end of turn.",
     ] {
-        let readings = parse_readings(&grammar, &env, None, ungrammatical);
+        let readings = parse_readings(&grammar, &env, &CardScope::default(), ungrammatical);
         assert!(readings.is_empty(), "{ungrammatical}: {readings:#?}");
     }
 }
@@ -322,7 +329,7 @@ fn bare_determiners_stay_on_the_canonical_path() {
     let counterintelligence = parse_readings(
         &grammar,
         &env,
-        None,
+        &CardScope::default(),
         "Return one or two target creatures to their owners' hands.",
     );
     assert_eq!(counterintelligence.len(), 1);
@@ -344,7 +351,7 @@ fn nominal_modifier_gate_blocks_tautological_noun_doubling() {
     let gated = sylex_english::bind(&env.lexicon, &env.frames).unwrap();
     let warpath = "Warpath deals 3 damage to each blocking creature and each blocked creature.";
 
-    let gated_readings = parse_readings(&gated, &env, Some("Warpath"), warpath);
+    let gated_readings = parse_readings(&gated, &env, &CardScope::full_names(["Warpath"]), warpath);
     assert_eq!(gated_readings.len(), 1);
 
     let ungated_source = format!(
@@ -357,6 +364,7 @@ fn nominal_modifier_gate_blocks_tautological_noun_doubling() {
         &env.frames,
     )
     .unwrap();
-    let ungated_readings = parse_readings(&ungated, &env, Some("Warpath"), warpath);
+    let ungated_readings =
+        parse_readings(&ungated, &env, &CardScope::full_names(["Warpath"]), warpath);
     assert_eq!(ungated_readings.len(), 2);
 }

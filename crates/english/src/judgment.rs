@@ -13,7 +13,6 @@ use sylex_syntax::Constituent;
 use sylex_syntax::Gap;
 use sylex_syntax::Parse;
 use sylex_syntax::Reading;
-use sylex_vocabulary::card_name_id;
 
 /// A grammatical function, as CGEL names it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -142,7 +141,11 @@ pub struct Judgment {
     pub grammatical: bool,
     /// The Category to parse as, or the grammar's root.
     pub category: Option<Ident>,
+    /// The name of the card the text is read as if on (`<card=NAME>`).
     pub card: Option<String>,
+    /// That card is stated to be a legendary permanent (`<legendary>`), so
+    /// its name has its Shortened form [CR#201.5c].
+    pub legendary: bool,
     pub text: String,
     /// Alternative groups; each must be satisfied by some one Reading.
     pub groups: Vec<Vec<Assertion>>,
@@ -233,6 +236,14 @@ fn parse_entry(line: &str, location: &str) -> Result<Judgment, String> {
         card = Some(after[..end].to_owned());
         rest = after[end + 1..].trim_start();
     }
+    let mut legendary = false;
+    if let Some(after) = rest.strip_prefix("<legendary>") {
+        if card.is_none() {
+            return Err("`<legendary>` follows the `<card=NAME>` it is about".to_owned());
+        }
+        legendary = true;
+        rest = after.trim_start();
+    }
     let (text, assertions) = match rest.find(" => ") {
         Some(at) => (rest[..at].trim(), Some(rest[at + 4..].trim())),
         None => (rest.trim_end_matches("=>").trim(), None),
@@ -245,6 +256,7 @@ fn parse_entry(line: &str, location: &str) -> Result<Judgment, String> {
         grammatical,
         category,
         card,
+        legendary,
         text: text.to_owned(),
         groups: Vec::new(),
         negated: Vec::new(),
@@ -399,34 +411,19 @@ fn parse_assertion(text: &str) -> Result<Assertion, String> {
     Ok(assertion)
 }
 
-/// Whether `name` is a card name of `lexicon`: the name a text may be read
-/// as if on a card of.
-#[must_use]
-pub fn is_card_name(lexicon: &Lexicon, name: &str) -> bool {
-    lexicon
-        .lexemes()
-        .get(&card_name_id(name))
-        .is_some_and(|lexeme| lexeme.card_name)
-}
-
 impl Judgment {
-    /// The Card Scope the entry's text is read in: the own name of the card
-    /// it states with `<card=NAME>` ([`crate::corpus::own_names`]), or the
-    /// empty scope. The name is an input like the text; no card is looked up.
-    ///
-    /// # Errors
-    /// A stated name that is no card name of `lexicon`, naming the entry.
-    pub fn scope(&self, lexicon: &Lexicon) -> Result<CardScope, String> {
-        let Some(name) = &self.card else {
-            return Ok(CardScope::default());
-        };
-        if is_card_name(lexicon, name) {
-            Ok(crate::corpus::own_names(name))
-        } else {
-            Err(format!(
-                "{}: `<card={name}>` states a name that is no card name of the lexicon",
-                self.location
-            ))
+    /// The Card Scope the entry's text is read in
+    /// (`sylex_vocabulary::stated_scope`): the name it states with
+    /// `<card=NAME>` as the card's own, in its Full form and, when the entry
+    /// also states `<legendary>` and the name has one, in its Shortened form
+    /// [CR#201.5c]; or the empty scope. The name and the flag are inputs
+    /// like the text: no card is looked up, and the name need be no printed
+    /// card's.
+    #[must_use]
+    pub fn scope(&self, lexicon: &Lexicon) -> CardScope {
+        match &self.card {
+            Some(name) => sylex_vocabulary::stated_scope(name, self.legendary, lexicon),
+            None => CardScope::default(),
         }
     }
 }
@@ -503,10 +500,9 @@ impl Judge<'_> {
     /// in scope.
     ///
     /// # Errors
-    /// The entry's [`Judgment::scope`] error, or a Category the grammar
-    /// lacks.
+    /// A Category the grammar lacks.
     pub fn parse(&self, entry: &Judgment) -> Result<Parse<'_>, String> {
-        self.parse_scoped(entry, &entry.scope(self.lexicon)?)
+        self.parse_scoped(entry, &entry.scope(self.lexicon))
     }
 
     /// Parses an entry's text as it asks, with `scope` in scope.
@@ -532,10 +528,7 @@ impl Judge<'_> {
     /// Reading.
     #[must_use]
     pub fn evaluate(&self, entry: &Judgment) -> Outcome {
-        match entry.scope(self.lexicon) {
-            Ok(scope) => self.evaluate_scoped(entry, &scope),
-            Err(why) => Outcome::Fails(why),
-        }
+        self.evaluate_scoped(entry, &entry.scope(self.lexicon))
     }
 
     /// [`Judge::evaluate`] with `scope` in scope.

@@ -17,12 +17,12 @@
 + Whenever one or more counters are put on a creature you control, if it's the first time counters have been put on that creature this turn, put a +1/+1 counter on that creature. => PrepositionPhrase "if it's the first time counters have been put on that creature this turn" as Adjunct of put; Clause "counters have been put on that creature this turn"; RelativeClause "counters have been put on that creature this turn" as Modifier of time gap "first time"; !Nominal "time counters"
 # A counter's kind is the one premodifier *counter* takes in its place: a measure or keyword there is no general premodifier, only a keyword a keyword counter can be is a kind [CR#122.1b], and a kind name stands nowhere else (english.md §3).
 + <card=Travel Preparations> Put a +1/+1 counter on each of up to two target creatures. => Kind "+1/+1" as Modifier of counter; readings 1
-+ <card=Mai, Jaded Edge> Exhaust — {3}: Put a double strike counter on Mai. => Kind "double strike" as Modifier of counter; readings 1
++ <card=Mai, Jaded Edge> <legendary> Exhaust — {3}: Put a double strike counter on Mai. => Kind "double strike" as Modifier of counter; readings 1
 + <card=Bomb Squad> {T}: Put a fuse counter on target creature. => Kind "fuse" as Modifier of counter; !KeywordPhrase "fuse"; readings 1
 + <card=Craft with Pride> Create a Treasure token. => NounPhrase "a Treasure token" as Object of create; readings 1
 + <card=Under the Skin> Manifest dread. => !Name "dread"; readings 1
 # A slash measure after *of* is a choice's option only, never the counted set of *number* standing apart from *counter*.
 + <card=Molten Hydra> {T}, Remove all +1/+1 counters from this creature: It deals damage to any target equal to the number of +1/+1 counters removed this way. => NounPhrase "the number of +1/+1 counters removed this way"; !MeasureNounPhrase "+1/+1"#2
 # Serial *time* is count-only: *three time counters* has no bare-relative Reading where mass *time* is the Subject of *counters*, and *votes for time* reads only the vote option.
-+ <card=Ojer Pakpatiq, Deepest Epoch> When Ojer Pakpatiq dies, return it to the battlefield tapped and transformed under its owner's control with three time counters on it. => Kind "time" as Modifier of counter; !NounPhrase "time"
++ <card=Ojer Pakpatiq, Deepest Epoch> <legendary> When Ojer Pakpatiq dies, return it to the battlefield tapped and transformed under its owner's control with three time counters on it. => Kind "time" as Modifier of counter; !NounPhrase "time"
 + <card=Plea for Power> Will of the council — Starting with you, each player votes for time or knowledge. If time gets more votes, take an extra turn after this one. If knowledge gets more votes or the vote is tied, draw three cards. => Name "time"#1; readings 2

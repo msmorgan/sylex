@@ -335,7 +335,7 @@ fn unit_rows(
     let parsed = cleave.map_or_else(|| u.text.clone(), |c| c.uncleaved.clone());
     let analyzed = env
         .lexicon
-        .analyze_source_scoped(&parsed, None, &face.scope());
+        .analyze_source_scoped(&parsed, None, &face.scope(&env.lexicon));
     let parse = grammar.parse_analyzed(&analyzed);
     let counts = parse.counts()?;
     let heads = parse.alternative_heads()?;
@@ -373,7 +373,9 @@ fn unit_rows(
                 let inside = counts.item_inside(item);
                 let word = |leaf: Option<usize>| match forest.leaf_reading(leaf?) {
                     LexicalReading::Word(word) => Some((word.lexeme, word.form)),
-                    LexicalReading::FlavorWord { .. } | LexicalReading::Numeral { .. } => None,
+                    LexicalReading::OwnName { .. }
+                    | LexicalReading::FlavorWord { .. }
+                    | LexicalReading::Numeral { .. } => None,
                 };
                 Ok(AlternativeRow {
                     production,
@@ -869,6 +871,12 @@ fn write_leaves(
                     Val::Null,
                 )
             }
+            LexicalReading::OwnName { form, .. } => (
+                Val::Static("own name"),
+                Val::Null,
+                Val::Debug(form),
+                Val::Null,
+            ),
             LexicalReading::FlavorWord { .. } => {
                 (Val::Static("flavor word"), Val::Null, Val::Null, Val::Null)
             }
@@ -1119,9 +1127,9 @@ mod tests {
                     |r| r.get(0),
                 )
                 .unwrap();
-            let analyzed = env
-                .lexicon
-                .analyze_source_scoped(&parsed, None, &face.scope());
+            let analyzed =
+                env.lexicon
+                    .analyze_source_scoped(&parsed, None, &face.scope(&env.lexicon));
             let expected = grammar.parse_analyzed(&analyzed).derivation_count();
             assert_eq!(
                 u128::try_from(totals[unit]).unwrap(),

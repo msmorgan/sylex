@@ -309,7 +309,7 @@ fn the_settled_spine_agrees_with_the_counts_and_the_readings() {
         let name = |why: String| format!("{} | {text}: {why}", face.name);
         let analyzed = env
             .lexicon
-            .analyze_source_scoped(&text, None, &face.scope());
+            .analyze_source_scoped(&text, None, &face.scope(&env.lexicon));
         let parse = grammar.parse_analyzed(&analyzed);
         let counts = parse.counts().unwrap();
         let forest = parse.fork_forest().unwrap();

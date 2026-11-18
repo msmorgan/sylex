@@ -51,9 +51,14 @@ pub(super) struct ForestwalkArgs {
     /// `+Category TEXT`), which may state its own card with `<card=NAME>`.
     text: Option<String>,
     /// Survey the text as if it were on the card so named. Nothing is
-    /// fetched: the name is an input like the text.
+    /// fetched: the name is an input like the text, and need be no printed
+    /// card's.
     #[arg(long, value_name = "NAME", conflicts_with = "card")]
     as_card: Option<String>,
+    /// With `--as-card`: that card is a legendary permanent, so its name has
+    /// its Shortened form.
+    #[arg(long, requires = "as_card")]
+    legendary: bool,
     /// Fetch the faces so named (a face's name, or its whole card's) from the
     /// supported corpus: alone, list their units; with `--line` or
     /// `--type-line`, survey that unit (then `NAME` must name one face). Takes
@@ -93,19 +98,13 @@ pub(super) fn run(args: &ForestwalkArgs, output: &mut dyn Write) -> Result<()> {
         Target::Survey(item) => *item,
     };
     let env = LexicalEnvironment::load().context("loading the lexical environment")?;
-    if let Some(name) = &args.as_card {
-        anyhow::ensure!(
-            sylex_english::judgment::is_card_name(&env.lexicon, name),
-            "`--as-card {name}` is no card name of the lexicon"
-        );
-    }
     let grammar = sylex_english::bind(&env.lexicon, &env.frames)?;
     let judge = Judge {
         grammar: &grammar,
         lexicon: &env.lexicon,
     };
     let entry = &item.entry;
-    let scope = entry.scope(&env.lexicon).map_err(anyhow::Error::msg)?;
+    let scope = entry.scope(&env.lexicon);
     let parse = judge
         .parse_scoped(entry, &scope)
         .map_err(anyhow::Error::msg)?;
@@ -335,8 +334,11 @@ fn target(args: &ForestwalkArgs, selectors: &[Selector]) -> Result<Target> {
                 "`--line` and `--type-line` pick a unit of a card fetched with `--card`; \
                  stated text is surveyed as given"
             );
-            let mut items =
-                super::stated_items(std::slice::from_ref(text), args.as_card.as_deref())?;
+            let mut items = super::stated_items(
+                std::slice::from_ref(text),
+                args.as_card.as_deref(),
+                args.legendary,
+            )?;
             let item = items.remove(0);
             let entry = &item.entry;
             anyhow::ensure!(
@@ -742,6 +744,7 @@ fn lexical(reading: &LexicalReading) -> String {
                 )
             }
         }
+        LexicalReading::OwnName { name, form } => format!("own name {name:?} {form:?}"),
         LexicalReading::FlavorWord { label } => format!("flavor word {label:?}"),
         LexicalReading::Numeral {
             value, notation, ..
