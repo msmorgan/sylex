@@ -42,17 +42,19 @@ equals, none of whose Readings satisfies that entry, is `known-wrong-only`.
   scope too ([CR#201.5c]): `<card=Jace, Cunning Castaway> <legendary> Jace
   draws two cards.` The name and the flag are inputs like the text: no card is
   looked up, and the name need be no printed card's.
-- **Anchor.** `<anchor=Khans>` reads the text with that Anchor Word in scope
+- **Anchor.** `<anchor=Khans>` reads the text with that Anchor Word stated
   ([CR#614.12c]), once per word: `<anchor=Khans> <anchor=Dragons> As this
   enchantment enters, choose Khans or Dragons.` A face's Anchor Words are read
-  from its text across its units (`Face::scope`); an entry is one unit, so it
-  states the words its text is read with.
+  from its text as its lines are read in order (`face::read_lines`): a line
+  offers them and the lines after it use them. An entry is one unit, so it
+  states the words the rest of its face introduces and uses.
 - **Vote.** `<vote=psychosis>` reads the text with that Vote Option in scope
   ([CR#701.38b]), once per word, after any `<anchor=…>`: `<vote=sickness>
   <vote=psychosis> If psychosis gets more votes, each opponent discards two
   cards.` A face's Vote Options are read from its text as its Anchor Words
-  are, from where a vote offers them and where the text then cites them; an
-  entry states them, whether or not its text offers them.
+  are, from where a vote offers them and where the text then cites them. A
+  text that holds both reads with no word stated; an entry that holds only
+  one of the two states the words.
 - **Text.** The exact expression, with its final punctuation; it runs to the
   end of the line or to `=>`.
 - **Assertions** follow `=>`, separated by `;`. `||` separates alternative

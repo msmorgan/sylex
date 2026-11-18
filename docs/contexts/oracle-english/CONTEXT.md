@@ -307,8 +307,8 @@ The CR term [CR#207.2c], here also covering ability words printed on
 Vintage-legal cards that the CR's list omits.
 
 **Flavor Word**:
-The CR term [CR#207.2d]. It is an open lexical slot, as a Set Name, an
-Introduced Name and an Anchor Word are: no inventory lists Flavor Words, so
+The CR term [CR#207.2d]. It is an open lexical slot, as a Set Name and an
+Introduced Word are: no inventory lists Flavor Words, so
 the italic run is captured verbatim.
 _Avoid_: flavor text
 
@@ -319,13 +319,23 @@ read by its title shape, and no Proper Name: it stands only as the parameter of
 its noun.
 _Avoid_: cited name
 
+**Introduced Word**:
+A word a face's own text gives and then uses again, which no inventory lists:
+an Introduced Name, an Anchor Word or a Vote Option. The text *introduces* it
+at a position that reads whatever word stands there, and *uses* it
+elsewhere: anywhere in the same Reading, or on a later line, whose Card Scope
+holds it. An
+Anchor Choice or an Option Choice *offers* its words, and stands only where a
+use of one of them *discharges* it. An *open word* is a spelling that has the
+shape of an Anchor Word or a Vote Option, which lexical analysis lists beside
+its matches and a parse reads only where the text introduces or uses it.
+
 **Anchor Word**:
 The CR term [CR#614.12c]: one of the two words a face's text offers as its
 permanent enters, each heading the bulleted ability linked to that choice. It
-is an open lexical slot and no Proper Name: no inventory lists it, and it is
-read from a face's text across its units, as a label of a bulleted line that
-an Anchor Choice of another line offers. It stands only where the Card Scope
-holds it, heading its ability or in an Anchor Choice.
+is an open lexical slot and no Proper Name: no inventory lists it. It is an
+Introduced Word: an Anchor Choice introduces the two words that stand in it,
+and a line after it that heads a bulleted ability with one of them uses it.
 
 **Anchor Choice**:
 The two Anchor Words an ability offers, joined by *or* (*choose Khans or
@@ -334,10 +344,10 @@ Dragons*). The words are cited, so it stands where a cited word does.
 **Vote Option**:
 One of the words a vote offers, "words with no rules meaning that are each
 connected to a different effect" [CR#701.38a,701.38b] (*sickness* and
-*psychosis* on Bite of the Black Rose). No inventory lists it: it is read
-from a face's text, the words an Option Choice offers where the text also
-cites one of them in an Option Mention. It stands only where the Card Scope
-holds it, in an Option Choice or as an Option Mention, and is no Proper Name.
+*psychosis* on Bite of the Black Rose). No inventory lists it. It is an
+Introduced Word: an Option Choice introduces the two words that stand in it,
+and an Option Mention uses one of them. It stands nowhere else, and is no
+Proper Name.
 The grammar names no keyword action, so its lexical Category is
 `Category::OptionWord`.
 
@@ -357,14 +367,15 @@ shortens. A legendary permanent whose name has a shortened spelling has one,
 whether or not its own text uses it.
 
 **Card Scope**:
-The card names a text is in the scope of, each with the forms of it that the
-text admits, and the Anchor Words and Vote Options of that text. A face's
-text holds its own name in its Full form and, where the card has a Shortened
-Name, in its Shortened form [CR#201.5c]; a face's Card Scope is derived from
-its name and type line, and its Anchor Words and Vote Options from its rules
-text, when its text is parsed. An Own Name stands only where the Card Scope
-holds that form of it, and an Anchor Word or a Vote Option only where it holds
-that word.
+The parse context of a text: the card names it is in the scope of, each with
+the forms of it that the text admits, the Introduced Words the lines before
+it introduce, and those the lines after it use. A face's text holds its own
+name in its Full form and, where the card has a Shortened Name, in its
+Shortened form [CR#201.5c]; the names are derived from the face's name and
+type line, and the words from its rules text, as its lines are parsed, once
+each and in order. An Own Name stands only where the Card Scope holds that
+form of it. A text read alone states the words the rest of its face
+introduces and uses.
 
 **Own Name**:
 A card's name, full or Shortened, in the text of its own face [CR#201.5]. It
@@ -390,7 +401,8 @@ A name a card's own text gives an object that is not a card, such as the name
 of a token it creates [CR#111.4]. No inventory lists it: it is the title run
 written where the text introduces it, after *named*, as the Object of
 *create* before the token's description, or after *its name is*, and it is
-named again only in a Reading that introduces it.
+named again only in a Reading that introduces it or on a line after one that
+does. It is an Introduced Word, offered in no choice.
 
 **Name Number**:
 The grammatical Number of a name, which the lexicon does not declare: where its

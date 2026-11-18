@@ -74,7 +74,7 @@ a card of a stated name).
   card's text introduces, as the name of a token it creates: it is an
   Introduced Name, read from the text (Lexicon §6). Nor is an Anchor Word
   [CR#614.12c] or a Vote Option [CR#701.38b]: each is read from the face's
-  text (`sylex_english::corpus::Face::scope`).
+  text as its lines are read (`sylex_english::face::read_lines`).
 
 The loader refuses a Core word that is also a Catalog item of the same
 Category, and `cr_coverage` refuses a catalog item the CR does not enumerate.

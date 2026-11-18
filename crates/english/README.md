@@ -73,8 +73,11 @@ per seed sentence.
 `set_type: funny`) from `data/scryfall/oracle-cards.jsonl` through
 `sylex_upstream`, which reads the snapshot once per process, one `Face` per
 Card Face record with its own name in lexical scope, in its Shortened form
-too for a legendary permanent (`Face::scope`, a function of the face's name
-and type line). Each face yields
+too for a legendary permanent (`Face::name_scope`, a function of the face's
+name and type line). `face` reads a face's lines once each, in order, carrying
+the words they introduce (Introduced Names, Anchor Words, Vote Options) to the
+lines after them (`face::read_lines`; `docs/design/lexicon.md` §2). Each face
+yields
 Corpus Units: its Type Line, and each paragraph line of its rules text after
 balanced reminder text is removed
 (`sylex_upstream::oracle_text::strip_reminder_text`). The split needs no parse.

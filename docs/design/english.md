@@ -357,10 +357,13 @@ production-directed scanning. Every alternative names a declared Lexeme with
 its lexical Category, Word Form, features and Provenance, or is one of the
 leaves no Lexeme declares: a numeral, a card's own name, and the open slots
 read by their shape, a Flavor Word, a Set Name and an Introduced Name, and
-an Anchor Word or a Vote Option the parse context holds ([Lexicon](lexicon.md)
-§2, §6). An
-unknown word is reported as a vocabulary gap, never guessed; a title run is
-one unless the parse takes it as an Introduced Name. Analysis and realization
+an Anchor Word or a Vote Option the parse context introduces
+([Lexicon](lexicon.md) §2, §6). Beside the alternatives it lists the text's
+open words, each spelling that has the shape of an Anchor Word or a Vote
+Option, which a Production reads only where it introduces the word or uses
+one its text introduces. An
+unknown word is reported as a vocabulary gap, never guessed; a title run or
+an open word is one unless the parse takes it as a word its text introduces. Analysis and realization
 share the same inflection rules. Why: the parser then sees every lexical
 alternative, so no choice is hidden in a scanner, and a word is spelled the
 way it is read.
@@ -376,12 +379,17 @@ values grow with the number of trees, which is exponential, while the forest
 stays polynomial.
 
 **Both round-trip laws hold**, under the same parse context and Lexical
-Environment. The parse context is the Card Scope: the card names, the Anchor
-Words and the Vote Options a text is read with. What decides a face's Anchor
-Words lies in several of its units, and what decides its Vote Options is no
-shape that lexical analysis could propose a leaf at, so both are decided
-before any unit's Readings are taken, and each unit is then parsed and
-admitted with the one scope; neither looks at another unit.
+Environment. The parse context is the Card Scope: the card names a text is
+read with, the words the lines before it introduce, and the words the lines
+after it use. A face's lines are parsed once each, in order: a line is read
+with the words introduced so far in its scope, and a root that offers a choice
+no word of which the line itself uses is kept until the lines after it are
+read, and is a Reading where one of them uses a word of it
+([Lexicon](lexicon.md) §2). The scope a line is left with holds all that its
+Readings depend on outside it, so the line parsed alone in that scope has the
+same Readings, and admission takes that scope: it holds a Reading's uses to an
+introduction, the Reading's own or the scope's, and its choices to a use, the
+Reading's own or the scope's.
 
 ```
 v is an admitted Reading of s                      =>  render(v) = s

@@ -38,40 +38,16 @@ em dash [CR#207.2d]. An Introduced Name is a name the text itself gives an
 object [CR#111.4], the title run written where the text introduces it (§6).
 An Anchor Word is one of the two words a face's text offers as its permanent
 enters, each heading the bulleted ability linked to that choice
-[CR#614.12c,607.2m] (*choose Khans or Dragons*; *• Khans — ...*). No one line
-settles it: a bulleted line that opens with a label may be a flavor-labeled
-mode (*• Thay — ...*, Cult of Skaro), and a line that offers two capitalized
-words may offer two subtypes (*choose Island or Swamp*, Roots of Life
-[CR#607.2d]). So it is read across a face's lines: they are parsed with the
-label of every bulleted line in scope as an Anchor Word, and the labels that
-an Anchor Choice in some Derivation of a line offers are the face's Anchor
-Words. Its Card Scope holds them (§6), and an Anchor Word leaf stands only
-where the scope holds its word, at the head of a bulleted ability and in an
-Anchor Choice; there the label is no Flavor Word. A text read alone states
-its Anchor Words as it states its card's name.
-A Vote Option is one of the words a vote offers, "words with no rules meaning
-that are each connected to a different effect" [CR#701.38a,701.38b] (*votes
-for sickness or psychosis*; *If psychosis gets more votes*; *for each numbers
-vote*). It has no shape of its own: it is any word (*free*, *return*,
-*planeswalk*) or title run (*Mines of Moria*), and the text's other uses of
-that word stay what they are (*chaos ensues* on the Path of the ... cards). Nor
-does the offer alone settle it, since a vote may as well offer what two words
-name [CR#701.38b]. So it is read from the face's lines by two parses. A line
-that writes a word whose frame selects an Option Choice is parsed with every
-word and title run in it in scope as a Vote Option, and the words an Option
-Choice in some Derivation offers are what its vote offers. The face's lines are
-then parsed with those words in scope, and an offer is confirmed where some
-Derivation cites one of its words in an Option Mention, as the Subject of a
-clause that counts its votes or before *vote*: that is the word's connection to
-an effect. The words of a confirmed offer are the face's Vote Options, both of
-them (*innocent*, which Trial of a Time Lord offers and never cites). Its Card
-Scope holds them (§6), and a Vote Option leaf stands only where the scope holds
-its word; the grammar admits it in an Option Choice and an Option Mention and
-nowhere else. A text read alone states its Vote Options as it states its
-Anchor Words. Every printed vote has its offer and its mentions in one line,
-but the words are still read before that line's Readings are taken, not within
-them as an Introduced Name is: lexical analysis proposes an Introduced Name at
-a title run, a shape, and a Vote Option has none to propose it at.
+[CR#614.12c,607.2m] (*choose Khans or Dragons*; *• Khans — ...*). A Vote
+Option is one of the words a vote offers, "words with no rules meaning that
+are each connected to a different effect" [CR#701.38a,701.38b] (*votes for
+sickness or psychosis*; *If psychosis gets more votes*; *for each numbers
+vote*). Neither has a shape of its own: a Vote Option is any word (*free*,
+*return*, *planeswalk*) or title run (*Mines of Moria*), an Anchor Word any
+capitalized one (*Believe*, *Dragons*, *NCR*), and the text's other uses of
+the word stay what they are (*chaos ensues* on the Path of the ... cards).
+The three are the words a text introduces, read as the lines of its face are
+(below).
 A Set Name is the name of an expansion a card's text cites before the noun *expansion* [CR#206.3a..206.3c] (*a name originally printed in the
 Antiquities expansion*): no card-scoped list or catalog of printed sets is
 consulted. It is read by title shape alone, right before a noun whose parameter
@@ -91,6 +67,58 @@ parentheses reminder-text removal strips (§1). Why: a guessed Category lets the
 grammar admit text no declaration accounts for, and the gap is never reported;
 an open slot read at its own positions is no guess, and a list of the names
 cards cite would be knowing the cards before parsing them.
+
+**A word a text introduces is read where the text introduces it.** An
+Introduced Name, an Anchor Word and a Vote Option are each given by the face's
+own text and then used again, so they are read as the face's lines are read:
+once each, in order.
+
+- *Introducing.* A position that introduces a word reads whatever word stands
+  there, and nothing puts a candidate in scope beforehand. For a name the
+  positions are `IntroducedName()`'s (§6). For the other two the position is
+  a Production that `offers`: the Anchor Choice (*choose Khans or Dragons*)
+  and the Option Choice a vote's frame selects (*votes for sickness or
+  psychosis*). Lexical analysis stays ignorant of the grammar: beside its
+  matches it lists the text's open words (`AnalyzedText::open_words`), a Vote
+  Option at every spelling of the shape of one and an Anchor Word at every
+  capitalized one, and the grammar admits an open word nowhere but in a
+  Production that offers it or, in the same Reading, uses it. An open word no
+  Reading takes is nothing, as a title run nothing introduces is.
+- *Using.* A use of a word needs its introduction: by the same Reading, at any
+  place before or after the use, or by a line before the text. The uses are a
+  name named again (`RepeatedName()`), an Anchor Word heading its bulleted
+  ability (*• Khans — ...*) and a Vote Option cited in an Option Mention,
+  the Subject of a clause that counts its votes or the premodifier of *vote*.
+  The words the lines so far introduce are held in the Card Scope of each
+  line after them (§6), where they are lexical matches as before. So a
+  bulleted line reads its label as an Anchor Word after the line that offers
+  it and as a Flavor Word anywhere else (*• Thay — ...*, Cult of Skaro), and
+  a word used on a line before the one that introduces it is not that word:
+  no card prints one.
+- *Discharging.* A choice a text offers is one of words only where the face
+  goes on to use them. A line that offers two capitalized words may offer two
+  subtypes (*choose Island or Swamp*, Roots of Life [CR#607.2d]), and a vote
+  may offer what two words name [CR#701.38b]. So a Reading that offers a
+  choice stands only where a use discharges it: a use of one of its words in
+  the same Reading, or in some Reading of a line after the text. One word is
+  enough: Trial of a Time Lord offers *innocent or guilty* and cites only
+  *guilty*. A name is offered in no choice, and stands with no use.
+
+Whether a Reading uses a word it introduces, and whether it discharges a
+choice it offers, are no facts of one Constituent, so each Constituent's
+summary records the words it introduces, the words it uses and the choices it
+offers, and the root compares them (`sylex_syntax`'s `introductions`
+module). What the lines after a line use is known only once they are read, so
+a parse keeps the roots that only they can discharge and takes those words
+afterwards (`Parse::discharge`): no line is parsed twice, and a face's
+Derivation count stays the sum of its units'. A line's Card Scope then holds
+all that its Readings depend on outside the line: the words the lines before
+it introduce and the words the lines after it use. The line parsed alone in
+that scope has the same Readings, and a text read alone states the words the
+rest of its face introduces and uses as it states its card's name.
+Why: a list of the words by card is the parse being told its answer, and so
+is a pass made over the text beforehand to find them; an order of reading
+that follows the text needs neither.
 
 **Every irregularity is declared.** Each Word Form has one default spelling
 rule, and every exception, consonant doubling included (*committed*), is an
@@ -221,8 +249,8 @@ way, as a Catalog term's words are.
 the text of its own face [CR#201.5,201.5c,712.6], and everywhere in
 that text. A face's Card Scope holds, of card names, its own name and nothing
 else, in its Full form and, where the card has a Shortened Name, in its
-Shortened form; beside the name it holds the face's Anchor Words and Vote
-Options (§2). The name
+Shortened form; beside the name a line's scope holds the words the face's
+other lines introduce and use (§2). The name
 of a meld result is the name of neither card of its meld pair, so it is another
 card's name on both, and neither card's text shortens it: *Mishra* on
 Phyrexian Dragon Engine is no name.
@@ -370,7 +398,8 @@ is introduced:
   Mishra's Warform*).
 
 `RepeatedName()` stands where any other name does, as a Subject, a possessor
-or a premodifier, and only in a Reading that also introduces that name: a
+or a premodifier, and only in a Reading that also introduces that name or on
+a line after one that does (§2): a
 later sentence (*Ragavan enters tapped and attacking*) or the token's own
 quoted ability, which names the token [CR#201.5] (*"Jumblebones can't
 block"*, *"Beau's power is equal to ..."*). It is never the Object of
@@ -385,8 +414,9 @@ join ([English](english.md) §2).
 Whether a Reading that names a name again also introduces it is no fact of
 one Constituent, so each Constituent's summary records the names it
 introduces and the names it names again, and a root holds the second set
-within the first. Only a title run its text writes at more than one place can
-be named again, before or after the place that introduces it. Admission
+within the first, a name that a line before the text introduces apart (§2).
+In one text only a title run written at more than one place can be named
+again, before or after the place that introduces it. Admission
 applies the same summary to a Reading built apart from a parse, and holds each
 Introduced Name to the title run analysis finds in its text
 ([English](english.md) §7, the second round-trip law). A title run is a
