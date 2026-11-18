@@ -88,6 +88,9 @@ pub enum FillSpec {
     /// A comparative clause, the Complement of *than* or equative *as*
     /// (`sylex_syntax::frames::ClauseKind::Comparative`).
     ComparativeClause,
+    /// A manner clause, the Complement of manner *as*
+    /// (`sylex_syntax::frames::ClauseKind::Manner`).
+    MannerClause,
     /// An expandable declarative content clause (CGEL, Ch. 11 §4.8, p. 971).
     ExpandableClause,
     /// A Clause set off by a dash, the content of the Object before it.

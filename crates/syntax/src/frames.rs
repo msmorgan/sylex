@@ -63,6 +63,10 @@ pub enum ClauseKind {
     /// corresponds to (*as many cards as they discarded this way*, *more
     /// cards than you do*; CGEL, Ch. 13 §2.1, p. 1108).
     Comparative,
+    /// A manner clause, the Complement of manner *as*: a comparative clause
+    /// whose implicit manner element is compared with the phrase's, with a
+    /// Gap (*divided as you choose*; CGEL, Ch. 13 §5.5, p. 1149, [34]).
+    Manner,
     Verbless,
     /// A non-finite or verbless clause with its Subject, the Complement of
     /// *with* and *without* (*with your hand revealed*; CGEL, Ch. 14 §8.3,
@@ -175,6 +179,7 @@ pub enum SlotKind {
     FiniteClause,
     TemporalClause,
     ComparativeClause,
+    MannerClause,
     ExpandableClause,
     SetOffClause,
     VerblessClause,
@@ -221,6 +226,7 @@ impl SlotFill {
             Self::Clause(ClauseKind::Finite) => SlotKind::FiniteClause,
             Self::Clause(ClauseKind::Temporal) => SlotKind::TemporalClause,
             Self::Clause(ClauseKind::Comparative) => SlotKind::ComparativeClause,
+            Self::Clause(ClauseKind::Manner) => SlotKind::MannerClause,
             Self::ExpandableClause => SlotKind::ExpandableClause,
             Self::SetOffClause => SlotKind::SetOffClause,
             Self::Clause(ClauseKind::Verbless) => SlotKind::VerblessClause,
