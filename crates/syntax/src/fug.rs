@@ -1091,9 +1091,8 @@ fn schemas(keyword: &str, item: &mut Item) -> Result<Vec<SchemaDecl>, LoadError>
         .collect()
 }
 
-/// A feature's values and whether it is local (`{ local }`).
-/// A feature's values, whether it is local, and, for a license feature, its
-/// head value.
+/// A feature's values, whether it is local (`{ local }`), and, for a license
+/// feature, its head value.
 fn feature(item: &mut Item) -> Result<(Vec<Ident>, bool, Option<Ident>), LoadError> {
     let value = item.value()?;
     let values = match value.kind {
