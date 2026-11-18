@@ -22,8 +22,9 @@ pub struct TypeLineParts {
 }
 
 impl CatalogSet {
-    /// Extracts every canonical catalog from the Comprehensive Rules and
-    /// Vintage-playable Scryfall Oracle card units.
+    /// Extracts every canonical catalog from the Comprehensive Rules and the
+    /// Scryfall Oracle card units: the Vintage-playable cards and the
+    /// dungeons.
     ///
     /// # Errors
     ///
@@ -31,7 +32,9 @@ impl CatalogSet {
     /// produce the complete canonical inventory.
     pub fn generate(cr: &str, oracle_cards: impl BufRead) -> Result<Self, CatalogError> {
         let mut entries = cr::extract(cr)?;
-        entries.insert(CatalogKind::CardNames, cards::extract(oracle_cards)?);
+        let names = cards::extract(oracle_cards)?;
+        entries.insert(CatalogKind::CardNames, names.cards);
+        entries.insert(CatalogKind::DungeonNames, names.dungeons);
         Self::from_entries(entries)
     }
 

@@ -64,6 +64,10 @@ pub struct OracleCard {
     pub layout: String,
     #[serde(default)]
     pub set_type: Option<String>,
+    /// Whether the printing is an oversized card (a Commander Party aid such
+    /// as *Baldur's Gate Wilderness*), not a card of play.
+    #[serde(default)]
+    pub oversized: bool,
     #[serde(default)]
     pub mana_cost: Option<String>,
     #[serde(default, rename = "cmc")]

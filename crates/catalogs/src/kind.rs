@@ -7,6 +7,7 @@ pub enum CatalogKind {
     CardTypes,
     CounterKindPhrases,
     CreatureTypes,
+    DungeonNames,
     EnchantmentTypes,
     KeywordAbilities,
     KeywordActions,
@@ -17,7 +18,7 @@ pub enum CatalogKind {
 }
 
 impl CatalogKind {
-    pub const ALL: [Self; 14] = [
+    pub const ALL: [Self; 15] = [
         Self::AbilityWords,
         Self::ArtifactTypes,
         Self::BattleTypes,
@@ -25,6 +26,7 @@ impl CatalogKind {
         Self::CardTypes,
         Self::CounterKindPhrases,
         Self::CreatureTypes,
+        Self::DungeonNames,
         Self::EnchantmentTypes,
         Self::KeywordAbilities,
         Self::KeywordActions,
@@ -44,6 +46,7 @@ impl CatalogKind {
             Self::CardTypes => "card-types.txt",
             Self::CounterKindPhrases => "counter-kind-phrases.txt",
             Self::CreatureTypes => "creature-types.txt",
+            Self::DungeonNames => "dungeon-names.txt",
             Self::EnchantmentTypes => "enchantment-types.txt",
             Self::KeywordAbilities => "keyword-abilities.txt",
             Self::KeywordActions => "keyword-actions.txt",

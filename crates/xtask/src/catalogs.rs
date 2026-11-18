@@ -164,6 +164,8 @@ mod tests {
     const ORACLE_FIXTURE: &str = concat!(
         r#"{"object":"card","id":"printing-legal","oracle_id":"oracle-legal","name":"Legal Name","layout":"normal","type_line":"Creature","keywords":[],"legalities":{"vintage":"legal"}}"#,
         "\n",
+        r#"{"object":"card","id":"printing-dungeon","oracle_id":"oracle-dungeon","name":"Tomb of Annihilation","layout":"normal","set_type":"token","type_line":"Dungeon","keywords":[],"legalities":{}}"#,
+        "\n",
     );
 
     #[test]
@@ -184,6 +186,7 @@ mod tests {
                 "card-types.txt",
                 "counter-kind-phrases.txt",
                 "creature-types.txt",
+                "dungeon-names.txt",
                 "enchantment-types.txt",
                 "keyword-abilities.txt",
                 "keyword-actions.txt",
@@ -205,7 +208,7 @@ mod tests {
 
         run(&generate_args(cr, oracle, output.clone())).unwrap();
 
-        assert_eq!(directory_bytes(&output).len(), 14);
+        assert_eq!(directory_bytes(&output).len(), 15);
     }
 
     #[test]

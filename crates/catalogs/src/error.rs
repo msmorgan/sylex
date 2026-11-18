@@ -29,8 +29,8 @@ pub enum CatalogError {
     InvalidEntry { catalog: String, entry: String },
     #[error("type line {type_line:?} contains no declared card type")]
     MissingCardType { type_line: String },
-    #[error("card-names: composite name without a selected face: {name:?}")]
-    CompositeCardName { name: String },
+    #[error("{catalog}: composite name without a selected face: {name:?}")]
+    CompositeName { catalog: String, name: String },
     #[error("{catalog}: expected one {rule} body rule, found {found}")]
     RuleCount {
         catalog: String,

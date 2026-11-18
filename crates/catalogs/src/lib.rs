@@ -60,6 +60,8 @@ mod tests {
         "\n",
         r#"{"object":"card","id":"printing-missing","oracle_id":"oracle-missing","name":"Missing","layout":"normal","keywords":[],"legalities":{}}"#,
         "\n",
+        r#"{"object":"card","id":"printing-dungeon","oracle_id":"oracle-dungeon","name":"Tomb of Annihilation","layout":"normal","set_type":"token","type_line":"Dungeon","keywords":[],"legalities":{}}"#,
+        "\n",
     );
 
     const LEGACY_KEYWORD_FIXTURE: &str = concat!(
@@ -74,6 +76,8 @@ mod tests {
     );
 
     const REORDERED_ORACLE_FIXTURE: &str = concat!(
+        r#"{"object":"card","id":"printing-dungeon","oracle_id":"oracle-dungeon","name":"Tomb of Annihilation","layout":"normal","set_type":"token","type_line":"Dungeon","keywords":[],"legalities":{}}"#,
+        "\n",
         r#"{"object":"card","id":"printing-missing","oracle_id":"oracle-missing","name":"Missing","layout":"normal","keywords":[],"legalities":{}}"#,
         "\n",
         r#"{"object":"card","id":"printing-faces","oracle_id":"oracle-faces","name":"Front // Back","layout":"modal_dfc","keywords":[],"legalities":{"vintage":"restricted"},"card_faces":[{"name":"Front","type_line":"Creature"},{"name":"Back","type_line":"Land"}]}"#,
@@ -126,6 +130,10 @@ mod tests {
         assert_eq!(
             values(&catalogs, CatalogKind::CreatureTypes),
             ["Advisor", "Time Lord"]
+        );
+        assert_eq!(
+            values(&catalogs, CatalogKind::DungeonNames),
+            ["Tomb of Annihilation"]
         );
         assert_eq!(
             values(&catalogs, CatalogKind::EnchantmentTypes),
