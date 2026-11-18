@@ -720,6 +720,11 @@ class StrandableDo = ["verb:do", "verb:don't"]
 // 5§9.2:413). *All* floats after a personal pronoun only (FloatedAll).
 class FloatingQuantifier = ["det:each", "det:both"]
 class SuperlativeQuantifier = ["det:most", "det:least", "det:fewest"]
+// The determinatives that modify a comparative of inequality (*no more
+// than two spells*; CGEL 13§4.4.1:1131, [29i]): *no*, *any* and *much*, and
+// *many*, the count form *much* has before a plural count head (13§4.1.2:1126,
+// [16]), never another determinative (∗*each more than two creatures*).
+class ComparativeDegreeModifier = ["det:no", "det:any", "det:much", "det:many"]
 // The superlative determinative that fuses with its head, printed only
 // after *tied for* (*tied for fewest*, Goblin Game). Never *most* or
 // *least*: fused, they
@@ -1737,18 +1742,19 @@ SerialTemporal: TemporalNounPhrase -> NounPhrase { head_final: [head] }
           head.Case := Plain
 // A comparative or equative count of *times* with its Complement after the
 // head (*more times than ...*; *as many times as you choose*; CGEL
-// 8§9:715): the Noun Phrase ComparativeCountDetermined or
+// 8§9:715): the Noun Phrase ComparativeDetermined or
 // EquativeCountDetermined builds, as a frequency Adjunct.
 ComparedFrequency: TemporalNounPhrase -> NounPhrase
     where head.NounDistribution := Serial,
           head.Comparison := Compared
-// The same under a determinative modifier (*Activate no more times each turn
+// The same under a degree modifier (*Activate no more times each turn
 // than the number of snow Swamps you control*, Withering Wisps), which no
 // Noun Phrase Production builds.
 ModifiedComparativeFrequency: TemporalNounPhrase ->
-    modifier:Lex(Determinative) determiner:Selecting(Determinative, Than) Nominal
+    modifier:Class(ComparativeDegreeModifier) determiner:Selecting(Determinative, Than) Nominal
     complement:Selected(PrepositionPhrase, Than)
     where head.NounDistribution = Serial,
+          modifier.Countability = determiner.Countability,
           head.Number = Plural,
           determiner.Number = head.Number,
           determiner.Countability = head.Countability,
@@ -2105,23 +2111,16 @@ SuperlativeMassDeterminer: DeterminerPhrase -> marker:Word(The) Class(Superlativ
           $.Countability = Mass,
           $.ComplementKind = Intransitive
 // The *than* Complement after the head (*more lands than you*, *less life
-// than an opponent*; CGEL 13§2.1:1104).
-ComparativeCountDetermined: NounPhrase ->
+// than an opponent*; CGEL 13§2.1:1104): a count determinative over a plural
+// count head, a mass one over a singular mass head, as the determinative's
+// own Number and Countability say (13§4.1.2:1126, [16]). The lexicon's
+// *less* is mass only, so count *less* (*less cards*, 13§4.1.2:1127, [17vi])
+// has no Reading.
+ComparativeDetermined: NounPhrase ->
     determiner:Selecting(Determinative, Than) Nominal complement:Selected(PrepositionPhrase, Than)
-    where head.Number = Plural,
-          head.Countability = Count,
-          determiner.Number = head.Number,
+    where determiner.Number = head.Number,
           determiner.Countability = head.Countability,
           $.Comparison = Compared,
-          $.Determination = Overt,
-          $.Case = Plain,
-          $.Person = Third
-ComparativeMassDetermined: NounPhrase ->
-    determiner:Selecting(Determinative, Than) Nominal complement:Selected(PrepositionPhrase, Than)
-    where head.Number = Singular,
-          head.Countability = Mass,
-          determiner.Number = head.Number,
-          determiner.Countability = head.Countability,
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
@@ -2140,21 +2139,18 @@ EquativeCountDetermined: NounPhrase ->
           $.Case = Plain,
           $.Person = Third
 // *No more than one*, *many more than two*: `valence DeterminerPhrase`'s
-// comparative with a modifier.
+// comparative under a degree modifier, *many* only over count *more*
+// (Countability) and *much* over mass. The phrase has no Grade of its own,
+// so no second modifier takes it (∗*no no more than one*).
 ModifiedComparativeDeterminer: DeterminerPhrase ->
-    modifier:Lex(Determinative) Selecting(Determinative, Than)
-    complement:Selected(PrepositionPhrase, Than) { unshared: [Number] }
-    where complement.Determination = Bare,
-          complement.ComplementKind != AdvP,
-          $.Number = complement.Number,
-          $.ComplementKind = PP,
-          $.ObliqueNumber = complement.Number,
-          $.ObliqueKind = complement.ComplementKind,
-          $.ObliqueDetermination = complement.Determination
+    modifier:Class(ComparativeDegreeModifier) DeterminerPhrase { unshared: [Grade] }
+    where head.Grade := Comparative,
+          modifier.Countability = head.Countability
 // *No more scream counters*: no *than* Complement.
 DegreeModifiedComparativeDeterminer: DeterminerPhrase ->
-    modifier:Word(No) Selecting(Determinative, Than)
-    where $.ComplementKind = Intransitive
+    modifier:Class(ComparativeDegreeModifier) Selecting(Determinative, Than)
+    where modifier.Countability = head.Countability,
+          $.ComplementKind = Intransitive
 // *Plus* and *minus* phrases modify a quantity (*2 plus the number of ...*,
 // *that many plus one*).
 AmountArithmetic: Amount -> Amount modifier:Selected(PrepositionPhrase, Plus, Minus)
@@ -2250,10 +2246,11 @@ ComparativeAdverb: AdverbPhrase ->
           head.Countability = Count,
           $.AdjunctPosition = End
 ModifiedComparativeAdverb: AdverbPhrase ->
-    modifier:Lex(Determinative) Selecting(Determinative, Than)
+    modifier:Class(ComparativeDegreeModifier) Selecting(Determinative, Than)
     complement:Selected(PrepositionPhrase, Than)
     where complement.ComplementKind = AdvP,
           head.Countability = Count,
+          modifier.Countability = head.Countability,
           $.AdjunctPosition = End
 // *Greater power than this creature* (CGEL 5§14.1:443).
 ComparativeIndirectComplement: Nominal ->
@@ -2817,9 +2814,13 @@ DeterminedCluster: NominalCluster ->
           $.Number = determiner.Number,
           $.Countability = determiner.Countability,
           $.DeterminativeDistribution = determiner.DeterminativeDistribution
+// A comparative or exceptive quantity's Cluster, count or mass as
+// ComparativeQuantityCountDetermined and ComparativeQuantityMassDetermined
+// give the nominal its Number.
 ComparativeCountCluster: NominalCluster ->
     determiner:DeterminerPhrase modifier:Premodifier
     where determiner.ComplementKind = PP,
+          determiner.ObliqueKind != ComparativeClause,
           determiner.ObliqueDetermination = Bare,
           determiner.Countability = Count,
           $.Countability = Count,
@@ -2884,11 +2885,19 @@ JointCoordinationDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal {
           $.Case = Plain,
           $.Person = Third
 // A comparative or exceptive quantity determines a count head agreeing with
-// its Complement (*more than one creature*) or a mass head (*less than
-// three mana*); a noun both count and mass is no mass head. Only a bare
-// standard: *more than the total* determines nothing (CGEL 5§11(d):432).
+// its Complement (*more than one creature*, *all but one +1/+1 counter*) or
+// a singular mass head whatever its Complement's Number (*less than three
+// mana*; CGEL 13§4.1.2:1126–1127, [16], [17i]), a measured mass as
+// MeasuredMass's is; a noun both count and mass is no mass head. The mass
+// Noun Phrase is `Resource` and the count one keeps its head's NounKind,
+// which no equation values by Countability, so each is its own Production
+// (as are their Clusters, whose Number is the standard's or Singular). Only
+// a bare standard:
+// *more than the total* determines nothing (CGEL 5§11(d):432), nor does a
+// comparative clause (∗*more than you do creatures*).
 ComparativeQuantityCountDetermined: NounPhrase -> determiner:DeterminerPhrase Nominal
     where determiner.ComplementKind = PP,
+          determiner.ObliqueKind != ComparativeClause,
           determiner.ObliqueDetermination = Bare,
           head.Countability = Count,
           determiner.ObliqueNumber = head.Number,
@@ -3076,24 +3085,18 @@ GenitiveModifiedQuantity: NounPhrase -> determiner:NounPhrase ModifiedQuantified
           $.Determination = Overt,
           $.Case = Plain,
           $.Person = Third
-// A property noun's comparative bound is the postpositive
-// comparative adjective's (*mana value less than X*), never its
-// Amount Complement.
 Unmodified: Nominal -> BareNominal { transparent: [head] }
     where head.BareMass != Modified,
           $.BareMassHead = Expanded,
-          $.ConjunctNumber = $.Number,
-          !(head.ComplementKind = Amount & head.ObliqueKind = PP)
+          $.ConjunctNumber = $.Number
 ExpandedBareMass: Nominal -> BareNominal { heavy: [head], transparent: [head] }
     where head.BareMass := Modified,
           $.BareMassHead = Expanded,
-          $.ConjunctNumber = $.Number,
-          !(head.ComplementKind = Amount & head.ObliqueKind = PP)
+          $.ConjunctNumber = $.Number
 UnmodifiedBareMass: Nominal -> BareNominal { light: [head], transparent: [head] }
     where head.BareMass := Modified,
           $.BareMassHead = Unmodified,
-          $.ConjunctNumber = $.Number,
-          !(head.ComplementKind = Amount & head.ObliqueKind = PP)
+          $.ConjunctNumber = $.Number
 // The Targeting Marker word alone is its determinative's own
 // DeterminerPhrase (*target creature*). BareTargetingMarker builds the word,
 // and ModifiedTargetingMarker the word after one adjective, as the head an
@@ -3607,9 +3610,14 @@ dependents TimeGiving = [
           $.NonPastTime = dependent.NonPastTime,
           !(head.PastTime = Past & dependent.NonPastTime = NonPast),
           !(head.NonPastTime = NonPast & dependent.PastTime = Past)
+// A property noun's comparative bound is the postpositive comparative
+// adjective's (*mana value less than X*), never its Amount Complement, which
+// is no ComparativeAmount (whose ComplementKind is `PP`): that is the
+// endpoint of a scalar change only (*reduce it to less than 1*).
 valence BareNominal {
     head: Noun,
     complement_kind: ComplementKind,
+    slots: [Amount -> [slot.ComplementKind != PP]],
     interleaved: InterleavedModifier,
     agree: [ObliqueNumber -> Number, ObliqueKind -> ComplementKind, ObliqueNounKind -> NounKind],
 }
@@ -3631,8 +3639,9 @@ valence DeterminerPhrase {
 }
 // A comparative determinative and its *than* Complement as siblings (*more
 // than one*; CGEL 13§2.1:1104). The bare standard gives the phrase its
-// Number (*more than two lands*), so Number is unshared. A determined
-// standard is ComparativeCountDetermined's, a bounding frequency
+// Number (*more than two lands*), so Number is unshared. Its Grade is
+// Comparative, which a degree modifier needs (ModifiedComparativeDeterminer).
+// A determined standard is ComparativeDetermined's, a bounding frequency
 // ComparativeAdverb's.
 valence DeterminerPhrase {
     variant: Comparative,
@@ -3640,8 +3649,10 @@ valence DeterminerPhrase {
     complement_kind: ComplementKind,
     selects: [Than],
     complemented,
-    unshared: [Number],
-    active: [complement.Determination = Bare, complement.ComplementKind != AdvP],
+    unshared: [Number, Grade],
+    active: [
+        complement.Determination = Bare, complement.ComplementKind != AdvP, $.Grade = Comparative,
+    ],
     agree: [
         Number -> Number, ObliqueNumber -> Number, ObliqueKind -> ComplementKind,
         ObliqueDetermination -> Determination,
